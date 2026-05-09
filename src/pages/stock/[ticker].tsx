@@ -98,27 +98,31 @@ export default function StockAnalysis() {
 
   const loadSectorNews = async (etfTicker: string, topSectors: SectorWeighting[]) => {
     setIsLoadingSectorNews(true);
-    const allSectorNews: SectorNewsItem[] = [];
+    let allSectorNews: SectorNewsItem[] = [];
 
     for (const sector of topSectors) {
       const newsItems = await marketService.getSectorNews(sector.sector);
       
-      for (const newsItem of newsItems.slice(0, 1)) {
-        const reaction = await dahliaAnalysisService.generateSectorNewsReaction(
-          newsItem.headline,
-          sector.sector,
-          etfTicker
-        );
+      const sectorReactions = await Promise.all(
+        newsItems.slice(0, 3).map(async (newsItem) => {
+          const reaction = await dahliaAnalysisService.generateSectorNewsReaction(
+            newsItem.headline,
+            sector.sector,
+            etfTicker
+          );
 
-        allSectorNews.push({
-          sector: sector.sector,
-          headline: newsItem.headline,
-          source: newsItem.source,
-          url: newsItem.url,
-          timestamp: newsItem.datetime,
-          dahliaReaction: reaction,
-        });
-      }
+          return {
+            sector: sector.sector,
+            headline: newsItem.headline,
+            source: newsItem.source,
+            url: newsItem.url,
+            timestamp: newsItem.datetime,
+            dahliaReaction: reaction,
+          };
+        })
+      );
+      
+      allSectorNews = [...allSectorNews, ...sectorReactions];
     }
 
     setSectorNews(allSectorNews);

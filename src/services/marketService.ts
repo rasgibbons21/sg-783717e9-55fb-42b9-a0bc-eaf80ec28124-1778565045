@@ -109,19 +109,6 @@ export const marketService = {
     }
   },
 
-  getETFSectorWeighting: async (ticker: string) => {
-    try {
-      const response = await fetch(
-        `https://financialmodelingprep.com/api/v3/etf-sector-weightings/${ticker}?apikey=${FMP_API_KEY}`
-      );
-      const data = await response.json();
-      return data || [];
-    } catch (error) {
-      console.error("Error fetching ETF sector weighting:", error);
-      return [];
-    }
-  },
-
   getSectorNews: async (sector: string): Promise<NewsItem[]> => {
     try {
       const sectorKeywords: Record<string, string> = {
