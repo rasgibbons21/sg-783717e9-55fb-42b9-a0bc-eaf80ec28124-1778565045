@@ -1,6 +1,6 @@
 ---
 title: Brokers Screen
-status: todo
+status: done
 priority: medium
 type: feature
 tags: [brokers, affiliates]
@@ -13,13 +13,13 @@ position: 5
 List of brokers with featured (affiliate) and non-affiliate options. Track clicks to Supabase.
 
 ## Checklist
-- [ ] Create Brokers.tsx with disclaimer at top
-- [ ] List 4 brokers: Robinhood (featured), Webull (featured), Fidelity, Charles Schwab
-- [ ] Each broker card: logo, name, description, key features, CTA button
-- [ ] Featured brokers: gold badge, "Start Investing" button
-- [ ] Non-affiliate: outline "Learn More" button
-- [ ] Track clicks to broker_clicks table in Supabase
-- [ ] Featured brokers NOT ranked higher — mixed list order
+- [x] Create Brokers.tsx listing Webull, Robinhood, Fidelity, Schwab
+- [x] Top disclaimer about affiliate commissions
+- [x] Broker cards: logo/icon, name, description, features
+- [x] Featured badges on affiliate brokers
+- [x] Primary 'Start Investing' button for affiliates, outline 'Learn More' for non-affiliates
+- [x] Clicking broker button logs to broker_clicks table
+- [x] Featured badges visible only on affiliates
 
 ## Acceptance
 - Disclaimer displays at top

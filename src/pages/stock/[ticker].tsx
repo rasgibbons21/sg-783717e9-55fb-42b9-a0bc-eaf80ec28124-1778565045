@@ -39,7 +39,7 @@ export default function StockAnalysis() {
   const loadStockData = async (symbol: string) => {
     const [quoteData, newsData] = await Promise.all([
       marketService.getQuote(symbol),
-      marketService.getStockNews(symbol),
+      marketService.getCompanyNews(symbol),
     ]);
 
     if (quoteData) setQuote(quoteData);
