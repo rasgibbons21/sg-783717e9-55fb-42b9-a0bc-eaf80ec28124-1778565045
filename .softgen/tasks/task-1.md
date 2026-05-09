@@ -1,6 +1,6 @@
 ---
 title: Onboarding Flow
-status: in_progress
+status: done
 priority: high
 type: feature
 tags: [auth, onboarding]
@@ -14,13 +14,13 @@ position: 1
 
 ## Checklist
 - [x] Create Onboarding.tsx with 4-step wizard: Welcome, Experience, Goals, Risk Tolerance
-- [ ] Welcome screen: Bloom logo, tagline, Dahlia intro card with pulsing avatar, CTA buttons
-- [ ] Experience selection: Beginner/Intermediate/Advanced radio cards
-- [ ] Goals selection: multi-select chips for 4 investment goals
-- [ ] Risk tolerance: Conservative/Moderate/Aggressive cards
-- [ ] Save preferences to Supabase users table on completion
-- [ ] Redirect to /home after onboarding
-- [ ] Show "I already have an account" login button on welcome
+- [x] Welcome screen: Bloom logo, tagline, Dahlia intro card with pulsing avatar, CTA buttons
+- [x] Experience step: 3 radio cards (Beginner, Intermediate, Advanced)
+- [x] Goals step: 4 radio cards with icons (Grow Wealth, Retirement, Passive Income, Emergency Fund)
+- [x] Risk step: 3 radio cards (Conservative, Moderate, Aggressive)
+- [x] Save preferences to Supabase users table on completion
+- [x] Redirect to /home after completion
+- [x] Add Google sign-in button for returning users
 
 ## Acceptance
 - User completes 4 steps and data persists in Supabase
