@@ -108,4 +108,54 @@ export const marketService = {
       return [];
     }
   },
+
+  getETFSectorWeighting: async (ticker: string) => {
+    try {
+      const response = await fetch(
+        `https://financialmodelingprep.com/api/v3/etf-sector-weightings/${ticker}?apikey=${FMP_API_KEY}`
+      );
+      const data = await response.json();
+      return data || [];
+    } catch (error) {
+      console.error("Error fetching ETF sector weighting:", error);
+      return [];
+    }
+  },
+
+  getSectorNews: async (sector: string): Promise<NewsItem[]> => {
+    try {
+      const sectorKeywords: Record<string, string> = {
+        "Technology": "technology",
+        "Financial Services": "banking finance",
+        "Healthcare": "healthcare pharma",
+        "Consumer Cyclical": "retail consumer",
+        "Communication Services": "telecom media",
+        "Industrials": "industrial manufacturing",
+        "Energy": "energy oil",
+        "Utilities": "utilities power",
+        "Real Estate": "real estate",
+        "Basic Materials": "materials mining",
+        "Consumer Defensive": "consumer staples",
+      };
+
+      const keyword = sectorKeywords[sector] || sector.toLowerCase();
+      const response = await fetch(
+        `https://finnhub.io/api/v1/news?category=general&token=${FINNHUB_API_KEY}`
+      );
+      const data = await response.json();
+      
+      // Filter news by sector keywords
+      const filtered = (data || [])
+        .filter((item: NewsItem) => 
+          item.headline.toLowerCase().includes(keyword) ||
+          item.summary?.toLowerCase().includes(keyword)
+        )
+        .slice(0, 3);
+
+      return filtered;
+    } catch (error) {
+      console.error("Error fetching sector news:", error);
+      return [];
+    }
+  },
 };

@@ -351,4 +351,58 @@ Never mention AI, APIs, algorithms, data sources, or automation. Write as if you
       };
     }
   },
+
+  generateSectorNewsReaction: async (
+    headline: string,
+    sector: string,
+    etfTicker: string
+  ): Promise<string> => {
+    try {
+      const anthropic = new Anthropic({
+        apiKey: process.env.ANTHROPIC_API_KEY,
+      });
+
+      const prompt = `You are Dahlia, Bloom's investing expert with a warm girlfriend tone. A news headline just came out related to the ${sector} sector, which is one of the main sectors in the ${etfTicker} ETF.
+
+Headline: "${headline}"
+
+Write ONE casual sentence (15-25 words max) explaining how this news might affect the ${sector} companies inside this ETF. Use language like:
+- "This is good news for the tech companies inside this ETF 👀"
+- "This could create some short term noise but probably won't affect the long term picture"
+- "Worth keeping an eye on this one — it could ripple through the whole sector"
+- "This is exactly what we want to see happening in this space 💛"
+- "Not a huge deal honestly, these things tend to smooth out"
+
+Keep it conversational, honest, and use light emojis naturally. Never use jargon. Just one sentence.`;
+
+      const message = await anthropic.messages.create({
+        model: "claude-3-5-sonnet-20241022",
+        max_tokens: 100,
+        messages: [
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+      });
+
+      const reaction = message.content[0].type === "text" 
+        ? message.content[0].text.trim() 
+        : "Keeping an eye on this one 🌸";
+
+      return reaction;
+    } catch (error) {
+      console.error("Error generating sector news reaction:", error);
+      
+      // Fallback reactions
+      const fallbacks = [
+        "This is worth watching for the companies in this ETF 👀",
+        "Could create some movement but probably won't change the bigger picture",
+        "Keeping an eye on how this plays out 🌸",
+        "This could ripple through the sector, worth noting",
+        "Not a huge deal but good to be aware of",
+      ];
+      return fallbacks[Math.floor(Math.random() * fallbacks.length)];
+    }
+  },
 };

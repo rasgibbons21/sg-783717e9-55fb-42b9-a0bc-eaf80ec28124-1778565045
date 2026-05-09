@@ -26,6 +26,15 @@ interface DahliaAnalysisData {
   timestamp: string;
 }
 
+interface SectorNewsItem {
+  sector: string;
+  headline: string;
+  source: string;
+  url: string;
+  timestamp: number;
+  dahliaReaction: string;
+}
+
 export default function StockAnalysis() {
   const router = useRouter();
   const { ticker } = router.query;
@@ -37,6 +46,8 @@ export default function StockAnalysis() {
   const [etfExpanded, setEtfExpanded] = useState(false);
   const [etfHoldings, setEtfHoldings] = useState<ETFHolding[]>([]);
   const [sectorWeighting, setSectorWeighting] = useState<SectorWeighting[]>([]);
+  const [sectorNews, setSectorNews] = useState<SectorNewsItem[]>([]);
+  const [isLoadingSectorNews, setIsLoadingSectorNews] = useState(false);
   const [chartInterval, setChartInterval] = useState<"1D" | "1W" | "1M" | "3M" | "1Y">("1D");
 
   useEffect(() => {
@@ -68,10 +79,14 @@ export default function StockAnalysis() {
         name: h.name,
         weight: h.weightPercentage
       })));
-      setSectorWeighting(sectors.map(s => ({
+      const sectorData = sectors.map(s => ({
         sector: s.sector,
         weight: s.weightPercentage
-      })));
+      }));
+      setSectorWeighting(sectorData);
+
+      // Load sector news for top 3 sectors
+      loadSectorNews(symbol, sectorData.slice(0, 3));
     }
 
     // Generate AI-powered Dahlia analysis
@@ -79,6 +94,35 @@ export default function StockAnalysis() {
     const analysis = await dahliaAnalysisService.generateAnalysis(symbol, isETFCheck);
     setDahliaAnalysis(analysis);
     setIsLoadingAnalysis(false);
+  };
+
+  const loadSectorNews = async (etfTicker: string, topSectors: SectorWeighting[]) => {
+    setIsLoadingSectorNews(true);
+    const allSectorNews: SectorNewsItem[] = [];
+
+    for (const sector of topSectors) {
+      const newsItems = await marketService.getSectorNews(sector.sector);
+      
+      for (const newsItem of newsItems.slice(0, 1)) {
+        const reaction = await dahliaAnalysisService.generateSectorNewsReaction(
+          newsItem.headline,
+          sector.sector,
+          etfTicker
+        );
+
+        allSectorNews.push({
+          sector: sector.sector,
+          headline: newsItem.headline,
+          source: newsItem.source,
+          url: newsItem.url,
+          timestamp: newsItem.datetime,
+          dahliaReaction: reaction,
+        });
+      }
+    }
+
+    setSectorNews(allSectorNews);
+    setIsLoadingSectorNews(false);
   };
 
   const formatPrice = (price: number) => {
@@ -230,6 +274,65 @@ export default function StockAnalysis() {
             )}
           </div>
         </Card>
+
+        {isETF && sectorNews.length > 0 && (
+          <div className="space-y-4">
+            <h2 className="font-serif text-2xl font-bold text-foreground">
+              What's affecting this ETF right now 🌺
+            </h2>
+            
+            {isLoadingSectorNews ? (
+              <Card className="p-6">
+                <div className="flex items-center justify-center">
+                  <Loader2 className="w-6 h-6 animate-spin text-accent" />
+                  <p className="ml-3 text-muted-foreground">
+                    Dahlia is checking sector news...
+                  </p>
+                </div>
+              </Card>
+            ) : (
+              <div className="space-y-3">
+                {sectorNews.map((item, index) => (
+                  <a
+                    key={index}
+                    href={item.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block"
+                  >
+                    <Card className="p-4 hover:border-accent/50 transition-colors space-y-3">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1 space-y-2">
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="text-xs">
+                              {item.sector}
+                            </Badge>
+                            <Badge variant="outline" className="text-xs">
+                              {formatTimestamp(item.timestamp)}
+                            </Badge>
+                          </div>
+                          <p className="font-semibold text-foreground leading-snug">
+                            {item.headline}
+                          </p>
+                          <p className="text-xs text-muted-foreground">{item.source}</p>
+                        </div>
+                      </div>
+                      
+                      <Card className="p-3 bg-accent/5 border-accent/30">
+                        <div className="flex gap-2">
+                          <span className="text-lg">🌺</span>
+                          <p className="text-sm text-foreground italic leading-relaxed flex-1">
+                            {item.dahliaReaction}
+                          </p>
+                        </div>
+                      </Card>
+                    </Card>
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {isETF && (
           <Card className="p-4 space-y-4">
