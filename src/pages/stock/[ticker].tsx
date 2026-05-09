@@ -5,7 +5,8 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { marketService, Quote, NewsItem } from "@/services/marketService";
-import { TrendingUp, TrendingDown, ChevronDown, ChevronUp } from "lucide-react";
+import { dahliaAnalysisService } from "@/services/dahliaAnalysisService";
+import { TrendingUp, TrendingDown, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
 import { SEO } from "@/components/SEO";
 
 interface ETFHolding {
@@ -19,11 +20,19 @@ interface SectorWeighting {
   weight: number;
 }
 
+interface DahliaAnalysisData {
+  analysis: string;
+  sentiment: "bullish" | "bearish" | "neutral" | "cautious";
+  timestamp: string;
+}
+
 export default function StockAnalysis() {
   const router = useRouter();
   const { ticker } = router.query;
   const [quote, setQuote] = useState<Quote | null>(null);
   const [news, setNews] = useState<NewsItem[]>([]);
+  const [dahliaAnalysis, setDahliaAnalysis] = useState<DahliaAnalysisData | null>(null);
+  const [isLoadingAnalysis, setIsLoadingAnalysis] = useState(false);
   const [isETF, setIsETF] = useState(false);
   const [etfExpanded, setEtfExpanded] = useState(false);
   const [etfHoldings, setEtfHoldings] = useState<ETFHolding[]>([]);
@@ -46,8 +55,10 @@ export default function StockAnalysis() {
     setNews(newsData);
 
     const commonETFs = ["SPY", "QQQ", "VOO", "VTI", "SCHD", "IVV", "AGG", "BND"];
-    if (commonETFs.includes(symbol.toUpperCase())) {
-      setIsETF(true);
+    const isETFCheck = commonETFs.includes(symbol.toUpperCase());
+    setIsETF(isETFCheck);
+
+    if (isETFCheck) {
       const [holdings, sectors] = await Promise.all([
         marketService.getETFHoldings(symbol),
         marketService.getETFSectorWeighting(symbol),
@@ -62,6 +73,12 @@ export default function StockAnalysis() {
         weight: s.weightPercentage
       })));
     }
+
+    // Generate AI-powered Dahlia analysis
+    setIsLoadingAnalysis(true);
+    const analysis = await dahliaAnalysisService.generateAnalysis(symbol, isETFCheck);
+    setDahliaAnalysis(analysis);
+    setIsLoadingAnalysis(false);
   };
 
   const formatPrice = (price: number) => {
@@ -86,31 +103,14 @@ export default function StockAnalysis() {
     }
   };
 
-  const getDahliaAnalysis = () => {
-    if (!ticker) return { sentiment: "Neutral", text: "" };
-
-    const analyses: Record<string, { sentiment: string; text: string }> = {
-      AAPL: {
-        sentiment: "Optimistic",
-        text: "Okay so Apple — they're not just making phones anymore girl. They've built this whole ecosystem where once you're in, you kinda don't want to leave (AirPods, Watch, iPad, all talking to each other). And their services — like iCloud and Apple Music — that's recurring revenue that just keeps rolling in 💰 The stock has had some ups and downs lately but their brand loyalty is insane. People camp out for new iPhones! That kind of customer devotion is rare. Just remember tech can be volatile so don't go all-in on any single stock okay? 💛",
-      },
-      NVDA: {
-        sentiment: "Strong",
-        text: "NVIDIA is basically making the brains that power AI right now — like if AI is the car, NVIDIA is making the engine. Every company trying to do anything with AI needs their chips. That's a pretty sweet spot to be in! 🚀 They've got that first-mover advantage and the tech is genuinely hard to replicate. BUT — and this is important — the stock price has already run up A LOT. So you're paying a premium. If you believe in the AI revolution long-term this could still have room to grow, but expect some bumpy rides along the way. High reward comes with high risk babe 💪",
-      },
-      SCHD: {
-        sentiment: "Steady",
-        text: "This is one of my favorites for someone wanting steady income girl 🌸 SCHD is an ETF — so you're buying a basket of about 100 solid companies all at once. These are established businesses that have been paying dividends for years (dividends = they literally send you cash just for owning the stock). It's like getting a little paycheck every quarter 💛 The companies in here aren't flashy — think stuff like Pepsi, Cisco, Texas Instruments — but that's the point. They're stable. When one company has a bad quarter the others hold it up. Plus it rebalances automatically so you don't have to do anything. This is a chill long-term hold, not a get-rich-quick thing. Perfect for building wealth steadily over time 📈",
-      },
+  const getSentimentLabel = (sentiment: string) => {
+    const labels: Record<string, string> = {
+      bullish: "Optimistic",
+      bearish: "Cautious",
+      neutral: "Neutral",
+      cautious: "Watchful",
     };
-
-    const tickerUpper = typeof ticker === "string" ? ticker.toUpperCase() : "";
-    return (
-      analyses[tickerUpper] || {
-        sentiment: "Neutral",
-        text: "I'm still learning about this one! Check back soon for my full analysis 🌺",
-      }
-    );
+    return labels[sentiment] || "Neutral";
   };
 
   if (!quote || !ticker) {
@@ -122,8 +122,6 @@ export default function StockAnalysis() {
       </Layout>
     );
   }
-
-  const analysis = getDahliaAnalysis();
 
   return (
     <Layout>
@@ -203,25 +201,34 @@ export default function StockAnalysis() {
                   Bloom's Investing Expert
                 </p>
               </div>
-              <Badge className="bg-accent/20 text-accent-foreground border-accent">
-                {analysis.sentiment}
-              </Badge>
+              {dahliaAnalysis && (
+                <Badge className="bg-accent/20 text-accent-foreground border-accent">
+                  {getSentimentLabel(dahliaAnalysis.sentiment)}
+                </Badge>
+              )}
             </div>
           </div>
 
           <div className="space-y-4">
-            <p className="text-foreground leading-relaxed">{analysis.text}</p>
-            <p className="text-sm text-muted-foreground italic">
-              — Dahlia 🌺
-            </p>
+            {isLoadingAnalysis ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-accent" />
+                <p className="ml-3 text-muted-foreground">
+                  Dahlia is reviewing the data...
+                </p>
+              </div>
+            ) : dahliaAnalysis ? (
+              <>
+                <p className="text-foreground leading-relaxed whitespace-pre-line">
+                  {dahliaAnalysis.analysis}
+                </p>
+              </>
+            ) : (
+              <p className="text-muted-foreground">
+                Analysis unavailable at this time.
+              </p>
+            )}
           </div>
-
-          <Card className="p-3 bg-muted border-muted-foreground/20">
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              This is just educational info — not financial advice. Always invest
-              what feels right for you 💛 — Dahlia
-            </p>
-          </Card>
         </Card>
 
         {isETF && (

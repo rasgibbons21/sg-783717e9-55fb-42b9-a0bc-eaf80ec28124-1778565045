@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { userService } from "@/services/userService";
 import { marketService, Quote } from "@/services/marketService";
+import { dahliaAnalysisService } from "@/services/dahliaAnalysisService";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import Link from "next/link";
 import type { Database } from "@/integrations/supabase/types";
@@ -63,7 +64,7 @@ export default function Home() {
         price: 0,
         change: 0,
         changePercent: 0,
-        insight: "This company keeps innovating and their loyal customer base keeps coming back — that kind of brand power is rare 🌟",
+        insight: "Loading Dahlia's analysis...",
       },
       {
         ticker: "SCHD",
@@ -71,7 +72,7 @@ export default function Home() {
         price: 0,
         change: 0,
         changePercent: 0,
-        insight: "Solid companies that pay you just for holding their stock — like getting a little thank you every quarter 💛",
+        insight: "Loading Dahlia's analysis...",
       },
       {
         ticker: "NVDA",
@@ -79,26 +80,42 @@ export default function Home() {
         price: 0,
         change: 0,
         changePercent: 0,
-        insight: "They're making the chips that power everything from phones to data centers — that's a strong position to be in 💪",
+        insight: "Loading Dahlia's analysis...",
       },
     ];
 
-    const picksWithPrices = await Promise.all(
+    // Load prices and AI-generated insights in parallel
+    const picksWithData = await Promise.all(
       picks.map(async (pick) => {
-        const quote = await marketService.getQuote(pick.ticker);
+        const [quote, analysis] = await Promise.all([
+          marketService.getQuote(pick.ticker),
+          dahliaAnalysisService.generateAnalysis(pick.ticker, pick.ticker === "SCHD"),
+        ]);
+
+        // Extract first sentence from analysis as insight
+        let insight = pick.insight;
+        if (analysis && analysis.analysis) {
+          const sentences = analysis.analysis.split(/[.!?]/);
+          const firstSentence = sentences.find(s => s.trim().length > 20);
+          if (firstSentence) {
+            insight = firstSentence.trim() + " 🌟";
+          }
+        }
+
         if (quote) {
           return {
             ...pick,
             price: quote.c,
             change: quote.d,
             changePercent: quote.dp,
+            insight,
           };
         }
-        return pick;
+        return { ...pick, insight };
       })
     );
 
-    setDahliasPicks(picksWithPrices);
+    setDahliasPicks(picksWithData);
   };
 
   const formatPrice = (price: number) => {
