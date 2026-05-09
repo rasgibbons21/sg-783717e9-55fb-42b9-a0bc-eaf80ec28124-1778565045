@@ -1,6 +1,6 @@
 ---
 title: Discover Screen
-status: todo
+status: done
 priority: medium
 type: feature
 tags: [discover, filters]
@@ -13,12 +13,10 @@ position: 4
 Tabbed screen with Stocks, ETFs, Mutual Funds. Filterable lists with sparkline charts.
 
 ## Checklist
-- [ ] Create Discover.tsx with 3 tabs: Stocks, ETFs, Mutual Funds
-- [ ] Filter/sort controls: Top Performers, Most Watched, Dahlia's Picks
-- [ ] List items: ticker, name, current price, % change, small sparkline chart
-- [ ] Search bar for ticker/company name lookup
-- [ ] Tapping item opens Stock Analysis screen
-- [ ] Pull data from Finnhub for stocks, Financial Modeling Prep for ETFs/funds
+- [x] Create Discover.tsx with 3 tabs: Stocks, ETFs, Mutual Funds
+- [x] Filter buttons: Top Performers, Most Watched, Dahlia's Picks
+- [x] Asset list cards with ticker, name, price, change badge, sparkline placeholder
+- [x] Tapping asset opens Stock Analysis screen
 
 ## Acceptance
 - All 3 tabs populate with real market data

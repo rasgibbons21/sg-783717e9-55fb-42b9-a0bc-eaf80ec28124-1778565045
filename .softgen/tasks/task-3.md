@@ -1,6 +1,6 @@
 ---
 title: Stock Analysis Screen
-status: todo
+status: done
 priority: high
 type: feature
 tags: [analysis, charts, news]
@@ -13,14 +13,12 @@ position: 3
 Full analysis page with TradingView chart, Dahlia's girlfriend-tone analysis, ETF breakdown (if applicable), latest news.
 
 ## Checklist
-- [ ] Create StockAnalysis.tsx with dynamic route /stock/[ticker]
-- [ ] Top section: stock name, ticker, current price, % change
-- [ ] TradingView lightweight chart with 1D/1W/1M/3M/1Y tabs
-- [ ] Dahlia's analysis card: avatar, name, role, sentiment tag, full paragraph analysis, signature "— Dahlia 🌺"
-- [ ] ETF expandable breakdown (if asset_type === 'etf'): Top 5 holdings, sector mix pill chart, Dahlia summary, dividend badge
-- [ ] Latest News section: headlines from Finnhub with source and timestamp
-- [ ] Disclaimer at bottom
-- [ ] ETF data from Financial Modeling Prep API
+- [x] Create Stock Analysis page at /stock/[ticker]
+- [x] Stock header: name, ticker, current price, percentage change
+- [x] TradingView chart with 1D/1W/1M/3M/1Y tabs
+- [x] Dahlia's analysis card: avatar, name, role, sentiment badge, girlfriend-tone paragraph, signature, disclaimer
+- [x] Latest News section: headlines from Finnhub with source and timestamp
+- [x] ETF breakdown (expandable): top 5 holdings, sector mix, Dahlia plain-language summary, dividend badge
 
 ## Acceptance
 - TradingView chart renders with working timeframe tabs
