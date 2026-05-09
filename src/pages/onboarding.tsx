@@ -14,7 +14,7 @@ export default function Onboarding() {
   const router = useRouter();
   const [step, setStep] = useState<Step>("welcome");
   const [experience, setExperience] = useState<ExperienceLevel>("beginner");
-  const [goals, setGoals] = useState<InvestmentGoal>("grow_wealth");
+  const [goals, setGoals] = useState<InvestmentGoal[]>([]);
   const [risk, setRisk] = useState<RiskTolerance>("moderate");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -34,6 +34,7 @@ export default function Onboarding() {
     } else if (step === "experience") {
       setStep("goals");
     } else if (step === "goals") {
+      if (goals.length === 0) return;
       setStep("risk");
     } else if (step === "risk") {
       await handleComplete();
@@ -189,11 +190,17 @@ export default function Onboarding() {
                 <Card
                   key={option.value}
                   className={`p-4 cursor-pointer transition-all ${
-                    goals === option.value
+                    goals.includes(option.value)
                       ? "border-accent border-2 bg-accent/5"
                       : "border-border hover:border-accent/50"
                   }`}
-                  onClick={() => setGoals(option.value)}
+                  onClick={() => {
+                    setGoals(prev => 
+                      prev.includes(option.value) 
+                        ? prev.filter(g => g !== option.value)
+                        : [...prev, option.value]
+                    );
+                  }}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -202,12 +209,12 @@ export default function Onboarding() {
                     </div>
                     <div
                       className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                        goals === option.value
+                        goals.includes(option.value)
                           ? "border-accent bg-accent"
                           : "border-border"
                       }`}
                     >
-                      {goals === option.value && (
+                      {goals.includes(option.value) && (
                         <div className="w-2.5 h-2.5 rounded-full bg-white" />
                       )}
                     </div>
@@ -218,6 +225,7 @@ export default function Onboarding() {
 
             <Button
               onClick={handleContinue}
+              disabled={goals.length === 0}
               className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-12"
             >
               Continue
