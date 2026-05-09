@@ -1,6 +1,6 @@
 ---
 title: Onboarding Flow
-status: todo
+status: in_progress
 priority: high
 type: feature
 tags: [auth, onboarding]
@@ -13,7 +13,7 @@ position: 1
 4-step onboarding capturing user preferences. Dahlia intro on welcome screen. Save all data to Supabase users table.
 
 ## Checklist
-- [ ] Create Onboarding.tsx with 4-step wizard: Welcome, Experience, Goals, Risk Tolerance
+- [x] Create Onboarding.tsx with 4-step wizard: Welcome, Experience, Goals, Risk Tolerance
 - [ ] Welcome screen: Bloom logo, tagline, Dahlia intro card with pulsing avatar, CTA buttons
 - [ ] Experience selection: Beginner/Intermediate/Advanced radio cards
 - [ ] Goals selection: multi-select chips for 4 investment goals
