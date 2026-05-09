@@ -14,11 +14,13 @@ Fonts: Cormorant Garamond (display, editorial credibility) + DM Sans (body, geom
 Style: 1960s editorial meets organic skincare boutique — warm authority with gentle confidence
 
 ## Features
-- **Onboarding:** 4-step flow capturing experience, goals, risk tolerance
-- **Home:** Personalized greeting, live market summary, Dahlia's daily picks, market movers
-- **Stock Analysis:** TradingView charts, Dahlia's girlfriend-tone analysis, real-time news
-- **Discover:** Filterable stocks/ETFs/mutual funds with sparkline charts
-- **Brokers:** Featured and non-affiliate broker listings with tracking
-- **Subscription:** Free vs Pro plans with PayPal integration
-- **Admin Dashboard:** Protected analytics, user management, revenue tracking
-- **Dahlia Popups:** Context-aware expert guidance (first visit, returning user, market tips)
+- **Onboarding:** 4-step flow capturing experience, goals, risk tolerance ✅
+- **Home:** Personalized greeting, live market summary, Dahlia's daily picks, market movers ✅
+- **Stock Analysis:** TradingView charts, Dahlia's girlfriend-tone analysis, real-time news ✅
+- **Discover:** Filterable stocks/ETFs/mutual funds with sparkline charts ✅
+- **Brokers:** Featured and non-affiliate broker listings with tracking ✅
+- **Subscription:** Free vs Pro plans with PayPal integration ✅
+- **Admin Dashboard:** Protected analytics, user management, revenue tracking ✅
+- **Dahlia Popups:** Context-aware expert guidance (first visit, returning user, market tips) ✅
+
+All core features complete. Ready for API keys and testing.

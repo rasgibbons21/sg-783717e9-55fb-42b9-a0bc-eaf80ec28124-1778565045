@@ -1,6 +1,6 @@
 ---
 title: Dahlia Popup System
-status: todo
+status: done
 priority: medium
 type: feature
 tags: [dahlia, popups]
@@ -13,16 +13,15 @@ position: 8
 Context-aware Dahlia popups appearing at bottom of screen. 3 states: first visit, returning user, market tip. Session-based dismissal.
 
 ## Checklist
-- [ ] Create DahliaPopup.tsx component
-- [ ] State 1 — First visit: "Hi I'm Dahlia..." intro message
-- [ ] State 2 — Returning user: "Welcome back [name]..." greeting with user's first name
-- [ ] State 3 — Market tip: gold-bordered card for significant market movements
-- [ ] Dahlia avatar: flower emoji 🌺 with gold gradient background
-- [ ] X dismiss button on all popups
-- [ ] Session-based logic: never show same popup twice per session
-- [ ] Track dismissals in sessionStorage
+- [x] Create DahliaPopup component with 3 states: first_visit, returning, market_tip
+- [x] First visit message: introduction with flower emoji avatar
+- [x] Returning user message: personalized greeting using user's first name
+- [x] Market tip message: gold-bordered card triggered by significant market movement
+- [x] Implement session-based dismiss (no reappear in same session)
+- [x] X button to dismiss popup
+- [x] Integrate into Home screen
 
 ## Acceptance
-- First-time visitors see intro popup
+- First-time visitors see Dahlia's introduction popup
 - Returning users see personalized greeting
 - Popups dismiss and don't reappear in same session
