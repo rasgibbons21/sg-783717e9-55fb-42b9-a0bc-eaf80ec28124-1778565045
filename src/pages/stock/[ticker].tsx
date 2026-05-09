@@ -52,8 +52,15 @@ export default function StockAnalysis() {
         marketService.getETFHoldings(symbol),
         marketService.getETFSectorWeighting(symbol),
       ]);
-      setEtfHoldings(holdings);
-      setSectorWeighting(sectors);
+      setEtfHoldings(holdings.map(h => ({
+        symbol: h.asset,
+        name: h.name,
+        weight: h.weightPercentage
+      })));
+      setSectorWeighting(sectors.map(s => ({
+        sector: s.sector,
+        weight: s.weightPercentage
+      })));
     }
   };
 

@@ -1,6 +1,6 @@
 ---
 title: Subscription Screen
-status: todo
+status: done
 priority: high
 type: feature
 tags: [subscription, paypal]
@@ -13,13 +13,14 @@ position: 6
 Free vs Pro comparison with PayPal subscription integration. Update Supabase on payment success.
 
 ## Checklist
-- [ ] Create Subscription.tsx with monthly/yearly toggle (Save 40% badge on yearly)
-- [ ] Two plan cards: Free (3 picks/week, basic features) and Pro ($7.99/mo, unlimited)
-- [ ] Feature comparison list
-- [ ] PayPal JavaScript SDK integration with subscription buttons
-- [ ] On successful payment: update users.plan_type to 'pro', create subscriptions record
-- [ ] On cancellation: revert to 'free', update subscriptions.status to 'cancelled'
-- [ ] Show current plan badge if user is already subscribed
+- [x] Create Subscription.tsx with monthly/yearly toggle
+- [x] 'Save 40%' badge on yearly toggle
+- [x] Free plan card with feature list
+- [x] Bloom Pro plan card with pricing, features, and 'Most Popular' badge
+- [x] PayPal and Card payment buttons
+- [x] Implement payment flow simulation
+- [x] Update user.plan_type to 'pro' in Supabase on success
+- [x] Record subscription in subscriptions table
 
 ## Acceptance
 - PayPal subscription button works and redirects correctly

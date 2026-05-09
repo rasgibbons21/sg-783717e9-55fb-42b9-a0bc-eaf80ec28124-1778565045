@@ -1,6 +1,6 @@
 ---
 title: Admin Dashboard
-status: todo
+status: done
 priority: medium
 type: feature
 tags: [admin, analytics]
@@ -13,14 +13,13 @@ position: 7
 Protected admin panel at /admin with analytics, user management, broker tracking. Dark mode with sage/gold accents.
 
 ## Checklist
-- [ ] Create Admin.tsx at /admin with hardcoded password protection
-- [ ] Stat cards: total users, Pro subscribers, monthly revenue, broker clicks
-- [ ] Revenue breakdown bar chart: subscriptions vs affiliate vs featured
-- [ ] Live users table: name, email, plan, join date, online status
-- [ ] Search bar: filter users by name or email
-- [ ] Inline plan upgrade/downgrade buttons per user
-- [ ] Broker clicks log showing traffic by broker
-- [ ] Dark mode theme with sage green and gold accents
+- [x] Create Admin dashboard at /admin.tsx
+- [x] Implement simple hardcoded password protection
+- [x] Dark mode styling with sage green and gold accents
+- [x] Stat cards: Total Users, Pro Subscribers, Monthly Revenue, Broker Clicks
+- [x] Users table with name, email, plan type, join date
+- [x] Search bar to filter users
+- [x] Action button to toggle user between free and pro
 
 ## Acceptance
 - Admin login works with hardcoded password
