@@ -1,325 +1,310 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { Layout } from "@/components/Layout";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Check, Loader2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { authService } from "@/services/authService";
 import { userService } from "@/services/userService";
-import { useToast } from "@/hooks/use-toast";
-import type { Database } from "@/integrations/supabase/types";
+import { Check, Loader2 } from "lucide-react";
+import { SEO } from "@/components/SEO";
 
-type User = Database["public"]["Tables"]["users"]["Row"];
+// PayPal Plan IDs
+const PAYPAL_MONTHLY_PLAN = "P-8W707879XT1115010NIACMNQ";
+const PAYPAL_YEARLY_PLAN = "P-1TU067111E1942024NIACQBI";
 
 declare global {
   interface Window {
-    paypal?: {
-      Buttons: (config: PayPalButtonsConfig) => {
-        render: (container: string) => void;
-      };
-    };
+    paypal?: any;
   }
-}
-
-interface PayPalButtonsConfig {
-  style?: {
-    layout?: string;
-    color?: string;
-    shape?: string;
-    label?: string;
-  };
-  createSubscription: (
-    data: unknown,
-    actions: {
-      subscription: {
-        create: (details: { plan_id: string }) => Promise<string>;
-      };
-    }
-  ) => Promise<string>;
-  onApprove: (
-    data: { subscriptionID: string },
-    actions: unknown
-  ) => Promise<void>;
-  onError?: (err: unknown) => void;
 }
 
 export default function Subscription() {
   const router = useRouter();
-  const { toast } = useToast();
-  const [user, setUser] = useState<User | null>(null);
-  const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
+  const [isYearly, setIsYearly] = useState(false);
+  const [currentPlan, setCurrentPlan] = useState<"free" | "pro">("free");
   const [isProcessing, setIsProcessing] = useState(false);
-  const [planIds, setPlanIds] = useState<{ monthly: string; yearly: string } | null>(null);
-  const paypalMonthlyRef = useRef<HTMLDivElement>(null);
-  const paypalYearlyRef = useRef<HTMLDivElement>(null);
+  const [paypalLoaded, setPaypalLoaded] = useState(false);
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    loadUserData();
-    initializePayPalPlans();
+    checkAuth();
+    loadPayPalScript();
   }, []);
 
   useEffect(() => {
-    if (planIds && window.paypal) {
+    if (paypalLoaded && user) {
       renderPayPalButtons();
     }
-  }, [planIds, billingCycle]);
+  }, [paypalLoaded, isYearly, user]);
 
-  const loadUserData = async () => {
+  const checkAuth = async () => {
+    const session = await authService.getCurrentSession();
+    if (!session) {
+      router.push("/");
+      return;
+    }
+
     const userData = await userService.getCurrentUser();
-    setUser(userData);
+    if (userData) {
+      setUser(userData);
+      setCurrentPlan(userData.plan_type as "free" | "pro");
+    }
   };
 
-  const initializePayPalPlans = async () => {
-    try {
-      const response = await fetch("/api/paypal/create-plans", {
-        method: "POST",
-      });
-      const data = await response.json();
-      
-      if (data.success) {
-        setPlanIds({
-          monthly: data.monthly,
-          yearly: data.yearly,
-        });
-      }
-    } catch (error) {
-      console.error("Error initializing PayPal plans:", error);
-      toast({
-        title: "Error",
-        description: "Failed to initialize payment options. Please refresh the page.",
-        variant: "destructive",
-      });
+  const loadPayPalScript = () => {
+    if (window.paypal) {
+      setPaypalLoaded(true);
+      return;
     }
+
+    const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
+    if (!clientId) {
+      console.error("PayPal Client ID not configured");
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&vault=true&intent=subscription`;
+    script.async = true;
+    script.onload = () => {
+      setPaypalLoaded(true);
+    };
+    script.onerror = () => {
+      console.error("Failed to load PayPal SDK");
+    };
+    document.body.appendChild(script);
   };
 
   const renderPayPalButtons = () => {
-    if (!window.paypal || !planIds) return;
-
-    const currentPlanId = billingCycle === "monthly" ? planIds.monthly : planIds.yearly;
-    const containerRef = billingCycle === "monthly" ? paypalMonthlyRef : paypalYearlyRef;
-
-    if (!containerRef.current) return;
+    const container = document.getElementById("paypal-button-container");
+    if (!container || !window.paypal) return;
 
     // Clear existing buttons
-    containerRef.current.innerHTML = "";
+    container.innerHTML = "";
 
-    window.paypal.Buttons({
-      style: {
-        layout: "vertical",
-        color: "gold",
-        shape: "rect",
-        label: "subscribe",
-      },
-      createSubscription: (data, actions) => {
-        return actions.subscription.create({
-          plan_id: currentPlanId,
-        });
-      },
-      onApprove: async (data) => {
-        setIsProcessing(true);
-        
-        try {
-          if (!user) {
-            throw new Error("User not found");
+    const planId = isYearly ? PAYPAL_YEARLY_PLAN : PAYPAL_MONTHLY_PLAN;
+
+    window.paypal
+      .Buttons({
+        style: {
+          shape: "rect",
+          color: "gold",
+          layout: "vertical",
+          label: "subscribe",
+        },
+        createSubscription: function (data: any, actions: any) {
+          return actions.subscription.create({
+            plan_id: planId,
+          });
+        },
+        onApprove: async function (data: any) {
+          setIsProcessing(true);
+          try {
+            // Update user plan in Supabase
+            if (user) {
+              await userService.updateUser(user.id, {
+                plan_type: "pro",
+              });
+
+              // Create subscription record
+              await fetch("/api/paypal/activate-subscription", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  userId: user.id,
+                  subscriptionId: data.subscriptionID,
+                  planType: isYearly ? "yearly" : "monthly",
+                }),
+              });
+
+              // Refresh page to show Pro status
+              window.location.reload();
+            }
+          } catch (error) {
+            console.error("Error activating subscription:", error);
+            alert("There was an error activating your subscription. Please contact support.");
+          } finally {
+            setIsProcessing(false);
           }
-
-          const response = await fetch("/api/paypal/activate-subscription", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              userId: user.id,
-              subscriptionId: data.subscriptionID,
-              planType: billingCycle,
-            }),
-          });
-
-          if (!response.ok) {
-            throw new Error("Failed to activate subscription");
-          }
-
-          toast({
-            title: "Welcome to Bloom Pro! 🌸",
-            description: "Your subscription is now active. Enjoy unlimited analysis!",
-          });
-
-          setTimeout(() => {
-            router.push("/home");
-          }, 2000);
-        } catch (error) {
-          console.error("Error activating subscription:", error);
-          toast({
-            title: "Subscription Error",
-            description: "There was an issue activating your subscription. Please contact support.",
-            variant: "destructive",
-          });
-        } finally {
-          setIsProcessing(false);
-        }
-      },
-      onError: (err) => {
-        console.error("PayPal error:", err);
-        toast({
-          title: "Payment Error",
-          description: "There was an issue processing your payment. Please try again.",
-          variant: "destructive",
-        });
-      },
-    }).render(billingCycle === "monthly" ? "#paypal-monthly-button" : "#paypal-yearly-button");
+        },
+        onError: function (err: any) {
+          console.error("PayPal subscription error:", err);
+          alert("There was an error processing your subscription. Please try again.");
+        },
+      })
+      .render("#paypal-button-container");
   };
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-    }).format(price);
-  };
-
-  const freeFeatures = [
-    "3 picks per week",
-    "Basic market summary",
-    "Broker directory",
-    "Educational content",
-  ];
-
-  const proFeatures = [
-    "Unlimited daily picks",
-    "Dahlia's full analysis on every pick",
-    "Stocks, ETFs, and Mutual Funds",
-    "Real-time news and charts",
-    "Portfolio tracker",
-    "Exclusive broker deals",
-    "Priority support",
-  ];
+  const monthlyPrice = 7.99;
+  const yearlyPrice = 57.99;
+  const yearlyMonthly = (yearlyPrice / 12).toFixed(2);
 
   return (
     <Layout>
-      <div className="max-w-lg mx-auto p-4 space-y-6">
-        <div className="text-center space-y-2">
-          <h1 className="font-serif text-3xl font-bold text-foreground">
-            Choose Your Plan
-          </h1>
-          <p className="text-muted-foreground">
-            Unlock unlimited analysis with Bloom Pro
-          </p>
-        </div>
+      <SEO 
+        title="Subscription Plans - Bloom" 
+        description="Choose between Free and Bloom Pro to unlock unlimited daily picks and full analysis"
+      />
+      <div className="max-w-lg mx-auto p-4">
+        <div className="space-y-6">
+          <div className="text-center space-y-2">
+            <h1 className="font-serif text-3xl font-bold text-foreground">
+              Choose Your Plan
+            </h1>
+            <p className="text-muted-foreground">
+              Get unlimited access to Dahlia's investing insights
+            </p>
+          </div>
 
-        <div className="flex items-center justify-center gap-3">
-          <Button
-            variant={billingCycle === "monthly" ? "default" : "outline"}
-            onClick={() => setBillingCycle("monthly")}
-            className={billingCycle === "monthly" ? "bg-primary" : ""}
-          >
-            Monthly
-          </Button>
-          <Button
-            variant={billingCycle === "yearly" ? "default" : "outline"}
-            onClick={() => setBillingCycle("yearly")}
-            className={billingCycle === "yearly" ? "bg-primary" : ""}
-          >
-            Yearly
-          </Button>
-          {billingCycle === "yearly" && (
-            <Badge className="bg-accent text-accent-foreground">
-              Save 40%
-            </Badge>
-          )}
-        </div>
-
-        <div className="space-y-4">
-          <Card className="p-6 space-y-4">
-            <div className="space-y-2">
-              <h2 className="font-serif text-2xl font-bold text-foreground">
-                Free
-              </h2>
-              <p className="text-3xl font-bold text-foreground">$0</p>
-            </div>
-
-            <div className="space-y-2">
-              {freeFeatures.map((feature) => (
-                <div key={feature} className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground">{feature}</p>
-                </div>
-              ))}
-            </div>
-
-            <Button
-              variant="outline"
-              className="w-full"
-              disabled={user?.plan_type === "free"}
-            >
-              {user?.plan_type === "free" ? "Current Plan" : "Downgrade to Free"}
-            </Button>
-          </Card>
-
-          <Card className="p-6 space-y-4 border-accent border-2 relative">
-            <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-accent-foreground">
-              Most Popular
-            </Badge>
-
-            <div className="space-y-2">
-              <h2 className="font-serif text-2xl font-bold text-foreground">
-                Bloom Pro
-              </h2>
-              <div className="flex items-baseline gap-2">
-                <p className="text-3xl font-bold text-foreground">
-                  {billingCycle === "monthly"
-                    ? formatPrice(7.99)
-                    : formatPrice(57.99)}
-                </p>
-                <span className="text-muted-foreground">
-                  /{billingCycle === "monthly" ? "month" : "year"}
-                </span>
-              </div>
-              {billingCycle === "yearly" && (
-                <p className="text-sm text-accent font-semibold">
-                  {formatPrice(4.83)}/month when billed annually
-                </p>
+          <Card className="p-4 bg-card">
+            <div className="flex items-center justify-center gap-4">
+              <span className={`text-sm font-medium ${!isYearly ? "text-foreground" : "text-muted-foreground"}`}>
+                Monthly
+              </span>
+              <Switch
+                checked={isYearly}
+                onCheckedChange={setIsYearly}
+                className="data-[state=checked]:bg-accent"
+              />
+              <span className={`text-sm font-medium ${isYearly ? "text-foreground" : "text-muted-foreground"}`}>
+                Yearly
+              </span>
+              {isYearly && (
+                <Badge className="bg-accent text-accent-foreground">
+                  Save 40%
+                </Badge>
               )}
             </div>
+          </Card>
 
-            <div className="space-y-2">
-              {proFeatures.map((feature) => (
-                <div key={feature} className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-accent" />
-                  <p className="text-sm text-foreground">{feature}</p>
-                </div>
-              ))}
-            </div>
-
-            {user?.plan_type === "pro" ? (
-              <Button variant="outline" className="w-full" disabled>
-                Current Plan
-              </Button>
-            ) : (
-              <div className="space-y-3">
-                {isProcessing ? (
-                  <div className="flex items-center justify-center py-4">
-                    <Loader2 className="w-6 h-6 animate-spin text-accent" />
-                    <p className="ml-3 text-muted-foreground">
-                      Processing your subscription...
-                    </p>
+          <div className="space-y-4">
+            {/* Free Plan */}
+            <Card className={`p-6 ${currentPlan === "free" ? "border-primary border-2" : ""}`}>
+              <div className="space-y-4">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h3 className="font-serif text-xl font-bold text-foreground">Free</h3>
+                    <p className="text-2xl font-bold text-foreground mt-1">$0</p>
                   </div>
-                ) : (
-                  <div
-                    id={billingCycle === "monthly" ? "paypal-monthly-button" : "paypal-yearly-button"}
-                    ref={billingCycle === "monthly" ? paypalMonthlyRef : paypalYearlyRef}
-                  />
+                  {currentPlan === "free" && (
+                    <Badge variant="outline" className="border-primary text-primary">
+                      Current Plan
+                    </Badge>
+                  )}
+                </div>
+
+                <ul className="space-y-2">
+                  {[
+                    "3 picks per week",
+                    "Basic market summary",
+                    "Broker directory",
+                  ].map((feature) => (
+                    <li key={feature} className="flex items-start gap-2">
+                      <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                      <span className="text-sm text-foreground">{feature}</span>
+                    </li>
+                  ))}
+                  <li className="flex items-start gap-2 opacity-50">
+                    <span className="text-sm text-muted-foreground line-through">Dahlia's full analysis</span>
+                  </li>
+                  <li className="flex items-start gap-2 opacity-50">
+                    <span className="text-sm text-muted-foreground line-through">ETF picks</span>
+                  </li>
+                </ul>
+
+                {currentPlan === "free" && (
+                  <Button variant="outline" className="w-full" disabled>
+                    Current Plan
+                  </Button>
                 )}
               </div>
-            )}
+            </Card>
+
+            {/* Pro Plan */}
+            <Card className={`p-6 border-accent ${currentPlan === "pro" ? "border-2" : "border"}`}>
+              <div className="space-y-4">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-serif text-xl font-bold text-foreground">Bloom Pro</h3>
+                      <Badge className="bg-accent text-accent-foreground">Popular</Badge>
+                    </div>
+                    <div className="mt-2">
+                      {isYearly ? (
+                        <>
+                          <p className="text-2xl font-bold text-foreground">${yearlyMonthly}/mo</p>
+                          <p className="text-sm text-muted-foreground">
+                            Billed ${yearlyPrice}/year
+                          </p>
+                        </>
+                      ) : (
+                        <p className="text-2xl font-bold text-foreground">${monthlyPrice}/mo</p>
+                      )}
+                    </div>
+                  </div>
+                  {currentPlan === "pro" && (
+                    <Badge variant="outline" className="border-accent text-accent">
+                      Current Plan
+                    </Badge>
+                  )}
+                </div>
+
+                <ul className="space-y-2">
+                  {[
+                    "Unlimited daily picks",
+                    "Dahlia's full analysis on every pick",
+                    "Stocks, ETFs, and mutual funds",
+                    "Real-time news and charts",
+                    "Portfolio tracker",
+                    "Exclusive broker deals",
+                  ].map((feature) => (
+                    <li key={feature} className="flex items-start gap-2">
+                      <Check className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
+                      <span className="text-sm text-foreground">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                {currentPlan === "free" && (
+                  <div className="space-y-3">
+                    <div id="paypal-button-container" className="min-h-[150px]">
+                      {!paypalLoaded && (
+                        <div className="flex items-center justify-center py-8">
+                          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                        </div>
+                      )}
+                    </div>
+
+                    {isProcessing && (
+                      <div className="text-center">
+                        <Loader2 className="w-6 h-6 animate-spin text-accent mx-auto" />
+                        <p className="text-sm text-muted-foreground mt-2">
+                          Activating your Pro subscription...
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {currentPlan === "pro" && (
+                  <Button variant="outline" className="w-full" disabled>
+                    Current Plan
+                  </Button>
+                )}
+              </div>
+            </Card>
+          </div>
+
+          <Card className="p-3 bg-muted border-muted-foreground/20">
+            <p className="text-xs text-center text-muted-foreground leading-relaxed">
+              Educational content only. Not financial advice. Bloom is not liable for any investment decisions or losses.
+            </p>
           </Card>
         </div>
-
-        <Card className="p-4 bg-muted">
-          <p className="text-xs text-center text-muted-foreground leading-relaxed">
-            By subscribing, you agree to our Terms of Service. Cancel anytime from
-            your account settings.
-          </p>
-        </Card>
       </div>
     </Layout>
   );
