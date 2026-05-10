@@ -13,7 +13,7 @@ export function SEOElements({
   description = "Bloom is the investing app built for women. Get plain language stock, ETF and mutual fund analysis from Dahlia — your personal investing expert. No jargon, no pressure. Just real talk about your money.",
   image = "/og-image.png",
   url,
-}: SEOProps) {
+EOProps) {
   return (
     <>
       <title>{title}</title>
