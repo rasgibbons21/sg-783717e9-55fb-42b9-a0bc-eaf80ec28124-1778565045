@@ -108,8 +108,13 @@ export default function Home() {
         // Get quote
         const quote = await marketService.getQuote(pick.ticker);
         
-        // Get AI-generated one-liner insight
-        const insightText = await dahliaAnalysisService.generateOneLinerInsight(pick.ticker);
+        // Get AI-generated insight
+        const analysis = await dahliaAnalysisService.generateAnalysis(
+          pick.ticker, 
+          quote, 
+          null, 
+          []
+        );
 
         setDahliasPicks(prev => {
           const updated = [...prev];
@@ -118,7 +123,7 @@ export default function Home() {
             price: quote?.c || 0,
             change: quote?.d || 0,
             changePercent: quote?.dp || 0,
-            insight: insightText || "Dahlia is thinking... 🌸",
+            insight: analysis?.content || "Dahlia is thinking... 🌸",
             loading: false,
           };
           return updated;
@@ -150,10 +155,10 @@ export default function Home() {
 
   const formatIndexName = (index: string) => {
     const names: Record<string, string> = {
-      "^GSPC": "S&P 500",
-      "^IXIC": "NASDAQ",
-      "^DJI": "DOW",
-      "^VIX": "VIX",
+      "SPY": "S&P 500",
+      "QQQ": "NASDAQ",
+      "DIA": "DOW",
+      "VIXY": "VIX",
     };
     return names[index] || index;
   };

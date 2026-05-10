@@ -50,7 +50,8 @@ export const marketService = {
   },
 
   async getMarketIndices(): Promise<Record<string, Quote>> {
-    const indices = ["^GSPC", "^IXIC", "^DJI", "^VIX"];
+    // Using ETF proxies as Finnhub free tier supports them reliably
+    const indices = ["SPY", "QQQ", "DIA", "VIXY"];
     const quotes: Record<string, Quote> = {};
 
     await Promise.all(
