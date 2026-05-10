@@ -9,7 +9,7 @@ import { userService } from "@/services/userService";
 import { Loader2 } from "lucide-react";
 
 type Step = "auth" | "experience" | "goals" | "risk";
-type AuthMode = "signup" | "login";
+type AuthMode = "signup" | "login" | "forgot";
 type ExperienceLevel = "beginner" | "intermediate" | "advanced";
 type InvestmentGoal = "grow_wealth" | "retirement" | "passive_income" | "emergency_fund";
 type RiskTolerance = "conservative" | "moderate" | "aggressive";
@@ -26,12 +26,27 @@ export default function Onboarding() {
   const [risk, setRisk] = useState<RiskTolerance>("moderate");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [resetEmailSent, setResetEmailSent] = useState(false);
 
   const handleAuth = async () => {
     setError("");
     setIsSubmitting(true);
 
     try {
+      if (authMode === "forgot") {
+        const { error: resetError } = await authService.resetPassword(email);
+        
+        if (resetError) {
+          setError(resetError.message);
+          setIsSubmitting(false);
+          return;
+        }
+
+        setResetEmailSent(true);
+        setIsSubmitting(false);
+        return;
+      }
+
       if (authMode === "signup") {
         if (!fullName.trim()) {
           setError("Please enter your full name");
@@ -130,80 +145,166 @@ export default function Onboarding() {
 
             <Card className="p-6">
               <div className="space-y-4">
-                <div className="flex gap-2 p-1 bg-muted rounded-lg">
-                  <Button
-                    type="button"
-                    variant={authMode === "signup" ? "default" : "ghost"}
-                    className="flex-1"
-                    onClick={() => setAuthMode("signup")}
-                  >
-                    Sign Up
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={authMode === "login" ? "default" : "ghost"}
-                    className="flex-1"
-                    onClick={() => setAuthMode("login")}
-                  >
-                    Log In
-                  </Button>
-                </div>
-
-                {authMode === "signup" && (
-                  <div className="space-y-2">
-                    <Label htmlFor="fullName">Full Name</Label>
-                    <Input
-                      id="fullName"
-                      type="text"
-                      placeholder="Jane Doe"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      disabled={isSubmitting}
-                    />
+                {authMode !== "forgot" && (
+                  <div className="flex gap-2 p-1 bg-muted rounded-lg">
+                    <Button
+                      type="button"
+                      variant={authMode === "signup" ? "default" : "ghost"}
+                      className="flex-1"
+                      onClick={() => {
+                        setAuthMode("signup");
+                        setResetEmailSent(false);
+                        setError("");
+                      }}
+                    >
+                      Sign Up
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={authMode === "login" ? "default" : "ghost"}
+                      className="flex-1"
+                      onClick={() => {
+                        setAuthMode("login");
+                        setResetEmailSent(false);
+                        setError("");
+                      }}
+                    >
+                      Log In
+                    </Button>
                   </div>
                 )}
 
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="jane@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={isSubmitting}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    disabled={isSubmitting}
-                  />
-                </div>
-
-                {error && (
-                  <p className="text-sm text-destructive">{error}</p>
+                {authMode === "forgot" && !resetEmailSent && (
+                  <div className="space-y-2">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className="mb-2"
+                      onClick={() => {
+                        setAuthMode("login");
+                        setResetEmailSent(false);
+                        setError("");
+                      }}
+                    >
+                      ← Back to Log In
+                    </Button>
+                    <h3 className="font-serif text-xl font-bold text-foreground">
+                      Reset Your Password
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      Enter your email and we'll send you instructions to reset your password.
+                    </p>
+                  </div>
                 )}
 
-                <Button
-                  onClick={handleAuth}
-                  disabled={isSubmitting || !email || !password || (authMode === "signup" && !fullName)}
-                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-12"
-                >
-                  {isSubmitting ? (
-                    <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Processing...</>
-                  ) : authMode === "signup" ? (
-                    "Create Account"
-                  ) : (
-                    "Log In"
-                  )}
-                </Button>
+                {authMode === "forgot" && resetEmailSent ? (
+                  <div className="space-y-4 py-4">
+                    <div className="w-16 h-16 rounded-full bg-accent/20 mx-auto flex items-center justify-center">
+                      <span className="text-3xl">📧</span>
+                    </div>
+                    <div className="text-center space-y-2">
+                      <h3 className="font-serif text-xl font-bold text-foreground">
+                        Check Your Email
+                      </h3>
+                      <p className="text-sm text-muted-foreground">
+                        We've sent password reset instructions to <strong>{email}</strong>. 
+                        Check your inbox (and spam folder just in case) 💛
+                      </p>
+                    </div>
+                    <Button
+                      onClick={() => {
+                        setAuthMode("login");
+                        setResetEmailSent(false);
+                        setEmail("");
+                      }}
+                      className="w-full"
+                    >
+                      Back to Log In
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    {authMode === "signup" && (
+                      <div className="space-y-2">
+                        <Label htmlFor="fullName">Full Name</Label>
+                        <Input
+                          id="fullName"
+                          type="text"
+                          placeholder="Jane Doe"
+                          value={fullName}
+                          onChange={(e) => setFullName(e.target.value)}
+                          disabled={isSubmitting}
+                        />
+                      </div>
+                    )}
+
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="jane@example.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        disabled={isSubmitting}
+                      />
+                    </div>
+
+                    {authMode !== "forgot" && (
+                      <div className="space-y-2">
+                        <Label htmlFor="password">Password</Label>
+                        <Input
+                          id="password"
+                          type="password"
+                          placeholder="••••••••"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          disabled={isSubmitting}
+                        />
+                      </div>
+                    )}
+
+                    {authMode === "login" && (
+                      <div className="flex justify-end">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setAuthMode("forgot");
+                            setError("");
+                          }}
+                          className="text-sm text-accent hover:underline"
+                        >
+                          Forgot password?
+                        </button>
+                      </div>
+                    )}
+
+                    {error && (
+                      <p className="text-sm text-destructive">{error}</p>
+                    )}
+
+                    <Button
+                      onClick={handleAuth}
+                      disabled={
+                        isSubmitting || 
+                        !email || 
+                        (authMode !== "forgot" && !password) || 
+                        (authMode === "signup" && !fullName)
+                      }
+                      className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-12"
+                    >
+                      {isSubmitting ? (
+                        <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Processing...</>
+                      ) : authMode === "signup" ? (
+                        "Create Account"
+                      ) : authMode === "login" ? (
+                        "Log In"
+                      ) : (
+                        "Send Reset Instructions"
+                      )}
+                    </Button>
+                  </>
+                )}
               </div>
             </Card>
           </div>
