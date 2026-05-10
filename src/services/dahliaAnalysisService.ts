@@ -1,6 +1,3 @@
-import { supabase } from "@/integrations/supabase/client";
-import type { StockQuote, ETFProfile } from "@/types";
-
 const POLYGON_API_KEY = process.env.NEXT_PUBLIC_POLYGON_API_KEY || "";
 const FINNHUB_API_KEY = process.env.NEXT_PUBLIC_FINNHUB_API_KEY || "";
 const FMP_API_KEY = process.env.NEXT_PUBLIC_FMP_API_KEY || "";

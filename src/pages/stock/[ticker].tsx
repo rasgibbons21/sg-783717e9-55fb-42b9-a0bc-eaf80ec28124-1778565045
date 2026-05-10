@@ -5,8 +5,8 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { marketService, Quote, NewsItem } from "@/services/marketService";
-import { dahliaAnalysisService } from "@/services/dahliaAnalysisService";
-import { TrendingUp, TrendingDown, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
+import { dahliaAnalysisService, DahliaAnalysis } from "@/services/dahliaAnalysisService";
+import { ChevronDown, ChevronUp, Loader2 } from "lucide-react";
 import { SEO } from "@/components/SEO";
 
 interface ETFHolding {
@@ -40,7 +40,7 @@ export default function StockAnalysis() {
   const { ticker } = router.query;
   const [quote, setQuote] = useState<Quote | null>(null);
   const [news, setNews] = useState<NewsItem[]>([]);
-  const [dahliaAnalysis, setDahliaAnalysis] = useState<DahliaAnalysisData | null>(null);
+  const [dahliaAnalysis, setDahliaAnalysis] = useState<DahliaAnalysis | null>(null);
   const [isLoadingAnalysis, setIsLoadingAnalysis] = useState(false);
   const [isETF, setIsETF] = useState(false);
   const [etfExpanded, setEtfExpanded] = useState(false);
@@ -54,6 +54,7 @@ export default function StockAnalysis() {
     if (ticker && typeof ticker === "string") {
       loadStockData(ticker);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ticker]);
 
   const loadStockData = async (symbol: string) => {
