@@ -1,4 +1,5 @@
-import Anthropic from "@anthropic-ai/sdk";
+import { supabase } from "@/integrations/supabase/client";
+import type { StockQuote, ETFProfile } from "@/types";
 
 const POLYGON_API_KEY = process.env.NEXT_PUBLIC_POLYGON_API_KEY || "";
 const FINNHUB_API_KEY = process.env.NEXT_PUBLIC_FINNHUB_API_KEY || "";
@@ -39,10 +40,9 @@ interface ETFSectorData {
   weight: number;
 }
 
-interface DahliaAnalysis {
-  analysis: string;
-  sentiment: "bullish" | "bearish" | "neutral" | "cautious";
-  timestamp: string;
+export interface DahliaAnalysis {
+  content: string;
+  sentiment: "Optimistic" | "Cautious" | "Neutral" | "Watchful";
 }
 
 export const dahliaAnalysisService = {
@@ -404,5 +404,113 @@ Keep it conversational, honest, and use light emojis naturally. Never use jargon
       ];
       return fallbacks[Math.floor(Math.random() * fallbacks.length)];
     }
+  },
+
+  generateAnalysis: async (
+    ticker: string,
+    quoteData: StockQuote | null,
+    companyProfile: any | null,
+    news: any[] = []
+  ): Promise<DahliaAnalysis | null> => {
+    try {
+      // 1. Check if we have an Anthropic API key via Supabase or environment
+      // We'll call our Next.js API route instead of the SDK directly
+      
+      const prompt = `
+Analyze ${ticker} for a beginner investor.
+Current price: $${quoteData?.c || "Unknown"}
+Daily change: ${quoteData?.dp ? `${quoteData.dp}%` : "Unknown"}
+Company info: ${companyProfile?.name || ticker} - ${companyProfile?.finnhubIndustry || "Unknown sector"}
+
+Recent news headlines:
+${news.slice(0, 3).map(n => `- ${n.headline}`).join('\n')}
+
+Provide a brief, warm analysis of what this means for an investor.
+`;
+
+      const response = await fetch("/api/analyze", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ prompt }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return data as DahliaAnalysis;
+      }
+
+      console.warn("AI API route failed, falling back to static analysis", response.status);
+      return dahliaAnalysisService.getStaticFallbackAnalysis(ticker, quoteData, companyProfile, news);
+    } catch (error) {
+      console.error("Error calling AI analysis endpoint:", error);
+      return dahliaAnalysisService.getStaticFallbackAnalysis(ticker, quoteData, companyProfile, news);
+    }
+  },
+
+  // Generate an analysis for an ETF specifically
+  generateETFAnalysis: async (
+    ticker: string,
+    quoteData: StockQuote | null,
+    etfProfile: ETFProfile | null,
+    holdings: any[] = []
+  ): Promise<DahliaAnalysis | null> => {
+    try {
+      const prompt = `
+Analyze the ${ticker} ETF for a beginner investor.
+Current price: $${quoteData?.c || "Unknown"}
+Daily change: ${quoteData?.dp ? `${quoteData.dp}%` : "Unknown"}
+ETF info: ${etfProfile?.name || ticker} - ${etfProfile?.assetClass || "Unknown asset class"}
+
+Top holdings:
+${holdings.slice(0, 5).map(h => `- ${h.symbol}: ${h.weightPercent}%`).join('\n')}
+
+Provide a brief, warm analysis of what this means and why someone might hold this ETF.
+`;
+
+      const response = await fetch("/api/analyze", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ prompt }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return data as DahliaAnalysis;
+      }
+
+      console.warn("AI API route failed, falling back to static ETF analysis", response.status);
+      return dahliaAnalysisService.getStaticFallbackETFAnalysis(ticker, quoteData, etfProfile);
+    } catch (error) {
+      console.error("Error calling AI analysis endpoint:", error);
+      return dahliaAnalysisService.getStaticFallbackETFAnalysis(ticker, quoteData, etfProfile);
+    }
+  },
+
+  // Fallback for when the API route is unavailable or fails
+  getStaticFallbackAnalysis: (
+    ticker: string,
+    quoteData: StockQuote | null,
+    companyProfile: any | null,
+    news: any[]
+  ): DahliaAnalysis => {
+    return {
+      content: `Hey! I'm having a bit of trouble pulling all the data for ${ticker} right now, but here's what I can tell you based on what I'm seeing.\n\nThe market is always moving, and this stock is no exception. Sometimes the data takes a minute to catch up, but that's okay — we're here to learn together.\n\nFor now, I'd say take your time with this one. Do a little more research on your own, check out what the company actually does, and see if it aligns with your goals. No rush!\n\nThis is just educational info — not financial advice. Always invest what feels right for you 💛 — Dahlia`,
+      sentiment: "neutral",
+    };
+  },
+
+  getStaticFallbackETFAnalysis: (
+    ticker: string,
+    quoteData: StockQuote | null,
+    etfProfile: ETFProfile | null
+  ): DahliaAnalysis => {
+    return {
+      content: `Hey! I'm having a bit of trouble pulling all the data for ${ticker} right now, but here's what I can tell you based on what I'm seeing.\n\nThe market is always moving, and this stock is no exception. Sometimes the data takes a minute to catch up, but that's okay — we're here to learn together.\n\nFor now, I'd say take your time with this one. Do a little more research on your own, check out what the company actually does, and see if it aligns with your goals. No rush!\n\nThis is just educational info — not financial advice. Always invest what feels right for you 💛 — Dahlia`,
+      sentiment: "neutral",
+    };
   },
 };
