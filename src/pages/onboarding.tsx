@@ -2,52 +2,84 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { supabase } from "@/integrations/supabase/client";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { authService } from "@/services/authService";
 import { userService } from "@/services/userService";
+import { Loader2 } from "lucide-react";
 
-type Step = "welcome" | "experience" | "goals" | "risk";
+type Step = "auth" | "experience" | "goals" | "risk";
+type AuthMode = "signup" | "login";
 type ExperienceLevel = "beginner" | "intermediate" | "advanced";
 type InvestmentGoal = "grow_wealth" | "retirement" | "passive_income" | "emergency_fund";
 type RiskTolerance = "conservative" | "moderate" | "aggressive";
 
 export default function Onboarding() {
   const router = useRouter();
-  const [step, setStep] = useState<Step>("welcome");
+  const [step, setStep] = useState<Step>("auth");
+  const [authMode, setAuthMode] = useState<AuthMode>("signup");
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [experience, setExperience] = useState<ExperienceLevel>("beginner");
   const [goals, setGoals] = useState<InvestmentGoal[]>([]);
   const [risk, setRisk] = useState<RiskTolerance>("moderate");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSignInWithGoogle = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/onboarding`,
-      },
-    });
-    if (error) console.error("Error signing in with Google:", error);
-  };
+  const handleAuth = async () => {
+    setError("");
+    setIsSubmitting(true);
 
-  const handleContinue = async () => {
-    if (step === "welcome") {
-      setStep("experience");
-    } else if (step === "experience") {
-      setStep("goals");
-    } else if (step === "goals") {
-      if (goals.length === 0) return;
-      setStep("risk");
-    } else if (step === "risk") {
-      await handleComplete();
+    try {
+      if (authMode === "signup") {
+        if (!fullName.trim()) {
+          setError("Please enter your full name");
+          setIsSubmitting(false);
+          return;
+        }
+
+        const { user, error: signupError } = await authService.signUp(email, password);
+        
+        if (signupError) {
+          setError(signupError.message);
+          setIsSubmitting(false);
+          return;
+        }
+
+        if (user) {
+          // Update user profile with full name
+          await userService.updateUser(user.id, { full_name: fullName });
+          setStep("experience");
+        }
+      } else {
+        const { user, error: loginError } = await authService.signIn(email, password);
+        
+        if (loginError) {
+          setError(loginError.message);
+          setIsSubmitting(false);
+          return;
+        }
+
+        if (user) {
+          router.push("/home");
+        }
+      }
+    } catch (err) {
+      setError("An unexpected error occurred");
+      console.error(err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleComplete = async () => {
     setIsSubmitting(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const currentUser = await authService.getCurrentUser();
       
-      if (user) {
-        await userService.updateUser(user.id, {
+      if (currentUser) {
+        await userService.updateUser(currentUser.id, {
           experience_level: experience,
           investment_goals: goals,
           risk_tolerance: risk,
@@ -64,23 +96,25 @@ export default function Onboarding() {
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-md">
-        {step === "welcome" && (
-          <div className="text-center space-y-6">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-accent mx-auto flex items-center justify-center">
-              <span className="text-4xl">🌸</span>
+        {step === "auth" && (
+          <div className="space-y-6">
+            <div className="text-center space-y-4">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-accent mx-auto flex items-center justify-center">
+                <span className="text-4xl">🌸</span>
+              </div>
+              
+              <h1 className="font-serif text-4xl font-bold text-foreground">
+                Bloom
+              </h1>
+              
+              <p className="text-lg text-muted-foreground font-medium">
+                Invest in yourself first 🌸
+              </p>
             </div>
-            
-            <h1 className="font-serif text-4xl font-bold text-foreground">
-              Bloom
-            </h1>
-            
-            <p className="text-lg text-muted-foreground font-medium">
-              Invest in yourself first 🌸
-            </p>
 
             <Card className="p-6 border-accent border-2">
               <div className="flex gap-4">
-                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-accent to-amber-400 flex items-center justify-center text-3xl flex-shrink-0 animate-pulse">
+                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-accent to-amber-400 flex items-center justify-center text-3xl flex-shrink-0">
                   🌺
                 </div>
                 <div className="flex-1 text-left">
@@ -94,22 +128,84 @@ export default function Onboarding() {
               </div>
             </Card>
 
-            <div className="space-y-3">
-              <Button
-                onClick={handleContinue}
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-base h-12"
-              >
-                Let's get started
-              </Button>
-              
-              <Button
-                onClick={handleSignInWithGoogle}
-                variant="outline"
-                className="w-full border-border text-foreground font-medium text-base h-12"
-              >
-                I already have an account
-              </Button>
-            </div>
+            <Card className="p-6">
+              <div className="space-y-4">
+                <div className="flex gap-2 p-1 bg-muted rounded-lg">
+                  <Button
+                    type="button"
+                    variant={authMode === "signup" ? "default" : "ghost"}
+                    className="flex-1"
+                    onClick={() => setAuthMode("signup")}
+                  >
+                    Sign Up
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={authMode === "login" ? "default" : "ghost"}
+                    className="flex-1"
+                    onClick={() => setAuthMode("login")}
+                  >
+                    Log In
+                  </Button>
+                </div>
+
+                {authMode === "signup" && (
+                  <div className="space-y-2">
+                    <Label htmlFor="fullName">Full Name</Label>
+                    <Input
+                      id="fullName"
+                      type="text"
+                      placeholder="Jane Doe"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      disabled={isSubmitting}
+                    />
+                  </div>
+                )}
+
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="jane@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={isSubmitting}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={isSubmitting}
+                  />
+                </div>
+
+                {error && (
+                  <p className="text-sm text-destructive">{error}</p>
+                )}
+
+                <Button
+                  onClick={handleAuth}
+                  disabled={isSubmitting || !email || !password || (authMode === "signup" && !fullName)}
+                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-12"
+                >
+                  {isSubmitting ? (
+                    <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Processing...</>
+                  ) : authMode === "signup" ? (
+                    "Create Account"
+                  ) : (
+                    "Log In"
+                  )}
+                </Button>
+              </div>
+            </Card>
           </div>
         )}
 
@@ -161,7 +257,7 @@ export default function Onboarding() {
             </div>
 
             <Button
-              onClick={handleContinue}
+              onClick={() => setStep("goals")}
               className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-12"
             >
               Continue
@@ -224,7 +320,7 @@ export default function Onboarding() {
             </div>
 
             <Button
-              onClick={handleContinue}
+              onClick={() => setStep("risk")}
               disabled={goals.length === 0}
               className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-12"
             >
@@ -281,11 +377,15 @@ export default function Onboarding() {
             </div>
 
             <Button
-              onClick={handleContinue}
+              onClick={handleComplete}
               disabled={isSubmitting}
               className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-12"
             >
-              {isSubmitting ? "Setting up your account..." : "Complete Setup"}
+              {isSubmitting ? (
+                <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Setting up your account...</>
+              ) : (
+                "Complete Setup"
+              )}
             </Button>
           </div>
         )}

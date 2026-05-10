@@ -38,10 +38,22 @@ export default function Home() {
     checkFirstVisit();
   }, []);
 
-  const checkFirstVisit = () => {
-    const hasVisited = sessionStorage.getItem("dahlia-popup-returning");
-    if (!hasVisited) {
-      setShowDahliaPopup(true);
+  const checkFirstVisit = async () => {
+    const currentUser = await authService.getCurrentUser();
+    if (currentUser) {
+      const userData = await userService.getCurrentUser();
+      
+      // Check if user just completed onboarding (no experience level set)
+      if (userData && !userData.experience_level) {
+        return; // Don't show popup if they haven't completed onboarding
+      }
+      
+      // Show popup for returning users
+      const hasVisited = sessionStorage.getItem("dahlia-popup-shown");
+      if (!hasVisited) {
+        setShowDahliaPopup(true);
+        sessionStorage.setItem("dahlia-popup-shown", "true");
+      }
     }
   };
 
