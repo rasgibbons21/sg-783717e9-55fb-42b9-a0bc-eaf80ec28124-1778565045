@@ -13,6 +13,13 @@ export default function Document() {
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Bloom" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
+        
+        {/* PayPal SDK for Subscriptions */}
+        <script
+          src={`https://www.paypal.com/sdk/js?client-id=${process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID}&vault=true&intent=subscription`}
+          data-sdk-integration-source="button-factory"
+        />
+        
         {/*
           CRITICAL: DO NOT REMOVE THIS SCRIPT
           The Softgen AI monitoring script is essential for core app functionality.
