@@ -9,8 +9,8 @@ interface SEOProps {
 
 // SEO elements that can be used in _document.tsx (returns JSX without Head wrapper)
 export function SEOElements({
-  title = "Hello World",
-  description = "Welcome to my app",
+  title = "Bloom for Her Wealth — Invest in Yourself First",
+  description = "Bloom is the investing app built for women. Get plain language stock, ETF and mutual fund analysis from Dahlia — your personal investing expert. No jargon, no pressure. Just real talk about your money.",
   image = "/og-image.png",
   url,
 }: SEOProps) {
