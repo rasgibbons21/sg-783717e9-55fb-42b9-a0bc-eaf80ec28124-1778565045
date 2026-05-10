@@ -1,8 +1,12 @@
 import { supabase } from "@/integrations/supabase/client";
 
 const PAYPAL_API_BASE = "https://api-m.paypal.com";
-const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "";
-const PAYPAL_SECRET = process.env.PAYPAL_SECRET || "";
+const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
+const PAYPAL_SECRET = process.env.PAYPAL_SECRET;
+
+// PayPal Subscription Plan IDs
+const PAYPAL_MONTHLY_PLAN_ID = "PROD-96J00408F4153314T";
+const PAYPAL_YEARLY_PLAN_ID = "PROD-3BA733477V643725E";
 
 interface PayPalSubscription {
   id: string;
