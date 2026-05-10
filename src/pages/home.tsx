@@ -4,6 +4,7 @@ import { DahliaPopup } from "@/components/DahliaPopup";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { authService } from "@/services/authService";
 import { userService } from "@/services/userService";
 import { marketService, Quote } from "@/services/marketService";
 import { dahliaAnalysisService } from "@/services/dahliaAnalysisService";
