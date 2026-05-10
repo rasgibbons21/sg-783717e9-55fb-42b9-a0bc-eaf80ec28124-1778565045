@@ -4,7 +4,6 @@ import type { StockQuote, ETFProfile } from "@/types";
 const POLYGON_API_KEY = process.env.NEXT_PUBLIC_POLYGON_API_KEY || "";
 const FINNHUB_API_KEY = process.env.NEXT_PUBLIC_FINNHUB_API_KEY || "";
 const FMP_API_KEY = process.env.NEXT_PUBLIC_FMP_API_KEY || "";
-const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || "";
 
 interface PriceData {
   currentPrice: number;
@@ -43,6 +42,8 @@ interface ETFSectorData {
 export interface DahliaAnalysis {
   content: string;
   sentiment: "Optimistic" | "Cautious" | "Neutral" | "Watchful";
+  timestamp?: string;
+  analysis?: string; // For backward compatibility
 }
 
 export const dahliaAnalysisService = {
@@ -243,112 +244,96 @@ export const dahliaAnalysisService = {
     }
   },
 
-  // Generate Dahlia's analysis using Claude API
-  async generateAnalysis(ticker: string, isETF: boolean = false): Promise<DahliaAnalysis> {
+  // Generate Dahlia's analysis using our Next.js API route
+  async generateAnalysis(
+    ticker: string, 
+    isETF: boolean = false, 
+    quoteData?: any, 
+    profileData?: any, 
+    newsData?: any[]
+  ): Promise<DahliaAnalysis> {
     try {
-      // Gather all data in parallel
-      const [priceData, news, fundamentals, chartPattern, sectorData] = await Promise.all([
-        this.getPriceData(ticker),
-        this.getNewsWithSentiment(ticker),
-        this.getFundamentals(ticker),
-        this.detectChartPattern(ticker),
-        isETF ? this.getETFSectorExposure(ticker) : Promise.resolve([]),
-      ]);
+      let priceAction = "Price data unavailable.";
+      let newsContext = "No recent news available.";
+      let fundamentalsContext = "Fundamental data unavailable.";
+      let chartContext = "Chart data unavailable.";
+      let sectorContext = "";
 
-      // Prepare data summary for Claude
-      const priceAction = priceData 
-        ? `Current price: $${priceData.currentPrice.toFixed(2)}, ${priceData.changePercent > 0 ? 'up' : 'down'} ${Math.abs(priceData.changePercent).toFixed(2)}% today. High: $${priceData.high.toFixed(2)}, Low: $${priceData.low.toFixed(2)}.`
-        : "Price data unavailable.";
+      // Fetch dynamic data if we need it (the 2-argument call)
+      if (!quoteData) {
+        const [priceData, news, fundamentals, chartPattern, sectorData] = await Promise.all([
+          this.getPriceData(ticker),
+          this.getNewsWithSentiment(ticker),
+          this.getFundamentals(ticker),
+          this.detectChartPattern(ticker),
+          isETF ? this.getETFSectorExposure(ticker) : Promise.resolve([]),
+        ]);
 
-      const newsContext = news.length > 0
-        ? news.map(n => `${n.sentiment.toUpperCase()}: "${n.headline}" (${n.source})`).join("\n")
-        : "No recent news available.";
+        if (priceData) {
+          priceAction = `Current price: $${priceData.currentPrice.toFixed(2)}, ${priceData.changePercent > 0 ? 'up' : 'down'} ${Math.abs(priceData.changePercent).toFixed(2)}% today.`;
+        }
+        
+        if (news && news.length > 0) {
+          newsContext = news.map(n => `${n.sentiment.toUpperCase()}: "${n.headline}"`).join("\n");
+        }
 
-      const fundamentalsContext = fundamentals
-        ? `Profit margin: ${(fundamentals.profitMargin * 100).toFixed(1)}%, Debt-to-equity: ${fundamentals.debtToEquity.toFixed(2)}, P/E ratio: ${fundamentals.peRatio.toFixed(1)}`
-        : "Fundamental data unavailable.";
+        if (fundamentals) {
+          fundamentalsContext = `Profit margin: ${(fundamentals.profitMargin * 100).toFixed(1)}%, Debt-to-equity: ${fundamentals.debtToEquity.toFixed(2)}, P/E ratio: ${fundamentals.peRatio.toFixed(1)}`;
+        }
 
-      const chartContext = `Chart shows a ${chartPattern.trend}${chartPattern.pattern ? ` with a ${chartPattern.pattern} pattern` : ''}. Trend strength: ${chartPattern.strength.toFixed(1)}%.`;
+        if (chartPattern) {
+          chartContext = `Chart shows a ${chartPattern.trend}${chartPattern.pattern ? ` with a ${chartPattern.pattern} pattern` : ''}.`;
+        }
 
-      const sectorContext = sectorData.length > 0
-        ? `Sector exposure: ${sectorData.map(s => `${s.sector} (${s.weight.toFixed(1)}%)`).join(', ')}.`
-        : "";
-
-      // Call Claude API
-      const anthropic = new Anthropic({
-        apiKey: ANTHROPIC_API_KEY,
-      });
+        if (sectorData && sectorData.length > 0) {
+          sectorContext = `Sector exposure: ${sectorData.map(s => `${s.sector} (${s.weight.toFixed(1)}%)`).join(', ')}.`;
+        }
+      } else {
+        // Use provided data (the 4-argument call backward compatibility)
+        priceAction = `Current price: $${quoteData?.c || "Unknown"}, Daily change: ${quoteData?.dp ? `${quoteData.dp}%` : "Unknown"}`;
+        if (profileData) {
+          fundamentalsContext = `Company info: ${profileData.name || ticker} - ${profileData.finnhubIndustry || profileData.assetClass || "Unknown"}`;
+        }
+        if (newsData && newsData.length > 0) {
+          newsContext = newsData.slice(0, 3).map(n => `- ${n.headline || n.symbol}`).join('\n');
+        }
+      }
 
       const prompt = `You are Dahlia, Bloom's investing expert. You have just reviewed the following data for ${ticker}:
 
 PRICE ACTION: ${priceAction}
-
-RECENT NEWS:
-${newsContext}
-
+RECENT NEWS: ${newsContext}
 FUNDAMENTALS: ${fundamentalsContext}
-
 CHART PATTERN: ${chartContext}
-
 ${sectorContext ? `SECTOR DATA: ${sectorContext}` : ''}
 
 Write a 3 paragraph analysis in your warm girlfriend tone. 
+Paragraph 1 — what is happening with this stock right now in plain language.
+Paragraph 2 — what the data and news are suggesting without using any financial jargon.
+Paragraph 3 — what makes sense here based on everything you are seeing (never say buy/sell/hold).
+End with: "This is just educational info — not financial advice. Always invest what feels right for you 💛 — Dahlia"`;
 
-Paragraph 1 — what is happening with this stock right now in plain language. Use everyday words like "the price went up/down" instead of technical terms.
-
-Paragraph 2 — what the data and news are suggesting without using any financial jargon. Replace terms like "bearish" with "concerning" or "looking shaky", "bullish" with "promising" or "looking strong", "consolidating" with "hanging around the same price", "momentum" with "energy" or "movement".
-
-Paragraph 3 — what makes sense here based on everything you are seeing. Frame this as what you personally think makes sense, not as a buy or sell recommendation. Never say "buy", "sell", or "hold". Instead use language like: "this one is worth watching", "the data is giving me pause right now", "everything is lining up nicely here", "I would want to see more before getting excited", or "this one feels like a sit and watch situation for now".
-
-End with: "This is just educational info — not financial advice. Always invest what feels right for you 💛 — Dahlia"
-
-Never mention AI, APIs, algorithms, data sources, or automation. Write as if you personally reviewed everything yourself. Use light emojis naturally but sparingly. Be honest about risk.`;
-
-      const message = await anthropic.messages.create({
-        model: "claude-3-5-sonnet-20241022",
-        max_tokens: 1024,
-        messages: [
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
+      const response = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt }),
       });
 
-      const analysisText = message.content[0].type === 'text' 
-        ? message.content[0].text 
-        : "Analysis unavailable at this time.";
-
-      // Determine overall sentiment
-      const newsPositive = news.filter(n => n.sentiment === "positive").length;
-      const newsNegative = news.filter(n => n.sentiment === "negative").length;
-      const trendPositive = chartPattern.trend === "uptrend";
-
-      let sentiment: "bullish" | "bearish" | "neutral" | "cautious";
-      if (newsPositive > newsNegative && trendPositive) {
-        sentiment = "bullish";
-      } else if (newsNegative > newsPositive && !trendPositive) {
-        sentiment = "bearish";
-      } else if (newsNegative > 0 || chartPattern.trend === "downtrend") {
-        sentiment = "cautious";
-      } else {
-        sentiment = "neutral";
+      if (response.ok) {
+        const data = await response.json();
+        // Handle both expected JSON formats
+        return {
+          content: data.content || data.analysis || "Analysis generated.",
+          sentiment: data.sentiment || "Neutral",
+          analysis: data.content || data.analysis, // Backward compatibility
+          timestamp: new Date().toISOString(),
+        };
       }
 
-      return {
-        analysis: analysisText,
-        sentiment,
-        timestamp: new Date().toISOString(),
-      };
+      return this.getStaticFallbackAnalysis(ticker);
     } catch (error) {
       console.error("Error generating Dahlia analysis:", error);
-      
-      // Fallback analysis
-      return {
-        analysis: `Hey! I'm having a bit of trouble pulling all the data for ${ticker} right now, but here's what I can tell you based on what I'm seeing.\n\nThe market is always moving, and this stock is no exception. Sometimes the data takes a minute to catch up, but that's okay — we're here to learn together.\n\nFor now, I'd say take your time with this one. Do a little more research on your own, check out what the company actually does, and see if it aligns with your goals. No rush!\n\nThis is just educational info — not financial advice. Always invest what feels right for you 💛 — Dahlia`,
-        sentiment: "neutral",
-        timestamp: new Date().toISOString(),
-      };
+      return this.getStaticFallbackAnalysis(ticker);
     }
   },
 
@@ -358,159 +343,39 @@ Never mention AI, APIs, algorithms, data sources, or automation. Write as if you
     etfTicker: string
   ): Promise<string> => {
     try {
-      const anthropic = new Anthropic({
-        apiKey: process.env.ANTHROPIC_API_KEY,
-      });
-
       const prompt = `You are Dahlia, Bloom's investing expert with a warm girlfriend tone. A news headline just came out related to the ${sector} sector, which is one of the main sectors in the ${etfTicker} ETF.
-
 Headline: "${headline}"
+Write ONE casual sentence (15-25 words max) explaining how this news might affect the ${sector} companies inside this ETF. Keep it conversational, honest, and use light emojis naturally. Never use jargon. Just one sentence.`;
 
-Write ONE casual sentence (15-25 words max) explaining how this news might affect the ${sector} companies inside this ETF. Use language like:
-- "This is good news for the tech companies inside this ETF 👀"
-- "This could create some short term noise but probably won't affect the long term picture"
-- "Worth keeping an eye on this one — it could ripple through the whole sector"
-- "This is exactly what we want to see happening in this space 💛"
-- "Not a huge deal honestly, these things tend to smooth out"
-
-Keep it conversational, honest, and use light emojis naturally. Never use jargon. Just one sentence.`;
-
-      const message = await anthropic.messages.create({
-        model: "claude-3-5-sonnet-20241022",
-        max_tokens: 100,
-        messages: [
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
+      const response = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          prompt, 
+          format: "text" // Tell API to just return text for this specific call if we update the API, otherwise we extract from content
+        }),
       });
 
-      const reaction = message.content[0].type === "text" 
-        ? message.content[0].text.trim() 
-        : "Keeping an eye on this one 🌸";
-
-      return reaction;
+      if (response.ok) {
+        const data = await response.json();
+        return data.content || data.text || "Keeping an eye on how this plays out 🌸";
+      }
+      return "Keeping an eye on how this plays out 🌸";
     } catch (error) {
       console.error("Error generating sector news reaction:", error);
-      
-      // Fallback reactions
-      const fallbacks = [
-        "This is worth watching for the companies in this ETF 👀",
-        "Could create some movement but probably won't change the bigger picture",
-        "Keeping an eye on how this plays out 🌸",
-        "This could ripple through the sector, worth noting",
-        "Not a huge deal but good to be aware of",
-      ];
-      return fallbacks[Math.floor(Math.random() * fallbacks.length)];
-    }
-  },
-
-  generateAnalysis: async (
-    ticker: string,
-    quoteData: StockQuote | null,
-    companyProfile: any | null,
-    news: any[] = []
-  ): Promise<DahliaAnalysis | null> => {
-    try {
-      // 1. Check if we have an Anthropic API key via Supabase or environment
-      // We'll call our Next.js API route instead of the SDK directly
-      
-      const prompt = `
-Analyze ${ticker} for a beginner investor.
-Current price: $${quoteData?.c || "Unknown"}
-Daily change: ${quoteData?.dp ? `${quoteData.dp}%` : "Unknown"}
-Company info: ${companyProfile?.name || ticker} - ${companyProfile?.finnhubIndustry || "Unknown sector"}
-
-Recent news headlines:
-${news.slice(0, 3).map(n => `- ${n.headline}`).join('\n')}
-
-Provide a brief, warm analysis of what this means for an investor.
-`;
-
-      const response = await fetch("/api/analyze", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ prompt }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        return data as DahliaAnalysis;
-      }
-
-      console.warn("AI API route failed, falling back to static analysis", response.status);
-      return dahliaAnalysisService.getStaticFallbackAnalysis(ticker, quoteData, companyProfile, news);
-    } catch (error) {
-      console.error("Error calling AI analysis endpoint:", error);
-      return dahliaAnalysisService.getStaticFallbackAnalysis(ticker, quoteData, companyProfile, news);
-    }
-  },
-
-  // Generate an analysis for an ETF specifically
-  generateETFAnalysis: async (
-    ticker: string,
-    quoteData: StockQuote | null,
-    etfProfile: ETFProfile | null,
-    holdings: any[] = []
-  ): Promise<DahliaAnalysis | null> => {
-    try {
-      const prompt = `
-Analyze the ${ticker} ETF for a beginner investor.
-Current price: $${quoteData?.c || "Unknown"}
-Daily change: ${quoteData?.dp ? `${quoteData.dp}%` : "Unknown"}
-ETF info: ${etfProfile?.name || ticker} - ${etfProfile?.assetClass || "Unknown asset class"}
-
-Top holdings:
-${holdings.slice(0, 5).map(h => `- ${h.symbol}: ${h.weightPercent}%`).join('\n')}
-
-Provide a brief, warm analysis of what this means and why someone might hold this ETF.
-`;
-
-      const response = await fetch("/api/analyze", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ prompt }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        return data as DahliaAnalysis;
-      }
-
-      console.warn("AI API route failed, falling back to static ETF analysis", response.status);
-      return dahliaAnalysisService.getStaticFallbackETFAnalysis(ticker, quoteData, etfProfile);
-    } catch (error) {
-      console.error("Error calling AI analysis endpoint:", error);
-      return dahliaAnalysisService.getStaticFallbackETFAnalysis(ticker, quoteData, etfProfile);
+      return "Keeping an eye on how this plays out 🌸";
     }
   },
 
   // Fallback for when the API route is unavailable or fails
-  getStaticFallbackAnalysis: (
-    ticker: string,
-    quoteData: StockQuote | null,
-    companyProfile: any | null,
-    news: any[]
-  ): DahliaAnalysis => {
+  getStaticFallbackAnalysis: (ticker: string): DahliaAnalysis => {
+    const fallbackText = `Hey! I'm having a bit of trouble pulling all the data for ${ticker} right now, but here's what I can tell you based on what I'm seeing.\n\nThe market is always moving, and this stock is no exception. Sometimes the data takes a minute to catch up, but that's okay — we're here to learn together.\n\nFor now, I'd say take your time with this one. Do a little more research on your own, check out what the company actually does, and see if it aligns with your goals. No rush!\n\nThis is just educational info — not financial advice. Always invest what feels right for you 💛 — Dahlia`;
+    
     return {
-      content: `Hey! I'm having a bit of trouble pulling all the data for ${ticker} right now, but here's what I can tell you based on what I'm seeing.\n\nThe market is always moving, and this stock is no exception. Sometimes the data takes a minute to catch up, but that's okay — we're here to learn together.\n\nFor now, I'd say take your time with this one. Do a little more research on your own, check out what the company actually does, and see if it aligns with your goals. No rush!\n\nThis is just educational info — not financial advice. Always invest what feels right for you 💛 — Dahlia`,
-      sentiment: "neutral",
-    };
-  },
-
-  getStaticFallbackETFAnalysis: (
-    ticker: string,
-    quoteData: StockQuote | null,
-    etfProfile: ETFProfile | null
-  ): DahliaAnalysis => {
-    return {
-      content: `Hey! I'm having a bit of trouble pulling all the data for ${ticker} right now, but here's what I can tell you based on what I'm seeing.\n\nThe market is always moving, and this stock is no exception. Sometimes the data takes a minute to catch up, but that's okay — we're here to learn together.\n\nFor now, I'd say take your time with this one. Do a little more research on your own, check out what the company actually does, and see if it aligns with your goals. No rush!\n\nThis is just educational info — not financial advice. Always invest what feels right for you 💛 — Dahlia`,
-      sentiment: "neutral",
+      content: fallbackText,
+      analysis: fallbackText,
+      sentiment: "Neutral",
+      timestamp: new Date().toISOString(),
     };
   },
 };

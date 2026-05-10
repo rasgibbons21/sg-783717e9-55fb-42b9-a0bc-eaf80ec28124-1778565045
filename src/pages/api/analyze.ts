@@ -59,11 +59,20 @@ You must respond with a JSON object in this exact format:
 
     // Try to parse the JSON response
     try {
+      // If the client requested raw text format, return it wrapped in an object
+      if (req.body.format === "text") {
+        return res.status(200).json({ text: responseContent.text });
+      }
+      
       const parsedResponse = JSON.parse(responseContent.text);
       return res.status(200).json(parsedResponse);
     } catch (parseError) {
-      console.error("Failed to parse Claude response as JSON:", responseContent.text);
-      return res.status(500).json({ error: "Invalid response format from AI" });
+      // If it fails to parse as JSON but we have text, return it as content
+      console.warn("Claude response wasn't valid JSON, wrapping text in object");
+      return res.status(200).json({ 
+        content: responseContent.text,
+        sentiment: "Neutral" 
+      });
     }
   } catch (error: any) {
     console.error("Error in AI analysis endpoint:", error);
