@@ -18,32 +18,29 @@ interface WatchlistItem {
 
 export default function Portfolio() {
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
   const [watchlist, setWatchlist] = useState<WatchlistItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [addingTicker, setAddingTicker] = useState("");
   const [isAddingNew, setIsAddingNew] = useState(false);
 
   useEffect(() => {
-    checkAuth();
+    checkAuthAndLoad();
   }, []);
 
-  const checkAuth = async () => {
-    const session = await authService.getSession();
+  const checkAuthAndLoad = async () => {
+    setLoading(true);
+    const session = await authService.getCurrentSession();
     if (!session) {
       router.push("/");
       return;
     }
-    setUser(session.user);
-    await loadWatchlist(session.user.id);
+    await loadWatchlist();
   };
 
-  const loadWatchlist = async (userId: string) => {
-    setLoading(true);
+  const loadWatchlist = async () => {
     try {
-      // Load user's watchlist from preferences
-      const { data: profile } = await authService.getProfile(userId);
-      const savedTickers = profile?.watchlist || ["AAPL", "GOOGL", "MSFT"];
+      const saved = localStorage.getItem("bloom_watchlist");
+      const savedTickers = saved ? JSON.parse(saved) : ["AAPL", "GOOGL", "MSFT"];
       
       const items: WatchlistItem[] = savedTickers.map((ticker: string) => ({
         ticker,
@@ -53,7 +50,6 @@ export default function Portfolio() {
       
       setWatchlist(items);
 
-      // Load quotes for each ticker
       for (let i = 0; i < items.length; i++) {
         const quote = await marketService.getQuote(items[i].ticker);
         setWatchlist(prev => {
@@ -70,7 +66,7 @@ export default function Portfolio() {
   };
 
   const addToWatchlist = async () => {
-    if (!addingTicker.trim() || !user) return;
+    if (!addingTicker.trim()) return;
 
     const ticker = addingTicker.trim().toUpperCase();
     
@@ -96,9 +92,9 @@ export default function Portfolio() {
       const updatedList = [...watchlist, newItem];
       setWatchlist(updatedList);
 
-      // Save to database
+      // Save to localStorage
       const tickers = updatedList.map(item => item.ticker);
-      await authService.updateProfile(user.id, { watchlist: tickers });
+      localStorage.setItem("bloom_watchlist", JSON.stringify(tickers));
 
       setAddingTicker("");
     } catch (error) {
@@ -110,14 +106,12 @@ export default function Portfolio() {
   };
 
   const removeFromWatchlist = async (ticker: string) => {
-    if (!user) return;
-
     const updatedList = watchlist.filter(item => item.ticker !== ticker);
     setWatchlist(updatedList);
 
-    // Save to database
+    // Save to localStorage
     const tickers = updatedList.map(item => item.ticker);
-    await authService.updateProfile(user.id, { watchlist: tickers });
+    localStorage.setItem("bloom_watchlist", JSON.stringify(tickers));
   };
 
   if (loading) {
