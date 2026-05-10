@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { userService } from "@/services/userService";
 import { marketService, Quote } from "@/services/marketService";
 import { dahliaAnalysisService } from "@/services/dahliaAnalysisService";
-import { TrendingUp, TrendingDown } from "lucide-react";
+import { TrendingUp, TrendingDown, Loader2 } from "lucide-react";
 import Link from "next/link";
 import type { Database } from "@/integrations/supabase/types";
 
@@ -20,6 +20,7 @@ interface StockPick {
   change: number;
   changePercent: number;
   insight: string;
+  loading?: boolean;
 }
 
 export default function Home() {
@@ -27,6 +28,8 @@ export default function Home() {
   const [marketIndices, setMarketIndices] = useState<Record<string, Quote>>({});
   const [dahliasPicks, setDahliasPicks] = useState<StockPick[]>([]);
   const [showDahliaPopup, setShowDahliaPopup] = useState(false);
+  const [loadingMarket, setLoadingMarket] = useState(true);
+  const [loadingPicks, setLoadingPicks] = useState(true);
 
   useEffect(() => {
     loadUserData();
@@ -52,11 +55,20 @@ export default function Home() {
   };
 
   const loadMarketData = async () => {
-    const indices = await marketService.getMarketIndices();
-    setMarketIndices(indices);
+    setLoadingMarket(true);
+    try {
+      const indices = await marketService.getMarketIndices();
+      console.log("Market indices loaded:", indices);
+      setMarketIndices(indices);
+    } catch (error) {
+      console.error("Error loading market data:", error);
+    } finally {
+      setLoadingMarket(false);
+    }
   };
 
   const loadDahliasPicks = async () => {
+    setLoadingPicks(true);
     const picks: StockPick[] = [
       {
         ticker: "AAPL",
@@ -64,7 +76,8 @@ export default function Home() {
         price: 0,
         change: 0,
         changePercent: 0,
-        insight: "Loading Dahlia's analysis...",
+        insight: "Loading...",
+        loading: true,
       },
       {
         ticker: "SCHD",
@@ -72,7 +85,8 @@ export default function Home() {
         price: 0,
         change: 0,
         changePercent: 0,
-        insight: "Loading Dahlia's analysis...",
+        insight: "Loading...",
+        loading: true,
       },
       {
         ticker: "NVDA",
@@ -80,42 +94,50 @@ export default function Home() {
         price: 0,
         change: 0,
         changePercent: 0,
-        insight: "Loading Dahlia's analysis...",
+        insight: "Loading...",
+        loading: true,
       },
     ];
 
-    // Load prices and AI-generated insights in parallel
-    const picksWithData = await Promise.all(
-      picks.map(async (pick) => {
-        const [quote, analysis] = await Promise.all([
-          marketService.getQuote(pick.ticker),
-          dahliaAnalysisService.generateAnalysis(pick.ticker, pick.ticker === "SCHD"),
-        ]);
+    setDahliasPicks(picks);
 
-        // Extract first sentence from analysis as insight
-        let insight = pick.insight;
-        if (analysis && analysis.analysis) {
-          const sentences = analysis.analysis.split(/[.!?]/);
-          const firstSentence = sentences.find(s => s.trim().length > 20);
-          if (firstSentence) {
-            insight = firstSentence.trim() + " 🌟";
-          }
-        }
+    // Load prices and AI-generated insights sequentially to avoid rate limits
+    for (let i = 0; i < picks.length; i++) {
+      const pick = picks[i];
+      try {
+        // Get quote
+        const quote = await marketService.getQuote(pick.ticker);
+        
+        // Get AI-generated one-liner insight
+        const insightText = await dahliaAnalysisService.generateOneLinerInsight(pick.ticker);
 
-        if (quote) {
-          return {
-            ...pick,
-            price: quote.c,
-            change: quote.d,
-            changePercent: quote.dp,
-            insight,
+        setDahliasPicks(prev => {
+          const updated = [...prev];
+          updated[i] = {
+            ...updated[i],
+            price: quote?.c || 0,
+            change: quote?.d || 0,
+            changePercent: quote?.dp || 0,
+            insight: insightText || "Dahlia is thinking... 🌸",
+            loading: false,
           };
-        }
-        return { ...pick, insight };
-      })
-    );
-
-    setDahliasPicks(picksWithData);
+          return updated;
+        });
+      } catch (error) {
+        console.error(`Error loading pick ${pick.ticker}:`, error);
+        setDahliasPicks(prev => {
+          const updated = [...prev];
+          updated[i] = {
+            ...updated[i],
+            insight: "Check back soon for Dahlia's take 💛",
+            loading: false,
+          };
+          return updated;
+        });
+      }
+    }
+    
+    setLoadingPicks(false);
   };
 
   const formatPrice = (price: number) => {
@@ -157,33 +179,43 @@ export default function Home() {
           </div>
 
           <Card className="p-4 bg-card">
-            <div className="grid grid-cols-2 gap-4">
-              {Object.entries(marketIndices).map(([index, quote]) => (
-                <div key={index} className="space-y-1">
-                  <p className="text-xs font-medium text-muted-foreground">
-                    {formatIndexName(index)}
-                  </p>
-                  <p className="text-lg font-bold text-foreground tabular-nums">
-                    {quote.c.toFixed(2)}
-                  </p>
-                  <div className="flex items-center gap-1">
-                    {quote.d >= 0 ? (
-                      <TrendingUp className="w-3 h-3 text-green-600" />
-                    ) : (
-                      <TrendingDown className="w-3 h-3 text-red-600" />
-                    )}
-                    <span
-                      className={`text-xs font-semibold tabular-nums ${
-                        quote.d >= 0 ? "text-green-600" : "text-red-600"
-                      }`}
-                    >
-                      {quote.d >= 0 ? "+" : ""}
-                      {quote.dp.toFixed(2)}%
-                    </span>
+            {loadingMarket ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+              </div>
+            ) : Object.keys(marketIndices).length === 0 ? (
+              <p className="text-center text-sm text-muted-foreground py-4">
+                Market data unavailable. Check API key.
+              </p>
+            ) : (
+              <div className="grid grid-cols-2 gap-4">
+                {Object.entries(marketIndices).map(([index, quote]) => (
+                  <div key={index} className="space-y-1">
+                    <p className="text-xs font-medium text-muted-foreground">
+                      {formatIndexName(index)}
+                    </p>
+                    <p className="text-lg font-bold text-foreground tabular-nums">
+                      {quote.c.toFixed(2)}
+                    </p>
+                    <div className="flex items-center gap-1">
+                      {quote.d >= 0 ? (
+                        <TrendingUp className="w-3 h-3 text-green-600" />
+                      ) : (
+                        <TrendingDown className="w-3 h-3 text-red-600" />
+                      )}
+                      <span
+                        className={`text-xs font-semibold tabular-nums ${
+                          quote.d >= 0 ? "text-green-600" : "text-red-600"
+                        }`}
+                      >
+                        {quote.d >= 0 ? "+" : ""}
+                        {quote.dp.toFixed(2)}%
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </Card>
 
           <div className="space-y-4">
@@ -208,41 +240,58 @@ export default function Home() {
                         {pick.name}
                       </p>
                     </div>
-                    <Badge
-                      variant={pick.changePercent >= 0 ? "default" : "destructive"}
-                      className={
-                        pick.changePercent >= 0
-                          ? "bg-green-100 text-green-800 hover:bg-green-100"
-                          : ""
-                      }
-                    >
-                      {pick.changePercent >= 0 ? "+" : ""}
-                      {pick.changePercent.toFixed(2)}%
-                    </Badge>
+                    {pick.loading ? (
+                      <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+                    ) : (
+                      <Badge
+                        variant={pick.changePercent >= 0 ? "default" : "destructive"}
+                        className={
+                          pick.changePercent >= 0
+                            ? "bg-green-100 text-green-800 hover:bg-green-100"
+                            : ""
+                        }
+                      >
+                        {pick.changePercent >= 0 ? "+" : ""}
+                        {pick.changePercent.toFixed(2)}%
+                      </Badge>
+                    )}
                   </div>
 
                   <div className="space-y-1">
-                    <p className="text-2xl font-bold text-foreground tabular-nums">
-                      {formatPrice(pick.price)}
-                    </p>
-                    <p
-                      className={`text-sm font-semibold tabular-nums ${
-                        pick.change >= 0 ? "text-green-600" : "text-red-600"
-                      }`}
-                    >
-                      {pick.change >= 0 ? "+" : ""}
-                      {formatPrice(pick.change)}
-                    </p>
+                    {pick.loading ? (
+                      <div className="h-8 bg-muted animate-pulse rounded" />
+                    ) : (
+                      <>
+                        <p className="text-2xl font-bold text-foreground tabular-nums">
+                          {formatPrice(pick.price)}
+                        </p>
+                        <p
+                          className={`text-sm font-semibold tabular-nums ${
+                            pick.change >= 0 ? "text-green-600" : "text-red-600"
+                          }`}
+                        >
+                          {pick.change >= 0 ? "+" : ""}
+                          {formatPrice(pick.change)}
+                        </p>
+                      </>
+                    )}
                   </div>
 
                   <Card className="p-3 border-accent border-l-4 bg-accent/5">
-                    <p className="text-sm italic text-foreground leading-relaxed">
-                      {pick.insight}
-                    </p>
+                    {pick.loading ? (
+                      <div className="space-y-2">
+                        <div className="h-4 bg-muted animate-pulse rounded w-full" />
+                        <div className="h-4 bg-muted animate-pulse rounded w-3/4" />
+                      </div>
+                    ) : (
+                      <p className="text-sm italic text-foreground leading-relaxed">
+                        {pick.insight}
+                      </p>
+                    )}
                   </Card>
 
                   <Link href={`/stock/${pick.ticker}`}>
-                    <Button variant="outline" className="w-full">
+                    <Button variant="outline" className="w-full" disabled={pick.loading}>
                       Read Dahlia's take →
                     </Button>
                   </Link>
