@@ -110,7 +110,8 @@ export default function Home() {
         
         // Get AI-generated insight
         const analysis = await dahliaAnalysisService.generateAnalysis(
-          pick.ticker, 
+          pick.ticker,
+          false, // isETF 
           quote, 
           null, 
           []
