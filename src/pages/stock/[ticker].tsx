@@ -188,29 +188,29 @@ export default function StockAnalysis() {
               <p className="text-muted-foreground">Stock Analysis</p>
             </div>
             <Badge
-              variant={quote.dp >= 0 ? "default" : "destructive"}
+              variant={(quote?.dp ?? 0) >= 0 ? "default" : "destructive"}
               className={`text-base px-3 py-1 ${
-                quote.dp >= 0
+                (quote?.dp ?? 0) >= 0
                   ? "bg-green-100 text-green-800 hover:bg-green-100"
                   : ""
               }`}
             >
-              {quote.dp >= 0 ? "+" : ""}
-              {quote.dp.toFixed(2)}%
+              {(quote?.dp ?? 0) >= 0 ? "+" : ""}
+              {quote?.dp != null ? quote.dp.toFixed(2) : '0.00'}%
             </Badge>
           </div>
 
           <div className="space-y-1">
             <p className="text-4xl font-bold text-foreground tabular-nums">
-              {formatPrice(quote.c)}
+              {formatPrice(quote?.c ?? 0)}
             </p>
             <p
               className={`text-lg font-semibold tabular-nums ${
-                quote.d >= 0 ? "text-green-600" : "text-red-600"
+                (quote?.d ?? 0) >= 0 ? "text-green-600" : "text-red-600"
               }`}
             >
-              {quote.d >= 0 ? "+" : ""}
-              {formatPrice(quote.d)} today
+              {(quote?.d ?? 0) >= 0 ? "+" : ""}
+              {formatPrice(quote?.d ?? 0)} today
             </p>
           </div>
         </div>
