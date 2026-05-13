@@ -89,7 +89,7 @@ export default function Onboarding() {
   };
 
   const handleCompleteOnboarding = async () => {
-    console.log("Starting onboarding completion...");
+    console.log("=== ONBOARDING COMPLETION START ===");
     console.log("Current values:", { experience, goals, risk });
     
     setIsSubmitting(true);
@@ -97,7 +97,7 @@ export default function Onboarding() {
 
     try {
       const currentUser = await authService.getCurrentUser();
-      console.log("Current user:", currentUser);
+      console.log("Current auth user:", currentUser);
       
       if (!currentUser) {
         throw new Error("User not authenticated");
@@ -108,29 +108,55 @@ export default function Onboarding() {
       const experienceCapitalized = experience.charAt(0).toUpperCase() + experience.slice(1);
       const riskCapitalized = risk.charAt(0).toUpperCase() + risk.slice(1);
 
-      console.log("Updating user with:", {
+      const updates = {
         experience_level: experienceCapitalized,
         investment_goals: goals,
         risk_tolerance: riskCapitalized,
-      });
+      };
 
-      const result = await userService.updateUser(currentUser.id, {
-        experience_level: experienceCapitalized,
-        investment_goals: goals,
-        risk_tolerance: riskCapitalized,
-      });
+      console.log("Attempting to update user with:", updates);
 
+      // Try update first
+      let result = await userService.updateUser(currentUser.id, updates);
+      
       console.log("Update result:", result);
 
-      if (result) {
-        console.log("Onboarding completed successfully, redirecting to /home");
-        router.push("/home");
-      } else {
-        throw new Error("Failed to save preferences");
+      // If update failed (no row exists), try to create the profile first
+      if (!result) {
+        console.log("Update failed - attempting to create user profile");
+        
+        const profileData = {
+          id: currentUser.id,
+          email: currentUser.email,
+          full_name: currentUser.user_metadata?.full_name || "",
+          plan_type: "free" as const,
+          ...updates
+        };
+        
+        console.log("Creating profile with:", profileData);
+        
+        result = await userService.createUserProfile(profileData);
+        console.log("Create profile result:", result);
+        
+        if (!result) {
+          throw new Error("Failed to create user profile. Please check your database connection.");
+        }
       }
+
+      console.log("=== ONBOARDING COMPLETED SUCCESSFULLY ===");
+      console.log("Redirecting to /home");
+      
+      router.push("/home");
     } catch (error: any) {
-      console.error("Error completing onboarding:", error);
-      setError(error.message || "Failed to save your preferences. Please try again.");
+      console.error("=== ONBOARDING ERROR ===");
+      console.error("Error type:", error.constructor.name);
+      console.error("Error message:", error.message);
+      console.error("Full error:", error);
+      
+      setError(
+        error.message || 
+        "Failed to save your preferences. Please try refreshing the page and trying again."
+      );
       setIsSubmitting(false);
     }
   };
@@ -503,6 +529,12 @@ export default function Onboarding() {
                 </Card>
               ))}
             </div>
+
+            {error && (
+              <Card className="p-4 border-destructive bg-destructive/5">
+                <p className="text-sm text-destructive">{error}</p>
+              </Card>
+            )}
 
             <Button
               onClick={handleCompleteOnboarding}
