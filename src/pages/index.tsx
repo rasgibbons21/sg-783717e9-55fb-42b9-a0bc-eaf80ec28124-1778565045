@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { marketService } from "@/services/marketService";
-import { TrendingUp, Sparkles, Shield, BarChart3, Users, DollarSign, Target } from "lucide-react";
+import { TrendingUp, Sparkles, Shield, BarChart3, Users, DollarSign, Target, Star } from "lucide-react";
 import { SEO } from "@/components/SEO";
 
 interface FeaturedStock {
@@ -115,90 +115,97 @@ export default function LandingPage() {
         <section className="relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-accent/5 to-background" />
           <div className="relative max-w-6xl mx-auto px-4 py-20 lg:py-32">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
-              <div className="space-y-8">
-                <div className="space-y-4">
-                  <h1 className="font-serif text-5xl lg:text-6xl font-bold text-foreground leading-tight">
-                    Your money.<br />
-                    Your terms.<br />
-                    <span className="text-accent">Your future.</span>
-                  </h1>
-                  <p className="text-xl text-muted-foreground leading-relaxed">
-                    Join thousands of women taking control of their financial future. 
-                    No jargon, no pressure—just real talk about investing with Dahlia, your expert guide.
-                  </p>
-                </div>
+            <div className="space-y-12">
+              {/* Hero Section */}
+              <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+                {/* Left side - Text content */}
+                <div className="space-y-8 order-2 lg:order-1">
+                  <div className="space-y-4">
+                    <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground leading-tight">
+                      Your money. Your terms. Your future.
+                    </h1>
+                    <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed max-w-xl">
+                      Investing made simple with Dahlia, your expert guide who explains
+                      everything in plain language. No confusing jargon. Just real talk
+                      about building wealth.
+                    </p>
+                  </div>
 
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <Link href="/onboarding">
-                    <Button size="lg" className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-lg h-14 px-8">
-                      Start Investing
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <Link href="/onboarding">
+                      <Button
+                        size="lg"
+                        className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-lg px-8 py-6"
+                      >
+                        Start Investing
+                      </Button>
+                    </Link>
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      onClick={() => setShowDahliaModal(true)}
+                      className="w-full sm:w-auto border-accent text-accent hover:bg-accent/10 font-semibold text-lg px-8 py-6"
+                    >
+                      Meet Dahlia
                     </Button>
-                  </Link>
-                  <Button 
-                    size="lg" 
-                    variant="outline" 
-                    className="w-full sm:w-auto border-accent text-accent hover:bg-accent hover:text-accent-foreground text-lg h-14 px-8"
-                    onClick={() => setShowDahliaModal(true)}
-                  >
-                    Meet Dahlia →
-                  </Button>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-4 pt-4">
+                    <div className="text-center space-y-1">
+                      <div className="flex items-center justify-center mb-2">
+                        <Users className="w-5 h-5 text-accent" />
+                      </div>
+                      <p className="text-2xl font-bold text-foreground">12K+</p>
+                      <p className="text-xs text-muted-foreground">Women Investors</p>
+                    </div>
+                    <div className="text-center space-y-1">
+                      <div className="flex items-center justify-center mb-2">
+                        <TrendingUp className="w-5 h-5 text-accent" />
+                      </div>
+                      <p className="text-2xl font-bold text-foreground">$2.4M</p>
+                      <p className="text-xs text-muted-foreground">Analyzed Weekly</p>
+                    </div>
+                    <div className="text-center space-y-1">
+                      <div className="flex items-center justify-center mb-2">
+                        <Star className="w-5 h-5 text-accent" />
+                      </div>
+                      <p className="text-2xl font-bold text-foreground">500+</p>
+                      <p className="text-xs text-muted-foreground">Daily Picks</p>
+                    </div>
+                  </div>
+
+                  <Card className="p-4 bg-gradient-to-br from-accent/10 to-accent/5 border-accent/20">
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent/80 to-accent flex items-center justify-center flex-shrink-0">
+                        <span className="text-xl">🌺</span>
+                      </div>
+                      <div className="space-y-1 flex-1">
+                        <div className="flex items-center gap-2">
+                          <p className="font-semibold text-foreground">Dahlia</p>
+                          <Sparkles className="w-4 h-4 text-accent" />
+                        </div>
+                        <p className="text-sm text-muted-foreground italic leading-relaxed">
+                          "Hi I'm Dahlia — I know everything about investing and I'm going
+                          to break it all down for you in a way that actually makes sense.
+                          No confusing terms, no pressure 💛"
+                        </p>
+                      </div>
+                    </div>
+                  </Card>
                 </div>
 
-                {/* Stats Row */}
-                <div className="grid grid-cols-3 gap-6 pt-8 border-t border-border">
-                  <div>
-                    <div className="flex items-center gap-2 text-accent mb-1">
-                      <Users className="w-5 h-5" />
-                      <p className="text-2xl font-bold text-foreground">12K+</p>
-                    </div>
-                    <p className="text-sm text-muted-foreground">Women Investors</p>
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2 text-accent mb-1">
-                      <TrendingUp className="w-5 h-5" />
-                      <p className="text-2xl font-bold text-foreground">$2.4M</p>
-                    </div>
-                    <p className="text-sm text-muted-foreground">Analyzed Weekly</p>
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2 text-accent mb-1">
-                      <Target className="w-5 h-5" />
-                      <p className="text-2xl font-bold text-foreground">500+</p>
-                    </div>
-                    <p className="text-sm text-muted-foreground">Daily Picks</p>
+                {/* Right side - Hero image */}
+                <div className="order-1 lg:order-2">
+                  <div className="relative">
+                    <img
+                      src="/images/hero-woman.png"
+                      alt="Woman managing investments"
+                      className="w-full h-auto rounded-2xl shadow-2xl object-cover"
+                    />
+                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-accent/10 to-transparent pointer-events-none"></div>
                   </div>
                 </div>
               </div>
-
-              {/* Dahlia Card */}
-              <Card className="relative p-8 bg-gradient-to-br from-accent/10 to-primary/10 border-accent/20 backdrop-blur">
-                <div className="absolute -top-6 -right-6 w-32 h-32 bg-accent/20 rounded-full blur-3xl" />
-                <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-primary/20 rounded-full blur-3xl" />
-                
-                <div className="relative space-y-6">
-                  <div className="flex items-start gap-4">
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-accent to-accent/70 flex items-center justify-center flex-shrink-0 shadow-lg">
-                      <span className="text-3xl">🌺</span>
-                    </div>
-                    <div>
-                      <h3 className="font-serif text-2xl font-bold text-foreground">Meet Dahlia</h3>
-                      <p className="text-sm text-accent font-semibold">Bloom's Investing Expert</p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <p className="text-foreground leading-relaxed italic">
-                      "Hi! I'm Dahlia, and I know everything about investing—but I promise to explain it like we're having brunch, not a finance lecture. No confusing jargon, no pressure. Just real talk about growing your money in a way that actually makes sense 💛"
-                    </p>
-                    
-                    <div className="flex items-center gap-2">
-                      <Sparkles className="w-5 h-5 text-accent" />
-                      <p className="text-sm text-muted-foreground">Available 24/7 to guide your investing journey</p>
-                    </div>
-                  </div>
-                </div>
-              </Card>
             </div>
           </div>
         </section>

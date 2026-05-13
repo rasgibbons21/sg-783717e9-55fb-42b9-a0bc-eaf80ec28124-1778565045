@@ -88,22 +88,49 @@ export default function Onboarding() {
     }
   };
 
-  const handleComplete = async () => {
+  const handleCompleteOnboarding = async () => {
+    console.log("Starting onboarding completion...");
+    console.log("Current values:", { experience, goals, risk });
+    
     setIsSubmitting(true);
+    setError("");
+
     try {
       const currentUser = await authService.getCurrentUser();
+      console.log("Current user:", currentUser);
       
-      if (currentUser) {
-        await userService.updateUser(currentUser.id, {
-          experience_level: experience,
-          investment_goals: goals,
-          risk_tolerance: risk,
-        });
-        router.push("/home");
+      if (!currentUser) {
+        throw new Error("User not authenticated");
       }
-    } catch (error) {
+
+      // Note: CHECK constraints require exact case matching
+      // Database expects: 'Beginner'/'Intermediate'/'Advanced' and 'Conservative'/'Moderate'/'Aggressive'
+      const experienceCapitalized = experience.charAt(0).toUpperCase() + experience.slice(1);
+      const riskCapitalized = risk.charAt(0).toUpperCase() + risk.slice(1);
+
+      console.log("Updating user with:", {
+        experience_level: experienceCapitalized,
+        investment_goals: goals,
+        risk_tolerance: riskCapitalized,
+      });
+
+      const result = await userService.updateUser(currentUser.id, {
+        experience_level: experienceCapitalized,
+        investment_goals: goals,
+        risk_tolerance: riskCapitalized,
+      });
+
+      console.log("Update result:", result);
+
+      if (result) {
+        console.log("Onboarding completed successfully, redirecting to /home");
+        router.push("/home");
+      } else {
+        throw new Error("Failed to save preferences");
+      }
+    } catch (error: any) {
       console.error("Error completing onboarding:", error);
-    } finally {
+      setError(error.message || "Failed to save your preferences. Please try again.");
       setIsSubmitting(false);
     }
   };
@@ -478,7 +505,7 @@ export default function Onboarding() {
             </div>
 
             <Button
-              onClick={handleComplete}
+              onClick={handleCompleteOnboarding}
               disabled={isSubmitting}
               className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-12"
             >
