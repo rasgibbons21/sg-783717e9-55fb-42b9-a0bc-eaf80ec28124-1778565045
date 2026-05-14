@@ -1,32 +1,28 @@
+import { Layout } from "@/components/Layout";
 import { Card } from "@/components/ui/card";
+import { WifiOff } from "lucide-react";
 
 export default function Offline() {
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-6">
-      <Card className="max-w-md w-full p-8 text-center space-y-6">
-        <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-accent to-accent/60 flex items-center justify-center">
-          <span className="text-4xl">🌺</span>
-        </div>
-        
-        <div className="space-y-3">
-          <h1 className="text-2xl font-serif font-semibold text-foreground">
-            You're offline right now
+    <Layout>
+      <div className="container-full py-12 flex items-center justify-center min-h-[70vh]">
+        <Card className="p-8 bg-card border-border rounded-2xl text-center max-w-md space-y-4">
+          <div className="flex justify-center">
+            <WifiOff className="w-16 h-16 text-muted-foreground" />
+          </div>
+          <h1 className="font-serif text-3xl font-bold text-foreground">
+            You're Offline
           </h1>
           <p className="text-muted-foreground leading-relaxed">
-            You're offline right now 🌺 but your saved picks are still here. Connect to get the latest from me.
+            Looks like you lost your internet connection girl. Don't worry, 
+            your saved data is still here. Just reconnect and you'll be 
+            back to building wealth in no time 💛
           </p>
-          <p className="text-sm text-muted-foreground italic">
-            — Dahlia
+          <p className="text-sm text-muted-foreground">
+            — Dahlia 🌺
           </p>
-        </div>
-
-        <button
-          onClick={() => window.location.reload()}
-          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-3 px-6 rounded-lg transition-colors"
-        >
-          Try Again
-        </button>
-      </Card>
-    </div>
+        </Card>
+      </div>
+    </Layout>
   );
 }
