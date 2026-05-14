@@ -171,7 +171,7 @@ export const notificationService = {
         icon: "/icon-192.png",
         badge: "/icon-192.png",
         vibrate: [200, 100, 200],
-      });
+      } as any);
 
       return true;
     } catch (error) {

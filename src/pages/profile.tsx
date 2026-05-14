@@ -25,12 +25,12 @@ export default function Profile() {
   }, []);
 
   const checkAuth = async () => {
-    const session = await authService.getSession();
+    const session = await authService.getCurrentSession();
     if (!session) {
       router.push("/");
       return;
     }
-    const profile = await authService.getProfile();
+    const profile = await authService.getCurrentUser();
     setUser(profile);
     setIsLoading(false);
   };

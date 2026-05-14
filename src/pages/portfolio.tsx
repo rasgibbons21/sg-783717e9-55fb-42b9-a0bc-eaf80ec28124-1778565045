@@ -39,19 +39,19 @@ export default function Portfolio() {
   }, []);
 
   const checkAuth = async () => {
-    const session = await authService.getSession();
+    const session = await authService.getCurrentSession();
     if (!session) {
       router.push("/");
       return;
     }
-    const profile = await authService.getProfile();
+    const profile = await authService.getCurrentUser();
     setUser(profile);
     await loadWatchlist();
     await loadPriceAlerts();
   };
 
   const loadPriceAlerts = async () => {
-    const session = await authService.getSession();
+    const session = await authService.getCurrentSession();
     if (!session) return;
 
     const alerts = await notificationService.getPriceAlerts(session.user.id);
@@ -153,24 +153,24 @@ export default function Portfolio() {
 
     const threshold = parseFloat(alertThreshold);
     if (isNaN(threshold) || threshold <= 0) {
-      alert("Please enter a valid percentage");
+      window.alert("Please enter a valid percentage");
       return;
     }
 
-    const alert = await notificationService.createPriceAlert(
+    const newAlert = await notificationService.createPriceAlert(
       user.id,
       selectedTicker,
       "price_change",
       threshold
     );
 
-    if (alert) {
+    if (newAlert) {
       await loadPriceAlerts();
       setShowAlertDialog(false);
       setSelectedTicker("");
       setAlertThreshold("5");
     } else {
-      alert("Failed to create price alert. Please try again.");
+      window.alert("Failed to create price alert. Please try again.");
     }
   };
 
