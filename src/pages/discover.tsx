@@ -54,7 +54,7 @@ export default function Discover() {
     const tickers = assetLists[activeTab][activeFilter];
     const assetData = await Promise.all(
       tickers.map(async (ticker) => {
-        const quote = await marketService.getQuote(ticker);
+        const quote = await marketService.getRealTimeQuote(ticker);
         if (quote) {
           return {
             ticker,

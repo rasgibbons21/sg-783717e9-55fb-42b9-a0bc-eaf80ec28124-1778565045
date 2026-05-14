@@ -221,6 +221,56 @@ export const dahliaAnalysisService = {
     }
   },
 
+  async getAnalysisWithMarketData(
+    ticker: string,
+    quoteData: any,
+    marketAnalysis: any
+  ): Promise<DahliaAnalysis> {
+    try {
+      const trendText = marketAnalysis.trend === "up" ? "climbing" : marketAnalysis.trend === "down" ? "dropping" : "trading sideways";
+      const volumeText = marketAnalysis.volumeRatio > 1.5 ? `${marketAnalysis.volumeRatio.toFixed(1)}x the average` : "about average";
+      const nearHigh = marketAnalysis.priceVs30DayHigh > -5; // within 5% of high
+      const nearLow = marketAnalysis.priceVs30DayLow < 5; // within 5% of low
+
+      let priceContext = "";
+      if (nearHigh) priceContext = "The price is near its 30 day high so watch for a pullback before jumping in.";
+      else if (nearLow) priceContext = "It's near its 30 day low, which could be a discount opportunity if you believe in the company.";
+      else priceContext = "It's trading right in the middle of its recent range.";
+
+      const prompt = `You are Dahlia, Bloom's investing expert. Write a 3 paragraph analysis in your warm girlfriend tone about ${ticker}.
+
+Use this REAL market data in your analysis. You MUST reference these numbers naturally like a friend talking:
+- The stock has been ${trendText} over the last 30 days.
+- Today's volume is ${volumeText}.
+- ${priceContext}
+
+Make it sound exactly like this example: "${ticker} has been climbing for 3 weeks straight and today's volume is 2x the average — something is definitely happening here 👀 The price is near its 30 day high so watch for a pullback before jumping in"
+
+Do not use any financial jargon. Never say buy/sell/hold.
+End with: "This is just educational info — not financial advice. Always invest what feels right for you 💛 — Dahlia"`;
+
+      const response = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return {
+          content: data.content || data.analysis || "Analysis generated.",
+          sentiment: data.sentiment || "Neutral",
+          analysis: data.content || data.analysis,
+          timestamp: new Date().toISOString(),
+        };
+      }
+      return this.getStaticFallbackAnalysis(ticker);
+    } catch (error) {
+      console.error("Error generating analysis with market data:", error);
+      return this.getStaticFallbackAnalysis(ticker);
+    }
+  },
+
   // Get ETF sector exposure
   async getETFSectorExposure(ticker: string): Promise<ETFSectorData[]> {
     try {

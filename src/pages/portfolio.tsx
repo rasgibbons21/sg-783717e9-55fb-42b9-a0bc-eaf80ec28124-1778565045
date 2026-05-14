@@ -5,14 +5,14 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { authService } from "@/services/authService";
-import { marketService, Quote } from "@/services/marketService";
+import { marketService } from "@/services/marketService";
 import { TrendingUp, TrendingDown, Plus, Trash2, Loader2 } from "lucide-react";
 import { SEO } from "@/components/SEO";
 import Link from "next/link";
 
 interface WatchlistItem {
   ticker: string;
-  quote: Quote | null;
+  quote: any;
   loading: boolean;
 }
 
@@ -51,7 +51,7 @@ export default function Portfolio() {
       setWatchlist(items);
 
       for (let i = 0; i < items.length; i++) {
-        const quote = await marketService.getQuote(items[i].ticker);
+        const quote = await marketService.getRealTimeQuote(items[i].ticker);
         setWatchlist(prev => {
           const updated = [...prev];
           updated[i] = { ...updated[i], quote, loading: false };
@@ -78,7 +78,7 @@ export default function Portfolio() {
 
     setIsAddingNew(true);
     try {
-      const quote = await marketService.getQuote(ticker);
+      const quote = await marketService.getRealTimeQuote(ticker);
       if (!quote) {
         alert("Invalid ticker symbol");
         setIsAddingNew(false);

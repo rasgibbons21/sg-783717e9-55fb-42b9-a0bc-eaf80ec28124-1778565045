@@ -52,7 +52,7 @@ export default function LandingPage() {
     const stocks: FeaturedStock[] = [];
 
     for (const ticker of tickers) {
-      const quote = await marketService.getQuote(ticker);
+      const quote = await marketService.getRealTimeQuote(ticker);
       if (quote) {
         stocks.push({
           ticker,
