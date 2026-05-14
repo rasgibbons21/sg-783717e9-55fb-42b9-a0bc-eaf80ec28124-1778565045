@@ -60,7 +60,7 @@ export default function Home() {
       const indices = ["^GSPC", "^IXIC", "^DJI", "^VIX"];
       const data = await Promise.all(
         indices.map(async (symbol) => {
-          const quote = await marketService.getQuote(symbol);
+          const quote = await marketService.getRealTimeQuote(symbol);
           return {
             symbol: symbol.replace("^", ""),
             name:
@@ -117,7 +117,7 @@ export default function Home() {
     try {
       const updatedPicks = await Promise.all(
         picks.map(async (pick) => {
-          const quote = await marketService.getQuote(pick.ticker);
+          const quote = await marketService.getRealTimeQuote(pick.ticker);
           return {
             ...pick,
             price: quote?.c || 0,
