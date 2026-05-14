@@ -17,8 +17,8 @@ Premium dark aesthetic redesign. Deep dark backgrounds with sage green, rose pin
 - [x] Update globals.css with dark color scheme (#0a0a0f background, #111118 secondary, #16161f cards)
 - [x] Update tailwind.config.ts with new color palette
 - [x] Import Fraunces font for headings
-- [ ] Update Layout component for full-width design
-- [ ] Replace flower emoji with logo throughout app
+- [x] Update Layout component for full-width design
+- [x] Replace flower emoji with logo throughout app
 
 ## Acceptance
 - Dark theme applied consistently across all pages

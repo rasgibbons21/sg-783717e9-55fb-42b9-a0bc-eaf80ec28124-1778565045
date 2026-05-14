@@ -13,11 +13,13 @@ position: 2
 Full-width home page with market summary bar, Dahlia chat bubble, and stock cards grid. Girlfriend-tone content from Dahlia.
 
 ## Checklist
-- [ ] Market summary bar (VIX, NASDAQ, S&P 500, DOW) with color indicators
-- [ ] Personalized greeting "Good morning [name] 🌸"
-- [ ] Dahlia chat bubble card with logo avatar and "Available 24/7" badge
-- [ ] "Dahlia's Picks Today" full-width grid
-- [ ] Stock cards with ticker, price, change%, sparkline, Dahlia blurb in italic
+- [x] Full-width layout with 5% left/right padding
+- [x] Market summary bar with VIX, NASDAQ, S&P 500, DOW
+- [x] Personalized greeting with user's first name
+- [x] Dahlia message card as chat bubble with logo avatar and "Available 24/7" badge
+- [x] "Dahlia's Picks Today" section with stock cards
+- [x] Each card shows ticker, company name, price, change%, Dahlia's girlfriend-tone quote
+- [x] All cards use rounded-2xl corners (16px)
 
 ## Acceptance
 - Market data displays live with color-coded changes
