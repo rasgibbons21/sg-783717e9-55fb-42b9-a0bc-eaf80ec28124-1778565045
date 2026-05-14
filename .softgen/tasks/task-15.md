@@ -1,6 +1,6 @@
 ---
 title: Market News Component for Watchlist
-status: in_progress
+status: done
 priority: medium
 type: feature
 tags: [news, home, watchlist]
