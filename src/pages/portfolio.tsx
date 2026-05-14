@@ -187,8 +187,6 @@ export default function Portfolio() {
     }
   };
 
-  const totalValue = watchlist.reduce((sum, item) => {
-
   if (isLoading) {
     return (
       <Layout>
