@@ -4,9 +4,10 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { marketService, Quote } from "@/services/marketService";
+import { marketService } from "@/services/marketService";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import Link from "next/link";
+import { SEO } from "@/components/SEO";
 
 type AssetType = "stocks" | "etfs" | "mutual-funds";
 type FilterType = "top-performers" | "most-watched" | "dahlias-picks";
@@ -140,32 +141,41 @@ export default function Discover() {
 
   return (
     <Layout>
-      <div className="max-w-lg mx-auto p-4 space-y-6">
+      <SEO title="Discover - Bloom" description="Explore stocks, ETFs, and mutual funds" />
+      <div className="container-full py-6 space-y-6">
         <div className="space-y-2">
-          <h1 className="font-serif text-3xl font-bold text-foreground">
-            Discover 🔍
+          <h1 className="font-serif text-4xl font-bold text-foreground">
+            Discover
           </h1>
-          <p className="text-muted-foreground">
-            Explore stocks, ETFs, and mutual funds
+          <p className="text-muted-foreground text-lg">
+            Explore stocks, ETFs, and mutual funds handpicked by Dahlia
           </p>
         </div>
 
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as AssetType)}>
-          <TabsList className="w-full grid grid-cols-3 bg-muted">
-            <TabsTrigger value="stocks">{getTabLabel("stocks")}</TabsTrigger>
-            <TabsTrigger value="etfs">{getTabLabel("etfs")}</TabsTrigger>
-            <TabsTrigger value="mutual-funds">{getTabLabel("mutual-funds")}</TabsTrigger>
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as AssetType)} className="space-y-6">
+          <TabsList className="w-full grid grid-cols-3 bg-card border border-border rounded-2xl p-1">
+            <TabsTrigger value="stocks" className="rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              Stocks
+            </TabsTrigger>
+            <TabsTrigger value="etfs" className="rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              ETFs
+            </TabsTrigger>
+            <TabsTrigger value="mutual-funds" className="rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              Mutual Funds
+            </TabsTrigger>
           </TabsList>
 
-          <div className="flex gap-2 overflow-x-auto py-4 -mx-4 px-4">
+          <div className="flex gap-3 overflow-x-auto pb-2">
             {(["top-performers", "most-watched", "dahlias-picks"] as FilterType[]).map((filter) => (
               <Button
                 key={filter}
                 variant={activeFilter === filter ? "default" : "outline"}
-                size="sm"
+                size="lg"
                 onClick={() => setActiveFilter(filter)}
-                className={`whitespace-nowrap ${
-                  activeFilter === filter ? "bg-primary" : ""
+                className={`whitespace-nowrap rounded-xl ${
+                  activeFilter === filter 
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90" 
+                    : "border-border hover:border-accent"
                 }`}
               >
                 {getFilterLabel(filter)}
@@ -173,74 +183,72 @@ export default function Discover() {
             ))}
           </div>
 
-          <TabsContent value={activeTab} className="space-y-3 mt-4">
+          <TabsContent value={activeTab} className="space-y-4 mt-0">
             {isLoading ? (
-              <div className="text-center py-12">
-                <p className="text-muted-foreground">Loading {getTabLabel(activeTab)}...</p>
+              <div className="text-center py-20">
+                <p className="text-muted-foreground text-lg">Loading {getTabLabel(activeTab)}...</p>
               </div>
             ) : (
-              assets.map((asset) => (
-                <Link key={asset.ticker} href={`/stock/${asset.ticker}`}>
-                  <Card className="p-4 hover:border-accent/50 transition-colors cursor-pointer">
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1 min-w-0 space-y-1">
-                        <div className="flex items-center gap-2">
-                          <p className="font-bold text-foreground text-lg">
-                            {asset.ticker}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {assets.map((asset) => (
+                  <Link key={asset.ticker} href={`/stock/${asset.ticker}`}>
+                    <Card className="p-5 bg-card border-border rounded-2xl hover:border-accent/50 transition-all cursor-pointer h-full">
+                      <div className="space-y-4">
+                        <div className="flex items-start justify-between">
+                          <div className="space-y-1 flex-1">
+                            <div className="flex items-center gap-2">
+                              <h3 className="font-bold text-xl text-foreground">
+                                {asset.ticker}
+                              </h3>
+                              <Badge
+                                className={`text-xs ${
+                                  asset.changePercent >= 0
+                                    ? "bg-primary/20 text-primary hover:bg-primary/20"
+                                    : "bg-rose/20 text-rose hover:bg-rose/20"
+                                }`}
+                              >
+                                {asset.changePercent >= 0 ? "+" : ""}
+                                {asset.changePercent.toFixed(2)}%
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-muted-foreground line-clamp-1">
+                              {asset.name}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="space-y-1">
+                          <p className="text-3xl font-bold text-foreground tabular-nums">
+                            {formatPrice(asset.price)}
                           </p>
-                          <Badge
-                            variant={asset.changePercent >= 0 ? "default" : "destructive"}
-                            className={`text-xs ${
-                              asset.changePercent >= 0
-                                ? "bg-green-100 text-green-800 hover:bg-green-100"
-                                : ""
-                            }`}
-                          >
-                            {asset.changePercent >= 0 ? "+" : ""}
-                            {asset.changePercent.toFixed(2)}%
-                          </Badge>
-                        </div>
-                        <p className="text-sm text-muted-foreground truncate">
-                          {asset.name}
-                        </p>
-                      </div>
-
-                      <div className="text-right space-y-1 ml-4">
-                        <p className="text-xl font-bold text-foreground tabular-nums">
-                          {formatPrice(asset.price)}
-                        </p>
-                        <div className="flex items-center justify-end gap-1">
-                          {asset.change >= 0 ? (
-                            <TrendingUp className="w-3 h-3 text-green-600" />
-                          ) : (
-                            <TrendingDown className="w-3 h-3 text-red-600" />
-                          )}
-                          <span
-                            className={`text-xs font-semibold tabular-nums ${
-                              asset.change >= 0 ? "text-green-600" : "text-red-600"
-                            }`}
-                          >
-                            {asset.change >= 0 ? "+" : ""}
-                            {formatPrice(asset.change)}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            {asset.change >= 0 ? (
+                              <TrendingUp className="w-4 h-4 text-primary" />
+                            ) : (
+                              <TrendingDown className="w-4 h-4 text-rose" />
+                            )}
+                            <span
+                              className={`text-sm font-semibold tabular-nums ${
+                                asset.change >= 0 ? "text-primary" : "text-rose"
+                              }`}
+                            >
+                              {asset.change >= 0 ? "+" : ""}
+                              {formatPrice(asset.change)}
+                            </span>
+                          </div>
                         </div>
                       </div>
-
-                      <div className="ml-4 w-16 h-12 flex items-center justify-center">
-                        <div className="text-xs text-muted-foreground">📈</div>
-                      </div>
-                    </div>
-                  </Card>
-                </Link>
-              ))
+                    </Card>
+                  </Link>
+                ))}
+              </div>
             )}
           </TabsContent>
         </Tabs>
 
-        <Card className="p-3 bg-muted border-muted-foreground/20">
+        <Card className="p-4 bg-muted/50 border-border/50 rounded-2xl">
           <p className="text-xs text-center text-muted-foreground leading-relaxed">
-            This is educational content only and does not constitute financial
-            advice. Bloom is not liable for any investment decisions or losses.
+            This is educational content only and does not constitute financial advice. Bloom is not liable for any investment decisions or losses.
           </p>
         </Card>
       </div>

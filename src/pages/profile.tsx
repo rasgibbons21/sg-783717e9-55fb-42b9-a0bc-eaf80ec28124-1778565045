@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Sparkles, Calendar, CreditCard, LogOut, User as UserIcon } from "lucide-react";
 import Link from "next/link";
 import type { Database } from "@/integrations/supabase/types";
+import { SEO } from "@/components/SEO";
 
 type User = Database["public"]["Tables"]["users"]["Row"];
 type Subscription = Database["public"]["Tables"]["subscriptions"]["Row"];
@@ -82,6 +83,7 @@ export default function Profile() {
   if (isLoading) {
     return (
       <Layout>
+        <SEO title="Profile - Bloom" description="Manage your account and subscription" />
         <div className="flex items-center justify-center min-h-[60vh]">
           <p className="text-muted-foreground">Loading profile...</p>
         </div>
@@ -92,10 +94,11 @@ export default function Profile() {
   if (!user) {
     return (
       <Layout>
+        <SEO title="Profile - Bloom" description="Manage your account and subscription" />
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center space-y-4">
             <p className="text-muted-foreground">Please sign in to view your profile</p>
-            <Button onClick={() => router.push("/onboarding")}>Sign In</Button>
+            <Button onClick={() => router.push("/onboarding")} className="rounded-xl">Sign In</Button>
           </div>
         </div>
       </Layout>
@@ -106,31 +109,31 @@ export default function Profile() {
 
   return (
     <Layout>
-      <div className="max-w-lg mx-auto p-4 space-y-6">
+      <SEO title="Profile - Bloom" description="Manage your account and subscription" />
+      <div className="container-full py-6 space-y-6 max-w-3xl mx-auto">
         <div className="space-y-2">
-          <h1 className="font-serif text-3xl font-bold text-foreground">
+          <h1 className="font-serif text-4xl font-bold text-foreground">
             Profile
           </h1>
-          <p className="text-muted-foreground">Manage your account and subscription</p>
+          <p className="text-muted-foreground text-lg">Manage your account and subscription</p>
         </div>
 
-        {/* Subscription Status Banner */}
         {isPro && subscription ? (
-          <Card className="p-5 bg-gradient-to-br from-accent/10 to-accent/5 border-accent">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-full bg-accent flex items-center justify-center flex-shrink-0">
-                <Sparkles className="w-6 h-6 text-accent-foreground" />
+          <Card className="p-6 bg-gradient-to-br from-accent/20 to-accent/5 border-accent rounded-2xl">
+            <div className="flex items-start gap-5">
+              <div className="w-16 h-16 rounded-2xl bg-accent flex items-center justify-center flex-shrink-0">
+                <Sparkles className="w-8 h-8 text-accent-foreground" />
               </div>
-              <div className="flex-1 space-y-3">
+              <div className="flex-1 space-y-4">
                 <div className="flex items-start justify-between">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <h2 className="font-serif text-xl font-bold text-foreground">
+                      <h2 className="font-serif text-2xl font-bold text-foreground">
                         Bloom Pro
                       </h2>
-                      <Badge className="bg-accent text-accent-foreground">Active</Badge>
+                      <Badge className="bg-accent text-accent-foreground hover:bg-accent">Active</Badge>
                     </div>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-muted-foreground">
                       Enjoying unlimited access to Dahlia's analysis
                     </p>
                   </div>
@@ -140,7 +143,7 @@ export default function Profile() {
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 text-muted-foreground">
                       <Calendar className="w-4 h-4" />
-                      <span className="text-xs font-medium">Started</span>
+                      <span className="text-xs font-medium uppercase tracking-wide">Started</span>
                     </div>
                     <p className="text-sm font-semibold text-foreground">
                       {formatDate(subscription.start_date)}
@@ -149,7 +152,7 @@ export default function Profile() {
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 text-muted-foreground">
                       <CreditCard className="w-4 h-4" />
-                      <span className="text-xs font-medium">Plan</span>
+                      <span className="text-xs font-medium uppercase tracking-wide">Plan</span>
                     </div>
                     <p className="text-sm font-semibold text-foreground capitalize">
                       {subscription.plan}
@@ -157,18 +160,18 @@ export default function Profile() {
                   </div>
                 </div>
 
-                <div className="flex gap-2 pt-2">
+                <div className="flex gap-3 pt-2">
                   <Link href="/subscription" className="flex-1">
-                    <Button variant="outline" className="w-full" size="sm">
+                    <Button variant="outline" className="w-full rounded-xl border-border hover:border-accent" size="lg">
                       Manage Plan
                     </Button>
                   </Link>
                   <Button
                     variant="outline"
-                    size="sm"
+                    size="lg"
                     onClick={handleCancelSubscription}
                     disabled={isCancelling}
-                    className="flex-1"
+                    className="flex-1 rounded-xl border-border hover:border-rose text-rose"
                   >
                     {isCancelling ? "Cancelling..." : "Cancel Subscription"}
                   </Button>
@@ -177,21 +180,21 @@ export default function Profile() {
             </div>
           </Card>
         ) : (
-          <Card className="p-5 bg-muted/50 border-dashed">
-            <div className="text-center space-y-3">
-              <div className="w-12 h-12 rounded-full bg-muted mx-auto flex items-center justify-center">
-                <Sparkles className="w-6 h-6 text-muted-foreground" />
+          <Card className="p-8 bg-card border-dashed border-2 border-border rounded-2xl">
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 rounded-2xl bg-muted mx-auto flex items-center justify-center">
+                <Sparkles className="w-8 h-8 text-muted-foreground" />
               </div>
               <div>
-                <h2 className="font-serif text-lg font-bold text-foreground mb-1">
+                <h2 className="font-serif text-2xl font-bold text-foreground mb-2">
                   You're on the Free Plan
                 </h2>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground">
                   Upgrade to Pro for unlimited access to Dahlia's analysis
                 </p>
               </div>
               <Link href="/subscription">
-                <Button className="bg-accent hover:bg-accent/90 text-accent-foreground">
+                <Button className="bg-accent hover:bg-accent/90 text-accent-foreground rounded-xl" size="lg">
                   Upgrade to Pro
                 </Button>
               </Link>
@@ -199,34 +202,33 @@ export default function Profile() {
           </Card>
         )}
 
-        {/* User Info Card */}
-        <Card className="p-5 space-y-4">
-          <div className="flex items-center gap-3 pb-3 border-b border-border">
-            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-              <UserIcon className="w-6 h-6 text-primary" />
+        <Card className="p-6 bg-card border-border rounded-2xl space-y-5">
+          <div className="flex items-center gap-4 pb-4 border-b border-border">
+            <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
+              <UserIcon className="w-8 h-8 text-primary" />
             </div>
             <div>
-              <p className="font-semibold text-foreground">{user.full_name || "Bloom User"}</p>
+              <p className="font-semibold text-lg text-foreground">{user.full_name || "Bloom User"}</p>
               <p className="text-sm text-muted-foreground">{user.email}</p>
             </div>
           </div>
 
-          <div className="space-y-3">
-            <div className="flex items-center justify-between py-2">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between py-3">
               <span className="text-sm text-muted-foreground">Member since</span>
               <span className="text-sm font-semibold text-foreground">
                 {formatDate(user.join_date)}
               </span>
             </div>
-            <div className="flex items-center justify-between py-2">
+            <div className="flex items-center justify-between py-3">
               <span className="text-sm text-muted-foreground">Investment experience</span>
-              <Badge variant="outline" className="capitalize">
+              <Badge variant="outline" className="capitalize border-border">
                 {user.experience_level || "Not set"}
               </Badge>
             </div>
-            <div className="flex items-center justify-between py-2">
+            <div className="flex items-center justify-between py-3">
               <span className="text-sm text-muted-foreground">Risk tolerance</span>
-              <Badge variant="outline" className="capitalize">
+              <Badge variant="outline" className="capitalize border-border">
                 {user.risk_tolerance || "Not set"}
               </Badge>
             </div>
@@ -235,7 +237,8 @@ export default function Profile() {
           <div className="pt-2">
             <Button
               variant="outline"
-              className="w-full justify-center gap-2"
+              className="w-full justify-center gap-2 rounded-xl border-border hover:border-accent"
+              size="lg"
               onClick={() => router.push("/onboarding")}
             >
               <UserIcon className="w-4 h-4" />
@@ -244,20 +247,19 @@ export default function Profile() {
           </div>
         </Card>
 
-        {/* Account Actions */}
-        <Card className="p-4">
+        <Card className="p-5 bg-card border-border rounded-2xl">
           <Button
             variant="ghost"
-            className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10"
+            className="w-full justify-start text-rose hover:text-rose hover:bg-rose/10 rounded-xl"
+            size="lg"
             onClick={handleSignOut}
           >
-            <LogOut className="w-4 h-4 mr-2" />
+            <LogOut className="w-5 h-5 mr-2" />
             Sign Out
           </Button>
         </Card>
 
-        {/* Disclaimer */}
-        <Card className="p-3 bg-muted border-muted-foreground/20">
+        <Card className="p-4 bg-muted/50 border-border/50 rounded-2xl">
           <p className="text-xs text-center text-muted-foreground leading-relaxed">
             Questions about your subscription? Contact us at support@bloom.app
           </p>

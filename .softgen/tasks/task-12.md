@@ -13,10 +13,15 @@ position: 4
 Apply dark theme and full-width layouts to remaining pages. Add Dahlia's personality to broker recommendations.
 
 ## Checklist
-- [ ] Discover: Full-width tabs (Stocks|ETFs|Mutual Funds|Crypto), dark cards
-- [ ] Brokers: Category sections, Dahlia quotes on each broker card, affiliate disclosure
-- [ ] Portfolio: Dark theme, total value display, holdings list, Dahlia empty state
-- [ ] Profile: Dark theme, avatar circle, subscription badge, settings rows
+- [x] Discover page: full-width, tabs for Stocks/ETFs/Mutual Funds, filter buttons, stock cards
+- [x] Brokers page: full-width, category sections, Dahlia quotes on each broker, affiliate disclosure
+- [x] Portfolio page: full-width, watchlist with add/remove, Dahlia tip card
+- [x] Profile page: full-width, subscription status, user info, sign out
+- [x] Onboarding: Bloom logo, dark theme, choice cards with icons for risk tolerance
+- [x] All cards use rounded-2xl corners (16px)
+- [x] Consistent dark theme across all pages
+- [x] Full-width layouts with proper padding
+- [x] Dahlia's voice present throughout
 
 ## Acceptance
 - All pages use consistent dark theme

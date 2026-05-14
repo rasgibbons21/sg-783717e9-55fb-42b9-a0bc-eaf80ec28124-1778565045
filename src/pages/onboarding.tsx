@@ -63,7 +63,6 @@ export default function Onboarding() {
         }
 
         if (user) {
-          // Update user profile with full name
           await userService.updateUser(user.id, { full_name: fullName });
           setStep("experience");
         }
@@ -103,8 +102,6 @@ export default function Onboarding() {
         throw new Error("User not authenticated");
       }
 
-      // Note: CHECK constraints require exact case matching
-      // Database expects: 'Beginner'/'Intermediate'/'Advanced' and 'Conservative'/'Moderate'/'Aggressive'
       const experienceCapitalized = experience.charAt(0).toUpperCase() + experience.slice(1);
       const riskCapitalized = risk.charAt(0).toUpperCase() + risk.slice(1);
 
@@ -116,12 +113,10 @@ export default function Onboarding() {
 
       console.log("Attempting to update user with:", updates);
 
-      // Try update first
       let result = await userService.updateUser(currentUser.id, updates);
       
       console.log("Update result:", result);
 
-      // If update failed (no row exists), try to create the profile first
       if (!result) {
         console.log("Update failed - attempting to create user profile");
         
@@ -167,24 +162,28 @@ export default function Onboarding() {
         {step === "auth" && (
           <div className="space-y-6">
             <div className="text-center space-y-4">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-accent mx-auto flex items-center justify-center">
-                <span className="text-4xl">🌸</span>
-              </div>
+              <img
+                src="/bloom-logo.png"
+                alt="Bloom Logo"
+                className="w-24 h-24 mx-auto rounded-full object-cover"
+              />
               
-              <h1 className="font-serif text-4xl font-bold text-foreground">
+              <h1 className="font-serif text-5xl font-bold text-foreground">
                 Bloom
               </h1>
               
-              <p className="text-lg text-muted-foreground font-medium">
+              <p className="text-xl text-muted-foreground font-medium">
                 Invest in yourself first 🌸
               </p>
             </div>
 
-            <Card className="p-6 border-accent border-2">
+            <Card className="p-6 bg-gradient-to-br from-accent/20 to-accent/5 border-accent rounded-2xl">
               <div className="flex gap-4">
-                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-accent to-amber-400 flex items-center justify-center text-3xl flex-shrink-0">
-                  🌺
-                </div>
+                <img
+                  src="/bloom-logo.png"
+                  alt="Dahlia"
+                  className="w-16 h-16 rounded-full object-cover flex-shrink-0"
+                />
                 <div className="flex-1 text-left">
                   <p className="font-serif text-lg font-semibold text-foreground mb-2">
                     Hi I'm Dahlia
@@ -196,14 +195,14 @@ export default function Onboarding() {
               </div>
             </Card>
 
-            <Card className="p-6">
+            <Card className="p-6 bg-card border-border rounded-2xl">
               <div className="space-y-4">
                 {authMode !== "forgot" && (
-                  <div className="flex gap-2 p-1 bg-muted rounded-lg">
+                  <div className="flex gap-2 p-1 bg-muted rounded-xl">
                     <Button
                       type="button"
                       variant={authMode === "signup" ? "default" : "ghost"}
-                      className="flex-1"
+                      className="flex-1 rounded-lg"
                       onClick={() => {
                         setAuthMode("signup");
                         setResetEmailSent(false);
@@ -215,7 +214,7 @@ export default function Onboarding() {
                     <Button
                       type="button"
                       variant={authMode === "login" ? "default" : "ghost"}
-                      className="flex-1"
+                      className="flex-1 rounded-lg"
                       onClick={() => {
                         setAuthMode("login");
                         setResetEmailSent(false);
@@ -270,7 +269,7 @@ export default function Onboarding() {
                         setResetEmailSent(false);
                         setEmail("");
                       }}
-                      className="w-full"
+                      className="w-full rounded-xl"
                     >
                       Back to Log In
                     </Button>
@@ -279,7 +278,7 @@ export default function Onboarding() {
                   <>
                     {authMode === "signup" && (
                       <div className="space-y-2">
-                        <Label htmlFor="fullName">Full Name</Label>
+                        <Label htmlFor="fullName" className="text-foreground">Full Name</Label>
                         <Input
                           id="fullName"
                           type="text"
@@ -287,12 +286,13 @@ export default function Onboarding() {
                           value={fullName}
                           onChange={(e) => setFullName(e.target.value)}
                           disabled={isSubmitting}
+                          className="bg-popover border-border rounded-xl"
                         />
                       </div>
                     )}
 
                     <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
+                      <Label htmlFor="email" className="text-foreground">Email</Label>
                       <Input
                         id="email"
                         type="email"
@@ -300,12 +300,13 @@ export default function Onboarding() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         disabled={isSubmitting}
+                        className="bg-popover border-border rounded-xl"
                       />
                     </div>
 
                     {authMode !== "forgot" && (
                       <div className="space-y-2">
-                        <Label htmlFor="password">Password</Label>
+                        <Label htmlFor="password" className="text-foreground">Password</Label>
                         <Input
                           id="password"
                           type="password"
@@ -313,6 +314,7 @@ export default function Onboarding() {
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           disabled={isSubmitting}
+                          className="bg-popover border-border rounded-xl"
                         />
                       </div>
                     )}
@@ -333,7 +335,7 @@ export default function Onboarding() {
                     )}
 
                     {error && (
-                      <p className="text-sm text-destructive">{error}</p>
+                      <p className="text-sm text-rose">{error}</p>
                     )}
 
                     <Button
@@ -344,7 +346,7 @@ export default function Onboarding() {
                         (authMode !== "forgot" && !password) || 
                         (authMode === "signup" && !fullName)
                       }
-                      className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-12"
+                      className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-12 rounded-xl"
                     >
                       {isSubmitting ? (
                         <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Processing...</>
@@ -365,44 +367,45 @@ export default function Onboarding() {
 
         {step === "experience" && (
           <div className="space-y-6">
-            <div className="text-center">
-              <h2 className="font-serif text-3xl font-bold text-foreground mb-2">
+            <div className="text-center space-y-2">
+              <h2 className="font-serif text-4xl font-bold text-foreground">
                 How much do you know about investing?
               </h2>
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground text-lg">
                 No judgment — just helps me personalize your experience
               </p>
             </div>
 
             <div className="space-y-3">
               {[
-                { value: "beginner" as ExperienceLevel, label: "Beginner", desc: "Just getting started" },
-                { value: "intermediate" as ExperienceLevel, label: "Intermediate", desc: "Some experience" },
-                { value: "advanced" as ExperienceLevel, label: "Advanced", desc: "Pretty comfortable" },
+                { value: "beginner" as ExperienceLevel, label: "Beginner", desc: "Just getting started", icon: "🌱" },
+                { value: "intermediate" as ExperienceLevel, label: "Intermediate", desc: "Some experience", icon: "🌿" },
+                { value: "advanced" as ExperienceLevel, label: "Advanced", desc: "Pretty comfortable", icon: "🌳" },
               ].map((option) => (
                 <Card
                   key={option.value}
-                  className={`p-4 cursor-pointer transition-all ${
+                  className={`p-5 cursor-pointer transition-all rounded-2xl ${
                     experience === option.value
-                      ? "border-accent border-2 bg-accent/5"
-                      : "border-border hover:border-accent/50"
+                      ? "border-primary border-2 bg-primary/5"
+                      : "border-border hover:border-primary/50 bg-card"
                   }`}
                   onClick={() => setExperience(option.value)}
                 >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-semibold text-foreground">{option.label}</p>
+                  <div className="flex items-center gap-4">
+                    <span className="text-3xl">{option.icon}</span>
+                    <div className="flex-1">
+                      <p className="font-semibold text-lg text-foreground">{option.label}</p>
                       <p className="text-sm text-muted-foreground">{option.desc}</p>
                     </div>
                     <div
-                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                      className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
                         experience === option.value
-                          ? "border-accent bg-accent"
+                          ? "border-primary bg-primary"
                           : "border-border"
                       }`}
                     >
                       {experience === option.value && (
-                        <div className="w-2.5 h-2.5 rounded-full bg-white" />
+                        <div className="w-3 h-3 rounded-full bg-white" />
                       )}
                     </div>
                   </div>
@@ -412,7 +415,7 @@ export default function Onboarding() {
 
             <Button
               onClick={() => setStep("goals")}
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-12"
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-12 rounded-xl"
             >
               Continue
             </Button>
@@ -421,11 +424,11 @@ export default function Onboarding() {
 
         {step === "goals" && (
           <div className="space-y-6">
-            <div className="text-center">
-              <h2 className="font-serif text-3xl font-bold text-foreground mb-2">
+            <div className="text-center space-y-2">
+              <h2 className="font-serif text-4xl font-bold text-foreground">
                 What's your main goal?
               </h2>
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground text-lg">
                 You can always change this later
               </p>
             </div>
@@ -439,10 +442,10 @@ export default function Onboarding() {
               ].map((option) => (
                 <Card
                   key={option.value}
-                  className={`p-4 cursor-pointer transition-all ${
+                  className={`p-5 cursor-pointer transition-all rounded-2xl ${
                     goals.includes(option.value)
-                      ? "border-accent border-2 bg-accent/5"
-                      : "border-border hover:border-accent/50"
+                      ? "border-primary border-2 bg-primary/5"
+                      : "border-border hover:border-primary/50 bg-card"
                   }`}
                   onClick={() => {
                     setGoals(prev => 
@@ -452,20 +455,18 @@ export default function Onboarding() {
                     );
                   }}
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">{option.icon}</span>
-                      <p className="font-semibold text-foreground">{option.label}</p>
-                    </div>
+                  <div className="flex items-center gap-4">
+                    <span className="text-3xl">{option.icon}</span>
+                    <p className="font-semibold text-lg text-foreground flex-1">{option.label}</p>
                     <div
-                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                      className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
                         goals.includes(option.value)
-                          ? "border-accent bg-accent"
+                          ? "border-primary bg-primary"
                           : "border-border"
                       }`}
                     >
                       {goals.includes(option.value) && (
-                        <div className="w-2.5 h-2.5 rounded-full bg-white" />
+                        <div className="w-3 h-3 rounded-full bg-white" />
                       )}
                     </div>
                   </div>
@@ -476,7 +477,7 @@ export default function Onboarding() {
             <Button
               onClick={() => setStep("risk")}
               disabled={goals.length === 0}
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-12"
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-12 rounded-xl"
             >
               Continue
             </Button>
@@ -485,44 +486,45 @@ export default function Onboarding() {
 
         {step === "risk" && (
           <div className="space-y-6">
-            <div className="text-center">
-              <h2 className="font-serif text-3xl font-bold text-foreground mb-2">
+            <div className="text-center space-y-2">
+              <h2 className="font-serif text-4xl font-bold text-foreground">
                 How do you feel about risk?
               </h2>
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground text-lg">
                 There's no right answer — just what feels right for you
               </p>
             </div>
 
             <div className="space-y-3">
               {[
-                { value: "conservative" as RiskTolerance, label: "Conservative", desc: "Steady and safe" },
-                { value: "moderate" as RiskTolerance, label: "Moderate", desc: "Balanced approach" },
-                { value: "aggressive" as RiskTolerance, label: "Aggressive", desc: "Higher potential growth" },
+                { value: "conservative" as RiskTolerance, label: "Conservative", desc: "Steady and safe, I want to protect what I have", icon: "🌱" },
+                { value: "moderate" as RiskTolerance, label: "Moderate", desc: "I want growth but not too much drama", icon: "🌿" },
+                { value: "aggressive" as RiskTolerance, label: "Aggressive", desc: "Let's grow this money, I can handle the ride", icon: "🌸" },
               ].map((option) => (
                 <Card
                   key={option.value}
-                  className={`p-4 cursor-pointer transition-all ${
+                  className={`p-5 cursor-pointer transition-all rounded-2xl ${
                     risk === option.value
-                      ? "border-accent border-2 bg-accent/5"
-                      : "border-border hover:border-accent/50"
+                      ? "border-primary border-2 bg-primary/5"
+                      : "border-border hover:border-primary/50 bg-card"
                   }`}
                   onClick={() => setRisk(option.value)}
                 >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-semibold text-foreground">{option.label}</p>
+                  <div className="flex items-start gap-4">
+                    <span className="text-3xl">{option.icon}</span>
+                    <div className="flex-1">
+                      <p className="font-semibold text-lg text-foreground mb-1">{option.label}</p>
                       <p className="text-sm text-muted-foreground">{option.desc}</p>
                     </div>
                     <div
-                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                      className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
                         risk === option.value
-                          ? "border-accent bg-accent"
+                          ? "border-primary bg-primary"
                           : "border-border"
                       }`}
                     >
                       {risk === option.value && (
-                        <div className="w-2.5 h-2.5 rounded-full bg-white" />
+                        <div className="w-3 h-3 rounded-full bg-white" />
                       )}
                     </div>
                   </div>
@@ -531,15 +533,15 @@ export default function Onboarding() {
             </div>
 
             {error && (
-              <Card className="p-4 border-destructive bg-destructive/5">
-                <p className="text-sm text-destructive">{error}</p>
+              <Card className="p-4 border-rose bg-rose/5 rounded-2xl">
+                <p className="text-sm text-rose">{error}</p>
               </Card>
             )}
 
             <Button
               onClick={handleCompleteOnboarding}
               disabled={isSubmitting}
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-12"
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-12 rounded-xl"
             >
               {isSubmitting ? (
                 <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Setting up your account...</>
