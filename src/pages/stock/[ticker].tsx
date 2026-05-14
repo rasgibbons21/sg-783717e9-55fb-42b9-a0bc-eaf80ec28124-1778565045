@@ -225,7 +225,7 @@ export default function StockAnalysis() {
 
       if (recentCandles.length >= 3) {
         const greenCandles = recentCandles.filter(c => c.close > c.open).length;
-        const redCandles = recentCanles.length - greenCandles;
+        const redCandles = recentCandles.length - greenCandles;
         
         const volumeIncreasing = recentCandles.length >= 2 && 
           recentCandles[recentCandles.length - 1].volume > recentCandles[recentCandles.length - 2].volume;
