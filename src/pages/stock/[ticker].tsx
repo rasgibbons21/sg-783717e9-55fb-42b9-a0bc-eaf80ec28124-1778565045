@@ -233,7 +233,7 @@ export default function StockAnalysis() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="space-y-1">
               <p className="text-xs text-muted-foreground">Market Cap</p>
-              <p className="text-lg font-bold text-foreground">{formatLargeNumber(quote?.marketCap)}</p>
+              <p className="text-lg font-bold text-foreground">{formatLargeNumber((quote as any)?.marketCap)}</p>
             </div>
             <div className="space-y-1">
               <p className="text-xs text-muted-foreground">52W High</p>
@@ -246,7 +246,7 @@ export default function StockAnalysis() {
             <div className="space-y-1">
               <p className="text-xs text-muted-foreground">Volume</p>
               <p className="text-lg font-bold text-foreground tabular-nums">
-                {quote?.v ? (quote.v / 1e6).toFixed(2) + "M" : "N/A"}
+                {(quote as any)?.v ? ((quote as any).v / 1e6).toFixed(2) + "M" : "N/A"}
               </p>
             </div>
           </div>
