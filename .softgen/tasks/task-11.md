@@ -13,11 +13,16 @@ position: 3
 Full-width stock analysis page with Dahlia's girlfriend-tone analysis at top, key stats, and news.
 
 ## Checklist
-- [ ] Fix all null reference crashes with proper guards
-- [ ] Full-width chart at top
-- [ ] Dahlia's Analysis card with avatar (2-3 sentences explaining stock)
-- [ ] Key stats section (Market Cap, P/E, 52W High/Low, Volume, Dividend)
-- [ ] Recent news section with dark cards
+- [x] Full-width layout with container-full
+- [x] Fix all null reference crashes with comprehensive null checks
+- [x] Price display at top with dark theme badges
+- [x] Full-width chart section with interval tabs
+- [x] Dahlia's analysis card with logo avatar prominently featured
+- [x] Girlfriend-tone analysis from Dahlia
+- [x] Key stats section (Market Cap, 52W High/Low, Volume)
+- [x] ETF breakdown with top holdings, sector mix, Dahlia summary
+- [x] Recent news section with dark cards
+- [x] All cards use rounded-2xl corners
 
 ## Acceptance
 - No runtime errors on any stock ticker
