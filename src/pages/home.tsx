@@ -7,9 +7,11 @@ import { Button } from "@/components/ui/button";
 import { authService } from "@/services/authService";
 import { userService } from "@/services/userService";
 import { marketService } from "@/services/marketService";
-import { TrendingUp, TrendingDown, ArrowRight } from "lucide-react";
+import { TrendingUp, TrendingDown, ArrowRight, ChevronRight } from "lucide-react";
 import { SEO } from "@/components/SEO";
 import Link from "next/link";
+import { Skeleton } from "@/components/ui/skeleton";
+import { supabase } from "@/integrations/supabase/client";
 
 interface MarketData {
   symbol: string;
@@ -31,14 +33,14 @@ interface StockPick {
 export default function Home() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
-  const [marketData, setMarketData] = useState<MarketData[]>([]);
+  const [marketData, setMarketData] = useState<any[]>([]);
   const [stockPicks, setStockPicks] = useState<StockPick[]>([]);
+  const [watchlistNews, setWatchlistNews] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingNews, setIsLoadingNews] = useState(true);
 
   useEffect(() => {
     checkAuth();
-    loadMarketData();
-    loadStockPicks();
   }, []);
 
   const checkAuth = async () => {
@@ -47,12 +49,52 @@ export default function Home() {
       router.push("/");
       return;
     }
+    const profile = await authService.getCurrentUser();
+    setUser(profile);
+    await loadMarketData();
+    await loadStockPicks();
+    await loadWatchlistNews(session.user.id);
+  };
 
-    const userData = await userService.getCurrentUser();
-    if (userData) {
-      setUser(userData);
+  const loadWatchlistNews = async (userId: string) => {
+    setIsLoadingNews(true);
+    try {
+      // Get user's watchlist
+      const { data: watchlist, error } = await supabase
+        .from("watchlist")
+        .select("ticker")
+        .eq("user_id", userId)
+        .limit(5);
+
+      if (error) throw error;
+
+      if (!watchlist || watchlist.length === 0) {
+        setWatchlistNews([]);
+        setIsLoadingNews(false);
+        return;
+      }
+
+      // Fetch news for each ticker
+      const newsPromises = watchlist.map(async (item) => {
+        const response = await fetch(
+          `https://finnhub.io/api/v1/company-news?symbol=${item.ticker}&from=${
+            new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]
+          }&to=${new Date().toISOString().split("T")[0]}&token=${
+            process.env.NEXT_PUBLIC_FINNHUB_API_KEY
+          }`
+        );
+        const newsData = await response.json();
+        return Array.isArray(newsData) ? newsData.slice(0, 2) : [];
+      });
+
+      const allNews = await Promise.all(newsPromises);
+      const flatNews = allNews.flat().sort((a, b) => b.datetime - a.datetime).slice(0, 6);
+      setWatchlistNews(flatNews);
+    } catch (error) {
+      console.error("Error loading watchlist news:", error);
+    } finally {
+      setIsLoadingNews(false);
     }
-    setIsLoading(false);
   };
 
   const loadMarketData = async () => {
@@ -238,6 +280,115 @@ export default function Home() {
               </div>
             </div>
           </div>
+        </Card>
+
+        {/* Market Movers */}
+        <Card className="p-6 bg-card border-border rounded-2xl">
+          <h2 className="text-xl font-semibold mb-4 text-foreground">
+            Market Movers
+          </h2>
+          <div className="space-y-3">
+            {stockPicks.slice(0, 5).map((stock) => (
+              <Link
+                key={stock.ticker}
+                href={`/stock/${stock.ticker}`}
+                className="flex items-center justify-between p-3 hover:bg-muted/50 rounded-lg transition-colors group"
+              >
+                <div>
+                  <p className="font-semibold text-foreground group-hover:text-accent transition-colors">
+                    {stock.ticker}
+                  </p>
+                  <p className="text-sm text-muted-foreground">{stock.name}</p>
+                </div>
+                <div className="text-right">
+                  <p className="font-semibold text-foreground">
+                    ${stock.price.toFixed(2)}
+                  </p>
+                  <Badge
+                    className={
+                      stock.changePercent >= 0
+                        ? "bg-primary/10 text-primary"
+                        : "bg-destructive/10 text-destructive"
+                    }
+                  >
+                    {stock.changePercent >= 0 ? "+" : ""}
+                    {stock.changePercent.toFixed(2)}%
+                  </Badge>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </Card>
+
+        {/* Market News for Watchlist */}
+        <Card className="p-6 bg-card border-border rounded-2xl">
+          <div className="flex items-center gap-2 mb-4">
+            <h2 className="text-xl font-semibold text-foreground">
+              Your Market News
+            </h2>
+            <span className="text-xl">📰</span>
+          </div>
+          <p className="text-sm text-muted-foreground mb-4">
+            Latest updates on the stocks you're watching
+          </p>
+
+          {isLoadingNews ? (
+            <div className="space-y-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="flex gap-4">
+                  <Skeleton className="w-20 h-20 rounded-lg" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-3 w-1/2" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : watchlistNews.length > 0 ? (
+            <div className="space-y-4">
+              {watchlistNews.map((article, index) => (
+                <a
+                  key={index}
+                  href={article.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex gap-4 p-3 hover:bg-muted/50 rounded-lg transition-colors group"
+                >
+                  {article.image && (
+                    <img
+                      src={article.image}
+                      alt={article.headline}
+                      className="w-20 h-20 object-cover rounded-lg"
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                      }}
+                    />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-medium text-foreground group-hover:text-accent transition-colors line-clamp-2 mb-1">
+                      {article.headline}
+                    </h3>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <span>{article.source}</span>
+                      <span>•</span>
+                      <span>
+                        {new Date(article.datetime * 1000).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </div>
+                </a>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-muted-foreground mb-2">
+                No news yet for your watchlist
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Add some stocks to your portfolio to see personalized news here 💛
+              </p>
+            </div>
+          )}
         </Card>
 
         {/* Dahlia's Picks Today */}
