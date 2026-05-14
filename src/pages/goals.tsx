@@ -13,6 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import {
   Select,
@@ -33,7 +34,10 @@ import {
   DollarSign,
   Check,
   Loader2,
+  Trophy,
+  Sparkles,
 } from "lucide-react";
+import confetti from "canvas-confetti";
 
 interface SavingsGoal {
   id: string;
@@ -68,11 +72,52 @@ const CATEGORY_EMOJIS: Record<string, string> = {
 
 export default function Goals() {
   const router = useRouter();
+  const [user, setUser] = useState<any>(null);
   const [goals, setGoals] = useState<SavingsGoal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isAddingProgress, setIsAddingProgress] = useState<string | null>(null);
   const [progressAmount, setProgressAmount] = useState("");
+
+  // Confetti celebration when goal is completed
+  const celebrateGoalCompletion = () => {
+    // Fire confetti from multiple angles for a premium celebration
+    const duration = 3000;
+    const animationEnd = Date.now() + duration;
+    const defaults = { 
+      startVelocity: 30, 
+      spread: 360, 
+      ticks: 60, 
+      zIndex: 9999,
+      colors: ['#3d7a54', '#c8953a', '#d4788a', '#f0f0f8']
+    };
+
+    const randomInRange = (min: number, max: number) => {
+      return Math.random() * (max - min) + min;
+    };
+
+    const interval: any = setInterval(() => {
+      const timeLeft = animationEnd - Date.now();
+
+      if (timeLeft <= 0) {
+        return clearInterval(interval);
+      }
+
+      const particleCount = 50 * (timeLeft / duration);
+
+      // Fire from left and right
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
+      });
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
+      });
+    }, 250);
+  };
 
   // Form state
   const [title, setTitle] = useState("");
@@ -126,18 +171,34 @@ export default function Goals() {
     setIsSubmitting(false);
   };
 
-  const handleAddProgress = async (goalId: string) => {
-    if (!progressAmount || parseFloat(progressAmount) <= 0) return;
+  const handleAddProgress = async () => {
+    if (!selectedGoal || !progressAmount) return;
 
-    const result = await goalsService.addProgress(
-      goalId,
-      parseFloat(progressAmount)
-    );
+    try {
+      const amount = parseFloat(progressAmount);
+      if (isNaN(amount) || amount <= 0) {
+        alert("Please enter a valid amount");
+        return;
+      }
 
-    if (result) {
+      const wasCompleted = selectedGoal.completed;
+      const newAmount = selectedGoal.current_amount + amount;
+      const willBeCompleted = newAmount >= selectedGoal.target_amount;
+
+      await goalsService.addProgress(selectedGoal.id, amount);
+      
+      // Trigger confetti if goal just became complete
+      if (!wasCompleted && willBeCompleted) {
+        celebrateGoalCompletion();
+      }
+
       await loadGoals();
-      setIsAddingProgress(null);
+      setShowAddProgressDialog(false);
       setProgressAmount("");
+      setSelectedGoal(null);
+    } catch (error) {
+      console.error("Error adding progress:", error);
+      alert("Failed to add progress. Please try again.");
     }
   };
 
