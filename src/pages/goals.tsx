@@ -171,34 +171,33 @@ export default function Goals() {
     setIsSubmitting(false);
   };
 
-  const handleAddProgress = async () => {
-    if (!selectedGoal || !progressAmount) return;
+  const handleAddProgress = async (goalId: string) => {
+    if (!progressAmount || parseFloat(progressAmount) <= 0) return;
 
-    try {
-      const amount = parseFloat(progressAmount);
-      if (isNaN(amount) || amount <= 0) {
-        alert("Please enter a valid amount");
-        return;
-      }
+    const amount = parseFloat(progressAmount);
+    
+    // Find the goal to check if it will be completed
+    const goal = goals.find(g => g.id === goalId);
+    if (!goal) return;
 
-      const wasCompleted = selectedGoal.completed;
-      const newAmount = selectedGoal.current_amount + amount;
-      const willBeCompleted = newAmount >= selectedGoal.target_amount;
+    const wasCompleted = goal.completed;
+    const newAmount = Number(goal.current_amount) + amount;
+    const willBeCompleted = newAmount >= Number(goal.target_amount);
 
-      await goalsService.addProgress(selectedGoal.id, amount);
-      
+    const result = await goalsService.addProgress(
+      goalId,
+      amount
+    );
+
+    if (result) {
       // Trigger confetti if goal just became complete
       if (!wasCompleted && willBeCompleted) {
         celebrateGoalCompletion();
       }
-
+      
       await loadGoals();
-      setShowAddProgressDialog(false);
+      setIsAddingProgress(null);
       setProgressAmount("");
-      setSelectedGoal(null);
-    } catch (error) {
-      console.error("Error adding progress:", error);
-      alert("Failed to add progress. Please try again.");
     }
   };
 
