@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { Layout } from "@/components/Layout";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { marketService, Quote, NewsItem } from "@/services/marketService";
-import { dahliaAnalysisService, DahliaAnalysis } from "@/services/dahliaAnalysisService";
-import { ChevronDown, ChevronUp, Loader2, TrendingUp, TrendingDown } from "lucide-react";
 import { SEO } from "@/components/SEO";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { marketService, type MarketAnalysis } from "@/services/marketService";
+import { dahliaAnalysisService } from "@/services/dahliaAnalysisService";
+import { ChevronDown, ChevronUp, Loader2, TrendingUp, TrendingDown } from "lucide-react";
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
 interface ETFHolding {
   symbol: string;
@@ -23,15 +25,19 @@ interface SectorWeighting {
 export default function StockAnalysis() {
   const router = useRouter();
   const { ticker } = router.query;
-  const [quote, setQuote] = useState<Quote | null>(null);
-  const [news, setNews] = useState<NewsItem[]>([]);
-  const [dahliaAnalysis, setDahliaAnalysis] = useState<DahliaAnalysis | null>(null);
-  const [isLoadingAnalysis, setIsLoadingAnalysis] = useState(false);
-  const [isETF, setIsETF] = useState(false);
+  const [quote, setQuote] = useState<any>(null);
+  const [chartData, setChartData] = useState<any[]>([]);
+  const [marketAnalysis, setMarketAnalysis] = useState<MarketAnalysis | null>(null);
+  const [dahliaAnalysis, setDahliaAnalysis] = useState<any>(null);
+  const [news, setNews] = useState<any[]>([]);
+  const [isLoadingQuote, setIsLoadingQuote] = useState(true);
+  const [isLoadingChart, setIsLoadingChart] = useState(true);
+  const [isLoadingAnalysis, setIsLoadingAnalysis] = useState(true);
+  const [chartInterval, setChartInterval] = useState<"1D" | "1W" | "1M" | "3M" | "1Y">("1M");
   const [showETFBreakdown, setShowETFBreakdown] = useState(false);
-  const [etfHoldings, setEtfHoldings] = useState<ETFHolding[]>([]);
-  const [sectorMix, setSectorMix] = useState<SectorWeighting[]>([]);
-  const [chartInterval, setChartInterval] = useState<"1D" | "1W" | "1M" | "3M" | "1Y">("1D");
+  const [isETF] = useState(false);
+  const [etfHoldings] = useState<any[]>([]);
+  const [sectorMix] = useState<any[]>([]);
 
   useEffect(() => {
     if (ticker && typeof ticker === "string") {
@@ -40,46 +46,57 @@ export default function StockAnalysis() {
   }, [ticker]);
 
   const loadStockData = async (symbol: string) => {
+    setIsLoadingQuote(true);
+    setIsLoadingChart(true);
+    setIsLoadingAnalysis(true);
+
+    // Fetch real-time quote
+    const quoteData = await marketService.getRealTimeQuote(symbol);
+    setQuote(quoteData);
+    setIsLoadingQuote(false);
+
+    // Fetch chart data
+    const days = chartInterval === "1D" ? 1 : chartInterval === "1W" ? 7 : chartInterval === "1M" ? 30 : chartInterval === "3M" ? 90 : 365;
+    const historical = await marketService.getHistoricalData(symbol, days);
+    setChartData(historical);
+    setIsLoadingChart(false);
+
+    // Fetch market analysis
+    const analysis = await marketService.getMarketAnalysis(symbol);
+    setMarketAnalysis(analysis);
+
+    // Generate Dahlia's analysis with real data
+    if (quoteData && analysis) {
+      const dahliaResponse = await dahliaAnalysisService.getAnalysisWithMarketData(
+        symbol,
+        quoteData,
+        analysis
+      );
+      setDahliaAnalysis(dahliaResponse);
+    }
+    setIsLoadingAnalysis(false);
+
+    // Fetch news (keeping existing Finnhub logic)
     try {
-      const [quoteData, newsData] = await Promise.all([
-        marketService.getQuote(symbol),
-        marketService.getCompanyNews(symbol),
-      ]);
-
-      if (quoteData) setQuote(quoteData);
-      setNews(newsData || []);
-
-      const commonETFs = ["SPY", "QQQ", "VOO", "VTI", "SCHD", "IVV", "AGG", "BND"];
-      const isETFCheck = commonETFs.includes(symbol.toUpperCase());
-      setIsETF(isETFCheck);
-
-      if (isETFCheck) {
-        const [holdings, sectors] = await Promise.all([
-          marketService.getETFHoldings(symbol),
-          marketService.getETFSectorWeighting(symbol),
-        ]);
-        
-        setEtfHoldings(holdings?.map(h => ({
-          symbol: h.asset,
-          name: h.name,
-          weight: h.weightPercentage
-        })) || []);
-        
-        setSectorMix(sectors?.map(s => ({
-          sector: s.sector,
-          weight: s.weightPercentage
-        })) || []);
-      }
-
-      setIsLoadingAnalysis(true);
-      const analysis = await dahliaAnalysisService.generateAnalysis(symbol, isETFCheck);
-      setDahliaAnalysis(analysis);
-      setIsLoadingAnalysis(false);
+      const newsResponse = await fetch(
+        `https://finnhub.io/api/v1/company-news?symbol=${symbol}&from=${
+          new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]
+        }&to=${new Date().toISOString().split("T")[0]}&token=${
+          process.env.NEXT_PUBLIC_FINNHUB_API_KEY
+        }`
+      );
+      const newsData = await newsResponse.json();
+      setNews(Array.isArray(newsData) ? newsData : []);
     } catch (error) {
-      console.error("Error loading stock data:", error);
-      setIsLoadingAnalysis(false);
+      console.error("Error fetching news:", error);
     }
   };
+
+  useEffect(() => {
+    if (ticker && typeof ticker === "string") {
+      loadStockData(ticker);
+    }
+  }, [chartInterval]);
 
   const formatPrice = (price: number | undefined | null) => {
     if (price == null) return "$0.00";
@@ -158,72 +175,142 @@ export default function StockAnalysis() {
           </div>
         </div>
 
-        {/* Chart */}
+        {/* Chart Section */}
         <Card className="p-6 bg-card border-border rounded-2xl">
-          <div className="flex gap-2 mb-4 overflow-x-auto">
+          <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
             {["1D", "1W", "1M", "3M", "1Y"].map((interval) => (
               <Button
                 key={interval}
                 variant={chartInterval === interval ? "default" : "outline"}
                 size="sm"
                 onClick={() => setChartInterval(interval as any)}
-                className="rounded-lg"
+                className={
+                  chartInterval === interval
+                    ? "bg-primary text-primary-foreground"
+                    : "border-border text-foreground hover:bg-primary/10"
+                }
               >
                 {interval}
               </Button>
             ))}
           </div>
-          <div className="h-80 bg-popover rounded-xl flex items-center justify-center border border-border">
-            <p className="text-muted-foreground text-sm">
-              TradingView chart for {ticker.toUpperCase()} — {chartInterval}
-            </p>
-          </div>
+
+          {isLoadingChart ? (
+            <div className="h-80 flex items-center justify-center">
+              <Loader2 className="w-8 h-8 animate-spin text-accent" />
+            </div>
+          ) : chartData.length > 0 ? (
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={chartData}>
+                  <XAxis
+                    dataKey="date"
+                    stroke="#8080a0"
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis
+                    stroke="#8080a0"
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(value) => `$${value.toFixed(0)}`}
+                    domain={["auto", "auto"]}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#16161f",
+                      border: "1px solid #2a2a3a",
+                      borderRadius: "8px",
+                      color: "#f0f0f8",
+                    }}
+                    formatter={(value: any) => [`$${value.toFixed(2)}`, "Price"]}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="price"
+                    stroke={
+                      chartData.length >= 2 &&
+                      chartData[chartData.length - 1].price > chartData[0].price
+                        ? "#3d7a54"
+                        : "#ef4444"
+                    }
+                    strokeWidth={2}
+                    dot={false}
+                    animationDuration={300}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          ) : (
+            <div className="h-80 flex items-center justify-center">
+              <p className="text-muted-foreground">No chart data available</p>
+            </div>
+          )}
         </Card>
 
         {/* Dahlia's Analysis */}
         {isLoadingAnalysis ? (
-          <Card className="p-8 bg-card border-border rounded-2xl">
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-8 h-8 animate-spin text-accent" />
-              <span className="ml-3 text-muted-foreground">Dahlia is analyzing this for you...</span>
+          <Card className="p-6 bg-card border-accent/20 rounded-2xl space-y-4">
+            <div className="flex items-start gap-4">
+              <Skeleton className="w-16 h-16 rounded-full" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-3 w-32" />
+              </div>
             </div>
+            <Skeleton className="h-20 w-full" />
           </Card>
         ) : dahliaAnalysis ? (
-          <Card className="p-6 bg-card border-accent/50 rounded-2xl">
-            <div className="space-y-5">
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0">
-                  <img
-                    src="/bloom-logo.png"
-                    alt="Dahlia"
-                    className="h-14 w-14 rounded-full object-cover"
-                  />
+          <Card className="p-6 bg-card border-accent/20 rounded-2xl space-y-4">
+            <div className="flex items-start gap-4">
+              <img
+                src="/bloom-logo.png"
+                alt="Dahlia"
+                className="w-16 h-16 rounded-full object-cover"
+              />
+              <div className="space-y-1 flex-1">
+                <div className="flex items-center gap-2">
+                  <h3 className="font-semibold text-foreground text-lg">Dahlia</h3>
+                  <Badge
+                    variant="outline"
+                    className={`text-xs ${
+                      dahliaAnalysis.sentiment === "Positive"
+                        ? "bg-primary/10 text-primary border-primary"
+                        : dahliaAnalysis.sentiment === "Negative"
+                        ? "bg-destructive/10 text-destructive border-destructive"
+                        : "bg-muted text-muted-foreground"
+                    }`}
+                  >
+                    {dahliaAnalysis.sentiment === "Positive" ? (
+                      <TrendingUp className="w-3 h-3 mr-1" />
+                    ) : dahliaAnalysis.sentiment === "Negative" ? (
+                      <TrendingDown className="w-3 h-3 mr-1" />
+                    ) : null}
+                    {dahliaAnalysis.sentiment}
+                  </Badge>
                 </div>
-                <div className="flex-1 space-y-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-semibold text-lg text-foreground">Dahlia</h3>
-                    <Badge className="text-xs bg-accent/20 text-accent hover:bg-accent/20">
-                      {dahliaAnalysis.sentiment}
-                    </Badge>
-                  </div>
-                  <p className="text-sm text-muted-foreground">Bloom's Investing Expert</p>
-                </div>
-              </div>
-
-              <div className="bg-popover p-5 rounded-xl border border-border">
-                <p className="text-foreground leading-relaxed whitespace-pre-line">
-                  {dahliaAnalysis.content}
+                <p className="text-sm text-muted-foreground">
+                  Bloom's Investing Expert
                 </p>
               </div>
-
-              <p className="text-sm font-medium text-accent">— Dahlia 🌺</p>
-
-              <Card className="p-4 bg-muted/50 border-border/50 rounded-xl">
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  This is just educational info — not financial advice. Always invest what feels right for you 💛
-                </p>
-              </Card>
             </div>
+
+            <div className="prose prose-sm max-w-none">
+              <p className="text-foreground leading-relaxed whitespace-pre-line">
+                {dahliaAnalysis.content}
+              </p>
+            </div>
+
+            <p className="text-sm font-medium text-accent">— Dahlia 🌺</p>
+
+            <Card className="p-3 bg-muted/50 border-muted-foreground/20 rounded-xl">
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                This is just educational info — not financial advice. Always invest
+                what feels right for you 💛 — Dahlia
+              </p>
+            </Card>
           </Card>
         ) : null}
 
