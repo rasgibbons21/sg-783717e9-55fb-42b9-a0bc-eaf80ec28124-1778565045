@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { marketService, type MarketAnalysis } from "@/services/marketService";
 import { dahliaAnalysisService } from "@/services/dahliaAnalysisService";
 import { ChevronDown, ChevronUp, Loader2, TrendingUp, TrendingDown } from "lucide-react";
-import { createChart, ColorType } from "lightweight-charts";
+import { createChart, ColorType, CandlestickSeries, HistogramSeries } from "lightweight-charts";
 
 type ChartInterval = "1D" | "5D" | "1M" | "3M" | "6M" | "1Y";
 
@@ -82,8 +82,7 @@ export default function StockAnalysis() {
       },
     });
 
-    const candlestickSeries = chart.addSeries({
-      type: 'Candlestick',
+    const candlestickSeries = chart.addSeries(CandlestickSeries, {
       upColor: "#22d472",
       downColor: "#f04848",
       borderUpColor: "#22d472",
@@ -92,8 +91,7 @@ export default function StockAnalysis() {
       wickDownColor: "#f04848",
     });
 
-    const volumeSeries = chart.addSeries({
-      type: 'Histogram',
+    const volumeSeries = chart.addSeries(HistogramSeries, {
       color: "#8080a0",
       priceFormat: {
         type: "volume",
