@@ -97,6 +97,80 @@ export const marketService = {
     }
   },
 
+  // Get historical OHLC data for candlestick charts
+  async getHistoricalOHLC(
+    ticker: string,
+    days: number
+  ): Promise<Array<{ time: string; open: number; high: number; low: number; close: number; volume: number }>> {
+    try {
+      const endDate = new Date();
+      const startDate = new Date();
+      startDate.setDate(endDate.getDate() - days);
+
+      const from = startDate.toISOString().split("T")[0];
+      const to = endDate.toISOString().split("T")[0];
+
+      // Determine interval based on days
+      let multiplier = 1;
+      let timespan = "day";
+      
+      if (days === 1) {
+        multiplier = 5;
+        timespan = "minute";
+      } else if (days <= 5) {
+        multiplier = 15;
+        timespan = "minute";
+      } else if (days <= 30) {
+        multiplier = 1;
+        timespan = "day";
+      } else if (days <= 180) {
+        multiplier = 1;
+        timespan = "day";
+      } else {
+        multiplier = 1;
+        timespan = "week";
+      }
+
+      const url = `${PRIMARY_BASE_URL}/v2/aggs/ticker/${ticker}/range/${multiplier}/${timespan}/${from}/${to}?adjusted=true&sort=asc&apiKey=${POLYGON_API_KEY}`;
+      
+      console.log("Fetching OHLC data:", url);
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (data.results && Array.isArray(data.results)) {
+        return data.results.map((bar: any) => ({
+          time: new Date(bar.t).toISOString().split("T")[0],
+          open: bar.o,
+          high: bar.h,
+          low: bar.l,
+          close: bar.c,
+          volume: bar.v || 0,
+        }));
+      }
+
+      // Fallback to secondary URL
+      const fallbackUrl = `${FALLBACK_BASE_URL}/v2/aggs/ticker/${ticker}/range/${multiplier}/${timespan}/${from}/${to}?adjusted=true&sort=asc&apiKey=${POLYGON_API_KEY}`;
+      const fallbackResponse = await fetch(fallbackUrl);
+      const fallbackData = await fallbackResponse.json();
+
+      if (fallbackData.results && Array.isArray(fallbackData.results)) {
+        return fallbackData.results.map((bar: any) => ({
+          time: new Date(bar.t).toISOString().split("T")[0],
+          open: bar.o,
+          high: bar.h,
+          low: bar.l,
+          close: bar.c,
+          volume: bar.v || 0,
+        }));
+      }
+
+      return [];
+    } catch (error) {
+      console.error("Error fetching OHLC data:", error);
+      return [];
+    }
+  },
+
   async getRealTimeQuote(ticker: string) {
     const primaryUrl = `${PRIMARY_BASE_URL}/v2/snapshot/locale/us/markets/stocks/tickers/${ticker}?apiKey=${POLYGON_API_KEY}`;
     const fallbackUrl = `${FALLBACK_BASE_URL}/v2/snapshot/locale/us/markets/stocks/tickers/${ticker}?apiKey=${POLYGON_API_KEY}`;
@@ -125,6 +199,7 @@ export const marketService = {
     }
   },
 
+  // Get market analysis data including candlestick patterns
   async getMarketAnalysis(ticker: string): Promise<MarketAnalysis | null> {
     try {
       const [chartData, quote] = await Promise.all([

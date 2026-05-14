@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/router";
 import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
@@ -9,31 +9,27 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { marketService, type MarketAnalysis } from "@/services/marketService";
 import { dahliaAnalysisService } from "@/services/dahliaAnalysisService";
 import { ChevronDown, ChevronUp, Loader2, TrendingUp, TrendingDown } from "lucide-react";
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { createChart, ColorType, IChartApi, ISeriesApi } from "lightweight-charts";
 
-interface ETFHolding {
-  symbol: string;
-  name: string;
-  weight: number;
-}
-
-interface SectorWeighting {
-  sector: string;
-  weight: number;
-}
+type ChartInterval = "1D" | "5D" | "1M" | "3M" | "6M" | "1Y";
 
 export default function StockAnalysis() {
   const router = useRouter();
   const { ticker } = router.query;
+  const chartContainerRef = useRef<HTMLDivElement>(null);
+  const chartRef = useRef<IChartApi | null>(null);
+  const candlestickSeriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null);
+  const volumeSeriesRef = useRef<ISeriesApi<"Histogram"> | null>(null);
+
   const [quote, setQuote] = useState<any>(null);
-  const [chartData, setChartData] = useState<any[]>([]);
+  const [ohlcData, setOhlcData] = useState<any[]>([]);
   const [marketAnalysis, setMarketAnalysis] = useState<MarketAnalysis | null>(null);
   const [dahliaAnalysis, setDahliaAnalysis] = useState<any>(null);
   const [news, setNews] = useState<any[]>([]);
   const [isLoadingQuote, setIsLoadingQuote] = useState(true);
   const [isLoadingChart, setIsLoadingChart] = useState(true);
   const [isLoadingAnalysis, setIsLoadingAnalysis] = useState(true);
-  const [chartInterval, setChartInterval] = useState<"1D" | "1W" | "1M" | "3M" | "1Y">("1M");
+  const [chartInterval, setChartInterval] = useState<ChartInterval>("1M");
   const [showETFBreakdown, setShowETFBreakdown] = useState(false);
   const [isETF] = useState(false);
   const [etfHoldings] = useState<any[]>([]);
@@ -45,9 +41,117 @@ export default function StockAnalysis() {
     }
   }, [ticker]);
 
+  useEffect(() => {
+    if (ticker && typeof ticker === "string") {
+      loadChartData(ticker);
+    }
+  }, [ticker, chartInterval]);
+
+  // Initialize chart
+  useEffect(() => {
+    if (!chartContainerRef.current) return;
+
+    const chart = createChart(chartContainerRef.current, {
+      layout: {
+        background: { type: ColorType.Solid, color: "#0a0a0f" },
+        textColor: "#8080a0",
+      },
+      grid: {
+        vertLines: { color: "#1e1e2a" },
+        horzLines: { color: "#1e1e2a" },
+      },
+      width: chartContainerRef.current.clientWidth,
+      height: 400,
+      crosshair: {
+        mode: 1,
+        vertLine: {
+          color: "#c8953a",
+          labelBackgroundColor: "#c8953a",
+        },
+        horzLine: {
+          color: "#c8953a",
+          labelBackgroundColor: "#c8953a",
+        },
+      },
+      timeScale: {
+        borderColor: "#2a2a3a",
+        timeVisible: true,
+      },
+      rightPriceScale: {
+        borderColor: "#2a2a3a",
+      },
+    });
+
+    const candlestickSeries = chart.addCandlestickSeries({
+      upColor: "#22d472",
+      downColor: "#f04848",
+      borderUpColor: "#22d472",
+      borderDownColor: "#f04848",
+      wickUpColor: "#22d472",
+      wickDownColor: "#f04848",
+    });
+
+    const volumeSeries = chart.addHistogramSeries({
+      color: "#8080a0",
+      priceFormat: {
+        type: "volume",
+      },
+      priceScaleId: "",
+    });
+
+    volumeSeries.priceScale().applyOptions({
+      scaleMargins: {
+        top: 0.8,
+        bottom: 0,
+      },
+    });
+
+    chartRef.current = chart;
+    candlestickSeriesRef.current = candlestickSeries;
+    volumeSeriesRef.current = volumeSeries;
+
+    const handleResize = () => {
+      if (chartContainerRef.current) {
+        chart.applyOptions({ width: chartContainerRef.current.clientWidth });
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      chart.remove();
+    };
+  }, []);
+
+  // Update chart data
+  useEffect(() => {
+    if (ohlcData.length > 0 && candlestickSeriesRef.current && volumeSeriesRef.current) {
+      const candleData = ohlcData.map(d => ({
+        time: d.time,
+        open: d.open,
+        high: d.high,
+        low: d.low,
+        close: d.close,
+      }));
+
+      const volumeData = ohlcData.map(d => ({
+        time: d.time,
+        value: d.volume,
+        color: d.close >= d.open ? "#22d47233" : "#f0484833",
+      }));
+
+      candlestickSeriesRef.current.setData(candleData);
+      volumeSeriesRef.current.setData(volumeData);
+
+      if (chartRef.current) {
+        chartRef.current.timeScale().fitContent();
+      }
+    }
+  }, [ohlcData]);
+
   const loadStockData = async (symbol: string) => {
     setIsLoadingQuote(true);
-    setIsLoadingChart(true);
     setIsLoadingAnalysis(true);
 
     // Fetch real-time quote
@@ -55,28 +159,18 @@ export default function StockAnalysis() {
     setQuote(quoteData);
     setIsLoadingQuote(false);
 
-    // Fetch chart data
-    const days = chartInterval === "1D" ? 1 : chartInterval === "1W" ? 7 : chartInterval === "1M" ? 30 : chartInterval === "3M" ? 90 : 365;
-    const historical = await marketService.getHistoricalData(symbol, days);
-    setChartData(historical);
-    setIsLoadingChart(false);
-
     // Fetch market analysis
     const analysis = await marketService.getMarketAnalysis(symbol);
     setMarketAnalysis(analysis);
 
-    // Generate Dahlia's analysis with real data
+    // Generate Dahlia's analysis with candlestick pattern recognition
     if (quoteData && analysis) {
-      const dahliaResponse = await dahliaAnalysisService.getAnalysisWithMarketData(
-        symbol,
-        quoteData,
-        analysis
-      );
+      const dahliaResponse = await generateCandlestickAnalysis(symbol, quoteData, analysis);
       setDahliaAnalysis(dahliaResponse);
     }
     setIsLoadingAnalysis(false);
 
-    // Fetch news (keeping existing Finnhub logic)
+    // Fetch news
     try {
       const newsResponse = await fetch(
         `https://finnhub.io/api/v1/company-news?symbol=${symbol}&from=${
@@ -92,11 +186,96 @@ export default function StockAnalysis() {
     }
   };
 
-  useEffect(() => {
-    if (ticker && typeof ticker === "string") {
-      loadStockData(ticker);
+  const loadChartData = async (symbol: string) => {
+    setIsLoadingChart(true);
+    const days = getDaysForInterval(chartInterval);
+    const historical = await marketService.getHistoricalOHLC(symbol, days);
+    setOhlcData(historical);
+    setIsLoadingChart(false);
+  };
+
+  const getDaysForInterval = (interval: ChartInterval): number => {
+    switch (interval) {
+      case "1D":
+        return 1;
+      case "5D":
+        return 5;
+      case "1M":
+        return 30;
+      case "3M":
+        return 90;
+      case "6M":
+        return 180;
+      case "1Y":
+        return 365;
+      default:
+        return 30;
     }
-  }, [chartInterval]);
+  };
+
+  const generateCandlestickAnalysis = async (
+    symbol: string,
+    quoteData: any,
+    marketAnalysis: MarketAnalysis
+  ) => {
+    try {
+      // Analyze recent candles for patterns
+      const recentCandles = ohlcData.slice(-5);
+      let patternText = "";
+
+      if (recentCandles.length >= 3) {
+        const greenCandles = recentCandles.filter(c => c.close > c.open).length;
+        const redCandles = recentCanles.length - greenCandles;
+        
+        const volumeIncreasing = recentCandles.length >= 2 && 
+          recentCandles[recentCandles.length - 1].volume > recentCandles[recentCandles.length - 2].volume;
+
+        if (greenCandles >= 3 && volumeIncreasing) {
+          patternText = "The last 3 candles are all green with increasing volume — that's called momentum and it usually means buyers are in control right now 📈";
+        } else if (redCandles >= 3 && volumeIncreasing) {
+          patternText = "Seeing 3 red candles in a row with heavy volume — sellers are pushing hard right now. This could continue or bounce, so watch closely 👀";
+        } else if (greenCandles === redCandles) {
+          patternText = "The chart's been bouncing between green and red candles — that's indecision. The market doesn't know which way it wants to go yet 🤔";
+        }
+      }
+
+      const trendText = marketAnalysis.trend === "up" ? "climbing" : marketAnalysis.trend === "down" ? "dropping" : "trading sideways";
+      const volumeText = marketAnalysis.volumeRatio > 1.5 ? `${marketAnalysis.volumeRatio.toFixed(1)}x the average` : "about average";
+      
+      const prompt = `You are Dahlia, Bloom's investing expert. Write a 3 paragraph analysis in your warm girlfriend tone about ${symbol}.
+
+Use this REAL candlestick chart data in your analysis:
+- ${patternText}
+- The stock has been ${trendText} over the last 30 days.
+- Today's volume is ${volumeText}.
+- Current price: $${quoteData.c.toFixed(2)}
+
+Reference the candlestick pattern naturally like: "The last 3 candles are all green with increasing volume — that's momentum girl, buyers are stepping in 📈"
+
+Make it conversational. No financial jargon. Never say buy/sell/hold.
+End with: "This is just educational info — not financial advice. Always invest what feels right for you 💛 — Dahlia"`;
+
+      const response = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return {
+          content: data.content || data.analysis || "Analysis generated.",
+          sentiment: data.sentiment || "Neutral",
+          analysis: data.content || data.analysis,
+          timestamp: new Date().toISOString(),
+        };
+      }
+      return dahliaAnalysisService.getStaticFallbackAnalysis(symbol);
+    } catch (error) {
+      console.error("Error generating candlestick analysis:", error);
+      return dahliaAnalysisService.getStaticFallbackAnalysis(symbol);
+    }
+  };
 
   const formatPrice = (price: number | undefined | null) => {
     if (price == null) return "$0.00";
@@ -112,7 +291,7 @@ export default function StockAnalysis() {
     if (num >= 1e12) return `$${(num / 1e12).toFixed(2)}T`;
     if (num >= 1e9) return `$${(num / 1e9).toFixed(2)}B`;
     if (num >= 1e6) return `$${(num / 1e6).toFixed(2)}M`;
-    return `$${num.toFixed(2)}`;
+    return `$${num.toLocaleString()}`;
   };
 
   if (!ticker || typeof ticker !== "string") {
@@ -125,65 +304,58 @@ export default function StockAnalysis() {
     );
   }
 
-  const changePercent = quote?.dp ?? 0;
-  const change = quote?.d ?? 0;
-  const isPositive = changePercent >= 0;
-
   return (
     <Layout>
       <SEO
-        title={`${ticker.toUpperCase()} Analysis - Bloom`}
-        description={`Dahlia's girlfriend-tone investment analysis for ${ticker.toUpperCase()}`}
+        title={`${ticker.toUpperCase()} Stock Analysis - Bloom`}
+        description={`Dahlia's investment analysis for ${ticker.toUpperCase()}`}
       />
       <div className="container-full py-6 space-y-6">
-        {/* Header */}
-        <div className="space-y-3">
+        {/* Price Header */}
+        <div className="space-y-2">
           <div className="flex items-start justify-between">
             <div>
               <h1 className="font-serif text-4xl font-bold text-foreground">
                 {ticker.toUpperCase()}
               </h1>
-              <p className="text-muted-foreground mt-1">Stock Analysis</p>
+              <p className="text-muted-foreground text-lg">Stock Analysis</p>
             </div>
             <Badge
-              className={`text-lg px-4 py-2 ${
-                isPositive
+              className={`text-base px-4 py-2 ${
+                (quote?.dp ?? 0) >= 0
                   ? "bg-primary/20 text-primary hover:bg-primary/20"
                   : "bg-rose/20 text-rose hover:bg-rose/20"
               }`}
             >
-              {isPositive ? "+" : ""}
+              {(quote?.dp ?? 0) >= 0 ? "+" : ""}
               {quote?.dp != null ? quote.dp.toFixed(2) : "0.00"}%
             </Badge>
           </div>
 
-          <div className="flex items-end gap-4">
-            <div>
-              <p className="text-5xl font-bold text-foreground tabular-nums">
-                {formatPrice(quote?.c)}
-              </p>
-              <div className={`flex items-center gap-2 mt-2 text-lg font-semibold ${
-                isPositive ? "text-primary" : "text-rose"
-              }`}>
-                {isPositive ? <TrendingUp className="h-5 w-5" /> : <TrendingDown className="h-5 w-5" />}
-                <span className="tabular-nums">
-                  {isPositive ? "+" : ""}
-                  {formatPrice(change)} today
-                </span>
-              </div>
-            </div>
+          <div className="space-y-1">
+            <p className="text-5xl font-bold text-foreground tabular-nums">
+              {formatPrice(quote?.c)}
+            </p>
+            <p
+              className={`text-xl font-semibold tabular-nums ${
+                (quote?.d ?? 0) >= 0 ? "text-primary" : "text-rose"
+              }`}
+            >
+              {(quote?.d ?? 0) >= 0 ? "+" : ""}
+              {formatPrice(quote?.d)} today
+            </p>
           </div>
         </div>
 
-        {/* Chart Section */}
+        {/* Candlestick Chart */}
         <Card className="p-6 bg-card border-border rounded-2xl">
           <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
-            {["1D", "1W", "1M", "3M", "1Y"].map((interval) => (
+            {(["1D", "5D", "1M", "3M", "6M", "1Y"] as ChartInterval[]).map((interval) => (
               <Button
                 key={interval}
                 variant={chartInterval === interval ? "default" : "outline"}
                 size="sm"
-                onClick={() => setChartInterval(interval as any)}
+                onClick={() => setChartInterval(interval)}
                 className={
                   chartInterval === interval
                     ? "bg-primary text-primary-foreground"
@@ -196,57 +368,15 @@ export default function StockAnalysis() {
           </div>
 
           {isLoadingChart ? (
-            <div className="h-80 flex items-center justify-center">
+            <div className="h-96 flex items-center justify-center bg-popover rounded-xl">
               <Loader2 className="w-8 h-8 animate-spin text-accent" />
             </div>
-          ) : chartData.length > 0 ? (
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={chartData}>
-                  <XAxis
-                    dataKey="date"
-                    stroke="#8080a0"
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                  />
-                  <YAxis
-                    stroke="#8080a0"
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                    tickFormatter={(value) => `$${value.toFixed(0)}`}
-                    domain={["auto", "auto"]}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#16161f",
-                      border: "1px solid #2a2a3a",
-                      borderRadius: "8px",
-                      color: "#f0f0f8",
-                    }}
-                    formatter={(value: any) => [`$${value.toFixed(2)}`, "Price"]}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="price"
-                    stroke={
-                      chartData.length >= 2 &&
-                      chartData[chartData.length - 1].price > chartData[0].price
-                        ? "#3d7a54"
-                        : "#ef4444"
-                    }
-                    strokeWidth={2}
-                    dot={false}
-                    animationDuration={300}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
           ) : (
-            <div className="h-80 flex items-center justify-center">
-              <p className="text-muted-foreground">No chart data available</p>
-            </div>
+            <div
+              ref={chartContainerRef}
+              className="w-full rounded-xl overflow-hidden"
+              style={{ minHeight: "400px" }}
+            />
           )}
         </Card>
 
@@ -341,35 +471,33 @@ export default function StockAnalysis() {
 
         {/* ETF Breakdown */}
         {isETF && (
-          <Card className="p-6 bg-card border-border rounded-2xl">
+          <Card className="p-6 bg-card border-border rounded-2xl space-y-4">
             <Button
               variant="ghost"
               onClick={() => setShowETFBreakdown(!showETFBreakdown)}
-              className="w-full flex items-center justify-between hover:bg-transparent p-0 h-auto"
+              className="w-full flex items-center justify-between"
             >
-              <span className="font-serif text-2xl font-bold text-foreground">
+              <span className="font-semibold text-foreground">
                 See what's inside 🌺
               </span>
               {showETFBreakdown ? (
-                <ChevronUp className="w-6 h-6 text-muted-foreground" />
+                <ChevronUp className="w-5 h-5" />
               ) : (
-                <ChevronDown className="w-6 h-6 text-muted-foreground" />
+                <ChevronDown className="w-5 h-5" />
               )}
             </Button>
 
             {showETFBreakdown && (
-              <div className="space-y-6 pt-6 mt-6 border-t border-border">
-                {/* Top Holdings */}
-                <div className="space-y-4">
-                  <h4 className="font-semibold text-lg text-foreground">Top 5 Holdings</h4>
+              <div className="space-y-6 pt-4">
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-foreground">Top Holdings</h4>
                   {etfHoldings.slice(0, 5).map((holding, index) => (
-                    <div key={index} className="space-y-2">
+                    <div key={index} className="space-y-1">
                       <div className="flex items-center justify-between text-sm">
-                        <div>
-                          <span className="font-semibold text-foreground">{holding.symbol}</span>
-                          <span className="text-muted-foreground ml-2">{holding.name}</span>
-                        </div>
-                        <span className="text-foreground font-semibold">
+                        <span className="font-medium text-foreground">
+                          {holding.symbol}
+                        </span>
+                        <span className="text-muted-foreground">
                           {holding.weight.toFixed(2)}%
                         </span>
                       </div>
@@ -383,30 +511,31 @@ export default function StockAnalysis() {
                   ))}
                 </div>
 
-                {/* Sector Mix */}
                 {sectorMix.length > 0 && (
                   <div className="space-y-3">
-                    <h4 className="font-semibold text-lg text-foreground">Sector Mix</h4>
+                    <h4 className="font-semibold text-foreground">
+                      Sector Breakdown
+                    </h4>
                     <div className="flex flex-wrap gap-2">
                       {sectorMix.map((sector, index) => (
                         <Badge
                           key={index}
                           variant="outline"
-                          className="text-sm border-border bg-popover"
+                          className="text-xs"
                         >
-                          {sector.sector}: {sector.weight.toFixed(1)}%
+                          {sector.sector}: {sector.percentage.toFixed(1)}%
                         </Badge>
                       ))}
                     </div>
                   </div>
                 )}
 
-                {/* Dahlia's ETF Summary */}
-                <Card className="p-5 bg-accent/10 border-accent/30 rounded-xl">
+                <Card className="p-4 bg-accent/5 border-accent rounded-xl">
                   <p className="text-sm text-foreground leading-relaxed">
-                    Basically girl, when you buy {ticker.toUpperCase()} you're buying a little piece of{" "}
-                    {etfHoldings.length}+ solid companies at once. If one has a bad week the others hold it up 💪 
-                    It's like not putting all your eggs in one basket.
+                    Basically girl, when you buy {ticker.toUpperCase()} you're buying
+                    a little piece of {etfHoldings.length}+ solid companies at once.
+                    If one has a bad week the others hold it up 💪 It's like not
+                    putting all your eggs in one basket.
                   </p>
                 </Card>
               </div>
@@ -417,15 +546,18 @@ export default function StockAnalysis() {
         {/* Latest News */}
         {news.length > 0 && (
           <div className="space-y-4">
-            <h2 className="font-serif text-2xl font-bold text-foreground">Latest News</h2>
-            <div className="grid gap-4">
+            <h2 className="font-serif text-2xl font-bold text-foreground">
+              Latest News
+            </h2>
+            <div className="space-y-3">
               {news.slice(0, 5).map((article, index) => (
-                <Card key={index} className="p-5 bg-card border-border rounded-2xl hover:border-accent/50 transition-all">
+                <Card key={index} className="p-5 bg-card border-border rounded-2xl hover:border-accent/30 transition-colors">
                   <div className="space-y-2">
                     <p className="text-xs text-muted-foreground">
-                      {article.source} • {new Date(article.datetime * 1000).toLocaleDateString()}
+                      {article.source} •{" "}
+                      {new Date(article.datetime * 1000).toLocaleDateString()}
                     </p>
-                    <h3 className="font-semibold text-foreground leading-snug">
+                    <h3 className="font-semibold text-foreground text-lg">
                       {article.headline}
                     </h3>
                     {article.summary && (
@@ -438,7 +570,7 @@ export default function StockAnalysis() {
                         href={article.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center text-sm text-accent hover:underline"
+                        className="text-sm text-accent hover:underline inline-block"
                       >
                         Read more →
                       </a>
@@ -453,7 +585,8 @@ export default function StockAnalysis() {
         {/* Disclaimer */}
         <Card className="p-4 bg-muted/50 border-border/50 rounded-2xl">
           <p className="text-xs text-center text-muted-foreground leading-relaxed">
-            This is educational content only and does not constitute financial advice. Bloom is not liable for any investment decisions or losses.
+            This is educational content only and does not constitute financial
+            advice. Bloom is not liable for any investment decisions or losses.
           </p>
         </Card>
       </div>
