@@ -13,15 +13,15 @@ position: 13
 Create a visual savings goal tracker where users can set, track, and visualize their progress toward financial goals. Use premium dark theme with Dahlia's girlfriend-tone encouragement.
 
 ## Checklist
-- [ ] Create savings_goals table in Supabase with RLS policies
-- [ ] Create /goals page with full-width layout
-- [ ] Add "Goals" tab to bottom navigation
-- [ ] Implement add/edit/delete goal functionality
-- [ ] Visual progress bars with percentage complete
-- [ ] Goal categories: Emergency Fund, Vacation, Home Down Payment, Car, Custom
-- [ ] Dahlia's motivational messages based on progress
-- [ ] Charts showing progress over time
-- [ ] Mark goals as complete when target reached
+- [x] Create savings_goals table in Supabase with RLS policies
+- [x] Create /goals page with full-width layout
+- [x] Add "Goals" tab to bottom navigation
+- [x] Implement add/edit/delete goal functionality
+- [x] Visual progress bars with percentage complete
+- [x] Goal categories: Emergency Fund, Vacation, Home Down Payment, Car, Custom
+- [x] Dahlia's motivational messages based on progress
+- [x] Charts showing progress over time
+- [x] Mark goals as complete when target reached
 
 ## Acceptance
 - Users can create multiple savings goals with target amounts

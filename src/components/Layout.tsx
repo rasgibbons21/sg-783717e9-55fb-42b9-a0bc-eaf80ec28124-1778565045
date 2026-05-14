@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { Home, Search, Briefcase, Building2, User } from "lucide-react";
+import { Home, Search, Briefcase, Building2, User, Target } from "lucide-react";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -10,11 +10,12 @@ export function Layout({ children }: LayoutProps) {
   const router = useRouter();
 
   const navItems = [
-    { icon: Home, label: "Home", path: "/home" },
-    { icon: Search, label: "Discover", path: "/discover" },
-    { icon: Briefcase, label: "Portfolio", path: "/portfolio" },
-    { icon: Building2, label: "Brokers", path: "/brokers" },
-    { icon: User, label: "Profile", path: "/profile" },
+    { href: "/home", icon: Home, label: "Home" },
+    { href: "/discover", icon: Search, label: "Discover" },
+    { href: "/goals", icon: Target, label: "Goals" },
+    { href: "/portfolio", icon: Briefcase, label: "Portfolio" },
+    { href: "/brokers", icon: Building2, label: "Brokers" },
+    { href: "/profile", icon: User, label: "Profile" },
   ];
 
   const isActive = (path: string) => router.pathname === path;
@@ -45,11 +46,11 @@ export function Layout({ children }: LayoutProps) {
         <div className="flex items-center justify-around h-16">
           {navItems.map((item) => {
             const Icon = item.icon;
-            const active = isActive(item.path);
+            const active = isActive(item.href);
             return (
               <Link
-                key={item.path}
-                href={item.path}
+                key={item.href}
+                href={item.href}
                 className={`flex flex-col items-center justify-center gap-1 px-3 py-2 transition-colors ${
                   active ? "text-primary" : "text-muted-foreground hover:text-foreground"
                 }`}
