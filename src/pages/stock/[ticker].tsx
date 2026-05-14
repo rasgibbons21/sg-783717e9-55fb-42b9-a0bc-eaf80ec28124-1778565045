@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { marketService, type MarketAnalysis } from "@/services/marketService";
 import { dahliaAnalysisService } from "@/services/dahliaAnalysisService";
 import { ChevronDown, ChevronUp, Loader2, TrendingUp, TrendingDown } from "lucide-react";
-import { createChart, ColorType, IChartApi, ISeriesApi } from "lightweight-charts";
+import { createChart, ColorType } from "lightweight-charts";
 
 type ChartInterval = "1D" | "5D" | "1M" | "3M" | "6M" | "1Y";
 
@@ -17,9 +17,9 @@ export default function StockAnalysis() {
   const router = useRouter();
   const { ticker } = router.query;
   const chartContainerRef = useRef<HTMLDivElement>(null);
-  const chartRef = useRef<IChartApi | null>(null);
-  const candlestickSeriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null);
-  const volumeSeriesRef = useRef<ISeriesApi<"Histogram"> | null>(null);
+  const chartRef = useRef<any>(null);
+  const candlestickSeriesRef = useRef<any>(null);
+  const volumeSeriesRef = useRef<any>(null);
 
   const [quote, setQuote] = useState<any>(null);
   const [ohlcData, setOhlcData] = useState<any[]>([]);
@@ -82,7 +82,8 @@ export default function StockAnalysis() {
       },
     });
 
-    const candlestickSeries = chart.addCandlestickSeries({
+    const candlestickSeries = chart.addSeries({
+      type: 'Candlestick',
       upColor: "#22d472",
       downColor: "#f04848",
       borderUpColor: "#22d472",
@@ -91,7 +92,8 @@ export default function StockAnalysis() {
       wickDownColor: "#f04848",
     });
 
-    const volumeSeries = chart.addHistogramSeries({
+    const volumeSeries = chart.addSeries({
+      type: 'Histogram',
       color: "#8080a0",
       priceFormat: {
         type: "volume",
