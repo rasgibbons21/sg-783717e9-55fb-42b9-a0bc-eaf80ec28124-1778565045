@@ -1,14 +1,20 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import Link from "next/link";
 import { Layout } from "@/components/Layout";
+import { SEO } from "@/components/SEO";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { authService } from "@/services/authService";
 import { marketService } from "@/services/marketService";
-import { TrendingUp, TrendingDown, Plus, Trash2, Loader2 } from "lucide-react";
-import { SEO } from "@/components/SEO";
-import Link from "next/link";
+import { notificationService } from "@/services/notificationService";
+import { supabase } from "@/integrations/supabase/client";
+import { TrendingUp, TrendingDown, Plus, Trash2, Loader2, Bell, BellOff } from "lucide-react";
 
 interface WatchlistItem {
   ticker: string;
@@ -18,23 +24,38 @@ interface WatchlistItem {
 
 export default function Portfolio() {
   const router = useRouter();
+  const [user, setUser] = useState<any>(null);
   const [watchlist, setWatchlist] = useState<WatchlistItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [addingTicker, setAddingTicker] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [newTicker, setNewTicker] = useState("");
   const [isAddingNew, setIsAddingNew] = useState(false);
+  const [priceAlerts, setPriceAlerts] = useState<any[]>([]);
+  const [showAlertDialog, setShowAlertDialog] = useState(false);
+  const [selectedTicker, setSelectedTicker] = useState("");
+  const [alertThreshold, setAlertThreshold] = useState("5");
 
   useEffect(() => {
-    checkAuthAndLoad();
+    checkAuth();
   }, []);
 
-  const checkAuthAndLoad = async () => {
-    setLoading(true);
-    const session = await authService.getCurrentSession();
+  const checkAuth = async () => {
+    const session = await authService.getSession();
     if (!session) {
       router.push("/");
       return;
     }
+    const profile = await authService.getProfile();
+    setUser(profile);
     await loadWatchlist();
+    await loadPriceAlerts();
+  };
+
+  const loadPriceAlerts = async () => {
+    const session = await authService.getSession();
+    if (!session) return;
+
+    const alerts = await notificationService.getPriceAlerts(session.user.id);
+    setPriceAlerts(alerts);
   };
 
   const loadWatchlist = async () => {
@@ -61,17 +82,17 @@ export default function Portfolio() {
     } catch (error) {
       console.error("Error loading watchlist:", error);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   const addToWatchlist = async () => {
-    if (!addingTicker.trim()) return;
+    if (!newTicker.trim()) return;
 
-    const ticker = addingTicker.trim().toUpperCase();
+    const ticker = newTicker.trim().toUpperCase();
     
     if (watchlist.some(item => item.ticker === ticker)) {
-      setAddingTicker("");
+      setNewTicker("");
       setIsAddingNew(false);
       return;
     }
@@ -92,7 +113,7 @@ export default function Portfolio() {
       const tickers = updatedList.map(item => item.ticker);
       localStorage.setItem("bloom_watchlist", JSON.stringify(tickers));
 
-      setAddingTicker("");
+      setNewTicker("");
     } catch (error) {
       console.error("Error adding to watchlist:", error);
       alert("Failed to add ticker to watchlist");
@@ -109,7 +130,66 @@ export default function Portfolio() {
     localStorage.setItem("bloom_watchlist", JSON.stringify(tickers));
   };
 
-  if (loading) {
+  const handleRemove = async (ticker: string) => {
+    if (!user?.id) return;
+
+    try {
+      const { error } = await supabase
+        .from("watchlist")
+        .delete()
+        .eq("user_id", user.id)
+        .eq("ticker", ticker);
+
+      if (error) throw error;
+
+      setWatchlist((prev) => prev.filter((item) => item.ticker !== ticker));
+    } catch (error) {
+      console.error("Error removing from watchlist:", error);
+    }
+  };
+
+  const handleCreateAlert = async () => {
+    if (!user?.id || !selectedTicker || !alertThreshold) return;
+
+    const threshold = parseFloat(alertThreshold);
+    if (isNaN(threshold) || threshold <= 0) {
+      alert("Please enter a valid percentage");
+      return;
+    }
+
+    const alert = await notificationService.createPriceAlert(
+      user.id,
+      selectedTicker,
+      "price_change",
+      threshold
+    );
+
+    if (alert) {
+      await loadPriceAlerts();
+      setShowAlertDialog(false);
+      setSelectedTicker("");
+      setAlertThreshold("5");
+    } else {
+      alert("Failed to create price alert. Please try again.");
+    }
+  };
+
+  const getAlertForTicker = (ticker: string) => {
+    return priceAlerts.find(
+      (alert) => alert.ticker === ticker && alert.alert_type === "price_change"
+    );
+  };
+
+  const toggleAlert = async (alertId: string, enabled: boolean) => {
+    const success = await notificationService.toggleAlert(alertId, enabled);
+    if (success) {
+      await loadPriceAlerts();
+    }
+  };
+
+  const totalValue = watchlist.reduce((sum, item) => {
+
+  if (isLoading) {
     return (
       <Layout>
         <SEO title="Watchlist - Bloom" description="Track your investment watchlist" />
@@ -134,8 +214,8 @@ export default function Portfolio() {
           <div className="flex gap-3">
             <input
               type="text"
-              value={addingTicker}
-              onChange={(e) => setAddingTicker(e.target.value.toUpperCase())}
+              value={newTicker}
+              onChange={(e) => setNewTicker(e.target.value.toUpperCase())}
               onKeyDown={(e) => e.key === "Enter" && addToWatchlist()}
               placeholder="Enter ticker (e.g., AAPL, VOO, SCHD)"
               className="flex-1 px-4 py-3 bg-popover border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
@@ -143,7 +223,7 @@ export default function Portfolio() {
             />
             <Button
               onClick={addToWatchlist}
-              disabled={!addingTicker.trim() || isAddingNew}
+              disabled={!newTicker.trim() || isAddingNew}
               className="gap-2 rounded-xl px-6 bg-primary hover:bg-primary/90"
               size="lg"
             >
@@ -198,17 +278,63 @@ export default function Portfolio() {
                         </div>
                       </div>
 
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          removeFromWatchlist(item.ticker);
-                        }}
-                        className="text-muted-foreground hover:text-rose -mr-2 -mt-2"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      <div className="flex items-center gap-2">
+                        <Badge
+                          className={
+                            item.quote?.dp >= 0
+                              ? "bg-primary/10 text-primary"
+                              : "bg-destructive/10 text-destructive"
+                          }
+                        >
+                          {item.quote?.dp >= 0 ? (
+                            <TrendingUp className="w-3 h-3 mr-1" />
+                          ) : (
+                            <TrendingDown className="w-3 h-3 mr-1" />
+                          )}
+                          {item.quote?.dp?.toFixed(2)}%
+                        </Badge>
+                        {(() => {
+                          const alert = getAlertForTicker(item.ticker);
+                          return alert ? (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => toggleAlert(alert.id, !alert.enabled)}
+                              className={
+                                alert.enabled
+                                  ? "text-accent hover:text-accent/80"
+                                  : "text-muted-foreground hover:text-foreground"
+                              }
+                            >
+                              {alert.enabled ? (
+                                <Bell className="w-4 h-4" />
+                              ) : (
+                                <BellOff className="w-4 h-4" />
+                              )}
+                            </Button>
+                          ) : (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setSelectedTicker(item.ticker);
+                                setShowAlertDialog(true);
+                              }}
+                              className="text-muted-foreground hover:text-accent"
+                            >
+                              <Bell className="w-4 h-4" />
+                            </Button>
+                          );
+                        })()}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleRemove(item.ticker)}
+                          className="text-destructive hover:text-destructive/80"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
                     
                     {item.loading ? (
@@ -260,6 +386,56 @@ export default function Portfolio() {
             </div>
           </div>
         </Card>
+
+        {/* Price Alert Dialog */}
+        <Dialog open={showAlertDialog} onOpenChange={setShowAlertDialog}>
+          <DialogContent className="bg-card border-border">
+            <DialogHeader>
+              <DialogTitle className="text-foreground">
+                Set Price Alert for {selectedTicker}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <p className="text-sm text-muted-foreground">
+                Get notified when {selectedTicker} moves by this percentage in a single day
+              </p>
+              <div className="space-y-2">
+                <Label htmlFor="threshold" className="text-foreground">
+                  Price Change Threshold (%)
+                </Label>
+                <Input
+                  id="threshold"
+                  type="number"
+                  value={alertThreshold}
+                  onChange={(e) => setAlertThreshold(e.target.value)}
+                  placeholder="5"
+                  className="bg-background border-border text-foreground"
+                  min="1"
+                  max="50"
+                  step="1"
+                />
+                <p className="text-xs text-muted-foreground">
+                  You'll get a notification if the price moves up or down by {alertThreshold}% or more
+                </p>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setShowAlertDialog(false)}
+                className="border-border text-foreground"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleCreateAlert}
+                className="bg-primary hover:bg-primary/90"
+              >
+                Create Alert
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         <Card className="p-4 bg-muted/50 border-border/50 rounded-2xl">
           <p className="text-xs text-center text-muted-foreground leading-relaxed">

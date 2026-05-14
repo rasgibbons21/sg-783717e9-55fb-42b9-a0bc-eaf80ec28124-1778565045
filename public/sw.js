@@ -7,54 +7,21 @@ const urlsToCache = [
   '/portfolio',
   '/brokers',
   '/profile',
-  '/offline',
   '/bloom-logo.png',
   '/icon-192.png',
   '/icon-512.png',
 ];
 
-// Install event - cache static assets
+// Install event
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('Opened cache');
       return cache.addAll(urlsToCache);
     })
   );
 });
 
-// Fetch event - serve from cache, fallback to network
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request).then((response) => {
-      // Cache hit - return response
-      if (response) {
-        return response;
-      }
-
-      return fetch(event.request).then((response) => {
-        // Don't cache non-successful responses
-        if (!response || response.status !== 200 || response.type !== 'basic') {
-          return response;
-        }
-
-        // Clone the response
-        const responseToCache = response.clone();
-
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseToCache);
-        });
-
-        return response;
-      }).catch(() => {
-        // If both cache and network fail, show offline page
-        return caches.match('/offline');
-      });
-    })
-  );
-});
-
-// Activate event - cleanup old caches
+// Activate event
 self.addEventListener('activate', (event) => {
   const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
@@ -68,4 +35,74 @@ self.addEventListener('activate', (event) => {
       );
     })
   );
+});
+
+// Fetch event
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    fetch(event.request)
+      .then((response) => {
+        const responseToCache = response.clone();
+        caches.open(CACHE_NAME).then((cache) => {
+          cache.put(event.request, responseToCache);
+        });
+        return response;
+      })
+      .catch(() => {
+        return caches.match(event.request).then((response) => {
+          return response || caches.match('/offline');
+        });
+      })
+  );
+});
+
+// Push notification event
+self.addEventListener('push', (event) => {
+  const data = event.data ? event.data.json() : {};
+  const title = data.title || 'Bloom Price Alert 🌸';
+  const options = {
+    body: data.body || 'Your stock has moved!',
+    icon: '/icon-192.png',
+    badge: '/icon-192.png',
+    vibrate: [200, 100, 200],
+    data: {
+      url: data.url || '/portfolio',
+      ticker: data.ticker,
+    },
+    actions: [
+      {
+        action: 'view',
+        title: 'View Stock',
+      },
+      {
+        action: 'close',
+        title: 'Dismiss',
+      },
+    ],
+    tag: data.ticker || 'price-alert',
+    requireInteraction: false,
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(title, options)
+  );
+});
+
+// Notification click event
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+
+  if (event.action === 'view') {
+    const urlToOpen = event.notification.data.url || '/portfolio';
+    event.waitUntil(
+      clients.openWindow(urlToOpen)
+    );
+  } else if (event.action === 'close') {
+    // Just close the notification
+  } else {
+    // Default action: open the app
+    event.waitUntil(
+      clients.openWindow('/portfolio')
+    );
+  }
 });
