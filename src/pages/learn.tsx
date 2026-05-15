@@ -1,6 +1,5 @@
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/router";
-import Link from "next/link";
 import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
 import { Card } from "@/components/ui/card";
@@ -10,9 +9,16 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { authService } from "@/services/authService";
 import { supabase } from "@/integrations/supabase/client";
-import { Search, ArrowLeft, Clock, CheckCircle2, Circle, ChevronRight, Bookmark, BookmarkCheck } from "lucide-react";
+import { Search, ArrowLeft, Clock, CheckCircle2, Circle, ChevronRight, Bookmark, BookmarkCheck, Award } from "lucide-react";
 
 type Category = "All" | "Stocks" | "ETFs" | "Mutual Funds" | "Dividends" | "Bonds" | "Retirement";
+
+interface QuizQuestion {
+  question: string;
+  options: string[];
+  correctAnswer: number;
+  explanation: string;
+}
 
 interface Lesson {
   id: string;
@@ -24,6 +30,7 @@ interface Lesson {
   content: string;
   keyTakeaway: string;
   relatedTopics: string[];
+  quiz: QuizQuestion[];
 }
 
 export default function Learn() {
@@ -34,6 +41,9 @@ export default function Learn() {
   const [completedLessons, setCompletedLessons] = useState<string[]>([]);
   const [bookmarkedLessons, setBookmarkedLessons] = useState<string[]>([]);
   const [selectedLesson, setSelectedLesson] = useState<string | null>(null);
+  const [quizAnswers, setQuizAnswers] = useState<(number | null)[]>([null, null, null]);
+  const [quizSubmitted, setQuizSubmitted] = useState(false);
+  const [quizScore, setQuizScore] = useState(0);
   const contentRef = useRef<HTMLDivElement>(null);
   const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
 
@@ -56,6 +66,26 @@ That's literally how people build wealth through the stock market girl. You're n
 The key is thinking long term. Day to day the price bounces around like crazy but over years and decades stocks have historically gone up. That's why we invest instead of just saving cash 💪`,
       keyTakeaway: "A stock = tiny piece of a real company. You make money when the company grows. Think long term not day to day.",
       relatedTopics: ["what-are-dividends", "bull-vs-bear", "market-cap"],
+      quiz: [
+        {
+          question: "When you buy a stock, what are you actually buying?",
+          options: ["A loan to the company", "A tiny piece of ownership in the company", "A guaranteed return on investment", "The company's debt"],
+          correctAnswer: 1,
+          explanation: "Exactly girl! You're buying actual ownership in the company. You become a part owner even if it's just a tiny piece 💪"
+        },
+        {
+          question: "What's the best way to approach stock investing according to Dahlia?",
+          options: ["Day trade for quick profits", "Sell immediately when prices drop", "Think long term and hold for years", "Only buy when prices are at their highest"],
+          correctAnswer: 2,
+          explanation: "Yes! Long term thinking is key. Day to day the market is crazy but over years it historically goes up. Patience wins sis 🌱"
+        },
+        {
+          question: "What happens to your stock's value when the company does well?",
+          options: ["It automatically gets sold", "The price usually goes up", "You have to pay more taxes", "Nothing changes"],
+          correctAnswer: 1,
+          explanation: "That's right! When the company makes money and grows the stock price usually increases. Your tiny slice becomes more valuable 📈"
+        }
+      ]
     },
     {
       id: "what-is-etf",
@@ -75,6 +105,26 @@ ETFs also have super low fees compared to mutual funds. We're talking like 0.03%
 Bottom line: ETFs are perfect for beginners because you get instant diversification without having to pick individual winners. You're betting on the market as a whole not on your ability to find the next Tesla. Instant diversification sis 💪`,
       keyTakeaway: "ETFs = bundle of many stocks in one. Less risk than single stocks. Perfect for beginners who want diversification.",
       relatedTopics: ["what-is-mutual-fund", "index-funds", "active-vs-passive"],
+      quiz: [
+        {
+          question: "What's the main benefit of buying an ETF over individual stocks?",
+          options: ["ETFs guarantee profits", "You get instant diversification across many companies", "ETFs never lose value", "You can only buy ETFs through special brokers"],
+          correctAnswer: 1,
+          explanation: "Exactly! ETFs give you instant diversification. One purchase = tiny pieces of hundreds of companies. If one tanks the others hold you up 💪"
+        },
+        {
+          question: "How many companies does VOO (an S&P 500 ETF) hold?",
+          options: ["50 companies", "100 companies", "500 companies", "1000 companies"],
+          correctAnswer: 2,
+          explanation: "Yes girl! VOO holds 500 of the biggest US companies. That's Apple Microsoft Amazon Google Tesla and 495 others all in one 🧺"
+        },
+        {
+          question: "What are typical ETF fees compared to mutual funds?",
+          options: ["ETFs cost much more", "ETFs cost about the same", "ETFs cost much less (like 0.03% vs 1%+)", "ETFs have no fees at all"],
+          correctAnswer: 2,
+          explanation: "That's right! ETFs have super low fees (0.03% for VOO) vs mutual funds (1%+). Over 30 years that difference is HUGE 💰"
+        }
+      ]
     },
     {
       id: "what-is-mutual-fund",
@@ -94,6 +144,26 @@ And here's the kicker — most actively managed funds don't even beat the market
 That said some women prefer having a professional manage their money especially when starting out. It feels safer. And there are some legit good mutual funds out there. Just know what you're paying for and whether it's worth it to you 🛍️`,
       keyTakeaway: "Mutual funds = professional manager picking stocks for you. Higher fees than ETFs. Most don't beat the market.",
       relatedTopics: ["what-is-etf", "index-funds", "active-vs-passive"],
+      quiz: [
+        {
+          question: "What's the main difference between a mutual fund and an ETF?",
+          options: ["Mutual funds can only be bought by wealthy investors", "Mutual funds have a professional manager actively picking stocks", "ETFs are illegal in most states", "There is no difference"],
+          correctAnswer: 1,
+          explanation: "Yes! Mutual funds have a professional manager actively buying and selling trying to beat the market. ETFs just track an index 📊"
+        },
+        {
+          question: "What percentage of actively managed mutual funds underperform the S&P 500?",
+          options: ["About 20%", "About 50%", "About 80%", "About 100%"],
+          correctAnswer: 2,
+          explanation: "Yep about 80%! Most actively managed funds lose to a simple S&P 500 index fund after fees. The data doesn't lie girl 📉"
+        },
+        {
+          question: "Why do mutual funds typically charge higher fees than ETFs?",
+          options: ["Because they're older", "To pay the professional fund manager", "They don't - fees are the same", "Government regulations require it"],
+          correctAnswer: 1,
+          explanation: "Correct! You're paying that fund manager's salary. They charge 1-2% vs 0.03% for ETFs. That adds up over time 💸"
+        }
+      ]
     },
     {
       id: "what-are-dividends",
@@ -113,6 +183,26 @@ Companies that pay consistent dividends are usually stable mature businesses. Th
 You can take the dividends as cash or reinvest them to buy more shares (that's called a DRIP and we'll talk about it later). Either way it's one of my favorite parts of investing because you're getting paid while you wait for the stock price to grow 💛`,
       keyTakeaway: "Dividends = cash payments just for owning stock. Usually paid quarterly. Free money for being patient.",
       relatedTopics: ["drip-investing", "what-is-stock", "index-funds"],
+      quiz: [
+        {
+          question: "How often are dividends typically paid?",
+          options: ["Once a year", "Every month", "Every quarter (4 times a year)", "Every day"],
+          correctAnswer: 2,
+          explanation: "That's right! Most dividend stocks pay quarterly so you get that cash hitting your account 4 times a year 💰"
+        },
+        {
+          question: "If a stock costs $100 and pays $4 per year in dividends, what's the yield?",
+          options: ["2%", "4%", "8%", "10%"],
+          correctAnswer: 1,
+          explanation: "Yes! $4 ÷ $100 = 4% yield. That's how much you're earning just for holding the stock. Compare that to a 0.5% savings account 📈"
+        },
+        {
+          question: "What type of companies typically pay consistent dividends?",
+          options: ["Brand new startup companies", "Stable mature businesses like Coca-Cola", "Companies that are losing money", "Only tech companies"],
+          correctAnswer: 1,
+          explanation: "Exactly! Stable mature companies that have been around forever usually pay dividends. They're not going anywhere and they reward loyalty 💪"
+        }
+      ]
     },
     {
       id: "bull-vs-bear",
@@ -132,6 +222,26 @@ Here's what's important: both are completely normal and temporary. The stock mar
 So when you see red don't panic and sell everything. That's literally when stocks are on sale. The best investors keep buying during bear markets because they know historically the market always recovers and reaches new highs. Stay calm and think long term girl 💪`,
       keyTakeaway: "Bull = up 20%+ (good). Bear = down 20%+ (scary but temporary). Both are normal. Don't panic sell during bear markets.",
       relatedTopics: ["what-is-stock", "dollar-cost-averaging", "index-funds"],
+      quiz: [
+        {
+          question: "What defines a bull market?",
+          options: ["When prices drop 20% or more", "When prices rise 20% or more", "When prices stay flat", "When you buy cattle stocks"],
+          correctAnswer: 1,
+          explanation: "Yes! Bull market = prices rising 20%+ from a recent low. Think bull charging forward with horns up 📈"
+        },
+        {
+          question: "How long does the average bear market last?",
+          options: ["About 9 months", "About 5 years", "About 1 month", "They never end"],
+          correctAnswer: 0,
+          explanation: "That's right! Average bear market is about 9 months. They're temporary girl. Every single one has ended eventually 💪"
+        },
+        {
+          question: "What should you do during a bear market according to Dahlia?",
+          options: ["Panic and sell everything", "Stop investing completely", "Stay calm and keep buying (stocks are on sale)", "Move all money to cash"],
+          correctAnswer: 2,
+          explanation: "Exactly! Bear markets = stocks on sale. The best investors keep buying because they know the market always recovers. Stay calm sis 🌱"
+        }
+      ]
     },
     {
       id: "market-cap",
@@ -156,6 +266,26 @@ Most financial advisors suggest having a mix. Put the bulk of your money in larg
 Don't confuse market cap with stock price btw. A $10 stock of a huge company might be a better value than a $1000 stock of a tiny company. Market cap tells the full story 💡`,
       keyTakeaway: "Market cap = company's total value (price × shares). Large cap = safer. Small cap = riskier but more growth potential.",
       relatedTopics: ["what-is-stock", "what-is-etf", "active-vs-passive"],
+      quiz: [
+        {
+          question: "How do you calculate market cap?",
+          options: ["Stock price ÷ number of shares", "Stock price × number of shares", "Stock price + number of shares", "Stock price - number of shares"],
+          correctAnswer: 1,
+          explanation: "Yes! Market cap = stock price × total shares. Super simple math that tells you the company's total value 🎯"
+        },
+        {
+          question: "Which type of company is typically considered safest?",
+          options: ["Small cap (under $2 billion)", "Mid cap ($2-10 billion)", "Large cap ($10 billion+)", "They're all equally safe"],
+          correctAnswer: 2,
+          explanation: "That's right! Large caps like Apple and Microsoft are usually safer but grow slower. They're the steady reliable friend 💪"
+        },
+        {
+          question: "Can a $10 stock be more valuable than a $1000 stock?",
+          options: ["No, higher price always means more valuable", "Yes, if the $10 stock has a much higher market cap", "Stock price and value are completely unrelated", "Only if it's a tech company"],
+          correctAnswer: 1,
+          explanation: "Exactly! Market cap tells the full story not just stock price. A $10 stock of a huge company can be worth way more than a $1000 stock of a tiny company 💡"
+        }
+      ]
     },
     {
       id: "pe-ratio",
@@ -177,6 +307,26 @@ High PE isn't always bad. Tech companies like Tesla or Netflix have high PEs bec
 Use PE to compare companies in the same industry. Comparing Apple's PE to a utility company's PE is pointless — they're in totally different businesses with different growth expectations. Stay in your lane when comparing girl 💪`,
       keyTakeaway: "PE ratio = stock price ÷ earnings. Low = cheap. High = expensive (or high growth expected). Compare within same industry only.",
       relatedTopics: ["what-is-stock", "market-cap", "active-vs-passive"],
+      quiz: [
+        {
+          question: "What does PE ratio stand for?",
+          options: ["Price to Earnings", "Profit to Equity", "Price to Equity", "Performance to Earnings"],
+          correctAnswer: 0,
+          explanation: "Yes! PE = Price to Earnings. It shows how much you're paying for each dollar of the company's profits 🔍"
+        },
+        {
+          question: "What's the average PE ratio for the S&P 500?",
+          options: ["Around 5", "Around 15-20", "Around 50", "Around 100"],
+          correctAnswer: 1,
+          explanation: "That's right! S&P 500 average is usually 15-20. Higher than that = expensive. Lower = cheap (or there's a problem) 📊"
+        },
+        {
+          question: "Is a high PE ratio always bad?",
+          options: ["Yes, high PE always means overpriced", "No, it can mean investors expect high growth", "PE ratio doesn't matter", "Only for tech companies"],
+          correctAnswer: 1,
+          explanation: "Exactly! High PE can mean investors believe the company will grow like crazy (like Tesla). It's not automatically bad girl 💪"
+        }
+      ]
     },
     {
       id: "index-funds",
@@ -200,6 +350,26 @@ The math is wild: if you invest $500 a month in an S&P 500 index fund for 30 yea
 Index funds are my #1 recommendation for beginners. They're boring they're simple and they work. You don't need to watch the market or pick stocks. Just buy and hold and let time do its thing. Boring wins sis 💰`,
       keyTakeaway: "Index funds = tracks the whole market (like S&P 500). Boring simple and historically beats 90% of active investors. Start here.",
       relatedTopics: ["what-is-etf", "dollar-cost-averaging", "active-vs-passive"],
+      quiz: [
+        {
+          question: "What does an S&P 500 index fund do?",
+          options: ["Tries to beat the market by picking stocks", "Tracks the 500 biggest US companies", "Only invests in tech stocks", "Guarantees 10% returns"],
+          correctAnswer: 1,
+          explanation: "Yes! It tracks the 500 biggest US companies. You're betting on America as a whole not individual stocks 🎯"
+        },
+        {
+          question: "What are typical index fund fees compared to active funds?",
+          options: ["Higher (2%+)", "About the same (1%)", "Much lower (0.03%)", "Index funds have no fees"],
+          correctAnswer: 2,
+          explanation: "That's right! Index funds like VOO charge 0.03% vs 1%+ for active funds. That difference is HUGE over 30 years 💰"
+        },
+        {
+          question: "What percentage of active fund managers underperform index funds?",
+          options: ["About 20%", "About 50%", "About 90%", "About 10%"],
+          correctAnswer: 2,
+          explanation: "Yep about 90%! Most professionals with fancy degrees lose to a boring index fund. That's why Warren Buffett recommends them 📈"
+        }
+      ]
     },
     {
       id: "dollar-cost-averaging",
@@ -221,6 +391,26 @@ This works especially well with 401k contributions. You're automatically investi
 Set it and forget it girl. That's the secret to building wealth without the stress. Consistency beats timing every single time 💪`,
       keyTakeaway: "DCA = invest same amount regularly (like $200/month). Removes timing stress. You buy more when prices are low. Set and forget.",
       relatedTopics: ["index-funds", "roth-ira", "bull-vs-bear"],
+      quiz: [
+        {
+          question: "What is dollar cost averaging?",
+          options: ["Investing all your money at once", "Investing the same amount at regular intervals", "Only buying when prices are low", "Trying to time the market perfectly"],
+          correctAnswer: 1,
+          explanation: "Yes! DCA = same amount regularly (like $200 every month). No timing stress no guessing. Just consistency 📅"
+        },
+        {
+          question: "What's the main benefit of dollar cost averaging?",
+          options: ["It guarantees profits", "It removes the stress of trying to time the market", "You only buy when prices are high", "It's faster than investing all at once"],
+          correctAnswer: 1,
+          explanation: "Exactly! DCA takes away the timing stress. You're not sitting there wondering when to buy — you just buy on schedule 💡"
+        },
+        {
+          question: "When does DCA cause you to buy more shares?",
+          options: ["When prices are high", "When prices are low", "Only on Mondays", "It doesn't matter"],
+          correctAnswer: 1,
+          explanation: "That's right! When prices drop your $200 buys MORE shares. You're automatically buying more when things are on sale 🛍️"
+        }
+      ]
     },
     {
       id: "roth-ira",
@@ -244,6 +434,26 @@ Rules to know:
 Start a Roth IRA as early as possible. Time is your biggest advantage here. Even small contributions in your 20s become massive amounts by retirement because of compound growth. Future you will thank present you so much girl 💛`,
       keyTakeaway: "Roth IRA = tax-free growth forever. Contribute early for maximum compound growth. One of the best retirement accounts period.",
       relatedTopics: ["dollar-cost-averaging", "index-funds", "what-are-dividends"],
+      quiz: [
+        {
+          question: "What's the biggest benefit of a Roth IRA?",
+          options: ["Your money grows tax-free forever", "You get an immediate tax deduction", "Guaranteed 10% returns", "No contribution limits"],
+          correctAnswer: 0,
+          explanation: "Yes! Tax-free growth FOREVER. You pay taxes going in but then all that growth is yours to keep. Zero taxes in retirement 🚀"
+        },
+        {
+          question: "What's the 2024 contribution limit for a Roth IRA?",
+          options: ["$3,000 per year", "$6,500 per year", "$10,000 per year", "Unlimited"],
+          correctAnswer: 1,
+          explanation: "That's right! $6,500 per year (or $7,000 if you're over 50). Max that out if you can — future you will be so grateful 💰"
+        },
+        {
+          question: "Can you withdraw your Roth IRA contributions before retirement?",
+          options: ["No, never without penalty", "Yes, contributions (not growth) can be withdrawn anytime", "Only if you're over 65", "Only with IRS approval"],
+          correctAnswer: 1,
+          explanation: "Exactly! You can withdraw your contributions anytime penalty free. But leave the growth alone until retirement for max benefit 💪"
+        }
+      ]
     },
     {
       id: "drip-investing",
@@ -265,6 +475,26 @@ Most brokerages offer automatic DRIP enrollment. Just turn it on and forget abou
 When you're young and don't need the income DRIP is the move. When you retire you can turn it off and take the dividends as cash for living expenses. It's like planting a money tree and watching it grow sis 🌱`,
       keyTakeaway: "DRIP = automatically reinvest dividends to buy more shares. Compound growth on autopilot. Turn it on and forget it.",
       relatedTopics: ["what-are-dividends", "dollar-cost-averaging", "index-funds"],
+      quiz: [
+        {
+          question: "What does DRIP stand for?",
+          options: ["Dividend Reduction Investment Plan", "Dividend Reinvestment Plan", "Daily Return Investment Program", "Diversified Risk Investment Portfolio"],
+          correctAnswer: 1,
+          explanation: "Yes! Dividend Reinvestment Plan. Your dividends automatically buy more shares instead of sitting as cash 🔄"
+        },
+        {
+          question: "How much extra could DRIP add to a $10k investment over 30 years?",
+          options: ["Nothing - it's the same", "About $10,000", "About $30,000", "About $100,000"],
+          correctAnswer: 2,
+          explanation: "That's right! About $30k extra from compound growth. Your dividends buying more shares that pay more dividends that buy MORE shares 💸"
+        },
+        {
+          question: "When should you turn off DRIP according to Dahlia?",
+          options: ["Never turn it off", "When you're young and don't need income", "When you retire and want dividend cash", "Only on weekends"],
+          correctAnswer: 2,
+          explanation: "Exactly! Keep DRIP on when you're young to maximize growth. Turn it off in retirement when you want that dividend cash for living expenses 🌱"
+        }
+      ]
     },
     {
       id: "active-vs-passive",
@@ -286,6 +516,26 @@ So why doesn't everyone just do passive? Because it's not exciting. Humans want 
 My take: If you're new go passive with index funds. Put 80-90% of your portfolio there. If you want to scratch the active itch use 10-20% to pick individual stocks. That way you get the stability of passive plus the fun of active without risking everything. Best of both worlds girl 💪`,
       keyTakeaway: "Active = pick stocks (exciting but usually loses). Passive = index funds (boring but wins). Go 80% passive 20% active to balance.",
       relatedTopics: ["index-funds", "what-is-etf", "what-is-mutual-fund"],
+      quiz: [
+        {
+          question: "What's the main difference between active and passive investing?",
+          options: ["Active tries to beat the market, passive tracks it", "They're exactly the same", "Passive is illegal in most states", "Active only works for millionaires"],
+          correctAnswer: 0,
+          explanation: "Yes! Active = trying to beat the market by picking stocks. Passive = just tracking the market with index funds 🎯"
+        },
+        {
+          question: "What percentage of active fund managers underperform the S&P 500?",
+          options: ["About 10%", "About 50%", "About 90%", "About 100%"],
+          correctAnswer: 2,
+          explanation: "That's right! About 90% of professionals lose to a simple S&P 500 index fund. The data is wild girl 📊"
+        },
+        {
+          question: "What's Dahlia's recommendation for beginners?",
+          options: ["100% active stock picking", "100% passive index funds", "80-90% passive, 10-20% active", "Don't invest at all"],
+          correctAnswer: 2,
+          explanation: "Exactly! 80-90% passive for stability, 10-20% active for fun. Best of both worlds without risking everything 💪"
+        }
+      ]
     },
   ];
 
@@ -302,10 +552,8 @@ My take: If you're new go passive with index funds. Put 80-90% of your portfolio
         const scrollPosition = element.scrollTop + element.clientHeight;
         const scrollHeight = element.scrollHeight;
 
-        // If scrolled to within 50px of bottom, mark as read
         if (scrollPosition >= scrollHeight - 50) {
           setHasScrolledToBottom(true);
-          handleCompleteLesson(selectedLesson);
         }
       };
 
@@ -330,7 +578,7 @@ My take: If you're new go passive with index funds. Put 80-90% of your portfolio
     try {
       const { data: progressData } = await supabase
         .from("lesson_progress")
-        .select("lesson_id")
+        .select("lesson_id, quiz_score, quiz_completed")
         .eq("user_id", userId)
         .eq("completed", true);
 
@@ -371,6 +619,49 @@ My take: If you're new go passive with index funds. Put 80-90% of your portfolio
     } catch (error) {
       console.error("Error completing lesson:", error);
     }
+  };
+
+  const handleSubmitQuiz = async () => {
+    if (!user?.id || !selectedLesson) return;
+
+    const lesson = lessons.find((l) => l.id === selectedLesson);
+    if (!lesson) return;
+
+    let score = 0;
+    quizAnswers.forEach((answer, index) => {
+      if (answer === lesson.quiz[index].correctAnswer) {
+        score++;
+      }
+    });
+
+    setQuizScore(score);
+    setQuizSubmitted(true);
+
+    try {
+      const { error } = await supabase
+        .from("lesson_progress")
+        .upsert({
+          user_id: user.id,
+          lesson_id: selectedLesson,
+          completed: true,
+          completed_at: new Date().toISOString(),
+          quiz_score: score,
+          quiz_completed: true,
+          quiz_attempts: 1,
+        });
+
+      if (!error && !completedLessons.includes(selectedLesson)) {
+        setCompletedLessons([...completedLessons, selectedLesson]);
+      }
+    } catch (error) {
+      console.error("Error submitting quiz:", error);
+    }
+  };
+
+  const resetQuiz = () => {
+    setQuizAnswers([null, null, null]);
+    setQuizSubmitted(false);
+    setQuizScore(0);
   };
 
   const toggleBookmark = async (lessonId: string) => {
@@ -439,7 +730,6 @@ My take: If you're new go passive with index funds. Put 80-90% of your portfolio
           className="min-h-screen bg-background pb-20 overflow-y-auto"
         >
           <div className="max-w-3xl mx-auto p-6 space-y-6">
-            {/* Header */}
             <div className="flex items-center gap-4">
               <Button
                 variant="ghost"
@@ -447,6 +737,7 @@ My take: If you're new go passive with index funds. Put 80-90% of your portfolio
                 onClick={() => {
                   setSelectedLesson(null);
                   setHasScrolledToBottom(false);
+                  resetQuiz();
                 }}
                 className="text-muted-foreground hover:text-foreground"
               >
@@ -455,7 +746,6 @@ My take: If you're new go passive with index funds. Put 80-90% of your portfolio
               </Button>
             </div>
 
-            {/* Lesson Header */}
             <Card className="p-6 bg-card border-border rounded-2xl space-y-4">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 space-y-3">
@@ -511,7 +801,6 @@ My take: If you're new go passive with index funds. Put 80-90% of your portfolio
               </div>
             </Card>
 
-            {/* Lesson Content */}
             <Card className="p-6 bg-card border-border rounded-2xl">
               <div className="prose prose-invert max-w-none">
                 <p className="text-foreground leading-relaxed whitespace-pre-line">
@@ -519,7 +808,6 @@ My take: If you're new go passive with index funds. Put 80-90% of your portfolio
                 </p>
               </div>
 
-              {/* Key Takeaway */}
               <div className="mt-8 p-4 bg-primary/10 border-l-4 border-primary rounded-r-lg">
                 <p className="text-sm font-semibold text-primary mb-2">
                   Key Takeaway
@@ -529,34 +817,128 @@ My take: If you're new go passive with index funds. Put 80-90% of your portfolio
                 </p>
               </div>
 
-              {/* Mark Complete Button */}
-              {!isCompleted && (
-                <Button
-                  onClick={() => handleCompleteLesson(lesson.id)}
-                  className="w-full mt-6 bg-primary hover:bg-primary/90"
-                >
-                  <CheckCircle2 className="w-4 h-4 mr-2" />
-                  Mark as Complete
-                </Button>
-              )}
-
-              {isCompleted && (
-                <div className="mt-6 p-4 bg-primary/10 border border-primary/30 rounded-lg text-center">
-                  <CheckCircle2 className="w-6 h-6 text-primary mx-auto mb-2" />
-                  <p className="text-sm font-semibold text-primary">
-                    Lesson completed! 🎉
-                  </p>
-                </div>
-              )}
-
-              {/* Disclaimer */}
               <p className="mt-6 text-xs text-muted-foreground text-center">
                 This is educational content only and does not constitute
                 financial advice. Always invest what feels right for you 💛
               </p>
             </Card>
 
-            {/* Related Topics */}
+            <Card className="p-6 bg-card border-accent/30 rounded-2xl space-y-6">
+              <div className="flex items-center gap-3">
+                <Award className="w-6 h-6 text-accent" />
+                <div>
+                  <h2 className="text-xl font-semibold text-foreground">
+                    Test Your Knowledge
+                  </h2>
+                  <p className="text-sm text-muted-foreground">
+                    See how much you learned from this lesson!
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                {lesson.quiz.map((question, qIndex) => (
+                  <div key={qIndex} className="space-y-3">
+                    <p className="font-medium text-foreground">
+                      {qIndex + 1}. {question.question}
+                    </p>
+                    <div className="space-y-2">
+                      {question.options.map((option, oIndex) => {
+                        const isSelected = quizAnswers[qIndex] === oIndex;
+                        const isCorrect = oIndex === question.correctAnswer;
+                        const showFeedback = quizSubmitted;
+
+                        return (
+                          <button
+                            key={oIndex}
+                            onClick={() => {
+                              if (!quizSubmitted) {
+                                const newAnswers = [...quizAnswers];
+                                newAnswers[qIndex] = oIndex;
+                                setQuizAnswers(newAnswers);
+                              }
+                            }}
+                            disabled={quizSubmitted}
+                            className={`w-full text-left p-3 rounded-lg border transition-all ${
+                              showFeedback && isCorrect
+                                ? "border-primary bg-primary/10 text-foreground"
+                                : showFeedback && isSelected && !isCorrect
+                                ? "border-destructive bg-destructive/10 text-foreground"
+                                : isSelected
+                                ? "border-accent bg-accent/10 text-foreground"
+                                : "border-border bg-muted/30 text-muted-foreground hover:border-accent hover:bg-accent/5"
+                            } ${quizSubmitted ? "cursor-default" : "cursor-pointer"}`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <div
+                                className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                                  showFeedback && isCorrect
+                                    ? "border-primary bg-primary"
+                                    : showFeedback && isSelected && !isCorrect
+                                    ? "border-destructive bg-destructive"
+                                    : isSelected
+                                    ? "border-accent bg-accent"
+                                    : "border-muted-foreground"
+                                }`}
+                              >
+                                {showFeedback && isCorrect && (
+                                  <CheckCircle2 className="w-3 h-3 text-white" />
+                                )}
+                                {showFeedback && isSelected && !isCorrect && (
+                                  <span className="text-white text-xs">✗</span>
+                                )}
+                              </div>
+                              <span className="text-sm">{option}</span>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    {quizSubmitted && (
+                      <div className="p-3 bg-accent/10 border-l-4 border-accent rounded-r-lg">
+                        <p className="text-sm text-foreground">
+                          {question.explanation}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {!quizSubmitted ? (
+                <Button
+                  onClick={handleSubmitQuiz}
+                  disabled={quizAnswers.includes(null)}
+                  className="w-full bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Submit Quiz
+                </Button>
+              ) : (
+                <div className="space-y-4">
+                  <div className="p-4 bg-primary/10 border border-primary/30 rounded-lg text-center">
+                    <Award className="w-8 h-8 text-primary mx-auto mb-2" />
+                    <p className="text-lg font-semibold text-primary mb-1">
+                      You scored {quizScore} out of 3!
+                    </p>
+                    <p className="text-sm text-foreground">
+                      {quizScore === 3
+                        ? "Perfect score girl! You absolutely crushed this lesson 🎉"
+                        : quizScore === 2
+                        ? "Nice work! You got most of it down 💪"
+                        : "That's okay! Go back and review the lesson anytime 💛"}
+                    </p>
+                  </div>
+                  <Button
+                    onClick={resetQuiz}
+                    variant="outline"
+                    className="w-full border-border"
+                  >
+                    Retake Quiz
+                  </Button>
+                </div>
+              )}
+            </Card>
+
             {relatedLessons.length > 0 && (
               <Card className="p-6 bg-card border-border rounded-2xl">
                 <h3 className="text-lg font-semibold text-foreground mb-4">
@@ -569,6 +951,7 @@ My take: If you're new go passive with index funds. Put 80-90% of your portfolio
                       onClick={() => {
                         setSelectedLesson(related.id);
                         setHasScrolledToBottom(false);
+                        resetQuiz();
                         window.scrollTo(0, 0);
                       }}
                       className="w-full flex items-center justify-between p-3 hover:bg-muted/50 rounded-lg transition-colors group"
@@ -616,7 +999,6 @@ My take: If you're new go passive with index funds. Put 80-90% of your portfolio
       />
       <div className="min-h-screen bg-background pb-20">
         <div className="max-w-4xl mx-auto p-6 space-y-6">
-          {/* Header */}
           <div className="text-center space-y-2">
             <h1 className="text-3xl font-bold text-foreground">
               Bloom University 🎓
@@ -627,7 +1009,6 @@ My take: If you're new go passive with index funds. Put 80-90% of your portfolio
             </p>
           </div>
 
-          {/* Progress Bar */}
           <Card className="p-6 bg-card border-accent/20 rounded-2xl">
             <div className="flex items-center justify-between mb-2">
               <p className="text-sm font-medium text-foreground">
@@ -643,7 +1024,6 @@ My take: If you're new go passive with index funds. Put 80-90% of your portfolio
             </p>
           </Card>
 
-          {/* Search */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <Input
@@ -655,7 +1035,6 @@ My take: If you're new go passive with index funds. Put 80-90% of your portfolio
             />
           </div>
 
-          {/* Category Chips */}
           <div className="flex gap-2 overflow-x-auto pb-2 hide-scrollbar">
             {categories.map((category) => (
               <Badge
@@ -673,7 +1052,6 @@ My take: If you're new go passive with index funds. Put 80-90% of your portfolio
             ))}
           </div>
 
-          {/* Lesson Cards */}
           <div className="space-y-3">
             {filteredLessons.length > 0 ? (
               filteredLessons.map((lesson) => {
@@ -759,7 +1137,6 @@ My take: If you're new go passive with index funds. Put 80-90% of your portfolio
             )}
           </div>
 
-          {/* Dahlia's Encouragement */}
           <Card className="p-6 bg-gradient-to-r from-accent/10 to-primary/10 border-accent/20 rounded-2xl">
             <div className="flex items-start gap-4">
               <img
@@ -787,7 +1164,6 @@ My take: If you're new go passive with index funds. Put 80-90% of your portfolio
             </div>
           </Card>
 
-          {/* Disclaimer */}
           <Card className="p-4 bg-muted/30 border-border rounded-xl">
             <p className="text-xs text-center text-muted-foreground leading-relaxed">
               This is educational content only and does not constitute financial
