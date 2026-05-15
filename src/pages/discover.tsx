@@ -1,346 +1,349 @@
-import { useState, useEffect } from "react";
-import { Layout } from "@/components/Layout";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { marketService } from "@/services/marketService";
-import { TrendingUp, TrendingDown } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import Link from "next/link";
+import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { authService } from "@/services/authService";
+import { TrendingUp, TrendingDown, ChevronRight, Eye, Star, Sparkles } from "lucide-react";
 
-type AssetType = "stocks" | "etfs" | "mutual-funds";
-type FilterType = "top-performers" | "most-watched" | "dahlias-picks";
+type AssetType = "Stocks" | "ETFs" | "Mutual Funds";
+type FilterType = "Top Performers" | "Most Watched" | "Dahlia's Picks";
 
-interface Asset {
+interface StockData {
   ticker: string;
   name: string;
   price: number;
   change: number;
   changePercent: number;
+  dahliaTake: string;
 }
 
+const DEFAULT_TICKERS = {
+  Stocks: ["AAPL", "NVDA", "MSFT", "GOOGL", "TSLA", "AMZN", "META"],
+  ETFs: ["VOO", "QQQ", "SCHD", "VTI", "JEPI", "SPY", "IVV"],
+  "Mutual Funds": ["VFIAX", "FXAIX", "VTSAX", "SWPPX", "FZROX"],
+};
+
+const DAHLIA_INSIGHTS: Record<string, string> = {
+  AAPL: "Everyone uses their products and the ecosystem locks people in. $162B in cash. Not going anywhere 💪",
+  NVDA: "Powering the AI revolution. Every tech company needs their chips and only they can make them this good 🚀",
+  VOO: "500 biggest US companies in one purchase. Bet on America as a whole instead of picking winners 🇺🇸",
+  SCHD: "Pays you every quarter just to hold it. 3.8% dividend yield means $380 per year on $10k 💸",
+  QQQ: "Top 100 tech companies. Higher risk but higher growth potential. For when you want more upside 📈",
+  MSFT: "Cloud, AI, Xbox, LinkedIn. Microsoft is in everything now and growing in all directions 💻",
+  TSLA: "Volatile but revolutionary. Electric vehicles plus energy storage plus AI. High risk high reward ⚡",
+  GOOGL: "Search, YouTube, Android, Cloud. Printing money from ads and growing in AI. Dominant position 🎯",
+  AMZN: "E-commerce king plus AWS cloud business. Two massive revenue streams. Prime locks in customers 📦",
+  META: "Instagram, Facebook, WhatsApp. 3 billion users worldwide. Ad business is a money printer 📱",
+  VTI: "Total US stock market. 4000+ companies. Ultimate diversification for long term wealth building 🌟",
+  JEPI: "Monthly dividend income plus growth. Great for people who want regular cash flow 💰",
+  SPY: "Original S&P 500 ETF. Tracks the 500 biggest companies. Classic long term bet on America 🇺🇸",
+  IVV: "Another S&P 500 tracker. Slightly lower fees than SPY. Same companies just cheaper to own 💵",
+  VFIAX: "Vanguard's S&P 500 mutual fund. Solid choice for retirement accounts. Low fees, proven track record 📊",
+  FXAIX: "Fidelity's S&P 500 fund. Zero expense ratio means you keep all the growth. Can't beat free 🎉",
+  VTSAX: "Total US market fund. 4000+ stocks. Set it and forget it for decades. Warren Buffett approved ✅",
+  SWPPX: "Schwab's S&P 500 fund. Another solid no-fee option. Pick your favorite broker and stick with it 🏦",
+  FZROX: "Fidelity Zero Total Market. Free index fund with everything. Great for beginners starting out 🌱",
+};
+
+const DAHLIAS_PICKS = ["VOO", "SCHD", "AAPL", "MSFT", "JEPI"];
+
+const COMPANY_NAMES: Record<string, string> = {
+  AAPL: "Apple Inc.",
+  NVDA: "NVIDIA Corporation",
+  MSFT: "Microsoft Corporation",
+  GOOGL: "Alphabet Inc.",
+  TSLA: "Tesla Inc.",
+  AMZN: "Amazon.com Inc.",
+  META: "Meta Platforms Inc.",
+  VOO: "Vanguard S&P 500 ETF",
+  QQQ: "Invesco QQQ Trust",
+  SCHD: "Schwab US Dividend Equity ETF",
+  VTI: "Vanguard Total Stock Market ETF",
+  JEPI: "JPMorgan Equity Premium Income ETF",
+  SPY: "SPDR S&P 500 ETF Trust",
+  IVV: "iShares Core S&P 500 ETF",
+  VFIAX: "Vanguard 500 Index Fund",
+  FXAIX: "Fidelity 500 Index Fund",
+  VTSAX: "Vanguard Total Stock Market Index Fund",
+  SWPPX: "Schwab S&P 500 Index Fund",
+  FZROX: "Fidelity ZERO Total Market Index Fund",
+};
+
 export default function Discover() {
-  const [activeTab, setActiveTab] = useState<AssetType>("stocks");
-  const [activeFilter, setActiveFilter] = useState<FilterType>("top-performers");
-  const [assets, setAssets] = useState<Asset[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+  const [user, setUser] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState<AssetType>("Stocks");
+  const [activeFilter, setActiveFilter] = useState<FilterType>("Top Performers");
+  const [stocks, setStocks] = useState<StockData[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadAssets();
+    checkAuth();
+  }, []);
+
+  useEffect(() => {
+    loadStocks();
   }, [activeTab, activeFilter]);
 
-  const loadAssets = async () => {
-    setIsLoading(true);
-    
-    const assetLists: Record<AssetType, Record<FilterType, string[]>> = {
-      stocks: {
-        "top-performers": ["AAPL", "MSFT", "GOOGL", "AMZN", "NVDA", "TSLA", "META", "NFLX"],
-        "most-watched": ["AAPL", "TSLA", "NVDA", "AMD", "AMZN", "GOOGL", "META", "MSFT"],
-        "dahlias-picks": ["AAPL", "NVDA", "MSFT", "COST", "V", "MA", "UNH", "JNJ"],
-      },
-      etfs: {
-        "top-performers": ["VOO", "SCHD", "QQQ", "VTI", "JEPI", "SPY", "VUG", "VTV"],
-        "most-watched": ["VOO", "SCHD", "QQQ", "VTI", "JEPI", "SPY", "IWM", "AGG"],
-        "dahlias-picks": ["VOO", "SCHD", "QQQ", "VTI", "JEPI"],
-      },
-      "mutual-funds": {
-        "top-performers": ["VFIAX", "FXAIX", "VTSAX", "FSKAX", "VIGAX", "FCNTX"],
-        "most-watched": ["VFIAX", "FXAIX", "VTSAX", "VGTSX", "FDGRX", "FCNTX"],
-        "dahlias-picks": ["VFIAX", "FXAIX", "VTSAX"],
-      },
-    };
+  const checkAuth = async () => {
+    const session = await authService.getCurrentSession();
+    if (!session) {
+      router.push("/");
+      return;
+    }
+    const profile = await authService.getCurrentUser();
+    setUser(profile);
+  };
 
-    const tickers = assetLists[activeTab][activeFilter];
-    const assetData = await Promise.all(
-      tickers.map(async (ticker) => {
-        const quote = await marketService.getRealTimeQuote(ticker);
-        if (quote) {
-          return {
-            ticker,
-            name: getAssetName(ticker),
-            price: quote.c,
-            change: quote.d,
-            changePercent: quote.dp,
-          };
+  const loadStocks = async () => {
+    setLoading(true);
+    try {
+      let tickers: string[] = [];
+
+      if (activeFilter === "Dahlia's Picks") {
+        tickers = DAHLIAS_PICKS;
+      } else {
+        tickers = DEFAULT_TICKERS[activeTab];
+      }
+
+      const stockPromises = tickers.map(async (ticker) => {
+        try {
+          const response = await fetch(
+            `https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/tickers/${ticker}?apiKey=${process.env.NEXT_PUBLIC_POLYGON_API_KEY}`
+          );
+          const data = await response.json();
+
+          if (data.ticker) {
+            return {
+              ticker: ticker,
+              name: COMPANY_NAMES[ticker] || ticker,
+              price: data.ticker.day?.c || data.ticker.prevDay?.c || 0,
+              change: data.ticker.todaysChange || 0,
+              changePercent: data.ticker.todaysChangePerc || 0,
+              dahliaTake: DAHLIA_INSIGHTS[ticker] || "This is a solid option worth researching 💡",
+            };
+          }
+          return null;
+        } catch (error) {
+          console.error(`Error fetching ${ticker}:`, error);
+          return null;
         }
-        return null;
-      })
-    );
+      });
 
-    const validAssets = assetData.filter((asset): asset is Asset => asset !== null);
-    
-    // Always show at least the default picks if we got valid data
-    setAssets(validAssets.length > 0 ? validAssets : []);
-    setIsLoading(false);
-  };
+      const results = await Promise.all(stockPromises);
+      const validStocks = results.filter((s): s is StockData => s !== null);
 
-  const getAssetName = (ticker: string): string => {
-    const names: Record<string, string> = {
-      AAPL: "Apple Inc.",
-      MSFT: "Microsoft Corporation",
-      GOOGL: "Alphabet Inc.",
-      AMZN: "Amazon.com Inc.",
-      NVDA: "NVIDIA Corporation",
-      TSLA: "Tesla Inc.",
-      META: "Meta Platforms Inc.",
-      NFLX: "Netflix Inc.",
-      AMD: "Advanced Micro Devices",
-      COST: "Costco Wholesale",
-      V: "Visa Inc.",
-      MA: "Mastercard Inc.",
-      UNH: "UnitedHealth Group",
-      JNJ: "Johnson & Johnson",
-      SPY: "SPDR S&P 500 ETF",
-      QQQ: "Invesco QQQ Trust",
-      VOO: "Vanguard S&P 500 ETF",
-      VTI: "Vanguard Total Stock Market ETF",
-      IVV: "iShares Core S&P 500 ETF",
-      SCHD: "Schwab US Dividend Equity ETF",
-      VUG: "Vanguard Growth ETF",
-      VTV: "Vanguard Value ETF",
-      JEPI: "JPMorgan Equity Premium Income ETF",
-      IWM: "iShares Russell 2000 ETF",
-      EEM: "iShares MSCI Emerging Markets ETF",
-      AGG: "iShares Core US Aggregate Bond ETF",
-      VYM: "Vanguard High Dividend Yield ETF",
-      DGRO: "iShares Core Dividend Growth ETF",
-      SPHD: "Invesco S&P 500 High Dividend Low Volatility ETF",
-      HDV: "iShares Core High Dividend ETF",
-      VFIAX: "Vanguard 500 Index Fund",
-      FXAIX: "Fidelity 500 Index Fund",
-      VTSAX: "Vanguard Total Stock Market Index Fund",
-      FSKAX: "Fidelity Total Market Index Fund",
-      VIGAX: "Vanguard Growth Index Fund",
-      FCNTX: "Fidelity Contrafund",
-      VGTSX: "Vanguard Total International Stock Index Fund",
-      FDGRX: "Fidelity Dividend Growth Fund",
-      VBTLX: "Vanguard Total Bond Market Index Fund",
-      VTIAX: "Vanguard Total International Stock Index Fund",
-      VHDYX: "Vanguard High-Yield Corporate Fund",
-    };
-    return names[ticker] || ticker;
-  };
+      // Sort by change percent for "Top Performers"
+      if (activeFilter === "Top Performers") {
+        validStocks.sort((a, b) => b.changePercent - a.changePercent);
+      }
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-    }).format(price);
-  };
-
-  const getTabLabel = (tab: AssetType) => {
-    return tab === "mutual-funds" ? "Mutual Funds" : tab.charAt(0).toUpperCase() + tab.slice(1);
-  };
-
-  const getFilterLabel = (filter: FilterType) => {
-    const labels: Record<FilterType, string> = {
-      "top-performers": "Top Performers",
-      "most-watched": "Most Watched",
-      "dahlias-picks": "Dahlia's Picks",
-    };
-    return labels[filter];
+      setStocks(validStocks);
+    } catch (error) {
+      console.error("Error loading stocks:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <Layout>
-      <SEO title="Discover - Bloom" description="Explore stocks, ETFs, and mutual funds" />
-      <div className="container-full py-6 space-y-6">
-        <div className="space-y-2">
-          <h1 className="font-serif text-4xl font-bold text-foreground">
-            Discover
-          </h1>
-          <p className="text-muted-foreground text-lg">
-            Explore stocks, ETFs, and mutual funds handpicked by Dahlia
-          </p>
-        </div>
+      <SEO
+        title="Discover - Bloom"
+        description="Explore stocks, ETFs, and mutual funds with Dahlia's expert insights"
+      />
 
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as AssetType)} className="space-y-6">
-          <TabsList className="w-full grid grid-cols-3 bg-card border border-border rounded-2xl p-1">
-            <TabsTrigger value="stocks" className="rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              Stocks
-            </TabsTrigger>
-            <TabsTrigger value="etfs" className="rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              ETFs
-            </TabsTrigger>
-            <TabsTrigger value="mutual-funds" className="rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              Mutual Funds
-            </TabsTrigger>
-          </TabsList>
+      <div className="min-h-screen bg-background pb-20">
+        {/* Header */}
+        <div className="sticky top-0 z-40 bg-background border-b border-border">
+          <div className="px-4 py-4">
+            <h1 className="text-2xl font-serif text-foreground">Discover</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Explore investments with Dahlia's insights
+            </p>
+          </div>
 
-          {/* Dahlia Education Section */}
-          <Card className="p-6 bg-card border-accent/20 rounded-2xl space-y-4">
-            <div className="flex items-center gap-3 mb-2">
-              <img
-                src="/bloom-logo.png"
-                alt="Dahlia"
-                className="w-12 h-12 rounded-full object-cover"
-              />
-              <div>
-                <h3 className="font-semibold text-foreground text-lg">Invest with Dahlia</h3>
-                <p className="text-sm text-muted-foreground">Learn the basics from your investing bestie</p>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              {/* Card 1 - What is a Stock */}
-              <Card className="p-4 bg-muted/30 border-border rounded-xl">
-                <details className="group">
-                  <summary className="flex items-center justify-between cursor-pointer list-none">
-                    <span className="font-semibold text-foreground">What is a Stock? 📈</span>
-                    <span className="text-muted-foreground group-open:rotate-180 transition-transform">▼</span>
-                  </summary>
-                  <div className="mt-3 space-y-3">
-                    <p className="text-sm text-foreground leading-relaxed">
-                      Okay so when you buy a stock you're basically buying a tiny piece of a real company. Like if you buy Apple stock you literally own a small slice of Apple. If Apple does well and makes more money their stock price usually goes up and so does your investment. If they have a bad year the price might drop. That's the risk but also the opportunity 🍎
-                    </p>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full border-primary text-primary hover:bg-primary/10 rounded-lg"
-                      onClick={() => setActiveTab("stocks")}
-                    >
-                      Explore Stocks
-                    </Button>
-                  </div>
-                </details>
-              </Card>
-
-              {/* Card 2 - What is an ETF */}
-              <Card className="p-4 bg-muted/30 border-border rounded-xl">
-                <details className="group">
-                  <summary className="flex items-center justify-between cursor-pointer list-none">
-                    <span className="font-semibold text-foreground">What is an ETF? 🧺</span>
-                    <span className="text-muted-foreground group-open:rotate-180 transition-transform">▼</span>
-                  </summary>
-                  <div className="mt-3 space-y-3">
-                    <p className="text-sm text-foreground leading-relaxed">
-                      Think of an ETF like ordering a combo meal instead of picking every single item yourself. An ETF bundles together lots of different stocks so you get a little bit of everything in one purchase. VOO for example holds 500 of the biggest US companies. So instead of picking winners yourself you're basically betting on America as a whole 💪 Much less risky than putting everything in one company.
-                    </p>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full border-primary text-primary hover:bg-primary/10 rounded-lg"
-                      onClick={() => setActiveTab("etfs")}
-                    >
-                      Explore ETFs
-                    </Button>
-                  </div>
-                </details>
-              </Card>
-
-              {/* Card 3 - What is a Mutual Fund */}
-              <Card className="p-4 bg-muted/30 border-border rounded-xl">
-                <details className="group">
-                  <summary className="flex items-center justify-between cursor-pointer list-none">
-                    <span className="font-semibold text-foreground">What is a Mutual Fund? 💼</span>
-                    <span className="text-muted-foreground group-open:rotate-180 transition-transform">▼</span>
-                  </summary>
-                  <div className="mt-3 space-y-3">
-                    <p className="text-sm text-foreground leading-relaxed">
-                      A mutual fund is similar to an ETF - it pools money from lots of investors to buy a diversified mix of stocks or bonds. The big difference is a professional fund manager makes the decisions for you. They usually cost a bit more in fees but some women prefer having an expert manage their money especially when starting out. Think of it like hiring a personal shopper vs doing it yourself 🛍️
-                    </p>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full border-primary text-primary hover:bg-primary/10 rounded-lg"
-                      onClick={() => setActiveTab("mutual-funds")}
-                    >
-                      Explore Mutual Funds
-                    </Button>
-                  </div>
-                </details>
-              </Card>
-            </div>
-          </Card>
-
-          <div className="flex gap-3 overflow-x-auto pb-2">
-            {(["top-performers", "most-watched", "dahlias-picks"] as FilterType[]).map((filter) => (
+          {/* Asset Type Tabs */}
+          <div className="flex gap-2 px-4 pb-3 overflow-x-auto hide-scrollbar">
+            {(["Stocks", "ETFs", "Mutual Funds"] as AssetType[]).map((tab) => (
               <Button
-                key={filter}
-                variant={activeFilter === filter ? "default" : "outline"}
-                size="lg"
-                onClick={() => setActiveFilter(filter)}
-                className={`whitespace-nowrap rounded-xl ${
-                  activeFilter === filter 
-                    ? "bg-primary text-primary-foreground hover:bg-primary/90" 
-                    : "border-border hover:border-accent"
-                }`}
+                key={tab}
+                variant={activeTab === tab ? "default" : "outline"}
+                size="sm"
+                onClick={() => {
+                  setActiveTab(tab);
+                  setActiveFilter("Top Performers");
+                }}
+                className={activeTab === tab ? "bg-primary text-primary-foreground" : ""}
               >
-                {getFilterLabel(filter)}
+                {tab}
               </Button>
             ))}
           </div>
 
-          <TabsContent value={activeTab} className="space-y-4 mt-0">
-            {isLoading ? (
-              <div className="text-center py-20">
-                <p className="text-muted-foreground text-lg">Loading {getTabLabel(activeTab)}...</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {assets.map((asset) => (
-                  <Link key={asset.ticker} href={`/stock/${asset.ticker}`}>
-                    <Card className="p-5 bg-card border-border rounded-2xl hover:border-accent/50 transition-all cursor-pointer h-full">
-                      <div className="space-y-4">
-                        <div className="flex items-start justify-between">
-                          <div className="space-y-1 flex-1">
-                            <div className="flex items-center gap-2">
-                              <h3 className="font-bold text-xl text-foreground">
-                                {asset.ticker}
-                              </h3>
-                              <Badge
-                                className={`text-xs ${
-                                  asset.changePercent >= 0
-                                    ? "bg-primary/20 text-primary hover:bg-primary/20"
-                                    : "bg-rose/20 text-rose hover:bg-rose/20"
-                                }`}
-                              >
-                                {asset.changePercent >= 0 ? "+" : ""}
-                                {asset.changePercent.toFixed(2)}%
-                              </Badge>
-                            </div>
-                            <p className="text-sm text-muted-foreground line-clamp-1">
-                              {asset.name}
-                            </p>
-                          </div>
-                        </div>
+          {/* Filter Tabs */}
+          <div className="flex gap-2 px-4 pb-3 overflow-x-auto hide-scrollbar border-t border-border pt-3">
+            {(["Top Performers", "Most Watched", "Dahlia's Picks"] as FilterType[]).map((filter) => (
+              <Button
+                key={filter}
+                variant={activeFilter === filter ? "secondary" : "ghost"}
+                size="sm"
+                onClick={() => setActiveFilter(filter)}
+                className="flex items-center gap-1"
+              >
+                {filter === "Top Performers" && <TrendingUp className="w-4 h-4" />}
+                {filter === "Most Watched" && <Eye className="w-4 h-4" />}
+                {filter === "Dahlia's Picks" && <Sparkles className="w-4 h-4" />}
+                {filter}
+              </Button>
+            ))}
+          </div>
+        </div>
 
-                        <div className="space-y-1">
-                          <p className="text-3xl font-bold text-foreground tabular-nums">
-                            {formatPrice(asset.price)}
-                          </p>
-                          <div className="flex items-center gap-2">
-                            {asset.change >= 0 ? (
-                              <TrendingUp className="w-4 h-4 text-primary" />
-                            ) : (
-                              <TrendingDown className="w-4 h-4 text-rose" />
-                            )}
-                            <span
-                              className={`text-sm font-semibold tabular-nums ${
-                                asset.change >= 0 ? "text-primary" : "text-rose"
-                              }`}
-                            >
-                              {asset.change >= 0 ? "+" : ""}
-                              {formatPrice(asset.change)}
-                            </span>
-                          </div>
-                        </div>
+        <div className="px-4 py-6 space-y-6">
+          {/* Dahlia's Picks Message */}
+          {activeFilter === "Dahlia's Picks" && (
+            <Card className="p-4 border-accent bg-accent/5">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent to-accent/60 flex items-center justify-center text-xl flex-shrink-0">
+                  🌺
+                </div>
+                <div>
+                  <p className="text-sm text-foreground italic">
+                    "These are my personal favorites right now sis. Do your own research but these are solid picks for most investing goals 🌸"
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">— Dahlia</p>
+                </div>
+              </div>
+            </Card>
+          )}
+
+          {/* Stock List */}
+          {loading ? (
+            <div className="space-y-3">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <Card key={i} className="p-4 animate-pulse">
+                  <div className="h-16 bg-muted rounded"></div>
+                </Card>
+              ))}
+            </div>
+          ) : stocks.length === 0 ? (
+            <Card className="p-8 text-center">
+              <p className="text-muted-foreground">No stocks found</p>
+            </Card>
+          ) : (
+            <div className="space-y-3">
+              {stocks.map((stock) => (
+                <Card
+                  key={stock.ticker}
+                  className="p-4 hover:shadow-md transition-shadow cursor-pointer"
+                  onClick={() => router.push(`/stock/${stock.ticker}`)}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="text-lg font-bold text-foreground">
+                          {stock.ticker}
+                        </h3>
+                        {activeFilter === "Dahlia's Picks" && (
+                          <Badge variant="secondary" className="bg-accent/20 text-accent border-accent">
+                            <Sparkles className="w-3 h-3 mr-1" />
+                            Dahlia's Pick
+                          </Badge>
+                        )}
                       </div>
-                    </Card>
-                  </Link>
-                ))}
-              </div>
-            )}
-          </TabsContent>
-        </Tabs>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        {stock.name}
+                      </p>
 
-        <Card className="p-4 bg-muted/50 border-border/50 rounded-2xl">
-          <p className="text-xs text-center text-muted-foreground leading-relaxed">
-            This is educational content only and does not constitute financial advice. Bloom is not liable for any investment decisions or losses.
-          </p>
-        </Card>
+                      {/* Dahlia's Take */}
+                      <div className="bg-primary/5 border-l-2 border-primary pl-3 py-2 mt-3">
+                        <p className="text-sm text-primary italic">
+                          "{stock.dahliaTake}"
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="text-right ml-4">
+                      <p className="text-lg font-semibold text-foreground">
+                        ${stock.price.toFixed(2)}
+                      </p>
+                      <Badge
+                        variant={stock.changePercent >= 0 ? "default" : "destructive"}
+                        className={
+                          stock.changePercent >= 0
+                            ? "bg-green-500/10 text-green-600 border-green-500/20"
+                            : "bg-red-500/10 text-red-600 border-red-500/20"
+                        }
+                      >
+                        {stock.changePercent >= 0 ? (
+                          <TrendingUp className="w-3 h-3 mr-1" />
+                        ) : (
+                          <TrendingDown className="w-3 h-3 mr-1" />
+                        )}
+                        {stock.changePercent >= 0 ? "+" : ""}
+                        {stock.changePercent.toFixed(2)}%
+                      </Badge>
+                      <ChevronRight className="w-5 h-5 text-muted-foreground mt-2" />
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
+
+          {/* Invest with Dahlia Education Section */}
+          <Card className="p-6 bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20">
+            <div className="flex items-start gap-4">
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-accent to-accent/60 flex items-center justify-center text-3xl flex-shrink-0">
+                🌺
+              </div>
+              <div className="flex-1">
+                <h2 className="text-xl font-serif text-foreground mb-2">
+                  Invest with Dahlia
+                </h2>
+                <p className="text-sm text-muted-foreground mb-4">
+                  I break down every investment in plain English so you can make confident decisions. No jargon, no pressure — just real talk about your money.
+                </p>
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-primary"></div>
+                    <span className="text-xs text-muted-foreground">Stock Analysis</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-primary"></div>
+                    <span className="text-xs text-muted-foreground">ETF Breakdowns</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-primary"></div>
+                    <span className="text-xs text-muted-foreground">Market News</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-primary"></div>
+                    <span className="text-xs text-muted-foreground">Risk Insights</span>
+                  </div>
+                </div>
+                <Link href="/subscription">
+                  <Button size="sm" className="w-full sm:w-auto bg-accent hover:bg-accent/90 text-white">
+                    Upgrade to Bloom Pro
+                    <ChevronRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </Card>
+
+          {/* Disclaimer */}
+          <Card className="p-4 bg-muted/50">
+            <p className="text-xs text-muted-foreground text-center">
+              This is educational content only and does not constitute financial advice. Bloom is not liable for any investment decisions or losses.
+            </p>
+          </Card>
+        </div>
       </div>
     </Layout>
   );
