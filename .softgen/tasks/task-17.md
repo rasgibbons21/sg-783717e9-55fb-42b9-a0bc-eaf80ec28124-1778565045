@@ -1,6 +1,6 @@
 ---
 title: Bloom University Learn Page
-status: in_progress
+status: done
 priority: high
 type: feature
 tags: [education, learn, dahlia]
@@ -13,15 +13,15 @@ position: 17
 Add a comprehensive Learn page to help users understand investing through Dahlia's warm girlfriend-tone education. Include search, categories, and progress tracking.
 
 ## Checklist
-- [ ] Create /learn page with Bloom University branding
-- [ ] Add Learn tab to bottom navigation (between Discover and Portfolio)
-- [ ] Implement search bar for filtering lessons
-- [ ] Add category chips for filtering (All, Stocks, ETFs, etc.)
-- [ ] Create educational lesson cards with Dahlia's explanations
-- [ ] Add progress bar tracking completed lessons
-- [ ] Store completion status in Supabase
-- [ ] Add lesson detail pages
-- [ ] Style with dark theme and Dahlia's voice throughout
+- [x] Create /learn page with Bloom University branding
+- [x] Add Learn tab to bottom navigation (between Discover and Portfolio)
+- [x] Implement search bar for filtering lessons
+- [x] Add category chips for filtering (All, Stocks, ETFs, etc.)
+- [x] Create educational lesson cards with Dahlia's explanations
+- [x] Add progress bar tracking completed lessons
+- [x] Store completion status in Supabase
+- [x] Add lesson detail pages
+- [x] Style with dark theme and Dahlia's voice throughout
 
 ## Acceptance
 - Users can access Learn from bottom navigation
