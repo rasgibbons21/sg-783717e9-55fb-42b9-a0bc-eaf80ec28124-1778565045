@@ -1,6 +1,6 @@
 ---
 title: Critical Fixes - Charts, PWA, Dahlia AI, Live Data
-status: in_progress
+status: done
 priority: urgent
 type: bug
 tags: [charts, pwa, ai, portfolio, discover]
@@ -19,13 +19,13 @@ Comprehensive fix for 6 critical issues:
 6. Discover page empty states for ETFs/Mutual Funds
 
 ## Checklist
-- [ ] Fix candlestick chart implementation with lightweight-charts
-- [ ] Fix PWA install prompt event handling
-- [ ] Add iOS Safari install instructions modal
-- [ ] Implement Dahlia AI analysis via Anthropic API
-- [ ] Add Dahlia education cards to Discover page
-- [ ] Fix portfolio live quotes for all watchlist tickers
-- [ ] Add default picks for empty Discover tabs
-- [ ] Test all timeframe buttons on charts
-- [ ] Verify install button works on Android/Chrome
-- [ ] Verify iOS install instructions appear correctly
+- [x] Fix candlestick chart implementation with lightweight-charts
+- [x] Fix PWA install prompt event handling
+- [x] Add iOS Safari install instructions modal
+- [x] Implement Dahlia AI analysis via Anthropic API
+- [x] Add Dahlia education cards to Discover page
+- [x] Fix portfolio live quotes for all watchlist tickers
+- [x] Add default picks for empty Discover tabs
+- [x] Test all timeframe buttons on charts
+- [x] Verify install button works on Android/Chrome
+- [x] Verify iOS install instructions appear correctly
