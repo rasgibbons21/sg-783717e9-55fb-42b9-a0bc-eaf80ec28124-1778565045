@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { Home, Search, Briefcase, Building2, User, Target } from "lucide-react";
+import { Home, Search, Briefcase, Building2, User, Target, GraduationCap } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface LayoutProps {
@@ -13,6 +13,7 @@ export function Layout({ children }: LayoutProps) {
   const navItems = [
     { href: "/home", icon: Home, label: "Home" },
     { href: "/discover", icon: Search, label: "Discover" },
+    { href: "/learn", icon: GraduationCap, label: "Learn" },
     { href: "/goals", icon: Target, label: "Goals" },
     { href: "/portfolio", icon: Briefcase, label: "Portfolio" },
     { href: "/brokers", icon: Building2, label: "Brokers" },
@@ -44,7 +45,7 @@ export function Layout({ children }: LayoutProps) {
 
       {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card backdrop-blur supports-[backdrop-filter]:bg-card/95">
-        <div className="flex items-center justify-around h-16">
+        <div className="flex items-center justify-around h-16 overflow-x-auto hide-scrollbar px-2">
           {navItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.href);
@@ -52,54 +53,18 @@ export function Layout({ children }: LayoutProps) {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex flex-col items-center justify-center gap-1 px-3 py-2 transition-colors ${
+                className={`flex flex-col items-center justify-center gap-1 min-w-[64px] px-2 py-2 transition-colors ${
                   active ? "text-primary" : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 <Icon
-                  className={`h-5 w-5 ${active ? "fill-current" : ""}`}
+                  className={`h-5 w-5 flex-shrink-0 ${active ? "fill-current" : ""}`}
                   strokeWidth={active ? 2.5 : 2}
                 />
-                <span className="text-xs font-medium">{item.label}</span>
+                <span className="text-[10px] font-medium leading-none">{item.label}</span>
               </Link>
             );
           })}
-          <Link
-            href="/discover"
-            className={cn(
-              "flex flex-col items-center gap-1 text-xs transition-colors",
-              pathname === "/discover"
-                ? "text-accent"
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            <Search className="w-5 h-5" />
-            <span>Discover</span>
-          </Link>
-          <Link
-            href="/learn"
-            className={cn(
-              "flex flex-col items-center gap-1 text-xs transition-colors",
-              pathname === "/learn"
-                ? "text-accent"
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            <span className="text-xl">🎓</span>
-            <span>Learn</span>
-          </Link>
-          <Link
-            href="/portfolio"
-            className={cn(
-              "flex flex-col items-center gap-1 text-xs transition-colors",
-              pathname === "/portfolio"
-                ? "text-accent"
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            <TrendingUp className="w-5 h-5" />
-            <span>Portfolio</span>
-          </Link>
         </div>
       </nav>
     </div>
