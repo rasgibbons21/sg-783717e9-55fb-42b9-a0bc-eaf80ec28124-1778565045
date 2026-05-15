@@ -40,14 +40,14 @@ export default function Discover() {
         "dahlias-picks": ["AAPL", "NVDA", "MSFT", "COST", "V", "MA", "UNH", "JNJ"],
       },
       etfs: {
-        "top-performers": ["SPY", "QQQ", "VOO", "VTI", "IVV", "SCHD", "VUG", "VTV"],
-        "most-watched": ["SPY", "QQQ", "VOO", "IWM", "EEM", "VTI", "SCHD", "AGG"],
-        "dahlias-picks": ["SCHD", "VOO", "VTI", "QQQ", "VYM", "DGRO", "SPHD", "HDV"],
+        "top-performers": ["VOO", "SCHD", "QQQ", "VTI", "JEPI", "SPY", "VUG", "VTV"],
+        "most-watched": ["VOO", "SCHD", "QQQ", "VTI", "JEPI", "SPY", "IWM", "AGG"],
+        "dahlias-picks": ["VOO", "SCHD", "QQQ", "VTI", "JEPI"],
       },
       "mutual-funds": {
         "top-performers": ["VFIAX", "FXAIX", "VTSAX", "FSKAX", "VIGAX", "FCNTX"],
-        "most-watched": ["VFIAX", "VTSAX", "FXAIX", "VGTSX", "FDGRX", "FCNTX"],
-        "dahlias-picks": ["VFIAX", "VTSAX", "VBTLX", "VTIAX", "VHDYX", "VIGAX"],
+        "most-watched": ["VFIAX", "FXAIX", "VTSAX", "VGTSX", "FDGRX", "FCNTX"],
+        "dahlias-picks": ["VFIAX", "FXAIX", "VTSAX"],
       },
     };
 
@@ -68,7 +68,10 @@ export default function Discover() {
       })
     );
 
-    setAssets(assetData.filter((asset): asset is Asset => asset !== null));
+    const validAssets = assetData.filter((asset): asset is Asset => asset !== null);
+    
+    // Always show at least the default picks if we got valid data
+    setAssets(validAssets.length > 0 ? validAssets : []);
     setIsLoading(false);
   };
 
@@ -96,6 +99,7 @@ export default function Discover() {
       SCHD: "Schwab US Dividend Equity ETF",
       VUG: "Vanguard Growth ETF",
       VTV: "Vanguard Value ETF",
+      JEPI: "JPMorgan Equity Premium Income ETF",
       IWM: "iShares Russell 2000 ETF",
       EEM: "iShares MSCI Emerging Markets ETF",
       AGG: "iShares Core US Aggregate Bond ETF",
@@ -164,6 +168,92 @@ export default function Discover() {
               Mutual Funds
             </TabsTrigger>
           </TabsList>
+
+          {/* Dahlia Education Section */}
+          <Card className="p-6 bg-card border-accent/20 rounded-2xl space-y-4">
+            <div className="flex items-center gap-3 mb-2">
+              <img
+                src="/bloom-logo.png"
+                alt="Dahlia"
+                className="w-12 h-12 rounded-full object-cover"
+              />
+              <div>
+                <h3 className="font-semibold text-foreground text-lg">Invest with Dahlia</h3>
+                <p className="text-sm text-muted-foreground">Learn the basics from your investing bestie</p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              {/* Card 1 - What is a Stock */}
+              <Card className="p-4 bg-muted/30 border-border rounded-xl">
+                <details className="group">
+                  <summary className="flex items-center justify-between cursor-pointer list-none">
+                    <span className="font-semibold text-foreground">What is a Stock? 📈</span>
+                    <span className="text-muted-foreground group-open:rotate-180 transition-transform">▼</span>
+                  </summary>
+                  <div className="mt-3 space-y-3">
+                    <p className="text-sm text-foreground leading-relaxed">
+                      Okay so when you buy a stock you're basically buying a tiny piece of a real company. Like if you buy Apple stock you literally own a small slice of Apple. If Apple does well and makes more money their stock price usually goes up and so does your investment. If they have a bad year the price might drop. That's the risk but also the opportunity 🍎
+                    </p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full border-primary text-primary hover:bg-primary/10 rounded-lg"
+                      onClick={() => setActiveTab("stocks")}
+                    >
+                      Explore Stocks
+                    </Button>
+                  </div>
+                </details>
+              </Card>
+
+              {/* Card 2 - What is an ETF */}
+              <Card className="p-4 bg-muted/30 border-border rounded-xl">
+                <details className="group">
+                  <summary className="flex items-center justify-between cursor-pointer list-none">
+                    <span className="font-semibold text-foreground">What is an ETF? 🧺</span>
+                    <span className="text-muted-foreground group-open:rotate-180 transition-transform">▼</span>
+                  </summary>
+                  <div className="mt-3 space-y-3">
+                    <p className="text-sm text-foreground leading-relaxed">
+                      Think of an ETF like ordering a combo meal instead of picking every single item yourself. An ETF bundles together lots of different stocks so you get a little bit of everything in one purchase. VOO for example holds 500 of the biggest US companies. So instead of picking winners yourself you're basically betting on America as a whole 💪 Much less risky than putting everything in one company.
+                    </p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full border-primary text-primary hover:bg-primary/10 rounded-lg"
+                      onClick={() => setActiveTab("etfs")}
+                    >
+                      Explore ETFs
+                    </Button>
+                  </div>
+                </details>
+              </Card>
+
+              {/* Card 3 - What is a Mutual Fund */}
+              <Card className="p-4 bg-muted/30 border-border rounded-xl">
+                <details className="group">
+                  <summary className="flex items-center justify-between cursor-pointer list-none">
+                    <span className="font-semibold text-foreground">What is a Mutual Fund? 💼</span>
+                    <span className="text-muted-foreground group-open:rotate-180 transition-transform">▼</span>
+                  </summary>
+                  <div className="mt-3 space-y-3">
+                    <p className="text-sm text-foreground leading-relaxed">
+                      A mutual fund is similar to an ETF - it pools money from lots of investors to buy a diversified mix of stocks or bonds. The big difference is a professional fund manager makes the decisions for you. They usually cost a bit more in fees but some women prefer having an expert manage their money especially when starting out. Think of it like hiring a personal shopper vs doing it yourself 🛍️
+                    </p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full border-primary text-primary hover:bg-primary/10 rounded-lg"
+                      onClick={() => setActiveTab("mutual-funds")}
+                    >
+                      Explore Mutual Funds
+                    </Button>
+                  </div>
+                </details>
+              </Card>
+            </div>
+          </Card>
 
           <div className="flex gap-3 overflow-x-auto pb-2">
             {(["top-performers", "most-watched", "dahlias-picks"] as FilterType[]).map((filter) => (

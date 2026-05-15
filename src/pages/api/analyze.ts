@@ -1,11 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import Anthropic from "@anthropic-ai/sdk";
 
-// Initialize Anthropic client
-// In a real app, this should be a server-only environment variable
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY || "",
-});
+const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 
 export default async function handler(
   req: NextApiRequest,
@@ -15,67 +10,69 @@ export default async function handler(
     return res.status(405).json({ error: "Method not allowed" });
   }
 
+  const { prompt } = req.body;
+
+  if (!prompt) {
+    return res.status(400).json({ error: "Prompt is required" });
+  }
+
+  if (!ANTHROPIC_API_KEY) {
+    console.error("ANTHROPIC_API_KEY not configured");
+    return res.status(200).json({
+      content: "I'm having trouble connecting to my analysis system right now. Try again in a moment! 💛",
+      sentiment: "Neutral",
+    });
+  }
+
   try {
-    const { prompt } = req.body;
-
-    if (!prompt) {
-      return res.status(400).json({ error: "Prompt is required" });
-    }
-
-    if (!process.env.ANTHROPIC_API_KEY) {
-      return res.status(503).json({ error: "Anthropic API key is not configured" });
-    }
-
-    const msg = await anthropic.messages.create({
-      model: "claude-3-5-sonnet-20241022",
-      max_tokens: 1024,
-      temperature: 0.7,
-      system: `You are Dahlia, an expert, warm, and approachable financial guide for women.
-Your goal is to explain stock/ETF data in plain, casual "girlfriend-tone" language.
-No jargon. Keep it empowering, grounded, and concise.
-
-Formatting rules:
-- Keep it to 2-3 short paragraphs.
-- Use emojis naturally.
-- Always end with exactly this disclaimer: "This is just educational info — not financial advice. Always invest what feels right for you 💛 — Dahlia"
-
-You must respond with a JSON object in this exact format:
-{
-  "content": "Your warm, plain-language analysis paragraphs...",
-  "sentiment": "Optimistic" | "Cautious" | "Neutral" | "Watchful"
-}`,
-      messages: [
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model: "claude-3-5-sonnet-20241022",
+        max_tokens: 1024,
+        system: "You are Dahlia, a warm friendly female AI investing guide for Bloom - an investing app for women. You explain investing like a knowledgeable girlfriend - warm, clear, no jargon, encouraging but honest. Use emojis occasionally. Never say buy or sell. Always add educational disclaimer.",
+        messages: [
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+      }),
     });
 
-    const responseContent = msg.content[0];
-    if (responseContent.type !== "text") {
-      throw new Error("Unexpected response type from Anthropic");
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Anthropic API error:", errorData);
+      throw new Error("Anthropic API request failed");
     }
 
-    // Try to parse the JSON response
-    try {
-      // If the client requested raw text format, return it wrapped in an object
-      if (req.body.format === "text") {
-        return res.status(200).json({ text: responseContent.text });
-      }
-      
-      const parsedResponse = JSON.parse(responseContent.text);
-      return res.status(200).json(parsedResponse);
-    } catch (parseError) {
-      // If it fails to parse as JSON but we have text, return it as content
-      console.warn("Claude response wasn't valid JSON, wrapping text in object");
-      return res.status(200).json({ 
-        content: responseContent.text,
-        sentiment: "Neutral" 
-      });
+    const data = await response.json();
+    const content = data.content[0].text;
+
+    // Determine sentiment from the analysis
+    let sentiment = "Neutral";
+    const lowerContent = content.toLowerCase();
+    if (lowerContent.includes("strong") || lowerContent.includes("good") || lowerContent.includes("positive") || lowerContent.includes("climbing") || lowerContent.includes("momentum")) {
+      sentiment = "Positive";
+    } else if (lowerContent.includes("concern") || lowerContent.includes("dropping") || lowerContent.includes("risk") || lowerContent.includes("careful") || lowerContent.includes("watch")) {
+      sentiment = "Negative";
     }
-  } catch (error: any) {
-    console.error("Error in AI analysis endpoint:", error);
-    return res.status(500).json({ error: error.message || "Failed to generate analysis" });
+
+    return res.status(200).json({
+      content,
+      sentiment,
+      analysis: content,
+    });
+  } catch (error) {
+    console.error("Error calling Anthropic API:", error);
+    return res.status(200).json({
+      content: "I'm having a little trouble analyzing this right now. The market data is still there though - take a look at the charts and news yourself! 💛",
+      sentiment: "Neutral",
+    });
   }
 }

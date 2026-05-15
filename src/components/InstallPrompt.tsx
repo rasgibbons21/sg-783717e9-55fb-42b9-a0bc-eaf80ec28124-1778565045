@@ -29,48 +29,51 @@ export function InstallPrompt() {
     }
 
     // Listen for the beforeinstallprompt event
-    const handleBeforeInstallPrompt = (e: Event) => {
+    const handleBeforeInstallPrompt = (e: any) => {
       e.preventDefault();
+      console.log('beforeinstallprompt event fired');
       setDeferredPrompt(e);
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
     // Show prompt after 30 seconds if not iOS and not already installed
-    if (!iOS && !standalone) {
-      const timer = setTimeout(() => {
+    const timer = setTimeout(() => {
+      if (!standalone) {
         setShowPrompt(true);
-      }, 30000);
-
-      return () => {
-        clearTimeout(timer);
-        window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-      };
-    }
-
-    // For iOS, show prompt after 30 seconds
-    if (iOS && !standalone) {
-      const timer = setTimeout(() => {
-        setShowPrompt(true);
-      }, 30000);
-
-      return () => clearTimeout(timer);
-    }
+      }
+    }, 30000);
 
     return () => {
+      clearTimeout(timer);
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
   }, []);
 
   const handleInstallClick = async () => {
-    if (!deferredPrompt) return;
+    if (!deferredPrompt) {
+      console.log('No deferred prompt available');
+      return;
+    }
 
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    
-    console.log(`User response to the install prompt: ${outcome}`);
-    setDeferredPrompt(null);
-    setShowPrompt(false);
+    try {
+      await deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      
+      console.log(`User response to the install prompt: ${outcome}`);
+      
+      if (outcome === 'accepted') {
+        console.log('User accepted the install prompt');
+      } else {
+        console.log('User dismissed the install prompt');
+      }
+      
+      setDeferredPrompt(null);
+      setShowPrompt(false);
+      localStorage.setItem('installPromptDismissed', Date.now().toString());
+    } catch (error) {
+      console.error('Error showing install prompt:', error);
+    }
   };
 
   const handleDismiss = () => {
