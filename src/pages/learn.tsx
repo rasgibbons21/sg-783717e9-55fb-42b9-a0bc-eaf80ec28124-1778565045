@@ -35,225 +35,226 @@ export default function Learn() {
   const lessons: Lesson[] = [
     {
       id: "what-is-stock",
-      title: "What is a Stock?",
-      category: "stocks",
-      duration: "3 min",
+      title: "What is a Stock",
+      category: "Stocks",
+      readTime: 3,
       difficulty: "Beginner",
-      summary: "Understanding what you actually own when you buy stocks",
-      content: `Okay so when you buy a stock you're basically buying a tiny piece of a real company. Like if you buy Apple stock you literally own a small slice of Apple. 
+      summary: "Understanding company ownership and how stocks work",
+      content: `Okay so here's the deal — when you buy a stock you're literally buying a tiny piece of a real company. Like if you buy one share of Apple stock you own a little slice of Apple. Not enough to boss Tim Cook around or anything 😂 but you're officially a part owner.
 
-If Apple does well and makes more money, their stock price usually goes up and so does your investment. If they have a bad year, the price might drop. That's the risk but also the opportunity 🍎
+When the company does well and makes money their stock price usually goes up. When they have a rough quarter the price might drop. That's the risk but also the opportunity.
 
-The cool part? Some companies pay you dividends just for holding their stock. It's like getting a bonus check every few months just for being an owner. And if the company grows a lot over time, your little slice can be worth WAY more than what you paid for it.
+Here's the cool part: some companies share their profits with you through dividends (we'll talk about those later). And if the company grows over time your tiny slice becomes more valuable. That's literally how people build wealth through the stock market girl.
 
-Think of it like buying a piece of your favorite local bakery. When they're successful and busy, your ownership stake becomes more valuable. When they have slow days, maybe not so much. But if you believe in the bakery long-term, you stick with it through the ups and downs 🥐`,
+The key is thinking long term. Day to day the price bounces around like crazy but over years and decades stocks have historically gone up. That's why we invest instead of just saving cash 💪`,
     },
     {
       id: "what-is-etf",
-      title: "What is an ETF?",
-      category: "etfs",
-      duration: "4 min",
+      title: "What is an ETF",
+      category: "ETFs",
+      readTime: 4,
       difficulty: "Beginner",
-      summary: "Why ETFs are like buying a combo meal instead of individual items",
-      content: `Think of an ETF like ordering a combo meal instead of picking every single item yourself. An ETF bundles together lots of different stocks (or bonds, or other stuff) so you get a little bit of everything in one purchase 🧺
+      summary: "The combo meal of investing explained",
+      content: `Think of an ETF like ordering a combo meal instead of picking every single item yourself. An ETF (Exchange Traded Fund) bundles together lots of different stocks into one package so you get a little bit of everything.
 
-VOO for example holds all 500 of the biggest US companies. So instead of you having to pick between Apple, Microsoft, Amazon, etc., you just buy VOO and you own tiny pieces of ALL of them automatically. It's like betting on America as a whole instead of trying to pick winners.
+For example VOO holds 500 of the biggest US companies. So when you buy one share of VOO you're getting a tiny piece of Apple Microsoft Amazon Google Tesla and 495 other companies all at once. It's literally diversification in a single purchase.
 
-The biggest advantage? It's WAY less risky than putting all your money in one company. If one company has a terrible year, the other 499 in your ETF help balance it out. You're diversified without having to think about it.
+The genius of this is risk reduction. If one company has a terrible day but the other 499 are doing fine your investment barely notices. Compare that to putting all your money in one stock — if that company tanks you're screwed.
 
-Plus ETFs are super easy to buy and sell - just like individual stocks. And most of them have really low fees compared to mutual funds. That's why so many people love them, including me 💪`,
+ETFs also have super low fees compared to mutual funds. We're talking like 0.03% per year for VOO. That's basically free. The stock market historically returns about 10% per year so you're keeping almost all of it.
+
+Bottom line: ETFs are perfect for beginners because you get instant diversification without having to pick individual winners. You're betting on the market as a whole not on your ability to find the next Tesla 🧺`,
     },
     {
-      id: "dividends-explained",
-      title: "How Dividends Work",
-      category: "dividends",
-      duration: "5 min",
+      id: "what-is-mutual-fund",
+      title: "What is a Mutual Fund",
+      category: "Mutual Funds",
+      readTime: 4,
       difficulty: "Beginner",
-      summary: "Getting paid just for holding stocks - yes really",
-      content: `Okay this is one of my FAVORITE topics because dividends are literally free money for holding stocks. Well, not free exactly - you had to buy the stock - but you know what I mean 💰
+      summary: "Professional money management explained simply",
+      content: `A mutual fund is like an ETF's older more expensive cousin. It's also a bundle of stocks but with one big difference — there's a professional fund manager making the decisions for you.
 
-Here's how it works: Some companies (usually the big established ones) share their profits with shareholders every quarter. If you own the stock, they deposit money directly into your account. No work required.
+So instead of just tracking an index like the S&P 500 this person is actively buying and selling stocks trying to beat the market. They're getting paid to be smart about your money which sounds great right?
 
-Let's say you own 100 shares of a stock that pays a $2 dividend per year. That's $200 deposited into your account annually, just for holding the stock. And if the stock price also goes up? Even better. You're making money two ways.
+Here's the catch: they charge way more in fees. Where an ETF might cost 0.03% per year a mutual fund might charge 1% or even 2%. That might not sound like much but over 30 years that difference is HUGE. We're talking potentially hundreds of thousands of dollars.
 
-The dividend yield tells you what percentage return you're getting from dividends alone. A 3% yield means if you invest $10,000, you'll get about $300 per year in dividend payments. Some people build entire portfolios around high-dividend stocks and live off the passive income. 
+And here's the kicker — most actively managed funds don't even beat the market after fees. Like 80% of them underperform a basic index fund. So you're paying extra for worse results most of the time.
 
-It's like owning rental property but without dealing with tenants or toilets. The companies do all the work, you just collect the checks 🌸`,
+That said some women prefer having a professional manage their money especially when starting out. It feels safer. And there are some legit good mutual funds out there. Just know what you're paying for and whether it's worth it to you 🛍️`,
     },
     {
-      id: "bonds-basics",
-      title: "Bonds for Beginners",
-      category: "bonds",
-      duration: "4 min",
+      id: "what-are-dividends",
+      title: "What are Dividends",
+      category: "Dividends",
+      readTime: 4,
       difficulty: "Beginner",
-      summary: "The boring investment that protects your money",
-      content: `Okay so bonds are honestly pretty boring compared to stocks, but that's kind of the point. They're the stable friend in your portfolio who always shows up on time and never causes drama 😌
+      summary: "Getting paid just for holding stocks",
+      content: `Girl dividends are literally free money for holding a stock. Well not free — you did invest your money — but it feels free because you don't have to do anything to get it.
 
-When you buy a bond, you're basically lending money to a company or government. They promise to pay you back with interest after a set time - could be a few months, could be 30 years. In the meantime, you get regular interest payments.
+Here's how it works: Some companies share their profits with shareholders every quarter. So if you own 100 shares of a company that pays $1 per share in dividends you get $100 deposited into your account four times a year. Just for holding the stock.
 
-Bonds don't usually make you rich, but they also don't crash the way stocks can. When the stock market is having a meltdown, bonds typically stay calm. That's why financial advisors always tell you to have "some" bonds in your portfolio - they balance out the crazy.
+The dividend yield tells you how much you're getting paid. If a stock costs $100 and pays $4 per year in dividends that's a 4% yield. Compare that to a savings account paying 0.5% and you can see why dividend investing is popular.
 
-The rule of thumb: younger women can afford to take more risk with stocks because you have time to recover from crashes. As you get closer to retirement, you shift more money into bonds for safety. But even in your 20s and 30s, having like 10-20% in bonds can help you sleep better when markets get wild.
+Companies that pay consistent dividends are usually stable mature businesses. Think Coca-Cola Johnson & Johnson Procter & Gamble. They've been around forever they're not going anywhere and they reward shareholders for loyalty.
 
-Think of bonds as the vegetables of your investment plate. Not exciting, but good for you 🥬`,
+You can take the dividends as cash or reinvest them to buy more shares (that's called a DRIP and we'll talk about it later). Either way it's one of my favorite parts of investing because you're getting paid while you wait for the stock price to grow 💰`,
     },
     {
-      id: "retirement-accounts",
-      title: "401k vs IRA vs Roth",
-      category: "retirement",
-      duration: "6 min",
+      id: "bull-vs-bear",
+      title: "Bull vs Bear Market",
+      category: "Stocks",
+      readTime: 3,
+      difficulty: "Beginner",
+      summary: "What people mean when they say the market is bullish or bearish",
+      content: `Okay so you'll hear people say "we're in a bull market" or "it's a bear market right now" — here's what that actually means.
+
+Bull market = prices going up. Think of a bull charging forward with its horns pointing up. When the market rises 20% or more from a recent low that's officially a bull market. Everyone's feeling good the news is positive and your portfolio is growing 📈
+
+Bear market = prices going down. A bear swipes down with its paws. When the market drops 20% or more from a recent high that's a bear market. People panic the news is scary and your portfolio shrinks 📉
+
+Here's what's important: both are completely normal and temporary. The stock market has had like 26 bear markets since 1928 and every single one ended eventually. The longest bull market lasted 11 years. The average bear market lasts about 9 months.
+
+So when you see red don't panic and sell everything. That's literally when stocks are on sale. The best investors keep buying during bear markets because they know historically the market always recovers and reaches new highs. Stay calm and think long term girl 💪`,
+    },
+    {
+      id: "market-cap",
+      title: "What is Market Cap",
+      category: "Stocks",
+      readTime: 3,
+      difficulty: "Beginner",
+      summary: "How to measure a company's total value",
+      content: `Market cap (market capitalization) is just a fancy way of saying how much the entire company is worth. It's calculated super simply: stock price × total number of shares.
+
+So if a company's stock is $100 and there are 1 million shares out there the market cap is $100 million. That's how much it would theoretically cost to buy the entire company.
+
+Companies get grouped into size categories:
+- Large cap: $10 billion or more (Apple Microsoft Amazon)
+- Mid cap: $2-10 billion (stable growing companies)
+- Small cap: Under $2 billion (newer riskier companies)
+
+Large caps are usually safer but grow slower. They're the steady reliable friend. Small caps can explode in value but they can also crash hard. They're the wild unpredictable friend 😂
+
+Most financial advisors suggest having a mix. Put the bulk of your money in large caps for stability then sprinkle in some mid and small caps for growth potential. That way you're not too boring or too risky — you're balanced.
+
+Don't confuse market cap with stock price btw. A $10 stock of a huge company might be a better value than a $1000 stock of a tiny company. Market cap tells the full story 🎯`,
+    },
+    {
+      id: "pe-ratio",
+      title: "What is PE Ratio",
+      category: "Stocks",
+      readTime: 4,
       difficulty: "Intermediate",
-      summary: "Which retirement account is right for you",
-      content: `Let me break down retirement accounts in a way that actually makes sense, because this stuff confuses everyone at first.
+      summary: "Is this stock expensive or a bargain?",
+      content: `The PE ratio (Price to Earnings ratio) tells you if a stock is expensive or cheap compared to how much money the company actually makes. It's like asking "am I paying $50 for a $10 shirt or is this actually worth it?"
 
-**401(k)**: This is through your employer. You contribute money from your paycheck BEFORE taxes (so it lowers your taxable income right now), your employer might match some of it (free money!), and it grows tax-free. You pay taxes when you take it out in retirement. Max contribution: $23,000/year.
+The formula is: Stock Price ÷ Earnings Per Share = PE Ratio
 
-**Traditional IRA**: Similar to 401k but you open it yourself. Same tax treatment - contribute pre-tax, pay taxes later. Max contribution: $7,000/year. Good if your employer doesn't offer a 401k or you want to save even more.
+So if a stock costs $100 and the company earns $5 per share the PE is 20. That means you're paying $20 for every $1 of earnings. The lower the number the cheaper the stock relative to its profits.
 
-**Roth IRA**: My personal favorite for younger women. You contribute money AFTER paying taxes on it (so no immediate tax break), but then it grows tax-free forever and you can withdraw it tax-free in retirement. This is huge if you think you'll be in a higher tax bracket later. Max: also $7,000/year.
+Average PE for the S&P 500 is usually around 15-20. If you see a PE of 50 that stock is expensive — investors are betting on huge future growth. If you see a PE of 8 that's cheap — either it's a value opportunity or something's wrong with the company.
 
-Here's my girlfriend take: If your employer matches 401k contributions, contribute at LEAST enough to get the full match - that's literally free money. Then max out your Roth IRA if you can. Then go back and put more in your 401k if you still have money to invest.
+High PE isn't always bad. Tech companies like Tesla or Netflix have high PEs because investors believe they'll grow like crazy. Low PE isn't always good — sometimes there's a reason nobody wants the stock.
 
-The Roth is especially good if you're young because you're probably in a lower tax bracket now than you will be in 30 years. Pay the taxes now while they're cheap 💎`,
-    },
-    {
-      id: "market-volatility",
-      title: "Don't Panic When Markets Drop",
-      category: "stocks",
-      duration: "5 min",
-      difficulty: "Intermediate",
-      summary: "What to do when your portfolio turns red",
-      content: `Listen, the market WILL drop. Sometimes a lot. And when it happens it feels TERRIBLE to watch your portfolio turn red. But here's what you need to understand: market drops are normal and expected.
-
-Since 1928, the S&P 500 has had a correction (drop of 10%+) every single year on average. And every few years there's a big crash of 20-30% or more. But over time, it always recovers and hits new highs. Always.
-
-The key is TIME. If you're investing for retirement in 30 years, a crash today literally doesn't matter. In fact, it's a SALE. You're buying stocks at a discount while everyone else is panicking.
-
-**What NOT to do when markets crash:**
-- Don't sell everything in a panic
-- Don't check your portfolio every hour
-- Don't stop contributing to your 401k
-
-**What TO do:**
-- Keep investing like normal (or invest MORE if you can)
-- Remember your long-term goals
-- Maybe take a break from financial news for a bit
-
-I know it's easier said than done when you see your money disappearing. But I promise you, the women who get rich from investing are the ones who hold steady through the scary times. The market rewards patience, not panic 🌸
-
-If seeing red makes you too anxious, honestly just don't look at your portfolio during crashes. Set up automatic investments and check back in a year. Future you will thank you.`,
+Use PE to compare companies in the same industry. Comparing Apple's PE to a utility company's PE is pointless — they're in totally different businesses with different growth expectations. Stay in your lane when comparing 🔍`,
     },
     {
       id: "index-funds",
-      title: "Why Index Funds Win",
-      category: "etfs",
-      duration: "5 min",
+      title: "Index Funds Explained",
+      category: "ETFs",
+      readTime: 4,
       difficulty: "Beginner",
-      summary: "The simple strategy that beats most professional investors",
-      content: `Here's a secret that the finance industry doesn't really want you to know: you don't need to be a genius to be a successful investor. You just need to buy index funds and be patient.
+      summary: "Why boring investing wins",
+      content: `An index fund is a type of mutual fund or ETF that tracks a market index like the S&P 500. Instead of trying to beat the market it just copies it. Sounds boring right? That's exactly why it works.
 
-An index fund is an ETF or mutual fund that owns ALL the stocks in a particular index (like the S&P 500). It doesn't try to pick winners - it just owns everything. Sounds boring right?
+The S&P 500 for example holds the 500 biggest US companies. When you buy an S&P 500 index fund you own a piece of all 500. You're not betting on individual companies — you're betting on American business as a whole.
 
-But here's the kicker: over 90% of professional fund managers FAIL to beat index funds over time. These are literally PhDs with teams of analysts, and they can't beat the simple strategy of owning everything.
+Here's why this strategy crushes most active investing:
+1. Super low fees (0.03% vs 1%+ for active funds)
+2. No risk of picking the wrong stocks
+3. Historically returns 10% per year on average
+4. Warren Buffett literally recommends this
 
-Why? Because trying to pick winning stocks is really hard. And even if you pick a winner, the fees you pay to actively managed funds eat up your gains. Index funds charge almost nothing (like 0.03% per year) so you keep more of your returns.
+The math is wild: if you invest $500 a month in an S&P 500 index fund for 30 years at 10% returns you end up with over $1 million. That's from just $180k of your own money. The rest is compound growth doing the work.
 
-**The classic boring portfolio:**
-- 70% S&P 500 index fund (VOO or VFIAX)
-- 20% Total International index (VXUS)
-- 10% Bonds (BND or AGG)
-
-That's it. That's the portfolio. Invest regularly, rebalance once a year, and ignore the noise. It's not sexy but it works.
-
-Warren Buffett literally told his wife to invest everything in index funds when he dies. If it's good enough for one of the best investors ever, it's good enough for us 💪`,
+Index funds are my #1 recommendation for beginners. They're boring they're simple and they work. You don't need to watch the market or pick stocks. Just buy and hold and let time do its thing 💰`,
     },
     {
       id: "dollar-cost-averaging",
-      title: "The Power of Investing Consistently",
-      category: "stocks",
-      duration: "4 min",
+      title: "Dollar Cost Averaging",
+      category: "Retirement",
+      readTime: 4,
       difficulty: "Beginner",
-      summary: "Why investing the same amount every month works magic",
-      content: `Okay so dollar-cost averaging sounds complicated but it's actually the simplest strategy ever: invest the same amount of money at regular intervals, no matter what the market is doing.
+      summary: "The strategy that removes timing stress",
+      content: `Dollar cost averaging (DCA) means investing the same amount of money at regular intervals no matter what the market is doing. Like $200 every month on the 1st. That's it. Super simple.
 
-Let's say you invest $500 every month into VOO:
-- When prices are high, your $500 buys fewer shares
-- When prices are low, your $500 buys MORE shares
-- Over time, you automatically buy more when things are on sale
+Why is this brilliant? Because it takes away the stress of trying to time the market. You're not sitting there wondering "is now a good time to buy?" You just buy automatically like clockwork.
 
-You don't have to time the market or stress about whether now is a "good time" to invest. You just set it and forget it.
+Here's what happens: when prices are high your $200 buys fewer shares. When prices are low your $200 buys more shares. Over time you average out the cost and you end up buying more when things are cheap.
 
-The real magic happens over decades. That $500/month turns into $6,000/year. Invested for 30 years at average market returns (about 10%), you'd end up with over $1 million. From just $500 a month! 🤯
+Compare this to trying to time the market perfectly — which is literally impossible even for professionals. People who wait for the "perfect moment" usually miss it or panic and buy at the top. DCA removes that emotional roller coaster.
 
-**Why this works:**
-- You never try to time the market (which nobody can do anyway)
-- You invest through crashes automatically (buying low)
-- You build the habit of consistent saving
-- It's emotionally easier than trying to invest lump sums
+This works especially well with 401k contributions. You're automatically investing every paycheck regardless of what the market is doing. You're buying the highs the lows and everything in between. And historically that strategy beats trying to be clever.
 
-Even if you can only do $50 or $100 a month, START. The habit is more important than the amount when you're young. You can increase it as you earn more.
-
-Set up automatic transfers from your checking to your investment account. Make it so automatic you forget it's happening. That's how wealth gets built - slowly, boringly, consistently 🌱`,
-  
+Set it and forget it girl. That's the secret to building wealth without the stress 📅`,
     },
     {
-      id: "expense-ratios",
-      title: "Why Fees Matter More Than You Think",
-      category: "etfs",
-      duration: "3 min",
+      id: "roth-ira",
+      title: "What is a Roth IRA",
+      category: "Retirement",
+      readTime: 5,
+      difficulty: "Beginner",
+      summary: "Tax-free growth for your future self",
+      content: `A Roth IRA is literally one of the best deals the government gives us for retirement. You put in money you've already paid taxes on and then it grows TAX FREE forever. When you take it out in retirement you pay ZERO taxes.
+
+Let me show you why this is huge: Say you put in $6,500 per year (the 2024 limit) from age 25 to 65. That's $260k of your own money. At 10% returns that grows to $3.5 MILLION. And you don't pay taxes on that $3.2 million of growth. That's insane.
+
+Compare that to a traditional 401k where you pay taxes when you withdraw. If you're in the 24% tax bracket that's $840,000 going to the IRS. With a Roth IRA that money stays in your pocket.
+
+Rules to know:
+- You can contribute $6,500 per year (or $7,000 if you're over 50)
+- You need earned income to contribute
+- You can withdraw your contributions anytime penalty free (but leave the growth alone until retirement)
+- Income limits apply but there are workarounds
+
+Start a Roth IRA as early as possible. Time is your biggest advantage here. Even small contributions in your 20s become massive amounts by retirement because of compound growth 🚀`,
+    },
+    {
+      id: "drip-investing",
+      title: "DRIP Investing",
+      category: "Dividends",
+      readTime: 4,
+      difficulty: "Beginner",
+      summary: "Automatically reinvesting dividends for compound growth",
+      content: `DRIP stands for Dividend Reinvestment Plan. It's basically autopilot for growing your wealth through dividends.
+
+Here's how it works: Instead of taking dividend payments as cash they automatically buy more shares of the stock. So if you own 100 shares of a stock paying $1 per share and it costs $50 per share your $100 dividend buys 2 more shares. Now you own 102 shares.
+
+Next quarter those 102 shares pay dividends which buy even more shares. And so on forever. This is compound growth in action — your money making money that makes more money.
+
+Why is this powerful? Let's say you invest $10,000 in a dividend stock with a 4% yield. Without DRIP in 30 years at 8% total returns you'd have about $100,000. With DRIP reinvesting those dividends you'd have closer to $130,000. That's an extra $30k for literally doing nothing.
+
+Most brokerages offer automatic DRIP enrollment. Just turn it on and forget about it. You won't see the dividend cash hit your account but your share count will slowly grow every quarter. It's perfect for long term buy and hold investing.
+
+When you're young and don't need the income DRIP is the move. When you retire you can turn it off and take the dividends as cash for living expenses 💸`,
+    },
+    {
+      id: "active-vs-passive",
+      title: "Active vs Passive Investing",
+      category: "ETFs",
+      readTime: 5,
       difficulty: "Intermediate",
-      summary: "How tiny fees can cost you hundreds of thousands",
-      content: `Let me blow your mind with some math real quick. A 1% fee doesn't sound like much right? But over your investing lifetime it can cost you literally hundreds of thousands of dollars.
+      summary: "Two completely different philosophies",
+      content: `This is probably the biggest debate in investing. Active means trying to beat the market by picking individual stocks or using a fund manager. Passive means buying index funds and holding forever.
 
-If you invest $500/month for 30 years at 10% returns:
-- With a 0.03% fee (index fund): $1,035,000
-- With a 1% fee (actively managed fund): $865,000
+Active investing: You're constantly researching buying and selling trying to find undervalued stocks before everyone else. It's exciting hands-on and potentially very profitable. But it's also time consuming stressful and statistically most people lose to the market.
 
-That 1% fee cost you $170,000! Over a million dollars became $170,000 less just from fees. That's insane.
+Passive investing: You buy a total market index fund or S&P 500 fund and hold it for decades. Boring as hell but historically returns 10% per year. No research needed no stress just patience.
 
-This is why I'm obsessed with low-cost index funds. Vanguard, Fidelity, and Schwab have funds with fees as low as 0.03%. Meanwhile some mutual funds charge 1-2% or more. They're literally taking a huge chunk of YOUR returns.
+Here's what the data shows: Over 15 years about 90% of active fund managers underperform the S&P 500. Read that again. The professionals with fancy degrees and insider access lose to a simple index fund.
 
-**Look for these on any fund:**
-- Expense ratio under 0.20% = good
-- Under 0.10% = great  
-- Under 0.05% = amazing
+So why doesn't everyone just do passive? Because it's not exciting. Humans want to feel smart and in control. Buying an index fund and forgetting about it doesn't feel like investing — it feels like giving up.
 
-The fund industry makes billions off investors who don't pay attention to fees. Don't be one of them. Every 0.1% you save in fees is more money that compounds for YOU instead of going to some fund company 💰
-
-Always check the expense ratio before you invest. It's usually listed right on the fund's page. This one number can make or break your retirement.`,
-    },
-    {
-      id: "mutual-funds-vs-etfs",
-      title: "Mutual Funds vs ETFs",
-      category: "mutual-funds",
-      duration: "4 min",
-      difficulty: "Beginner",
-      summary: "What's the actual difference and which should you choose",
-      content: `Okay so mutual funds and ETFs are super similar - both let you buy a basket of stocks in one purchase. But there are some key differences that actually matter.
-
-**ETFs:**
-- Trade like stocks (buy/sell anytime during market hours)
-- Usually lower fees
-- More tax-efficient
-- Can be bought with fractional shares (on most platforms)
-- Examples: VOO, SCHD, QQQ
-
-**Mutual Funds:**
-- Only trade once per day after market closes
-- Sometimes higher fees (but not always)
-- Can have minimum investments ($1,000+ sometimes)
-- Examples: VFIAX, FXAIX, VTSAX
-
-For most people, especially if you're just starting out, ETFs are the way to go. Lower fees, more flexibility, easier to buy and sell.
-
-BUT there are some good mutual funds too, especially index mutual funds from Vanguard and Fidelity. If your 401k only offers mutual funds, that's fine - just make sure you're picking the low-cost index ones.
-
-The most important thing isn't whether you choose ETF vs mutual fund. It's:
-1. Picking low-cost options (under 0.20% expense ratio)
-2. Diversifying broadly (like an S&P 500 fund)
-3. Investing consistently
-
-Don't overthink this decision. Both can work great. Just avoid the high-fee actively managed funds that try to convince you they're worth the extra cost (they're not) 🎯`,
+My take: If you're new go passive with index funds. Put 80-90% of your portfolio there. If you want to scratch the active itch use 10-20% to pick individual stocks. That way you get the stability of passive plus the fun of active without risking everything 🎯`,
     },
   ];
 
