@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { Home, Search, Briefcase, Building2, User, Target } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -63,6 +64,42 @@ export function Layout({ children }: LayoutProps) {
               </Link>
             );
           })}
+          <Link
+            href="/discover"
+            className={cn(
+              "flex flex-col items-center gap-1 text-xs transition-colors",
+              pathname === "/discover"
+                ? "text-accent"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <Search className="w-5 h-5" />
+            <span>Discover</span>
+          </Link>
+          <Link
+            href="/learn"
+            className={cn(
+              "flex flex-col items-center gap-1 text-xs transition-colors",
+              pathname === "/learn"
+                ? "text-accent"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <span className="text-xl">🎓</span>
+            <span>Learn</span>
+          </Link>
+          <Link
+            href="/portfolio"
+            className={cn(
+              "flex flex-col items-center gap-1 text-xs transition-colors",
+              pathname === "/portfolio"
+                ? "text-accent"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <TrendingUp className="w-5 h-5" />
+            <span>Portfolio</span>
+          </Link>
         </div>
       </nav>
     </div>
