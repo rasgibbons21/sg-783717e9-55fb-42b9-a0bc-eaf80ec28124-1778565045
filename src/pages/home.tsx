@@ -1,25 +1,16 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { Layout } from "@/components/Layout";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { authService } from "@/services/authService";
-import { userService } from "@/services/userService";
-import { marketService } from "@/services/marketService";
-import { TrendingUp, TrendingDown, ArrowRight, ChevronRight } from "lucide-react";
-import { SEO } from "@/components/SEO";
 import Link from "next/link";
+import { Layout } from "@/components/Layout";
+import { SEO } from "@/components/SEO";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { authService } from "@/services/authService";
+import { marketService } from "@/services/marketService";
 import { supabase } from "@/integrations/supabase/client";
-
-interface MarketData {
-  symbol: string;
-  name: string;
-  price: number;
-  change: number;
-  changePercent: number;
-}
+import { TrendingUp, TrendingDown, ChevronRight } from "lucide-react";
 
 interface StockPick {
   ticker: string;
@@ -30,14 +21,65 @@ interface StockPick {
   dahliaQuote: string;
 }
 
+// Default fallback data
+const DEFAULT_MARKET_DATA = [
+  { symbol: "GSPC", name: "S&P 500", price: 5200.00, change: 0, changePercent: 0 },
+  { symbol: "IXIC", name: "NASDAQ", price: 16400.00, change: 0, changePercent: 0 },
+  { symbol: "DJI", name: "DOW", price: 38500.00, change: 0, changePercent: 0 },
+  { symbol: "VIX", name: "VIX", price: 14.50, change: 0, changePercent: 0 },
+];
+
+const DEFAULT_STOCK_PICKS: StockPick[] = [
+  {
+    ticker: "AAPL",
+    name: "Apple Inc.",
+    price: 180.00,
+    change: 0,
+    changePercent: 0,
+    dahliaQuote: "AAPL - you already know this one. Everyone uses their products, the ecosystem locks people in, and they have $162B in cash. That's not going anywhere 💪",
+  },
+  {
+    ticker: "NVDA",
+    name: "NVIDIA Corporation",
+    price: 450.00,
+    change: 0,
+    changePercent: 0,
+    dahliaQuote: "NVDA is powering the AI revolution girl. Every tech company needs their chips. The demand is insane and they're the only ones who can make them this good 🚀",
+  },
+  {
+    ticker: "VOO",
+    name: "Vanguard S&P 500 ETF",
+    price: 420.00,
+    change: 0,
+    changePercent: 0,
+    dahliaQuote: "VOO tracks the 500 biggest US companies. Think of it like betting on America as a whole instead of picking winners. Been going up for decades sis 📈",
+  },
+  {
+    ticker: "SCHD",
+    name: "Schwab US Dividend Equity ETF",
+    price: 75.00,
+    change: 0,
+    changePercent: 0,
+    dahliaQuote: "SCHD is literally paying you every quarter just to hold it. It's like getting a bonus at work but from your investment. Dividend yield is 3.8% right now which is solid 💅",
+  },
+  {
+    ticker: "MSFT",
+    name: "Microsoft Corporation",
+    price: 410.00,
+    change: 0,
+    changePercent: 0,
+    dahliaQuote: "MSFT owns Windows, Office, Azure cloud, and now they're all-in on AI with OpenAI. They make money from everything businesses do online. Rock solid 💼",
+  },
+];
+
 export default function Home() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
-  const [marketData, setMarketData] = useState<any[]>([]);
-  const [stockPicks, setStockPicks] = useState<StockPick[]>([]);
+  const [marketData, setMarketData] = useState<any[]>(DEFAULT_MARKET_DATA);
+  const [stockPicks, setStockPicks] = useState<StockPick[]>(DEFAULT_STOCK_PICKS);
   const [watchlistNews, setWatchlistNews] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [isLoadingNews, setIsLoadingNews] = useState(true);
+  const [dataLoaded, setDataLoaded] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -51,15 +93,40 @@ export default function Home() {
     }
     const profile = await authService.getCurrentUser();
     setUser(profile);
-    await loadMarketData();
-    await loadStockPicks();
-    await loadWatchlistNews(session.user.id);
+    
+    // Load data with timeout
+    loadDataWithTimeout();
+  };
+
+  const loadDataWithTimeout = async () => {
+    const timeoutId = setTimeout(() => {
+      console.log("Home: Data loading timeout - using fallback data");
+      setDataLoaded(true);
+      setIsLoadingNews(false);
+    }, 5000);
+
+    try {
+      await Promise.all([
+        loadMarketData(),
+        loadStockPicks(),
+        loadWatchlistNews(user?.id),
+      ]);
+      clearTimeout(timeoutId);
+      setDataLoaded(true);
+    } catch (error) {
+      console.error("Home: Error loading data:", error);
+      clearTimeout(timeoutId);
+      setDataLoaded(true);
+    }
   };
 
   const loadWatchlistNews = async (userId: string) => {
-    setIsLoadingNews(true);
+    if (!userId) {
+      setIsLoadingNews(false);
+      return;
+    }
+
     try {
-      // Get user's watchlist
       const { data: watchlist, error } = await supabase
         .from("watchlist")
         .select("ticker")
@@ -74,7 +141,6 @@ export default function Home() {
         return;
       }
 
-      // Fetch news for each ticker
       const newsPromises = watchlist.map(async (item) => {
         const response = await fetch(
           `https://finnhub.io/api/v1/company-news?symbol=${item.ticker}&from=${
@@ -100,8 +166,8 @@ export default function Home() {
   const loadMarketData = async () => {
     try {
       const indices = ["^GSPC", "^IXIC", "^DJI", "^VIX"];
-      const data = await Promise.all(
-        indices.map(async (symbol) => {
+      const dataPromises = indices.map(async (symbol) => {
+        try {
           const quote = await marketService.getRealTimeQuote(symbol);
           return {
             symbol: symbol.replace("^", ""),
@@ -117,204 +183,154 @@ export default function Home() {
             change: quote?.d || 0,
             changePercent: quote?.dp || 0,
           };
-        })
-      );
-      setMarketData(data);
+        } catch (error) {
+          console.error(`Error loading ${symbol}:`, error);
+          return null;
+        }
+      });
+
+      const data = await Promise.all(dataPromises);
+      const validData = data.filter((item) => item !== null);
+      
+      if (validData.length > 0) {
+        setMarketData(validData);
+      }
     } catch (error) {
       console.error("Error loading market data:", error);
     }
   };
 
   const loadStockPicks = async () => {
-    const picks: StockPick[] = [
-      {
-        ticker: "SCHD",
-        name: "Schwab US Dividend Equity ETF",
-        price: 0,
-        change: 0,
-        changePercent: 0,
-        dahliaQuote:
-          "SCHD is literally paying you every quarter just to hold it. It's like getting a bonus at work but from your investment. Dividend yield is 3.8% right now which is solid 💅",
-      },
-      {
-        ticker: "VOO",
-        name: "Vanguard S&P 500 ETF",
-        price: 0,
-        change: 0,
-        changePercent: 0,
-        dahliaQuote:
-          "VOO tracks the 500 biggest US companies. Think of it like betting on America as a whole instead of picking winners. Been going up for decades sis 📈",
-      },
-      {
-        ticker: "AAPL",
-        name: "Apple Inc.",
-        price: 0,
-        change: 0,
-        changePercent: 0,
-        dahliaQuote:
-          "AAPL - you already know this one. Everyone uses their products, the ecosystem locks people in, and they have $162B in cash. That's not going anywhere 💪",
-      },
-    ];
-
     try {
-      const updatedPicks = await Promise.all(
-        picks.map(async (pick) => {
-          const quote = await marketService.getRealTimeQuote(pick.ticker);
+      const tickers = ["AAPL", "NVDA", "VOO", "SCHD", "MSFT"];
+      const picksPromises = tickers.map(async (ticker, index) => {
+        try {
+          const quote = await marketService.getRealTimeQuote(ticker);
           return {
-            ...pick,
-            price: quote?.c || 0,
+            ...DEFAULT_STOCK_PICKS[index],
+            price: quote?.c || DEFAULT_STOCK_PICKS[index].price,
             change: quote?.d || 0,
             changePercent: quote?.dp || 0,
           };
-        })
-      );
-      setStockPicks(updatedPicks);
+        } catch (error) {
+          console.error(`Error loading ${ticker}:`, error);
+          return DEFAULT_STOCK_PICKS[index];
+        }
+      });
+
+      const picks = await Promise.all(picksPromises);
+      setStockPicks(picks);
     } catch (error) {
       console.error("Error loading stock picks:", error);
-      setStockPicks(picks);
     }
   };
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-    }).format(price);
-  };
-
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return "Good morning";
-    if (hour < 18) return "Good afternoon";
-    return "Good evening";
-  };
-
-  if (isLoading) {
-    return (
-      <Layout>
-        <div className="flex items-center justify-center min-h-screen">
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
-      </Layout>
-    );
-  }
-
   return (
     <Layout>
-      <SEO title="Home - Bloom" description="Your personalized investment dashboard" />
-      <div className="container-full py-6 space-y-6">
+      <SEO
+        title="Home — Bloom"
+        description="Your personalized investment dashboard"
+      />
+
+      <div className="max-w-4xl mx-auto space-y-6 pb-24 px-[5%]">
+        {/* Greeting */}
+        <div className="pt-6">
+          <h1 className="text-3xl font-bold text-foreground mb-1">
+            Welcome back, {user?.full_name?.split(" ")[0] || "Investor"} 🌸
+          </h1>
+          {user?.plan_type === "pro" && (
+            <Badge className="bg-accent text-accent-foreground">
+              Bloom Pro ✨
+            </Badge>
+          )}
+        </div>
+
         {/* Market Summary Bar */}
         <Card className="p-4 bg-card border-border rounded-2xl">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {marketData.map((market) => (
-              <div key={market.symbol} className="space-y-1">
-                <p className="text-xs text-muted-foreground font-medium">
-                  {market.name}
+            {marketData.map((index) => (
+              <div key={index.symbol} className="text-center">
+                <p className="text-xs text-muted-foreground mb-1">
+                  {index.name}
                 </p>
-                <p className="text-lg font-bold text-foreground tabular-nums">
-                  {formatPrice(market.price)}
+                <p className="font-semibold text-foreground text-lg">
+                  {index.price > 0 ? index.price.toFixed(2) : "—"}
                 </p>
-                <div
-                  className={`flex items-center gap-1 text-sm font-semibold ${
-                    market.change >= 0 ? "text-primary" : "text-rose"
-                  }`}
-                >
-                  {market.change >= 0 ? (
-                    <TrendingUp className="h-4 w-4" />
-                  ) : (
-                    <TrendingDown className="h-4 w-4" />
-                  )}
-                  <span className="tabular-nums">
-                    {market.change >= 0 ? "+" : ""}
-                    {market.changePercent.toFixed(2)}%
-                  </span>
-                </div>
+                {index.price > 0 && (
+                  <Badge
+                    className={
+                      index.changePercent >= 0
+                        ? "bg-primary/10 text-primary text-xs"
+                        : "bg-destructive/10 text-destructive text-xs"
+                    }
+                  >
+                    {index.changePercent >= 0 ? "+" : ""}
+                    {index.changePercent.toFixed(2)}%
+                  </Badge>
+                )}
               </div>
             ))}
           </div>
         </Card>
 
-        {/* Greeting */}
-        <div>
-          <h1 className="font-serif text-4xl font-bold text-foreground">
-            {getGreeting()}, {user?.full_name?.split(" ")[0] || "there"} 🌸
-          </h1>
-          {user?.plan_type === "pro" && (
-            <Badge className="mt-2 bg-accent text-accent-foreground">
-              Bloom Pro
-            </Badge>
-          )}
-        </div>
-
-        {/* Dahlia's Message */}
+        {/* Dahlia's Picks Today */}
         <Card className="p-6 bg-card border-border rounded-2xl">
-          <div className="flex items-start gap-4">
-            <div className="flex-shrink-0">
-              <div className="relative">
-                <img
-                  src="/bloom-logo.png"
-                  alt="Dahlia"
-                  className="h-12 w-12 rounded-full object-cover"
-                />
-                <div className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-primary border-2 border-card"></div>
-              </div>
-            </div>
-            <div className="flex-1 space-y-2">
-              <div className="flex items-center gap-2">
-                <h3 className="font-semibold text-foreground">Dahlia</h3>
-                <Badge
-                  variant="outline"
-                  className="text-xs border-primary text-primary"
-                >
-                  Available 24/7
-                </Badge>
-              </div>
-              <div className="bg-popover p-4 rounded-2xl rounded-tl-none border border-border">
-                <p className="text-sm text-foreground leading-relaxed">
-                  Welcome back {user?.full_name?.split(" ")[0] || "sis"} 🌸 I've
-                  been watching the market and I've got some solid picks ready for
-                  you. Everything's looking pretty stable today — perfect time to
-                  review your portfolio 💛
-                </p>
-              </div>
-            </div>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold text-foreground">
+              Dahlia's Picks Today 🌺
+            </h2>
           </div>
-        </Card>
 
-        {/* Market Movers */}
-        <Card className="p-6 bg-card border-border rounded-2xl">
-          <h2 className="text-xl font-semibold mb-4 text-foreground">
-            Market Movers
-          </h2>
           <div className="space-y-3">
-            {stockPicks.slice(0, 5).map((stock) => (
+            {stockPicks.map((stock) => (
               <Link
                 key={stock.ticker}
                 href={`/stock/${stock.ticker}`}
-                className="flex items-center justify-between p-3 hover:bg-muted/50 rounded-lg transition-colors group"
+                className="block"
               >
-                <div>
-                  <p className="font-semibold text-foreground group-hover:text-accent transition-colors">
-                    {stock.ticker}
-                  </p>
-                  <p className="text-sm text-muted-foreground">{stock.name}</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-semibold text-foreground">
-                    ${stock.price.toFixed(2)}
-                  </p>
-                  <Badge
-                    className={
-                      stock.changePercent >= 0
-                        ? "bg-primary/10 text-primary"
-                        : "bg-destructive/10 text-destructive"
-                    }
+                <Card className="p-4 hover:bg-muted/50 transition-colors border-border rounded-xl">
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <p className="font-semibold text-foreground text-lg">
+                        {stock.ticker}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {stock.name}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-semibold text-foreground">
+                        ${stock.price.toFixed(2)}
+                      </p>
+                      {stock.price > 0 && stock.changePercent !== 0 && (
+                        <Badge
+                          className={
+                            stock.changePercent >= 0
+                              ? "bg-primary/10 text-primary"
+                              : "bg-destructive/10 text-destructive"
+                          }
+                        >
+                          {stock.changePercent >= 0 ? "+" : ""}
+                          {stock.changePercent.toFixed(2)}%
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+
+                  <Card className="p-3 bg-accent/5 border-accent/20 rounded-lg">
+                    <p className="text-sm italic text-foreground leading-relaxed">
+                      "{stock.dahliaQuote}"
+                    </p>
+                  </Card>
+
+                  <Button
+                    variant="ghost"
+                    className="w-full mt-2 text-accent hover:text-accent/80 group"
                   >
-                    {stock.changePercent >= 0 ? "+" : ""}
-                    {stock.changePercent.toFixed(2)}%
-                  </Badge>
-                </div>
+                    Read Dahlia's take
+                    <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </Card>
               </Link>
             ))}
           </div>
@@ -391,88 +407,71 @@ export default function Home() {
           )}
         </Card>
 
-        {/* Dahlia's Picks Today */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="font-serif text-2xl font-bold text-foreground">
-              Dahlia's Picks Today
-            </h2>
-            <Link href="/discover">
-              <Button variant="ghost" size="sm" className="text-accent">
-                View All
-                <ArrowRight className="ml-1 h-4 w-4" />
-              </Button>
-            </Link>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {stockPicks.map((pick) => (
-              <Card
-                key={pick.ticker}
-                className="p-5 bg-card border-border rounded-2xl hover:border-primary/50 transition-all cursor-pointer"
-                onClick={() => router.push(`/stock/${pick.ticker}`)}
+        {/* Market Movers */}
+        <Card className="p-6 bg-card border-border rounded-2xl">
+          <h2 className="text-xl font-semibold mb-4 text-foreground">
+            Market Movers
+          </h2>
+          <div className="space-y-3">
+            {stockPicks.slice(0, 5).map((stock) => (
+              <Link
+                key={stock.ticker}
+                href={`/stock/${stock.ticker}`}
+                className="flex items-center justify-between p-3 hover:bg-muted/50 rounded-lg transition-colors group"
               >
-                <div className="space-y-4">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h3 className="font-bold text-lg text-foreground">
-                        {pick.ticker}
-                      </h3>
-                      <p className="text-xs text-muted-foreground line-clamp-1">
-                        {pick.name}
-                      </p>
-                    </div>
+                <div>
+                  <p className="font-semibold text-foreground group-hover:text-accent transition-colors">
+                    {stock.ticker}
+                  </p>
+                  <p className="text-sm text-muted-foreground">{stock.name}</p>
+                </div>
+                <div className="text-right">
+                  <p className="font-semibold text-foreground">
+                    ${stock.price.toFixed(2)}
+                  </p>
+                  {stock.price > 0 && stock.changePercent !== 0 && (
                     <Badge
-                      variant={pick.changePercent >= 0 ? "default" : "destructive"}
                       className={
-                        pick.changePercent >= 0
-                          ? "bg-primary/20 text-primary hover:bg-primary/20"
-                          : "bg-rose/20 text-rose hover:bg-rose/20"
+                        stock.changePercent >= 0
+                          ? "bg-primary/10 text-primary"
+                          : "bg-destructive/10 text-destructive"
                       }
                     >
-                      {pick.changePercent >= 0 ? "+" : ""}
-                      {pick.changePercent.toFixed(2)}%
+                      {stock.changePercent >= 0 ? "+" : ""}
+                      {stock.changePercent.toFixed(2)}%
                     </Badge>
-                  </div>
-
-                  <div>
-                    <p className="text-2xl font-bold text-foreground tabular-nums">
-                      {formatPrice(pick.price)}
-                    </p>
-                    <p
-                      className={`text-sm font-semibold tabular-nums ${
-                        pick.change >= 0 ? "text-primary" : "text-rose"
-                      }`}
-                    >
-                      {pick.change >= 0 ? "+" : ""}
-                      {formatPrice(pick.change)} today
-                    </p>
-                  </div>
-
-                  <div className="pt-3 border-t border-border">
-                    <p className="text-sm text-muted-foreground italic leading-relaxed">
-                      {pick.dahliaQuote}
-                    </p>
-                  </div>
-
-                  <Button
-                    variant="ghost"
-                    className="w-full text-accent hover:text-accent hover:bg-accent/10"
-                  >
-                    Read Dahlia's take
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
+                  )}
                 </div>
-              </Card>
+              </Link>
             ))}
           </div>
-        </div>
+        </Card>
+
+        {/* Dahlia's Tip */}
+        <Card className="p-6 bg-accent/5 border-accent/20 rounded-2xl">
+          <div className="flex items-start gap-4">
+            <img
+              src="/bloom-logo.png"
+              alt="Dahlia"
+              className="w-12 h-12 rounded-full object-cover flex-shrink-0"
+            />
+            <div className="flex-1">
+              <p className="text-sm text-foreground leading-relaxed mb-2">
+                <span className="font-semibold">Dahlia's Daily Tip:</span> Don't
+                panic when you see red days. The market goes up and down - that's
+                totally normal. What matters is your long-term strategy and
+                staying consistent 💛
+              </p>
+              <p className="text-xs text-muted-foreground">— Dahlia 🌺</p>
+            </div>
+          </div>
+        </Card>
 
         {/* Disclaimer */}
-        <Card className="p-4 bg-muted border-border/50 rounded-2xl">
+        <Card className="p-4 bg-muted/50 border-border rounded-xl">
           <p className="text-xs text-center text-muted-foreground leading-relaxed">
-            Educational content only. Not financial advice. Bloom is not liable for
-            any investment decisions or losses.
+            This is educational content only and does not constitute financial
+            advice. Bloom is not liable for any investment decisions or losses.
           </p>
         </Card>
       </div>
