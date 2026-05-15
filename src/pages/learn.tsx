@@ -334,11 +334,11 @@ My take: If you're new go passive with index funds. Put 80-90% of your portfolio
         .eq("user_id", userId)
         .eq("completed", true);
 
-      const { data: userData } = await supabase
+      const { data: userData } = await (supabase
         .from("users")
         .select("bookmarked_lessons")
         .eq("id", userId)
-        .single();
+        .single() as any);
 
       if (progressData) {
         setCompletedLessons(progressData.map((p) => p.lesson_id));
@@ -382,8 +382,8 @@ My take: If you're new go passive with index funds. Put 80-90% of your portfolio
       : [...bookmarkedLessons, lessonId];
 
     try {
-      const { error } = await supabase
-        .from("users")
+      const { error } = await (supabase
+        .from("users") as any)
         .update({ bookmarked_lessons: newBookmarks })
         .eq("id", user.id);
 

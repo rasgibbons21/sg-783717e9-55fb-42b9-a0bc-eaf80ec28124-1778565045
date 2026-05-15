@@ -247,6 +247,7 @@ export type Database = {
       users: {
         Row: {
           avatar_url: string | null
+          bookmarked_lessons: string[] | null
           created_at: string | null
           email: string
           experience_level: string | null
@@ -260,6 +261,7 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          bookmarked_lessons?: string[] | null
           created_at?: string | null
           email: string
           experience_level?: string | null
@@ -273,6 +275,7 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          bookmarked_lessons?: string[] | null
           created_at?: string | null
           email?: string
           experience_level?: string | null
