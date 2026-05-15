@@ -1,4 +1,4 @@
- 
+/* eslint-disable @typescript-eslint/no-empty-object-type */
 export type Json =
   | string
   | number
@@ -54,6 +54,9 @@ export type Database = {
           created_at: string | null
           id: string
           lesson_id: string
+          quiz_attempts: number | null
+          quiz_completed: boolean | null
+          quiz_score: number | null
           user_id: string
         }
         Insert: {
@@ -62,6 +65,9 @@ export type Database = {
           created_at?: string | null
           id?: string
           lesson_id: string
+          quiz_attempts?: number | null
+          quiz_completed?: boolean | null
+          quiz_score?: number | null
           user_id: string
         }
         Update: {
@@ -70,6 +76,9 @@ export type Database = {
           created_at?: string | null
           id?: string
           lesson_id?: string
+          quiz_attempts?: number | null
+          quiz_completed?: boolean | null
+          quiz_score?: number | null
           user_id?: string
         }
         Relationships: []
