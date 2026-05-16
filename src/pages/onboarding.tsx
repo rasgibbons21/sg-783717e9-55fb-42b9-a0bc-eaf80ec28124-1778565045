@@ -54,7 +54,7 @@ export default function Onboarding() {
           return;
         }
 
-        const { user, error: signupError } = await authService.signUp(email, password);
+        const { user, error: signupError } = await authService.signUp(email, password, fullName);
         
         if (signupError) {
           setError(signupError.message);
