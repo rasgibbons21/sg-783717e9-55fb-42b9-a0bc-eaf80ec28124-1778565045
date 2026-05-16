@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { RiskRewardCalculator } from "@/components/RiskRewardCalculator";
 import { authService } from "@/services/authService";
 import { supabase } from "@/integrations/supabase/client";
 import { Search, ArrowLeft, Clock, CheckCircle2, Circle, ChevronRight, Bookmark, BookmarkCheck, Award } from "lucide-react";
@@ -1637,6 +1638,11 @@ Follow this and you're automatically in the top 10% of traders. Most people skip
                 {category}
               </Badge>
             ))}
+          </div>
+
+          {/* Risk to Reward Calculator */}
+          <div className="mb-8">
+            <RiskRewardCalculator />
           </div>
 
           <div className="space-y-3">
