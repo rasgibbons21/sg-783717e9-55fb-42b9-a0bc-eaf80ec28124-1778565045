@@ -61,7 +61,7 @@ export const authService = {
           data: {
             full_name: fullName,
           },
-          emailRedirectTo: `${getURL()}auth/confirm-email`
+          emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
         }
       });
 
@@ -153,40 +153,20 @@ export const authService = {
   },
 
   // Reset password
-  async resetPassword(email: string): Promise<{ error: AuthError | null }> {
+  /**
+   * Send password reset email
+   */
+  async resetPassword(email: string): Promise<{ error: any }> {
     try {
-      const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${getURL()}auth/reset-password`,
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback?type=recovery`,
       });
 
-      if (error) {
-        return { error: { message: error.message } };
-      }
-
-      // Send custom Resend password reset email
-      try {
-        // Note: Supabase will handle sending the actual reset link
-        // This is just for tracking/custom branding if needed
-        const user = await authService.getUserByEmail(email);
-        await fetch('/api/auth/send-password-reset', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: email,
-            resetUrl: `${getURL()}/auth/reset-password`,
-            name: user?.full_name || '',
-          }),
-        });
-      } catch (emailError) {
-        console.error('Error sending password reset email:', emailError);
-        // Don't block reset if email fails
-      }
-
+      if (error) throw error;
       return { error: null };
     } catch (error) {
-      return { 
-        error: { message: "An unexpected error occurred during password reset" } 
-      };
+      console.error("Password reset error:", error);
+      return { error };
     }
   },
 
@@ -215,6 +195,28 @@ export const authService = {
         user: null, 
         error: { message: "An unexpected error occurred during email confirmation" } 
       };
+    }
+  },
+
+  /**
+   * Sign in with OAuth provider (Google, etc.)
+   */
+  async signInWithOAuth(
+    provider: "google" | "github" | "apple"
+  ): Promise<{ error: any }> {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
+        },
+      });
+
+      if (error) throw error;
+      return { error: null };
+    } catch (error) {
+      console.error("OAuth sign in error:", error);
+      return { error };
     }
   },
 
