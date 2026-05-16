@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { RiskRewardCalculator } from "@/components/RiskRewardCalculator";
+import { PositionSizeCalculator } from "@/components/PositionSizeCalculator";
 import { authService } from "@/services/authService";
 import { supabase } from "@/integrations/supabase/client";
 import { Search, ArrowLeft, Clock, CheckCircle2, Circle, ChevronRight, Bookmark, BookmarkCheck, Award } from "lucide-react";
@@ -1645,7 +1646,13 @@ Follow this and you're automatically in the top 10% of traders. Most people skip
             <RiskRewardCalculator />
           </div>
 
-          <div className="space-y-3">
+          {/* Position Size Calculator */}
+          <div className="mb-8">
+            <PositionSizeCalculator />
+          </div>
+
+          {/* Lessons Grid */}
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {filteredLessons.length > 0 ? (
               filteredLessons.map((lesson) => {
                 const isCompleted = completedLessons.includes(lesson.id);
