@@ -19,7 +19,7 @@ export default async function handler(
 
   try {
     const { data, error } = await resend.emails.send({
-      from: "Dahlia from Bloom <dahlia@shebloomswealth.app>",
+      from: "Pansy from Bloom <pansy@shebloomswealth.app>",
       to: email,
       subject: "Reset your Bloom password 🌸",
       html: `
@@ -43,7 +43,7 @@ export default async function handler(
                       </td>
                     </tr>
                     
-                    <!-- Dahlia's Message -->
+                    <!-- Pansy's Message -->
                     <tr>
                       <td style="padding: 40px;">
                         <div style="display: flex; align-items: start; margin-bottom: 24px;">
@@ -91,7 +91,7 @@ export default async function handler(
                     <tr>
                       <td style="background-color: #FAF8F4; padding: 32px 40px; border-top: 1px solid #E5E3DC;">
                         <p style="margin: 0 0 12px; color: #2D3E2E; font-size: 14px; line-height: 1.6; font-weight: 600;">
-                          Security Tips from Dahlia 🔒
+                          Security Tips from Pansy 🔒
                         </p>
                         <ul style="margin: 0 0 24px; padding-left: 20px; color: #5A6B5A; font-size: 13px; line-height: 1.6;">
                           <li>Use a unique password for Bloom</li>

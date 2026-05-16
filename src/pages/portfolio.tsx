@@ -367,12 +367,12 @@ export default function Portfolio() {
           <div className="flex gap-4">
             <img
               src="/bloom-logo.png"
-              alt="Dahlia"
+              alt="Pansy"
               className="h-12 w-12 rounded-full object-cover flex-shrink-0"
             />
             <div className="flex-1 space-y-3">
               <p className="text-sm text-foreground leading-relaxed">
-                <span className="font-semibold">Tip from Dahlia:</span> Building a watchlist is a great way to research before you invest. Take your time, read the news, and see how stocks move over a few weeks! No rush girl 💛
+                <span className="font-semibold">Tip from Pansy:</span> Building a watchlist is a great way to research before you invest. Take your time, read the news, and see how stocks move over a few weeks! No rush girl 💛
               </p>
               <Button
                 variant="outline"

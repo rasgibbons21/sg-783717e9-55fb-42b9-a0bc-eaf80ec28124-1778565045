@@ -10,11 +10,11 @@ position: 1
 ---
 
 ## Notes
-4-step onboarding capturing user preferences. Dahlia intro on welcome screen. Save all data to Supabase users table.
+4-step onboarding capturing user preferences. Pansy intro on welcome screen. Save all data to Supabase users table.
 
 ## Checklist
 - [x] Create Onboarding.tsx with 4-step wizard: Welcome, Experience, Goals, Risk Tolerance
-- [x] Welcome screen: Bloom logo, tagline, Dahlia intro card with pulsing avatar, CTA buttons
+- [x] Welcome screen: Bloom logo, tagline, Pansy intro card with pulsing avatar, CTA buttons
 - [x] Experience step: 3 radio cards (Beginner, Intermediate, Advanced)
 - [x] Goals step: 4 radio cards with icons (Grow Wealth, Retirement, Passive Income, Emergency Fund)
 - [x] Risk step: 3 radio cards (Conservative, Moderate, Aggressive)
@@ -24,5 +24,5 @@ position: 1
 
 ## Acceptance
 - User completes 4 steps and data persists in Supabase
-- Dahlia's welcome message displays with pulsing flower avatar
+- Pansy's welcome message displays with pulsing flower avatar
 - Onboarding skips for returning users

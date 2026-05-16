@@ -76,7 +76,7 @@ The key is thinking long term. Day to day the price bounces around like crazy bu
           explanation: "Exactly girl! You're buying actual ownership in the company. You become a part owner even if it's just a tiny piece 💪"
         },
         {
-          question: "What's the best way to approach stock investing according to Dahlia?",
+          question: "What's the best way to approach stock investing according to Pansy?",
           options: ["Day trade for quick profits", "Sell immediately when prices drop", "Think long term and hold for years", "Only buy when prices are at their highest"],
           correctAnswer: 2,
           explanation: "Yes! Long term thinking is key. Day to day the market is crazy but over years it historically goes up. Patience wins sis 🌱"
@@ -238,7 +238,7 @@ So when you see red don't panic and sell everything. That's literally when stock
           explanation: "That's right! Average bear market is about 9 months. They're temporary girl. Every single one has ended eventually 💪"
         },
         {
-          question: "What should you do during a bear market according to Dahlia?",
+          question: "What should you do during a bear market according to Pansy?",
           options: ["Panic and sell everything", "Stop investing completely", "Stay calm and keep buying (stocks are on sale)", "Move all money to cash"],
           correctAnswer: 2,
           explanation: "Exactly! Bear markets = stocks on sale. The best investors keep buying because they know the market always recovers. Stay calm sis 🌱"
@@ -491,7 +491,7 @@ When you're young and don't need the income DRIP is the move. When you retire yo
           explanation: "That's right! About $30k extra from compound growth. Your dividends buying more shares that pay more dividends that buy MORE shares 💸"
         },
         {
-          question: "When should you turn off DRIP according to Dahlia?",
+          question: "When should you turn off DRIP according to Pansy?",
           options: ["Never turn it off", "When you're young and don't need income", "When you retire and want dividend cash", "Only on weekends"],
           correctAnswer: 2,
           explanation: "Exactly! Keep DRIP on when you're young to maximize growth. Turn it off in retirement when you want that dividend cash for living expenses 🌱"
@@ -542,7 +542,7 @@ My take: If you're new go passive with index funds. Put 80-90% of your portfolio
           explanation: "That's right! About 90% of professionals lose to a simple S&P 500 index fund. The data is wild girl 📊"
         },
         {
-          question: "What's Dahlia's recommendation for beginners?",
+          question: "What's Pansy's recommendation for beginners?",
           options: [
             "100% active stock picking",
             "100% passive index funds",
@@ -612,7 +612,7 @@ This isn't about being smart or picking perfectly. It's about math and disciplin
           explanation: "Yes! 3:1 ratio means if you risk $100 you should target at least $300 profit. That's how the math works in your favor 🎯"
         },
         {
-          question: "What's the hardest part of the 3:1 rule according to Dahlia?",
+          question: "What's the hardest part of the 3:1 rule according to Pansy?",
           options: [
             "Picking winning stocks",
             "Having discipline to cut losses and let winners run",
@@ -668,7 +668,7 @@ Set your rules before you invest. Write them down. Follow them no matter how you
       relatedTopics: ["risk-reward-rule", "dollar-cost-averaging", "bull-vs-bear"],
       quiz: [
         {
-          question: "According to Dahlia's rules, what should you do when a stock drops 20%?",
+          question: "According to Pansy's rules, what should you do when a stock drops 20%?",
           options: [
             "Panic sell everything",
             "Buy 15% more",
@@ -753,7 +753,7 @@ Missing a move feels bad but losing money feels worse. Protect your capital sis.
           explanation: "Exactly! FOMO hits when everyone's posting gains and you feel left out. That's when you buy at the top girl 📈"
         },
         {
-          question: "What's Dahlia's FOMO rule?",
+          question: "What's Pansy's FOMO rule?",
           options: [
             "Buy immediately when you see gains",
             "If you didn't plan it before market open, don't take it that day",
@@ -851,7 +851,7 @@ Protect your capital. Your ego can recover but your account might not 🛡️`,
           explanation: "Exactly! Stop. Close everything. Walk away. Come back TOMORROW not in 10 minutes. Let emotions reset sis 🌸"
         },
         {
-          question: "Why is revenge trading so dangerous according to Dahlia?",
+          question: "Why is revenge trading so dangerous according to Pansy?",
           options: [
             "It violates market regulations",
             "Your ego gets involved and turns small losses into huge disasters",
@@ -920,7 +920,7 @@ Print these six questions out. Put them on your screen. Make yourself answer the
           explanation: "Yes! Emotional state comes FIRST. If you're feeling strong emotions, stop. Come back when you're neutral 🧠"
         },
         {
-          question: "What's the minimum risk to reward ratio Dahlia requires?",
+          question: "What's the minimum risk to reward ratio Pansy requires?",
           options: [
             "1:1",
             "2:1",
@@ -1378,11 +1378,11 @@ Follow this and you're automatically in the top 10% of traders. Most people skip
               <div className="flex items-center gap-3">
                 <img
                   src="/bloom-logo.png"
-                  alt="Dahlia"
+                  alt="Pansy"
                   className="w-12 h-12 rounded-full object-cover"
                 />
                 <div>
-                  <p className="font-semibold text-foreground">Dahlia</p>
+                  <p className="font-semibold text-foreground">Pansy</p>
                   <p className="text-sm text-muted-foreground">
                     Bloom's Investing Expert
                   </p>
@@ -1584,7 +1584,7 @@ Follow this and you're automatically in the top 10% of traders. Most people skip
     <Layout>
       <SEO
         title="Bloom University - Learn Investing"
-        description="Everything about investing explained by Dahlia in girlfriend language"
+        description="Everything about investing explained by Pansy in girlfriend language"
       />
       <div className="min-h-screen bg-background pb-20">
         <div className="max-w-4xl mx-auto p-6 space-y-6">
@@ -1593,7 +1593,7 @@ Follow this and you're automatically in the top 10% of traders. Most people skip
               Bloom University 🎓
             </h1>
             <p className="text-muted-foreground">
-              Everything about investing explained by Dahlia in girlfriend
+              Everything about investing explained by Pansy in girlfriend
               language
             </p>
           </div>
@@ -1666,7 +1666,7 @@ Follow this and you're automatically in the top 10% of traders. Most people skip
                     <div className="flex items-center gap-4">
                       <img
                         src="/bloom-logo.png"
-                        alt="Dahlia"
+                        alt="Pansy"
                         className="w-12 h-12 rounded-full object-cover flex-shrink-0"
                       />
                       <div className="flex-1 min-w-0">
@@ -1741,7 +1741,7 @@ Follow this and you're automatically in the top 10% of traders. Most people skip
             <div className="flex items-start gap-4">
               <img
                 src="/bloom-logo.png"
-                alt="Dahlia"
+                alt="Pansy"
                 className="w-14 h-14 rounded-full object-cover"
               />
               <div className="flex-1">
@@ -1758,7 +1758,7 @@ Follow this and you're automatically in the top 10% of traders. Most people skip
                   You've got this! 💪
                 </p>
                 <p className="text-xs text-muted-foreground mt-3">
-                  — Dahlia 🌺
+                  — Pansy 🌺
                 </p>
               </div>
             </div>

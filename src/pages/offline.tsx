@@ -19,7 +19,7 @@ export default function Offline() {
             back to building wealth in no time 💛
           </p>
           <p className="text-sm text-muted-foreground">
-            — Dahlia 🌺
+            — Pansy 🌺
           </p>
         </Card>
       </div>

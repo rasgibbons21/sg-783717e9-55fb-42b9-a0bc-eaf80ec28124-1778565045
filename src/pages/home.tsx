@@ -19,7 +19,7 @@ interface StockPick {
   price: number;
   change: number;
   changePercent: number;
-  dahliaQuote: string;
+  pansyQuote: string;
 }
 
 // Default fallback data
@@ -37,7 +37,7 @@ const DEFAULT_STOCK_PICKS: StockPick[] = [
     price: 180.00,
     change: 0,
     changePercent: 0,
-    dahliaQuote: "AAPL - you already know this one. Everyone uses their products, the ecosystem locks people in, and they have $162B in cash. That's not going anywhere 💪",
+    pansyQuote: "AAPL - you already know this one. Everyone uses their products, the ecosystem locks people in, and they have $162B in cash. That's not going anywhere 💪",
   },
   {
     ticker: "NVDA",
@@ -45,7 +45,7 @@ const DEFAULT_STOCK_PICKS: StockPick[] = [
     price: 450.00,
     change: 0,
     changePercent: 0,
-    dahliaQuote: "NVDA is powering the AI revolution girl. Every tech company needs their chips. The demand is insane and they're the only ones who can make them this good 🚀",
+    pansyQuote: "NVDA is powering the AI revolution girl. Every tech company needs their chips. The demand is insane and they're the only ones who can make them this good 🚀",
   },
   {
     ticker: "VOO",
@@ -53,7 +53,7 @@ const DEFAULT_STOCK_PICKS: StockPick[] = [
     price: 420.00,
     change: 0,
     changePercent: 0,
-    dahliaQuote: "VOO tracks the 500 biggest US companies. Think of it like betting on America as a whole instead of picking winners. Been going up for decades sis 📈",
+    pansyQuote: "VOO tracks the 500 biggest US companies. Think of it like betting on America as a whole instead of picking winners. Been going up for decades sis 📈",
   },
   {
     ticker: "SCHD",
@@ -61,7 +61,7 @@ const DEFAULT_STOCK_PICKS: StockPick[] = [
     price: 75.00,
     change: 0,
     changePercent: 0,
-    dahliaQuote: "SCHD is literally paying you every quarter just to hold it. It's like getting a bonus at work but from your investment. Dividend yield is 3.8% right now which is solid 💅",
+    pansyQuote: "SCHD is literally paying you every quarter just to hold it. It's like getting a bonus at work but from your investment. Dividend yield is 3.8% right now which is solid 💅",
   },
   {
     ticker: "MSFT",
@@ -69,7 +69,7 @@ const DEFAULT_STOCK_PICKS: StockPick[] = [
     price: 410.00,
     change: 0,
     changePercent: 0,
-    dahliaQuote: "MSFT owns Windows, Office, Azure cloud, and now they're all-in on AI with OpenAI. They make money from everything businesses do online. Rock solid 💼",
+    pansyQuote: "MSFT owns Windows, Office, Azure cloud, and now they're all-in on AI with OpenAI. They make money from everything businesses do online. Rock solid 💼",
   },
 ];
 
@@ -82,7 +82,7 @@ export default function Home() {
   const [isLoadingNews, setIsLoadingNews] = useState(true);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [marketSummary, setMarketSummary] = useState<any>(null);
-  const [dahliasPicks, setDahliasPicks] = useState<any[]>([]);
+  const [pansysPicks, setPansysPicks] = useState<any[]>([]);
   const [marketMovers, setMarketMovers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [rulesOpen, setRulesOpen] = useState(false);
@@ -358,7 +358,7 @@ export default function Home() {
           </div>
         </Card>
 
-        {/* Dahlia's Picks Today */}
+        {/* Pansy's Picks Today */}
         <Card className="p-6 bg-card border-border rounded-2xl">
           <div className="flex items-center justify-between">
             <h2 className="font-serif text-2xl font-bold text-foreground">
@@ -404,7 +404,7 @@ export default function Home() {
 
                   <Card className="p-3 bg-accent/5 border-accent/20 rounded-lg">
                     <p className="text-sm italic text-foreground leading-relaxed">
-                      "{stock.dahliaQuote}"
+                      "{stock.pansyQuote}"
                     </p>
                   </Card>
 
@@ -412,7 +412,7 @@ export default function Home() {
                     variant="ghost"
                     className="w-full mt-2 text-accent hover:text-accent/80 group"
                   >
-                    Read Dahlia's take
+                    Read Pansy's take
                     <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </Card>
@@ -532,22 +532,22 @@ export default function Home() {
           </div>
         </Card>
 
-        {/* Dahlia's Tip */}
+        {/* Pansy's Tip */}
         <Card className="p-6 bg-accent/5 border-accent/20 rounded-2xl">
           <div className="flex items-start gap-4">
             <img
               src="/bloom-logo.png"
-              alt="Dahlia"
+              alt="Pansy"
               className="w-12 h-12 rounded-full object-cover flex-shrink-0"
             />
             <div className="flex-1">
               <p className="text-sm text-foreground leading-relaxed mb-2">
-                <span className="font-semibold">Dahlia's Daily Tip:</span> Don't
+                <span className="font-semibold">Pansy's Daily Tip:</span> Don't
                 panic when you see red days. The market goes up and down - that's
                 totally normal. What matters is your long-term strategy and
                 staying consistent 💛
               </p>
-              <p className="text-xs text-muted-foreground">— Dahlia 🌺</p>
+              <p className="text-xs text-muted-foreground">— Pansy 🌺</p>
             </div>
           </div>
         </Card>

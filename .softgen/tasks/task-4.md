@@ -14,7 +14,7 @@ Tabbed screen with Stocks, ETFs, Mutual Funds. Filterable lists with sparkline c
 
 ## Checklist
 - [x] Create Discover.tsx with 3 tabs: Stocks, ETFs, Mutual Funds
-- [x] Filter buttons: Top Performers, Most Watched, Dahlia's Picks
+- [x] Filter buttons: Top Performers, Most Watched, Pansy's Picks
 - [x] Asset list cards with ticker, name, price, change badge, sparkline placeholder
 - [x] Tapping asset opens Stock Analysis screen
 

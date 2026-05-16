@@ -73,7 +73,7 @@ export default function Contact() {
                 🌺
               </div>
               <h3 className="font-serif text-xl font-semibold text-primary">
-                Dahlia's Support Team
+                Pansy's Support Team
               </h3>
               <p className="text-foreground leading-relaxed">
                 Have questions about Bloom, your account, or need technical help? Our team is ready to assist you. 

@@ -35,7 +35,7 @@ export default function Privacy() {
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">How We Use Your Information</h2>
             <ul className="mb-6 space-y-2 text-foreground">
               <li>To provide and personalize the Bloom experience</li>
-              <li>To send account confirmation and security emails from dahlia@shebloomswealth.app</li>
+              <li>To send account confirmation and security emails from pansy@shebloomswealth.app</li>
               <li>To improve our AI analysis and recommendations</li>
               <li>To send educational content and market updates only if you opt in</li>
               <li>We never sell your personal data to third parties</li>

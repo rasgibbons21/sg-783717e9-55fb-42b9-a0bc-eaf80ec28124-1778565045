@@ -162,17 +162,20 @@ export function RiskRewardCalculator() {
         {commentary && (
           <Card
             className={`mt-4 ${
-              commentary.includes("🔥")
+              commentary.message.includes("🔥")
                 ? "border-accent bg-accent/5"
-                : commentary.includes("👍")
+                : commentary.message.includes("👍")
                 ? "border-primary bg-primary/5"
-                : commentary.includes("🤔")
+                : commentary.message.includes("🤔")
                 ? "border-muted bg-muted/5"
                 : "border-destructive bg-destructive/5"
             }`}
           >
             <CardContent className="p-4">
               <p className="font-semibold text-foreground">Pansy's Take</p>
+              <p className="text-sm leading-relaxed text-muted-foreground mt-2">
+                {commentary.message}
+              </p>
             </CardContent>
           </Card>
         )}

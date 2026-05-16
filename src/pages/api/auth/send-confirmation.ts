@@ -19,7 +19,7 @@ export default async function handler(
 
   try {
     const { data, error } = await resend.emails.send({
-      from: "Dahlia from Bloom <dahlia@shebloomswealth.app>",
+      from: "Pansy from Bloom <pansy@shebloomswealth.app>",
       to: email,
       subject: "Welcome to Bloom 🌸 Confirm your email",
       html: `
@@ -43,14 +43,14 @@ export default async function handler(
                       </td>
                     </tr>
                     
-                    <!-- Dahlia's Greeting -->
+                    <!-- Pansy's Greeting -->
                     <tr>
                       <td style="padding: 40px;">
                         <div style="display: flex; align-items: start; margin-bottom: 24px;">
                           <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #C9A84C 0%, #D4AF37 100%); display: flex; align-items: center; justify-content: center; font-size: 24px; margin-right: 16px;">🌺</div>
                           <div style="flex: 1;">
                             <p style="margin: 0 0 8px; color: #2D3E2E; font-size: 16px; line-height: 1.6;">
-                              Hey ${name || 'there'}! I'm Dahlia, your investing guide at Bloom 💛
+                              Hey ${name || 'there'}! I'm Pansy, your investing guide at Bloom 💛
                             </p>
                             <p style="margin: 0; color: #5A6B5A; font-size: 14px; line-height: 1.6;">
                               I'm so excited you're here! I know investing can feel overwhelming but I'm going to break everything down for you in a way that actually makes sense. No confusing jargon, no pressure — just real talk about your money.

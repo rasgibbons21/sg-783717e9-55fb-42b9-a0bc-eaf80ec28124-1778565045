@@ -230,7 +230,7 @@ export default function Goals() {
     return Math.min((current / target) * 100, 100);
   };
 
-  const getDahliaMessage = (progress: number) => {
+  const getPansyMessage = (progress: number) => {
     if (progress === 0) {
       return "Every journey starts with a single step girl! Let's get this money 💰";
     } else if (progress < 25) {
@@ -409,17 +409,17 @@ export default function Goals() {
           </Card>
         </div>
 
-        {/* Dahlia's Tip */}
+        {/* Pansy's Tip */}
         <Card className="p-4 bg-gradient-to-br from-accent/10 to-accent/5 border-accent/20 rounded-2xl">
           <div className="flex items-start gap-3">
             <img
               src="/bloom-logo.png"
-              alt="Dahlia"
+              alt="Pansy"
               className="w-10 h-10 rounded-full object-cover"
             />
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
-                <p className="font-semibold text-foreground">Dahlia</p>
+                <p className="font-semibold text-foreground">Pansy</p>
                 <Badge className="bg-primary text-primary-foreground text-xs">
                   Available 24/7
                 </Badge>
@@ -524,10 +524,10 @@ export default function Goals() {
                       </p>
                     </div>
 
-                    {/* Dahlia's Message */}
+                    {/* Pansy's Message */}
                     <Card className="p-3 bg-accent/5 border-accent/20 rounded-xl">
                       <p className="text-sm text-muted-foreground italic">
-                        {getDahliaMessage(progress)}
+                        {getPansyMessage(progress)}
                       </p>
                     </Card>
 

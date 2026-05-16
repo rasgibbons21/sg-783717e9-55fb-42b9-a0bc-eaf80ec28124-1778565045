@@ -36,14 +36,14 @@ interface ETFSectorData {
   weight: number;
 }
 
-export interface DahliaAnalysis {
+export interface PansyAnalysis {
   content: string;
   sentiment: "Optimistic" | "Cautious" | "Neutral" | "Watchful";
   timestamp?: string;
   analysis?: string; // For backward compatibility
 }
 
-export const dahliaAnalysisService = {
+export const pansyAnalysisService = {
   // Get real-time price data from Polygon.io
   async getPriceData(ticker: string): Promise<PriceData | null> {
     try {
@@ -225,7 +225,7 @@ export const dahliaAnalysisService = {
     ticker: string,
     quoteData: any,
     marketAnalysis: any
-  ): Promise<DahliaAnalysis> {
+  ): Promise<PansyAnalysis> {
     try {
       const trendText = marketAnalysis.trend === "up" ? "climbing" : marketAnalysis.trend === "down" ? "dropping" : "trading sideways";
       const volumeText = marketAnalysis.volumeRatio > 1.5 ? `${marketAnalysis.volumeRatio.toFixed(1)}x the average` : "about average";
@@ -237,7 +237,7 @@ export const dahliaAnalysisService = {
       else if (nearLow) priceContext = "It's near its 30 day low, which could be a discount opportunity if you believe in the company.";
       else priceContext = "It's trading right in the middle of its recent range.";
 
-      const prompt = `You are Dahlia, Bloom's investing expert. Write a 3 paragraph analysis in your warm girlfriend tone about ${ticker}.
+      const prompt = `You are Pansy, Bloom's investing expert. Write a 3 paragraph analysis in your warm girlfriend tone about ${ticker}.
 
 Use this REAL market data in your analysis. You MUST reference these numbers naturally like a friend talking:
 - The stock has been ${trendText} over the last 30 days.
@@ -247,7 +247,7 @@ Use this REAL market data in your analysis. You MUST reference these numbers nat
 Make it sound exactly like this example: "${ticker} has been climbing for 3 weeks straight and today's volume is 2x the average — something is definitely happening here 👀 The price is near its 30 day high so watch for a pullback before jumping in"
 
 Do not use any financial jargon. Never say buy/sell/hold.
-End with: "This is just educational info — not financial advice. Always invest what feels right for you 💛 — Dahlia"`;
+End with: "This is just educational info — not financial advice. Always invest what feels right for you 💛 — Pansy"`;
 
       const response = await fetch("/api/analyze", {
         method: "POST",
@@ -291,14 +291,14 @@ End with: "This is just educational info — not financial advice. Always invest
     }
   },
 
-  // Generate Dahlia's analysis using our Next.js API route
+  // Generate Pansy's analysis using our Next.js API route
   async generateAnalysis(
     ticker: string, 
     isETF: boolean = false, 
     quoteData?: any, 
     profileData?: any, 
     newsData?: any[]
-  ): Promise<DahliaAnalysis> {
+  ): Promise<PansyAnalysis> {
     try {
       let priceAction = "Price data unavailable.";
       let newsContext = "No recent news available.";
@@ -346,7 +346,7 @@ End with: "This is just educational info — not financial advice. Always invest
         }
       }
 
-      const prompt = `You are Dahlia, Bloom's investing expert. You have just reviewed the following data for ${ticker}:
+      const prompt = `You are Pansy, Bloom's investing expert. You have just reviewed the following data for ${ticker}:
 
 PRICE ACTION: ${priceAction}
 RECENT NEWS: ${newsContext}
@@ -358,7 +358,7 @@ Write a 3 paragraph analysis in your warm girlfriend tone.
 Paragraph 1 — what is happening with this stock right now in plain language.
 Paragraph 2 — what the data and news are suggesting without using any financial jargon.
 Paragraph 3 — what makes sense here based on everything you are seeing (never say buy/sell/hold).
-End with: "This is just educational info — not financial advice. Always invest what feels right for you 💛 — Dahlia"`;
+End with: "This is just educational info — not financial advice. Always invest what feels right for you 💛 — Pansy"`;
 
       const response = await fetch("/api/analyze", {
         method: "POST",
@@ -379,7 +379,7 @@ End with: "This is just educational info — not financial advice. Always invest
 
       return this.getStaticFallbackAnalysis(ticker);
     } catch (error) {
-      console.error("Error generating Dahlia analysis:", error);
+      console.error("Error generating Pansy analysis:", error);
       return this.getStaticFallbackAnalysis(ticker);
     }
   },
@@ -390,7 +390,7 @@ End with: "This is just educational info — not financial advice. Always invest
     etfTicker: string
   ): Promise<string> => {
     try {
-      const prompt = `You are Dahlia, Bloom's investing expert with a warm girlfriend tone. A news headline just came out related to the ${sector} sector, which is one of the main sectors in the ${etfTicker} ETF.
+      const prompt = `You are Pansy, Bloom's investing expert with a warm girlfriend tone. A news headline just came out related to the ${sector} sector, which is one of the main sectors in the ${etfTicker} ETF.
 Headline: "${headline}"
 Write ONE casual sentence (15-25 words max) explaining how this news might affect the ${sector} companies inside this ETF. Keep it conversational, honest, and use light emojis naturally. Never use jargon. Just one sentence.`;
 
@@ -415,8 +415,8 @@ Write ONE casual sentence (15-25 words max) explaining how this news might affec
   },
 
   // Fallback for when the API route is unavailable or fails
-  getStaticFallbackAnalysis: (ticker: string): DahliaAnalysis => {
-    const fallbackText = `Hey! I'm having a bit of trouble pulling all the data for ${ticker} right now, but here's what I can tell you based on what I'm seeing.\n\nThe market is always moving, and this stock is no exception. Sometimes the data takes a minute to catch up, but that's okay — we're here to learn together.\n\nFor now, I'd say take your time with this one. Do a little more research on your own, check out what the company actually does, and see if it aligns with your goals. No rush!\n\nThis is just educational info — not financial advice. Always invest what feels right for you 💛 — Dahlia`;
+  getStaticFallbackAnalysis: (ticker: string): PansyAnalysis => {
+    const fallbackText = `Hey! I'm having a bit of trouble pulling all the data for ${ticker} right now, but here's what I can tell you based on what I'm seeing.\n\nThe market is always moving, and this stock is no exception. Sometimes the data takes a minute to catch up, but that's okay — we're here to learn together.\n\nFor now, I'd say take your time with this one. Do a little more research on your own, check out what the company actually does, and see if it aligns with your goals. No rush!\n\nThis is just educational info — not financial advice. Always invest what feels right for you 💛 — Pansy`;
     
     return {
       content: fallbackText,

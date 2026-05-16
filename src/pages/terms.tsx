@@ -25,12 +25,12 @@ export default function Terms() {
 
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">The Service</h2>
             <p className="mb-6 text-foreground">
-              Bloom is an educational investing platform operated by Cinder Vault Enterprises LLC. Bloom provides educational content about stocks, ETFs, mutual funds, and investing through Dahlia, our AI guide. Bloom is NOT a registered investment advisor, broker-dealer, or financial institution.
+              Bloom is an educational investing platform operated by Cinder Vault Enterprises LLC. Bloom provides educational content about stocks, ETFs, mutual funds, and investing through Pansy, our AI guide. Bloom is NOT a registered investment advisor, broker-dealer, or financial institution.
             </p>
 
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Educational Purpose Only</h2>
             <p className="mb-2 text-foreground">
-              All content on Bloom, including Dahlia's analysis, market commentary, ETF suggestions, and stock information, is for EDUCATIONAL PURPOSES ONLY.
+              All content on Bloom, including Pansy's analysis, market commentary, ETF suggestions, and stock information, is for EDUCATIONAL PURPOSES ONLY.
             </p>
             <p className="mb-2 text-foreground">Nothing on Bloom constitutes:</p>
             <ul className="mb-6 space-y-2 text-foreground">
@@ -55,12 +55,12 @@ export default function Terms() {
 
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Affiliate Disclosure</h2>
             <p className="mb-6 text-foreground">
-              Bloom participates in broker affiliate programs. We may earn a commission when you sign up with a recommended broker through our platform. This never affects the independence of our educational content or Dahlia's analysis.
+              Bloom participates in broker affiliate programs. We may earn a commission when you sign up with a recommended broker through our platform. This never affects the independence of our educational content or Pansy's analysis.
             </p>
 
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Intellectual Property</h2>
             <p className="mb-6 text-foreground">
-              All Bloom content, including Dahlia's character, the Bloom logo, and all app content, is owned by Cinder Vault Enterprises LLC. You may not copy, reproduce, or distribute our content without written permission.
+              All Bloom content, including Pansy's character, the Bloom logo, and all app content, is owned by Cinder Vault Enterprises LLC. You may not copy, reproduce, or distribute our content without written permission.
             </p>
 
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Limitation of Liability</h2>

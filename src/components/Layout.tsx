@@ -2,8 +2,8 @@ import { ReactNode, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { Home, Search, Target, Briefcase, Building2, User, GraduationCap } from "lucide-react";
-import { PansyPopup } from "./DahliaPopup";
-import { PansyPsychologyToast } from "./DahliaPsychologyToast";
+import { PansyPopup } from "./PansyPopup";
+import { PansyPsychologyToast } from "./PansyPsychologyToast";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 

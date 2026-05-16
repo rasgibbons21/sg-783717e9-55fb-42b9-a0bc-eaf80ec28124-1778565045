@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { marketService, type MarketAnalysis } from "@/services/marketService";
-import { dahliaAnalysisService } from "@/services/dahliaAnalysisService";
+import { pansyAnalysisService } from "@/services/pansyAnalysisService";
 import { ChevronDown, ChevronUp, Loader2, TrendingUp, TrendingDown } from "lucide-react";
 import { createChart, ColorType, CandlestickSeries, HistogramSeries } from "lightweight-charts";
 
@@ -24,7 +24,7 @@ export default function StockAnalysis() {
   const [quote, setQuote] = useState<any>(null);
   const [ohlcData, setOhlcData] = useState<any[]>([]);
   const [marketAnalysis, setMarketAnalysis] = useState<MarketAnalysis | null>(null);
-  const [dahliaAnalysis, setDahliaAnalysis] = useState<any>(null);
+  const [pansyAnalysis, setPansyAnalysis] = useState<any>(null);
   const [news, setNews] = useState<any[]>([]);
   const [isLoadingQuote, setIsLoadingQuote] = useState(true);
   const [isLoadingChart, setIsLoadingChart] = useState(true);
@@ -163,10 +163,10 @@ export default function StockAnalysis() {
     const analysis = await marketService.getMarketAnalysis(symbol);
     setMarketAnalysis(analysis);
 
-    // Generate Dahlia's analysis with candlestick pattern recognition
+    // Generate Pansy's analysis with candlestick pattern recognition
     if (quoteData && analysis) {
-      const dahliaResponse = await generateCandlestickAnalysis(symbol, quoteData, analysis);
-      setDahliaAnalysis(dahliaResponse);
+      const pansyResponse = await generateCandlestickAnalysis(symbol, quoteData, analysis);
+      setPansyAnalysis(pansyResponse);
     }
     setIsLoadingAnalysis(false);
 
@@ -242,7 +242,7 @@ export default function StockAnalysis() {
       const trendText = marketAnalysis.trend === "up" ? "climbing" : marketAnalysis.trend === "down" ? "dropping" : "trading sideways";
       const volumeText = marketAnalysis.volumeRatio > 1.5 ? `${marketAnalysis.volumeRatio.toFixed(1)}x the average` : "about average";
       
-      const prompt = `You are Dahlia, Bloom's investing expert. Write a 3 paragraph analysis in your warm girlfriend tone about ${symbol}.
+      const prompt = `You are Pansy, Bloom's investing expert. Write a 3 paragraph analysis in your warm girlfriend tone about ${symbol}.
 
 Use this REAL candlestick chart data in your analysis:
 - ${patternText}
@@ -253,7 +253,7 @@ Use this REAL candlestick chart data in your analysis:
 Reference the candlestick pattern naturally like: "The last 3 candles are all green with increasing volume — that's momentum girl, buyers are stepping in 📈"
 
 Make it conversational. No financial jargon. Never say buy/sell/hold.
-End with: "This is just educational info — not financial advice. Always invest what feels right for you 💛 — Dahlia"`;
+End with: "This is just educational info — not financial advice. Always invest what feels right for you 💛 — Pansy"`;
 
       const response = await fetch("/api/analyze", {
         method: "POST",
@@ -270,10 +270,10 @@ End with: "This is just educational info — not financial advice. Always invest
           timestamp: new Date().toISOString(),
         };
       }
-      return dahliaAnalysisService.getStaticFallbackAnalysis(symbol);
+      return pansyAnalysisService.getStaticFallbackAnalysis(symbol);
     } catch (error) {
       console.error("Error generating candlestick analysis:", error);
-      return dahliaAnalysisService.getStaticFallbackAnalysis(symbol);
+      return pansyAnalysisService.getStaticFallbackAnalysis(symbol);
     }
   };
 
@@ -308,7 +308,7 @@ End with: "This is just educational info — not financial advice. Always invest
     <Layout>
       <SEO
         title={`${ticker.toUpperCase()} Stock Analysis - Bloom`}
-        description={`Dahlia's investment analysis for ${ticker.toUpperCase()}`}
+        description={`Pansy's investment analysis for ${ticker.toUpperCase()}`}
       />
       <div className="container-full py-6 space-y-6">
         {/* Price Header */}
@@ -380,7 +380,7 @@ End with: "This is just educational info — not financial advice. Always invest
           )}
         </Card>
 
-        {/* Dahlia's Analysis */}
+        {/* Pansy's Analysis */}
         {isLoadingAnalysis ? (
           <Card className="p-6 bg-card border-accent/20 rounded-2xl space-y-4">
             <div className="flex items-start gap-4">
@@ -392,33 +392,33 @@ End with: "This is just educational info — not financial advice. Always invest
             </div>
             <Skeleton className="h-20 w-full" />
           </Card>
-        ) : dahliaAnalysis ? (
+        ) : pansyAnalysis ? (
           <Card className="p-6 bg-card border-accent/20 rounded-2xl space-y-4">
             <div className="flex items-start gap-4">
               <img
                 src="/bloom-logo.png"
-                alt="Dahlia"
+                alt="Pansy"
                 className="w-16 h-16 rounded-full object-cover"
               />
               <div className="space-y-1 flex-1">
                 <div className="flex items-center gap-2">
-                  <h3 className="font-semibold text-foreground text-lg">Dahlia</h3>
+                  <h3 className="font-semibold text-foreground text-lg">Pansy</h3>
                   <Badge
                     variant="outline"
                     className={`text-xs ${
-                      dahliaAnalysis.sentiment === "Positive"
+                      pansyAnalysis.sentiment === "Positive"
                         ? "bg-primary/10 text-primary border-primary"
-                        : dahliaAnalysis.sentiment === "Negative"
+                        : pansyAnalysis.sentiment === "Negative"
                         ? "bg-destructive/10 text-destructive border-destructive"
                         : "bg-muted text-muted-foreground"
                     }`}
                   >
-                    {dahliaAnalysis.sentiment === "Positive" ? (
+                    {pansyAnalysis.sentiment === "Positive" ? (
                       <TrendingUp className="w-3 h-3 mr-1" />
-                    ) : dahliaAnalysis.sentiment === "Negative" ? (
+                    ) : pansyAnalysis.sentiment === "Negative" ? (
                       <TrendingDown className="w-3 h-3 mr-1" />
                     ) : null}
-                    {dahliaAnalysis.sentiment}
+                    {pansyAnalysis.sentiment}
                   </Badge>
                 </div>
                 <p className="text-sm text-muted-foreground">
@@ -429,16 +429,16 @@ End with: "This is just educational info — not financial advice. Always invest
 
             <div className="prose prose-sm max-w-none">
               <p className="text-foreground leading-relaxed whitespace-pre-line">
-                {dahliaAnalysis.content}
+                {pansyAnalysis.content}
               </p>
             </div>
 
-            <p className="text-sm font-medium text-accent">— Dahlia 🌺</p>
+            <p className="text-sm font-medium text-accent">— Pansy 🌺</p>
 
             <Card className="p-3 bg-muted/50 border-muted-foreground/20 rounded-xl">
               <p className="text-xs text-muted-foreground leading-relaxed">
                 This is just educational info — not financial advice. Always invest
-                what feels right for you 💛 — Dahlia
+                what feels right for you 💛 — Pansy
               </p>
             </Card>
           </Card>
