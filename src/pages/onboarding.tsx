@@ -32,16 +32,7 @@ export default function Onboarding() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [resetEmailSent, setResetEmailSent] = useState(false);
-  const [answers, setAnswers] = useState<OnboardingAnswers>({
-    name: "",
-    email: "",
-    password: "",
-    experience: "",
-    goals: [],
-    riskTolerance: "",
-  });
   const [termsAccepted, setTermsAccepted] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   const handleAuth = async () => {
     setError("");

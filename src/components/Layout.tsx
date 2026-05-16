@@ -100,20 +100,15 @@ export function Layout({ children }: LayoutProps) {
             </div>
             <div>
               <h4 className="mb-4 text-sm font-semibold text-foreground">Contact</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
+              <ul className="space-y-2 text-sm">
                 <li>
-                  <a href="mailto:info@vanguardapexholdings.com" className="hover:text-primary">
-                    info@vanguardapexholdings.com
-                  </a>
+                  <Link href="/contact" className="text-muted-foreground hover:text-primary">
+                    Contact Us
+                  </Link>
                 </li>
                 <li>
-                  <a href="mailto:admin@vanguardapexholdings.com" className="hover:text-primary">
-                    Support
-                  </a>
-                </li>
-                <li>
-                  <a href="https://shebloomswealth.app" className="hover:text-primary">
-                    shebloomswealth.app
+                  <a href="mailto:admin@vanguardapexholdings.com" className="text-muted-foreground hover:text-primary">
+                    support@vanguardapexholdings.com
                   </a>
                 </li>
               </ul>
