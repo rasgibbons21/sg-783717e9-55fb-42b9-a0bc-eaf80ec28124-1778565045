@@ -52,12 +52,15 @@ export const authService = {
   },
 
   // Sign up with email and password
-  async signUp(email: string, password: string): Promise<{ user: AuthUser | null; error: AuthError | null }> {
+  async signUp(email: string, password: string, fullName: string): Promise<{ user: AuthUser | null; error: AuthError | null }> {
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
+          data: {
+            full_name: fullName,
+          },
           emailRedirectTo: `${getURL()}auth/confirm-email`
         }
       });
@@ -72,6 +75,28 @@ export const authService = {
         user_metadata: data.user.user_metadata,
         created_at: data.user.created_at
       } : null;
+
+      // Send custom Resend confirmation email
+      if (data.user && !data.user.confirmed_at) {
+        try {
+          // Get the confirmation URL from Supabase
+          const { data: { session } } = await supabase.auth.getSession();
+          const confirmationUrl = `${getURL()}/auth/confirm?token=${data.user.email_confirmed_at}`;
+          
+          await fetch('/api/auth/send-confirmation', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: data.user.email,
+              confirmationUrl: confirmationUrl,
+              name: fullName,
+            }),
+          });
+        } catch (emailError) {
+          console.error('Error sending confirmation email:', emailError);
+          // Don't block signup if email fails
+        }
+      }
 
       return { user: authUser, error: null };
     } catch (error) {
@@ -130,12 +155,31 @@ export const authService = {
   // Reset password
   async resetPassword(email: string): Promise<{ error: AuthError | null }> {
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${getURL()}auth/reset-password`,
       });
 
       if (error) {
         return { error: { message: error.message } };
+      }
+
+      // Send custom Resend password reset email
+      try {
+        // Note: Supabase will handle sending the actual reset link
+        // This is just for tracking/custom branding if needed
+        const user = await authService.getUserByEmail(email);
+        await fetch('/api/auth/send-password-reset', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: email,
+            resetUrl: `${getURL()}/auth/reset-password`,
+            name: user?.full_name || '',
+          }),
+        });
+      } catch (emailError) {
+        console.error('Error sending password reset email:', emailError);
+        // Don't block reset if email fails
       }
 
       return { error: null };
@@ -177,5 +221,20 @@ export const authService = {
   // Listen to auth state changes
   onAuthStateChange(callback: (event: string, session: Session | null) => void) {
     return supabase.auth.onAuthStateChange(callback);
+  }
+
+  static async getUserByEmail(email: string) {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('email', email)
+        .single();
+      
+      if (error) return null;
+      return data;
+    } catch {
+      return null;
+    }
   }
 };
