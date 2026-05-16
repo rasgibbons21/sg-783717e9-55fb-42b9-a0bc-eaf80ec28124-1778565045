@@ -700,6 +700,167 @@ Set your rules before you invest. Write them down. Follow them no matter how you
         }
       ]
     },
+    {
+      id: "what-is-fomo",
+      title: "What is FOMO",
+      category: "Trading Psychology",
+      readTime: 4,
+      difficulty: "Beginner",
+      summary: "Fear of missing out destroys portfolios",
+      content: `FOMO (Fear Of Missing Out) is literally the #1 way people lose money in the stock market girl. Let me paint you a picture 🎨
+
+You're scrolling Twitter or watching YouTube and everyone's talking about this stock that's up 40% in a week. Green candles everywhere. People posting screenshots of their gains. Your timeline is full of "I told you so" posts.
+
+Now you're thinking: "Everyone's making money except me. I need to get in NOW before I miss it!"
+
+So you buy at $150. It feels good for 30 minutes. Then the stock drops to $105. You're down 30% in 2 days. What happened? You bought at the top after the move already happened. Classic FOMO trap.
+
+**Here's the truth:**
+
+The market will ALWAYS be there sis. There will always be another opportunity. Another stock. Another rally. Another chance. You're not missing out on your last opportunity ever — you're just missing THIS particular move that already happened.
+
+**The FOMO Rule:**
+
+If you didn't plan the trade before market open, do NOT take it that day. Walk away. Come back tomorrow with a clear head and a plan.
+
+Why? Because when you have FOMO you're trading from emotion not logic. You're chasing instead of planning. You're reacting instead of thinking. That's when bad decisions happen.
+
+The stocks that everyone's talking about? You're late. The gains already happened. You're buying someone else's exit. They're selling to you at the top while posting celebration tweets.
+
+**What to do instead:**
+
+- Make a watchlist the night before
+- Set price alerts for entry points
+- Wait for pullbacks
+- Plan your entries when emotions are low
+- If you missed the move accept it and move on
+
+Missing a move feels bad but losing money feels worse. Protect your capital sis. The market will give you another chance 🌸`,
+      keyTakeaway: "FOMO makes you buy at tops after moves already happened. If you didn't plan it before market open, don't take it that day. Market will always be there.",
+      relatedTopics: ["investment-rules", "revenge-trading", "risk-reward-rule"],
+      quiz: [
+        {
+          question: "When does FOMO typically make you buy a stock?",
+          options: [
+            "After careful planning and research",
+            "After it already ran 40% and everyone's talking about it",
+            "When prices are at yearly lows",
+            "Based on fundamental analysis"
+          ],
+          correctAnswer: 1,
+          explanation: "Exactly! FOMO hits when everyone's posting gains and you feel left out. That's when you buy at the top girl 📈"
+        },
+        {
+          question: "What's Dahlia's FOMO rule?",
+          options: [
+            "Buy immediately when you see gains",
+            "If you didn't plan it before market open, don't take it that day",
+            "Always follow what Twitter says",
+            "Buy every stock that's up 40%"
+          ],
+          correctAnswer: 1,
+          explanation: "Yes! If it wasn't on your plan before markets opened, walk away. Come back tomorrow with a clear head 🌸"
+        },
+        {
+          question: "Why is missing a move better than chasing it?",
+          options: [
+            "Missing moves guarantees future profits",
+            "The market only has one opportunity ever",
+            "Protecting capital is more important - there's always another opportunity",
+            "Chasing moves always works out"
+          ],
+          correctAnswer: 2,
+          explanation: "That's right! Missing a move feels bad but losing money feels worse. The market will give you another chance sis 💪"
+        }
+      ]
+    },
+    {
+      id: "revenge-trading",
+      title: "Revenge Trading Warning",
+      category: "Trading Psychology",
+      readTime: 4,
+      difficulty: "Intermediate",
+      summary: "The fastest way to blow up your account",
+      content: `Girl this is the emotional trap that destroys accounts. Let me show you how it happens step by step 💥
+
+**The Revenge Trading Spiral:**
+
+1. You lose $200 on a trade. It stings. You're frustrated.
+
+2. Emotion says: "I need to recover that loss NOW. I can't end the day down."
+
+3. You risk $400 on the next trade trying to make it all back at once.
+
+4. You lose again. Now you're down $600 total.
+
+5. Panic sets in. "I NEED to win this back!" You risk $800.
+
+6. Three losing trades later you're down $2,000. Your account is bleeding.
+
+What started as a $200 loss turned into a $2,000 disaster because you couldn't walk away. This is revenge trading and it's one of the fastest ways to blow up an account.
+
+**Here's what you need to understand:**
+
+The market doesn't owe you anything. It doesn't care that you lost $200. It doesn't know you exist. There's no cosmic balance that says you "deserve" to win it back. The next trade is completely independent of the last one.
+
+**When you feel revenge trading coming — and you WILL feel it — do this:**
+
+1. Stop trading immediately
+2. Close your charts and apps
+3. Go for a walk
+4. Come back tomorrow
+
+Not in 10 minutes. Not after lunch. TOMORROW. Give your emotions time to reset.
+
+**Why this is so hard:**
+
+Your ego gets involved. Losing money makes you feel stupid. You want to prove you're not stupid by winning it back. But that's ego talking not logic. Capital preservation is more important than ego sis 💅
+
+**The Pro Move:**
+
+Accept the loss. Take it on the chin. Journal about what went wrong. Learn from it. Come back tomorrow with a clear head and your original system.
+
+One $200 loss won't ruin you. Revenge trading that turns $200 into $2,000 WILL ruin you.
+
+Protect your capital. Your ego can recover but your account might not 🛡️`,
+      keyTakeaway: "Losing $200 then risking $400 to 'win it back' spirals into disaster. Walk away. Capital is more important than ego.",
+      relatedTopics: ["what-is-fomo", "investment-rules", "risk-reward-rule"],
+      quiz: [
+        {
+          question: "What typically triggers revenge trading?",
+          options: [
+            "A well-planned winning trade",
+            "Losing money and wanting to recover it immediately",
+            "Following your trading plan",
+            "Taking a break from trading"
+          ],
+          correctAnswer: 1,
+          explanation: "Yes! You lose money, emotion kicks in, and you think 'I need to win it back NOW.' That's when revenge trading starts 💥"
+        },
+        {
+          question: "What should you do when you feel revenge trading coming?",
+          options: [
+            "Risk more money to win it back faster",
+            "Check the charts constantly",
+            "Stop trading, close charts, go for a walk",
+            "Keep trading but with smaller sizes"
+          ],
+          correctAnswer: 2,
+          explanation: "Exactly! Stop. Close everything. Walk away. Come back TOMORROW not in 10 minutes. Let emotions reset sis 🌸"
+        },
+        {
+          question: "Why is revenge trading so dangerous according to Dahlia?",
+          options: [
+            "It violates market regulations",
+            "Your ego gets involved and turns small losses into huge disasters",
+            "It's too time consuming",
+            "It requires complex math"
+          ],
+          correctAnswer: 1,
+          explanation: "That's right! Ego makes you risk bigger to 'prove' you're not stupid. One $200 loss becomes $2,000. Capital > ego girl 💅"
+        }
+      ]
+    },
   ];
 
   useEffect(() => {
