@@ -1,16 +1,19 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import Link from "next/link";
 import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { authService } from "@/services/authService";
 import { notificationService } from "@/services/notificationService";
-import { User, CreditCard, Bell, Shield, LogOut, CheckCircle2, BellRing, BellOff } from "lucide-react";
+import { User, Mail, Calendar, Crown, Settings, LogOut, Camera, Share, CreditCard, Bell, Shield, CheckCircle2, BellRing, BellOff } from "lucide-react";
 
 export default function Profile() {
   const router = useRouter();
@@ -169,6 +172,28 @@ export default function Profile() {
             </div>
           </div>
         </Card>
+
+          {/* Share Bloom */}
+          <Card className="border-accent bg-gradient-to-br from-accent/10 to-primary/10">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Share className="h-5 w-5" />
+                Share Bloom
+              </CardTitle>
+              <CardDescription>
+                Know someone who'd love Bloom? Share it with them!
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Link href="/share">
+                <Button
+                  className="w-full bg-gradient-to-r from-accent to-primary hover:from-accent/90 hover:to-primary/90"
+                >
+                  View Share Page
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
 
         {/* Notification Settings */}
         <Card className="p-6 bg-card border-border rounded-2xl">

@@ -9,7 +9,7 @@ export interface SEOProps {
 
 const defaultSEO = {
   title: "Bloom — Investment Analysis for Women",
-  description: "Mobile-first investment app designed for women investors. Get warm, approachable analysis from Dahlia, your expert guide who explains everything in plain language.",
+  description: "Mobile-first investment app designed for women investors. Get warm, approachable analysis from Pansy, your expert guide who explains everything in plain language.",
   image: "/og-image.png",
   url: "https://bloom.app",
 };

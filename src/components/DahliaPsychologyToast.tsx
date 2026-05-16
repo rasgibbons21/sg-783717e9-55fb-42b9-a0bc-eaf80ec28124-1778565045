@@ -1,71 +1,65 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { useToast } from "@/hooks/use-toast";
 
-const psychologyMessages = [
-  "The market will always be there sis.\nNo rush. No FOMO 🌸 — Dahlia",
-  "Missing a trade is okay.\nChasing one from emotion is not 💅 — Dahlia",
-  "Discipline over intelligence.\nEvery single time 🏆 — Dahlia",
-  "No revenge trades.\nThe market owes you nothing ⚠️ — Dahlia",
-  "Your best trade today might be\nthe one you did not take 🌸 — Dahlia",
-  "5 wins 5 losses can still mean profit\nwith the right risk to reward ratio 📊 — Dahlia",
+const PSYCHOLOGY_MESSAGES = [
+  "The market will always be there sis.\nNo rush. No FOMO 🌸 — Pansy",
+  "Missing a trade is okay.\nChasing one from emotion is not 💅 — Pansy",
+  "Discipline over intelligence.\nEvery single time 🏆 — Pansy",
+  "No revenge trades.\nThe market owes you nothing ⚠️ — Pansy",
+  "Your best trade today might be\nthe one you did not take 🌸 — Pansy",
+  "5 wins 5 losses can still mean profit\nwith the right risk to reward ratio 📊 — Pansy",
 ];
 
-export function DahliaPsychologyToast() {
-  const { toast } = useToast();
+export function PansyPsychologyToast() {
   const router = useRouter();
-  const [hasShownToast, setHasShownToast] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
-    // Check if toast has already been shown this session
-    const toastShown = sessionStorage.getItem("dahlia_psychology_toast_shown");
-    if (toastShown) {
-      setHasShownToast(true);
-      return;
-    }
-
-    // Don't show on onboarding or landing page
+    // Don't show on landing or onboarding pages
     if (router.pathname === "/" || router.pathname === "/onboarding") {
       return;
     }
 
-    // Random delay between 10-30 seconds after page load
-    const randomDelay = Math.floor(Math.random() * 20000) + 10000;
+    const toastShown = sessionStorage.getItem("pansy_psychology_toast_shown");
+    
+    if (toastShown === "true") {
+      return;
+    }
 
+    // Random delay between 10-30 seconds
+    const delay = Math.floor(Math.random() * 20000) + 10000;
+    
     const timeoutId = setTimeout(() => {
-      if (!hasShownToast) {
-        // Pick a random message
-        const randomMessage =
-          psychologyMessages[
-            Math.floor(Math.random() * psychologyMessages.length)
-          ];
+      // Pick a random message
+      const randomMessage = PSYCHOLOGY_MESSAGES[
+        Math.floor(Math.random() * PSYCHOLOGY_MESSAGES.length)
+      ];
 
-        // Show the toast
-        toast({
-          description: (
-            <div className="flex items-start gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-accent to-primary text-xl shadow-md">
-                🌺
-              </div>
-              <div className="flex-1">
-                <p className="whitespace-pre-line text-sm leading-relaxed text-white">
-                  {randomMessage}
-                </p>
-              </div>
+      // Show the toast
+      toast({
+        description: (
+          <div className="flex items-start gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-accent to-primary text-xl shadow-md">
+              🌺
             </div>
-          ),
-          duration: 6000,
-          className: "border-primary bg-zinc-900 text-white shadow-lg",
-        });
+            <div className="flex-1">
+              <p className="whitespace-pre-line text-sm leading-relaxed text-white">
+                {randomMessage}
+              </p>
+            </div>
+          </div>
+        ),
+        duration: 6000,
+        className: "border-primary bg-zinc-900 text-white shadow-lg",
+      });
 
-        // Mark as shown for this session
-        sessionStorage.setItem("dahlia_psychology_toast_shown", "true");
-        setHasShownToast(true);
-      }
-    }, randomDelay);
+      // Mark as shown for this session
+      sessionStorage.setItem("pansy_psychology_toast_shown", "true");
+    }, delay);
 
     return () => clearTimeout(timeoutId);
-  }, [router.pathname, toast, hasShownToast]);
+  }, [router.pathname, toast]);
 
   return null;
 }

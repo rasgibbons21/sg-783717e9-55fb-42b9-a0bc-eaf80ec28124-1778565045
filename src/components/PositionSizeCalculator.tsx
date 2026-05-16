@@ -41,7 +41,7 @@ export function PositionSizeCalculator() {
 
   const result = calculatePosition();
 
-  const getDahliaCommentary = () => {
+  const getPansyCommentary = () => {
     if (!result || result.error) return null;
 
     const { riskPercent } = result;
@@ -74,7 +74,7 @@ export function PositionSizeCalculator() {
     }
   };
 
-  const commentary = getDahliaCommentary();
+  const commentary = getPansyCommentary();
 
   return (
     <Card className="border-accent bg-gradient-to-br from-accent/10 to-primary/10">
@@ -199,24 +199,17 @@ export function PositionSizeCalculator() {
               </Card>
             </div>
 
-            {/* Dahlia's Commentary */}
-            {commentary && (
-              <Card className="p-4 bg-accent/5 border-accent/30">
-                <div className="flex items-start gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-accent to-primary text-xl shadow-md">
-                    🌺
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-xs text-muted-foreground mb-1 font-semibold">
-                      Dahlia's Take:
-                    </p>
-                    <p className={`text-sm leading-relaxed font-medium ${commentary.color}`}>
-                      {commentary.text}
-                    </p>
-                  </div>
-                </div>
-              </Card>
-            )}
+            {/* Pansy's Commentary */}
+            <Card className="border-accent bg-accent/5">
+              <CardContent className="p-4">
+                <p className="mb-2 text-sm font-semibold text-foreground">
+                  Pansy's Take:
+                </p>
+                <p className={`text-sm leading-relaxed font-medium ${commentary.color}`}>
+                  {commentary.text}
+                </p>
+              </CardContent>
+            </Card>
 
             {/* Explanation */}
             <div className="pt-2 space-y-2">
@@ -242,16 +235,13 @@ export function PositionSizeCalculator() {
           </Card>
         )}
 
-        {/* Dahlia's Note */}
-        <Card className="p-4 bg-accent/5 border-accent/20">
-          <div className="flex items-start gap-3">
-            <span className="text-xl">🌺</span>
-            <p className="text-xs text-foreground leading-relaxed">
-              <span className="font-semibold">Dahlia's Rule:</span> Never risk more than 3% per trade. 
-              Most pros risk 1-2% maximum. Position sizing keeps you alive through losing streaks. 
-              Protect your capital first sis — profits come after 💛
+        {/* Pansy's Note */}
+        <Card className="mt-6 border-accent/20 bg-gradient-to-br from-accent/5 to-primary/5">
+          <CardContent className="p-4">
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              <span className="font-semibold">Pansy's Rule:</span> Never risk more than 3% per trade.
             </p>
-          </div>
+          </CardContent>
         </Card>
       </CardContent>
     </Card>

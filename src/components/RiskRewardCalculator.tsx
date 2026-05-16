@@ -24,8 +24,8 @@ export function RiskRewardCalculator() {
   const positionSize = riskPerShare > 0 ? Math.floor(riskAmount / riskPerShare) : 0;
   const rewardAmount = positionSize * rewardPerShare;
 
-  // Get Dahlia's commentary based on ratio
-  const getDahliaCommentary = (ratio: string) => {
+  // Get Pansy's commentary based on ratio
+  const getPansyCommentary = (ratio: string) => {
     const r = parseFloat(ratio);
     if (r < 1) {
       return {
@@ -50,7 +50,7 @@ export function RiskRewardCalculator() {
     }
   };
 
-  const commentary = getDahliaCommentary(riskRewardRatio);
+  const commentary = getPansyCommentary(riskRewardRatio);
 
   return (
     <Card className="border-accent">
@@ -65,7 +65,7 @@ export function RiskRewardCalculator() {
               Risk to Reward Calculator
             </CardTitle>
             <CardDescription>
-              Let Dahlia help you calculate if a trade is worth taking
+              Let Pansy help you calculate if a trade is worth taking
             </CardDescription>
           </div>
         </div>
@@ -158,29 +158,24 @@ export function RiskRewardCalculator() {
           </div>
         </div>
 
-        {/* Dahlia's Commentary */}
-        <Card className={commentary.color === "destructive" ? "border-destructive bg-destructive/10" : "border-primary bg-accent/20"}>
-          <CardContent className="pt-6">
-            <div className="flex items-start gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-accent to-primary text-xl shadow-md">
-                🌺
-              </div>
-              <div className="flex-1 space-y-2">
-                <div className="flex items-center gap-2">
-                  <p className="font-semibold text-foreground">Dahlia's Take</p>
-                  {parseFloat(riskRewardRatio) >= 3 && (
-                    <Badge variant="default" className="bg-primary text-primary-foreground">
-                      Excellent
-                    </Badge>
-                  )}
-                </div>
-                <p className="text-sm leading-relaxed text-foreground">
-                  {commentary.message}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Pansy's Commentary */}
+        {commentary && (
+          <Card
+            className={`mt-4 ${
+              commentary.includes("🔥")
+                ? "border-accent bg-accent/5"
+                : commentary.includes("👍")
+                ? "border-primary bg-primary/5"
+                : commentary.includes("🤔")
+                ? "border-muted bg-muted/5"
+                : "border-destructive bg-destructive/5"
+            }`}
+          >
+            <CardContent className="p-4">
+              <p className="font-semibold text-foreground">Pansy's Take</p>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Educational Note */}
         <p className="text-xs text-muted-foreground">
