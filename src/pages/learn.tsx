@@ -11,7 +11,7 @@ import { authService } from "@/services/authService";
 import { supabase } from "@/integrations/supabase/client";
 import { Search, ArrowLeft, Clock, CheckCircle2, Circle, ChevronRight, Bookmark, BookmarkCheck, Award } from "lucide-react";
 
-type Category = "All" | "Stocks" | "ETFs" | "Mutual Funds" | "Dividends" | "Bonds" | "Retirement";
+type Category = "All" | "Stocks" | "ETFs" | "Mutual Funds" | "Dividends" | "Bonds" | "Retirement" | "Trading Psychology";
 
 interface QuizQuestion {
   question: string;
@@ -519,21 +519,184 @@ My take: If you're new go passive with index funds. Put 80-90% of your portfolio
       quiz: [
         {
           question: "What's the main difference between active and passive investing?",
-          options: ["Active tries to beat the market, passive tracks it", "They're exactly the same", "Passive is illegal in most states", "Active only works for millionaires"],
+          options: [
+            "Active tries to beat the market, passive tracks it",
+            "They're exactly the same",
+            "Passive is illegal in most states",
+            "Active only works for millionaires"
+          ],
           correctAnswer: 0,
           explanation: "Yes! Active = trying to beat the market by picking stocks. Passive = just tracking the market with index funds 🎯"
         },
         {
           question: "What percentage of active fund managers underperform the S&P 500?",
-          options: ["About 10%", "About 50%", "About 90%", "About 100%"],
+          options: [
+            "About 10%",
+            "About 50%",
+            "About 90%",
+            "About 100%"
+          ],
           correctAnswer: 2,
           explanation: "That's right! About 90% of professionals lose to a simple S&P 500 index fund. The data is wild girl 📊"
         },
         {
           question: "What's Dahlia's recommendation for beginners?",
-          options: ["100% active stock picking", "100% passive index funds", "80-90% passive, 10-20% active", "Don't invest at all"],
+          options: [
+            "100% active stock picking",
+            "100% passive index funds",
+            "80-90% passive, 10-20% active",
+            "Don't invest at all"
+          ],
           correctAnswer: 2,
           explanation: "Exactly! 80-90% passive for stability, 10-20% active for fun. Best of both worlds without risking everything 💪"
+        }
+      ]
+    },
+    {
+      id: "risk-reward-rule",
+      title: "The 3:1 Risk to Reward Rule",
+      category: "Trading Psychology",
+      readTime: 4,
+      difficulty: "Intermediate",
+      summary: "Win rate matters less than you think",
+      content: `Girl let me blow your mind with some math that changes everything about how you think about investing 🤯
+
+Make 10 trades: 5 winners and 5 losers. You were literally wrong half the time. Sounds bad right? Watch this:
+
+**The Bad Trades:**
+Lose $100 on each losing trade = -$500 total
+
+**The Good Trades:**
+Win $300 on each winning trade = +$1,500 total
+
+**Net Profit = +$1,000**
+
+You were wrong HALF the time and still made a thousand dollars. How? Because your winners were 3 times bigger than your losers. That's the 3:1 risk to reward rule.
+
+Most beginners obsess over win rate. "I need to be right 80% of the time!" But professional traders know that's backwards thinking. You can be wrong MORE than you're right and still crush it if you cut losses quickly and let winners run.
+
+The discipline part is the hard part: taking that $100 loss and not holding on hoping it comes back. That's where people mess up. They hold losers too long trying to "get back to even" and they sell winners too early taking profits too soon.
+
+**The Rules:**
+- Set your stop loss BEFORE you enter the trade
+- Risk $1 to make $3 minimum
+- Take the loss when it hits your stop
+- Let winners run until they hit your target
+
+This isn't about being smart or picking perfectly. It's about math and discipline. Risk to reward matters way more than win rate sis 💪`,
+      keyTakeaway: "You can be wrong 50% of the time and still profit big. Risk small, win big. 3:1 minimum risk to reward ratio.",
+      relatedTopics: ["investment-rules", "dollar-cost-averaging", "bull-vs-bear"],
+      quiz: [
+        {
+          question: "In the 3:1 example, you were right what percentage of the time?",
+          options: [
+            "80%",
+            "70%",
+            "50%",
+            "30%"
+          ],
+          correctAnswer: 2,
+          explanation: "Exactly! You were right only 50% of the time but still made $1,000 profit. Win rate isn't everything girl 💪"
+        },
+        {
+          question: "If you risk $100 per trade, what should your minimum profit target be?",
+          options: [
+            "$100",
+            "$200",
+            "$300",
+            "$500"
+          ],
+          correctAnswer: 2,
+          explanation: "Yes! 3:1 ratio means if you risk $100 you should target at least $300 profit. That's how the math works in your favor 🎯"
+        },
+        {
+          question: "What's the hardest part of the 3:1 rule according to Dahlia?",
+          options: [
+            "Picking winning stocks",
+            "Having discipline to cut losses and let winners run",
+            "Using complex math",
+            "Timing the market perfectly"
+          ],
+          correctAnswer: 1,
+          explanation: "That's right! The discipline to take losses quickly and let winners run is where most people fail. It's emotional not intellectual 💛"
+        }
+      ]
+    },
+    {
+      id: "investment-rules",
+      title: "Investment Rules That Work",
+      category: "Trading Psychology",
+      readTime: 5,
+      difficulty: "Intermediate",
+      summary: "Systematic rules eliminate emotional decisions",
+      content: `Here's the framework that removes 90% of the emotional stress from investing. You don't need to be smart — you need to follow the system 🎯
+
+**THE RULES:**
+
+**When Your Stock Drops:**
+- Drop 10%? Hold. This is just normal noise.
+- Drop 20%? Buy 15% more. It's on sale.
+- Drop 30%? Buy 30% more. Major discount baby.
+
+**When Your Stock Rises:**
+- Rise 30%? Sell 10%. Lock in some gains.
+- Rise 50%? Sell 30%. Take profits girl.
+- Rise 100%? Sell 60%. You doubled your money — secure it.
+
+Why does this work? Because it forces you to buy low and sell high which is literally what everyone says to do but nobody actually does when emotions kick in 😂
+
+**The Problem Without Rules:**
+
+Stock drops 20%: "Oh no I'm losing money! Should I sell?" (Panic)
+Stock rises 30%: "It might go higher! Should I hold?" (Greed)
+
+You're making emotional decisions based on fear and hope. That's how people lose money.
+
+**The Solution With Rules:**
+
+Stock drops 20%: "Time to buy 15% more per my system."
+Stock rises 30%: "Time to sell 10% per my system."
+
+No thinking. No emotion. Just execute the plan. The decision was already made before you entered the position.
+
+This isn't about being clever or timing perfectly. It's about having a disciplined framework that takes emotion out of it. Most people fail at investing not because they're dumb but because they let feelings override logic.
+
+Set your rules before you invest. Write them down. Follow them no matter how you feel. Discipline over intelligence every time girl 🏆`,
+      keyTakeaway: "Systematic buy/sell rules eliminate emotional decisions. Follow the framework regardless of feelings. Discipline beats intelligence.",
+      relatedTopics: ["risk-reward-rule", "dollar-cost-averaging", "bull-vs-bear"],
+      quiz: [
+        {
+          question: "According to Dahlia's rules, what should you do when a stock drops 20%?",
+          options: [
+            "Panic sell everything",
+            "Buy 15% more",
+            "Do nothing and hope",
+            "Check the news constantly"
+          ],
+          correctAnswer: 1,
+          explanation: "Yes! Stock drops 20% = buy 15% more. It's on sale. The rule eliminates the emotional panic response 💪"
+        },
+        {
+          question: "If your stock rises 100% (doubles), how much should you sell?",
+          options: [
+            "Sell nothing - let it ride",
+            "Sell 10%",
+            "Sell 30%",
+            "Sell 60%"
+          ],
+          correctAnswer: 3,
+          explanation: "That's right! Rise 100% = sell 60%. You doubled your money — secure most of it and let some ride. Lock in wins sis 🏆"
+        },
+        {
+          question: "What's the main advantage of having investment rules?",
+          options: [
+            "Rules guarantee profits",
+            "Rules eliminate emotional decisions",
+            "Rules let you time the market perfectly",
+            "Rules make investing faster"
+          ],
+          correctAnswer: 1,
+          explanation: "Exactly! Rules remove emotion from investing. You decided what to do BEFORE feelings kicked in. That's how discipline beats fear and greed 🎯"
         }
       ]
     },
@@ -703,6 +866,7 @@ My take: If you're new go passive with index funds. Put 80-90% of your portfolio
     "Dividends",
     "Bonds",
     "Retirement",
+    "Trading Psychology",
   ];
 
   const completionPercentage = Math.round(
