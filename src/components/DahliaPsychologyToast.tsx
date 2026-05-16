@@ -44,18 +44,18 @@ export function DahliaPsychologyToast() {
         toast({
           description: (
             <div className="flex items-start gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-accent to-primary text-xl">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-accent to-primary text-xl shadow-md">
                 🌺
               </div>
               <div className="flex-1">
-                <p className="whitespace-pre-line text-sm leading-relaxed text-foreground">
+                <p className="whitespace-pre-line text-sm leading-relaxed text-white">
                   {randomMessage}
                 </p>
               </div>
             </div>
           ),
           duration: 6000,
-          className: "border-primary bg-card",
+          className: "border-primary bg-zinc-900 text-white shadow-lg",
         });
 
         // Mark as shown for this session
