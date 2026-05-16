@@ -221,9 +221,9 @@ export const authService = {
   // Listen to auth state changes
   onAuthStateChange(callback: (event: string, session: Session | null) => void) {
     return supabase.auth.onAuthStateChange(callback);
-  }
+  },
 
-  static async getUserByEmail(email: string) {
+  async getUserByEmail(email: string) {
     try {
       const { data, error } = await supabase
         .from('users')
