@@ -861,6 +861,182 @@ Protect your capital. Your ego can recover but your account might not 🛡️`,
         }
       ]
     },
+    {
+      id: "self-assessment",
+      title: "Self Assessment Before Every Trade",
+      category: "Trading Psychology",
+      readTime: 5,
+      difficulty: "Intermediate",
+      summary: "The 6-question checklist that saves accounts",
+      content: `This is the checklist that separates emotional traders from disciplined traders. Before you place ANY trade — before you even think about clicking that buy button — you need to honestly answer these six questions 🧠
+
+**THE SIX QUESTIONS:**
+
+**1. Am I calm right now?**
+If you're anxious, excited, angry, frustrated, or feeling ANY strong emotion — STOP. Emotions cloud judgment. Come back when you're neutral.
+
+**2. Is this trade in my plan?**
+Did you identify this setup yesterday? Is it on your watchlist? Or are you reacting to something you just saw 5 minutes ago? Reactive trades lose money.
+
+**3. Do I have entry, exit, and stop loss defined?**
+You need all three BEFORE you enter. If you're figuring it out as you go, you're gambling not trading.
+
+**4. What is my risk to reward ratio?**
+Minimum 3:1. Risk $100 to make $300. If you can't clearly state your risk to reward, you shouldn't take the trade.
+
+**5. Am I trading to make money or prove something?**
+Be brutally honest. Are you trying to win back a loss? Prove you're smart? Show someone else you're right? If it's anything other than "make money systematically" — walk away.
+
+**6. Can I afford to lose this amount?**
+Not "can my account handle it" — can YOU emotionally handle it? If losing this trade would stress you out or keep you up at night, your position is too big.
+
+**If you cannot answer all six questions honestly and confidently — DO NOT place the trade.**
+
+That's it. That's the system. It sounds simple but most people skip this because they don't want to miss the move. But here's the truth: The best trades are the ones you DON'T take when your answers are wrong.
+
+**What this prevents:**
+
+- FOMO trades (fails question 2)
+- Revenge trades (fails question 5)
+- Oversized positions (fails question 6)
+- Emotional decisions (fails question 1)
+- Undefined risk (fails questions 3 and 4)
+
+Print these six questions out. Put them on your screen. Make yourself answer them every single time. It takes 30 seconds and it will save your account sis 💪`,
+      keyTakeaway: "Six questions before every trade: calm, planned, defined risk, risk/reward, making money (not proving something), can afford loss. No trade if you can't answer honestly.",
+      relatedTopics: ["risk-management", "what-is-fomo", "revenge-trading"],
+      quiz: [
+        {
+          question: "What's the first question you should ask before any trade?",
+          options: [
+            "What's the current price?",
+            "Am I calm right now?",
+            "What's the company's earnings?",
+            "What did Twitter say?"
+          ],
+          correctAnswer: 1,
+          explanation: "Yes! Emotional state comes FIRST. If you're feeling strong emotions, stop. Come back when you're neutral 🧠"
+        },
+        {
+          question: "What's the minimum risk to reward ratio Dahlia requires?",
+          options: [
+            "1:1",
+            "2:1",
+            "3:1",
+            "5:1"
+          ],
+          correctAnswer: 2,
+          explanation: "That's right! Minimum 3:1. Risk $100 to make $300. If you can't clearly state it, don't take the trade 🎯"
+        },
+        {
+          question: "What should you do if you can't answer all 6 questions honestly?",
+          options: [
+            "Take the trade anyway - YOLO",
+            "Answer the ones you can and guess the rest",
+            "Do NOT place the trade",
+            "Ask someone else what to do"
+          ],
+          correctAnswer: 2,
+          explanation: "Exactly! If all 6 answers aren't clear and honest, walk away. The best trades are ones you DON'T take when answers are wrong sis 💪"
+        }
+      ]
+    },
+    {
+      id: "risk-management",
+      title: "Risk Management Like a Pro",
+      category: "Trading Psychology",
+      readTime: 5,
+      difficulty: "Intermediate",
+      summary: "The 3% rule that professional traders live by",
+      content: `This is THE most important lesson in this entire app. Risk management isn't sexy but it's the difference between surviving and blowing up your account. Let me show you the math that pros use 🛡️
+
+**THE 3% RULE:**
+
+Never risk more than 3% of your account on a single trade. EVER.
+
+**Here's the math:**
+
+Account: $10,000
+Max risk per trade: 3% = $300
+
+Even if you have TEN losses in a row (which hopefully won't happen if you're following the other lessons), you still keep 70% of your capital.
+
+Trade 1: -$300 (down to $9,700)
+Trade 2: -$291 (down to $9,409)
+Trade 3: -$282 (down to $9,127)
+... keep going ...
+Trade 10: -$232 (down to $7,374)
+
+You had a TERRIBLE losing streak — literally wrong 10 times in a row — and you still have $7,374. You can recover from that. You live to trade another day.
+
+**Now watch what happens if you risk 10% per trade:**
+
+Trade 1: -$1,000 (down to $9,000)
+Trade 2: -$900 (down to $8,100)
+Trade 3: -$810 (down to $7,290)
+... keep going ...
+Trade 10: -$387 (down to $3,486)
+
+Same ten losses. But now you're down 65% of your account. That's DEVASTATING. You need to make 186% just to get back to even. You're probably done.
+
+**Why 3% works:**
+
+- Keeps emotions in check (losses don't hurt as much)
+- Allows for long losing streaks without destruction
+- Forces you to take smaller positions (prevents YOLO trades)
+- Lets your winners compound over time
+- Professional risk management = professional results
+
+**Small consistent gains beat big gambles every single time.**
+
+Think about it: If you make 2% per week for a year that's 104% return. You've doubled your account taking tiny gains. But most people want to 10x in a month and end up losing everything instead.
+
+**The Pro Mindset:**
+
+- Protect capital FIRST
+- Profits come AFTER
+- Survive to thrive
+- Consistency over excitement
+
+That's it. Risk 3% max per trade. It's boring. It's not exciting. It won't make you rich overnight. But it will keep you in the game long enough to actually build wealth sis 💛`,
+      keyTakeaway: "Never risk more than 3% per trade. $10k account = $300 max risk. Ten losses in a row still keeps 70% capital. Protect capital first, profits second.",
+      relatedTopics: ["self-assessment", "risk-reward-rule", "investment-rules"],
+      quiz: [
+        {
+          question: "What's the maximum you should risk on a single trade?",
+          options: [
+            "1% of account",
+            "3% of account",
+            "10% of account",
+            "Whatever feels right"
+          ],
+          correctAnswer: 1,
+          explanation: "Yes! Maximum 3% per trade. It's the pro standard. Keeps you alive through losing streaks sis 🛡️"
+        },
+        {
+          question: "If your account is $10,000, what's your max risk per trade?",
+          options: [
+            "$100",
+            "$300",
+            "$1,000",
+            "$3,000"
+          ],
+          correctAnswer: 1,
+          explanation: "That's right! $10,000 × 3% = $300 maximum risk per trade. Even 10 losses in a row keeps you at 70% capital 💪"
+        },
+        {
+          question: "What comes FIRST in professional trading?",
+          options: [
+            "Making big profits quickly",
+            "Protecting capital",
+            "Being right all the time",
+            "Impressing other traders"
+          ],
+          correctAnswer: 1,
+          explanation: "Exactly! Protect capital FIRST. Profits come AFTER. Survive to thrive. Boring but effective girl 💛"
+        }
+      ]
+    },
   ];
 
   useEffect(() => {
