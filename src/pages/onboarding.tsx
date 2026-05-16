@@ -1,9 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { Layout } from "@/components/Layout";
+import { SEO } from "@/components/SEO";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { authService } from "@/services/authService";
 import { userService } from "@/services/userService";
 import { Loader2 } from "lucide-react";
@@ -27,6 +32,16 @@ export default function Onboarding() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [resetEmailSent, setResetEmailSent] = useState(false);
+  const [answers, setAnswers] = useState<OnboardingAnswers>({
+    name: "",
+    email: "",
+    password: "",
+    experience: "",
+    goals: [],
+    riskTolerance: "",
+  });
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleAuth = async () => {
     setError("");
@@ -177,21 +192,50 @@ export default function Onboarding() {
               </p>
             </div>
 
-            <Card className="p-6 bg-gradient-to-br from-accent/20 to-accent/5 border-accent rounded-2xl">
-              <div className="flex gap-4">
-                <img
-                  src="/bloom-logo.png"
-                  alt="Dahlia"
-                  className="w-16 h-16 rounded-full object-cover flex-shrink-0"
-                />
-                <div className="flex-1 text-left">
-                  <p className="font-serif text-lg font-semibold text-foreground mb-2">
-                    Hi I'm Dahlia
-                  </p>
-                  <p className="text-sm leading-relaxed text-foreground">
-                    I know everything about investing and I'm going to break it all down for you in a way that actually makes sense. No confusing terms, no pressure. Just real talk about your money 💛
+            {/* Dahlia's Intro Card */}
+            <Card className="border-accent bg-gradient-to-br from-accent/20 to-background p-8">
+              <div className="flex items-start gap-4">
+                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-accent to-primary text-3xl shadow-lg">
+                  🌺
+                </div>
+                <div className="flex-1 space-y-4">
+                  <div>
+                    <h3 className="mb-1 font-serif text-xl font-semibold text-primary">
+                      Hi! I'm Dahlia
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      Bloom's Investing Expert
+                    </p>
+                  </div>
+                  <p className="leading-relaxed text-foreground">
+                    I know everything about investing and I'm going to break it
+                    all down for you in a way that actually makes sense. No
+                    confusing terms, no pressure. Just real talk about your money
+                    💛
                   </p>
                 </div>
+              </div>
+            </Card>
+
+            {/* Terms & Privacy Checkbox */}
+            <Card className="p-6">
+              <div className="flex items-start gap-3">
+                <Checkbox
+                  id="terms"
+                  checked={termsAccepted}
+                  onCheckedChange={(checked) => setTermsAccepted(checked as boolean)}
+                  className="mt-1"
+                />
+                <Label htmlFor="terms" className="cursor-pointer text-sm leading-relaxed text-foreground">
+                  I agree to the{" "}
+                  <Link href="/terms" target="_blank" className="text-primary underline hover:text-primary/80">
+                    Terms of Service
+                  </Link>{" "}
+                  and{" "}
+                  <Link href="/privacy" target="_blank" className="text-primary underline hover:text-primary/80">
+                    Privacy Policy
+                  </Link>
+                </Label>
               </div>
             </Card>
 

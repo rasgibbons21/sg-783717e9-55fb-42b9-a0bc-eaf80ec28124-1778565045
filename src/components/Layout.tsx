@@ -67,6 +67,68 @@ export function Layout({ children }: LayoutProps) {
           })}
         </div>
       </nav>
+
+      {/* Footer */}
+      <footer className="mt-auto border-t border-border bg-background py-8">
+        <div className="mx-auto max-w-7xl px-4">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+            <div>
+              <h3 className="mb-4 font-serif text-lg font-semibold text-primary">Bloom</h3>
+              <p className="text-sm text-muted-foreground">
+                Invest in yourself first 🌸
+              </p>
+            </div>
+            <div>
+              <h4 className="mb-4 text-sm font-semibold text-foreground">Legal</h4>
+              <ul className="space-y-2 text-sm">
+                <li>
+                  <Link href="/privacy" className="text-muted-foreground hover:text-primary">
+                    Privacy Policy
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/terms" className="text-muted-foreground hover:text-primary">
+                    Terms of Service
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/disclaimer" className="text-muted-foreground hover:text-primary">
+                    Disclaimer
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="mb-4 text-sm font-semibold text-foreground">Contact</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li>
+                  <a href="mailto:info@vanguardapexholdings.com" className="hover:text-primary">
+                    info@vanguardapexholdings.com
+                  </a>
+                </li>
+                <li>
+                  <a href="mailto:admin@vanguardapexholdings.com" className="hover:text-primary">
+                    Support
+                  </a>
+                </li>
+                <li>
+                  <a href="https://shebloomswealth.app" className="hover:text-primary">
+                    shebloomswealth.app
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div className="mt-8 border-t border-border pt-8">
+            <p className="text-xs text-muted-foreground">
+              © 2026 Cinder Vault Enterprises LLC. All rights reserved. Bloom is a product of Cinder Vault Enterprises LLC.
+            </p>
+            <p className="mt-2 text-xs text-muted-foreground">
+              Bloom is for educational purposes only and does not constitute financial advice. All investing involves risk of loss. Some broker links may be affiliate partnerships where Bloom earns a commission.
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
