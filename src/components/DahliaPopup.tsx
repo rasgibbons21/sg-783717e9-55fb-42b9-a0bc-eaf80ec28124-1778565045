@@ -2,12 +2,12 @@ import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 
 interface DahliaPopupProps {
-  type: "first-visit" | "returning" | "market-tip";
+  type?: "first-visit" | "returning" | "market-tip";
   userName?: string;
   marketTip?: string;
 }
 
-export function DahliaPopup({ type, userName, marketTip }: DahliaPopupProps) {
+export function DahliaPopup({ type = "first-visit", userName, marketTip }: DahliaPopupProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
 
