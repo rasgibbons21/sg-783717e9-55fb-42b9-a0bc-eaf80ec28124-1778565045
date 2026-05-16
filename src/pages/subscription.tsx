@@ -156,7 +156,7 @@ export default function Subscription() {
               Choose Your Plan
             </h1>
             <p className="text-muted-foreground">
-              Get unlimited access to Dahlia's investing insights
+              Get unlimited access to Pansy's investing insights
             </p>
           </div>
 
@@ -209,7 +209,7 @@ export default function Subscription() {
                     </li>
                   ))}
                   <li className="flex items-start gap-2 opacity-50">
-                    <span className="text-sm text-muted-foreground line-through">Dahlia's full analysis</span>
+                    <span className="text-sm text-muted-foreground line-through">Pansy's full analysis</span>
                   </li>
                   <li className="flex items-start gap-2 opacity-50">
                     <span className="text-sm text-muted-foreground line-through">ETF picks</span>
@@ -256,7 +256,7 @@ export default function Subscription() {
                 <ul className="space-y-2">
                   {[
                     "Unlimited daily picks",
-                    "Dahlia's full analysis on every pick",
+                    "Pansy's full analysis on every pick",
                     "Stocks, ETFs, and mutual funds",
                     "Real-time news and charts",
                     "Portfolio tracker",

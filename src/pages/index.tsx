@@ -19,7 +19,7 @@ interface FeaturedStock {
 
 export default function LandingPage() {
   const router = useRouter();
-  const [showDahliaModal, setShowDahliaModal] = useState(false);
+  const [showPansyModal, setShowPansyModal] = useState(false);
   const [featuredStocks, setFeaturedStocks] = useState<FeaturedStock[]>([]);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
@@ -90,7 +90,7 @@ export default function LandingPage() {
     <>
       <SEO 
         title="Bloom - Investing Made Simple for Women" 
-        description="Your money. Your terms. Your future. Join thousands of women taking control of their financial future with Dahlia, your personal investing guide."
+        description="Your money. Your terms. Your future. Join thousands of women taking control of their financial future with Pansy, your personal investing guide."
       />
       
       <div className="min-h-screen bg-background">
@@ -125,7 +125,7 @@ export default function LandingPage() {
                       Your money. Your terms. Your future.
                     </h1>
                     <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed max-w-xl">
-                      Investing made simple with Dahlia, your expert guide who explains
+                      Investing made simple with Pansy, your expert guide who explains
                       everything in plain language. No confusing jargon. Just real talk
                       about building wealth.
                     </p>
@@ -143,10 +143,10 @@ export default function LandingPage() {
                     <Button
                       size="lg"
                       variant="outline"
-                      onClick={() => setShowDahliaModal(true)}
+                      onClick={() => setShowPansyModal(true)}
                       className="w-full sm:w-auto border-accent text-accent hover:bg-accent/10 font-semibold text-lg px-8 py-6"
                     >
-                      Meet Dahlia
+                      Meet Pansy
                     </Button>
                   </div>
 
@@ -181,11 +181,11 @@ export default function LandingPage() {
                       </div>
                       <div className="space-y-1 flex-1">
                         <div className="flex items-center gap-2">
-                          <p className="font-semibold text-foreground">Dahlia</p>
+                          <p className="font-semibold text-foreground">Pansy</p>
                           <Sparkles className="w-4 h-4 text-accent" />
                         </div>
                         <p className="text-sm text-muted-foreground italic leading-relaxed">
-                          "Hi I'm Dahlia — I know everything about investing and I'm going
+                          "Hi I'm Pansy — I know everything about investing and I'm going
                           to break it all down for you in a way that actually makes sense.
                           No confusing terms, no pressure 💛"
                         </p>
@@ -244,7 +244,7 @@ export default function LandingPage() {
                   Get Personalized Picks
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Dahlia analyzes the market daily and shares picks tailored to your profile. 
+                  Pansy analyzes the market daily and shares picks tailored to your profile. 
                   Every recommendation comes with plain-language analysis you'll actually understand.
                 </p>
               </Card>
@@ -273,7 +273,7 @@ export default function LandingPage() {
                 Today's Featured Picks
               </h2>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                See what Dahlia's watching today—real-time data, real insights
+                See what Pansy's watching today—real-time data, real insights
               </p>
             </div>
 
@@ -315,7 +315,7 @@ export default function LandingPage() {
 
                     <Link href="/onboarding">
                       <Button variant="outline" className="w-full">
-                        See Dahlia's Analysis →
+                        See Pansy's Analysis →
                       </Button>
                     </Link>
                   </div>
@@ -361,7 +361,7 @@ export default function LandingPage() {
                 </div>
                 <h3 className="font-semibold text-foreground">Start Free</h3>
                 <p className="text-sm text-muted-foreground">
-                  No credit card required to explore Bloom and meet Dahlia
+                  No credit card required to explore Bloom and meet Pansy
                 </p>
               </div>
             </div>
@@ -391,12 +391,12 @@ export default function LandingPage() {
         </footer>
       </div>
 
-      {/* Dahlia Modal */}
-      {showDahliaModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowDahliaModal(false)}>
+      {/* Pansy Modal */}
+      {showPansyModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowPansyModal(false)}>
           <Card className="max-w-lg w-full p-8 space-y-6 relative" onClick={(e) => e.stopPropagation()}>
             <button
-              onClick={() => setShowDahliaModal(false)}
+              onClick={() => setShowPansyModal(false)}
               className="absolute top-4 right-4 w-8 h-8 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
             >
               ✕
@@ -407,14 +407,14 @@ export default function LandingPage() {
                 <span className="text-4xl">🌺</span>
               </div>
               <div>
-                <h3 className="font-serif text-3xl font-bold text-foreground">Dahlia</h3>
+                <h3 className="font-serif text-3xl font-bold text-foreground">Pansy</h3>
                 <p className="text-accent font-semibold">Bloom's Investing Expert</p>
               </div>
             </div>
 
             <div className="space-y-4">
               <p className="text-foreground leading-relaxed">
-                Hi, I'm Dahlia! 🌸 I know everything about investing, but I promise to explain it like we're chatting over coffee—no confusing finance-bro talk.
+                Hi, I'm Pansy! 🌸 I know everything about investing, but I promise to explain it like we're chatting over coffee—no confusing finance-bro talk.
               </p>
               <p className="text-foreground leading-relaxed">
                 Every day, I analyze thousands of stocks, ETFs, and funds to find opportunities that match your goals. Then I break down what's happening in plain language you'll actually understand.
@@ -425,8 +425,8 @@ export default function LandingPage() {
             </div>
 
             <Link href="/onboarding">
-              <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-12" onClick={() => setShowDahliaModal(false)}>
-                Start Investing With Dahlia
+              <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-12" onClick={() => setShowPansyModal(false)}>
+                Start Investing With Pansy
               </Button>
             </Link>
           </Card>

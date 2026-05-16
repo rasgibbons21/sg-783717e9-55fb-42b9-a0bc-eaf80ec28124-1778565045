@@ -2,8 +2,8 @@ import { ReactNode, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { Home, Search, Target, Briefcase, Building2, User, GraduationCap } from "lucide-react";
-import { DahliaPopup } from "./DahliaPopup";
-import { DahliaPsychologyToast } from "./DahliaPsychologyToast";
+import { PansyPopup } from "./DahliaPopup";
+import { PansyPsychologyToast } from "./DahliaPsychologyToast";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -47,11 +47,11 @@ export function Layout({ children }: LayoutProps) {
       {/* Main Content */}
       <main className="flex-1 overflow-auto pb-20 md:pb-4">{children}</main>
 
-      {/* Dahlia Popup */}
-      <DahliaPopup />
+      {/* Pansy Popup */}
+      <PansyPopup />
 
-      {/* Dahlia Psychology Toast */}
-      <DahliaPsychologyToast />
+      {/* Pansy Psychology Toast */}
+      <PansyPsychologyToast />
 
       {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card backdrop-blur supports-[backdrop-filter]:bg-card/95">

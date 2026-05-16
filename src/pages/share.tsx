@@ -9,7 +9,7 @@ export default function SharePage() {
     <>
       <SEO
         title="Bloom - Invest in Yourself First 🌸"
-        description="Investment analysis designed for women. Learn from Dahlia, get personalized picks, and build wealth with confidence."
+        description="Investment analysis designed for women. Learn from Pansy, get personalized picks, and build wealth with confidence."
         image="/bloom-share.png"
       />
       
@@ -36,7 +36,7 @@ export default function SharePage() {
             </h1>
             
             <p className="mb-12 text-lg text-zinc-300 sm:text-xl">
-              Investment analysis designed for women. Learn from Dahlia, get personalized picks, and build wealth with confidence.
+              Investment analysis designed for women. Learn from Pansy, get personalized picks, and build wealth with confidence.
             </p>
 
             {/* CTA Buttons */}
@@ -77,7 +77,7 @@ export default function SharePage() {
                 </div>
                 <h3 className="mb-2 font-semibold text-white">Made for Women</h3>
                 <p className="text-sm text-zinc-400">
-                  Investment education without the intimidation. Dahlia explains everything in plain language.
+                  Investment education without the intimidation. Pansy explains everything in plain language.
                 </p>
               </Card>
 
@@ -86,7 +86,7 @@ export default function SharePage() {
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-accent/20 to-primary/20">
                   <Sparkles className="h-6 w-6 text-accent" />
                 </div>
-                <h3 className="mb-2 font-semibold text-white">Dahlia's Daily Picks</h3>
+                <h3 className="mb-2 font-semibold text-white">Pansy's Daily Picks</h3>
                 <p className="text-sm text-zinc-400">
                   Your personal investing expert analyzes stocks, ETFs, and mutual funds just for you.
                 </p>

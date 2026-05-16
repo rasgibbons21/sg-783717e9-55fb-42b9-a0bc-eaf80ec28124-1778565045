@@ -262,7 +262,7 @@ export default function Home() {
                       🌺
                     </div>
                     <div className="flex-1">
-                      <CardTitle className="text-lg">Dahlia's Investment Rules</CardTitle>
+                      <CardTitle className="text-lg">Pansy's Investment Rules</CardTitle>
                       <CardDescription className="mt-1">
                         Save these rules. Follow them every time. Discipline beats intelligence 💪
                       </CardDescription>
@@ -360,9 +360,9 @@ export default function Home() {
 
         {/* Dahlia's Picks Today */}
         <Card className="p-6 bg-card border-border rounded-2xl">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-foreground">
-              Dahlia's Picks Today 🌺
+          <div className="flex items-center justify-between">
+            <h2 className="font-serif text-2xl font-bold text-foreground">
+              Pansy's Picks Today
             </h2>
           </div>
 

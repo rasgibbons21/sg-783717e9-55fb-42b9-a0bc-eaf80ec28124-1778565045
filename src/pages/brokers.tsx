@@ -9,7 +9,7 @@ interface Broker {
   id: string;
   name: string;
   description: string;
-  dahliaQuote: string;
+  pansyQuote: string;
   features: string[];
   isAffiliate: boolean;
   link: string;
@@ -22,7 +22,7 @@ export default function Brokers() {
       id: "robinhood",
       name: "Robinhood",
       description: "Perfect for beginners who want a simple, beautiful app",
-      dahliaQuote: "Robinhood is perfect if you're just starting. Zero fees, you can buy fractional shares for like $1, and the app is actually beautiful. No excuses not to start sis 💅",
+      pansyQuote: "Robinhood is perfect if you're just starting. Zero fees, you can buy fractional shares for like $1, and the app is actually beautiful. No excuses not to start sis 💅",
       features: ["Zero commissions", "Fractional shares from $1", "Easy to use", "Instant deposits"],
       isAffiliate: true,
       link: "https://robinhood.com",
@@ -32,7 +32,7 @@ export default function Brokers() {
       id: "webull",
       name: "Webull",
       description: "Great for investors who want advanced charts and data",
-      dahliaQuote: "Webull gives you all the data without making it overwhelming. Love the paper trading feature — you can practice without risking real money. Smart move 📊",
+      pansyQuote: "Webull gives you all the data without making it overwhelming. Love the paper trading feature — you can practice without risking real money. Smart move 📊",
       features: ["Advanced charts", "Paper trading", "Zero commissions", "Extended hours"],
       isAffiliate: true,
       link: "https://webull.com",
@@ -42,7 +42,7 @@ export default function Brokers() {
       id: "fidelity",
       name: "Fidelity",
       description: "Trusted broker with excellent customer service and research",
-      dahliaQuote: "Fidelity is like the reliable best friend — been around forever, super helpful when you need them, and they have amazing research tools. Totally trustworthy 💚",
+      pansyQuote: "Fidelity is like the reliable best friend — been around forever, super helpful when you need them, and they have amazing research tools. Totally trustworthy 💚",
       features: ["Great support", "Fractional shares", "Research tools", "Retirement accounts"],
       isAffiliate: false,
       link: "https://fidelity.com",
@@ -52,7 +52,7 @@ export default function Brokers() {
       id: "schwab",
       name: "Charles Schwab",
       description: "Comprehensive platform with educational resources",
-      dahliaQuote: "Schwab is perfect if you want to learn while you invest. Their education hub is actually good, and they don't make you feel dumb for asking questions ✨",
+      pansyQuote: "Schwab is perfect if you want to learn while you invest. Their education hub is actually good, and they don't make you feel dumb for asking questions ✨",
       features: ["Education hub", "No account minimums", "Strong research", "24/7 support"],
       isAffiliate: false,
       link: "https://schwab.com",
@@ -78,14 +78,14 @@ export default function Brokers() {
 
   return (
     <Layout>
-      <SEO title="Brokers - Bloom" description="Find the right investment platform with Dahlia's guidance" />
+      <SEO title="Brokers - Bloom" description="Find the right investment platform with Pansy's guidance" />
       <div className="container-full py-6 space-y-6">
         <div className="space-y-2">
           <h1 className="font-serif text-4xl font-bold text-foreground">
             Find Your Broker
           </h1>
           <p className="text-muted-foreground text-lg">
-            Dahlia's honest takes on where to start investing
+            Pansy's honest takes on where to start investing
           </p>
         </div>
 
@@ -126,14 +126,14 @@ export default function Brokers() {
                 <div className="flex gap-3">
                   <img
                     src="/bloom-logo.png"
-                    alt="Dahlia"
+                    alt="Pansy"
                     className="h-10 w-10 rounded-full object-cover flex-shrink-0"
                   />
                   <div className="flex-1">
                     <p className="text-sm text-foreground italic leading-relaxed">
-                      "{broker.dahliaQuote}"
+                      "{broker.pansyQuote}"
                     </p>
-                    <p className="text-xs text-accent mt-2">— Dahlia 🌺</p>
+                    <p className="text-xs text-accent mt-2">— Pansy 🌺</p>
                   </div>
                 </div>
               </Card>

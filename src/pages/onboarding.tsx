@@ -183,7 +183,7 @@ export default function Onboarding() {
               </p>
             </div>
 
-            {/* Dahlia's Intro Card */}
+            {/* Pansy's Intro Card */}
             <Card className="border-accent bg-gradient-to-br from-accent/20 to-background p-8">
               <div className="flex items-start gap-4">
                 <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-accent to-primary text-3xl shadow-lg">
@@ -192,7 +192,7 @@ export default function Onboarding() {
                 <div className="flex-1 space-y-4">
                   <div>
                     <h3 className="mb-1 font-serif text-xl font-semibold text-primary">
-                      Hi! I'm Dahlia
+                      Hi! I'm Pansy
                     </h3>
                     <p className="text-sm text-muted-foreground">
                       Bloom's Investing Expert

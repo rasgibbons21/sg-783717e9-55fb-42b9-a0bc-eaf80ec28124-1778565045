@@ -263,23 +263,23 @@ export default function Profile() {
           </div>
         </Card>
 
-        {/* Dahlia's Privacy Tip */}
+        {/* Pansy's Privacy Tip */}
         <Card className="p-6 bg-accent/5 border-accent/20 rounded-2xl">
           <div className="flex items-start gap-4">
             <img
               src="/bloom-logo.png"
-              alt="Dahlia"
+              alt="Pansy"
               className="w-12 h-12 rounded-full object-cover"
             />
             <div className="space-y-2 flex-1">
               <div className="flex items-center gap-2">
-                <p className="font-semibold text-foreground">Dahlia's Privacy Tip</p>
+                <p className="font-semibold text-foreground">Pansy's Privacy Tip</p>
                 <Shield className="w-4 h-4 text-accent" />
               </div>
               <p className="text-sm text-foreground leading-relaxed">
                 Your data is always yours, babe. We never share your info with third parties, and you can delete your account anytime. Push notifications only go to your device — nobody else sees them 💛
               </p>
-              <p className="text-sm font-medium text-accent">— Dahlia 🌺</p>
+              <p className="text-sm font-medium text-accent">— Pansy 🌺</p>
             </div>
           </div>
         </Card>

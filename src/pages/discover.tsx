@@ -10,7 +10,7 @@ import { authService } from "@/services/authService";
 import { TrendingUp, TrendingDown, ChevronRight, Eye, Star, Sparkles } from "lucide-react";
 
 type AssetType = "Stocks" | "ETFs" | "Mutual Funds";
-type FilterType = "Top Performers" | "Most Watched" | "Dahlia's Picks";
+type FilterType = "Top Performers" | "Most Watched" | "Pansy's Picks";
 
 interface StockData {
   ticker: string;
@@ -18,7 +18,7 @@ interface StockData {
   price: number;
   change: number;
   changePercent: number;
-  dahliaTake: string;
+  pansyTake: string;
 }
 
 const DEFAULT_TICKERS = {
@@ -27,7 +27,7 @@ const DEFAULT_TICKERS = {
   "Mutual Funds": ["VFIAX", "FXAIX", "VTSAX", "SWPPX", "FZROX"],
 };
 
-const DAHLIA_INSIGHTS: Record<string, string> = {
+const PANSY_INSIGHTS: Record<string, string> = {
   AAPL: "Everyone uses their products and the ecosystem locks people in. $162B in cash. Not going anywhere 💪",
   NVDA: "Powering the AI revolution. Every tech company needs their chips and only they can make them this good 🚀",
   VOO: "500 biggest US companies in one purchase. Bet on America as a whole instead of picking winners 🇺🇸",
@@ -49,7 +49,7 @@ const DAHLIA_INSIGHTS: Record<string, string> = {
   FZROX: "Fidelity Zero Total Market. Free index fund with everything. Great for beginners starting out 🌱",
 };
 
-const DAHLIAS_PICKS = ["VOO", "SCHD", "AAPL", "MSFT", "JEPI"];
+const PANSYS_PICKS = ["VOO", "SCHD", "AAPL", "MSFT", "JEPI"];
 
 const COMPANY_NAMES: Record<string, string> = {
   AAPL: "Apple Inc.",
@@ -104,8 +104,8 @@ export default function Discover() {
     try {
       let tickers: string[] = [];
 
-      if (activeFilter === "Dahlia's Picks") {
-        tickers = DAHLIAS_PICKS;
+      if (activeFilter === "Pansy's Picks") {
+        tickers = PANSYS_PICKS;
       } else {
         tickers = DEFAULT_TICKERS[activeTab];
       }
@@ -124,7 +124,7 @@ export default function Discover() {
               price: data.ticker.day?.c || data.ticker.prevDay?.c || 0,
               change: data.ticker.todaysChange || 0,
               changePercent: data.ticker.todaysChangePerc || 0,
-              dahliaTake: DAHLIA_INSIGHTS[ticker] || "This is a solid option worth researching 💡",
+              pansyTake: PANSY_INSIGHTS[ticker] || "This is a solid option worth researching 💡",
             };
           }
           return null;
@@ -154,7 +154,7 @@ export default function Discover() {
     <Layout>
       <SEO
         title="Discover - Bloom"
-        description="Explore stocks, ETFs, and mutual funds with Dahlia's expert insights"
+        description="Explore stocks, ETFs, and mutual funds with Pansy's expert insights"
       />
 
       <div className="min-h-screen bg-background pb-20">
@@ -163,7 +163,7 @@ export default function Discover() {
           <div className="px-4 py-4">
             <h1 className="text-2xl font-serif text-foreground">Discover</h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Explore investments with Dahlia's insights
+              Explore investments with Pansy's insights
             </p>
           </div>
 
@@ -187,7 +187,7 @@ export default function Discover() {
 
           {/* Filter Tabs */}
           <div className="flex gap-2 px-4 pb-3 overflow-x-auto hide-scrollbar border-t border-border pt-3">
-            {(["Top Performers", "Most Watched", "Dahlia's Picks"] as FilterType[]).map((filter) => (
+            {(["Top Performers", "Most Watched", "Pansy's Picks"] as FilterType[]).map((filter) => (
               <Button
                 key={filter}
                 variant={activeFilter === filter ? "secondary" : "ghost"}
@@ -197,7 +197,7 @@ export default function Discover() {
               >
                 {filter === "Top Performers" && <TrendingUp className="w-4 h-4" />}
                 {filter === "Most Watched" && <Eye className="w-4 h-4" />}
-                {filter === "Dahlia's Picks" && <Sparkles className="w-4 h-4" />}
+                {filter === "Pansy's Picks" && <Sparkles className="w-4 h-4" />}
                 {filter}
               </Button>
             ))}
@@ -205,8 +205,8 @@ export default function Discover() {
         </div>
 
         <div className="px-4 py-6 space-y-6">
-          {/* Dahlia's Picks Message */}
-          {activeFilter === "Dahlia's Picks" && (
+          {/* Pansy's Picks Message */}
+          {activeFilter === "Pansy's Picks" && (
             <Card className="p-4 border-accent bg-accent/5">
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent to-accent/60 flex items-center justify-center text-xl flex-shrink-0">
@@ -216,7 +216,7 @@ export default function Discover() {
                   <p className="text-sm text-foreground italic">
                     "These are my personal favorites right now sis. Do your own research but these are solid picks for most investing goals 🌸"
                   </p>
-                  <p className="text-xs text-muted-foreground mt-1">— Dahlia</p>
+                  <p className="text-xs text-muted-foreground mt-1">— Pansy</p>
                 </div>
               </div>
             </Card>
@@ -249,10 +249,10 @@ export default function Discover() {
                         <h3 className="text-lg font-bold text-foreground">
                           {stock.ticker}
                         </h3>
-                        {activeFilter === "Dahlia's Picks" && (
+                        {activeFilter === "Pansy's Picks" && (
                           <Badge variant="secondary" className="bg-accent/20 text-accent border-accent">
                             <Sparkles className="w-3 h-3 mr-1" />
-                            Dahlia's Pick
+                            Pansy's Pick
                           </Badge>
                         )}
                       </div>
@@ -260,10 +260,10 @@ export default function Discover() {
                         {stock.name}
                       </p>
 
-                      {/* Dahlia's Take */}
+                      {/* Pansy's Take */}
                       <div className="bg-primary/5 border-l-2 border-primary pl-3 py-2 mt-3">
                         <p className="text-sm text-primary italic">
-                          "{stock.dahliaTake}"
+                          "{stock.pansyTake}"
                         </p>
                       </div>
                     </div>
@@ -296,7 +296,7 @@ export default function Discover() {
             </div>
           )}
 
-          {/* Invest with Dahlia Education Section */}
+          {/* Invest with Pansy Education Section */}
           <Card className="p-6 bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20">
             <div className="flex items-start gap-4">
               <div className="w-16 h-16 rounded-full bg-gradient-to-br from-accent to-accent/60 flex items-center justify-center text-3xl flex-shrink-0">
@@ -304,7 +304,7 @@ export default function Discover() {
               </div>
               <div className="flex-1">
                 <h2 className="text-xl font-serif text-foreground mb-2">
-                  Invest with Dahlia
+                  Invest with Pansy
                 </h2>
                 <p className="text-sm text-muted-foreground mb-4">
                   I break down every investment in plain English so you can make confident decisions. No jargon, no pressure — just real talk about your money.
