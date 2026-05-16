@@ -10,7 +10,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { authService } from "@/services/authService";
 import { marketService } from "@/services/marketService";
-import { TrendingUp, TrendingDown, ArrowRight, Crown, ChevronDown } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { TrendingUp, TrendingDown, ArrowRight, Crown, ChevronDown, ChevronRight } from "lucide-react";
 
 interface StockPick {
   ticker: string;
