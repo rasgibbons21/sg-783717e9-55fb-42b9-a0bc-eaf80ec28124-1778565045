@@ -1037,6 +1037,92 @@ That's it. Risk 3% max per trade. It's boring. It's not exciting. It won't make 
         }
       ]
     },
+    {
+      id: "trading-psychology-checklist",
+      title: "Trading Psychology Checklist",
+      category: "Trading Psychology",
+      readTime: 3,
+      difficulty: "Beginner",
+      summary: "Your pre-trade, during-trade, and post-trade system",
+      content: `This is your complete trading checklist girl. Print this out. Pin it to your screen. Follow it EVERY SINGLE TIME and you'll automatically be in the top 10% of traders. Why? Because most people skip steps. You won't 🌸
+
+**BEFORE YOU TRADE:**
+
+✓ I am calm and not trading from emotion
+✓ This trade is in my plan, not impulsive
+✓ I have entry, stop loss, and profit target defined
+✓ Risk to reward is at least 2:1 (preferably 3:1)
+✓ I am risking less than 3% of my account
+
+If ANY checkbox is unchecked — do NOT place the trade. Walk away. Come back when all five are true.
+
+**DURING THE TRADE:**
+
+✓ I will not move my stop loss to avoid a loss
+✓ I will not add to a losing position out of hope
+
+These are the two biggest ways people blow up winning systems. You set your stop for a REASON. Honor it. Don't move it down because you "feel" like the stock will bounce. It won't care about your feelings.
+
+And never average down on a losing trade thinking it'll come back. That's how small losses become catastrophic ones.
+
+**AFTER THE TRADE:**
+
+✓ I will journal this trade (win or lose)
+✓ I will not revenge trade if I lose
+
+Win or lose, write it down. What was your entry? Exit? Why did you take it? How did you feel? What worked? What didn't? This is how you improve.
+
+And if you lose — which you will sometimes even with perfect execution — do NOT immediately jump into another trade trying to win it back. That's revenge trading and it destroys accounts.
+
+**Why This Works:**
+
+Before = Prevents emotional and impulsive trades
+During = Keeps you disciplined when emotions spike
+After = Builds your edge through reflection and prevents spiraling
+
+**The Truth:**
+
+You don't need a complicated strategy. You don't need insider information. You don't need expensive software. You need THIS checklist and the discipline to follow it.
+
+Follow this and you're automatically in the top 10% of traders. Most people skip steps. Be the one who doesn't sis 🌸`,
+      keyTakeaway: "Three-phase checklist: BEFORE (5 checks), DURING (2 rules), AFTER (2 actions). Follow religiously = top 10% of traders. Most skip steps — don't be most.",
+      relatedTopics: ["self-assessment", "risk-management", "revenge-trading"],
+      quiz: [
+        {
+          question: "How many checks must pass BEFORE you take a trade?",
+          options: [
+            "You don't need checks - just trade",
+            "At least 3 out of 5",
+            "All 5 must be checked",
+            "Whatever feels right"
+          ],
+          correctAnswer: 2,
+          explanation: "Yes! ALL FIVE must be checked. If even ONE is unchecked, walk away. No exceptions sis 🌸"
+        },
+        {
+          question: "What should you NEVER do during a trade?",
+          options: [
+            "Check the price",
+            "Move your stop loss to avoid a loss",
+            "Take profits at your target",
+            "Follow your plan"
+          ],
+          correctAnswer: 1,
+          explanation: "That's right! Never move your stop loss down. You set it for a REASON. Honor it. Don't let hope override logic 🛡️"
+        },
+        {
+          question: "What must you do after EVERY trade?",
+          options: [
+            "Celebrate if you won, forget if you lost",
+            "Immediately jump into the next trade",
+            "Journal the trade and avoid revenge trading",
+            "Tell everyone on Twitter"
+          ],
+          correctAnswer: 2,
+          explanation: "Exactly! Journal every trade (win or lose) and absolutely NO revenge trading after losses. Reflection builds edge sis 💪"
+        }
+      ]
+    },
   ];
 
   useEffect(() => {
