@@ -1,16 +1,16 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { authService } from "@/services/authService";
 import { marketService } from "@/services/marketService";
-import { supabase } from "@/integrations/supabase/client";
-import { TrendingUp, TrendingDown, ChevronRight } from "lucide-react";
+import { TrendingUp, TrendingDown, ArrowRight, Crown, ChevronDown } from "lucide-react";
 
 interface StockPick {
   ticker: string;
@@ -80,6 +80,11 @@ export default function Home() {
   const [watchlistNews, setWatchlistNews] = useState<any[]>([]);
   const [isLoadingNews, setIsLoadingNews] = useState(true);
   const [dataLoaded, setDataLoaded] = useState(false);
+  const [marketSummary, setMarketSummary] = useState<any>(null);
+  const [dahliasPicks, setDahliasPicks] = useState<any[]>([]);
+  const [marketMovers, setMarketMovers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [rulesOpen, setRulesOpen] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -244,6 +249,85 @@ export default function Home() {
             </Badge>
           )}
         </div>
+
+        {/* Investment Rules Card */}
+        <Card className="border-accent bg-gradient-to-br from-accent/10 to-primary/10">
+          <Collapsible open={rulesOpen} onOpenChange={setRulesOpen}>
+            <CollapsibleTrigger asChild>
+              <CardHeader className="cursor-pointer hover:bg-accent/5 transition-colors rounded-t-xl">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-accent to-primary text-xl shadow-md">
+                      🌺
+                    </div>
+                    <div className="flex-1">
+                      <CardTitle className="text-lg">Dahlia's Investment Rules</CardTitle>
+                      <CardDescription className="mt-1">
+                        Save these rules. Follow them every time. Discipline beats intelligence 💪
+                      </CardDescription>
+                    </div>
+                  </div>
+                  <ChevronDown
+                    className={`h-5 w-5 text-muted-foreground transition-transform ${
+                      rulesOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </div>
+              </CardHeader>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <CardContent className="space-y-4 pt-2">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-destructive flex items-center gap-2">
+                      <TrendingDown className="h-4 w-4" />
+                      When Your Stock Drops:
+                    </h4>
+                    <div className="space-y-2 pl-6">
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-sm font-medium text-foreground">Drop 10%?</span>
+                        <span className="text-sm text-muted-foreground">Hold.</span>
+                      </div>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-sm font-medium text-foreground">Drop 20%?</span>
+                        <span className="text-sm text-muted-foreground">Buy 15% more.</span>
+                      </div>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-sm font-medium text-foreground">Drop 30%?</span>
+                        <span className="text-sm text-muted-foreground">Buy 30% more.</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-primary flex items-center gap-2">
+                      <TrendingUp className="h-4 w-4" />
+                      When Your Stock Rises:
+                    </h4>
+                    <div className="space-y-2 pl-6">
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-sm font-medium text-foreground">Rise 30%?</span>
+                        <span className="text-sm text-muted-foreground">Sell 10%.</span>
+                      </div>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-sm font-medium text-foreground">Rise 50%?</span>
+                        <span className="text-sm text-muted-foreground">Sell 30%.</span>
+                      </div>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-sm font-medium text-foreground">Rise 100%?</span>
+                        <span className="text-sm text-muted-foreground">Sell 60%.</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="pt-2 border-t border-border">
+                  <p className="text-xs text-muted-foreground italic">
+                    No thinking. No emotion. Just execute the plan. The decision was already made before you entered the position. 🎯
+                  </p>
+                </div>
+              </CardContent>
+            </CollapsibleContent>
+          </Collapsible>
+        </Card>
 
         {/* Market Summary Bar */}
         <Card className="p-4 bg-card border-border rounded-2xl">
