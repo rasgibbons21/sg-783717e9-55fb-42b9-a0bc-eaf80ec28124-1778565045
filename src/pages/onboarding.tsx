@@ -60,7 +60,8 @@ export default function Onboarding() {
         return;
       }
 
-      if (authMode !== "forgot" && password.length < 6) {
+      // At this point, authMode is either "signup" or "login" (forgot was handled above)
+      if (password.length < 6) {
         setError("Password must be at least 6 characters long");
         setIsSubmitting(false);
         return;
@@ -398,7 +399,7 @@ export default function Onboarding() {
                       disabled={
                         isSubmitting || 
                         !email || 
-                        (authMode !== "forgot" && !password) || 
+                        !password || 
                         (authMode === "signup" && !fullName) ||
                         (authMode === "signup" && !termsAccepted)
                       }
