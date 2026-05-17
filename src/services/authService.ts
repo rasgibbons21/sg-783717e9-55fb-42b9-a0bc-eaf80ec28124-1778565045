@@ -13,6 +13,84 @@ export interface AuthError {
   code?: string;
 }
 
+// Helper function to check if Supabase is properly configured
+const checkSupabaseConnection = (): { isConnected: boolean; error?: string } => {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    return {
+      isConnected: false,
+      error: "Connection error. Please try again shortly.",
+    };
+  }
+
+  return { isConnected: true };
+};
+
+// Helper function to convert Supabase errors to user-friendly messages
+const formatAuthError = (error: any): AuthError => {
+  console.error("Auth error:", error);
+
+  // Map common Supabase error messages to user-friendly ones
+  const errorMessage = error?.message?.toLowerCase() || "";
+
+  if (errorMessage.includes("invalid login credentials")) {
+    return {
+      message: "Invalid email or password. Please check your credentials and try again.",
+      code: error?.status?.toString(),
+    };
+  }
+
+  if (errorMessage.includes("email not confirmed")) {
+    return {
+      message: "Please confirm your email address. Check your inbox for the confirmation link.",
+      code: error?.status?.toString(),
+    };
+  }
+
+  if (errorMessage.includes("user already registered")) {
+    return {
+      message: "An account with this email already exists. Try logging in instead.",
+      code: error?.status?.toString(),
+    };
+  }
+
+  if (errorMessage.includes("email rate limit exceeded")) {
+    return {
+      message: "Too many attempts. Please wait a few minutes and try again.",
+      code: error?.status?.toString(),
+    };
+  }
+
+  if (errorMessage.includes("invalid email")) {
+    return {
+      message: "Please enter a valid email address.",
+      code: error?.status?.toString(),
+    };
+  }
+
+  if (errorMessage.includes("password") && errorMessage.includes("short")) {
+    return {
+      message: "Password must be at least 6 characters long.",
+      code: error?.status?.toString(),
+    };
+  }
+
+  if (errorMessage.includes("network") || errorMessage.includes("fetch")) {
+    return {
+      message: "Network error. Please check your internet connection and try again.",
+      code: error?.status?.toString(),
+    };
+  }
+
+  // Return original message if no match found
+  return {
+    message: error?.message || "An unexpected error occurred. Please try again.",
+    code: error?.status?.toString(),
+  };
+};
+
 // Dynamic URL Helper
 const getURL = () => {
   let url = process?.env?.NEXT_PUBLIC_VERCEL_URL ?? 
@@ -53,6 +131,15 @@ export const authService = {
 
   // Sign up with email and password
   async signUp(email: string, password: string, fullName: string): Promise<{ user: AuthUser | null; error: AuthError | null }> {
+    // Check connection first
+    const connectionCheck = checkSupabaseConnection();
+    if (!connectionCheck.isConnected) {
+      return {
+        user: null,
+        error: { message: connectionCheck.error || "Connection error" },
+      };
+    }
+
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -66,7 +153,7 @@ export const authService = {
       });
 
       if (error) {
-        return { user: null, error: { message: error.message, code: error.status?.toString() } };
+        return { user: null, error: formatAuthError(error) };
       }
 
       const authUser = data.user ? {
@@ -79,7 +166,6 @@ export const authService = {
       // Send custom Resend confirmation email
       if (data.user && !data.user.confirmed_at) {
         try {
-          // Get the confirmation URL from Supabase
           const { data: { session } } = await supabase.auth.getSession();
           const confirmationUrl = `${getURL()}/auth/confirm?token=${data.user.email_confirmed_at}`;
           
@@ -99,16 +185,25 @@ export const authService = {
       }
 
       return { user: authUser, error: null };
-    } catch (error) {
+    } catch (error: any) {
       return { 
         user: null, 
-        error: { message: "An unexpected error occurred during sign up" } 
+        error: formatAuthError(error)
       };
     }
   },
 
   // Sign in with email and password
   async signIn(email: string, password: string): Promise<{ user: AuthUser | null; error: AuthError | null }> {
+    // Check connection first
+    const connectionCheck = checkSupabaseConnection();
+    if (!connectionCheck.isConnected) {
+      return {
+        user: null,
+        error: { message: connectionCheck.error || "Connection error" },
+      };
+    }
+
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -116,7 +211,7 @@ export const authService = {
       });
 
       if (error) {
-        return { user: null, error: { message: error.message, code: error.status?.toString() } };
+        return { user: null, error: formatAuthError(error) };
       }
 
       const authUser = data.user ? {
@@ -127,10 +222,10 @@ export const authService = {
       } : null;
 
       return { user: authUser, error: null };
-    } catch (error) {
+    } catch (error: any) {
       return { 
         user: null, 
-        error: { message: "An unexpected error occurred during sign in" } 
+        error: formatAuthError(error)
       };
     }
   },
@@ -156,17 +251,28 @@ export const authService = {
   /**
    * Send password reset email
    */
-  async resetPassword(email: string): Promise<{ error: any }> {
+  async resetPassword(email: string): Promise<{ error: AuthError | null }> {
+    // Check connection first
+    const connectionCheck = checkSupabaseConnection();
+    if (!connectionCheck.isConnected) {
+      return {
+        error: { message: connectionCheck.error || "Connection error" },
+      };
+    }
+
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback?type=recovery`,
       });
 
-      if (error) throw error;
+      if (error) {
+        return { error: formatAuthError(error) };
+      }
+
       return { error: null };
-    } catch (error) {
+    } catch (error: any) {
       console.error("Password reset error:", error);
-      return { error };
+      return { error: formatAuthError(error) };
     }
   },
 

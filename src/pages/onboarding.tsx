@@ -39,6 +39,13 @@ export default function Onboarding() {
     setIsSubmitting(true);
 
     try {
+      // Basic validation
+      if (!email || !email.includes("@")) {
+        setError("Please enter a valid email address");
+        setIsSubmitting(false);
+        return;
+      }
+
       if (authMode === "forgot") {
         const { error: resetError } = await authService.resetPassword(email);
         
@@ -53,9 +60,21 @@ export default function Onboarding() {
         return;
       }
 
+      if (authMode !== "forgot" && password.length < 6) {
+        setError("Password must be at least 6 characters long");
+        setIsSubmitting(false);
+        return;
+      }
+
       if (authMode === "signup") {
         if (!fullName.trim()) {
           setError("Please enter your full name");
+          setIsSubmitting(false);
+          return;
+        }
+
+        if (!termsAccepted) {
+          setError("Please accept the Terms of Service and Privacy Policy to continue");
           setIsSubmitting(false);
           return;
         }
@@ -85,10 +104,9 @@ export default function Onboarding() {
           router.push("/home");
         }
       }
-    } catch (err) {
-      setError("An unexpected error occurred");
-      console.error(err);
-    } finally {
+    } catch (err: any) {
+      console.error("Auth error:", err);
+      setError(err?.message || "An unexpected error occurred");
       setIsSubmitting(false);
     }
   };
@@ -370,7 +388,9 @@ export default function Onboarding() {
                     )}
 
                     {error && (
-                      <p className="text-sm text-rose">{error}</p>
+                      <Card className="p-4 bg-destructive/10 border-destructive rounded-xl">
+                        <p className="text-sm text-destructive font-medium">{error}</p>
+                      </Card>
                     )}
 
                     <Button
@@ -379,7 +399,8 @@ export default function Onboarding() {
                         isSubmitting || 
                         !email || 
                         (authMode !== "forgot" && !password) || 
-                        (authMode === "signup" && !fullName)
+                        (authMode === "signup" && !fullName) ||
+                        (authMode === "signup" && !termsAccepted)
                       }
                       className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-12 rounded-xl"
                     >
