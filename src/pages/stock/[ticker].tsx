@@ -1,594 +1,471 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import Script from "next/script";
 import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { marketService, type MarketAnalysis } from "@/services/marketService";
-import { pansyAnalysisService } from "@/services/pansyAnalysisService";
-import { ChevronDown, ChevronUp, Loader2, TrendingUp, TrendingDown } from "lucide-react";
-import { createChart, ColorType, CandlestickSeries, HistogramSeries } from "lightweight-charts";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ArrowLeft, TrendingUp, TrendingDown, Loader2 } from "lucide-react";
+import Link from "next/link";
 
-type ChartInterval = "1D" | "5D" | "1M" | "3M" | "6M" | "1Y";
+// Declare TradingView on window
+declare global {
+  interface Window {
+    TradingView: any;
+  }
+}
 
-export default function StockAnalysis() {
+interface StockQuote {
+  c: number;
+  h: number;
+  l: number;
+  o: number;
+  pc: number;
+  d: number;
+  dp: number;
+  t: number;
+}
+
+interface NewsArticle {
+  category: string;
+  datetime: number;
+  headline: string;
+  id: number;
+  image: string;
+  related: string;
+  source: string;
+  summary: string;
+  url: string;
+}
+
+interface PansyAnalysis {
+  overview: string;
+  entry: {
+    text: string;
+    signal: "good" | "wait" | "avoid";
+  };
+  exitHold: string;
+  risk: string;
+  timestamp: number;
+}
+
+export default function StockDetail() {
   const router = useRouter();
   const { ticker } = router.query;
-  const chartContainerRef = useRef<HTMLDivElement>(null);
-  const chartRef = useRef<any>(null);
-  const candlestickSeriesRef = useRef<any>(null);
-  const volumeSeriesRef = useRef<any>(null);
 
-  const [quote, setQuote] = useState<any>(null);
-  const [ohlcData, setOhlcData] = useState<any[]>([]);
-  const [marketAnalysis, setMarketAnalysis] = useState<MarketAnalysis | null>(null);
-  const [pansyAnalysis, setPansyAnalysis] = useState<any>(null);
-  const [news, setNews] = useState<any[]>([]);
-  const [isLoadingQuote, setIsLoadingQuote] = useState(true);
-  const [isLoadingChart, setIsLoadingChart] = useState(true);
-  const [isLoadingAnalysis, setIsLoadingAnalysis] = useState(true);
-  const [chartInterval, setChartInterval] = useState<ChartInterval>("1M");
-  const [showETFBreakdown, setShowETFBreakdown] = useState(false);
-  const [isETF] = useState(false);
-  const [etfHoldings] = useState<any[]>([]);
-  const [sectorMix] = useState<any[]>([]);
+  const [quote, setQuote] = useState<StockQuote | null>(null);
+  const [profile, setProfile] = useState<any>(null);
+  const [news, setNews] = useState<NewsArticle[]>([]);
+  const [pansyAnalysis, setPansyAnalysis] = useState<PansyAnalysis | null>(null);
+  const [loadingAnalysis, setLoadingAnalysis] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [chartLoaded, setChartLoaded] = useState(false);
+  const [selectedTimeframe, setSelectedTimeframe] = useState("1D");
+
+  // TradingView widget reference
+  const [widget, setWidget] = useState<any>(null);
+
+  const timeframes = [
+    { label: "1D", interval: "5", range: "1D" },
+    { label: "1W", interval: "30", range: "5D" },
+    { label: "1M", interval: "D", range: "1M" },
+    { label: "3M", interval: "D", range: "3M" },
+    { label: "6M", interval: "W", range: "6M" },
+    { label: "1Y", interval: "W", range: "12M" },
+  ];
 
   useEffect(() => {
-    if (ticker && typeof ticker === "string") {
-      loadStockData(ticker);
-    }
+    if (!ticker) return;
+    loadStockData();
   }, [ticker]);
 
   useEffect(() => {
-    if (ticker && typeof ticker === "string") {
-      loadChartData(ticker);
+    if (chartLoaded && ticker) {
+      initTradingViewWidget();
     }
-  }, [ticker, chartInterval]);
+  }, [chartLoaded, ticker, selectedTimeframe]);
 
-  // Initialize chart
-  useEffect(() => {
-    if (!chartContainerRef.current) return;
+  const loadStockData = async () => {
+    if (!ticker || typeof ticker !== "string") return;
 
-    const chart = createChart(chartContainerRef.current, {
-      layout: {
-        background: { type: ColorType.Solid, color: "#0a0a0f" },
-        textColor: "#8080a0",
-      },
-      grid: {
-        vertLines: { color: "#1e1e2a" },
-        horzLines: { color: "#1e1e2a" },
-      },
-      width: chartContainerRef.current.clientWidth,
-      height: 400,
-      crosshair: {
-        mode: 1,
-        vertLine: {
-          color: "#c8953a",
-          labelBackgroundColor: "#c8953a",
-        },
-        horzLine: {
-          color: "#c8953a",
-          labelBackgroundColor: "#c8953a",
-        },
-      },
-      timeScale: {
-        borderColor: "#2a2a3a",
-        timeVisible: true,
-      },
-      rightPriceScale: {
-        borderColor: "#2a2a3a",
-      },
-    });
-
-    const candlestickSeries = chart.addSeries(CandlestickSeries, {
-      upColor: "#22d472",
-      downColor: "#f04848",
-      borderUpColor: "#22d472",
-      borderDownColor: "#f04848",
-      wickUpColor: "#22d472",
-      wickDownColor: "#f04848",
-    });
-
-    const volumeSeries = chart.addSeries(HistogramSeries, {
-      color: "#8080a0",
-      priceFormat: {
-        type: "volume",
-      },
-      priceScaleId: "",
-    });
-
-    volumeSeries.priceScale().applyOptions({
-      scaleMargins: {
-        top: 0.8,
-        bottom: 0,
-      },
-    });
-
-    chartRef.current = chart;
-    candlestickSeriesRef.current = candlestickSeries;
-    volumeSeriesRef.current = volumeSeries;
-
-    const handleResize = () => {
-      if (chartContainerRef.current) {
-        chart.applyOptions({ width: chartContainerRef.current.clientWidth });
-      }
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-      chart.remove();
-    };
-  }, []);
-
-  // Update chart data
-  useEffect(() => {
-    if (ohlcData.length > 0 && candlestickSeriesRef.current && volumeSeriesRef.current) {
-      const candleData = ohlcData.map(d => ({
-        time: d.time,
-        open: d.open,
-        high: d.high,
-        low: d.low,
-        close: d.close,
-      }));
-
-      const volumeData = ohlcData.map(d => ({
-        time: d.time,
-        value: d.volume,
-        color: d.close >= d.open ? "#22d47233" : "#f0484833",
-      }));
-
-      candlestickSeriesRef.current.setData(candleData);
-      volumeSeriesRef.current.setData(volumeData);
-
-      if (chartRef.current) {
-        chartRef.current.timeScale().fitContent();
-      }
-    }
-  }, [ohlcData]);
-
-  const loadStockData = async (symbol: string) => {
-    setIsLoadingQuote(true);
-    setIsLoadingAnalysis(true);
-
-    // Fetch real-time quote
-    const quoteData = await marketService.getRealTimeQuote(symbol);
-    setQuote(quoteData);
-    setIsLoadingQuote(false);
-
-    // Fetch market analysis
-    const analysis = await marketService.getMarketAnalysis(symbol);
-    setMarketAnalysis(analysis);
-
-    // Generate Pansy's analysis with candlestick pattern recognition
-    if (quoteData && analysis) {
-      const pansyResponse = await generateCandlestickAnalysis(symbol, quoteData, analysis);
-      setPansyAnalysis(pansyResponse);
-    }
-    setIsLoadingAnalysis(false);
-
-    // Fetch news
+    setLoading(true);
     try {
-      const newsResponse = await fetch(
-        `https://finnhub.io/api/v1/company-news?symbol=${symbol}&from=${
-          new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]
-        }&to=${new Date().toISOString().split("T")[0]}&token=${
-          process.env.NEXT_PUBLIC_FINNHUB_API_KEY
-        }`
+      // Fetch quote
+      const quoteRes = await fetch(
+        `https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${process.env.NEXT_PUBLIC_FINNHUB_API_KEY}`
       );
-      const newsData = await newsResponse.json();
-      setNews(Array.isArray(newsData) ? newsData : []);
+      const quoteData = await quoteRes.json();
+      setQuote(quoteData);
+
+      // Fetch profile
+      const profileRes = await fetch(
+        `https://finnhub.io/api/v1/stock/profile2?symbol=${ticker}&token=${process.env.NEXT_PUBLIC_FINNHUB_API_KEY}`
+      );
+      const profileData = await profileRes.json();
+      setProfile(profileData);
+
+      // Fetch news
+      const newsRes = await fetch(
+        `https://finnhub.io/api/v1/company-news?symbol=${ticker}&from=${new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]}&to=${new Date().toISOString().split("T")[0]}&token=${process.env.NEXT_PUBLIC_FINNHUB_API_KEY}`
+      );
+      const newsData = await newsRes.json();
+      setNews(newsData.slice(0, 10));
+
+      // Check cache for Pansy analysis
+      checkCachedAnalysis(ticker.toUpperCase());
     } catch (error) {
-      console.error("Error fetching news:", error);
+      console.error("Error loading stock data:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const loadChartData = async (symbol: string) => {
-    setIsLoadingChart(true);
-    const days = getDaysForInterval(chartInterval);
-    const historical = await marketService.getHistoricalOHLC(symbol, days);
-    setOhlcData(historical);
-    setIsLoadingChart(false);
-  };
+  const checkCachedAnalysis = (tickerSymbol: string) => {
+    const now = new Date();
+    const cacheKey = `bloom_pansy_${tickerSymbol}_${now.toISOString().split("T")[0]}_${now.getHours()}`;
+    const cached = localStorage.getItem(cacheKey);
 
-  const getDaysForInterval = (interval: ChartInterval): number => {
-    switch (interval) {
-      case "1D":
-        return 1;
-      case "5D":
-        return 5;
-      case "1M":
-        return 30;
-      case "3M":
-        return 90;
-      case "6M":
-        return 180;
-      case "1Y":
-        return 365;
-      default:
-        return 30;
-    }
-  };
-
-  const generateCandlestickAnalysis = async (
-    symbol: string,
-    quoteData: any,
-    marketAnalysis: MarketAnalysis
-  ) => {
-    try {
-      // Analyze recent candles for patterns
-      const recentCandles = ohlcData.slice(-5);
-      let patternText = "";
-
-      if (recentCandles.length >= 3) {
-        const greenCandles = recentCandles.filter(c => c.close > c.open).length;
-        const redCandles = recentCandles.length - greenCandles;
-        
-        const volumeIncreasing = recentCandles.length >= 2 && 
-          recentCandles[recentCandles.length - 1].volume > recentCandles[recentCandles.length - 2].volume;
-
-        if (greenCandles >= 3 && volumeIncreasing) {
-          patternText = "The last 3 candles are all green with increasing volume — that's called momentum and it usually means buyers are in control right now 📈";
-        } else if (redCandles >= 3 && volumeIncreasing) {
-          patternText = "Seeing 3 red candles in a row with heavy volume — sellers are pushing hard right now. This could continue or bounce, so watch closely 👀";
-        } else if (greenCandles === redCandles) {
-          patternText = "The chart's been bouncing between green and red candles — that's indecision. The market doesn't know which way it wants to go yet 🤔";
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        // Check if cache is less than 2 hours old
+        if (Date.now() - parsed.timestamp < 2 * 60 * 60 * 1000) {
+          setPansyAnalysis(parsed);
+          return;
         }
+      } catch (e) {
+        console.error("Error parsing cached analysis:", e);
       }
+    }
 
-      const trendText = marketAnalysis.trend === "up" ? "climbing" : marketAnalysis.trend === "down" ? "dropping" : "trading sideways";
-      const volumeText = marketAnalysis.volumeRatio > 1.5 ? `${marketAnalysis.volumeRatio.toFixed(1)}x the average` : "about average";
-      
-      const prompt = `You are Pansy, Bloom's investing expert. Write a 3 paragraph analysis in your warm girlfriend tone about ${symbol}.
+    // No valid cache, fetch new analysis
+    if (quote && profile) {
+      fetchPansyAnalysis(tickerSymbol);
+    }
+  };
 
-Use this REAL candlestick chart data in your analysis:
-- ${patternText}
-- The stock has been ${trendText} over the last 30 days.
-- Today's volume is ${volumeText}.
-- Current price: $${quoteData.c.toFixed(2)}
+  const fetchPansyAnalysis = async (tickerSymbol: string) => {
+    if (!quote || !profile) return;
 
-Reference the candlestick pattern naturally like: "The last 3 candles are all green with increasing volume — that's momentum girl, buyers are stepping in 📈"
-
-Make it conversational. No financial jargon. Never say buy/sell/hold.
-End with: "This is just educational info — not financial advice. Always invest what feels right for you 💛 — Pansy"`;
-
+    setLoadingAnalysis(true);
+    try {
       const response = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify({
+          ticker: tickerSymbol,
+          name: profile.name || tickerSymbol,
+          price: quote.c,
+          change: quote.d,
+          changePercent: quote.dp,
+          high52: profile.high52 || quote.h,
+          low52: profile.low52 || quote.l,
+          marketCap: profile.marketCapitalization,
+          peRatio: profile.peRatio,
+          news: news.slice(0, 3),
+        }),
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        return {
-          content: data.content || data.analysis || "Analysis generated.",
-          sentiment: data.sentiment || "Neutral",
-          analysis: data.content || data.analysis,
-          timestamp: new Date().toISOString(),
-        };
+      const data = await response.json();
+
+      if (data.analysis) {
+        // Parse the analysis into structured format
+        const analysis: PansyAnalysis = parseAnalysis(data.analysis);
+        setPansyAnalysis(analysis);
+
+        // Cache the analysis
+        const now = new Date();
+        const cacheKey = `bloom_pansy_${tickerSymbol}_${now.toISOString().split("T")[0]}_${now.getHours()}`;
+        localStorage.setItem(cacheKey, JSON.stringify(analysis));
       }
-      return pansyAnalysisService.getStaticFallbackAnalysis(symbol);
     } catch (error) {
-      console.error("Error generating candlestick analysis:", error);
-      return pansyAnalysisService.getStaticFallbackAnalysis(symbol);
+      console.error("Error fetching Pansy analysis:", error);
+    } finally {
+      setLoadingAnalysis(false);
     }
   };
 
-  const formatPrice = (price: number | undefined | null) => {
-    if (price == null) return "$0.00";
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-    }).format(price);
+  const parseAnalysis = (text: string): PansyAnalysis => {
+    // Simple parsing - you can make this more sophisticated
+    const paragraphs = text.split("\n\n").filter((p) => p.trim());
+
+    // Determine entry signal based on keywords
+    let entrySignal: "good" | "wait" | "avoid" = "wait";
+    const lowerText = text.toLowerCase();
+    if (lowerText.includes("good entry") || lowerText.includes("solid entry") || lowerText.includes("good time to")) {
+      entrySignal = "good";
+    } else if (lowerText.includes("avoid") || lowerText.includes("stay away") || lowerText.includes("not worth")) {
+      entrySignal = "avoid";
+    }
+
+    return {
+      overview: paragraphs[0] || text.substring(0, 200),
+      entry: {
+        text: paragraphs[1] || "Consider your risk tolerance and investment goals before entering a position.",
+        signal: entrySignal,
+      },
+      exitHold: paragraphs[2] || "Monitor your position and adjust based on your goals.",
+      risk: paragraphs[3] || "Market volatility can affect all stocks. Invest only what you can afford to lose.",
+      timestamp: Date.now(),
+    };
   };
 
-  const formatLargeNumber = (num: number | undefined | null) => {
-    if (num == null) return "N/A";
-    if (num >= 1e12) return `$${(num / 1e12).toFixed(2)}T`;
-    if (num >= 1e9) return `$${(num / 1e9).toFixed(2)}B`;
-    if (num >= 1e6) return `$${(num / 1e6).toFixed(2)}M`;
-    return `$${num.toLocaleString()}`;
+  const initTradingViewWidget = () => {
+    if (!ticker || !window.TradingView) return;
+
+    // Clear existing widget
+    const container = document.getElementById("tradingview_chart");
+    if (container) {
+      container.innerHTML = "";
+    }
+
+    const timeframe = timeframes.find((t) => t.label === selectedTimeframe);
+
+    try {
+      const newWidget = new window.TradingView.widget({
+        width: "100%",
+        height: 400,
+        symbol: ticker as string,
+        interval: timeframe?.interval || "D",
+        timezone: "Etc/UTC",
+        theme: "dark",
+        style: "1",
+        locale: "en",
+        toolbar_bg: "#0a0a10",
+        enable_publishing: false,
+        hide_top_toolbar: false,
+        hide_legend: false,
+        save_image: false,
+        container_id: "tradingview_chart",
+        studies: ["RSI@tv-builtin", "MACD@tv-builtin"],
+        overrides: {
+          "mainSeriesProperties.candleStyle.upColor": "#22d472",
+          "mainSeriesProperties.candleStyle.downColor": "#f04848",
+          "mainSeriesProperties.candleStyle.wickUpColor": "#22d472",
+          "mainSeriesProperties.candleStyle.wickDownColor": "#f04848",
+          "paneProperties.background": "#0a0a10",
+          "paneProperties.vertGridProperties.color": "#1e1e2c",
+          "paneProperties.horzGridProperties.color": "#1e1e2c",
+          "scalesProperties.textColor": "#8080a0",
+        },
+      });
+
+      setWidget(newWidget);
+    } catch (error) {
+      console.error("Error initializing TradingView widget:", error);
+    }
   };
 
-  if (!ticker || typeof ticker !== "string") {
+  if (loading) {
     return (
       <Layout>
-        <div className="flex items-center justify-center min-h-screen">
-          <p className="text-muted-foreground">Invalid ticker</p>
+        <div className="container-full py-6 space-y-6">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-96 w-full" />
+          <Skeleton className="h-64 w-full" />
         </div>
       </Layout>
     );
   }
 
+  if (!quote || !profile) {
+    return (
+      <Layout>
+        <div className="container-full py-6">
+          <p className="text-muted-foreground">Stock data not available</p>
+        </div>
+      </Layout>
+    );
+  }
+
+  const isPositive = quote.dp >= 0;
+
   return (
     <Layout>
-      <SEO
-        title={`${ticker.toUpperCase()} Stock Analysis - Bloom`}
-        description={`Pansy's investment analysis for ${ticker.toUpperCase()}`}
-      />
-      <div className="container-full py-6 space-y-6">
-        {/* Price Header */}
-        <div className="space-y-2">
-          <div className="flex items-start justify-between">
-            <div>
-              <h1 className="font-serif text-4xl font-bold text-foreground">
-                {ticker.toUpperCase()}
-              </h1>
-              <p className="text-muted-foreground text-lg">Stock Analysis</p>
-            </div>
-            <Badge
-              className={`text-base px-4 py-2 ${
-                (quote?.dp ?? 0) >= 0
-                  ? "bg-primary/20 text-primary hover:bg-primary/20"
-                  : "bg-rose/20 text-rose hover:bg-rose/20"
-              }`}
-            >
-              {(quote?.dp ?? 0) >= 0 ? "+" : ""}
-              {quote?.dp != null ? quote.dp.toFixed(2) : "0.00"}%
-            </Badge>
-          </div>
+      <SEO title={`${ticker} - ${profile.name || "Stock Analysis"} | Bloom`} description={`Get Pansy's analysis on ${ticker} stock`} />
 
-          <div className="space-y-1">
-            <p className="text-5xl font-bold text-foreground tabular-nums">
-              {formatPrice(quote?.c)}
-            </p>
-            <p
-              className={`text-xl font-semibold tabular-nums ${
-                (quote?.d ?? 0) >= 0 ? "text-primary" : "text-rose"
-              }`}
-            >
-              {(quote?.d ?? 0) >= 0 ? "+" : ""}
-              {formatPrice(quote?.d)} today
-            </p>
+      <Script
+        src="https://s3.tradingview.com/tv.js"
+        strategy="lazyOnload"
+        onLoad={() => setChartLoaded(true)}
+      />
+
+      <div className="container-full py-6 space-y-6">
+        {/* Back Button */}
+        <Link href="/discover">
+          <Button variant="ghost" size="sm">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Discover
+          </Button>
+        </Link>
+
+        {/* Stock Header */}
+        <div className="space-y-2">
+          <div className="flex items-center gap-3">
+            <h1 className="text-3xl font-bold text-foreground">{ticker}</h1>
+            {profile.logo && (
+              <img src={profile.logo} alt={profile.name} className="w-10 h-10 rounded-full object-cover" />
+            )}
+          </div>
+          <p className="text-lg text-muted-foreground">{profile.name}</p>
+          <div className="flex items-baseline gap-3">
+            <span className="text-4xl font-bold text-foreground">${quote.c.toFixed(2)}</span>
+            <Badge variant={isPositive ? "default" : "destructive"} className="text-sm">
+              {isPositive ? <TrendingUp className="w-4 h-4 mr-1" /> : <TrendingDown className="w-4 h-4 mr-1" />}
+              {isPositive ? "+" : ""}
+              {quote.d.toFixed(2)} ({isPositive ? "+" : ""}
+              {quote.dp.toFixed(2)}%)
+            </Badge>
           </div>
         </div>
 
-        {/* Candlestick Chart */}
-        <Card className="p-6 bg-card border-border rounded-2xl">
-          <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
-            {(["1D", "5D", "1M", "3M", "6M", "1Y"] as ChartInterval[]).map((interval) => (
-              <Button
-                key={interval}
-                variant={chartInterval === interval ? "default" : "outline"}
-                size="sm"
-                onClick={() => setChartInterval(interval)}
-                className={
-                  chartInterval === interval
-                    ? "bg-primary text-primary-foreground"
-                    : "border-border text-foreground hover:bg-primary/10"
-                }
-              >
-                {interval}
-              </Button>
-            ))}
-          </div>
+        {/* Timeframe Buttons */}
+        <div className="flex gap-2 overflow-x-auto pb-2">
+          {timeframes.map((tf) => (
+            <Button
+              key={tf.label}
+              variant={selectedTimeframe === tf.label ? "default" : "outline"}
+              size="sm"
+              onClick={() => setSelectedTimeframe(tf.label)}
+              className="min-w-[60px]"
+            >
+              {tf.label}
+            </Button>
+          ))}
+        </div>
 
-          {isLoadingChart ? (
-            <div className="h-96 flex items-center justify-center bg-popover rounded-xl">
-              <Loader2 className="w-8 h-8 animate-spin text-accent" />
-            </div>
-          ) : (
-            <div
-              ref={chartContainerRef}
-              className="w-full rounded-xl overflow-hidden"
-              style={{ minHeight: "400px" }}
-            />
-          )}
+        {/* TradingView Chart */}
+        <Card className="bg-card border-border">
+          <CardContent className="p-0">
+            <div id="tradingview_chart" className="w-full" style={{ minHeight: "400px" }}></div>
+          </CardContent>
         </Card>
 
         {/* Pansy's Analysis */}
-        {isLoadingAnalysis ? (
-          <Card className="p-6 bg-card border-accent/20 rounded-2xl space-y-4">
-            <div className="flex items-start gap-4">
-              <Skeleton className="w-16 h-16 rounded-full" />
-              <div className="flex-1 space-y-2">
-                <Skeleton className="h-4 w-24" />
-                <Skeleton className="h-3 w-32" />
+        <Card className="border-accent/20 bg-gradient-to-br from-accent/5 to-primary/5">
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-2xl">
+                🌺
+              </div>
+              <div>
+                <CardTitle className="text-xl text-accent">Pansy's Analysis</CardTitle>
+                <p className="text-sm text-muted-foreground">Investment analysis in plain language</p>
               </div>
             </div>
-            <Skeleton className="h-20 w-full" />
-          </Card>
-        ) : pansyAnalysis ? (
-          <Card className="p-6 bg-card border-accent/20 rounded-2xl space-y-4">
-            <div className="flex items-start gap-4">
-              <img
-                src="/bloom-logo.png"
-                alt="Pansy"
-                className="w-16 h-16 rounded-full object-cover"
-              />
-              <div className="space-y-1 flex-1">
-                <div className="flex items-center gap-2">
-                  <h3 className="font-semibold text-foreground text-lg">Pansy</h3>
-                  <Badge
-                    variant="outline"
-                    className={`text-xs ${
-                      pansyAnalysis.sentiment === "Positive"
-                        ? "bg-primary/10 text-primary border-primary"
-                        : pansyAnalysis.sentiment === "Negative"
-                        ? "bg-destructive/10 text-destructive border-destructive"
-                        : "bg-muted text-muted-foreground"
+          </CardHeader>
+          <CardContent>
+            {loadingAnalysis ? (
+              <div className="flex flex-col items-center justify-center py-12 space-y-4">
+                <Loader2 className="w-8 h-8 text-accent animate-spin" />
+                <p className="text-muted-foreground">Pansy is analyzing {ticker} for you... 🌸</p>
+              </div>
+            ) : pansyAnalysis ? (
+              <Tabs defaultValue="overview" className="w-full">
+                <TabsList className="grid w-full grid-cols-4">
+                  <TabsTrigger value="overview">Overview</TabsTrigger>
+                  <TabsTrigger value="entry">Entry</TabsTrigger>
+                  <TabsTrigger value="exit">Exit/Hold</TabsTrigger>
+                  <TabsTrigger value="risk">Risk</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="overview" className="space-y-4">
+                  <p className="text-foreground leading-relaxed">{pansyAnalysis.overview}</p>
+                </TabsContent>
+
+                <TabsContent value="entry" className="space-y-4">
+                  <h3 className="font-semibold text-foreground flex items-center gap-2">
+                    Entry Consideration 🎯
+                  </h3>
+                  <Card
+                    className={`p-4 ${
+                      pansyAnalysis.entry.signal === "good"
+                        ? "bg-primary/10 border-primary"
+                        : pansyAnalysis.entry.signal === "avoid"
+                        ? "bg-destructive/10 border-destructive"
+                        : "bg-accent/10 border-accent"
                     }`}
                   >
-                    {pansyAnalysis.sentiment === "Positive" ? (
-                      <TrendingUp className="w-3 h-3 mr-1" />
-                    ) : pansyAnalysis.sentiment === "Negative" ? (
-                      <TrendingDown className="w-3 h-3 mr-1" />
-                    ) : null}
-                    {pansyAnalysis.sentiment}
-                  </Badge>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  Bloom's Investing Expert
-                </p>
-              </div>
-            </div>
+                    <p className="text-foreground leading-relaxed">{pansyAnalysis.entry.text}</p>
+                  </Card>
+                </TabsContent>
 
-            <div className="prose prose-sm max-w-none">
-              <p className="text-foreground leading-relaxed whitespace-pre-line">
-                {pansyAnalysis.content}
-              </p>
-            </div>
+                <TabsContent value="exit" className="space-y-4">
+                  <h3 className="font-semibold text-foreground flex items-center gap-2">
+                    Exit or Hold? 💭
+                  </h3>
+                  <p className="text-foreground leading-relaxed">{pansyAnalysis.exitHold}</p>
+                </TabsContent>
 
-            <p className="text-sm font-medium text-accent">— Pansy 🌺</p>
+                <TabsContent value="risk" className="space-y-4">
+                  <h3 className="font-semibold text-foreground flex items-center gap-2">
+                    Key Risk ⚠️
+                  </h3>
+                  <Card className="p-4 bg-accent/10 border-accent">
+                    <p className="text-foreground leading-relaxed">{pansyAnalysis.risk}</p>
+                  </Card>
+                </TabsContent>
 
-            <Card className="p-3 bg-muted/50 border-muted-foreground/20 rounded-xl">
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                This is just educational info — not financial advice. Always invest
-                what feels right for you 💛 — Pansy
-              </p>
-            </Card>
-          </Card>
-        ) : null}
-
-        {/* Key Stats */}
-        <Card className="p-6 bg-card border-border rounded-2xl">
-          <h2 className="font-serif text-2xl font-bold text-foreground mb-4">Key Stats</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="space-y-1">
-              <p className="text-xs text-muted-foreground">Market Cap</p>
-              <p className="text-lg font-bold text-foreground">{formatLargeNumber((quote as any)?.marketCap)}</p>
-            </div>
-            <div className="space-y-1">
-              <p className="text-xs text-muted-foreground">52W High</p>
-              <p className="text-lg font-bold text-foreground">{formatPrice(quote?.h)}</p>
-            </div>
-            <div className="space-y-1">
-              <p className="text-xs text-muted-foreground">52W Low</p>
-              <p className="text-lg font-bold text-foreground">{formatPrice(quote?.l)}</p>
-            </div>
-            <div className="space-y-1">
-              <p className="text-xs text-muted-foreground">Volume</p>
-              <p className="text-lg font-bold text-foreground tabular-nums">
-                {(quote as any)?.v ? ((quote as any).v / 1e6).toFixed(2) + "M" : "N/A"}
-              </p>
-            </div>
-          </div>
-        </Card>
-
-        {/* ETF Breakdown */}
-        {isETF && (
-          <Card className="p-6 bg-card border-border rounded-2xl space-y-4">
-            <Button
-              variant="ghost"
-              onClick={() => setShowETFBreakdown(!showETFBreakdown)}
-              className="w-full flex items-center justify-between"
-            >
-              <span className="font-semibold text-foreground">
-                See what's inside 🌺
-              </span>
-              {showETFBreakdown ? (
-                <ChevronUp className="w-5 h-5" />
-              ) : (
-                <ChevronDown className="w-5 h-5" />
-              )}
-            </Button>
-
-            {showETFBreakdown && (
-              <div className="space-y-6 pt-4">
-                <div className="space-y-3">
-                  <h4 className="font-semibold text-foreground">Top Holdings</h4>
-                  {etfHoldings.slice(0, 5).map((holding, index) => (
-                    <div key={index} className="space-y-1">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="font-medium text-foreground">
-                          {holding.symbol}
-                        </span>
-                        <span className="text-muted-foreground">
-                          {holding.weight.toFixed(2)}%
-                        </span>
-                      </div>
-                      <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-accent"
-                          style={{ width: `${holding.weight}%` }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {sectorMix.length > 0 && (
-                  <div className="space-y-3">
-                    <h4 className="font-semibold text-foreground">
-                      Sector Breakdown
-                    </h4>
-                    <div className="flex flex-wrap gap-2">
-                      {sectorMix.map((sector, index) => (
-                        <Badge
-                          key={index}
-                          variant="outline"
-                          className="text-xs"
-                        >
-                          {sector.sector}: {sector.percentage.toFixed(1)}%
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                <Card className="p-4 bg-accent/5 border-accent rounded-xl">
-                  <p className="text-sm text-foreground leading-relaxed">
-                    Basically girl, when you buy {ticker.toUpperCase()} you're buying
-                    a little piece of {etfHoldings.length}+ solid companies at once.
-                    If one has a bad week the others hold it up 💪 It's like not
-                    putting all your eggs in one basket.
+                <div className="mt-6 pt-4 border-t border-border">
+                  <p className="text-xs text-muted-foreground italic">
+                    Educational only. Not financial advice. Do your own research before investing. — Pansy 🌺
                   </p>
-                </Card>
+                </div>
+              </Tabs>
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">Analysis not available yet</p>
+                <Button onClick={() => fetchPansyAnalysis(ticker as string)} variant="outline" className="mt-4">
+                  Generate Analysis
+                </Button>
               </div>
             )}
-          </Card>
-        )}
+          </CardContent>
+        </Card>
 
         {/* Latest News */}
         {news.length > 0 && (
-          <div className="space-y-4">
-            <h2 className="font-serif text-2xl font-bold text-foreground">
-              Latest News
-            </h2>
-            <div className="space-y-3">
-              {news.slice(0, 5).map((article, index) => (
-                <Card key={index} className="p-5 bg-card border-border rounded-2xl hover:border-accent/30 transition-colors">
-                  <div className="space-y-2">
-                    <p className="text-xs text-muted-foreground">
-                      {article.source} •{" "}
-                      {new Date(article.datetime * 1000).toLocaleDateString()}
-                    </p>
-                    <h3 className="font-semibold text-foreground text-lg">
-                      {article.headline}
-                    </h3>
-                    {article.summary && (
-                      <p className="text-sm text-muted-foreground line-clamp-2">
-                        {article.summary}
-                      </p>
-                    )}
-                    {article.url && (
-                      <a
-                        href={article.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm text-accent hover:underline inline-block"
-                      >
-                        Read more →
-                      </a>
+          <Card>
+            <CardHeader>
+              <CardTitle>Latest News</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {news.map((article) => (
+                <a
+                  key={article.id}
+                  href={article.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors"
+                >
+                  <div className="flex justify-between items-start gap-4">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-foreground mb-1">{article.headline}</h3>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <span>{article.source}</span>
+                        <span>•</span>
+                        <span>{new Date(article.datetime * 1000).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                    {article.image && (
+                      <img src={article.image} alt="" className="w-20 h-20 object-cover rounded" />
                     )}
                   </div>
-                </Card>
+                </a>
               ))}
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         )}
 
         {/* Disclaimer */}
-        <Card className="p-4 bg-muted/50 border-border/50 rounded-2xl">
-          <p className="text-xs text-center text-muted-foreground leading-relaxed">
-            This is educational content only and does not constitute financial
-            advice. Bloom is not liable for any investment decisions or losses.
+        <div className="p-4 bg-muted/50 border border-border rounded-lg">
+          <p className="text-xs text-muted-foreground text-center">
+            This is educational content only and does not constitute financial advice. Bloom is not liable for any investment decisions or losses.
           </p>
-        </Card>
+        </div>
       </div>
     </Layout>
   );
