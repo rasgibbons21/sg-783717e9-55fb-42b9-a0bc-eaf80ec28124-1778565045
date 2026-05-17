@@ -318,6 +318,7 @@ export default function Onboarding() {
                       </p>
                     </div>
                     <Button
+                      type="button"
                       onClick={() => {
                         setAuthMode("login");
                         setResetEmailSent(false);
@@ -395,11 +396,12 @@ export default function Onboarding() {
                     )}
 
                     <Button
+                      type="button"
                       onClick={handleAuth}
                       disabled={
                         isSubmitting || 
                         !email || 
-                        !password || 
+                        (authMode !== "forgot" && !password) || 
                         (authMode === "signup" && !fullName) ||
                         (authMode === "signup" && !termsAccepted)
                       }
@@ -471,6 +473,7 @@ export default function Onboarding() {
             </div>
 
             <Button
+              type="button"
               onClick={() => setStep("goals")}
               className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-12 rounded-xl"
             >
@@ -532,6 +535,7 @@ export default function Onboarding() {
             </div>
 
             <Button
+              type="button"
               onClick={() => setStep("risk")}
               disabled={goals.length === 0}
               className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-12 rounded-xl"
@@ -596,6 +600,7 @@ export default function Onboarding() {
             )}
 
             <Button
+              type="button"
               onClick={handleCompleteOnboarding}
               disabled={isSubmitting}
               className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-12 rounded-xl"
