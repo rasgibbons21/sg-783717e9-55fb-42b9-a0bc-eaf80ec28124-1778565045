@@ -6,6 +6,10 @@ import type { Database } from './types';
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
+// Log the Supabase URL on app load for debugging
+console.log('Supabase URL:', SUPABASE_URL);
+console.log('Supabase Key exists:', !!SUPABASE_PUBLISHABLE_KEY);
+
 if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
   throw new Error('Missing Supabase environment variables. Please check your .env.local file.');
 }

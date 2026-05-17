@@ -13,6 +13,38 @@ export interface AuthError {
   code?: string;
 }
 
+// Test Supabase connection before auth operations
+async function testSupabaseConnection(): Promise<boolean> {
+  try {
+    console.log('Testing Supabase connection...');
+    const { error } = await supabase
+      .from('profiles')
+      .select('count')
+      .limit(1);
+    
+    if (error) {
+      console.error('Supabase connection error:', error);
+      return false;
+    }
+    
+    console.log('Supabase connection successful');
+    return true;
+  } catch (err) {
+    console.error('Connection test failed:', err);
+    return false;
+  }
+}
+
+// Timeout wrapper for auth operations
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number = 10000): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error('Request timeout')), timeoutMs)
+    ),
+  ]);
+}
+
 // Helper function to check if Supabase is properly configured
 const checkSupabaseConnection = (): { isConnected: boolean; error?: string } => {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -34,6 +66,21 @@ const formatAuthError = (error: any): AuthError => {
 
   // Map common Supabase error messages to user-friendly ones
   const errorMessage = error?.message?.toLowerCase() || "";
+
+  // Connection and timeout errors
+  if (errorMessage.includes("timeout") || errorMessage.includes("request timeout")) {
+    return {
+      message: "This is taking longer than usual. Please try again 🌸",
+      code: "TIMEOUT",
+    };
+  }
+
+  if (errorMessage.includes("failed to fetch") || errorMessage.includes("network request failed")) {
+    return {
+      message: "We are having trouble connecting right now. Please check back in a moment 🌸",
+      code: "CONNECTION_ERROR",
+    };
+  }
 
   if (errorMessage.includes("invalid login credentials")) {
     return {
@@ -140,8 +187,20 @@ export const authService = {
       };
     }
 
+    // Test actual Supabase connection
+    const isConnected = await testSupabaseConnection();
+    if (!isConnected) {
+      return {
+        user: null,
+        error: { 
+          message: "We are having trouble connecting right now. Please check back in a moment 🌸",
+          code: "CONNECTION_ERROR"
+        },
+      };
+    }
+
     try {
-      const { data, error } = await supabase.auth.signUp({
+      const signUpPromise = supabase.auth.signUp({
         email,
         password,
         options: {
@@ -151,6 +210,8 @@ export const authService = {
           emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
         }
       });
+
+      const { data, error } = await withTimeout(signUpPromise, 10000);
 
       if (error) {
         return { user: null, error: formatAuthError(error) };
@@ -204,11 +265,25 @@ export const authService = {
       };
     }
 
+    // Test actual Supabase connection
+    const isConnected = await testSupabaseConnection();
+    if (!isConnected) {
+      return {
+        user: null,
+        error: { 
+          message: "We are having trouble connecting right now. Please check back in a moment 🌸",
+          code: "CONNECTION_ERROR"
+        },
+      };
+    }
+
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const signInPromise = supabase.auth.signInWithPassword({
         email,
         password,
       });
+
+      const { data, error } = await withTimeout(signInPromise, 10000);
 
       if (error) {
         return { user: null, error: formatAuthError(error) };
@@ -260,10 +335,23 @@ export const authService = {
       };
     }
 
+    // Test actual Supabase connection
+    const isConnected = await testSupabaseConnection();
+    if (!isConnected) {
+      return {
+        error: { 
+          message: "We are having trouble connecting right now. Please check back in a moment 🌸",
+          code: "CONNECTION_ERROR"
+        },
+      };
+    }
+
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      const resetPromise = supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback?type=recovery`,
       });
+
+      const { error } = await withTimeout(resetPromise, 10000);
 
       if (error) {
         return { error: formatAuthError(error) };
