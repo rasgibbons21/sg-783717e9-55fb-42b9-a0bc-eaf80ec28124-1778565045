@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -27,7 +26,6 @@ import {
   Trash2,
   Eye,
   Send,
-  AlertTriangle,
   Database,
   Brain,
   BarChart3,
@@ -39,11 +37,11 @@ import { supabase } from "@/integrations/supabase/client";
 interface User {
   id: string;
   email: string;
-  full_name: string;
+  full_name?: string;
   created_at: string;
   experience_level?: string;
   risk_tolerance?: string;
-  plan_type: string;
+  plan_type?: string;
   last_active?: string;
 }
 
@@ -63,6 +61,14 @@ interface AnalysisLog {
   created_at: string;
   user_id: string;
   success: boolean;
+}
+
+interface EmailLog {
+  id: string;
+  email: string;
+  type: string;
+  status: string;
+  created_at: string;
 }
 
 interface SystemHealth {
@@ -93,6 +99,7 @@ export default function AdminDashboard() {
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [analysisLogs, setAnalysisLogs] = useState<AnalysisLog[]>([]);
+  const [emailLogs, setEmailLogs] = useState<EmailLog[]>([]);
   const [systemHealth, setSystemHealth] = useState<SystemHealth>({
     supabase: false,
     anthropic: false,
@@ -122,6 +129,7 @@ export default function AdminDashboard() {
       loadOverviewStats(),
       loadUsers(),
       loadAnalysisLogs(),
+      loadEmailLogs(),
       checkSystemHealth(),
     ]);
     setLoading(false);
@@ -130,12 +138,10 @@ export default function AdminDashboard() {
   // Load overview statistics
   const loadOverviewStats = async () => {
     try {
-      // Total users
       const { count: totalUsers } = await supabase
         .from("profiles")
         .select("*", { count: "exact", head: true });
 
-      // New users today
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const { count: newUsersToday } = await supabase
@@ -143,7 +149,6 @@ export default function AdminDashboard() {
         .select("*", { count: "exact", head: true })
         .gte("created_at", today.toISOString());
 
-      // New users this week
       const weekAgo = new Date();
       weekAgo.setDate(weekAgo.getDate() - 7);
       const { count: newUsersWeek } = await supabase
@@ -151,7 +156,6 @@ export default function AdminDashboard() {
         .select("*", { count: "exact", head: true })
         .gte("created_at", weekAgo.toISOString());
 
-      // New users this month
       const monthAgo = new Date();
       monthAgo.setDate(monthAgo.getDate() - 30);
       const { count: newUsersMonth } = await supabase
@@ -159,13 +163,11 @@ export default function AdminDashboard() {
         .select("*", { count: "exact", head: true })
         .gte("created_at", monthAgo.toISOString());
 
-      // Completed onboarding
       const { count: completedOnboarding } = await supabase
         .from("profiles")
         .select("*", { count: "exact", head: true })
         .not("experience_level", "is", null);
 
-      // Total watchlist items
       const { count: totalWatchlist } = await supabase
         .from("watchlist")
         .select("*", { count: "exact", head: true });
@@ -175,7 +177,7 @@ export default function AdminDashboard() {
         newUsersToday: newUsersToday || 0,
         newUsersWeek: newUsersWeek || 0,
         newUsersMonth: newUsersMonth || 0,
-        activeSessions: 0, // Would need active session tracking
+        activeSessions: 0,
         completedOnboarding: completedOnboarding || 0,
         totalWatchlist: totalWatchlist || 0,
       });
@@ -194,8 +196,8 @@ export default function AdminDashboard() {
 
       if (error) throw error;
 
-      setUsers(data || []);
-      setFilteredUsers(data || []);
+      setUsers((data as User[]) || []);
+      setFilteredUsers((data as User[]) || []);
     } catch (error) {
       console.error("Error loading users:", error);
     }
@@ -210,14 +212,28 @@ export default function AdminDashboard() {
         .order("created_at", { ascending: false })
         .limit(50);
 
-      if (error) {
-        console.log("Analysis logs table might not exist yet");
-        return;
+      if (!error && data) {
+        setAnalysisLogs(data);
       }
-
-      setAnalysisLogs(data || []);
     } catch (error) {
       console.error("Error loading analysis logs:", error);
+    }
+  };
+
+  // Load email logs
+  const loadEmailLogs = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("email_logs")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(50);
+
+      if (!error && data) {
+        setEmailLogs(data);
+      }
+    } catch (error) {
+      console.error("Error loading email logs:", error);
     }
   };
 
@@ -230,7 +246,6 @@ export default function AdminDashboard() {
       email: false,
     };
 
-    // Check Supabase
     try {
       const { error } = await supabase.from("profiles").select("count").limit(1);
       health.supabase = !error;
@@ -238,17 +253,9 @@ export default function AdminDashboard() {
       health.supabase = false;
     }
 
-    // Check Anthropic (would need an API call)
-    health.anthropic = !!process.env.NEXT_PUBLIC_ANTHROPIC_API_KEY;
-
-    // Check Market Data APIs
-    health.marketData = !!(
-      process.env.NEXT_PUBLIC_FINNHUB_API_KEY &&
-      process.env.NEXT_PUBLIC_POLYGON_API_KEY
-    );
-
-    // Check Resend (would need an API call)
-    health.email = true; // Assume working for now
+    health.anthropic = !!process.env.NEXT_PUBLIC_ANTHROPIC_API_KEY || !!process.env.ANTHROPIC_API_KEY;
+    health.marketData = !!(process.env.NEXT_PUBLIC_FINNHUB_API_KEY || process.env.NEXT_PUBLIC_POLYGON_API_KEY);
+    health.email = true;
 
     setSystemHealth(health);
   };
@@ -278,9 +285,7 @@ export default function AdminDashboard() {
 
     try {
       const { error } = await supabase.from("profiles").delete().eq("id", userId);
-
       if (error) throw error;
-
       await loadUsers();
       await loadOverviewStats();
     } catch (error) {
@@ -305,7 +310,6 @@ export default function AdminDashboard() {
       });
 
       if (error) throw error;
-
       alert("Broadcast message sent! Users will see it on their home page.");
       setBroadcastMessage("");
     } catch (error) {
@@ -319,7 +323,6 @@ export default function AdminDashboard() {
   // Most searched tickers
   const getMostSearchedTickers = () => {
     const tickerCounts: Record<string, number> = {};
-    
     analysisLogs.forEach((log) => {
       tickerCounts[log.ticker] = (tickerCounts[log.ticker] || 0) + 1;
     });
@@ -333,6 +336,7 @@ export default function AdminDashboard() {
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center p-4">
+        <SEO title="Admin Access - Bloom" />
         <Card className="w-full max-w-md bg-[#1a1a2e] border-[#3d7a54]">
           <CardHeader className="text-center space-y-4">
             <img
@@ -381,12 +385,12 @@ export default function AdminDashboard() {
 
   // Main dashboard
   return (
-    <Layout hideNav>
+    <>
       <SEO title="Admin Dashboard - Bloom" />
       <div className="min-h-screen bg-[#0a0a0f] text-white pb-20">
         {/* Header */}
         <div className="bg-gradient-to-r from-[#3d7a54] to-[#2d5a44] border-b border-[#3d7a54]/30">
-          <div className="container-full py-6">
+          <div className="container-full py-6 px-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <img
@@ -404,7 +408,7 @@ export default function AdminDashboard() {
               <Button
                 variant="outline"
                 onClick={() => router.push("/home")}
-                className="border-white/20 text-white hover:bg-white/10"
+                className="border-white/20 text-white hover:bg-white/10 hidden sm:flex"
               >
                 Back to Home
               </Button>
@@ -412,7 +416,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        <div className="container-full py-8 space-y-8">
+        <div className="container-full py-8 px-4 space-y-8">
           {/* Overview Stats */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Card className="bg-[#1a1a2e] border-[#3d7a54]/30">
@@ -465,7 +469,7 @@ export default function AdminDashboard() {
             <Card className="bg-[#1a1a2e] border-[#3d7a54]/30">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium text-gray-400">
-                  Total Watchlist Items
+                  Total Watchlist
                 </CardTitle>
                 <Activity className="w-4 h-4 text-[#3d7a54]" />
               </CardHeader>
@@ -480,7 +484,7 @@ export default function AdminDashboard() {
 
           {/* Tabs */}
           <Tabs defaultValue="users" className="space-y-6">
-            <TabsList className="bg-[#1a1a2e] border border-[#3d7a54]/30">
+            <TabsList className="bg-[#1a1a2e] border border-[#3d7a54]/30 flex flex-wrap h-auto">
               <TabsTrigger value="users" className="data-[state=active]:bg-[#3d7a54]">
                 <Users className="w-4 h-4 mr-2" />
                 Users
@@ -493,6 +497,10 @@ export default function AdminDashboard() {
                 <Activity className="w-4 h-4 mr-2" />
                 System Health
               </TabsTrigger>
+              <TabsTrigger value="emails" className="data-[state=active]:bg-[#3d7a54]">
+                <Mail className="w-4 h-4 mr-2" />
+                Email Logs
+              </TabsTrigger>
               <TabsTrigger value="broadcast" className="data-[state=active]:bg-[#3d7a54]">
                 <Send className="w-4 h-4 mr-2" />
                 Broadcast
@@ -503,7 +511,7 @@ export default function AdminDashboard() {
             <TabsContent value="users" className="space-y-4">
               <Card className="bg-[#1a1a2e] border-[#3d7a54]/30">
                 <CardHeader>
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <CardTitle className="text-white">User Management</CardTitle>
                     <div className="flex items-center gap-2">
                       <Search className="w-4 h-4 text-gray-500" />
@@ -511,7 +519,7 @@ export default function AdminDashboard() {
                         placeholder="Search users..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-64 bg-[#0a0a0f] border-gray-700 text-white"
+                        className="w-full sm:w-64 bg-[#0a0a0f] border-gray-700 text-white"
                       />
                     </div>
                   </div>
@@ -560,18 +568,11 @@ export default function AdminDashboard() {
                                     : "bg-gray-500/20 text-gray-400 border-gray-500/50"
                                 }
                               >
-                                {user.plan_type}
+                                {user.plan_type || "free"}
                               </Badge>
                             </TableCell>
                             <TableCell>
                               <div className="flex gap-2">
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  className="text-gray-400 hover:text-white"
-                                >
-                                  <Eye className="w-4 h-4" />
-                                </Button>
                                 <Button
                                   size="sm"
                                   variant="ghost"
@@ -736,6 +737,56 @@ export default function AdminDashboard() {
               </div>
             </TabsContent>
 
+            {/* Email Logs Tab */}
+            <TabsContent value="emails" className="space-y-4">
+              <Card className="bg-[#1a1a2e] border-[#3d7a54]/30">
+                <CardHeader>
+                  <CardTitle className="text-white">Email Delivery Logs</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="border-gray-800 hover:bg-transparent">
+                          <TableHead className="text-gray-400">Email</TableHead>
+                          <TableHead className="text-gray-400">Type</TableHead>
+                          <TableHead className="text-gray-400">Status</TableHead>
+                          <TableHead className="text-gray-400">Sent At</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {emailLogs.map((log) => (
+                          <TableRow key={log.id} className="border-gray-800 hover:bg-[#0a0a0f]/50">
+                            <TableCell className="text-gray-300">{log.email}</TableCell>
+                            <TableCell className="text-gray-300 capitalize">{log.type}</TableCell>
+                            <TableCell>
+                              <Badge className={
+                                log.status === 'delivered' || log.status === 'success' 
+                                  ? 'bg-green-500/20 text-green-400 border-green-500/50' 
+                                  : 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50'
+                              }>
+                                {log.status}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-gray-400 text-sm">
+                              {new Date(log.created_at).toLocaleString()}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                        {emailLogs.length === 0 && (
+                          <TableRow className="border-gray-800 hover:bg-transparent">
+                            <TableCell colSpan={4} className="text-center text-gray-500 py-8">
+                              No email logs found. Logs will appear here when confirmation emails are sent.
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
             {/* Broadcast Tab */}
             <TabsContent value="broadcast" className="space-y-4">
               <Card className="bg-[#1a1a2e] border-[#3d7a54]/30">
@@ -787,6 +838,6 @@ export default function AdminDashboard() {
           </Tabs>
         </div>
       </div>
-    </Layout>
+    </>
   );
 }
