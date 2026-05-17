@@ -15,6 +15,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      broadcast_messages: {
+        Row: {
+          active: boolean | null
+          created_at: string | null
+          created_by: string | null
+          id: string
+          message: string
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          message: string
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          message?: string
+        }
+        Relationships: []
+      }
       broker_clicks: {
         Row: {
           broker_name: string
@@ -109,6 +133,41 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      pansy_analysis_logs: {
+        Row: {
+          created_at: string | null
+          error_message: string | null
+          id: string
+          success: boolean | null
+          ticker: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          success?: boolean | null
+          ticker: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          success?: boolean | null
+          ticker?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pansy_analysis_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       price_alerts: {
         Row: {
