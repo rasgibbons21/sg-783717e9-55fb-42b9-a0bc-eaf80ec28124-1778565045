@@ -42,13 +42,9 @@ interface NewsArticle {
 }
 
 interface PansyAnalysis {
-  overview: string;
-  entry: {
-    text: string;
-    signal: "good" | "wait" | "avoid";
-  };
-  exitHold: string;
-  risk: string;
+  whyThisEtf: string;
+  portfolioRole: string;
+  risksToKnow: string;
   timestamp: number;
 }
 
@@ -189,28 +185,25 @@ export default function StockDetail() {
   };
 
   const parseAnalysis = (text: string): PansyAnalysis => {
-    // Simple parsing - you can make this more sophisticated
-    const paragraphs = text.split("\n\n").filter((p) => p.trim());
-
-    // Determine entry signal based on keywords
-    let entrySignal: "good" | "wait" | "avoid" = "wait";
-    const lowerText = text.toLowerCase();
-    if (lowerText.includes("good entry") || lowerText.includes("solid entry") || lowerText.includes("good time to")) {
-      entrySignal = "good";
-    } else if (lowerText.includes("avoid") || lowerText.includes("stay away") || lowerText.includes("not worth")) {
-      entrySignal = "avoid";
-    }
-
+    // Determine entry signal based on keywords (for UI color coding if needed)
     return {
-      overview: paragraphs[0] || text.substring(0, 200),
-      entry: {
-        text: paragraphs[1] || "Consider your risk tolerance and investment goals before entering a position.",
-        signal: entrySignal,
-      },
-      exitHold: paragraphs[2] || "Monitor your position and adjust based on your goals.",
-      risk: paragraphs[3] || "Market volatility can affect all stocks. Invest only what you can afford to lose.",
+      whyThisEtf: extractSectionLocal(text, ["Why This ETF", "Why This Investment", "Overview", "Situation"]) || text.substring(0, 300),
+      portfolioRole: extractSectionLocal(text, ["Portfolio Role", "Role", "Entry", "Fit"]) || "This can serve as a core holding or satellite position depending on your goals.",
+      risksToKnow: extractSectionLocal(text, ["Risks to Know", "Key Risk", "Risk", "What to Watch"]) || "All investments carry risk. Monitor for market volatility.",
       timestamp: Date.now(),
     };
+  };
+
+  const extractSectionLocal = (text: string, sectionTitles: string[]): string => {
+    for (const title of sectionTitles) {
+      const regex = new RegExp(`${title}[:\\s]*([^\\n]+(?:\\n(?!\\*\\*|#)[^\\n]+)*)`, "i");
+      const match = text.match(regex);
+      if (match && match[1]) {
+        return match[1].trim();
+      }
+    }
+    const paragraphs = text.split("\n\n").filter(p => p.trim().length > 0);
+    return paragraphs[0] || "Check back in a moment for my full analysis 🌸";
   };
 
   const initTradingViewWidget = () => {
@@ -364,48 +357,37 @@ export default function StockDetail() {
                 <p className="text-muted-foreground">Pansy is analyzing {ticker} for you... 🌸</p>
               </div>
             ) : pansyAnalysis ? (
-              <Tabs defaultValue="overview" className="w-full">
-                <TabsList className="grid w-full grid-cols-4">
-                  <TabsTrigger value="overview">Overview</TabsTrigger>
-                  <TabsTrigger value="entry">Entry</TabsTrigger>
-                  <TabsTrigger value="exit">Exit/Hold</TabsTrigger>
-                  <TabsTrigger value="risk">Risk</TabsTrigger>
+              <Tabs defaultValue="why-this" className="w-full">
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="why-this">Why This ETF</TabsTrigger>
+                  <TabsTrigger value="role">Portfolio Role</TabsTrigger>
+                  <TabsTrigger value="risks">Risks to Know</TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="overview" className="space-y-4">
-                  <p className="text-foreground leading-relaxed">{pansyAnalysis.overview}</p>
-                </TabsContent>
-
-                <TabsContent value="entry" className="space-y-4">
+                <TabsContent value="why-this" className="space-y-4">
                   <h3 className="font-semibold text-foreground flex items-center gap-2">
-                    Entry Consideration 🎯
+                    Why This ETF 🎯
                   </h3>
-                  <Card
-                    className={`p-4 ${
-                      pansyAnalysis.entry.signal === "good"
-                        ? "bg-primary/10 border-primary"
-                        : pansyAnalysis.entry.signal === "avoid"
-                        ? "bg-destructive/10 border-destructive"
-                        : "bg-accent/10 border-accent"
-                    }`}
-                  >
-                    <p className="text-foreground leading-relaxed">{pansyAnalysis.entry.text}</p>
+                  <Card className="p-4 bg-primary/10 border-primary">
+                    <p className="text-foreground leading-relaxed">{pansyAnalysis.whyThisEtf}</p>
                   </Card>
                 </TabsContent>
 
-                <TabsContent value="exit" className="space-y-4">
+                <TabsContent value="role" className="space-y-4">
                   <h3 className="font-semibold text-foreground flex items-center gap-2">
-                    Exit or Hold? 💭
-                  </h3>
-                  <p className="text-foreground leading-relaxed">{pansyAnalysis.exitHold}</p>
-                </TabsContent>
-
-                <TabsContent value="risk" className="space-y-4">
-                  <h3 className="font-semibold text-foreground flex items-center gap-2">
-                    Key Risk ⚠️
+                    Portfolio Role 🧩
                   </h3>
                   <Card className="p-4 bg-accent/10 border-accent">
-                    <p className="text-foreground leading-relaxed">{pansyAnalysis.risk}</p>
+                    <p className="text-foreground leading-relaxed">{pansyAnalysis.portfolioRole}</p>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="risks" className="space-y-4">
+                  <h3 className="font-semibold text-foreground flex items-center gap-2">
+                    Risks to Know ⚠️
+                  </h3>
+                  <Card className="p-4 bg-rose/10 border-rose">
+                    <p className="text-foreground leading-relaxed">{pansyAnalysis.risksToKnow}</p>
                   </Card>
                 </TabsContent>
 

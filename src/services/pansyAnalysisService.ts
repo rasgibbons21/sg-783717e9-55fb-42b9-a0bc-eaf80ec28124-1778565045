@@ -1,67 +1,3 @@
-import Anthropic from "@anthropic-ai/sdk";
-
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
-
-// Comprehensive ETF Analysis System Prompt
-const ETF_ANALYSIS_SYSTEM_PROMPT = `You are Pansy, Bloom's warm and intelligent investing mentor. You speak in clear, encouraging girlfriend language — no jargon, no hype, no "get rich quick" energy. You are a calm long-term wealth educator.
-
-When analyzing an ETF or building a portfolio recommendation, you must:
-
-STEP 1 — SEARCH AND RESEARCH
-Use web search to find current performance data, expense ratios, top holdings, recent analyst sentiment, and any notable news for the ETF. Also search for any new or emerging ETFs that may fit the user's profile better than traditional options.
-
-STEP 2 — PROFILE MATCHING
-Reason through why this ETF does or does not fit the user based on:
-- Their risk tolerance (conservative / moderate / aggressive)
-- Their investing timeline and age
-- Their goals (growth, income, stability, retirement, wealth building)
-- Their experience level (beginner, intermediate, advanced)
-
-STEP 3 — COMPOUND GROWTH REASONING
-If the user has provided monthly contribution amount, age, and timeline, calculate and explain:
-- Estimated future portfolio value using historical average returns
-- Total contributions vs total growth from compounding
-- How starting earlier impacts outcomes dramatically
-- Use the snowball analogy: "Compounding works like a snowball rolling downhill — slow at first, then accelerating as returns build on previous returns"
-
-STEP 4 — PORTFOLIO STRUCTURE
-When suggesting multiple ETFs explain:
-- Why each ETF exists in the portfolio
-- How they work together (foundation + growth + income)
-- Example: VOO as the core, SCHD for income and stability, QQQ for growth exposure
-
-STEP 5 — TIME HORIZON LOGIC
-- 20-40 year horizon: may suit aggressive growth ETFs like QQQ or SCHG
-- Medium horizon: balanced mix like VOO + SCHD
-- Near retirement: stability and dividend focus like SCHD, VYM, BND
-- Always explain why time horizon reduces volatility risk
-
-STEP 6 — BEHAVIORAL FINANCE EDUCATION
-Always include a brief reminder about:
-- Consistency beats timing
-- Dollar-cost averaging removes emotional decisions
-- Market downturns are normal and temporary over long periods
-- Panic selling destroys compounding
-
-STEP 7 — HONEST RISK BREAKDOWN
-Explain in beginner language:
-- Possible drawdowns and what causes them
-- Sector concentration risks
-- Volatility expectations
-- How this ETF behaves during recessions
-
-TONE RULES:
-- Warm, calm, girlfriend energy — never cold or robotic
-- Never say "buy" or "sell" — say "entry consideration" and "exit consideration"
-- Never hype-driven or gambling-focused
-- Always honest about both upside and risk
-- Explain everything like you are talking to a smart friend who is new to investing
-
-Always end with:
-"This is for educational purposes only and is not financial advice. Investing involves risk including possible loss of principal. Historical performance does not guarantee future results. Always do your own research and consult a financial professional before investing 🌸"`;
-
 const POLYGON_API_KEY = process.env.NEXT_PUBLIC_POLYGON_API_KEY || "";
 const FINNHUB_API_KEY = process.env.NEXT_PUBLIC_FINNHUB_API_KEY || "";
 const FMP_API_KEY = process.env.NEXT_PUBLIC_FMP_API_KEY || "";
@@ -432,7 +368,6 @@ End with: "This is just educational info — not financial advice. Always invest
 
       if (response.ok) {
         const data = await response.json();
-        // Handle both expected JSON formats
         return {
           content: data.content || data.analysis || "Analysis generated.",
           sentiment: data.sentiment || "Neutral",
@@ -461,15 +396,12 @@ Write ONE casual sentence (15-25 words max) explaining how this news might affec
       const response = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          prompt, 
-          format: "text" // Tell API to just return text for this specific call if we update the API, otherwise we extract from content
-        }),
+        body: JSON.stringify({ prompt }),
       });
 
       if (response.ok) {
         const data = await response.json();
-        return data.content || data.text || "Keeping an eye on how this plays out 🌸";
+        return data.content || data.analysis || "Keeping an eye on how this plays out 🌸";
       }
       return "Keeping an eye on how this plays out 🌸";
     } catch (error) {
@@ -507,7 +439,6 @@ Write ONE casual sentence (15-25 words max) explaining how this news might affec
     try {
       console.log(`Pansy analyzing ${ticker}...`);
 
-      // Check cache first (2 hour TTL)
       const cacheKey = `bloom_pansy_${ticker}_${new Date().toISOString().split("T")[0]}_${new Date().getHours()}`;
       const cached = localStorage.getItem(cacheKey);
       if (cached) {
@@ -515,7 +446,6 @@ Write ONE casual sentence (15-25 words max) explaining how this news might affec
         return JSON.parse(cached);
       }
 
-      // Build user context for personalized analysis
       let userContext = "";
       if (userProfile) {
         userContext = `\n\nUSER PROFILE:
@@ -545,77 +475,52 @@ Change Today: ${changePercent.toFixed(2)}%
 ${userContext}
 
 Please provide:
-1. **Current Situation** (1-2 sentences on what's happening with this investment right now based on your web search)
-2. **Entry Consideration** — Is this a good area to start a position or should she wait? Use web search to check current market conditions and momentum.
-3. **Exit/Hold** — If already holding, should she consider taking profits or holding? 
-4. **Key Risk** — What's the main risk to watch?
-5. **Pansy's Honest Bottom Line** — Your personal take in girlfriend language
-
-If this is an ETF, also include:
-- Portfolio role (how it fits with other investments)
-- Top holdings breakdown
-- Sector diversification
-- Dividend information if applicable
+1. **Why This ETF / Investment** (1-2 sentences on what's happening with this investment right now based on your web search)
+2. **Portfolio Role** — Is this a good area to start a position, how does it fit with other investments, and should she wait? Use web search to check current market conditions.
+3. **Risks to Know** — What's the main risk to watch?
 
 Use web search to get the latest data and performance metrics. Sound like a knowledgeable girlfriend giving real talk, not a robot reading data.`;
 
-      const response = await anthropic.messages.create({
-        model: "claude-3-7-sonnet-20250219",
-        max_tokens: 2000,
-        temperature: 0.7,
-        system: ETF_ANALYSIS_SYSTEM_PROMPT,
-        tools: [
-          {
-            type: "web_search_20250305",
-            name: "web_search",
-          },
-        ],
-        messages: [
-          {
-            role: "user",
-            content: userMessage,
-          },
-        ],
+      const response = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userMessage }),
       });
 
-      // Extract text content from response
-      let analysisText = "";
-      for (const block of response.content) {
-        if (block.type === "text") {
-          analysisText += block.text;
-        }
+      if (!response.ok) {
+        throw new Error("Failed to fetch analysis from server");
       }
+
+      const data = await response.json();
+      const analysisText = data.analysis || data.content;
 
       if (!analysisText) {
         throw new Error("No analysis text received from Pansy");
       }
 
-      // Parse the analysis into structured format
       const analysis = {
-        overview: extractSection(analysisText, ["Current Situation", "Overview", "What's Happening"]),
-        entry: extractSection(analysisText, ["Entry Consideration", "Entry", "Should You Buy"]),
-        exitHold: extractSection(analysisText, ["Exit/Hold", "Exit or Hold", "Hold Strategy"]),
-        risk: extractSection(analysisText, ["Key Risk", "Risk", "What to Watch"]),
-        bottomLine: extractSection(analysisText, ["Bottom Line", "Pansy's Take", "Final Thought", "Honest Take"]),
+        whyThisEtf: extractSection(analysisText, ["Why This ETF", "Why This Investment", "Overview", "Situation"]),
+        portfolioRole: extractSection(analysisText, ["Portfolio Role", "Role", "Entry", "Fit"]),
+        risksToKnow: extractSection(analysisText, ["Risks to Know", "Key Risk", "Risk", "What to Watch"]),
         fullText: analysisText,
         timestamp: new Date().toISOString(),
       };
 
-      // Determine sentiment based on entry section
       let sentiment: "bullish" | "neutral" | "bearish" = "neutral";
-      const entryLower = analysis.entry.toLowerCase();
+      const roleLower = analysis.portfolioRole.toLowerCase();
       if (
-        entryLower.includes("good entry") ||
-        entryLower.includes("solid opportunity") ||
-        entryLower.includes("looks promising") ||
-        entryLower.includes("good area")
+        roleLower.includes("good entry") ||
+        roleLower.includes("solid opportunity") ||
+        roleLower.includes("looks promising") ||
+        roleLower.includes("good area") ||
+        roleLower.includes("core holding")
       ) {
         sentiment = "bullish";
       } else if (
-        entryLower.includes("wait") ||
-        entryLower.includes("caution") ||
-        entryLower.includes("avoid") ||
-        entryLower.includes("risky")
+        roleLower.includes("wait") ||
+        roleLower.includes("caution") ||
+        roleLower.includes("avoid") ||
+        roleLower.includes("risky")
       ) {
         sentiment = "bearish";
       }
@@ -629,7 +534,6 @@ Use web search to get the latest data and performance metrics. Sound like a know
         changePercent,
       };
 
-      // Cache the result for 2 hours
       localStorage.setItem(cacheKey, JSON.stringify(result));
       console.log(`Cached analysis for ${ticker}`);
 
@@ -637,15 +541,12 @@ Use web search to get the latest data and performance metrics. Sound like a know
     } catch (error: any) {
       console.error("Error in Pansy analysis:", error);
       
-      // Return fallback analysis
       return {
-        overview: `I'm looking at ${companyName} (${ticker}) which is currently trading at $${price}, ${
+        whyThisEtf: `I'm looking at ${companyName} (${ticker}) which is currently trading at $${price}, ${
           changePercent >= 0 ? "up" : "down"
         } ${Math.abs(changePercent).toFixed(2)}% today.`,
-        entry: "I need a moment to gather the latest data for you. Try refreshing in a few seconds 🌸",
-        exitHold: "Hold tight while I analyze the current position.",
-        risk: "Market conditions are always changing, so staying informed is key.",
-        bottomLine: "Let me do a deeper analysis and I'll have better insights for you shortly 💛",
+        portfolioRole: "I need a moment to gather the latest data for you. Try refreshing in a few seconds 🌸",
+        risksToKnow: "Market conditions are always changing, so staying informed is key.",
         fullText: "Analysis temporarily unavailable. Please try again in a moment.",
         sentiment: "neutral" as const,
         ticker,
@@ -686,35 +587,19 @@ Please provide:
 
 Use web search to find currently top-performing ETFs that match her profile. Consider new ETFs launched in the last 12 months if they're worth recommending. Be specific with allocation percentages and realistic with projections.`;
 
-      const response = await anthropic.messages.create({
-        model: "claude-3-7-sonnet-20250219",
-        max_tokens: 2500,
-        temperature: 0.7,
-        system: ETF_ANALYSIS_SYSTEM_PROMPT,
-        tools: [
-          {
-            type: "web_search_20250305",
-            name: "web_search",
-          },
-        ],
-        messages: [
-          {
-            role: "user",
-            content: userMessage,
-          },
-        ],
+      const response = await fetch("/api/analyze-portfolio", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userMessage }),
       });
 
-      // Extract text content
-      let recommendationText = "";
-      for (const block of response.content) {
-        if (block.type === "text") {
-          recommendationText += block.text;
-        }
+      if (!response.ok) {
+        throw new Error("Failed to fetch recommendation from server");
       }
 
+      const data = await response.json();
       return {
-        fullText: recommendationText,
+        fullText: data.fullText || "Check back in a moment for my recommendation 🌸",
         timestamp: new Date().toISOString(),
       };
     } catch (error: any) {
@@ -724,17 +609,15 @@ Use web search to find currently top-performing ETFs that match her profile. Con
   },
 };
 
-// Helper function to extract sections from Pansy's response
 function extractSection(text: string, sectionTitles: string[]): string {
   for (const title of sectionTitles) {
-    const regex = new RegExp(`${title}[:\\s]*([^\\n]+(?:\\n(?!\\*\\*)[^\\n]+)*)`, "i");
+    const regex = new RegExp(`${title}[:\\s]*([^\\n]+(?:\\n(?!\\*\\*|#)[^\\n]+)*)`, "i");
     const match = text.match(regex);
     if (match && match[1]) {
       return match[1].trim();
     }
   }
   
-  // Fallback: return first paragraph if no section found
-  const paragraphs = text.split("\n\n");
+  const paragraphs = text.split("\n\n").filter(p => p.trim().length > 0);
   return paragraphs[0] || "Check back in a moment for my full analysis 🌸";
 }

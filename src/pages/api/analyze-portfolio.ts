@@ -68,19 +68,15 @@ export default async function handler(
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { prompt, userMessage } = req.body;
-  const finalMessage = userMessage || prompt;
+  const { userMessage } = req.body;
 
-  if (!finalMessage) {
-    return res.status(400).json({ error: "prompt or userMessage is required" });
+  if (!userMessage) {
+    return res.status(400).json({ error: "userMessage is required" });
   }
 
   if (!ANTHROPIC_API_KEY) {
     console.error("ANTHROPIC_API_KEY not configured");
-    return res.status(200).json({
-      content: "I'm having trouble connecting to my analysis system right now. Try again in a moment! 💛",
-      sentiment: "Neutral",
-    });
+    return res.status(500).json({ error: "API key not configured" });
   }
 
   try {
@@ -90,19 +86,19 @@ export default async function handler(
 
     const response = await anthropic.messages.create({
       model: "claude-3-7-sonnet-20250219",
-      max_tokens: 2000,
+      max_tokens: 2500,
       temperature: 0.7,
       system: ETF_ANALYSIS_SYSTEM_PROMPT,
       tools: [
         {
           type: "web_search_20250305",
           name: "web_search",
-        } as any,
+        } as any, // Cast to any to bypass strict type checking for beta tools
       ],
       messages: [
         {
           role: "user",
-          content: finalMessage,
+          content: userMessage,
         },
       ],
     });
@@ -114,36 +110,11 @@ export default async function handler(
       }
     }
 
-    // Determine sentiment from the analysis
-    let sentiment = "Neutral";
-    const lowerContent = analysisText.toLowerCase();
-    if (
-      lowerContent.includes("good entry") ||
-      lowerContent.includes("solid opportunity") ||
-      lowerContent.includes("looks promising") ||
-      lowerContent.includes("good area")
-    ) {
-      sentiment = "Positive";
-    } else if (
-      lowerContent.includes("wait") ||
-      lowerContent.includes("caution") ||
-      lowerContent.includes("avoid") ||
-      lowerContent.includes("risky")
-    ) {
-      sentiment = "Negative";
-    }
-
     return res.status(200).json({
-      content: analysisText,
-      analysis: analysisText,
-      sentiment,
+      fullText: analysisText,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error calling Anthropic API:", error);
-    return res.status(200).json({
-      content: "I'm having a little trouble analyzing this right now. The market data is still there though - take a look at the charts and news yourself! 💛",
-      analysis: "I'm having a little trouble analyzing this right now. The market data is still there though - take a look at the charts and news yourself! 💛",
-      sentiment: "Neutral",
-    });
+    return res.status(500).json({ error: error.message });
   }
 }
