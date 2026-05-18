@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { authService } from "@/services/authService";
+import { userService } from "@/services/userService";
 import { marketService } from "@/services/marketService";
 import { supabase } from "@/integrations/supabase/client";
 import { TrendingUp, TrendingDown, ArrowRight, Crown, ChevronDown, ChevronRight } from "lucide-react";
@@ -97,8 +98,10 @@ export default function Home() {
       router.push("/");
       return;
     }
-    const profile = await authService.getCurrentUser();
-    setUser(profile);
+    
+    // Load complete user profile from users table (includes full_name, risk_tolerance, etc.)
+    const userProfile = await userService.getCurrentUser();
+    setUser(userProfile);
     
     // Load data with timeout
     loadDataWithTimeout();
@@ -112,10 +115,13 @@ export default function Home() {
     }, 5000);
 
     try {
+      // Get user data first
+      const userProfile = await userService.getCurrentUser();
+      
       await Promise.all([
         loadMarketData(),
         loadStockPicks(),
-        loadWatchlistNews(user?.id),
+        loadWatchlistNews(userProfile?.id),
       ]);
       clearTimeout(timeoutId);
       setDataLoaded(true);

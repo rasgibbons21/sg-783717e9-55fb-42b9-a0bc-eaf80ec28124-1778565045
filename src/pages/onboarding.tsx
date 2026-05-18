@@ -147,8 +147,8 @@ export default function Onboarding() {
         
         const profileData = {
           id: currentUser.id,
-          email: currentUser.email,
-          full_name: currentUser.user_metadata?.full_name || "",
+          email: currentUser.email || email, // Use email from form if auth email is missing
+          full_name: currentUser.user_metadata?.full_name || fullName,
           plan_type: "free" as const,
           ...updates
         };
@@ -159,11 +159,23 @@ export default function Onboarding() {
         console.log("Create profile result:", result);
         
         if (!result) {
-          throw new Error("Failed to create user profile. Please check your database connection.");
+          console.error("Failed to create user profile - checking if row already exists");
+          
+          // Try to fetch existing user to see if it exists
+          const existingUser = await userService.getCurrentUser();
+          console.log("Existing user check:", existingUser);
+          
+          if (!existingUser) {
+            throw new Error("Failed to create user profile. Please check your database connection.");
+          }
+          
+          // If user exists, just proceed (update may have failed due to race condition)
+          result = existingUser;
         }
       }
 
       console.log("=== ONBOARDING COMPLETED SUCCESSFULLY ===");
+      console.log("Final user data:", result);
       console.log("Redirecting to /home");
       
       router.push("/home");
