@@ -174,69 +174,72 @@ export default function Discover() {
         STOCK_TICKERS.map(async (ticker) => {
           try {
             const quote = await marketService.getRealTimeQuote(ticker);
-            return {
+            const asset: Asset = {
               ticker,
               name: ASSET_NAMES[ticker] || ticker,
               price: quote?.c || 0,
               change: quote?.d || 0,
               changePercent: quote?.dp || 0,
-              type: "stock" as const,
+              type: "stock",
               trend: getTrend(quote?.dp || 0),
               riskLevel: getRiskLevel(ticker, "stock"),
             };
+            return asset;
           } catch (error) {
             console.error(`Error loading ${ticker}:`, error);
             return null;
           }
         })
       );
-      setStocks(stockData.filter((s): s is Asset => s !== null));
+      setStocks(stockData.filter((s) => s !== null) as Asset[]);
 
       // Load ETFs
       const etfData = await Promise.all(
         ETF_TICKERS.map(async (ticker) => {
           try {
             const quote = await marketService.getRealTimeQuote(ticker);
-            return {
+            const asset: Asset = {
               ticker,
               name: ASSET_NAMES[ticker] || ticker,
               price: quote?.c || 0,
               change: quote?.d || 0,
               changePercent: quote?.dp || 0,
-              type: "etf" as const,
+              type: "etf",
               trend: getTrend(quote?.dp || 0),
               riskLevel: getRiskLevel(ticker, "etf"),
             };
+            return asset;
           } catch (error) {
             console.error(`Error loading ${ticker}:`, error);
             return null;
           }
         })
       );
-      setEtfs(etfData.filter((e): e is Asset => e !== null));
+      setEtfs(etfData.filter((e) => e !== null) as Asset[]);
 
       // Load Mutual Funds
       const mfData = await Promise.all(
         MUTUAL_FUND_TICKERS.map(async (ticker) => {
           try {
             const quote = await marketService.getRealTimeQuote(ticker);
-            return {
+            const asset: Asset = {
               ticker,
               name: ASSET_NAMES[ticker] || ticker,
               price: quote?.c || 0,
               change: quote?.d || 0,
               changePercent: quote?.dp || 0,
-              type: "mutual-fund" as const,
+              type: "mutual-fund",
               trend: getTrend(quote?.dp || 0),
               riskLevel: getRiskLevel(ticker, "mutual-fund"),
             };
+            return asset;
           } catch (error) {
             console.error(`Error loading ${ticker}:`, error);
             return null;
           }
         })
       );
-      setMutualFunds(mfData.filter((m): m is Asset => m !== null));
+      setMutualFunds(mfData.filter((m) => m !== null) as Asset[]);
     } catch (error) {
       console.error("Error loading market data:", error);
     } finally {
