@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import Layout from "@/components/Layout";
+import { Layout } from "@/components/Layout";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -56,16 +56,28 @@ export default function StockDetail() {
   const loadStockData = async (symbol: string) => {
     setIsLoading(true);
     try {
-      const [quote, newsData] = await Promise.all([
-        marketService.getStockQuote(symbol),
-        marketService.getStockNews(symbol).catch(() => []),
-      ]);
+      const quote = await marketService.getRealTimeQuote(symbol);
+      
+      // Fallback for news since we don't have a direct method
+      let newsData = [];
+      try {
+        const response = await fetch(
+          `https://finnhub.io/api/v1/company-news?symbol=${symbol}&from=${
+            new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]
+          }&to=${new Date().toISOString().split("T")[0]}&token=${
+            process.env.NEXT_PUBLIC_FINNHUB_API_KEY
+          }`
+        );
+        newsData = await response.json();
+      } catch (e) {
+        console.error("Error fetching news:", e);
+      }
 
-      setStockData(quote);
-      setNews(newsData || []);
+      setStockData(quote || { c: 0, dp: 0, name: symbol });
+      setNews(Array.isArray(newsData) ? newsData : []);
 
       // Load Pansy's analysis
-      await loadPansyAnalysis(symbol, quote);
+      await loadPansyAnalysis(symbol, quote || { c: 0, dp: 0, name: symbol });
     } catch (error) {
       console.error("Error loading stock data:", error);
     } finally {
