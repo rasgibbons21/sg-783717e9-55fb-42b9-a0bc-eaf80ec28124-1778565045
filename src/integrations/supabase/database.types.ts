@@ -1,4 +1,4 @@
- 
+/* eslint-disable @typescript-eslint/no-empty-object-type */
 export type Json =
   | string
   | number
@@ -341,6 +341,7 @@ export type Database = {
           avatar_url: string | null
           bookmarked_lessons: string[] | null
           created_at: string | null
+          current_age: number | null
           email: string
           experience_level: string | null
           full_name: string | null
@@ -348,13 +349,17 @@ export type Database = {
           investment_goals: string[] | null
           join_date: string | null
           last_active: string | null
+          monthly_contribution: number | null
           plan_type: string | null
+          retirement_age: number | null
           risk_tolerance: string | null
+          time_horizon: string | null
         }
         Insert: {
           avatar_url?: string | null
           bookmarked_lessons?: string[] | null
           created_at?: string | null
+          current_age?: number | null
           email: string
           experience_level?: string | null
           full_name?: string | null
@@ -362,13 +367,17 @@ export type Database = {
           investment_goals?: string[] | null
           join_date?: string | null
           last_active?: string | null
+          monthly_contribution?: number | null
           plan_type?: string | null
+          retirement_age?: number | null
           risk_tolerance?: string | null
+          time_horizon?: string | null
         }
         Update: {
           avatar_url?: string | null
           bookmarked_lessons?: string[] | null
           created_at?: string | null
+          current_age?: number | null
           email?: string
           experience_level?: string | null
           full_name?: string | null
@@ -376,8 +385,11 @@ export type Database = {
           investment_goals?: string[] | null
           join_date?: string | null
           last_active?: string | null
+          monthly_contribution?: number | null
           plan_type?: string | null
+          retirement_age?: number | null
           risk_tolerance?: string | null
+          time_horizon?: string | null
         }
         Relationships: []
       }
