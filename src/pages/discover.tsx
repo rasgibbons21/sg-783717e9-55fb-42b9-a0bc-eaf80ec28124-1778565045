@@ -45,6 +45,26 @@ const MUTUAL_FUND_TICKERS = [
   "FXAIX", "VTSAX", "VFIAX", "FCNTX", "PRGFX", "VWELX", "FDGRX", "AGTHX", "DODFX", "VBTLX"
 ];
 
+const ASSET_NAMES: Record<string, string> = {
+  "AAPL": "Apple Inc.", "MSFT": "Microsoft", "NVDA": "NVIDIA", "GOOGL": "Alphabet", 
+  "AMZN": "Amazon", "META": "Meta Platforms", "TSLA": "Tesla", "JPM": "JPMorgan Chase", 
+  "V": "Visa", "JNJ": "Johnson & Johnson", "WMT": "Walmart", "BAC": "Bank of America", 
+  "XOM": "Exxon Mobil", "UNH": "UnitedHealth", "PG": "Procter & Gamble", "HD": "Home Depot", 
+  "MA": "Mastercard", "ABBV": "AbbVie", "AVGO": "Broadcom", "CRM": "Salesforce",
+  "VOO": "Vanguard S&P 500 ETF", "QQQ": "Invesco QQQ Trust", "SPY": "SPDR S&P 500 ETF",
+  "SCHD": "Schwab US Dividend Equity ETF", "VTI": "Vanguard Total Stock Market ETF", 
+  "IVV": "iShares Core S&P 500 ETF", "VGT": "Vanguard Information Tech ETF", 
+  "ARKK": "ARK Innovation ETF", "SCHG": "Schwab US Large-Cap Growth ETF", 
+  "VYM": "Vanguard High Dividend Yield ETF", "BND": "Vanguard Total Bond Market ETF", 
+  "AGG": "iShares Core US Aggregate Bond ETF", "GLD": "SPDR Gold Shares", 
+  "IWM": "iShares Russell 2000 ETF", "JEPI": "JPMorgan Equity Premium Income ETF",
+  "FXAIX": "Fidelity 500 Index Fund", "VTSAX": "Vanguard Total Stock Market Index Fund", 
+  "VFIAX": "Vanguard 500 Index Fund", "FCNTX": "Fidelity Contrafund", 
+  "PRGFX": "T. Rowe Price Growth Stock Fund", "VWELX": "Vanguard Wellington Fund", 
+  "FDGRX": "Fidelity Growth Company Fund", "AGTHX": "The Growth Fund of America", 
+  "DODFX": "Dodge & Cox International Stock Fund", "VBTLX": "Vanguard Total Bond Market Index Fund"
+};
+
 const PANSYS_DEFAULT_PICKS: Asset[] = [
   {
     ticker: "NVDA",
@@ -113,10 +133,13 @@ export default function Discover() {
         { name: "VIX", symbol: "^VIX" },
       ];
 
+      const finnhubKey = process.env.NEXT_PUBLIC_FINNHUB_API_KEY;
+
       const indexData = await Promise.all(
         indices.map(async (index) => {
           try {
-            const quote = await marketService.getRealTimeQuote(index.symbol);
+            const response = await fetch(`https://finnhub.io/api/v1/quote?symbol=${index.symbol}&token=${finnhubKey}`);
+            const quote = await response.json();
             return {
               name: index.name,
               symbol: index.symbol,
@@ -153,7 +176,7 @@ export default function Discover() {
             const quote = await marketService.getRealTimeQuote(ticker);
             return {
               ticker,
-              name: quote?.name || ticker,
+              name: ASSET_NAMES[ticker] || ticker,
               price: quote?.c || 0,
               change: quote?.d || 0,
               changePercent: quote?.dp || 0,
@@ -176,7 +199,7 @@ export default function Discover() {
             const quote = await marketService.getRealTimeQuote(ticker);
             return {
               ticker,
-              name: quote?.name || ticker,
+              name: ASSET_NAMES[ticker] || ticker,
               price: quote?.c || 0,
               change: quote?.d || 0,
               changePercent: quote?.dp || 0,
@@ -199,7 +222,7 @@ export default function Discover() {
             const quote = await marketService.getRealTimeQuote(ticker);
             return {
               ticker,
-              name: quote?.name || ticker,
+              name: ASSET_NAMES[ticker] || ticker,
               price: quote?.c || 0,
               change: quote?.d || 0,
               changePercent: quote?.dp || 0,
