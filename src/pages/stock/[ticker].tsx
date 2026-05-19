@@ -221,54 +221,73 @@ export default function StockDetail() {
 
               <TabsContent value="overview" className="space-y-4 mt-4">
                 <div className="space-y-3">
-                  <div className="flex items-start gap-2">
-                    <Info className="w-4 h-4 mt-0.5 text-primary flex-shrink-0" />
-                    <p className="text-sm text-foreground leading-relaxed">{pansyAnalysis.overview}</p>
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-sm shrink-0">
+                      🌺
+                    </div>
+                    <p className="text-sm text-foreground leading-relaxed pt-1">{pansyAnalysis.overview}</p>
                   </div>
-                  {pansyAnalysis.scorecard && (
-                    <Card className="p-4 bg-accent/10 border-accent">
-                      <h4 className="text-sm font-semibold text-foreground mb-2">Scorecard</h4>
-                      <p className="text-sm text-foreground/90 whitespace-pre-line">{pansyAnalysis.scorecard}</p>
-                    </Card>
-                  )}
                 </div>
               </TabsContent>
 
               <TabsContent value="entry-exit" className="space-y-4 mt-4">
-                <Card className="p-4 bg-primary/10 border-primary">
-                  <h3 className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2">
+                <Card className="p-4 border-[#3d7a54]/30 bg-[#3d7a54]/10">
+                  <h3 className="text-sm font-semibold text-[#3d7a54] mb-2 flex items-center gap-2">
                     <TrendingUp className="w-4 h-4" />
                     Entry Consideration
                   </h3>
-                  <p className="text-sm text-foreground leading-relaxed">{pansyAnalysis.entry}</p>
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-xs shrink-0">🌺</div>
+                    <p className="text-sm text-foreground leading-relaxed">{pansyAnalysis.entry}</p>
+                  </div>
                 </Card>
 
-                <Card className="p-4 bg-rose/10 border-rose">
-                  <h3 className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2">
+                <Card className="p-4 border-[#d4788a]/30 bg-[#d4788a]/10">
+                  <h3 className="text-sm font-semibold text-[#d4788a] mb-2 flex items-center gap-2">
                     <TrendingDown className="w-4 h-4" />
                     Exit Consideration
                   </h3>
-                  <p className="text-sm text-foreground leading-relaxed">{pansyAnalysis.exit}</p>
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-xs shrink-0">🌺</div>
+                    <p className="text-sm text-foreground leading-relaxed">{pansyAnalysis.exit}</p>
+                  </div>
                 </Card>
               </TabsContent>
 
               <TabsContent value="risk" className="space-y-4 mt-4">
-                <Card className="p-4 bg-rose/10 border-rose">
-                  <h3 className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2">
+                <Card className="p-4 border-[#d4788a]/30 bg-[#d4788a]/10">
+                  <h3 className="text-sm font-semibold text-[#d4788a] mb-2 flex items-center gap-2">
                     <AlertTriangle className="w-4 h-4" />
                     Risk Assessment
                   </h3>
-                  <p className="text-sm text-foreground leading-relaxed">{pansyAnalysis.risk}</p>
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-xs shrink-0">🌺</div>
+                    <p className="text-sm text-foreground leading-relaxed">{pansyAnalysis.risk}</p>
+                  </div>
                 </Card>
 
-                <Card className="p-4 bg-accent/10 border-accent">
-                  <h3 className="text-sm font-semibold text-foreground mb-2">💡 Behavioral Tip</h3>
-                  <p className="text-sm text-foreground leading-relaxed italic">{pansyAnalysis.behavioralTip}</p>
+                {pansyAnalysis.scorecard && (
+                  <Card className="p-4 border-[#c8953a]/40 bg-[#c8953a]/10">
+                    <h4 className="text-sm font-semibold text-[#c8953a] mb-2 flex items-center gap-2">
+                      📋 Scorecard
+                    </h4>
+                    <p className="text-sm text-foreground/90 whitespace-pre-line font-mono">{pansyAnalysis.scorecard}</p>
+                  </Card>
+                )}
+
+                <Card className="p-4 border-accent/20 bg-accent/5">
+                  <h3 className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2">
+                    💡 Behavioral Tip
+                  </h3>
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-xs shrink-0">🌺</div>
+                    <p className="text-sm text-foreground leading-relaxed italic">{pansyAnalysis.behavioralTip}</p>
+                  </div>
                 </Card>
 
-                <Card className="p-4 bg-accent/20 border-accent">
-                  <h3 className="text-sm font-semibold text-accent mb-2">Pansy's Verdict</h3>
-                  <p className="text-base font-medium text-foreground">{pansyAnalysis.verdict}</p>
+                <Card className="p-4 border-[#c8953a]/50 bg-[#c8953a]/20 shadow-lg">
+                  <h3 className="text-sm font-semibold text-[#c8953a] mb-1">Pansy's Verdict</h3>
+                  <p className="text-lg font-bold text-foreground">{pansyAnalysis.verdict}</p>
                 </Card>
               </TabsContent>
             </Tabs>

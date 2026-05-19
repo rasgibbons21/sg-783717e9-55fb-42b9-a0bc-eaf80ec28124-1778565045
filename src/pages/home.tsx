@@ -21,6 +21,9 @@ interface StockPick {
   change: number;
   changePercent: number;
   pansyQuote: string;
+  type?: string;
+  trend?: string;
+  riskLevel?: string;
 }
 
 // Default fallback data
@@ -33,20 +36,15 @@ const DEFAULT_MARKET_DATA = [
 
 const DEFAULT_STOCK_PICKS: StockPick[] = [
   {
-    ticker: "AAPL",
-    name: "Apple Inc.",
-    price: 180.00,
-    change: 0,
-    changePercent: 0,
-    pansyQuote: "AAPL - you already know this one. Everyone uses their products, the ecosystem locks people in, and they have $162B in cash. That's not going anywhere 💪",
-  },
-  {
     ticker: "NVDA",
     name: "NVIDIA Corporation",
     price: 450.00,
     change: 0,
     changePercent: 0,
-    pansyQuote: "NVDA is powering the AI revolution girl. Every tech company needs their chips. The demand is insane and they're the only ones who can make them this good 🚀",
+    pansyQuote: "Powering the AI revolution. Every tech company needs their chips.",
+    type: "Stock",
+    trend: "Bullish",
+    riskLevel: "Aggressive",
   },
   {
     ticker: "VOO",
@@ -54,23 +52,21 @@ const DEFAULT_STOCK_PICKS: StockPick[] = [
     price: 420.00,
     change: 0,
     changePercent: 0,
-    pansyQuote: "VOO tracks the 500 biggest US companies. Think of it like betting on America as a whole instead of picking winners. Been going up for decades sis 📈",
+    pansyQuote: "Tracks the 500 biggest US companies. A foundational piece for any portfolio.",
+    type: "ETF",
+    trend: "Bullish",
+    riskLevel: "Moderate",
   },
   {
-    ticker: "SCHD",
-    name: "Schwab US Dividend Equity ETF",
-    price: 75.00,
+    ticker: "FXAIX",
+    name: "Fidelity 500 Index Fund",
+    price: 180.00,
     change: 0,
     changePercent: 0,
-    pansyQuote: "SCHD is literally paying you every quarter just to hold it. It's like getting a bonus at work but from your investment. Dividend yield is 3.8% right now which is solid 💅",
-  },
-  {
-    ticker: "MSFT",
-    name: "Microsoft Corporation",
-    price: 410.00,
-    change: 0,
-    changePercent: 0,
-    pansyQuote: "MSFT owns Windows, Office, Azure cloud, and now they're all-in on AI with OpenAI. They make money from everything businesses do online. Rock solid 💼",
+    pansyQuote: "One of the lowest cost index funds. Perfect for set-and-forget retirement accounts.",
+    type: "Mutual Fund",
+    trend: "Sideways",
+    riskLevel: "Conservative",
   },
 ];
 
@@ -214,7 +210,7 @@ export default function Home() {
 
   const loadStockPicks = async () => {
     try {
-      const tickers = ["AAPL", "NVDA", "VOO", "SCHD", "MSFT"];
+      const tickers = ["NVDA", "VOO", "FXAIX"];
       const picksPromises = tickers.map(async (ticker, index) => {
         try {
           const quote = await marketService.getRealTimeQuote(ticker);
@@ -366,9 +362,9 @@ export default function Home() {
 
         {/* Pansy's Picks Today */}
         <Card className="p-6 bg-card border-border rounded-2xl">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-4">
             <h2 className="font-serif text-2xl font-bold text-foreground">
-              Pansy's Picks Today
+              Pansy's Daily Picks
             </h2>
           </div>
 
@@ -382,9 +378,14 @@ export default function Home() {
                 <Card className="p-4 hover:bg-muted/50 transition-colors border-border rounded-xl">
                   <div className="flex items-start justify-between mb-2">
                     <div>
-                      <p className="font-semibold text-foreground text-lg">
-                        {stock.ticker}
-                      </p>
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="font-semibold text-foreground text-lg">
+                          {stock.ticker}
+                        </p>
+                        <Badge variant="outline" className="text-xs bg-background/50">
+                          {stock.type}
+                        </Badge>
+                      </div>
                       <p className="text-sm text-muted-foreground">
                         {stock.name}
                       </p>
@@ -397,8 +398,8 @@ export default function Home() {
                         <Badge
                           className={
                             stock.changePercent >= 0
-                              ? "bg-primary/10 text-primary"
-                              : "bg-destructive/10 text-destructive"
+                              ? "bg-[#3d7a54]/20 text-[#3d7a54]"
+                              : "bg-[#d4788a]/20 text-[#d4788a]"
                           }
                         >
                           {stock.changePercent >= 0 ? "+" : ""}
@@ -408,19 +409,23 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <Card className="p-3 bg-accent/5 border-accent/20 rounded-lg">
+                  <div className="flex gap-2 my-3">
+                    <Badge className="bg-[#3d7a54]/10 text-[#3d7a54] text-xs font-normal border-[#3d7a54]/20">
+                      Trend: {stock.trend}
+                    </Badge>
+                    <Badge className="bg-[#d4788a]/10 text-[#d4788a] text-xs font-normal border-[#d4788a]/20">
+                      Risk: {stock.riskLevel}
+                    </Badge>
+                  </div>
+
+                  <Card className="p-3 bg-accent/5 border-accent/20 rounded-lg flex gap-3 items-start">
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-xs shrink-0 mt-0.5">
+                      🌺
+                    </div>
                     <p className="text-sm italic text-foreground leading-relaxed">
                       "{stock.pansyQuote}"
                     </p>
                   </Card>
-
-                  <Button
-                    variant="ghost"
-                    className="w-full mt-2 text-accent hover:text-accent/80 group"
-                  >
-                    Read Pansy's take
-                    <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
-                  </Button>
                 </Card>
               </Link>
             ))}
