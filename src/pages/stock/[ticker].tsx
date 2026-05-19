@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PansyChat } from "@/components/PansyChat";
 import { marketService } from "@/services/marketService";
 import { TrendingUp, TrendingDown, AlertTriangle, ExternalLink, BarChart3, Activity, Target } from "lucide-react";
 import Link from "next/link";
@@ -429,6 +430,16 @@ export default function StockDetail() {
               </Card>
             ))}
           </div>
+        )}
+
+        {/* Floating Pansy Chat */}
+        {ticker && stockData && (
+          <PansyChat
+            ticker={ticker as string}
+            companyName={stockData.name || (ticker as string)}
+            currentPrice={stockData.c}
+            analysisContext={pansyAnalysis?.fullText}
+          />
         )}
       </div>
     </Layout>
