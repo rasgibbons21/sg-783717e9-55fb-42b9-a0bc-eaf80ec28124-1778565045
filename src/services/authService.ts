@@ -209,7 +209,7 @@ export const authService = {
           data: {
             full_name: fullName,
           },
-          emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
+          emailRedirectTo: "https://shebloomswealth.app/auth/callback"
         }
       });
 
@@ -350,7 +350,7 @@ export const authService = {
 
     try {
       const resetPromise = supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback?type=recovery`,
+        redirectTo: "https://shebloomswealth.app/auth/callback?type=recovery",
       });
 
       const { error } = await withTimeout(resetPromise, 10000);
@@ -404,7 +404,7 @@ export const authService = {
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
+          redirectTo: "https://shebloomswealth.app/auth/callback",
         },
       });
 
