@@ -517,9 +517,9 @@ export default function Discover() {
 
 function AssetCard({ asset }: { asset: Asset }) {
   return (
-    <Link href={`/stock/${asset.ticker}`}>
-      <Card className="p-4 hover:bg-muted/50 transition-colors border-border rounded-xl">
-        <div className="flex items-start justify-between mb-3">
+    <Card className="p-4 hover:bg-muted/50 transition-colors border-border rounded-xl">
+      <div className="flex items-start justify-between mb-3">
+        <Link href={`/stock/${asset.ticker}`} className="flex-1">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <p className="font-semibold text-foreground text-lg">
@@ -531,45 +531,47 @@ function AssetCard({ asset }: { asset: Asset }) {
             </div>
             <p className="text-sm text-muted-foreground">{asset.name}</p>
           </div>
-          <div className="text-right">
-            <p className="font-semibold text-foreground">
-              ${asset.price.toFixed(2)}
-            </p>
-            {asset.price > 0 && (
-              <Badge
-                className={
-                  asset.changePercent >= 0
-                    ? "bg-[#3d7a54]/20 text-[#3d7a54]"
-                    : "bg-[#d4788a]/20 text-[#d4788a]"
-                }
-              >
-                {asset.changePercent >= 0 ? <TrendingUp className="w-3 h-3 mr-1" /> : <TrendingDown className="w-3 h-3 mr-1" />}
-                {asset.changePercent >= 0 ? "+" : ""}
-                {asset.changePercent.toFixed(2)}%
-              </Badge>
-            )}
-          </div>
+        </Link>
+        <div className="text-right">
+          <p className="font-semibold text-foreground">
+            ${asset.price.toFixed(2)}
+          </p>
+          {asset.price > 0 && (
+            <Badge
+              className={
+                asset.changePercent >= 0
+                  ? "bg-[#3d7a54]/20 text-[#3d7a54]"
+                  : "bg-[#d4788a]/20 text-[#d4788a]"
+              }
+            >
+              {asset.changePercent >= 0 ? <TrendingUp className="w-3 h-3 mr-1" /> : <TrendingDown className="w-3 h-3 mr-1" />}
+              {asset.changePercent >= 0 ? "+" : ""}
+              {asset.changePercent.toFixed(2)}%
+            </Badge>
+          )}
         </div>
+      </div>
 
-        {/* Trend and Risk Badges */}
-        {(asset.trend || asset.riskLevel) && (
-          <div className="flex gap-2 mb-3">
-            {asset.trend && (
-              <Badge className={`text-xs font-normal ${getTrendColor(asset.trend)}`}>
-                Trend: {asset.trend}
-              </Badge>
-            )}
-            {asset.riskLevel && (
-              <Badge className={`text-xs font-normal ${getRiskColor(asset.riskLevel)}`}>
-                Risk: {asset.riskLevel}
-              </Badge>
-            )}
-          </div>
-        )}
+      {/* Trend and Risk Badges */}
+      {(asset.trend || asset.riskLevel) && (
+        <div className="flex gap-2 mb-3">
+          {asset.trend && (
+            <Badge className={`text-xs font-normal ${getTrendColor(asset.trend)}`}>
+              Trend: {asset.trend}
+            </Badge>
+          )}
+          {asset.riskLevel && (
+            <Badge className={`text-xs font-normal ${getRiskColor(asset.riskLevel)}`}>
+              Risk: {asset.riskLevel}
+            </Badge>
+          )}
+        </div>
+      )}
 
-        {/* Pansy's Quote */}
-        {asset.pansyQuote && (
-          <Card className="p-3 bg-accent/5 border-accent/20 rounded-lg flex gap-3 items-start">
+      {/* Pansy's Quote */}
+      {asset.pansyQuote && (
+        <Link href={`/stock/${asset.ticker}`}>
+          <Card className="p-3 bg-accent/5 border-accent/20 rounded-lg flex gap-3 items-start mb-3">
             <div className="w-6 h-6 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-xs shrink-0 mt-0.5">
               🌺
             </div>
@@ -577,9 +579,23 @@ function AssetCard({ asset }: { asset: Asset }) {
               "{asset.pansyQuote}"
             </p>
           </Card>
-        )}
-      </Card>
-    </Link>
+        </Link>
+      )}
+
+      {/* Action Buttons */}
+      <div className="flex gap-2">
+        <Link href={`/stock/${asset.ticker}`} className="flex-1">
+          <Button variant="outline" size="sm" className="w-full">
+            Full Analysis
+          </Button>
+        </Link>
+        <Link href={`/compare?tickers=${asset.ticker}`}>
+          <Button variant="outline" size="sm">
+            Compare
+          </Button>
+        </Link>
+      </div>
+    </Card>
   );
 }
 
