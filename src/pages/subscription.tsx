@@ -29,6 +29,20 @@ export default function Subscription() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
+    const checkAuth = async () => {
+      const session = await authService.getCurrentSession();
+      if (!session) {
+        router.push("/");
+        return;
+      }
+
+      const userData = await userService.getCurrentUser();
+      if (userData) {
+        setUser(userData);
+        setCurrentPlan(userData.plan_type as "free" | "pro");
+      }
+    };
+    
     checkAuth();
     
     // Check for URL errors (e.g. from canceled checkout)
@@ -37,21 +51,7 @@ export default function Subscription() {
     } else if (router.query.error) {
       setErrorMsg("There was an issue processing your subscription. Please try again.");
     }
-  }, [router.query]);
-
-  const checkAuth = async () => {
-    const session = await authService.getCurrentSession();
-    if (!session) {
-      router.push("/");
-      return;
-    }
-
-    const userData = await userService.getCurrentUser();
-    if (userData) {
-      setUser(userData);
-      setCurrentPlan(userData.plan_type as "free" | "pro");
-    }
-  };
+  }, [router]);
 
   const handleSubscribe = async () => {
     setIsProcessing(true);
