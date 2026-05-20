@@ -10,6 +10,8 @@ import { userService } from "@/services/userService";
 import { Check, Loader2, AlertCircle } from "lucide-react";
 import { SEO } from "@/components/SEO";
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 // PayPal Plan IDs
 const PAYPAL_MONTHLY_PLAN = "P-8W707879XT1115010NIACMNQ";
 const PAYPAL_YEARLY_PLAN = "P-1TU067111E1942024NIACQBI";
