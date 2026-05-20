@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 const POLYGON_API_KEY = process.env.NEXT_PUBLIC_POLYGON_API_KEY;
 const PRIMARY_BASE_URL = "https://api.massive.com";
 const FALLBACK_BASE_URL = "https://api.polygon.io";

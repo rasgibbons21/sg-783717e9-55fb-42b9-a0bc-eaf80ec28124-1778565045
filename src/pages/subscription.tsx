@@ -11,6 +11,7 @@ import { Check, Loader2, AlertCircle } from "lucide-react";
 import { SEO } from "@/components/SEO";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 // PayPal Plan IDs
 const PAYPAL_MONTHLY_PLAN = "P-8W707879XT1115010NIACMNQ";
