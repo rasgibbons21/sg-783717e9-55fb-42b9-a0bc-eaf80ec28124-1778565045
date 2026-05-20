@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { authService } from "@/services/authService";
 import { userService } from "@/services/userService";
-import { Check, Loader2 } from "lucide-react";
+import { Check, Loader2, AlertCircle } from "lucide-react";
 import { SEO } from "@/components/SEO";
 
 // PayPal Plan IDs
@@ -25,19 +25,19 @@ export default function Subscription() {
   const [isYearly, setIsYearly] = useState(false);
   const [currentPlan, setCurrentPlan] = useState<"free" | "pro">("free");
   const [isProcessing, setIsProcessing] = useState(false);
-  const [paypalLoaded, setPaypalLoaded] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     checkAuth();
-    loadPayPalScript();
-  }, []);
-
-  useEffect(() => {
-    if (paypalLoaded && user) {
-      renderPayPalButtons();
+    
+    // Check for URL errors (e.g. from canceled checkout)
+    if (router.query.canceled) {
+      setErrorMsg("Checkout was canceled. You have not been charged.");
+    } else if (router.query.error) {
+      setErrorMsg("There was an issue processing your subscription. Please try again.");
     }
-  }, [paypalLoaded, isYearly, user]);
+  }, [router.query]);
 
   const checkAuth = async () => {
     const session = await authService.getCurrentSession();
@@ -53,90 +53,37 @@ export default function Subscription() {
     }
   };
 
-  const loadPayPalScript = () => {
-    if (window.paypal) {
-      setPaypalLoaded(true);
-      return;
+  const handleSubscribe = async () => {
+    setIsProcessing(true);
+    setErrorMsg(null);
+    try {
+      const response = await fetch("/api/paypal/create-subscription", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          planType: isYearly ? "annual" : "monthly",
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to create subscription");
+      }
+
+      if (data.approvalUrl) {
+        // Redirect to PayPal hosted checkout
+        window.location.href = data.approvalUrl;
+      } else {
+        throw new Error("No approval URL returned");
+      }
+    } catch (error: any) {
+      console.error("Subscription error:", error);
+      setErrorMsg(error.message || "Failed to start checkout. Please try again.");
+      setIsProcessing(false);
     }
-
-    const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
-    if (!clientId) {
-      console.error("PayPal Client ID not configured");
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&vault=true&intent=subscription`;
-    script.async = true;
-    script.onload = () => {
-      setPaypalLoaded(true);
-    };
-    script.onerror = () => {
-      console.error("Failed to load PayPal SDK");
-    };
-    document.body.appendChild(script);
-  };
-
-  const renderPayPalButtons = () => {
-    const container = document.getElementById("paypal-button-container");
-    if (!container || !window.paypal) return;
-
-    // Clear existing buttons
-    container.innerHTML = "";
-
-    const planId = isYearly ? PAYPAL_YEARLY_PLAN : PAYPAL_MONTHLY_PLAN;
-
-    window.paypal
-      .Buttons({
-        style: {
-          shape: "rect",
-          color: "gold",
-          layout: "vertical",
-          label: "subscribe",
-        },
-        createSubscription: function (data: any, actions: any) {
-          return actions.subscription.create({
-            plan_id: planId,
-          });
-        },
-        onApprove: async function (data: any) {
-          setIsProcessing(true);
-          try {
-            // Update user plan in Supabase
-            if (user) {
-              await userService.updateUser(user.id, {
-                plan_type: "pro",
-              });
-
-              // Create subscription record
-              await fetch("/api/paypal/activate-subscription", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  userId: user.id,
-                  subscriptionId: data.subscriptionID,
-                  planType: isYearly ? "yearly" : "monthly",
-                }),
-              });
-
-              // Refresh page to show Pro status
-              window.location.reload();
-            }
-          } catch (error) {
-            console.error("Error activating subscription:", error);
-            alert("There was an error activating your subscription. Please contact support.");
-          } finally {
-            setIsProcessing(false);
-          }
-        },
-        onError: function (err: any) {
-          console.error("PayPal subscription error:", err);
-          alert("There was an error processing your subscription. Please try again.");
-        },
-      })
-      .render("#paypal-button-container");
   };
 
   const monthlyPrice = 7.99;
@@ -159,6 +106,13 @@ export default function Subscription() {
               Get unlimited access to Pansy's investing insights
             </p>
           </div>
+          
+          {errorMsg && (
+            <Card className="p-4 bg-[#d4788a]/10 border-[#d4788a]/30 flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-[#d4788a] shrink-0 mt-0.5" />
+              <p className="text-sm text-[#d4788a]">{errorMsg}</p>
+            </Card>
+          )}
 
           <Card className="p-4 bg-card">
             <div className="flex items-center justify-center gap-4">
@@ -270,29 +224,30 @@ export default function Subscription() {
                 </ul>
 
                 {currentPlan === "free" && (
-                  <div className="space-y-3">
-                    <div id="paypal-button-container" className="min-h-[150px]">
-                      {!paypalLoaded && (
-                        <div className="flex items-center justify-center py-8">
-                          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-                        </div>
+                  <div className="space-y-3 pt-4">
+                    <Button 
+                      className="w-full bg-accent hover:bg-accent/90 text-accent-foreground" 
+                      onClick={handleSubscribe}
+                      disabled={isProcessing || !user}
+                    >
+                      {isProcessing ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Redirecting to PayPal...
+                        </>
+                      ) : (
+                        "Upgrade to Bloom Pro"
                       )}
-                    </div>
-
-                    {isProcessing && (
-                      <div className="text-center">
-                        <Loader2 className="w-6 h-6 animate-spin text-accent mx-auto" />
-                        <p className="text-sm text-muted-foreground mt-2">
-                          Activating your Pro subscription...
-                        </p>
-                      </div>
-                    )}
+                    </Button>
+                    <p className="text-xs text-center text-muted-foreground">
+                      Secure checkout powered by PayPal
+                    </p>
                   </div>
                 )}
 
                 {currentPlan === "pro" && (
-                  <Button variant="outline" className="w-full" disabled>
-                    Current Plan
+                  <Button variant="outline" className="w-full border-accent text-accent" disabled>
+                    Active Plan
                   </Button>
                 )}
               </div>
