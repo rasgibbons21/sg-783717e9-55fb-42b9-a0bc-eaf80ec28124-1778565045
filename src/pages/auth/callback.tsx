@@ -12,44 +12,75 @@ export default function AuthCallback() {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        // Get the hash from URL (Supabase sends tokens in hash)
+        const url = new URL(window.location.href);
+        const code = url.searchParams.get("code");
+        const type = url.searchParams.get("type");
         const hashParams = new URLSearchParams(window.location.hash.substring(1));
         const accessToken = hashParams.get("access_token");
         const refreshToken = hashParams.get("refresh_token");
-        const type = hashParams.get("type");
 
-        // Check if we have tokens in the hash
-        if (accessToken && refreshToken) {
-          // Set the session using the tokens
-          const { error } = await supabase.auth.setSession({
+        let currentUser = null;
+
+        // PKCE Flow (Primary)
+        if (code) {
+          const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+          if (error) throw error;
+          if (data.session) {
+            currentUser = data.session.user;
+          }
+        } 
+        // Implicit Flow (Fallback for older emails)
+        else if (accessToken && refreshToken) {
+          const { data, error } = await supabase.auth.setSession({
             access_token: accessToken,
             refresh_token: refreshToken,
           });
-
           if (error) throw error;
-
-          setStatus("success");
-          
-          if (type === "recovery") {
-            setMessage("Password reset successful! Redirecting...");
-            setTimeout(() => router.push("/profile"), 1500);
-          } else {
-            setMessage("Email confirmed successfully! Redirecting...");
-            setTimeout(() => router.push("/home"), 1500);
-          }
-        } else {
-          // Fallback: try to get session from Supabase
+          currentUser = data.user;
+        } 
+        // Session fallback
+        else {
           const { data: { session }, error } = await supabase.auth.getSession();
-          
           if (error) throw error;
+          if (session) currentUser = session.user;
+        }
+        
+        if (!currentUser) {
+          throw new Error("No authentication data found");
+        }
+
+        setStatus("success");
+        
+        if (type === "recovery") {
+          setMessage("Password reset successful! Redirecting...");
+          setTimeout(() => router.push("/profile"), 1500);
+        } else {
+          setMessage("Authentication successful! Redirecting...");
           
-          if (session) {
-            setStatus("success");
-            setMessage("Authentication successful! Redirecting...");
-            setTimeout(() => router.push("/home"), 1500);
-          } else {
-            throw new Error("No authentication data found");
+          // Determine if user is new or returning based on onboarding completion
+          let isNewUser = false;
+          try {
+            const { data: userData } = await supabase
+              .from('users')
+              .select('experience_level')
+              .eq('id', currentUser.id)
+              .single();
+              
+            if (!userData || !userData.experience_level) {
+              isNewUser = true;
+            }
+          } catch (e) {
+            console.error("Error checking user status", e);
+            isNewUser = true; // Fallback to onboarding if check fails
           }
+          
+          setTimeout(() => {
+            if (isNewUser) {
+              router.push('/onboarding'); // new users
+            } else {
+              router.push('/home');
+            }
+          }, 1500);
         }
       } catch (error) {
         console.error("Auth callback error:", error);

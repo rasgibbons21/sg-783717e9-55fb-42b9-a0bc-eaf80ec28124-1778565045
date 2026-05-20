@@ -209,7 +209,7 @@ export const authService = {
           data: {
             full_name: fullName,
           },
-          emailRedirectTo: "https://shebloomswealth.app/auth/callback"
+          emailRedirectTo: 'https://shebloomswealth.app/auth/callback'
         }
       });
 
