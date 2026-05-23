@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
@@ -78,15 +79,11 @@ export default function Home() {
   const [stockPicks, setStockPicks] = useState<StockPick[]>(DEFAULT_STOCK_PICKS);
   const [watchlistNews, setWatchlistNews] = useState<any[]>([]);
   const [isLoadingNews, setIsLoadingNews] = useState(true);
-  const [dataLoaded, setDataLoaded] = useState(false);
-  const [marketSummary, setMarketSummary] = useState<any>(null);
-  const [pansysPicks, setPansysPicks] = useState<any[]>([]);
-  const [marketMovers, setMarketMovers] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const [rulesOpen, setRulesOpen] = useState(false);
 
   useEffect(() => {
     checkAuth();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const checkAuth = async () => {
@@ -107,7 +104,6 @@ export default function Home() {
   const loadDataWithTimeout = async () => {
     const timeoutId = setTimeout(() => {
       console.log("Home: Data loading timeout - using fallback data");
-      setDataLoaded(true);
       setIsLoadingNews(false);
     }, 5000);
 
@@ -121,11 +117,9 @@ export default function Home() {
         loadWatchlistNews(userProfile?.id),
       ]);
       clearTimeout(timeoutId);
-      setDataLoaded(true);
     } catch (error) {
       console.error("Home: Error loading data:", error);
       clearTimeout(timeoutId);
-      setDataLoaded(true);
     }
   };
 

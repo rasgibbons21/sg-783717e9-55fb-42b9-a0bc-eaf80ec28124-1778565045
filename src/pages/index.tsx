@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @next/next/no-img-element */
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
@@ -8,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { marketService } from "@/services/marketService";
-import { TrendingUp, Sparkles, Shield, BarChart3, Users, DollarSign, Target, Star } from "lucide-react";
+import { TrendingUp, Sparkles, Shield, BarChart3, Users, DollarSign, Star } from "lucide-react";
 import { SEO } from "@/components/SEO";
 
 interface FeaturedStock {
@@ -28,6 +27,7 @@ export default function LandingPage() {
   useEffect(() => {
     checkAuthAndRedirect();
     loadFeaturedStocks();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const checkAuthAndRedirect = async () => {
