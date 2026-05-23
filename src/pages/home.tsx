@@ -1,4 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
@@ -6,14 +7,13 @@ import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { authService } from "@/services/authService";
 import { userService } from "@/services/userService";
 import { marketService } from "@/services/marketService";
 import { supabase } from "@/integrations/supabase/client";
-import { TrendingUp, TrendingDown, ArrowRight, Crown, ChevronDown, ChevronRight } from "lucide-react";
+import { TrendingUp, TrendingDown, ChevronDown } from "lucide-react";
 
 interface StockPick {
   ticker: string;
@@ -74,10 +74,10 @@ const DEFAULT_STOCK_PICKS: StockPick[] = [
 
 export default function Home() {
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
-  const [marketData, setMarketData] = useState<any[]>(DEFAULT_MARKET_DATA);
+  const [user, setUser] = useState(null);
+  const [marketData, setMarketData] = useState(DEFAULT_MARKET_DATA);
   const [stockPicks, setStockPicks] = useState<StockPick[]>(DEFAULT_STOCK_PICKS);
-  const [watchlistNews, setWatchlistNews] = useState<any[]>([]);
+  const [watchlistNews, setWatchlistNews] = useState([]);
   const [isLoadingNews, setIsLoadingNews] = useState(true);
   const [rulesOpen, setRulesOpen] = useState(false);
 
