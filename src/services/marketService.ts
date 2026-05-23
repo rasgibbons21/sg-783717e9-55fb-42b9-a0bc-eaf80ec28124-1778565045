@@ -54,6 +54,9 @@ export interface MarketAnalysis {
   currentPrice: number;
 }
 
+const quoteCache = new Map<string, { data: any; timestamp: number }>();
+const CACHE_DURATION = 60000; // 60 seconds
+
 export const marketService = {
   async fetchWithFallback(primaryUrl: string, fallbackUrl: string) {
     try {
@@ -174,17 +177,26 @@ export const marketService = {
   },
 
   async getRealTimeQuote(ticker: string) {
+    const now = Date.now();
+    const cached = quoteCache.get(ticker);
+    if (cached && now - cached.timestamp < CACHE_DURATION) {
+      console.log(`[Cache Hit] Real-time quote for ${ticker}`);
+      return cached.data;
+    }
+
     const primaryUrl = `${PRIMARY_BASE_URL}/v2/snapshot/locale/us/markets/stocks/tickers/${ticker}?apiKey=${POLYGON_API_KEY}`;
     const fallbackUrl = `${FALLBACK_BASE_URL}/v2/snapshot/locale/us/markets/stocks/tickers/${ticker}?apiKey=${POLYGON_API_KEY}`;
 
     try {
       const response = await this.fetchWithFallback(primaryUrl, fallbackUrl);
       const data: PolygonQuote = await response.json();
+      
+      console.log(`[API Response] Real-time quote for ${ticker}:`, data);
 
       if (data.ticker) {
         const t = data.ticker;
-        return {
-          c: t.day?.c || 0,
+        const result = {
+          c: t.day?.c || t.lastQuote?.p || t.lastQuote?.P || 0,
           h: t.day?.h || 0,
           l: t.day?.l || 0,
           o: t.day?.o || 0,
@@ -193,7 +205,11 @@ export const marketService = {
           dp: t.todaysChangePerc || 0,
           v: t.day?.v || 0,
         };
+        quoteCache.set(ticker, { data: result, timestamp: now });
+        return result;
       }
+      
+      console.log(`[API Error] No ticker data returned for ${ticker}:`, data);
       return null;
     } catch (error) {
       console.error("Error fetching real-time quote:", error);

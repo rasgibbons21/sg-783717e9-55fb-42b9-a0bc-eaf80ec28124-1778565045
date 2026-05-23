@@ -24,6 +24,7 @@ interface StockPick {
   type?: string;
   trend?: string;
   riskLevel?: string;
+  error?: boolean;
 }
 
 // Default fallback data
@@ -174,10 +175,12 @@ export default function Home() {
   const loadMarketData = async () => {
     try {
       const indices = ["^GSPC", "^IXIC", "^DJI", "^VIX"];
-      const dataPromises = indices.map(async (symbol) => {
+      const data = [];
+      
+      for (const symbol of indices) {
         try {
           const quote = await marketService.getRealTimeQuote(symbol);
-          return {
+          data.push({
             symbol: symbol.replace("^", ""),
             name:
               symbol === "^GSPC"
@@ -190,18 +193,15 @@ export default function Home() {
             price: quote?.c || 0,
             change: quote?.d || 0,
             changePercent: quote?.dp || 0,
-          };
+            error: !quote || quote.c === 0
+          });
         } catch (error) {
           console.error(`Error loading ${symbol}:`, error);
-          return null;
         }
-      });
+      }
 
-      const data = await Promise.all(dataPromises);
-      const validData = data.filter((item) => item !== null);
-      
-      if (validData.length > 0) {
-        setMarketData(validData);
+      if (data.length > 0) {
+        setMarketData(data);
       }
     } catch (error) {
       console.error("Error loading market data:", error);
@@ -211,22 +211,25 @@ export default function Home() {
   const loadStockPicks = async () => {
     try {
       const tickers = ["NVDA", "VOO", "FXAIX"];
-      const picksPromises = tickers.map(async (ticker, index) => {
+      const picks = [];
+      
+      for (let i = 0; i < tickers.length; i++) {
+        const ticker = tickers[i];
         try {
           const quote = await marketService.getRealTimeQuote(ticker);
-          return {
-            ...DEFAULT_STOCK_PICKS[index],
-            price: quote?.c || DEFAULT_STOCK_PICKS[index].price,
+          picks.push({
+            ...DEFAULT_STOCK_PICKS[i],
+            price: quote?.c || DEFAULT_STOCK_PICKS[i].price,
             change: quote?.d || 0,
             changePercent: quote?.dp || 0,
-          };
+            error: !quote || quote.c === 0
+          });
         } catch (error) {
           console.error(`Error loading ${ticker}:`, error);
-          return DEFAULT_STOCK_PICKS[index];
+          picks.push({ ...DEFAULT_STOCK_PICKS[i], error: true });
         }
-      });
+      }
 
-      const picks = await Promise.all(picksPromises);
       setStockPicks(picks);
     } catch (error) {
       console.error("Error loading stock picks:", error);
@@ -340,20 +343,26 @@ export default function Home() {
                 <p className="text-xs text-muted-foreground mb-1">
                   {index.name}
                 </p>
-                <p className="font-semibold text-foreground text-lg">
-                  {index.price > 0 ? index.price.toFixed(2) : "—"}
-                </p>
-                {index.price > 0 && (
-                  <Badge
-                    className={
-                      index.changePercent >= 0
-                        ? "bg-primary/10 text-primary text-xs"
-                        : "bg-destructive/10 text-destructive text-xs"
-                    }
-                  >
-                    {index.changePercent >= 0 ? "+" : ""}
-                    {index.changePercent.toFixed(2)}%
-                  </Badge>
+                {index.error ? (
+                  <p className="font-semibold text-destructive text-sm mt-2">Data unavailable</p>
+                ) : (
+                  <>
+                    <p className="font-semibold text-foreground text-lg">
+                      {index.price > 0 ? index.price.toFixed(2) : "—"}
+                    </p>
+                    {index.price > 0 && (
+                      <Badge
+                        className={
+                          index.changePercent >= 0
+                            ? "bg-primary/10 text-primary text-xs"
+                            : "bg-destructive/10 text-destructive text-xs"
+                        }
+                      >
+                        {index.changePercent >= 0 ? "+" : ""}
+                        {index.changePercent.toFixed(2)}%
+                      </Badge>
+                    )}
+                  </>
                 )}
               </div>
             ))}
@@ -391,20 +400,26 @@ export default function Home() {
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold text-foreground">
-                        ${stock.price.toFixed(2)}
-                      </p>
-                      {stock.price > 0 && stock.changePercent !== 0 && (
-                        <Badge
-                          className={
-                            stock.changePercent >= 0
-                              ? "bg-[#3d7a54]/20 text-[#3d7a54]"
-                              : "bg-[#d4788a]/20 text-[#d4788a]"
-                          }
-                        >
-                          {stock.changePercent >= 0 ? "+" : ""}
-                          {stock.changePercent.toFixed(2)}%
-                        </Badge>
+                      {stock.error ? (
+                        <p className="text-sm font-medium text-destructive mt-1">Data unavailable</p>
+                      ) : (
+                        <>
+                          <p className="font-semibold text-foreground">
+                            ${stock.price.toFixed(2)}
+                          </p>
+                          {stock.price > 0 && stock.changePercent !== 0 && (
+                            <Badge
+                              className={
+                                stock.changePercent >= 0
+                                  ? "bg-[#3d7a54]/20 text-[#3d7a54]"
+                                  : "bg-[#d4788a]/20 text-[#d4788a]"
+                              }
+                            >
+                              {stock.changePercent >= 0 ? "+" : ""}
+                              {stock.changePercent.toFixed(2)}%
+                            </Badge>
+                          )}
+                        </>
                       )}
                     </div>
                   </div>

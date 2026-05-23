@@ -21,6 +21,7 @@ interface Asset {
   trend?: string;
   riskLevel?: string;
   pansyQuote?: string;
+  error?: boolean;
 }
 
 interface MarketIndex {
@@ -134,31 +135,30 @@ export default function Discover() {
       ];
 
       const finnhubKey = process.env.NEXT_PUBLIC_FINNHUB_API_KEY;
+      const indexData = [];
 
-      const indexData = await Promise.all(
-        indices.map(async (index) => {
-          try {
-            const response = await fetch(`https://finnhub.io/api/v1/quote?symbol=${index.symbol}&token=${finnhubKey}`);
-            const quote = await response.json();
-            return {
-              name: index.name,
-              symbol: index.symbol,
-              value: quote?.c || 0,
-              change: quote?.d || 0,
-              changePercent: quote?.dp || 0,
-            };
-          } catch (error) {
-            console.error(`Error loading ${index.name}:`, error);
-            return {
-              name: index.name,
-              symbol: index.symbol,
-              value: 0,
-              change: 0,
-              changePercent: 0,
-            };
-          }
-        })
-      );
+      for (const index of indices) {
+        try {
+          const response = await fetch(`https://finnhub.io/api/v1/quote?symbol=${index.symbol}&token=${finnhubKey}`);
+          const quote = await response.json();
+          indexData.push({
+            name: index.name,
+            symbol: index.symbol,
+            value: quote?.c || 0,
+            change: quote?.d || 0,
+            changePercent: quote?.dp || 0,
+          });
+        } catch (error) {
+          console.error(`Error loading ${index.name}:`, error);
+          indexData.push({
+            name: index.name,
+            symbol: index.symbol,
+            value: 0,
+            change: 0,
+            changePercent: 0,
+          });
+        }
+      }
 
       setMarketIndices(indexData);
     } catch (error) {
@@ -170,76 +170,73 @@ export default function Discover() {
     setIsLoading(true);
     try {
       // Load stocks
-      const stockData = await Promise.all(
-        STOCK_TICKERS.map(async (ticker) => {
-          try {
-            const quote = await marketService.getRealTimeQuote(ticker);
-            const asset: Asset = {
-              ticker,
-              name: ASSET_NAMES[ticker] || ticker,
-              price: quote?.c || 0,
-              change: quote?.d || 0,
-              changePercent: quote?.dp || 0,
-              type: "stock",
-              trend: getTrend(quote?.dp || 0),
-              riskLevel: getRiskLevel(ticker, "stock"),
-            };
-            return asset;
-          } catch (error) {
-            console.error(`Error loading ${ticker}:`, error);
-            return null;
-          }
-        })
-      );
-      setStocks(stockData.filter((s) => s !== null) as Asset[]);
+      const stockData: Asset[] = [];
+      for (const ticker of STOCK_TICKERS) {
+        try {
+          const quote = await marketService.getRealTimeQuote(ticker);
+          const hasError = !quote || quote.c === 0;
+          stockData.push({
+            ticker,
+            name: ASSET_NAMES[ticker] || ticker,
+            price: quote?.c || 0,
+            change: quote?.d || 0,
+            changePercent: quote?.dp || 0,
+            type: "stock",
+            trend: getTrend(quote?.dp || 0),
+            riskLevel: getRiskLevel(ticker, "stock"),
+            error: hasError
+          });
+        } catch (error) {
+          console.error(`Error loading ${ticker}:`, error);
+        }
+      }
+      setStocks(stockData);
 
       // Load ETFs
-      const etfData = await Promise.all(
-        ETF_TICKERS.map(async (ticker) => {
-          try {
-            const quote = await marketService.getRealTimeQuote(ticker);
-            const asset: Asset = {
-              ticker,
-              name: ASSET_NAMES[ticker] || ticker,
-              price: quote?.c || 0,
-              change: quote?.d || 0,
-              changePercent: quote?.dp || 0,
-              type: "etf",
-              trend: getTrend(quote?.dp || 0),
-              riskLevel: getRiskLevel(ticker, "etf"),
-            };
-            return asset;
-          } catch (error) {
-            console.error(`Error loading ${ticker}:`, error);
-            return null;
-          }
-        })
-      );
-      setEtfs(etfData.filter((e) => e !== null) as Asset[]);
+      const etfData: Asset[] = [];
+      for (const ticker of ETF_TICKERS) {
+        try {
+          const quote = await marketService.getRealTimeQuote(ticker);
+          const hasError = !quote || quote.c === 0;
+          etfData.push({
+            ticker,
+            name: ASSET_NAMES[ticker] || ticker,
+            price: quote?.c || 0,
+            change: quote?.d || 0,
+            changePercent: quote?.dp || 0,
+            type: "etf",
+            trend: getTrend(quote?.dp || 0),
+            riskLevel: getRiskLevel(ticker, "etf"),
+            error: hasError
+          });
+        } catch (error) {
+          console.error(`Error loading ${ticker}:`, error);
+        }
+      }
+      setEtfs(etfData);
 
       // Load Mutual Funds
-      const mfData = await Promise.all(
-        MUTUAL_FUND_TICKERS.map(async (ticker) => {
-          try {
-            const quote = await marketService.getRealTimeQuote(ticker);
-            const asset: Asset = {
-              ticker,
-              name: ASSET_NAMES[ticker] || ticker,
-              price: quote?.c || 0,
-              change: quote?.d || 0,
-              changePercent: quote?.dp || 0,
-              type: "mutual-fund",
-              trend: getTrend(quote?.dp || 0),
-              riskLevel: getRiskLevel(ticker, "mutual-fund"),
-            };
-            return asset;
-          } catch (error) {
-            console.error(`Error loading ${ticker}:`, error);
-            return null;
-          }
-        })
-      );
-      setMutualFunds(mfData.filter((m) => m !== null) as Asset[]);
+      const mfData: Asset[] = [];
+      for (const ticker of MUTUAL_FUND_TICKERS) {
+        try {
+          const quote = await marketService.getRealTimeQuote(ticker);
+          const hasError = !quote || quote.c === 0;
+          mfData.push({
+            ticker,
+            name: ASSET_NAMES[ticker] || ticker,
+            price: quote?.c || 0,
+            change: quote?.d || 0,
+            changePercent: quote?.dp || 0,
+            type: "mutual-fund",
+            trend: getTrend(quote?.dp || 0),
+            riskLevel: getRiskLevel(ticker, "mutual-fund"),
+            error: hasError
+          });
+        } catch (error) {
+          console.error(`Error loading ${ticker}:`, error);
+        }
+      }
+      setMutualFunds(mfData);
     } catch (error) {
       console.error("Error loading market data:", error);
     } finally {
@@ -250,22 +247,23 @@ export default function Discover() {
   const loadPansysPicks = async () => {
     setIsLoadingPicks(true);
     try {
-      // Load live prices for default picks
-      const defaultPicksWithPrices = await Promise.all(
-        PANSYS_DEFAULT_PICKS.map(async (pick) => {
-          try {
-            const quote = await marketService.getRealTimeQuote(pick.ticker);
-            return {
-              ...pick,
-              price: quote?.c || pick.price,
-              change: quote?.d || pick.change,
-              changePercent: quote?.dp || pick.changePercent,
-            };
-          } catch (error) {
-            return pick;
-          }
-        })
-      );
+      // Load live prices for default picks sequentially
+      const defaultPicksWithPrices = [];
+      for (const pick of PANSYS_DEFAULT_PICKS) {
+        try {
+          const quote = await marketService.getRealTimeQuote(pick.ticker);
+          const hasError = !quote || quote.c === 0;
+          defaultPicksWithPrices.push({
+            ...pick,
+            price: quote?.c || pick.price,
+            change: quote?.d || pick.change,
+            changePercent: quote?.dp || pick.changePercent,
+            error: hasError
+          });
+        } catch (error) {
+          defaultPicksWithPrices.push({ ...pick, error: true });
+        }
+      }
 
       // Try to get additional picks from API
       try {
@@ -533,21 +531,27 @@ function AssetCard({ asset }: { asset: Asset }) {
           </div>
         </Link>
         <div className="text-right">
-          <p className="font-semibold text-foreground">
-            ${asset.price.toFixed(2)}
-          </p>
-          {asset.price > 0 && (
-            <Badge
-              className={
-                asset.changePercent >= 0
-                  ? "bg-[#3d7a54]/20 text-[#3d7a54]"
-                  : "bg-[#d4788a]/20 text-[#d4788a]"
-              }
-            >
-              {asset.changePercent >= 0 ? <TrendingUp className="w-3 h-3 mr-1" /> : <TrendingDown className="w-3 h-3 mr-1" />}
-              {asset.changePercent >= 0 ? "+" : ""}
-              {asset.changePercent.toFixed(2)}%
-            </Badge>
+          {asset.error ? (
+            <p className="text-sm font-medium text-destructive mt-1">Data unavailable</p>
+          ) : (
+            <>
+              <p className="font-semibold text-foreground">
+                ${asset.price.toFixed(2)}
+              </p>
+              {asset.price > 0 && (
+                <Badge
+                  className={
+                    asset.changePercent >= 0
+                      ? "bg-[#3d7a54]/20 text-[#3d7a54]"
+                      : "bg-[#d4788a]/20 text-[#d4788a]"
+                  }
+                >
+                  {asset.changePercent >= 0 ? <TrendingUp className="w-3 h-3 mr-1" /> : <TrendingDown className="w-3 h-3 mr-1" />}
+                  {asset.changePercent >= 0 ? "+" : ""}
+                  {asset.changePercent.toFixed(2)}%
+                </Badge>
+              )}
+            </>
           )}
         </div>
       </div>
