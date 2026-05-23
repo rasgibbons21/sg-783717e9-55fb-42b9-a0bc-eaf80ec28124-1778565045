@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { NextApiRequest, NextApiResponse } from "next";
 import Anthropic from "@anthropic-ai/sdk";
 
@@ -78,18 +79,10 @@ export default async function handler(
     }
 
     // Build context message
-    let contextMessage = `Current stock context:
-Ticker: ${ticker}
-Company: ${companyName || ticker}
-Current Price: $${currentPrice}
-
-`;
+    let contextMessage = `Current stock context:\nTicker: ${ticker}\nCompany: ${companyName || ticker}\nCurrent Price: $${currentPrice}\n\n`;
 
     if (analysisContext) {
-      contextMessage += `Previous Analysis Summary:
-${analysisContext}
-
-`;
+      contextMessage += `Previous Analysis Summary:\n${analysisContext}\n\n`;
     }
 
     contextMessage += `User's Question: ${question}`;
