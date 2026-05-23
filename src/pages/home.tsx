@@ -537,20 +537,26 @@ export default function Home() {
                   <p className="text-sm text-muted-foreground">{stock.name}</p>
                 </div>
                 <div className="text-right">
-                  <p className="font-semibold text-foreground">
-                    ${stock.price.toFixed(2)}
-                  </p>
-                  {stock.price > 0 && stock.changePercent !== 0 && (
-                    <Badge
-                      className={
-                        stock.changePercent >= 0
-                          ? "bg-primary/10 text-primary"
-                          : "bg-destructive/10 text-destructive"
-                      }
-                    >
-                      {stock.changePercent >= 0 ? "+" : ""}
-                      {stock.changePercent.toFixed(2)}%
-                    </Badge>
+                  {stock.error ? (
+                    <p className="text-sm font-medium text-destructive">Unavailable</p>
+                  ) : (
+                    <>
+                      <p className="font-semibold text-foreground">
+                        ${stock.price.toFixed(2)}
+                      </p>
+                      {stock.price > 0 && stock.changePercent !== 0 && (
+                        <Badge
+                          className={
+                            stock.changePercent >= 0
+                              ? "bg-primary/10 text-primary"
+                              : "bg-destructive/10 text-destructive"
+                          }
+                        >
+                          {stock.changePercent >= 0 ? "+" : ""}
+                          {stock.changePercent.toFixed(2)}%
+                        </Badge>
+                      )}
+                    </>
                   )}
                 </div>
               </Link>

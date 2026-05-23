@@ -270,7 +270,11 @@ export default function Discover() {
         const response = await fetch("/api/pansy-picks");
         if (response.ok) {
           const additionalPicks = await response.json();
-          setPansysPicks([...defaultPicksWithPrices, ...additionalPicks]);
+          const processedAdditionalPicks = additionalPicks.map((p: any) => ({
+            ...p,
+            error: !p.price || p.price === 0
+          }));
+          setPansysPicks([...defaultPicksWithPrices, ...processedAdditionalPicks]);
         } else {
           setPansysPicks(defaultPicksWithPrices);
         }
