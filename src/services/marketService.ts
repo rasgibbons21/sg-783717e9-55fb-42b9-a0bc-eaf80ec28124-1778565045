@@ -217,6 +217,57 @@ export const marketService = {
     }
   },
 
+  async getMarketIndices(): Promise<any[]> {
+    const now = Date.now();
+    const cacheKey = "market_indices";
+    const cached = quoteCache.get(cacheKey);
+    if (cached && now - cached.timestamp < CACHE_DURATION) {
+      console.log(`[Cache Hit] Market indices`);
+      return cached.data;
+    }
+
+    const finnhubKey = process.env.NEXT_PUBLIC_FINNHUB_API_KEY;
+    const indices = [
+      { name: "S&P 500", symbol: "^GSPC" },
+      { name: "NASDAQ", symbol: "^IXIC" },
+      { name: "DOW", symbol: "^DJI" },
+      { name: "VIX", symbol: "^VIX" },
+    ];
+
+    const results = [];
+    for (const index of indices) {
+      try {
+        const response = await fetch(`https://finnhub.io/api/v1/quote?symbol=${index.symbol}&token=${finnhubKey}`);
+        const data = await response.json();
+        console.log(`[API Response] Finnhub index ${index.symbol}:`, data);
+        
+        results.push({
+          symbol: index.symbol.replace("^", ""),
+          name: index.name,
+          price: data?.c || 0,
+          change: data?.d || 0,
+          changePercent: data?.dp || 0,
+          error: !data || data.c === 0
+        });
+      } catch (error) {
+        console.error(`[API Error] Finnhub index ${index.symbol}:`, error);
+        results.push({
+          symbol: index.symbol.replace("^", ""),
+          name: index.name,
+          price: 0,
+          change: 0,
+          changePercent: 0,
+          error: true
+        });
+      }
+    }
+    
+    if (results.length > 0) {
+      quoteCache.set(cacheKey, { data: results, timestamp: now });
+    }
+    return results;
+  },
+
   // Get market analysis data including candlestick patterns
   async getMarketAnalysis(ticker: string): Promise<MarketAnalysis | null> {
     try {

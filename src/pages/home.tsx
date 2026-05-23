@@ -88,6 +88,7 @@ export default function Home() {
   const [stockPicks, setStockPicks] = useState<StockPick[]>(DEFAULT_STOCK_PICKS);
   const [watchlistNews, setWatchlistNews] = useState<any[]>([]);
   const [isLoadingNews, setIsLoadingNews] = useState(true);
+  const [isLoadingIndices, setIsLoadingIndices] = useState(true);
   const [rulesOpen, setRulesOpen] = useState(false);
 
   useEffect(() => {
@@ -176,38 +177,16 @@ export default function Home() {
   };
 
   const loadMarketData = async () => {
+    setIsLoadingIndices(true);
     try {
-      const indices = ["^GSPC", "^IXIC", "^DJI", "^VIX"];
-      const data = [];
-      
-      for (const symbol of indices) {
-        try {
-          const quote = await marketService.getRealTimeQuote(symbol);
-          data.push({
-            symbol: symbol.replace("^", ""),
-            name:
-              symbol === "^GSPC"
-                ? "S&P 500"
-                : symbol === "^IXIC"
-                ? "NASDAQ"
-                : symbol === "^DJI"
-                ? "DOW"
-                : "VIX",
-            price: quote?.c || 0,
-            change: quote?.d || 0,
-            changePercent: quote?.dp || 0,
-            error: !quote || quote.c === 0
-          });
-        } catch (error) {
-          console.error(`Error loading ${symbol}:`, error);
-        }
-      }
-
-      if (data.length > 0) {
+      const data = await marketService.getMarketIndices();
+      if (data && data.length > 0) {
         setMarketData(data);
       }
     } catch (error) {
       console.error("Error loading market data:", error);
+    } finally {
+      setIsLoadingIndices(false);
     }
   };
 
@@ -341,7 +320,15 @@ export default function Home() {
         {/* Market Summary Bar */}
         <Card className="p-4 bg-card border-border rounded-2xl">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {marketData.map((index) => (
+            {isLoadingIndices ? (
+              [1, 2, 3, 4].map((i) => (
+                <div key={i} className="flex flex-col items-center space-y-2">
+                  <Skeleton className="h-3 w-16" />
+                  <Skeleton className="h-6 w-20" />
+                  <Skeleton className="h-4 w-12" />
+                </div>
+              ))
+            ) : marketData.map((index) => (
               <div key={index.symbol} className="text-center">
                 <p className="text-xs text-muted-foreground mb-1">
                   {index.name}

@@ -33,6 +33,7 @@ interface MarketIndex {
   value: number;
   change: number;
   changePercent: number;
+  error?: boolean;
 }
 
 const STOCK_TICKERS = [
@@ -116,6 +117,7 @@ export default function Discover() {
   const [marketIndices, setMarketIndices] = useState<MarketIndex[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingPicks, setIsLoadingPicks] = useState(false);
+  const [isLoadingIndices, setIsLoadingIndices] = useState(true);
 
   useEffect(() => {
     loadMarketData();
@@ -129,43 +131,17 @@ export default function Discover() {
   }, [activeFilter]);
 
   const loadMarketIndices = async () => {
+    setIsLoadingIndices(true);
     try {
-      const indices = [
-        { name: "S&P 500", symbol: "^GSPC" },
-        { name: "NASDAQ", symbol: "^IXIC" },
-        { name: "DOW", symbol: "^DJI" },
-        { name: "VIX", symbol: "^VIX" },
-      ];
-
-      const finnhubKey = process.env.NEXT_PUBLIC_FINNHUB_API_KEY;
-      const indexData = [];
-
-      for (const index of indices) {
-        try {
-          const response = await fetch(`https://finnhub.io/api/v1/quote?symbol=${index.symbol}&token=${finnhubKey}`);
-          const quote = await response.json();
-          indexData.push({
-            name: index.name,
-            symbol: index.symbol,
-            value: quote?.c || 0,
-            change: quote?.d || 0,
-            changePercent: quote?.dp || 0,
-          });
-        } catch (error) {
-          console.error(`Error loading ${index.name}:`, error);
-          indexData.push({
-            name: index.name,
-            symbol: index.symbol,
-            value: 0,
-            change: 0,
-            changePercent: 0,
-          });
-        }
-      }
-
-      setMarketIndices(indexData);
+      const indexData = await marketService.getMarketIndices();
+      setMarketIndices(indexData.map(i => ({
+        ...i,
+        value: i.price, // Map price back to value for existing UI
+      })));
     } catch (error) {
       console.error("Error loading market indices:", error);
+    } finally {
+      setIsLoadingIndices(false);
     }
   };
 
@@ -368,38 +344,40 @@ export default function Discover() {
         {/* Market Summary Bar */}
         <Card className="p-4 bg-card border-border rounded-2xl">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {marketIndices.length > 0 ? (
-              marketIndices.map((index) => (
-                <div key={index.symbol} className="space-y-1">
-                  <p className="text-sm text-muted-foreground">{index.name}</p>
-                  <p className="font-semibold text-foreground">
-                    {index.value > 0 ? index.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "—"}
-                  </p>
-                  {index.value > 0 && (
-                    <Badge
-                      className={
-                        index.changePercent >= 0
-                          ? "bg-[#3d7a54]/20 text-[#3d7a54] text-xs"
-                          : "bg-[#d4788a]/20 text-[#d4788a] text-xs"
-                      }
-                    >
-                      {index.changePercent >= 0 ? "+" : ""}
-                      {index.changePercent.toFixed(2)}%
-                    </Badge>
-                  )}
+            {isLoadingIndices ? (
+              [1, 2, 3, 4].map((i) => (
+                <div key={i} className="space-y-1">
+                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-6 w-24" />
+                  <Skeleton className="h-5 w-16" />
                 </div>
               ))
-            ) : (
-              <>
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="space-y-1">
-                    <Skeleton className="h-4 w-20" />
-                    <Skeleton className="h-6 w-24" />
-                    <Skeleton className="h-5 w-16" />
-                  </div>
-                ))}
-              </>
-            )}
+            ) : marketIndices.map((index) => (
+              <div key={index.symbol} className="space-y-1">
+                <p className="text-sm text-muted-foreground">{index.name}</p>
+                {index.error ? (
+                  <p className="font-semibold text-destructive text-sm mt-2">Data unavailable</p>
+                ) : (
+                  <>
+                    <p className="font-semibold text-foreground">
+                      {index.value > 0 ? index.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "—"}
+                    </p>
+                    {index.value > 0 && (
+                      <Badge
+                        className={
+                          index.changePercent >= 0
+                            ? "bg-[#3d7a54]/20 text-[#3d7a54] text-xs"
+                            : "bg-[#d4788a]/20 text-[#d4788a] text-xs"
+                        }
+                      >
+                        {index.changePercent >= 0 ? "+" : ""}
+                        {index.changePercent.toFixed(2)}%
+                      </Badge>
+                    )}
+                  </>
+                )}
+              </div>
+            ))}
           </div>
         </Card>
 
