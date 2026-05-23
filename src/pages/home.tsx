@@ -15,6 +15,15 @@ import { marketService } from "@/services/marketService";
 import { supabase } from "@/integrations/supabase/client";
 import { TrendingUp, TrendingDown, ChevronDown } from "lucide-react";
 
+interface MarketIndex {
+  symbol: string;
+  name: string;
+  price: number;
+  change: number;
+  changePercent: number;
+  error?: boolean;
+}
+
 interface StockPick {
   ticker: string;
   name: string;
@@ -29,7 +38,7 @@ interface StockPick {
 }
 
 // Default fallback data
-const DEFAULT_MARKET_DATA = [
+const DEFAULT_MARKET_DATA: MarketIndex[] = [
   { symbol: "GSPC", name: "S&P 500", price: 5200.00, change: 0, changePercent: 0 },
   { symbol: "IXIC", name: "NASDAQ", price: 16400.00, change: 0, changePercent: 0 },
   { symbol: "DJI", name: "DOW", price: 38500.00, change: 0, changePercent: 0 },
@@ -74,10 +83,10 @@ const DEFAULT_STOCK_PICKS: StockPick[] = [
 
 export default function Home() {
   const router = useRouter();
-  const [user, setUser] = useState(null);
-  const [marketData, setMarketData] = useState(DEFAULT_MARKET_DATA);
+  const [user, setUser] = useState<any>(null);
+  const [marketData, setMarketData] = useState<MarketIndex[]>(DEFAULT_MARKET_DATA);
   const [stockPicks, setStockPicks] = useState<StockPick[]>(DEFAULT_STOCK_PICKS);
-  const [watchlistNews, setWatchlistNews] = useState([]);
+  const [watchlistNews, setWatchlistNews] = useState<any[]>([]);
   const [isLoadingNews, setIsLoadingNews] = useState(true);
   const [rulesOpen, setRulesOpen] = useState(false);
 
