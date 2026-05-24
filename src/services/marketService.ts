@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-const FMP_API_KEY = process.env.NEXT_PUBLIC_FMP_API_KEY;
+// Removed direct frontend API key dependency
 
 interface ChartDataPoint {
   date: string;
@@ -35,7 +35,7 @@ export const marketService = {
 
   async getHistoricalData(ticker: string, days: number = 30): Promise<ChartDataPoint[]> {
     try {
-      const url = `https://financialmodelingprep.com/api/v3/historical-price-full/${ticker}?timeseries=${days}&apiKey=${FMP_API_KEY}`;
+      const url = `/api/stock-chart?ticker=${ticker}&endpoint=historical-price-full&timeseries=${days}`;
       const response = await this.apiFetch(url);
       const data = await response.json();
 
@@ -65,11 +65,11 @@ export const marketService = {
     }
 
     try {
-      const url = `https://financialmodelingprep.com/api/v3/quote/${ticker}?apiKey=${FMP_API_KEY}`;
+      const url = `/api/stock-data?tickers=${ticker}`;
       const response = await this.apiFetch(url);
       const data = await response.json();
 
-      console.log(`[API Response] FMP quote for ${ticker}:`, data);
+      console.log(`[API Response] Local quote for ${ticker}:`, data);
 
       if (data && data.length > 0) {
         const quote = data[0];
@@ -112,11 +112,11 @@ export const marketService = {
       { name: "VIX", symbol: "^VIX" },
     ];
     
-    // Batch tickers for FMP
+    // Batch tickers for local API route
     const tickers = indices.map(i => i.symbol).join(",");
 
     try {
-      const url = `https://financialmodelingprep.com/api/v3/quote/${tickers}?apiKey=${FMP_API_KEY}`;
+      const url = `/api/stock-data?tickers=${tickers}`;
       const response = await this.apiFetch(url);
       const data = await response.json();
       
@@ -161,38 +161,38 @@ export const marketService = {
 
       switch(timeframe) {
         case "1D":
-          url = `https://financialmodelingprep.com/api/v3/historical-chart/5min/${ticker}?apiKey=${FMP_API_KEY}`;
+          url = `/api/stock-chart?ticker=${ticker}&endpoint=5min`;
           isIntraday = true;
           break;
         case "5D":
-          url = `https://financialmodelingprep.com/api/v3/historical-chart/15min/${ticker}?apiKey=${FMP_API_KEY}`;
+          url = `/api/stock-chart?ticker=${ticker}&endpoint=15min`;
           isIntraday = true;
           break;
         case "1M":
-          url = `https://financialmodelingprep.com/api/v3/historical-chart/1hour/${ticker}?apiKey=${FMP_API_KEY}`;
+          url = `/api/stock-chart?ticker=${ticker}&endpoint=1hour`;
           isIntraday = true;
           break;
         case "3M":
-          url = `https://financialmodelingprep.com/api/v3/historical-price-full/${ticker}?timeseries=90&apiKey=${FMP_API_KEY}`;
+          url = `/api/stock-chart?ticker=${ticker}&endpoint=historical-price-full&timeseries=90`;
           break;
         case "6M":
-          url = `https://financialmodelingprep.com/api/v3/historical-price-full/${ticker}?timeseries=180&apiKey=${FMP_API_KEY}`;
+          url = `/api/stock-chart?ticker=${ticker}&endpoint=historical-price-full&timeseries=180`;
           break;
         case "YTD":
-          url = `https://financialmodelingprep.com/api/v3/historical-price-full/${ticker}?timeseries=250&apiKey=${FMP_API_KEY}`;
+          url = `/api/stock-chart?ticker=${ticker}&endpoint=historical-price-full&timeseries=250`;
           break;
         case "1Y":
-          url = `https://financialmodelingprep.com/api/v3/historical-price-full/${ticker}?timeseries=250&apiKey=${FMP_API_KEY}`;
+          url = `/api/stock-chart?ticker=${ticker}&endpoint=historical-price-full&timeseries=250`;
           break;
         case "5Y":
-          url = `https://financialmodelingprep.com/api/v3/historical-price-full/${ticker}?timeseries=1250&apiKey=${FMP_API_KEY}`;
+          url = `/api/stock-chart?ticker=${ticker}&endpoint=historical-price-full&timeseries=1250`;
           break;
         default:
-          url = `https://financialmodelingprep.com/api/v3/historical-chart/5min/${ticker}?apiKey=${FMP_API_KEY}`;
+          url = `/api/stock-chart?ticker=${ticker}&endpoint=5min`;
           isIntraday = true;
       }
 
-      console.log(`[API Request] Fetching FMP chart data for ${ticker} (${timeframe}):`, url);
+      console.log(`[API Request] Fetching local chart data for ${ticker} (${timeframe}):`, url);
       const response = await this.apiFetch(url);
       const data = await response.json();
 

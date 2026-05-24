@@ -136,12 +136,10 @@ export default function StockDetail() {
     try {
       const quote = await marketService.getRealTimeQuote(symbol);
 
-      // Fallback for news using FMP
+      // Fallback for news using local API route
       let newsData = [];
       try {
-        const response = await fetch(
-          `https://financialmodelingprep.com/api/v3/stock_news?tickers=${symbol}&limit=10&apiKey=${process.env.NEXT_PUBLIC_FMP_API_KEY}`
-        );
+        const response = await fetch(`/api/stock-news?ticker=${symbol}`);
         const data = await response.json();
         if (data && Array.isArray(data)) {
           newsData = data.map((item: any) => ({
