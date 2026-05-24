@@ -1,41 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-const POLYGON_API_KEY = process.env.NEXT_PUBLIC_POLYGON_API_KEY;
-const PRIMARY_BASE_URL = "https://api.massive.com";
-const FALLBACK_BASE_URL = "https://api.polygon.io";
-
-interface PolygonQuote {
-  ticker: {
-    ticker: string;
-    todaysChangePerc: number;
-    todaysChange: number;
-    day: {
-      c: number;
-      h: number;
-      l: number;
-      o: number;
-      v: number;
-    };
-    lastQuote?: {
-      P: number;
-      p: number;
-    };
-    prevDay?: {
-      c: number;
-    };
-  };
-}
-
-interface PolygonAgg {
-  v: number;  // volume
-  vw: number; // volume weighted average
-  o: number;  // open
-  c: number;  // close
-  h: number;  // high
-  l: number;  // low
-  t: number;  // timestamp
-  n: number;  // number of transactions
-}
+const FMP_API_KEY = process.env.NEXT_PUBLIC_FMP_API_KEY;
 
 interface ChartDataPoint {
   date: string;
@@ -58,130 +23,35 @@ const quoteCache = new Map<string, { data: any; timestamp: number }>();
 const CACHE_DURATION = 60000; // 60 seconds
 
 export const marketService = {
-  async polygonFetch(url: string, init?: RequestInit) {
+  async apiFetch(url: string, init?: RequestInit) {
     const response = await fetch(url, init);
     if (response.status === 429) {
       if (typeof window !== "undefined") {
-        window.dispatchEvent(new CustomEvent("polygon-rate-limit"));
+        window.dispatchEvent(new CustomEvent("fmp-rate-limit"));
       }
     }
     return response;
   },
 
-  async fetchWithFallback(primaryUrl: string, fallbackUrl: string) {
-    try {
-      const response = await this.polygonFetch(primaryUrl);
-      if (response.ok) return response;
-      console.warn("Primary API failed, trying fallback...");
-      return this.polygonFetch(fallbackUrl);
-    } catch (error) {
-      console.warn("Primary API error, trying fallback:", error);
-      return this.polygonFetch(fallbackUrl);
-    }
-  },
-
   async getHistoricalData(ticker: string, days: number = 30): Promise<ChartDataPoint[]> {
-    const to = new Date();
-    const from = new Date();
-    from.setDate(from.getDate() - days);
-
-    const fromStr = from.toISOString().split("T")[0];
-    const toStr = to.toISOString().split("T")[0];
-
-    const primaryUrl = `${PRIMARY_BASE_URL}/v2/aggs/ticker/${ticker}/range/1/day/${fromStr}/${toStr}?adjusted=true&sort=asc&apiKey=${POLYGON_API_KEY}`;
-    const fallbackUrl = `${FALLBACK_BASE_URL}/v2/aggs/ticker/${ticker}/range/1/day/${fromStr}/${toStr}?adjusted=true&sort=asc&apiKey=${POLYGON_API_KEY}`;
-
     try {
-      const response = await this.fetchWithFallback(primaryUrl, fallbackUrl);
+      const url = `https://financialmodelingprep.com/api/v3/historical-price-full/${ticker}?timeseries=${days}&apiKey=${FMP_API_KEY}`;
+      const response = await this.apiFetch(url);
       const data = await response.json();
 
-      if (data.results && Array.isArray(data.results)) {
-        return data.results.map((item: PolygonAgg) => ({
-          date: new Date(item.t).toLocaleDateString("en-US", {
+      if (data.historical && Array.isArray(data.historical)) {
+        return data.historical.reverse().map((item: any) => ({
+          date: new Date(item.date).toLocaleDateString("en-US", {
             month: "short",
             day: "numeric",
           }),
-          price: item.c,
-          timestamp: item.t,
+          price: item.close,
+          timestamp: new Date(item.date).getTime(),
         }));
       }
       return [];
     } catch (error) {
       console.error("Error fetching historical data:", error);
-      return [];
-    }
-  },
-
-  // Get historical OHLC data for candlestick charts
-  async getHistoricalOHLC(
-    ticker: string,
-    days: number
-  ): Promise<Array<{ time: string; open: number; high: number; low: number; close: number; volume: number }>> {
-    try {
-      const endDate = new Date();
-      const startDate = new Date();
-      startDate.setDate(endDate.getDate() - days);
-
-      const from = startDate.toISOString().split("T")[0];
-      const to = endDate.toISOString().split("T")[0];
-
-      // Determine interval based on days
-      let multiplier = 1;
-      let timespan = "day";
-      
-      if (days === 1) {
-        multiplier = 5;
-        timespan = "minute";
-      } else if (days <= 5) {
-        multiplier = 15;
-        timespan = "minute";
-      } else if (days <= 30) {
-        multiplier = 1;
-        timespan = "day";
-      } else if (days <= 180) {
-        multiplier = 1;
-        timespan = "day";
-      } else {
-        multiplier = 1;
-        timespan = "week";
-      }
-
-      const url = `${PRIMARY_BASE_URL}/v2/aggs/ticker/${ticker}/range/${multiplier}/${timespan}/${from}/${to}?adjusted=true&sort=asc&apiKey=${POLYGON_API_KEY}`;
-      
-      console.log("Fetching OHLC data:", url);
-      const response = await this.polygonFetch(url);
-      const data = await response.json();
-
-      if (data.results && Array.isArray(data.results)) {
-        return data.results.map((bar: any) => ({
-          time: new Date(bar.t).toISOString().split("T")[0],
-          open: bar.o,
-          high: bar.h,
-          low: bar.l,
-          close: bar.c,
-          volume: bar.v || 0,
-        }));
-      }
-
-      // Fallback to secondary URL
-      const fallbackUrl = `${FALLBACK_BASE_URL}/v2/aggs/ticker/${ticker}/range/${multiplier}/${timespan}/${from}/${to}?adjusted=true&sort=asc&apiKey=${POLYGON_API_KEY}`;
-      const fallbackResponse = await this.polygonFetch(fallbackUrl);
-      const fallbackData = await fallbackResponse.json();
-
-      if (fallbackData.results && Array.isArray(fallbackData.results)) {
-        return fallbackData.results.map((bar: any) => ({
-          time: new Date(bar.t).toISOString().split("T")[0],
-          open: bar.o,
-          high: bar.h,
-          low: bar.l,
-          close: bar.c,
-          volume: bar.v || 0,
-        }));
-      }
-
-      return [];
-    } catch (error) {
-      console.error("Error fetching OHLC data:", error);
       return [];
     }
   },
@@ -195,47 +65,30 @@ export const marketService = {
     }
 
     try {
-      const priceUrl = `https://api.polygon.io/v2/last/trade/${ticker}?apiKey=${POLYGON_API_KEY}`;
-      const prevUrl = `https://api.polygon.io/v2/aggs/ticker/${ticker}/prev?adjusted=true&apiKey=${POLYGON_API_KEY}`;
+      const url = `https://financialmodelingprep.com/api/v3/quote/${ticker}?apiKey=${FMP_API_KEY}`;
+      const response = await this.apiFetch(url);
+      const data = await response.json();
 
-      const [priceRes, prevRes] = await Promise.all([
-        this.polygonFetch(priceUrl),
-        this.polygonFetch(prevUrl)
-      ]);
+      console.log(`[API Response] FMP quote for ${ticker}:`, data);
 
-      const priceData = await priceRes.json();
-      const prevData = await prevRes.json();
-
-      console.log(`[API Response] Polygon last trade for ${ticker}:`, priceData);
-
-      if (priceData.results && priceData.results.p) {
-        const currentPrice = priceData.results.p;
-        let prevClose = currentPrice;
-        let d = 0;
-        let dp = 0;
-
-        if (prevData.results && prevData.results.length > 0) {
-          prevClose = prevData.results[0].c;
-          d = currentPrice - prevClose;
-          dp = (d / prevClose) * 100;
-        }
-
+      if (data && data.length > 0) {
+        const quote = data[0];
         const result = {
-          c: currentPrice,
-          h: currentPrice,
-          l: currentPrice,
-          o: currentPrice,
-          pc: prevClose,
-          d: d,
-          dp: dp,
-          v: priceData.results?.s || 0,
+          c: quote.price,
+          h: quote.dayHigh || quote.price,
+          l: quote.dayLow || quote.price,
+          o: quote.open || quote.price,
+          pc: quote.previousClose || quote.price,
+          d: quote.change,
+          dp: quote.changesPercentage,
+          v: quote.volume || 0,
         };
 
         quoteCache.set(ticker, { data: result, timestamp: now });
         return result;
       }
 
-      console.log(`[API Error] No price data returned for ${ticker}:`, priceData);
+      console.log(`[API Error] No price data returned for ${ticker}:`, data);
       return null;
     } catch (error) {
       console.error("Error fetching real-time quote:", error);
@@ -252,125 +105,146 @@ export const marketService = {
       return cached.data;
     }
 
-    // Using ETF proxies since standard indices require a paid Polygon subscription
     const indices = [
-      { name: "S&P 500", symbol: "SPY" },
-      { name: "NASDAQ", symbol: "QQQ" },
-      { name: "DOW", symbol: "DIA" },
-      { name: "VIX", symbol: "VIXY" },
+      { name: "S&P 500", symbol: "^GSPC" },
+      { name: "NASDAQ", symbol: "^IXIC" },
+      { name: "DOW", symbol: "^DJI" },
+      { name: "VIX", symbol: "^VIX" },
     ];
-
-    const results = [];
-    for (const index of indices) {
-      try {
-        const data = await this.getRealTimeQuote(index.symbol);
-        results.push({
-          symbol: index.symbol,
-          name: index.name,
-          price: data?.c || 0,
-          change: data?.d || 0,
-          changePercent: data?.dp || 0,
-          error: !data || data.c === 0
-        });
-      } catch (error) {
-        console.error(`[API Error] Index proxy ${index.symbol}:`, error);
-        results.push({
-          symbol: index.symbol,
-          name: index.name,
-          price: 0,
-          change: 0,
-          changePercent: 0,
-          error: true
-        });
-      }
-    }
     
-    if (results.length > 0) {
-      quoteCache.set(cacheKey, { data: results, timestamp: now });
+    // Batch tickers for FMP
+    const tickers = indices.map(i => i.symbol).join(",");
+
+    try {
+      const url = `https://financialmodelingprep.com/api/v3/quote/${tickers}?apiKey=${FMP_API_KEY}`;
+      const response = await this.apiFetch(url);
+      const data = await response.json();
+      
+      const results = [];
+      for (const index of indices) {
+        const quote = data?.find?.((q: any) => q.symbol === index.symbol);
+        if (quote) {
+          results.push({
+            symbol: index.symbol.replace("^", ""),
+            name: index.name,
+            price: quote.price,
+            change: quote.change,
+            changePercent: quote.changesPercentage,
+            error: false
+          });
+        } else {
+          results.push({
+            symbol: index.symbol.replace("^", ""),
+            name: index.name,
+            price: 0,
+            change: 0,
+            changePercent: 0,
+            error: true
+          });
+        }
+      }
+      
+      if (results.length > 0) {
+        quoteCache.set(cacheKey, { data: results, timestamp: now });
+      }
+      return results;
+    } catch (error) {
+      console.error("Error fetching market indices:", error);
+      return [];
     }
-    return results;
   },
 
   async getChartData(ticker: string, timeframe: string = "1D") {
-    const toDate = new Date();
-    let fromDate = new Date();
-    let multiplier = 1;
-    let timespan = "day";
-
-    switch(timeframe) {
-      case "1D":
-        fromDate.setDate(toDate.getDate() - 4); 
-        multiplier = 5; timespan = "minute";
-        break;
-      case "5D":
-        fromDate.setDate(toDate.getDate() - 7); 
-        multiplier = 15; timespan = "minute";
-        break;
-      case "1M":
-        fromDate.setDate(toDate.getDate() - 30);
-        multiplier = 1; timespan = "hour";
-        break;
-      case "3M":
-        fromDate.setDate(toDate.getDate() - 90);
-        multiplier = 1; timespan = "day";
-        break;
-      case "6M":
-        fromDate.setDate(toDate.getDate() - 180);
-        multiplier = 1; timespan = "day";
-        break;
-      case "YTD":
-        fromDate = new Date(toDate.getFullYear(), 0, 1);
-        multiplier = 1; timespan = "day";
-        break;
-      case "1Y":
-        fromDate.setDate(toDate.getDate() - 365);
-        multiplier = 1; timespan = "day";
-        break;
-      case "5Y":
-        fromDate.setDate(toDate.getDate() - (365 * 5));
-        multiplier = 1; timespan = "week";
-        break;
-      default:
-        fromDate.setDate(toDate.getDate() - 4);
-        multiplier = 5; timespan = "minute";
-    }
-
-    const fromStr = fromDate.toISOString().split("T")[0];
-    const toStr = toDate.toISOString().split("T")[0];
-
     try {
-      const url = `https://api.polygon.io/v2/aggs/ticker/${ticker}/range/${multiplier}/${timespan}/${fromStr}/${toStr}?adjusted=true&sort=asc&apiKey=${POLYGON_API_KEY}`;
-      console.log(`[API Request] Fetching Polygon chart data for ${ticker} (${timeframe}):`, url);
-      
-      const response = await this.polygonFetch(url);
-      const data = await response.json();
-      
-      console.log(`[API Response] Polygon chart data for ${ticker} (${timeframe}):`, data);
+      let url = "";
+      let isIntraday = false;
 
-      if (data.results && Array.isArray(data.results)) {
-        let results = data.results.map((item: any) => ({
-          time: item.t,
-          date: new Date(item.t).toLocaleString("en-US", {
+      switch(timeframe) {
+        case "1D":
+          url = `https://financialmodelingprep.com/api/v3/historical-chart/5min/${ticker}?apiKey=${FMP_API_KEY}`;
+          isIntraday = true;
+          break;
+        case "5D":
+          url = `https://financialmodelingprep.com/api/v3/historical-chart/15min/${ticker}?apiKey=${FMP_API_KEY}`;
+          isIntraday = true;
+          break;
+        case "1M":
+          url = `https://financialmodelingprep.com/api/v3/historical-chart/1hour/${ticker}?apiKey=${FMP_API_KEY}`;
+          isIntraday = true;
+          break;
+        case "3M":
+          url = `https://financialmodelingprep.com/api/v3/historical-price-full/${ticker}?timeseries=90&apiKey=${FMP_API_KEY}`;
+          break;
+        case "6M":
+          url = `https://financialmodelingprep.com/api/v3/historical-price-full/${ticker}?timeseries=180&apiKey=${FMP_API_KEY}`;
+          break;
+        case "YTD":
+          url = `https://financialmodelingprep.com/api/v3/historical-price-full/${ticker}?timeseries=250&apiKey=${FMP_API_KEY}`;
+          break;
+        case "1Y":
+          url = `https://financialmodelingprep.com/api/v3/historical-price-full/${ticker}?timeseries=250&apiKey=${FMP_API_KEY}`;
+          break;
+        case "5Y":
+          url = `https://financialmodelingprep.com/api/v3/historical-price-full/${ticker}?timeseries=1250&apiKey=${FMP_API_KEY}`;
+          break;
+        default:
+          url = `https://financialmodelingprep.com/api/v3/historical-chart/5min/${ticker}?apiKey=${FMP_API_KEY}`;
+          isIntraday = true;
+      }
+
+      console.log(`[API Request] Fetching FMP chart data for ${ticker} (${timeframe}):`, url);
+      const response = await this.apiFetch(url);
+      const data = await response.json();
+
+      let results = [];
+
+      if (isIntraday && Array.isArray(data)) {
+        // Intraday is newest first, so reverse it
+        results = data.reverse().map((item: any) => ({
+          time: new Date(item.date).getTime(),
+          date: new Date(item.date).toLocaleString("en-US", {
             month: "short",
             day: "numeric",
-            ...(timeframe === "1D" || timeframe === "5D" ? { hour: "numeric", minute: "2-digit" } : {})
+            hour: "numeric", 
+            minute: "2-digit"
           }),
-          open: item.o,
-          high: item.h,
-          low: item.l,
-          close: item.c,
-          volume: item.v,
+          open: item.open,
+          high: item.high,
+          low: item.low,
+          close: item.close,
+          volume: item.volume,
         }));
 
         if (timeframe === "1D" && results.length > 0) {
           const lastDate = new Date(results[results.length - 1].time).toLocaleDateString();
           results = results.filter((r: any) => new Date(r.time).toLocaleDateString() === lastDate);
         }
+      } else if (!isIntraday && data.historical && Array.isArray(data.historical)) {
+        results = data.historical.reverse().map((item: any) => ({
+          time: new Date(item.date).getTime(),
+          date: new Date(item.date).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: timeframe === "5Y" ? "numeric" : undefined
+          }),
+          open: item.open,
+          high: item.high,
+          low: item.low,
+          close: item.close,
+          volume: item.volume,
+        }));
 
+        if (timeframe === "YTD") {
+          const currentYear = new Date().getFullYear();
+          results = results.filter(r => new Date(r.time).getFullYear() === currentYear);
+        }
+      }
+
+      if (results.length > 0) {
         return results;
       }
-      
-      console.log(`[API Error] Invalid or empty chart data returned for ${ticker}:`, data);
+
+      console.log(`[API Error] Invalid or empty chart data returned for ${ticker}`);
       return null;
     } catch (error) {
       console.error("Error fetching chart data:", error);
@@ -378,7 +252,6 @@ export const marketService = {
     }
   },
 
-  // Get market analysis data including candlestick patterns
   async getMarketAnalysis(ticker: string): Promise<MarketAnalysis | null> {
     try {
       const [chartData, quote] = await Promise.all([
@@ -388,7 +261,6 @@ export const marketService = {
 
       if (chartData.length === 0 || !quote) return null;
 
-      // Calculate trend
       const firstPrice = chartData[0].price;
       const lastPrice = chartData[chartData.length - 1].price;
       const priceChange = ((lastPrice - firstPrice) / firstPrice) * 100;
@@ -397,18 +269,13 @@ export const marketService = {
       if (priceChange > 2) trend = "up";
       else if (priceChange < -2) trend = "down";
 
-      // Calculate 30-day high and low
       const prices = chartData.map((d) => d.price);
       const high30Day = Math.max(...prices);
       const low30Day = Math.min(...prices);
 
-      // Calculate average volume (assuming we have volume data)
-      const avgVolume = quote.v; // Simplified - would need historical volume data
-
-      // Volume ratio (today vs average)
+      const avgVolume = quote.v;
       const volumeRatio = avgVolume > 0 ? quote.v / avgVolume : 1;
 
-      // Price vs 30-day high/low
       const priceVs30DayHigh = ((quote.c - high30Day) / high30Day) * 100;
       const priceVs30DayLow = ((quote.c - low30Day) / low30Day) * 100;
 
@@ -431,10 +298,10 @@ export const marketService = {
   async getMarketSummary() {
     try {
       const [vix, nasdaq, sp500, dow] = await Promise.all([
-        this.getRealTimeQuote("VIX"),
-        this.getRealTimeQuote("NDAQ"),
-        this.getRealTimeQuote("SPY"), // S&P 500 ETF as proxy
-        this.getRealTimeQuote("DIA"), // Dow ETF as proxy
+        this.getRealTimeQuote("^VIX"),
+        this.getRealTimeQuote("^IXIC"),
+        this.getRealTimeQuote("^GSPC"), 
+        this.getRealTimeQuote("^DJI"), 
       ]);
 
       return {

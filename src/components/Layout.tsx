@@ -33,13 +33,13 @@ export function Layout({ children }: LayoutProps) {
     const handleRateLimit = () => {
       toast({
         title: "API Limit Reached 🐢",
-        description: "We've hit the Polygon.io free tier limit (5 requests/minute). Please wait a moment before fetching more data.",
+        description: "We've hit the Financial Modeling Prep free tier limit. Please wait a moment before fetching more data.",
         variant: "destructive",
       });
     };
 
-    window.addEventListener("polygon-rate-limit", handleRateLimit);
-    return () => window.removeEventListener("polygon-rate-limit", handleRateLimit);
+    window.addEventListener("fmp-rate-limit", handleRateLimit);
+    return () => window.removeEventListener("fmp-rate-limit", handleRateLimit);
   }, [toast]);
 
   return (

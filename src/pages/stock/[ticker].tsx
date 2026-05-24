@@ -136,20 +136,20 @@ export default function StockDetail() {
     try {
       const quote = await marketService.getRealTimeQuote(symbol);
 
-      // Fallback for news using Polygon
+      // Fallback for news using FMP
       let newsData = [];
       try {
         const response = await fetch(
-          `https://api.polygon.io/v2/reference/news?ticker=${symbol}&limit=10&apiKey=${process.env.NEXT_PUBLIC_POLYGON_API_KEY}`
+          `https://financialmodelingprep.com/api/v3/stock_news?tickers=${symbol}&limit=10&apiKey=${process.env.NEXT_PUBLIC_FMP_API_KEY}`
         );
         const data = await response.json();
-        if (data.results) {
-          newsData = data.results.map((item: any) => ({
+        if (data && Array.isArray(data)) {
+          newsData = data.map((item: any) => ({
             headline: item.title,
-            source: item.publisher?.name || "Market News",
-            datetime: new Date(item.published_utc).getTime() / 1000,
-            url: item.article_url,
-            summary: item.description
+            source: item.site || "Market News",
+            datetime: new Date(item.publishedDate).getTime() / 1000,
+            url: item.url,
+            summary: item.text
           }));
         }
       } catch (e) {
@@ -305,7 +305,7 @@ export default function StockDetail() {
             ) : null}
           </div>
           <p className="text-xs text-muted-foreground">
-            Historical OHLC data provided by Polygon.io
+            Historical OHLC data provided by Financial Modeling Prep
           </p>
         </Card>
 
