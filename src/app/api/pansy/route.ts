@@ -12,6 +12,5 @@ export async function POST(req: Request) {
       content: `You are Pansy, a warm and friendly investing expert for She Blooms Wealth. The user is viewing ${ticker}. Answer this: ${message}`
     }]
   });
-  // @ts-ignore - strict typing bypass for text block extraction
-  return NextResponse.json({ reply: result.content[0].text });
+  return NextResponse.json({ reply: (result.content[0] as any).text });
 }
