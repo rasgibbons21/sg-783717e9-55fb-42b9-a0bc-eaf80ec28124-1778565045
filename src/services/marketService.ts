@@ -65,30 +65,32 @@ export const marketService = {
     }
 
     try {
-      const url = `/api/stock-data?tickers=${ticker}`;
+      const apiKey = process.env.NEXT_PUBLIC_FINNHUB_API_KEY;
+      if (!apiKey) throw new Error("Finnhub API key missing");
+
+      const url = `https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${apiKey}`;
       const response = await this.apiFetch(url);
       const data = await response.json();
 
-      console.log(`[API Response] Local quote for ${ticker}:`, data);
+      console.log(`[API Response] Finnhub quote for ${ticker}:`, data);
 
-      if (data && data.length > 0) {
-        const quote = data[0];
+      if (data && typeof data.c === "number" && data.c !== 0) {
         const result = {
-          c: quote.price,
-          h: quote.dayHigh || quote.price,
-          l: quote.dayLow || quote.price,
-          o: quote.open || quote.price,
-          pc: quote.previousClose || quote.price,
-          d: quote.change,
-          dp: quote.changesPercentage,
-          v: quote.volume || 0,
+          c: data.c,
+          h: data.h || data.c,
+          l: data.l || data.c,
+          o: data.o || data.c,
+          pc: data.pc || data.c,
+          d: data.d || 0,
+          dp: data.dp || 0,
+          v: data.v || 0,
         };
 
         quoteCache.set(ticker, { data: result, timestamp: now });
         return result;
       }
 
-      console.log(`[API Error] No price data returned for ${ticker}:`, data);
+      console.log(`[API Error] Invalid price data returned for ${ticker}:`, data);
       return null;
     } catch (error) {
       console.error("Error fetching real-time quote:", error);
@@ -106,35 +108,30 @@ export const marketService = {
     }
 
     const indices = [
-      { name: "S&P 500", symbol: "^GSPC" },
-      { name: "NASDAQ", symbol: "^IXIC" },
-      { name: "DOW", symbol: "^DJI" },
-      { name: "VIX", symbol: "^VIX" },
+      { name: "S&P 500", symbol: "SPY" },
+      { name: "NASDAQ", symbol: "QQQ" },
+      { name: "DOW", symbol: "DIA" },
+      { name: "VIX", symbol: "VIXY" },
     ];
     
-    // Batch tickers for local API route
-    const tickers = indices.map(i => i.symbol).join(",");
-
-    try {
-      const url = `/api/stock-data?tickers=${tickers}`;
-      const response = await this.apiFetch(url);
-      const data = await response.json();
-      
-      const results = [];
-      for (const index of indices) {
-        const quote = data?.find?.((q: any) => q.symbol === index.symbol);
-        if (quote) {
+    const results = [];
+    
+    for (const index of indices) {
+      try {
+        const data = await this.getRealTimeQuote(index.symbol);
+        
+        if (data) {
           results.push({
-            symbol: index.symbol.replace("^", ""),
+            symbol: index.symbol,
             name: index.name,
-            price: quote.price,
-            change: quote.change,
-            changePercent: quote.changesPercentage,
+            price: data.c,
+            change: data.d,
+            changePercent: data.dp,
             error: false
           });
         } else {
           results.push({
-            symbol: index.symbol.replace("^", ""),
+            symbol: index.symbol,
             name: index.name,
             price: 0,
             change: 0,
@@ -142,16 +139,26 @@ export const marketService = {
             error: true
           });
         }
+        
+        // 500ms delay between calls to avoid Finnhub free tier rate limits
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      } catch (error) {
+        console.error(`Error fetching index ${index.symbol}:`, error);
+        results.push({
+          symbol: index.symbol,
+          name: index.name,
+          price: 0,
+          change: 0,
+          changePercent: 0,
+          error: true
+        });
       }
-      
-      if (results.length > 0) {
-        quoteCache.set(cacheKey, { data: results, timestamp: now });
-      }
-      return results;
-    } catch (error) {
-      console.error("Error fetching market indices:", error);
-      return [];
     }
+    
+    if (results.length > 0) {
+      quoteCache.set(cacheKey, { data: results, timestamp: now });
+    }
+    return results;
   },
 
   async getMarketAnalysis(ticker: string): Promise<MarketAnalysis | null> {
@@ -199,11 +206,12 @@ export const marketService = {
 
   async getMarketSummary() {
     try {
+      // Using ETF proxies for Finnhub
       const [vix, nasdaq, sp500, dow] = await Promise.all([
-        this.getRealTimeQuote("^VIX"),
-        this.getRealTimeQuote("^IXIC"),
-        this.getRealTimeQuote("^GSPC"), 
-        this.getRealTimeQuote("^DJI"), 
+        this.getRealTimeQuote("VIXY"),
+        this.getRealTimeQuote("QQQ"),
+        this.getRealTimeQuote("SPY"), 
+        this.getRealTimeQuote("DIA"), 
       ]);
 
       return {
