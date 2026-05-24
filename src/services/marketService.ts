@@ -225,4 +225,30 @@ export const marketService = {
       return null;
     }
   },
+
+  async getGeneralNews() {
+    try {
+      const apiKey = process.env.NEXT_PUBLIC_FINNHUB_API_KEY;
+      if (!apiKey) return [];
+
+      const url = `https://finnhub.io/api/v1/news?category=general&token=${apiKey}`;
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (Array.isArray(data)) {
+        return data.slice(0, 5).map((item: any) => ({
+          headline: item.headline,
+          source: item.source,
+          datetime: item.datetime,
+          url: item.url,
+          image: item.image,
+          summary: item.summary
+        }));
+      }
+      return [];
+    } catch (error) {
+      console.error("Error fetching general news:", error);
+      return [];
+    }
+  },
 };

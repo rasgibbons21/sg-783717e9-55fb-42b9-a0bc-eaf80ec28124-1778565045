@@ -133,36 +133,39 @@ export default function Home() {
   };
 
   const loadWatchlistNews = async (userId: string) => {
-    if (!userId) {
-      setIsLoadingNews(false);
-      return;
-    }
-
     try {
-      const { data: watchlist, error } = await supabase
-        .from("watchlist")
-        .select("ticker")
-        .eq("user_id", userId)
-        .limit(5);
+      let newsLoaded = false;
 
-      if (error) throw error;
+      if (userId) {
+        const { data: watchlist, error } = await supabase
+          .from("watchlist")
+          .select("ticker")
+          .eq("user_id", userId)
+          .limit(5);
 
-      if (!watchlist || watchlist.length === 0) {
-        setWatchlistNews([]);
-        setIsLoadingNews(false);
-        return;
+        if (!error && watchlist && watchlist.length > 0) {
+          const newsPromises = watchlist.map(async (item) => {
+            // Use the new local API route for FMP
+            const response = await fetch(`/api/stock-news?ticker=${item.ticker}`);
+            const newsData = await response.json();
+            return Array.isArray(newsData) ? newsData.slice(0, 2) : [];
+          });
+
+          const allNews = await Promise.all(newsPromises);
+          const flatNews = allNews.flat().sort((a, b) => b.datetime - a.datetime).slice(0, 5);
+          
+          if (flatNews.length > 0) {
+            setWatchlistNews(flatNews);
+            newsLoaded = true;
+          }
+        }
       }
 
-      const newsPromises = watchlist.map(async (item) => {
-        // Use the new local API route for FMP
-        const response = await fetch(`/api/stock-news?ticker=${item.ticker}`);
-        const newsData = await response.json();
-        return Array.isArray(newsData) ? newsData.slice(0, 2) : [];
-      });
-
-      const allNews = await Promise.all(newsPromises);
-      const flatNews = allNews.flat().sort((a, b) => b.datetime - a.datetime).slice(0, 6);
-      setWatchlistNews(flatNews);
+      // Fallback to general market news if watchlist is empty or has no news
+      if (!newsLoaded) {
+        const generalNews = await marketService.getGeneralNews();
+        setWatchlistNews(generalNews);
+      }
     } catch (error) {
       console.error("Error loading watchlist news:", error);
     } finally {
@@ -435,7 +438,7 @@ export default function Home() {
               <span className="text-xl">📰</span>
             </div>
             <p className="text-sm text-muted-foreground mb-4">
-              Latest updates on the stocks you're watching
+              Latest market updates and news on stocks you're watching
             </p>
 
             {isLoadingNews ? (
