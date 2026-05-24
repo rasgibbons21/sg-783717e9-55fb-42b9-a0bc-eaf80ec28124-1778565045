@@ -46,16 +46,12 @@ export function PansyChat({ ticker, companyName, currentPrice, analysisContext }
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/chat", {
+      const response = await fetch("/api/pansy", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ticker,
-          companyName,
-          currentPrice,
-          analysisContext,
-          question: inputValue,
-          conversationHistory: messages,
+          message: inputValue,
         }),
       });
 
@@ -63,7 +59,7 @@ export function PansyChat({ ticker, companyName, currentPrice, analysisContext }
         const data = await response.json();
         const assistantMessage: Message = {
           role: "assistant",
-          content: data.answer,
+          content: data.reply,
           timestamp: Date.now(),
         };
         setMessages((prev) => [...prev, assistantMessage]);
