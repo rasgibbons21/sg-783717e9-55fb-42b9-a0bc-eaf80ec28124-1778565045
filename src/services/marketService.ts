@@ -184,32 +184,48 @@ export const marketService = {
       return cached.data;
     }
 
-    const primaryUrl = `${PRIMARY_BASE_URL}/v2/snapshot/locale/us/markets/stocks/tickers/${ticker}?apiKey=${POLYGON_API_KEY}`;
-    const fallbackUrl = `${FALLBACK_BASE_URL}/v2/snapshot/locale/us/markets/stocks/tickers/${ticker}?apiKey=${POLYGON_API_KEY}`;
-
     try {
-      const response = await this.fetchWithFallback(primaryUrl, fallbackUrl);
-      const data: PolygonQuote = await response.json();
-      
-      console.log(`[API Response] Real-time quote for ${ticker}:`, data);
+      const priceUrl = `https://api.polygon.io/v2/last/trade/${ticker}?apiKey=${POLYGON_API_KEY}`;
+      const prevUrl = `https://api.polygon.io/v2/aggs/ticker/${ticker}/prev?adjusted=true&apiKey=${POLYGON_API_KEY}`;
 
-      if (data.ticker) {
-        const t = data.ticker;
+      const [priceRes, prevRes] = await Promise.all([
+        fetch(priceUrl),
+        fetch(prevUrl)
+      ]);
+
+      const priceData = await priceRes.json();
+      const prevData = await prevRes.json();
+
+      console.log(`[API Response] Polygon last trade for ${ticker}:`, priceData);
+
+      if (priceData.results && priceData.results.p) {
+        const currentPrice = priceData.results.p;
+        let prevClose = currentPrice;
+        let d = 0;
+        let dp = 0;
+
+        if (prevData.results && prevData.results.length > 0) {
+          prevClose = prevData.results[0].c;
+          d = currentPrice - prevClose;
+          dp = (d / prevClose) * 100;
+        }
+
         const result = {
-          c: t.day?.c || t.lastQuote?.p || t.lastQuote?.P || 0,
-          h: t.day?.h || 0,
-          l: t.day?.l || 0,
-          o: t.day?.o || 0,
-          pc: t.prevDay?.c || 0,
-          d: t.todaysChange || 0,
-          dp: t.todaysChangePerc || 0,
-          v: t.day?.v || 0,
+          c: currentPrice,
+          h: currentPrice,
+          l: currentPrice,
+          o: currentPrice,
+          pc: prevClose,
+          d: d,
+          dp: dp,
+          v: priceData.results?.s || 0,
         };
+
         quoteCache.set(ticker, { data: result, timestamp: now });
         return result;
       }
-      
-      console.log(`[API Error] No ticker data returned for ${ticker}:`, data);
+
+      console.log(`[API Error] No price data returned for ${ticker}:`, priceData);
       return null;
     } catch (error) {
       console.error("Error fetching real-time quote:", error);
@@ -226,23 +242,20 @@ export const marketService = {
       return cached.data;
     }
 
-    const finnhubKey = process.env.NEXT_PUBLIC_FINNHUB_API_KEY;
+    // Using ETF proxies since standard indices require a paid Polygon subscription
     const indices = [
-      { name: "S&P 500", symbol: "^GSPC" },
-      { name: "NASDAQ", symbol: "^IXIC" },
-      { name: "DOW", symbol: "^DJI" },
-      { name: "VIX", symbol: "^VIX" },
+      { name: "S&P 500", symbol: "SPY" },
+      { name: "NASDAQ", symbol: "QQQ" },
+      { name: "DOW", symbol: "DIA" },
+      { name: "VIX", symbol: "VIXY" },
     ];
 
     const results = [];
     for (const index of indices) {
       try {
-        const response = await fetch(`https://finnhub.io/api/v1/quote?symbol=${index.symbol}&token=${finnhubKey}`);
-        const data = await response.json();
-        console.log(`[API Response] Finnhub index ${index.symbol}:`, data);
-        
+        const data = await this.getRealTimeQuote(index.symbol);
         results.push({
-          symbol: index.symbol.replace("^", ""),
+          symbol: index.symbol,
           name: index.name,
           price: data?.c || 0,
           change: data?.d || 0,
@@ -250,9 +263,9 @@ export const marketService = {
           error: !data || data.c === 0
         });
       } catch (error) {
-        console.error(`[API Error] Finnhub index ${index.symbol}:`, error);
+        console.error(`[API Error] Index proxy ${index.symbol}:`, error);
         results.push({
-          symbol: index.symbol.replace("^", ""),
+          symbol: index.symbol,
           name: index.name,
           price: 0,
           change: 0,
@@ -269,76 +282,76 @@ export const marketService = {
   },
 
   async getChartData(ticker: string, timeframe: string = "1D") {
-    const finnhubKey = process.env.NEXT_PUBLIC_FINNHUB_API_KEY;
-    
-    // Calculate from and to timestamps (UNIX seconds)
-    const to = Math.floor(Date.now() / 1000);
-    let from = to;
-    let resolution = "D";
+    const toDate = new Date();
+    let fromDate = new Date();
+    let multiplier = 1;
+    let timespan = "day";
 
     switch(timeframe) {
       case "1D":
-        from = to - (24 * 60 * 60 * 4); // 4 days back to ensure we get data even over long weekends
-        resolution = "5"; // 5 minutes
+        fromDate.setDate(toDate.getDate() - 4); 
+        multiplier = 5; timespan = "minute";
         break;
       case "5D":
-        from = to - (5 * 24 * 60 * 60 * 2); // extra buffer for weekends
-        resolution = "15"; // 15 minutes
+        fromDate.setDate(toDate.getDate() - 7); 
+        multiplier = 15; timespan = "minute";
         break;
       case "1M":
-        from = to - (30 * 24 * 60 * 60);
-        resolution = "60"; // 60 minutes
+        fromDate.setDate(toDate.getDate() - 30);
+        multiplier = 1; timespan = "hour";
         break;
       case "3M":
-        from = to - (90 * 24 * 60 * 60);
-        resolution = "D";
+        fromDate.setDate(toDate.getDate() - 90);
+        multiplier = 1; timespan = "day";
         break;
       case "6M":
-        from = to - (180 * 24 * 60 * 60);
-        resolution = "D";
+        fromDate.setDate(toDate.getDate() - 180);
+        multiplier = 1; timespan = "day";
         break;
       case "YTD":
-        from = Math.floor(new Date(new Date().getFullYear(), 0, 1).getTime() / 1000);
-        resolution = "D";
+        fromDate = new Date(toDate.getFullYear(), 0, 1);
+        multiplier = 1; timespan = "day";
         break;
       case "1Y":
-        from = to - (365 * 24 * 60 * 60);
-        resolution = "D";
+        fromDate.setDate(toDate.getDate() - 365);
+        multiplier = 1; timespan = "day";
         break;
       case "5Y":
-        from = to - (5 * 365 * 24 * 60 * 60);
-        resolution = "W";
+        fromDate.setDate(toDate.getDate() - (365 * 5));
+        multiplier = 1; timespan = "week";
         break;
       default:
-        from = to - (24 * 60 * 60 * 4);
-        resolution = "5";
+        fromDate.setDate(toDate.getDate() - 4);
+        multiplier = 5; timespan = "minute";
     }
 
+    const fromStr = fromDate.toISOString().split("T")[0];
+    const toStr = toDate.toISOString().split("T")[0];
+
     try {
-      const url = `https://finnhub.io/api/v1/stock/candle?symbol=${ticker}&resolution=${resolution}&from=${from}&to=${to}&token=${finnhubKey}`;
-      console.log(`[API Request] Fetching chart data for ${ticker} (${timeframe}):`, url);
+      const url = `https://api.polygon.io/v2/aggs/ticker/${ticker}/range/${multiplier}/${timespan}/${fromStr}/${toStr}?adjusted=true&sort=asc&apiKey=${POLYGON_API_KEY}`;
+      console.log(`[API Request] Fetching Polygon chart data for ${ticker} (${timeframe}):`, url);
       
       const response = await fetch(url);
       const data = await response.json();
       
-      console.log(`[API Response] Chart data for ${ticker} (${timeframe}):`, data);
+      console.log(`[API Response] Polygon chart data for ${ticker} (${timeframe}):`, data);
 
-      if (data.s === "ok" && data.t && data.c) {
-        let results = data.t.map((timestamp: number, index: number) => ({
-          time: timestamp * 1000,
-          date: new Date(timestamp * 1000).toLocaleString("en-US", {
+      if (data.results && Array.isArray(data.results)) {
+        let results = data.results.map((item: any) => ({
+          time: item.t,
+          date: new Date(item.t).toLocaleString("en-US", {
             month: "short",
             day: "numeric",
             ...(timeframe === "1D" || timeframe === "5D" ? { hour: "numeric", minute: "2-digit" } : {})
           }),
-          open: data.o[index],
-          high: data.h[index],
-          low: data.l[index],
-          close: data.c[index],
-          volume: data.v[index],
+          open: item.o,
+          high: item.h,
+          low: item.l,
+          close: item.c,
+          volume: item.v,
         }));
 
-        // If 1D, just take the last day's worth of data from the results
         if (timeframe === "1D" && results.length > 0) {
           const lastDate = new Date(results[results.length - 1].time).toLocaleDateString();
           results = results.filter((r: any) => new Date(r.time).toLocaleDateString() === lastDate);

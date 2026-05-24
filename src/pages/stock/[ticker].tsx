@@ -136,23 +136,28 @@ export default function StockDetail() {
     try {
       const quote = await marketService.getRealTimeQuote(symbol);
 
-      // Fallback for news
+      // Fallback for news using Polygon
       let newsData = [];
       try {
         const response = await fetch(
-          `https://finnhub.io/api/v1/company-news?symbol=${symbol}&from=${
-            new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]
-          }&to=${new Date().toISOString().split("T")[0]}&token=${
-            process.env.NEXT_PUBLIC_FINNHUB_API_KEY
-          }`
+          `https://api.polygon.io/v2/reference/news?ticker=${symbol}&limit=10&apiKey=${process.env.NEXT_PUBLIC_POLYGON_API_KEY}`
         );
-        newsData = await response.json();
+        const data = await response.json();
+        if (data.results) {
+          newsData = data.results.map((item: any) => ({
+            headline: item.title,
+            source: item.publisher?.name || "Market News",
+            datetime: new Date(item.published_utc).getTime() / 1000,
+            url: item.article_url,
+            summary: item.description
+          }));
+        }
       } catch (e) {
         console.error("Error fetching news:", e);
       }
 
       setStockData(quote || { c: 0, dp: 0, name: symbol });
-      setNews(Array.isArray(newsData) ? newsData.slice(0, 10) : []);
+      setNews(newsData);
 
       // Load Pansy's analysis
       await loadPansyAnalysis(symbol, quote || { c: 0, dp: 0, name: symbol });
@@ -300,7 +305,7 @@ export default function StockDetail() {
             ) : null}
           </div>
           <p className="text-xs text-muted-foreground">
-            Historical OHLC data provided by Finnhub
+            Historical OHLC data provided by Polygon.io
           </p>
         </Card>
 
