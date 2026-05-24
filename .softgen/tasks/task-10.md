@@ -1,6 +1,6 @@
 ---
 title: Home Page Premium Redesign
-status: todo
+status: done
 priority: high
 type: feature
 tags: [home, ui, pansy]
