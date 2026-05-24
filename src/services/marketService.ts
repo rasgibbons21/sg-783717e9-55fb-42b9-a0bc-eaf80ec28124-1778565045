@@ -206,19 +206,19 @@ export const marketService = {
 
   async getMarketSummary() {
     try {
-      // Using ETF proxies for Finnhub
-      const [vix, nasdaq, sp500, dow] = await Promise.all([
-        this.getRealTimeQuote("VIXY"),
-        this.getRealTimeQuote("QQQ"),
-        this.getRealTimeQuote("SPY"), 
-        this.getRealTimeQuote("DIA"), 
-      ]);
+      // Reuse getMarketIndices to safely fetch sequentially and avoid Finnhub rate limits
+      const indices = await this.getMarketIndices();
+      
+      const vix = indices.find(i => i.symbol === "VIXY");
+      const nasdaq = indices.find(i => i.symbol === "QQQ");
+      const sp500 = indices.find(i => i.symbol === "SPY");
+      const dow = indices.find(i => i.symbol === "DIA");
 
       return {
-        vix: vix || { c: 0, d: 0, dp: 0 },
-        nasdaq: nasdaq || { c: 0, d: 0, dp: 0 },
-        sp500: sp500 || { c: 0, d: 0, dp: 0 },
-        dow: dow || { c: 0, d: 0, dp: 0 },
+        vix: vix ? { c: vix.price, d: vix.change, dp: vix.changePercent } : { c: 0, d: 0, dp: 0 },
+        nasdaq: nasdaq ? { c: nasdaq.price, d: nasdaq.change, dp: nasdaq.changePercent } : { c: 0, d: 0, dp: 0 },
+        sp500: sp500 ? { c: sp500.price, d: sp500.change, dp: sp500.changePercent } : { c: 0, d: 0, dp: 0 },
+        dow: dow ? { c: dow.price, d: dow.change, dp: dow.changePercent } : { c: 0, d: 0, dp: 0 },
       };
     } catch (error) {
       console.error("Error fetching market summary:", error);
