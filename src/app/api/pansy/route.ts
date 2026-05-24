@@ -1,4 +1,3 @@
-// @ts-nocheck
 import Anthropic from '@anthropic-ai/sdk';
 import { NextResponse } from 'next/server';
 
@@ -11,5 +10,9 @@ export async function POST(req: Request) {
     max_tokens: 1024,
     messages: [{ role: 'user', content: `You are Pansy, a friendly investing expert. The user is asking about ${ticker}: ${message}` }]
   });
-  return NextResponse.json({ reply: response.content[0].text });
+  
+  const firstBlock = response.content[0];
+  const reply = firstBlock && firstBlock.type === 'text' ? firstBlock.text : '';
+  
+  return NextResponse.json({ reply });
 }
