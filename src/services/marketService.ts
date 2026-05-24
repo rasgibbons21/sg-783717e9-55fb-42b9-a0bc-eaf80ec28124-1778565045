@@ -268,6 +268,93 @@ export const marketService = {
     return results;
   },
 
+  async getChartData(ticker: string, timeframe: string = "1D") {
+    const finnhubKey = process.env.NEXT_PUBLIC_FINNHUB_API_KEY;
+    
+    // Calculate from and to timestamps (UNIX seconds)
+    const to = Math.floor(Date.now() / 1000);
+    let from = to;
+    let resolution = "D";
+
+    switch(timeframe) {
+      case "1D":
+        from = to - (24 * 60 * 60 * 4); // 4 days back to ensure we get data even over long weekends
+        resolution = "5"; // 5 minutes
+        break;
+      case "5D":
+        from = to - (5 * 24 * 60 * 60 * 2); // extra buffer for weekends
+        resolution = "15"; // 15 minutes
+        break;
+      case "1M":
+        from = to - (30 * 24 * 60 * 60);
+        resolution = "60"; // 60 minutes
+        break;
+      case "3M":
+        from = to - (90 * 24 * 60 * 60);
+        resolution = "D";
+        break;
+      case "6M":
+        from = to - (180 * 24 * 60 * 60);
+        resolution = "D";
+        break;
+      case "YTD":
+        from = Math.floor(new Date(new Date().getFullYear(), 0, 1).getTime() / 1000);
+        resolution = "D";
+        break;
+      case "1Y":
+        from = to - (365 * 24 * 60 * 60);
+        resolution = "D";
+        break;
+      case "5Y":
+        from = to - (5 * 365 * 24 * 60 * 60);
+        resolution = "W";
+        break;
+      default:
+        from = to - (24 * 60 * 60 * 4);
+        resolution = "5";
+    }
+
+    try {
+      const url = `https://finnhub.io/api/v1/stock/candle?symbol=${ticker}&resolution=${resolution}&from=${from}&to=${to}&token=${finnhubKey}`;
+      console.log(`[API Request] Fetching chart data for ${ticker} (${timeframe}):`, url);
+      
+      const response = await fetch(url);
+      const data = await response.json();
+      
+      console.log(`[API Response] Chart data for ${ticker} (${timeframe}):`, data);
+
+      if (data.s === "ok" && data.t && data.c) {
+        let results = data.t.map((timestamp: number, index: number) => ({
+          time: timestamp * 1000,
+          date: new Date(timestamp * 1000).toLocaleString("en-US", {
+            month: "short",
+            day: "numeric",
+            ...(timeframe === "1D" || timeframe === "5D" ? { hour: "numeric", minute: "2-digit" } : {})
+          }),
+          open: data.o[index],
+          high: data.h[index],
+          low: data.l[index],
+          close: data.c[index],
+          volume: data.v[index],
+        }));
+
+        // If 1D, just take the last day's worth of data from the results
+        if (timeframe === "1D" && results.length > 0) {
+          const lastDate = new Date(results[results.length - 1].time).toLocaleDateString();
+          results = results.filter((r: any) => new Date(r.time).toLocaleDateString() === lastDate);
+        }
+
+        return results;
+      }
+      
+      console.log(`[API Error] Invalid or empty chart data returned for ${ticker}:`, data);
+      return null;
+    } catch (error) {
+      console.error("Error fetching chart data:", error);
+      return null;
+    }
+  },
+
   // Get market analysis data including candlestick patterns
   async getMarketAnalysis(ticker: string): Promise<MarketAnalysis | null> {
     try {
