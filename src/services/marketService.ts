@@ -58,15 +58,25 @@ const quoteCache = new Map<string, { data: any; timestamp: number }>();
 const CACHE_DURATION = 60000; // 60 seconds
 
 export const marketService = {
+  async polygonFetch(url: string, init?: RequestInit) {
+    const response = await fetch(url, init);
+    if (response.status === 429) {
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("polygon-rate-limit"));
+      }
+    }
+    return response;
+  },
+
   async fetchWithFallback(primaryUrl: string, fallbackUrl: string) {
     try {
-      const response = await fetch(primaryUrl);
+      const response = await this.polygonFetch(primaryUrl);
       if (response.ok) return response;
       console.warn("Primary API failed, trying fallback...");
-      return fetch(fallbackUrl);
+      return this.polygonFetch(fallbackUrl);
     } catch (error) {
       console.warn("Primary API error, trying fallback:", error);
-      return fetch(fallbackUrl);
+      return this.polygonFetch(fallbackUrl);
     }
   },
 
@@ -139,7 +149,7 @@ export const marketService = {
       const url = `${PRIMARY_BASE_URL}/v2/aggs/ticker/${ticker}/range/${multiplier}/${timespan}/${from}/${to}?adjusted=true&sort=asc&apiKey=${POLYGON_API_KEY}`;
       
       console.log("Fetching OHLC data:", url);
-      const response = await fetch(url);
+      const response = await this.polygonFetch(url);
       const data = await response.json();
 
       if (data.results && Array.isArray(data.results)) {
@@ -155,7 +165,7 @@ export const marketService = {
 
       // Fallback to secondary URL
       const fallbackUrl = `${FALLBACK_BASE_URL}/v2/aggs/ticker/${ticker}/range/${multiplier}/${timespan}/${from}/${to}?adjusted=true&sort=asc&apiKey=${POLYGON_API_KEY}`;
-      const fallbackResponse = await fetch(fallbackUrl);
+      const fallbackResponse = await this.polygonFetch(fallbackUrl);
       const fallbackData = await fallbackResponse.json();
 
       if (fallbackData.results && Array.isArray(fallbackData.results)) {
@@ -189,8 +199,8 @@ export const marketService = {
       const prevUrl = `https://api.polygon.io/v2/aggs/ticker/${ticker}/prev?adjusted=true&apiKey=${POLYGON_API_KEY}`;
 
       const [priceRes, prevRes] = await Promise.all([
-        fetch(priceUrl),
-        fetch(prevUrl)
+        this.polygonFetch(priceUrl),
+        this.polygonFetch(prevUrl)
       ]);
 
       const priceData = await priceRes.json();
@@ -332,7 +342,7 @@ export const marketService = {
       const url = `https://api.polygon.io/v2/aggs/ticker/${ticker}/range/${multiplier}/${timespan}/${fromStr}/${toStr}?adjusted=true&sort=asc&apiKey=${POLYGON_API_KEY}`;
       console.log(`[API Request] Fetching Polygon chart data for ${ticker} (${timeframe}):`, url);
       
-      const response = await fetch(url);
+      const response = await this.polygonFetch(url);
       const data = await response.json();
       
       console.log(`[API Response] Polygon chart data for ${ticker} (${timeframe}):`, data);

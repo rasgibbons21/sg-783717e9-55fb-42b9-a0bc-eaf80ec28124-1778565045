@@ -6,6 +6,8 @@ import { PansyPopup } from "./PansyPopup";
 import { PansyPsychologyToast } from "./PansyPsychologyToast";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { Toaster } from "@/components/ui/toaster";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -13,6 +15,7 @@ interface LayoutProps {
 
 export function Layout({ children }: LayoutProps) {
   const router = useRouter();
+  const { toast } = useToast();
 
   const navItems = [
     { href: "/home", icon: Home, label: "Home" },
@@ -25,6 +28,19 @@ export function Layout({ children }: LayoutProps) {
   ];
 
   const isActive = (path: string) => router.pathname === path;
+
+  useEffect(() => {
+    const handleRateLimit = () => {
+      toast({
+        title: "API Limit Reached 🐢",
+        description: "We've hit the Polygon.io free tier limit (5 requests/minute). Please wait a moment before fetching more data.",
+        variant: "destructive",
+      });
+    };
+
+    window.addEventListener("polygon-rate-limit", handleRateLimit);
+    return () => window.removeEventListener("polygon-rate-limit", handleRateLimit);
+  }, [toast]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -52,6 +68,9 @@ export function Layout({ children }: LayoutProps) {
 
       {/* Pansy Psychology Toast */}
       <PansyPsychologyToast />
+
+      {/* Global Toaster for Rate Limits */}
+      <Toaster />
 
       {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card backdrop-blur supports-[backdrop-filter]:bg-card/95">
