@@ -13,52 +13,6 @@ import { marketService } from "@/services/marketService";
 import { TrendingUp, TrendingDown, AlertTriangle, ExternalLink, BarChart3, Activity, Target } from "lucide-react";
 import Link from "next/link";
 
-function SimpleChart({ data, color }: { data: any[], color: string }) {
-  if (!data || data.length === 0) return <div className="flex items-center justify-center h-full text-muted-foreground">No data available for this timeframe</div>;
-
-  const minPrice = Math.min(...data.map(d => d.close));
-  const maxPrice = Math.max(...data.map(d => d.close));
-  const range = maxPrice - minPrice || 1;
-  const padding = range * 0.1;
-  const adjustedMin = minPrice - padding;
-  const adjustedMax = maxPrice + padding;
-  const adjustedRange = adjustedMax - adjustedMin;
-
-  const points = data.map((d, i) => {
-    const x = (i / (data.length - 1)) * 100;
-    const y = 100 - ((d.close - adjustedMin) / adjustedRange) * 100;
-    return `${x},${y}`;
-  }).join(" ");
-
-  return (
-    <div className="w-full h-full relative">
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full overflow-visible">
-        <defs>
-          <linearGradient id={`gradient-${color.replace("#", "")}`} x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0%" stopColor={color} stopOpacity={0.3} />
-            <stop offset="100%" stopColor={color} stopOpacity={0} />
-          </linearGradient>
-        </defs>
-        <polyline
-          fill="none"
-          stroke={color}
-          strokeWidth="2"
-          vectorEffect="non-scaling-stroke"
-          points={points}
-        />
-        <polygon
-          fill={`url(#gradient-${color.replace("#", "")})`}
-          points={`0,100 ${points} 100,100`}
-        />
-      </svg>
-      <div className="absolute top-0 left-0 text-xs font-medium text-foreground">${adjustedMax.toFixed(2)}</div>
-      <div className="absolute bottom-0 left-0 text-xs font-medium text-foreground">${adjustedMin.toFixed(2)}</div>
-      <div className="absolute top-4 left-0 text-xs text-muted-foreground opacity-70">{data[0].date}</div>
-      <div className="absolute top-4 right-0 text-xs text-muted-foreground opacity-70 text-right">{data[data.length - 1].date}</div>
-    </div>
-  );
-}
-
 interface StockData {
   c: number;
   dp: number;
@@ -95,41 +49,11 @@ export default function StockDetail() {
   const [isLoading, setIsLoading] = useState(true);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   
-  const [chartData, setChartData] = useState<any[] | null>(null);
-  const [isLoadingChart, setIsLoadingChart] = useState(true);
-  const [chartError, setChartError] = useState<string | null>(null);
-  const [selectedTimeframe, setSelectedTimeframe] = useState("1D");
-
   useEffect(() => {
     if (ticker && typeof ticker === "string") {
       loadStockData(ticker.toUpperCase());
     }
   }, [ticker]);
-
-  useEffect(() => {
-    if (ticker && typeof ticker === "string") {
-      loadChartData(ticker.toUpperCase(), selectedTimeframe);
-    }
-  }, [ticker, selectedTimeframe]);
-
-  const loadChartData = async (symbol: string, timeframe: string) => {
-    setIsLoadingChart(true);
-    setChartError(null);
-    try {
-      const data = await marketService.getChartData(symbol, timeframe);
-      if (!data || data.length === 0) {
-        setChartError("No historical data available for this timeframe.");
-        setChartData(null);
-      } else {
-        setChartData(data);
-      }
-    } catch (error: any) {
-      setChartError(error.message || "Failed to load chart data.");
-      setChartData(null);
-    } finally {
-      setIsLoadingChart(false);
-    }
-  };
 
   const loadStockData = async (symbol: string) => {
     setIsLoading(true);
@@ -190,8 +114,6 @@ export default function StockDetail() {
       setIsAnalyzing(false);
     }
   };
-
-  const timeframes = ["1D", "5D", "1M", "3M", "6M", "YTD", "1Y", "5Y"];
 
   const getRatingColor = (rating: string) => {
     if (rating === "Strong Watch") return "text-[#3d7a54] bg-[#3d7a54]/10 border-[#3d7a54]/20";
@@ -265,46 +187,18 @@ export default function StockDetail() {
               <BarChart3 className="w-5 h-5 text-foreground" />
               <h2 className="font-semibold text-foreground">Live Chart</h2>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {timeframes.map((tf) => (
-                <Button
-                  key={tf}
-                  size="sm"
-                  variant={selectedTimeframe === tf ? "default" : "outline"}
-                  onClick={() => setSelectedTimeframe(tf)}
-                  className={
-                    selectedTimeframe === tf
-                      ? "bg-primary text-primary-foreground"
-                      : "border-border text-foreground hover:bg-muted"
-                  }
-                >
-                  {tf}
-                </Button>
-              ))}
-            </div>
           </div>
           
-          <div className="w-full h-[400px] rounded-lg overflow-hidden mt-4 bg-[#0a0a0f] p-4 relative border border-white/5">
-            {isLoadingChart ? (
-              <div className="flex flex-col items-center justify-center h-full space-y-4">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                <p className="text-muted-foreground text-sm">Fetching historical OHLC data...</p>
-              </div>
-            ) : chartError ? (
-              <div className="flex flex-col items-center justify-center h-full space-y-2">
-                <AlertTriangle className="w-8 h-8 text-destructive opacity-80" />
-                <p className="text-destructive font-medium">{chartError}</p>
-                <Button variant="outline" size="sm" onClick={() => loadChartData(ticker as string, selectedTimeframe)} className="mt-2">
-                  Retry Fetch
-                </Button>
-              </div>
-            ) : chartData && chartData.length > 0 && stockData ? (
-              <SimpleChart data={chartData} color={stockData.dp >= 0 ? "#3d7a54" : "#d4788a"} />
-            ) : null}
+          <div className="w-full h-[400px] rounded-lg overflow-hidden mt-4 bg-[#0a0a0f] relative border border-white/5">
+            {ticker && (
+              <iframe 
+                src={`https://s.tradingview.com/widgetembed/?symbol=${ticker}&interval=D&theme=dark`}
+                width="100%" 
+                height="400"
+                frameBorder="0"
+              />
+            )}
           </div>
-          <p className="text-xs text-muted-foreground">
-            Historical OHLC data provided by Financial Modeling Prep
-          </p>
         </Card>
 
         {/* Pansy's Analysis */}
