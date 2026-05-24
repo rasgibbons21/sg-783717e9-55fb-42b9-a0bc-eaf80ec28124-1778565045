@@ -2,10 +2,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import Anthropic from "@anthropic-ai/sdk";
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
-
 const PANSY_CHAT_SYSTEM_PROMPT = `You are Pansy, Bloom's warm and knowledgeable investing mentor. You're currently helping a user understand a specific stock or ETF they're researching.
 
 Your role in this chat:
@@ -65,6 +61,10 @@ export default async function handler(
   }
 
   console.log("API key exists:", !!process.env.ANTHROPIC_API_KEY);
+
+  const anthropic = new Anthropic({
+    apiKey: process.env.ANTHROPIC_API_KEY || "", // Ensure it doesn't crash on import if missing
+  });
 
   try {
     const {
