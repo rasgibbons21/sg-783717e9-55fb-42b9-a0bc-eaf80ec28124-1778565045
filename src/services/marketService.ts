@@ -140,8 +140,8 @@ export const marketService = {
           });
         }
         
-        // 500ms delay between calls to avoid Finnhub free tier rate limits
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        // 300ms delay between calls to avoid Finnhub free tier rate limits
+        await new Promise((resolve) => setTimeout(resolve, 300));
       } catch (error) {
         console.error(`Error fetching index ${index.symbol}:`, error);
         results.push({
