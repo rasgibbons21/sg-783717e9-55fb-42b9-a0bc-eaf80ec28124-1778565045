@@ -34,7 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });
 
   try {
-    const { subscription_id, plan } = req.query;
+    const { subscription_id } = req.query;
 
     if (!subscription_id) {
       return res.redirect("/subscription?error=missing_subscription_id");

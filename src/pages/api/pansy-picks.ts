@@ -96,7 +96,7 @@ export default async function handler(
               riskLevel: pick.riskLevel,
               pansyQuote: pick.pansyQuote,
             };
-          } catch (error: any) {
+          } catch {
             return {
               ticker: pick.ticker,
               name: pick.name,

@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { SEO } from "@/components/SEO";
@@ -24,7 +25,6 @@ import {
   XCircle,
   Search,
   Trash2,
-  Eye,
   Send,
   Database,
   Brain,
@@ -83,7 +83,7 @@ export default function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
   const [authError, setAuthError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
 
   // Dashboard state
   const [stats, setStats] = useState<OverviewStats>({

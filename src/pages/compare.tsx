@@ -180,6 +180,7 @@ export default function Compare() {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const getMetricColor = (value: number, _isPercentage: boolean = false) => {
     if (value > 0) return "text-[#3d7a54]";
     if (value < 0) return "text-[#d4788a]";
