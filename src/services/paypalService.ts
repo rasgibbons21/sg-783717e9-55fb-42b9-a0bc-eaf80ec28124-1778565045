@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { supabase } from "@/integrations/supabase/client";
 
 const PAYPAL_API_BASE = "https://api-m.paypal.com";
