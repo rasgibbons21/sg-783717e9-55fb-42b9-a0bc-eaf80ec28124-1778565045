@@ -68,15 +68,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const subscription = await subscriptionRes.json();
     if (!subscriptionRes.ok) throw new Error(subscription.message || "Failed to create subscription");
 
-    const approvalUrl = subscription.links.find((link: any) => link.rel === "approve")?.href;
+    const approvalUrl = subscription.links.find((link: { rel: string; href: string }) => link.rel === "approve")?.href;
 
     if (!approvalUrl) {
       throw new Error("No approval URL returned from PayPal");
     }
 
     return res.status(200).json({ approvalUrl });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error creating subscription:", error);
-    return res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: (error as Error).message });
   }
 }

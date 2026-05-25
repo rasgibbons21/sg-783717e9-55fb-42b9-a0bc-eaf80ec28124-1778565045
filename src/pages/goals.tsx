@@ -16,7 +16,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import {
   Select,
@@ -37,8 +36,6 @@ import {
   DollarSign,
   Check,
   Loader2,
-  Trophy,
-  Sparkles,
 } from "lucide-react";
 import confetti from "canvas-confetti";
 
@@ -75,7 +72,6 @@ const CATEGORY_EMOJIS: Record<string, string> = {
 
 export default function Goals() {
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
   const [goals, setGoals] = useState<SavingsGoal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);

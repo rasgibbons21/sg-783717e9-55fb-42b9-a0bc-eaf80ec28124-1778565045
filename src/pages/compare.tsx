@@ -6,7 +6,6 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Skeleton } from "@/components/ui/skeleton";
 import { marketService } from "@/services/marketService";
 import { Search, X, TrendingUp, TrendingDown, ArrowRight, BarChart3 } from "lucide-react";
 import Link from "next/link";
@@ -46,6 +45,7 @@ export default function Compare() {
       const tickerList = tickers.split(",").slice(0, 4);
       loadAssetsForComparison(tickerList);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.query.tickers]);
 
   const loadAssetsForComparison = async (tickers: string[]) => {
@@ -180,7 +180,7 @@ export default function Compare() {
     }
   };
 
-  const getMetricColor = (value: number, isPercentage: boolean = false) => {
+  const getMetricColor = (value: number, _isPercentage: boolean = false) => {
     if (value > 0) return "text-[#3d7a54]";
     if (value < 0) return "text-[#d4788a]";
     return "text-muted-foreground";

@@ -6,8 +6,8 @@ import type { Database } from "@/integrations/supabase/types";
 // In production, we'd verify the webhook signature with PayPal
 
 const supabase = createClient<Database>(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY! // Need service role to bypass RLS
+  process.env.NEXT_PUBLIC_SUPABASE_URL || "",
+  process.env.SUPABASE_SERVICE_ROLE_KEY || "" // Need service role to bypass RLS
 );
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -71,8 +71,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     return res.status(200).json({ received: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error processing PayPal webhook:", error);
-    return res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: (error as Error).message });
   }
 }
