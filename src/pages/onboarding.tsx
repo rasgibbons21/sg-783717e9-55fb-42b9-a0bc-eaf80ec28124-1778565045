@@ -141,11 +141,11 @@ export default function Onboarding() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        await supabase.from('users').upsert({
-          id: user.id,
-          risk_tolerance: risk,
-          onboarding_complete: true,
-          updated_at: new Date().toISOString()
+        // Use the existing type-safe userService to avoid Supabase strict type errors
+        await userService.updateUser(user.id, {
+          risk_tolerance: risk.charAt(0).toUpperCase() + risk.slice(1),
+          experience_level: experience.charAt(0).toUpperCase() + experience.slice(1),
+          investment_goals: goals
         });
       }
     } catch (error) {
