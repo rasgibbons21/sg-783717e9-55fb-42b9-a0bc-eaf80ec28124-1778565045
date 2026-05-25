@@ -55,8 +55,9 @@ export function PansyChat({ ticker, companyName, currentPrice, analysisContext }
         }),
       });
 
+      const data = await response.json().catch(() => ({}));
+
       if (response.ok) {
-        const data = await response.json();
         const assistantMessage: Message = {
           role: "assistant",
           content: data.reply,
@@ -64,18 +65,18 @@ export function PansyChat({ ticker, companyName, currentPrice, analysisContext }
         };
         setMessages((prev) => [...prev, assistantMessage]);
       } else {
+        const errorText = data.error || "I'm having trouble connecting right now.";
         const errorMessage: Message = {
           role: "assistant",
-          content: "I'm having trouble connecting right now. Please try again in a moment 🌸",
+          content: `Error: ${errorText}`,
           timestamp: Date.now(),
         };
         setMessages((prev) => [...prev, errorMessage]);
       }
     } catch (error) {
-      console.error("Error sending message:", error);
       const errorMessage: Message = {
         role: "assistant",
-        content: "Something went wrong on my end. Let me catch my breath and try again 💛",
+        content: "Network error: Could not reach the server.",
         timestamp: Date.now(),
       };
       setMessages((prev) => [...prev, errorMessage]);
