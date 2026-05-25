@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PansyChat } from "@/components/PansyChat";
+import { TextWithPansyTooltips } from "@/components/TextWithPansyTooltips";
 import { marketService } from "@/services/marketService";
 import { TrendingUp, TrendingDown, AlertTriangle, ExternalLink, BarChart3, Activity, Target } from "lucide-react";
 import Link from "next/link";
@@ -245,8 +246,8 @@ export default function StockDetail() {
                     <BarChart3 className="w-4 h-4" />
                     Chart Analysis
                   </h3>
-                  <p className="text-sm text-foreground leading-relaxed whitespace-pre-line">
-                    {pansyAnalysis.technical}
+                  <p className="text-sm text-foreground leading-relaxed">
+                    <TextWithPansyTooltips text={pansyAnalysis.technical} />
                   </p>
                 </Card>
               </TabsContent>
@@ -257,8 +258,8 @@ export default function StockDetail() {
                     <Target className="w-4 h-4" />
                     Business Analysis
                   </h3>
-                  <p className="text-sm text-foreground leading-relaxed whitespace-pre-line">
-                    {pansyAnalysis.fundamental}
+                  <p className="text-sm text-foreground leading-relaxed">
+                    <TextWithPansyTooltips text={pansyAnalysis.fundamental} />
                   </p>
                 </Card>
 
@@ -269,7 +270,7 @@ export default function StockDetail() {
                       Bullish Scenario
                     </h3>
                     <p className="text-sm text-foreground leading-relaxed">
-                      {pansyAnalysis.bullishScenario}
+                      <TextWithPansyTooltips text={pansyAnalysis.bullishScenario} />
                     </p>
                   </Card>
 
@@ -279,7 +280,7 @@ export default function StockDetail() {
                       Bearish Scenario
                     </h3>
                     <p className="text-sm text-foreground leading-relaxed">
-                      {pansyAnalysis.bearishScenario}
+                      <TextWithPansyTooltips text={pansyAnalysis.bearishScenario} />
                     </p>
                   </Card>
                 </div>
@@ -291,8 +292,8 @@ export default function StockDetail() {
                     <h4 className="text-sm font-semibold text-[#c8953a] mb-2 flex items-center gap-2">
                       📋 Scorecard
                     </h4>
-                    <p className="text-sm text-foreground/90 whitespace-pre-line">
-                      {pansyAnalysis.scorecard}
+                    <p className="text-sm text-foreground/90">
+                      <TextWithPansyTooltips text={pansyAnalysis.scorecard} />
                     </p>
                   </Card>
                 )}
@@ -306,7 +307,7 @@ export default function StockDetail() {
                       🌺
                     </div>
                     <p className="text-sm text-foreground leading-relaxed italic">
-                      {pansyAnalysis.behavioralTip}
+                      <TextWithPansyTooltips text={pansyAnalysis.behavioralTip} />
                     </p>
                   </div>
                 </Card>
