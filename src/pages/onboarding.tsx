@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { authService } from "@/services/authService";
 import { userService } from "@/services/userService";
+import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 
 type Step = "auth" | "experience" | "goals" | "risk";
@@ -136,88 +137,22 @@ export default function Onboarding() {
   };
 
   const handleCompleteOnboarding = async () => {
-    if (submitLock.current) {
-      console.log("🔒 Onboarding completion blocked: already processing");
-      return;
-    }
-    submitLock.current = true;
-    
-    console.log("=== ONBOARDING COMPLETION START ===");
-    console.log("1. Current form values:", { experience, goals, risk });
-    
     setIsSubmitting(true);
-    setError("");
-
     try {
-      const currentUser = await authService.getCurrentUser();
-      console.log("2. Current auth user:", currentUser);
-      
-      if (!currentUser) {
-        console.warn("No user found. Redirecting to home to re-verify session.");
-        router.push("/home");
-        return;
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase.from('users').upsert({
+          id: user.id,
+          risk_tolerance: risk,
+          onboarding_complete: true,
+          updated_at: new Date().toISOString()
+        });
       }
-
-      const experienceCapitalized = experience.charAt(0).toUpperCase() + experience.slice(1);
-      const riskCapitalized = risk.charAt(0).toUpperCase() + risk.slice(1);
-
-      const updates = {
-        experience_level: experienceCapitalized,
-        investment_goals: goals,
-        risk_tolerance: riskCapitalized,
-      };
-
-      console.log("3. Prepared database updates:", updates);
-
-      const saveToDatabase = async () => {
-        console.log("4. Attempting to update existing user profile...");
-        let result = await userService.updateUser(currentUser.id, updates);
-        
-        console.log("5. Update result:", result ? "Success" : "Failed");
-
-        if (!result) {
-          console.log("6. Update failed. Attempting to CREATE new user profile instead...");
-          
-          const profileData = {
-            id: currentUser.id,
-            email: currentUser.email || email,
-            full_name: currentUser.user_metadata?.full_name || fullName,
-            plan_type: "free" as const,
-            ...updates
-          };
-          
-          result = await userService.createUserProfile(profileData);
-          console.log("7. Create profile result:", result ? "Success" : "Failed");
-          
-          if (!result) {
-            console.warn("8. Profile creation also failed. Proceeding anyway.");
-          }
-        }
-        return result;
-      };
-
-      // 5-second timeout safeguard
-      console.log("9. Starting 5-second timeout race...");
-      await Promise.race([
-        saveToDatabase(),
-        new Promise((resolve) => setTimeout(() => {
-          console.warn("⏱️ TIMEOUT: Supabase save took longer than 5 seconds! Bypassing lock.");
-          resolve(true);
-        }, 5000))
-      ]);
-
-      console.log("=== ONBOARDING COMPLETED SUCCESSFULLY ===");
-      console.log("10. Redirecting to /home");
-      
-      // Keep locked during redirect
-      router.push("/home");
-    } catch (error: any) {
-      console.error("=== ONBOARDING ERROR ===");
-      console.error("Error:", error);
-      console.warn("Bypassing error and forcing redirect to /home");
-      
-      // Keep locked during redirect
-      router.push("/home");
+    } catch (error) {
+      console.error('Profile save error:', error);
+    } finally {
+      setIsSubmitting(false);
+      window.location.href = '/home';
     }
   };
 
