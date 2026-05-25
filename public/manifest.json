@@ -1,25 +1,14 @@
 {
   "name": "Bloom — She Blooms Wealth",
   "short_name": "Bloom",
-  "description": "Investing & wealth building for women",
-  "theme_color": "#3d7a54",
-  "background_color": "#0a0a0f",
+  "description": "Investing made simple for women",
+  "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "start_url": "/",
-  "scope": "/",
+  "background_color": "#06060a",
+  "theme_color": "#c8953a",
   "icons": [
-    {
-      "src": "/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
   ]
 }
