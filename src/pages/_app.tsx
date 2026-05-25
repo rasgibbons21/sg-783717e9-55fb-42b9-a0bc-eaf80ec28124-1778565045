@@ -2,10 +2,13 @@ import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import { ThemeProvider } from "@/contexts/ThemeProvider";
 import { Toaster } from "@/components/ui/toaster";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { InstallPrompt } from "@/components/InstallPrompt";
+import SplashScreen from "@/components/SplashScreen";
 
 export default function App({ Component, pageProps }: AppProps) {
+  const [showSplash, setShowSplash] = useState(true);
+
   useEffect(() => {
     // Register service worker
     if ('serviceWorker' in navigator) {
@@ -21,6 +24,10 @@ export default function App({ Component, pageProps }: AppProps) {
       });
     }
   }, []);
+
+  if (showSplash) {
+    return <SplashScreen onComplete={() => setShowSplash(false)} />;
+  }
 
   return (
     <ThemeProvider>
