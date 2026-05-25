@@ -117,8 +117,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       annual_plan_id: annualPlan.id,
       message: "Please save these plan IDs to your environment variables as PAYPAL_MONTHLY_PLAN_ID and PAYPAL_ANNUAL_PLAN_ID"
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error creating plans:", error);
-    return res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: (error as Error).message });
   }
 }

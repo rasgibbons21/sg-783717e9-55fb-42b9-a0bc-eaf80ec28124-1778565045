@@ -93,7 +93,7 @@ export default async function handler(
         {
           type: "web_search_20250305",
           name: "web_search",
-        } as any, // Cast to any to bypass strict type checking for beta tools
+        } as unknown as Record<string, unknown>, // Cast to unknown to bypass strict type checking for beta tools
       ],
       messages: [
         {
@@ -113,8 +113,8 @@ export default async function handler(
     return res.status(200).json({
       fullText: analysisText,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error calling Anthropic API:", error);
-    return res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: (error as Error).message });
   }
 }

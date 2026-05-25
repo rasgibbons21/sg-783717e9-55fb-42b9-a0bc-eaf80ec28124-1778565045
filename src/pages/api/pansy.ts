@@ -23,9 +23,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }]
     });
     
-    return res.status(200).json({ reply: (result.content[0] as any).text });
-  } catch (error: any) {
+    return res.status(200).json({ reply: (result.content[0] as {text?: string}).text });
+  } catch (error: unknown) {
     console.error("Pansy route error:", error);
-    return res.status(500).json({ error: error.message || String(error) });
+    return res.status(500).json({ error: (error as Error).message || String(error) });
   }
 }

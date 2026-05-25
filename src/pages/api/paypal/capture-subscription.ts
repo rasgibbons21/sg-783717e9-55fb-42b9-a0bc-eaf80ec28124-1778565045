@@ -3,8 +3,8 @@ import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 
 const supabase = createClient<Database>(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY! // Need service role to bypass RLS and update users
+  process.env.NEXT_PUBLIC_SUPABASE_URL || "",
+  process.env.SUPABASE_SERVICE_ROLE_KEY || "" // Need service role to bypass RLS and update users
 );
 
 const PAYPAL_API = process.env.NODE_ENV === "production" 
@@ -44,8 +44,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Since this is an API route hit from PayPal redirect, we need to get the user ID
     // We'll rely on the user's active session in Supabase via their browser cookie
     const supabaseClient = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      process.env.NEXT_PUBLIC_SUPABASE_URL || "",
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",
       {
         global: {
           headers: {
@@ -78,8 +78,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.redirect(`/subscription?error=subscription_${subscription.status.toLowerCase()}`);
     }
 
-    const planType = typeof plan === "string" ? plan : subscription.custom_id || "monthly";
-
     // 1. Update users table
     const { error: userError } = await supabase
       .from("users")
@@ -106,7 +104,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     return res.redirect("/home?success=pro_unlocked");
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error capturing subscription:", error);
     return res.redirect("/subscription?error=capture_failed");
   }

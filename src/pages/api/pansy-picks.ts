@@ -77,7 +77,7 @@ export default async function handler(
       
       // Fetch live prices for the picks
       const picksWithPrices = await Promise.all(
-        picks.map(async (pick: any) => {
+        picks.map(async (pick: Record<string, string>) => {
           try {
             const finnhubKey = process.env.NEXT_PUBLIC_FINNHUB_API_KEY;
             const quoteRes = await fetch(
@@ -96,7 +96,7 @@ export default async function handler(
               riskLevel: pick.riskLevel,
               pansyQuote: pick.pansyQuote,
             };
-          } catch (error) {
+          } catch (error: any) {
             return {
               ticker: pick.ticker,
               name: pick.name,
@@ -117,8 +117,8 @@ export default async function handler(
 
     // Fallback if parsing fails
     return res.status(200).json([]);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error generating Pansy's picks:", error);
-    return res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: (error as Error).message });
   }
 }

@@ -263,11 +263,11 @@ Use web search to get the latest chart data, technical indicators, fundamental m
     };
 
     return res.status(200).json(result);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error in Pansy analysis:", error);
 
     return res.status(500).json({
-      error: error.message || "Analysis temporarily unavailable",
+      error: (error as Error).message || "Analysis temporarily unavailable",
       technical: "I'm gathering the latest chart data for you. This usually takes a moment — try refreshing 🌸",
       fundamental: "I need to research this company's fundamentals. Check back in a few seconds.",
       behavioralTip: "While you wait: remember that patience is key. The best setups reveal themselves when you're not rushing 💛",

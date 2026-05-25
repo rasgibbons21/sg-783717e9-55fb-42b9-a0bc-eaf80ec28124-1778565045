@@ -109,7 +109,7 @@ export default async function handler(
       bestFor: {},
       verdict: "Comparison analysis in progress.",
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error generating comparison analysis:", error);
     return res.status(500).json({
       summary: "Girl, something went wrong on my end. Give me a sec to sort this out 🌸",
@@ -117,7 +117,7 @@ export default async function handler(
       risks: {},
       bestFor: {},
       verdict: "",
-      error: error.message,
+      error: (error as Error).message,
     });
   }
 }
