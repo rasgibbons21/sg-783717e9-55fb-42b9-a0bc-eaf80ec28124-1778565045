@@ -48,7 +48,6 @@ export default async function handler(
       max_tokens: 1500,
       temperature: 0.7,
       system: PICKS_SYSTEM_PROMPT,
-      // @ts-expect-error - Beta feature tool structure is not yet typed in the SDK
       tools: [
         {
           type: "web_search_20250305",

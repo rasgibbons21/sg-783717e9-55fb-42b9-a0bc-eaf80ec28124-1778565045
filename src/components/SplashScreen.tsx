@@ -11,10 +11,14 @@ export default function SplashScreen({ onComplete }: { onComplete: () => void })
     if (sessionStorage.getItem('splashShown')) { onComplete(); return; }
     sessionStorage.setItem('splashShown', 'true');
 
-    const fc = flowerRef.current!;
-    const ctx = fc.getContext('2d')!;
-    const bgC = bgRef.current!;
-    const bgCtx = bgC.getContext('2d')!;
+    const fc = flowerRef.current;
+    const bgC = bgRef.current;
+    if (!fc || !bgC) return;
+    
+    const ctx = fc.getContext('2d');
+    const bgCtx = bgC.getContext('2d');
+    if (!ctx || !bgCtx) return;
+    
     const W=280, H=280, CX=140, CY=140;
     let animId: number, chimePlayed=false;
 
@@ -66,7 +70,7 @@ export default function SplashScreen({ onComplete }: { onComplete: () => void })
       ctx.restore();
     }
 
-    const fallingPetals: any[] = [];
+    const fallingPetals: Array<{x:number, y:number, vx:number, vy:number, rot:number, rotV:number, size:number, alpha:number, delay:number, color:string}> = [];
     function initFallingPetals(){
       fallingPetals.length=0;
       for(let i=0;i<18;i++) fallingPetals.push({x:Math.random()*W,y:-20-Math.random()*100,vx:(Math.random()-0.5)*0.4,vy:0.3+Math.random()*0.5,rot:Math.random()*Math.PI*2,rotV:(Math.random()-0.5)*0.04,size:6+Math.random()*8,alpha:0.4+Math.random()*0.5,delay:1800+Math.random()*2000,color:['#f0a0b8','#ebb0c5','#f5b8cc'][Math.floor(Math.random()*3)]});
@@ -93,13 +97,15 @@ export default function SplashScreen({ onComplete }: { onComplete: () => void })
 
     function playChime(){
       if(chimePlayed)return;chimePlayed=true;
-      try{const ac=new((window as any).AudioContext||(window as any).webkitAudioContext)();
+      try{const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+        if (!AudioCtx) return;
+        const ac=new AudioCtx();
         [[392,0],[494,0.1],[587,0.22],[784,0.38],[988,0.55],[784,0.75],[587,0.95]].forEach(([f,d])=>{
           const o=ac.createOscillator(),g=ac.createGain();o.connect(g);g.connect(ac.destination);
           o.type='sine';o.frequency.value=f;const t=ac.currentTime+d;
           g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.12,t+0.05);g.gain.exponentialRampToValueAtTime(0.001,t+1.6);
           o.start(t);o.stop(t+1.8);});
-      }catch(e){}
+      }catch { /* ignore */ }
     }
 
     function render(elapsed: number){
@@ -131,7 +137,7 @@ export default function SplashScreen({ onComplete }: { onComplete: () => void })
     initFallingPetals();
     requestAnimationFrame(t=>loop(t,t));
     return()=>{if(animId)cancelAnimationFrame(animId);};
-  },[]);
+  }, [onComplete]);
 
   return (
     <div style={{position:'fixed',inset:0,background:'#06060a',display:'flex',alignItems:'center',justifyContent:'center',zIndex:9999}}>
