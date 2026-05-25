@@ -206,10 +206,8 @@ export const authService = {
         email,
         password,
         options: {
-          data: {
-            full_name: fullName,
-          },
-          emailRedirectTo: 'https://shebloomswealth.app/auth/confirm'
+          emailRedirectTo: 'https://shebloomswealth.app/auth/confirm',
+          data: { full_name: fullName }
         }
       });
 

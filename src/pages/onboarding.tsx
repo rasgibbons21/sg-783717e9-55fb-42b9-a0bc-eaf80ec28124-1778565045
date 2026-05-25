@@ -17,7 +17,7 @@ import { userService } from "@/services/userService";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 
-type Step = "auth" | "experience" | "goals" | "risk";
+type Step = "auth" | "check-email" | "experience" | "goals" | "risk";
 type AuthMode = "signup" | "login" | "forgot";
 type ExperienceLevel = "beginner" | "intermediate" | "advanced";
 type InvestmentGoal = "grow_wealth" | "retirement" | "passive_income" | "emergency_fund";
@@ -109,7 +109,7 @@ export default function Onboarding() {
 
         if (user) {
           await userService.updateUser(user.id, { full_name: fullName });
-          setStep("experience");
+          setStep("check-email");
           submitLock.current = false;
           setIsSubmitting(false);
         }
@@ -395,6 +395,56 @@ export default function Onboarding() {
                   </>
                 )}
               </div>
+            </Card>
+          </div>
+        )}
+
+        {step === "check-email" && (
+          <div className="space-y-6">
+            <div className="text-center space-y-4">
+              <div className="w-20 h-20 bg-accent/20 rounded-full flex items-center justify-center mx-auto text-4xl">
+                📧
+              </div>
+              
+              <h2 className="font-serif text-4xl font-bold text-foreground">
+                Check your email!
+              </h2>
+              
+              <p className="text-muted-foreground text-lg">
+                We sent a confirmation link to <strong>{email}</strong>.
+                <br/>Click the link in your email to activate your account.
+              </p>
+            </div>
+
+            <Card className="p-6 bg-card border-border rounded-2xl space-y-4 text-center">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={async () => {
+                  setIsSubmitting(true);
+                  try {
+                    await supabase.auth.resend({
+                      type: 'signup',
+                      email: email,
+                      options: {
+                        emailRedirectTo: 'https://shebloomswealth.app/auth/confirm'
+                      }
+                    });
+                    alert("Email resent! Check your inbox.");
+                  } catch (e) {
+                    console.error("Resend error:", e);
+                  } finally {
+                    setIsSubmitting(false);
+                  }
+                }}
+                disabled={isSubmitting}
+                className="w-full h-12 rounded-xl border-primary text-primary hover:bg-primary/10"
+              >
+                {isSubmitting ? "Sending..." : "Resend email"}
+              </Button>
+              <p className="text-sm text-muted-foreground italic">
+                Check your spam folder too 🌸
+              </p>
             </Card>
           </div>
         )}

@@ -55,7 +55,7 @@ export default function AdminDashboard() {
 
   const fetchData = async () => {
     try {
-      const res = await fetch("/api/admin/dashboard-data");
+      const res = await fetch("/api/admin/users");
       if (res.ok) {
         const json = await res.json();
         setData(json);
