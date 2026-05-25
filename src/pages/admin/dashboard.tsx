@@ -60,7 +60,7 @@ export default function AdminDashboard() {
         const json = await res.json();
         setData(json);
       }
-    } catch (e) {
+    } catch {
       console.error("Failed to load dashboard data");
     } finally {
       setLoading(false);
@@ -85,7 +85,7 @@ export default function AdminDashboard() {
       } else {
         alert("Pansy API returned an error. Check logs.");
       }
-    } catch (e) {
+    } catch {
       alert("Failed to connect to Pansy API.");
     } finally {
       setTestingPansy(false);
