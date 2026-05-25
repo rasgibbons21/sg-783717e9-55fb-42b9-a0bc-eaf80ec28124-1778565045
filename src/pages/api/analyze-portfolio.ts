@@ -89,11 +89,12 @@ export default async function handler(
       max_tokens: 2500,
       temperature: 0.7,
       system: ETF_ANALYSIS_SYSTEM_PROMPT,
+      // @ts-expect-error - Beta feature tool structure is not yet typed in the SDK
       tools: [
         {
           type: "web_search_20250305",
           name: "web_search",
-        } as unknown as Record<string, unknown>, // Cast to unknown to bypass strict type checking for beta tools
+        },
       ],
       messages: [
         {
