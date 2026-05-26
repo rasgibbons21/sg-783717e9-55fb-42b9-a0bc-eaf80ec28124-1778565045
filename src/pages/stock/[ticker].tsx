@@ -376,6 +376,18 @@ export default function StockDetail() {
             analysisContext={pansyAnalysis?.fullText}
           />
         )}
+
+        {/* Floating Ask Pansy Button */}
+        {!showChat && (
+          <button
+            onClick={() => setShowChat(true)}
+            className="fixed bg-accent hover:bg-accent/90 text-accent-foreground rounded-full shadow-lg transition-all duration-200 hover:scale-105 flex items-center gap-2 px-4 py-3"
+            style={{ bottom: '90px', right: '16px', zIndex: 50 }}
+          >
+            <span className="text-xl">🌺</span>
+            <span className="font-medium">Ask Pansy</span>
+          </button>
+        )}
       </div>
     </Layout>
   );
