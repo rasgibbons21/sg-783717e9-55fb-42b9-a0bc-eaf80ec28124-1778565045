@@ -377,13 +377,6 @@ export default function StockDetail() {
           />
         )}
       </div>
-
-      {/* Pansy Chat Integration */}
-      <PansyChat
-        ticker={ticker as string}
-        currentPrice={stockData.c}
-        analysisContext={pansyAnalysis?.fullText}
-      />
     </Layout>
   );
 }
