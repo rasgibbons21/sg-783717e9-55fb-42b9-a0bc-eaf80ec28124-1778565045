@@ -380,7 +380,7 @@ export default function StockDetail() {
 
       {/* Pansy Chat Integration */}
       <PansyChat
-        ticker={ticker}
+        ticker={ticker as string}
         currentPrice={stockData.c}
         analysisContext={pansyAnalysis?.fullText}
       />
