@@ -43,7 +43,7 @@ export function Layout({ children }: LayoutProps) {
   }, [toast]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col pb-[80px]">
       {/* Top Navbar */}
       <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container-full flex h-16 items-center justify-between">
@@ -61,7 +61,7 @@ export function Layout({ children }: LayoutProps) {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto pb-20 md:pb-4">{children}</main>
+      <main className="flex-1 w-full">{children}</main>
 
       {/* Pansy Popup */}
       <PansyPopup />
