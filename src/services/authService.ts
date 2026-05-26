@@ -202,7 +202,7 @@ export const authService = {
     }
 
     try {
-      const signUpPromise = supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -210,8 +210,6 @@ export const authService = {
           data: { full_name: fullName }
         }
       });
-
-      const { data, error } = await withTimeout(signUpPromise, 10000);
 
       if (error) {
         return { user: null, error: formatAuthError(error) };

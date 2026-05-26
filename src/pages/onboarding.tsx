@@ -34,6 +34,7 @@ export default function Onboarding() {
   const [goals, setGoals] = useState<InvestmentGoal[]>([]);
   const [risk, setRisk] = useState<RiskTolerance>("moderate");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [signupSuccess, setSignupSuccess] = useState(false);
   const [error, setError] = useState("");
   const [resetEmailSent, setResetEmailSent] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -109,9 +110,10 @@ export default function Onboarding() {
 
         if (user) {
           await userService.updateUser(user.id, { full_name: fullName });
-          setStep("check-email");
+          setSignupSuccess(true);
           submitLock.current = false;
           setIsSubmitting(false);
+          return;
         }
       } else {
         const { user, error: loginError } = await authService.signIn(email, password);
@@ -155,6 +157,18 @@ export default function Onboarding() {
       window.location.href = '/home';
     }
   };
+
+  if (signupSuccess) {
+    return (
+      <div style={{textAlign:'center', padding:40}}>
+        <div style={{fontSize:60}}>🌸</div>
+        <h2>Check your email!</h2>
+        <p>We sent a confirmation link to <strong>{email}</strong></p>
+        <p>Click the link to activate your account.</p>
+        <p style={{color:'#666', fontSize:12}}>Don't forget to check your spam folder 🌸</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">

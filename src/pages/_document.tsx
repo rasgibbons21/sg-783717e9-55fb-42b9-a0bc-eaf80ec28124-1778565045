@@ -16,7 +16,7 @@ export default function Document() {
         <link rel="apple-touch-icon" href="/icon-192.png" />
         
         {/* Favicon */}
-        <link rel="icon" href="/bloom-logo.png" />
+        <link rel="icon" href="/icon-192.png" />
       </Head>
       <body>
         <Main />

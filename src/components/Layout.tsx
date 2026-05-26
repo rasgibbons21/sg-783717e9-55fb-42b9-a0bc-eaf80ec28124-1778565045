@@ -49,9 +49,9 @@ export function Layout({ children }: LayoutProps) {
         <div className="container-full flex h-16 items-center justify-between">
           <Link href="/home" className="flex items-center gap-3">
             <img
-              src="/bloom-logo.png"
+              src="/icon-192.png"
               alt="Bloom"
-              className="h-8 w-auto"
+              className="h-8 w-auto rounded-md"
             />
             <span className="font-serif text-xl font-bold text-foreground">
               Bloom
