@@ -403,7 +403,7 @@ export default function Onboarding() {
           <div className="space-y-6">
             <div className="text-center space-y-4">
               <div className="w-20 h-20 bg-accent/20 rounded-full flex items-center justify-center mx-auto text-4xl">
-                📧
+                🌸
               </div>
               
               <h2 className="font-serif text-4xl font-bold text-foreground">
@@ -443,7 +443,7 @@ export default function Onboarding() {
                 {isSubmitting ? "Sending..." : "Resend email"}
               </Button>
               <p className="text-sm text-muted-foreground italic">
-                Check your spam folder too 🌸
+                Don't forget to check your spam folder 🌸
               </p>
             </Card>
           </div>
