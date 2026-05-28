@@ -11,7 +11,6 @@ import { Check, Loader2, AlertCircle } from "lucide-react";
 import { SEO } from "@/components/SEO";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 
 export default function Subscription() {
   const router = useRouter();
