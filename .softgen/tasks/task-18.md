@@ -1,6 +1,6 @@
 ---
 title: "Replace PayPal with Stripe"
-status: "in_progress"
+status: "done"
 priority: "high"
 type: "feature"
 tags: ["payments", "stripe", "subscription"]
@@ -16,12 +16,12 @@ Migrate subscription flow from PayPal to Stripe.
 - Remove all old PayPal code.
 
 ## Checklist
-- [ ] Install `stripe` and `@stripe/stripe-js` packages
-- [ ] Delete `paypalService.ts` and `/api/paypal/*` files
-- [ ] Create `/api/stripe/create-checkout-session.ts` endpoint
-- [ ] Create `/subscription/success.tsx` page
-- [ ] Update `subscription.tsx` to use Stripe Checkout
-- [ ] Test build and ensure no PayPal references remain
+- [x] Install `stripe` and `@stripe/stripe-js` packages
+- [x] Delete `paypalService.ts` and `/api/paypal/*` files
+- [x] Create `/api/stripe/create-checkout-session.ts` endpoint
+- [x] Create `/subscription/success.tsx` page
+- [x] Update `subscription.tsx` to use Stripe Checkout
+- [x] Test build and ensure no PayPal references remain
 
 ## Acceptance
 - User can select Monthly or Yearly plan and click to subscribe

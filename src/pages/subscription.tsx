@@ -13,16 +13,6 @@ import { SEO } from "@/components/SEO";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-// PayPal Plan IDs
-const PAYPAL_MONTHLY_PLAN = "P-8W707879XT1115010NIACMNQ";
-const PAYPAL_YEARLY_PLAN = "P-1TU067111E1942024NIACQBI";
-
-declare global {
-  interface Window {
-    paypal?: any;
-  }
-}
-
 export default function Subscription() {
   const router = useRouter();
   const [isYearly, setIsYearly] = useState(false);
@@ -60,27 +50,37 @@ export default function Subscription() {
     setIsProcessing(true);
     setErrorMsg(null);
     try {
-      const response = await fetch("/api/paypal/create-subscription", {
+      const priceId = isYearly 
+        ? process.env.NEXT_PUBLIC_STRIPE_YEARLY_PRICE_ID 
+        : process.env.NEXT_PUBLIC_STRIPE_MONTHLY_PRICE_ID;
+
+      if (!priceId) {
+        throw new Error("Subscription pricing is not configured correctly.");
+      }
+
+      const response = await fetch("/api/stripe/create-checkout-session", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          planType: isYearly ? "annual" : "monthly",
+          priceId,
+          userId: user?.id,
+          email: user?.email
         }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to create subscription");
+        throw new Error(data.error || "Failed to create checkout session");
       }
 
-      if (data.approvalUrl) {
-        // Redirect to PayPal hosted checkout
-        window.location.href = data.approvalUrl;
+      if (data.url) {
+        // Redirect to Stripe hosted checkout
+        window.location.href = data.url;
       } else {
-        throw new Error("No approval URL returned");
+        throw new Error("No checkout URL returned");
       }
     } catch (error: any) {
       console.error("Subscription error:", error);
@@ -236,14 +236,14 @@ export default function Subscription() {
                       {isProcessing ? (
                         <>
                           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Redirecting to PayPal...
+                          Redirecting to Stripe...
                         </>
                       ) : (
                         "Upgrade to Bloom Pro"
                       )}
                     </Button>
                     <p className="text-xs text-center text-muted-foreground">
-                      Secure checkout powered by PayPal
+                      Secure checkout powered by Stripe
                     </p>
                   </div>
                 )}
