@@ -2,12 +2,39 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2, CheckCircle, XCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Loader2, CheckCircle, AlertCircle } from "lucide-react";
 
 export default function AuthCallback() {
   const router = useRouter();
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
   const [message, setMessage] = useState("Processing your authentication...");
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [isResending, setIsResending] = useState(false);
+
+  const handleResendEmail = async () => {
+    if (!userEmail) return;
+    
+    setIsResending(true);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: userEmail,
+        options: {
+          emailRedirectTo: 'https://shebloomswealth.app/auth/callback'
+        }
+      });
+      
+      if (error) throw error;
+      
+      setMessage("✨ New confirmation email sent! Check your inbox (and spam folder).");
+    } catch (err) {
+      console.error("Resend error:", err);
+      setMessage("Couldn't resend the email. Please try signing up again.");
+    } finally {
+      setIsResending(false);
+    }
+  };
 
   useEffect(() => {
     const handleAuthCallback = async () => {
@@ -76,17 +103,29 @@ export default function AuthCallback() {
           
           setTimeout(() => {
             if (isNewUser) {
-              router.push('/onboarding'); // new users
+              router.push('/onboarding');
             } else {
               router.push('/home');
             }
           }, 1500);
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error("Auth callback error:", error);
         setStatus("error");
-        setMessage("Authentication failed. Redirecting to login...");
-        setTimeout(() => router.push("/"), 3000);
+        
+        // Extract email from error if available
+        const errorMessage = error?.message || "";
+        if (errorMessage.includes("email")) {
+          const emailMatch = errorMessage.match(/[\w.-]+@[\w.-]+\.\w+/);
+          if (emailMatch) setUserEmail(emailMatch[0]);
+        }
+        
+        // Friendly Pansy error message
+        if (errorMessage.includes("expired") || errorMessage.includes("invalid")) {
+          setMessage("Oops! This confirmation link has expired or was already used. No worries — I can send you a fresh one! 🌸");
+        } else {
+          setMessage("Something went wrong with your confirmation link. Let me help you get a new one! 🌸");
+        }
       }
     };
 
@@ -102,7 +141,7 @@ export default function AuthCallback() {
               <>
                 <Loader2 className="h-12 w-12 text-primary animate-spin" />
                 <h2 className="text-xl font-semibold text-foreground">
-                  Authenticating...
+                  Confirming your account...
                 </h2>
               </>
             )}
@@ -116,13 +155,39 @@ export default function AuthCallback() {
             )}
             {status === "error" && (
               <>
-                <XCircle className="h-12 w-12 text-destructive" />
+                <div className="text-6xl mb-2">🌸</div>
                 <h2 className="text-xl font-semibold text-foreground">
-                  Something went wrong
+                  Link Expired
                 </h2>
               </>
             )}
             <p className="text-muted-foreground">{message}</p>
+            
+            {status === "error" && userEmail && (
+              <Button
+                onClick={handleResendEmail}
+                disabled={isResending}
+                className="mt-4 w-full"
+              >
+                {isResending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  "Send me a new link"
+                )}
+              </Button>
+            )}
+            
+            {status === "error" && !userEmail && (
+              <Button
+                onClick={() => router.push("/")}
+                className="mt-4 w-full"
+              >
+                Back to Sign In
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>
