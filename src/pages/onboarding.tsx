@@ -441,7 +441,7 @@ export default function Onboarding() {
                       type: 'signup',
                       email: email,
                       options: {
-                        emailRedirectTo: 'https://shebloomswealth.app/auth/confirm'
+                        emailRedirectTo: 'https://shebloomswealth.app/auth/callback'
                       }
                     });
                     alert("Email resent! Check your inbox.");

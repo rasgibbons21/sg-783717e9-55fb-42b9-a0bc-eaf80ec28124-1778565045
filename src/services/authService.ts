@@ -206,7 +206,7 @@ export const authService = {
         email,
         password,
         options: {
-          emailRedirectTo: 'https://shebloomswealth.app/auth/confirm',
+          emailRedirectTo: 'https://shebloomswealth.app/auth/callback',
           data: { full_name: fullName }
         }
       });
@@ -221,27 +221,6 @@ export const authService = {
         user_metadata: data.user.user_metadata,
         created_at: data.user.created_at
       } : null;
-
-      // Send custom Resend confirmation email
-      if (data.user && !data.user.confirmed_at) {
-        try {
-          const { data: { session } } = await supabase.auth.getSession();
-          const confirmationUrl = `${getURL()}/auth/confirm?token=${data.user.email_confirmed_at}`;
-          
-          await fetch('/api/auth/send-confirmation', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              email: data.user.email,
-              confirmationUrl: confirmationUrl,
-              name: fullName,
-            }),
-          });
-        } catch (emailError) {
-          console.error('Error sending confirmation email:', emailError);
-          // Don't block signup if email fails
-        }
-      }
 
       return { user: authUser, error: null };
     } catch (error: any) {
