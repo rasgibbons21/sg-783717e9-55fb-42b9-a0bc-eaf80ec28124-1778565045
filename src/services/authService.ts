@@ -179,35 +179,14 @@ export const authService = {
   },
 
   // Sign up with email and password
-  async signUp(email: string, password: string, fullName: string): Promise<{ user: AuthUser | null; error: AuthError | null }> {
-    // Check connection first
-    const connectionCheck = checkSupabaseConnection();
-    if (!connectionCheck.isConnected) {
-      return {
-        user: null,
-        error: { message: connectionCheck.error || "Connection error" },
-      };
-    }
-
-    // Test actual Supabase connection
-    const isConnected = await testSupabaseConnection();
-    if (!isConnected) {
-      return {
-        user: null,
-        error: { 
-          message: "We are having trouble connecting right now. Please check back in a moment 🌸",
-          code: "CONNECTION_ERROR"
-        },
-      };
-    }
-
+  signUp: async (email: string, password: string, fullName: string) => {
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: 'https://shebloomswealth.app/auth/callback',
-          data: { full_name: fullName }
+          data: { full_name: fullName },
+          emailRedirectTo: 'https://shebloomswealth.app/auth/callback'
         }
       });
 
