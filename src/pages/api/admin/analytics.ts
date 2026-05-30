@@ -56,8 +56,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // MRR calculation
     const monthlyRevenue = subscriptions?.reduce((sum, sub) => {
-      if (sub.plan_type === 'monthly') return sum + 7.99;
-      if (sub.plan_type === 'yearly') return sum + (57.99 / 12);
+      if (sub.plan === 'monthly') return sum + 7.99;
+      if (sub.plan === 'yearly') return sum + (57.99 / 12);
       return sum;
     }, 0) || 0;
 
