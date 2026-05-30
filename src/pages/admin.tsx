@@ -57,7 +57,8 @@ export default function AdminDashboard() {
   }, []);
 
   const handleLogin = () => {
-    if (password === 'bloomadmin2026') {
+    const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'bloomadmin2026';
+    if (password === ADMIN_PASSWORD) {
       setIsAuthenticated(true);
       localStorage.setItem('bloom-admin-auth', 'true');
       loadAnalytics();
@@ -68,13 +69,14 @@ export default function AdminDashboard() {
 
   const loadAnalytics = async () => {
     setIsLoading(true);
+    const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'bloomadmin2026';
     try {
       const [analyticsRes, brokersRes] = await Promise.all([
         fetch('/api/admin/analytics', {
-          headers: { 'Authorization': `Bearer bloomadmin2026` }
+          headers: { 'Authorization': `Bearer ${ADMIN_PASSWORD}` }
         }),
         fetch('/api/admin/broker-clicks', {
-          headers: { 'Authorization': `Bearer bloomadmin2026` }
+          headers: { 'Authorization': `Bearer ${ADMIN_PASSWORD}` }
         })
       ]);
 
@@ -95,9 +97,10 @@ export default function AdminDashboard() {
   };
 
   const handleExport = async (type: string) => {
+    const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'bloomadmin2026';
     try {
       const res = await fetch(`/api/admin/export-csv?type=${type}`, {
-        headers: { 'Authorization': `Bearer bloomadmin2026` }
+        headers: { 'Authorization': `Bearer ${ADMIN_PASSWORD}` }
       });
       
       const blob = await res.blob();

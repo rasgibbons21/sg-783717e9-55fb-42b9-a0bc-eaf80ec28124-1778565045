@@ -7,8 +7,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const { authorization } = req.headers;
+  const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'bloomadmin2026';
   
-  if (authorization !== `Bearer ${process.env.ADMIN_PASSWORD}`) {
+  if (authorization !== `Bearer ${ADMIN_PASSWORD}`) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
