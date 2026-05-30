@@ -74,8 +74,6 @@
   }
 }
 
-font-family: var(--font-dm-sans), var(--font-geist-sans);
-
 @keyframes pulse-glow {
   0%, 100% {
     box-shadow: 0 0 0 0 rgba(200, 149, 58, 0.4);
