@@ -245,20 +245,7 @@ export const authService = {
         return { user: null, error: formatAuthError(error) };
       }
 
-      // Check if user has already confirmed their email
-      if (data.user?.email_confirmed_at) {
-        // User already confirmed - session is persisted, no need to re-confirm
-        const authUser = data.user ? {
-          id: data.user.id,
-          email: data.user.email || "",
-          user_metadata: data.user.user_metadata,
-          created_at: data.user.created_at
-        } : null;
-
-        return { user: authUser, error: null };
-      }
-
-      // Email not confirmed yet - return user but UI should handle confirmation requirement
+      // User is confirmed and has a valid session — go straight to home, never ask for confirmation again
       const authUser = data.user ? {
         id: data.user.id,
         email: data.user.email || "",
@@ -276,19 +263,16 @@ export const authService = {
   },
 
   // Sign out
-  async signOut(): Promise<{ error: AuthError | null }> {
+  async signOut(): Promise<void> {
     try {
-      const { error } = await supabase.auth.signOut();
-      
-      if (error) {
-        return { error: { message: error.message } };
-      }
-
-      return { error: null };
+      await supabase.auth.signOut();
+      localStorage.removeItem("bloom-auth");
+      // Go to login page, not confirmation
+      window.location.href = "/";
     } catch (error) {
-      return { 
-        error: { message: "An unexpected error occurred during sign out" } 
-      };
+      console.error("Sign out error:", error);
+      // Even if sign out fails, redirect to login
+      window.location.href = "/";
     }
   },
 

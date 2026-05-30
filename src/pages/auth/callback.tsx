@@ -7,43 +7,32 @@ export default function AuthCallback() {
   
   useEffect(() => {
     const handleCallback = async () => {
-      try {
-        // First check if there's already a valid session
-        const { data: sessionData } = await supabase.auth.getSession();
-        
-        if (sessionData.session) {
-          // Session exists - check if user is new or returning
-          const isNewUser = sessionData.session.user?.created_at === sessionData.session.user?.last_sign_in_at;
-          router.push(isNewUser ? "/onboarding" : "/home");
-          return;
-        }
-
-        // No session - exchange code for session
-        const url = new URL(window.location.href);
-        const code = url.searchParams.get("code");
-        
-        if (code) {
-          const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+      // First check if we already have a valid session
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session) {
+        // Already have a session — go home immediately
+        router.push("/home");
+        return;
+      }
+      
+      // Handle the code from email confirmation
+      const code = new URLSearchParams(window.location.search).get("code");
+      if (code) {
+        const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+        if (!error && data.session) {
+          // Check if this is first time login
+          const createdAt = new Date(data.user?.created_at || "");
+          const lastSignIn = new Date(data.user?.last_sign_in_at || "");
+          const diffSeconds = Math.abs(lastSignIn.getTime() - createdAt.getTime()) / 1000;
+          const isNewUser = diffSeconds < 60;
           
-          if (error) {
-            console.error("Exchange code error:", error);
-            router.push("/?error=confirmation_failed");
-            return;
-          }
-
-          if (data.session) {
-            // Session is now persisted - redirect based on user status
-            const isNewUser = data.user?.created_at === data.user?.last_sign_in_at;
-            router.push(isNewUser ? "/onboarding" : "/home");
-          } else {
-            router.push("/?error=confirmation_failed");
-          }
+          router.push(isNewUser ? "/onboarding" : "/home");
         } else {
           router.push("/?error=confirmation_failed");
         }
-      } catch (error) {
-        console.error("Callback error:", error);
-        router.push("/?error=confirmation_failed");
+      } else {
+        router.push("/");
       }
     };
     
@@ -51,8 +40,20 @@ export default function AuthCallback() {
   }, [router]);
 
   return (
-    <div style={{background:"#0a0a0f",color:"#ffffff",height:"100vh",display:"flex",alignItems:"center",justifyContent:"center"}}>
-      <p>Confirming your email... 🌸</p>
+    <div style={{
+      background: "#0a0a0f",
+      color: "#ffffff",
+      height: "100vh",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: "16px"
+    }}>
+      <div style={{ fontSize: "32px" }}>🌸</div>
+      <p style={{ fontFamily: "Georgia,serif", fontSize: "18px" }}>
+        Setting things up for you...
+      </p>
     </div>
   );
 }
