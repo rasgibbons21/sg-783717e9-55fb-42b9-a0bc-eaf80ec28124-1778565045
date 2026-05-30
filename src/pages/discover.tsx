@@ -132,7 +132,8 @@ export default function Discover() {
       }
     };
     checkUserPlan();
-    loadTrendingStocks();
+    loadMarketIndices();
+    loadMarketData();
   }, []);
 
   useEffect(() => {
