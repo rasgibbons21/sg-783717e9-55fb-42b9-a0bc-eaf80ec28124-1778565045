@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { Home, Search, Target, Briefcase, Building2, User, GraduationCap } from "lucide-react";
+import { Home, Search, Target, Briefcase, Building2, User, GraduationCap, PieChart } from "lucide-react";
 import { PansyPopup } from "./PansyPopup";
 import { PansyPsychologyToast } from "./PansyPsychologyToast";
 import { cn } from "@/lib/utils";
@@ -16,6 +16,16 @@ interface LayoutProps {
 export function Layout({ children }: LayoutProps) {
   const router = useRouter();
   const { toast } = useToast();
+  const currentPath = router.pathname;
+
+  const isActivePath = (path: string) => {
+    if (path === "/home") return currentPath === "/home";
+    if (path === "/discover") return currentPath.startsWith("/discover") || currentPath.startsWith("/stock");
+    if (path === "/portfolio") return currentPath.startsWith("/portfolio");
+    if (path === "/brokers") return currentPath === "/brokers";
+    if (path === "/profile") return currentPath.startsWith("/profile") || currentPath.startsWith("/subscription");
+    return false;
+  };
 
   const navItems = [
     { href: "/home", icon: Home, label: "Home" },
@@ -27,7 +37,7 @@ export function Layout({ children }: LayoutProps) {
     { href: "/profile", icon: User, label: "Profile" },
   ];
 
-  const isActive = (path: string) => router.pathname === path;
+  const isActive = (path: string) => isActivePath(path);
 
   useEffect(() => {
     const handleRateLimit = () => {
@@ -75,25 +85,50 @@ export function Layout({ children }: LayoutProps) {
       {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card backdrop-blur supports-[backdrop-filter]:bg-card/95">
         <div className="flex items-center justify-around h-16 overflow-x-auto hide-scrollbar px-2">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const active = isActive(item.href);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex flex-col items-center justify-center gap-1 min-w-[64px] px-2 py-2 transition-colors ${
-                  active ? "text-primary" : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                <Icon
-                  className={`h-5 w-5 flex-shrink-0 ${active ? "fill-current" : ""}`}
-                  strokeWidth={active ? 2.5 : 2}
-                />
-                <span className="text-[10px] font-medium leading-none">{item.label}</span>
-              </Link>
-            );
-          })}
+          <Link href="/home" passHref>
+            <button className={`flex flex-col items-center gap-1 px-2 py-1 rounded-lg transition-colors ${
+              isActivePath("/home") ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
+            }`}>
+              <Home className="w-5 h-5" />
+              <span className="text-xs">Home</span>
+            </button>
+          </Link>
+
+          <Link href="/discover" passHref>
+            <button className={`flex flex-col items-center gap-1 px-2 py-1 rounded-lg transition-colors ${
+              isActivePath("/discover") ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
+            }`}>
+              <Search className="w-5 h-5" />
+              <span className="text-xs">Discover</span>
+            </button>
+          </Link>
+
+          <Link href="/portfolio" passHref>
+            <button className={`flex flex-col items-center gap-1 px-2 py-1 rounded-lg transition-colors ${
+              isActivePath("/portfolio") ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
+            }`}>
+              <PieChart className="w-5 h-5" />
+              <span className="text-xs">Portfolio</span>
+            </button>
+          </Link>
+
+          <Link href="/brokers" passHref>
+            <button className={`flex flex-col items-center gap-1 px-2 py-1 rounded-lg transition-colors ${
+              isActivePath("/brokers") ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
+            }`}>
+              <Building2 className="w-5 h-5" />
+              <span className="text-xs">Brokers</span>
+            </button>
+          </Link>
+
+          <Link href="/profile" passHref>
+            <button className={`flex flex-col items-center gap-1 px-2 py-1 rounded-lg transition-colors ${
+              isActivePath("/profile") ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
+            }`}>
+              <User className="w-5 h-5" />
+              <span className="text-xs">Profile</span>
+            </button>
+          </Link>
         </div>
       </nav>
 

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable react-hooks/exhaustive-deps */
+ 
 import { useEffect, useState } from "react";
 import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
@@ -13,6 +13,8 @@ import { Input } from "@/components/ui/input";
 import { marketService } from "@/services/marketService";
 import { Search, TrendingUp, TrendingDown } from "lucide-react";
 import Link from "next/link";
+import { userService } from "@/services/userService";
+import { UpgradeBanner } from "@/components/UpgradeModal";
 
 interface Asset {
   ticker: string;
@@ -110,6 +112,9 @@ export default function Discover() {
   const [activeTab, setActiveTab] = useState("stocks");
   const [activeFilter, setActiveFilter] = useState("top-performers");
   const [searchQuery, setSearchQuery] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [userPlan, setUserPlan] = useState<string>("free");
   const [stocks, setStocks] = useState<Asset[]>([]);
   const [etfs, setEtfs] = useState<Asset[]>([]);
   const [mutualFunds, setMutualFunds] = useState<Asset[]>([]);
@@ -120,8 +125,14 @@ export default function Discover() {
   const [isLoadingIndices, setIsLoadingIndices] = useState(true);
 
   useEffect(() => {
-    loadMarketData();
-    loadMarketIndices();
+    const checkUserPlan = async () => {
+      const user = await userService.getCurrentUser();
+      if (user) {
+        setUserPlan(user.plan_type || "free");
+      }
+    };
+    checkUserPlan();
+    loadTrendingStocks();
   }, []);
 
   useEffect(() => {
@@ -384,7 +395,7 @@ export default function Discover() {
         {/* Header */}
         <div className="space-y-4">
           <h1 className="font-serif text-3xl md:text-4xl font-bold text-foreground">
-            Discover Investments
+            Discover
           </h1>
 
           {/* Search */}
@@ -425,8 +436,16 @@ export default function Discover() {
           </div>
         </div>
 
+        {/* Upgrade Banner for Free Users */}
+        {userPlan === "free" && (
+          <UpgradeBanner 
+            message="Want Pansy's full breakdown on every stock? Upgrade to Pro 🌸"
+            className="mb-4"
+          />
+        )}
+
         {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="stocks">Stocks</TabsTrigger>
             <TabsTrigger value="etfs">ETFs</TabsTrigger>

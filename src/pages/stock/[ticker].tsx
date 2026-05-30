@@ -10,7 +10,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PansyChat } from "@/components/PansyChat";
 import { TextWithPansyTooltips } from "@/components/TextWithPansyTooltips";
+import { UpgradeModal, UpgradeBanner, useViewTracker } from "@/components/UpgradeModal";
 import { marketService } from "@/services/marketService";
+import { userService } from "@/services/userService";
 import { TrendingUp, TrendingDown, AlertTriangle, ExternalLink, BarChart3, Activity, Target, Sparkles } from "lucide-react";
 import Link from "next/link";
 
@@ -49,12 +51,28 @@ export default function StockDetail() {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [userPlan, setUserPlan] = useState<string>("free");
+  const { viewCount, trackView, showUpgradeModal, setShowUpgradeModal } = useViewTracker();
   
+  useEffect(() => {
+    const checkUserPlan = async () => {
+      const user = await userService.getCurrentUser();
+      if (user) {
+        setUserPlan(user.plan_type || "free");
+      }
+    };
+    checkUserPlan();
+  }, []);
+
   useEffect(() => {
     if (ticker && typeof ticker === "string") {
       loadStockData(ticker.toUpperCase());
+      // Track view for free users
+      if (userPlan === "free") {
+        trackView();
+      }
     }
-  }, [ticker]);
+  }, [ticker, userPlan]);
 
   const loadStockData = async (symbol: string) => {
     setIsLoading(true);
@@ -352,28 +370,19 @@ export default function StockDetail() {
               </p>
             </div>
           </Card>
-        ) : (
-          <Card className="p-8 bg-gradient-to-br from-[#c8953a]/10 to-[#3d7a54]/10 border-[#c8953a] border-2 animate-pulse-glow">
-            <div className="flex flex-col items-center gap-6 text-center">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-3xl shadow-lg">
-                🌺
-              </div>
-              <div className="space-y-2">
-                <h3 className="font-serif text-xl font-semibold text-foreground">Want to know what Pansy thinks?</h3>
-                <p className="text-sm text-muted-foreground max-w-md">
-                  Get her expert analysis on this stock — written in plain English, no confusing jargon.
-                </p>
-              </div>
-              <Button 
-                onClick={() => loadPansyAnalysis(ticker as string, stockData)}
-                className="bg-[#c8953a] hover:bg-[#c8953a]/90 text-white font-semibold px-8 py-6 text-lg shadow-lg"
-              >
-                <span className="mr-2">Get Pansy's Take</span>
-                🌺
-              </Button>
-            </div>
-          </Card>
+        ) : null}
+
+        {/* Upgrade Banner for Free Users After Analysis */}
+        {pansyAnalysis && userPlan === "free" && (
+          <UpgradeBanner message="Loved Pansy's take? Get unlimited analysis with Bloom Pro — $7.99/month" />
         )}
+
+        {/* Upgrade Modal */}
+        <UpgradeModal 
+          isOpen={showUpgradeModal} 
+          onClose={() => setShowUpgradeModal(false)}
+          trigger={pansyAnalysis ? "after_analysis" : "view_limit"}
+        />
 
         {/* Latest News */}
         {news.length > 0 && (
