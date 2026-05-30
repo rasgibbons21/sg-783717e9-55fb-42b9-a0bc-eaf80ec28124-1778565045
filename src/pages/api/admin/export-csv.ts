@@ -46,9 +46,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         .select('*')
         .order('created_at', { ascending: false });
 
-      csvContent = 'User ID,Plan Type,Status,Stripe Subscription,Created At\n';
+      csvContent = 'User ID,Plan,Status,Payment Method,Created At\n';
       data?.forEach(sub => {
-        csvContent += `"${sub.user_id}","${sub.plan}","${sub.status}","${sub.stripe_subscription_id || ''}","${sub.created_at}"\n`;
+        csvContent += `"${sub.user_id}","${sub.plan}","${sub.status}","${sub.payment_method || ''}","${sub.created_at}"\n`;
       });
       filename = 'subscriptions.csv';
     }
