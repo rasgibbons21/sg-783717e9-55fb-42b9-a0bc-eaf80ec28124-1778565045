@@ -154,7 +154,8 @@ export default function Onboarding() {
       console.error('Profile save error:', error);
     } finally {
       setIsSubmitting(false);
-      window.location.href = '/home';
+      // Redirect to subscription offer page instead of home
+      window.location.href = '/subscription-offer';
     }
   };
 

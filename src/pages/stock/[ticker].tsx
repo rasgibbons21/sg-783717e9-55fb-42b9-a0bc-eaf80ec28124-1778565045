@@ -181,6 +181,27 @@ export default function StockDetail() {
           </div>
         </div>
 
+        {/* Prominent Pansy Analysis CTA */}
+        {!pansyAnalysis && !isAnalyzing && (
+          <Card className="p-6 bg-gradient-to-br from-[#c8953a]/20 to-[#c8953a]/10 border-[#c8953a] border-2 animate-pulse-glow">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-2xl shrink-0 shadow-lg">
+                🌺
+              </div>
+              <div className="flex-1">
+                <h3 className="font-serif text-lg font-semibold text-foreground">Want Pansy's full breakdown?</h3>
+                <p className="text-sm text-muted-foreground">Get her expert take in plain English — no jargon.</p>
+              </div>
+              <Button 
+                onClick={() => loadPansyAnalysis(ticker as string, stockData)}
+                className="bg-[#c8953a] hover:bg-[#c8953a]/90 text-white font-semibold px-6 py-3 text-base shadow-lg shrink-0"
+              >
+                ✨ Get Pansy's Take
+              </Button>
+            </div>
+          </Card>
+        )}
+
         {/* TradingView Chart */}
         <Card className="p-6 bg-[#0a0a0f] border-border rounded-2xl space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-3">
@@ -210,7 +231,7 @@ export default function StockDetail() {
                 🌺
               </div>
               <div className="flex items-center gap-2">
-                <p className="text-foreground font-medium">Pansy is reading the chart</p>
+                <p className="text-foreground font-medium">Pansy is analyzing this for you</p>
                 <span className="animate-pulse">...</span>
               </div>
               <p className="text-sm text-muted-foreground">This usually takes 5-10 seconds</p>
