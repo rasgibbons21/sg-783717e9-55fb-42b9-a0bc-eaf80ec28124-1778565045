@@ -7,24 +7,46 @@ export default function AuthCallback() {
   
   useEffect(() => {
     const handleCallback = async () => {
-      const { data, error } = await supabase.auth.getSession();
-      if (data.session) {
-        router.push("/onboarding");
-      } else {
+      try {
+        // First check if there's already a valid session
+        const { data: sessionData } = await supabase.auth.getSession();
+        
+        if (sessionData.session) {
+          // Session exists - check if user is new or returning
+          const isNewUser = sessionData.session.user?.created_at === sessionData.session.user?.last_sign_in_at;
+          router.push(isNewUser ? "/onboarding" : "/home");
+          return;
+        }
+
+        // No session - exchange code for session
         const url = new URL(window.location.href);
         const code = url.searchParams.get("code");
+        
         if (code) {
-          const { error } = await supabase.auth.exchangeCodeForSession(code);
-          if (!error) {
-            router.push("/onboarding");
+          const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+          
+          if (error) {
+            console.error("Exchange code error:", error);
+            router.push("/?error=confirmation_failed");
+            return;
+          }
+
+          if (data.session) {
+            // Session is now persisted - redirect based on user status
+            const isNewUser = data.user?.created_at === data.user?.last_sign_in_at;
+            router.push(isNewUser ? "/onboarding" : "/home");
           } else {
             router.push("/?error=confirmation_failed");
           }
         } else {
           router.push("/?error=confirmation_failed");
         }
+      } catch (error) {
+        console.error("Callback error:", error);
+        router.push("/?error=confirmation_failed");
       }
     };
+    
     handleCallback();
   }, [router]);
 

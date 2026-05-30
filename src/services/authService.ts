@@ -245,6 +245,20 @@ export const authService = {
         return { user: null, error: formatAuthError(error) };
       }
 
+      // Check if user has already confirmed their email
+      if (data.user?.email_confirmed_at) {
+        // User already confirmed - session is persisted, no need to re-confirm
+        const authUser = data.user ? {
+          id: data.user.id,
+          email: data.user.email || "",
+          user_metadata: data.user.user_metadata,
+          created_at: data.user.created_at
+        } : null;
+
+        return { user: authUser, error: null };
+      }
+
+      // Email not confirmed yet - return user but UI should handle confirmation requirement
       const authUser = data.user ? {
         id: data.user.id,
         email: data.user.email || "",
