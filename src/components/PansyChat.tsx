@@ -22,6 +22,7 @@ export function PansyChat({ ticker, companyName, currentPrice, analysisContext }
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [hasAutoTriggered, setHasAutoTriggered] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -32,17 +33,25 @@ export function PansyChat({ ticker, companyName, currentPrice, analysisContext }
     scrollToBottom();
   }, [messages]);
 
-  const handleSendMessage = async () => {
-    if (!inputValue.trim() || isLoading) return;
+  // Auto-trigger analysis when chat opens
+  useEffect(() => {
+    if (isOpen && !hasAutoTriggered && messages.length === 0) {
+      setHasAutoTriggered(true);
+      const autoMessage = `Analyze ${ticker} for me right now — give me the full breakdown including trend, momentum, entry consideration, exit consideration, and risk level in your warm girlfriend style`;
+      sendMessage(autoMessage);
+    }
+  }, [isOpen, hasAutoTriggered, messages.length, ticker]);
+
+  const sendMessage = async (messageText: string) => {
+    if (!messageText.trim() || isLoading) return;
 
     const userMessage: Message = {
       role: "user",
-      content: inputValue,
+      content: messageText,
       timestamp: Date.now(),
     };
 
     setMessages((prev) => [...prev, userMessage]);
-    setInputValue("");
     setIsLoading(true);
 
     try {
@@ -51,7 +60,7 @@ export function PansyChat({ ticker, companyName, currentPrice, analysisContext }
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ticker,
-          message: inputValue,
+          message: messageText,
         }),
       });
 
@@ -85,11 +94,21 @@ export function PansyChat({ ticker, companyName, currentPrice, analysisContext }
     }
   };
 
+  const handleSendMessage = async () => {
+    if (!inputValue.trim()) return;
+    await sendMessage(inputValue);
+    setInputValue("");
+  };
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
+  };
+
+  const handleSuggestedQuestion = (question: string) => {
+    sendMessage(question);
   };
 
   const suggestedQuestions = [
@@ -139,7 +158,10 @@ export function PansyChat({ ticker, companyName, currentPrice, analysisContext }
           <Button
             size="icon"
             variant="ghost"
-            onClick={() => setIsOpen(false)}
+            onClick={() => {
+              setIsOpen(false);
+              setHasAutoTriggered(false);
+            }}
             className="h-8 w-8"
           >
             <X className="w-4 h-4" />
@@ -149,7 +171,7 @@ export function PansyChat({ ticker, companyName, currentPrice, analysisContext }
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.length === 0 ? (
+        {messages.length === 0 && !isLoading ? (
           <div className="space-y-4">
             <div className="flex items-start gap-3">
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-sm shrink-0">
@@ -158,61 +180,63 @@ export function PansyChat({ ticker, companyName, currentPrice, analysisContext }
               <div className="flex-1">
                 <Card className="p-3 bg-primary/5 border-primary/20">
                   <p className="text-sm text-foreground">
-                    Hey! I've analyzed {companyName} for you. Ask me anything about the stock, the chart, the risk level, or how it might fit your portfolio 💛
+                    Hey! Let me analyze {companyName} for you... 💛
                   </p>
                 </Card>
               </div>
             </div>
-
-            <div className="space-y-2">
-              <p className="text-xs text-muted-foreground px-2">Try asking:</p>
-              {suggestedQuestions.map((question, index) => (
-                <Button
-                  key={index}
-                  variant="outline"
-                  size="sm"
-                  className="w-full justify-start text-left h-auto py-2 px-3 border-border hover:border-primary/50 hover:bg-primary/5"
-                  onClick={() => {
-                    setInputValue(question);
-                  }}
-                >
-                  <span className="text-sm text-foreground">{question}</span>
-                </Button>
-              ))}
-            </div>
           </div>
         ) : (
-          messages.map((message, index) => (
-            <div
-              key={index}
-              className={`flex items-start gap-3 ${
-                message.role === "user" ? "flex-row-reverse" : ""
-              }`}
-            >
-              {message.role === "assistant" && (
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-sm shrink-0">
-                  🌺
-                </div>
-              )}
-              <Card
-                className={`p-3 max-w-[85%] ${
-                  message.role === "user"
-                    ? "bg-primary/20 border-primary/30"
-                    : "bg-muted/50 border-border"
+          <>
+            {messages.map((message, index) => (
+              <div
+                key={index}
+                className={`flex items-start gap-3 ${
+                  message.role === "user" ? "flex-row-reverse" : ""
                 }`}
               >
-                <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
-                  {message.content}
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {new Date(message.timestamp).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </p>
-              </Card>
-            </div>
-          ))
+                {message.role === "assistant" && (
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-sm shrink-0">
+                    🌺
+                  </div>
+                )}
+                <Card
+                  className={`p-3 max-w-[85%] ${
+                    message.role === "user"
+                      ? "bg-primary/20 border-primary/30"
+                      : "bg-muted/50 border-border"
+                  }`}
+                >
+                  <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
+                    {message.content}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {new Date(message.timestamp).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                </Card>
+              </div>
+            ))}
+            
+            {messages.length > 0 && !isLoading && (
+              <div className="space-y-2 pt-2">
+                <p className="text-xs text-muted-foreground px-2">Ask me more:</p>
+                {suggestedQuestions.map((question, index) => (
+                  <Button
+                    key={index}
+                    variant="outline"
+                    size="sm"
+                    className="w-full justify-start text-left h-auto py-2 px-3 border-border hover:border-primary/50 hover:bg-primary/5"
+                    onClick={() => handleSuggestedQuestion(question)}
+                  >
+                    <span className="text-sm text-foreground">{question}</span>
+                  </Button>
+                ))}
+              </div>
+            )}
+          </>
         )}
         {isLoading && (
           <div className="flex items-start gap-3">
@@ -220,6 +244,7 @@ export function PansyChat({ ticker, companyName, currentPrice, analysisContext }
               🌺
             </div>
             <Card className="p-3 bg-muted/50 border-border">
+              <p className="text-xs text-muted-foreground mb-2">Pansy is typing...</p>
               <div className="flex gap-1">
                 <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
                 <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
