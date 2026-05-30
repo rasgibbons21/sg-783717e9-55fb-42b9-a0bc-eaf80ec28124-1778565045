@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PansyChat } from "@/components/PansyChat";
 import { TextWithPansyTooltips } from "@/components/TextWithPansyTooltips";
 import { marketService } from "@/services/marketService";
-import { TrendingUp, TrendingDown, AlertTriangle, ExternalLink, BarChart3, Activity, Target } from "lucide-react";
+import { TrendingUp, TrendingDown, AlertTriangle, ExternalLink, BarChart3, Activity, Target, Sparkles } from "lucide-react";
 import Link from "next/link";
 
 interface StockData {
@@ -193,7 +193,7 @@ export default function StockDetail() {
           <div className="w-full h-[400px] rounded-lg overflow-hidden mt-4 bg-[#0a0a0f] relative border border-white/5">
             {ticker && (
               <iframe 
-                src={`https://s.tradingview.com/widgetembed/?symbol=${ticker}&interval=D&theme=dark`}
+                src={`https://s.tradingview.com/widgetembed/?symbol=${ticker}&interval=D&theme=dark&studies=RSI@tv-basicstudies&studies=VWAP@tv-basicstudies`}
                 width="100%" 
                 height="400"
                 frameBorder="0"
@@ -204,16 +204,22 @@ export default function StockDetail() {
 
         {/* Pansy's Analysis */}
         {isAnalyzing ? (
-          <Card className="p-8">
+          <Card className="p-8 border-[#c8953a] animate-pulse-glow">
             <div className="flex flex-col items-center gap-4">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-              <p className="text-muted-foreground">Pansy is analyzing the chart and fundamentals...</p>
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-3xl animate-bounce">
+                🌺
+              </div>
+              <div className="flex items-center gap-2">
+                <p className="text-foreground font-medium">Pansy is reading the chart</p>
+                <span className="animate-pulse">...</span>
+              </div>
+              <p className="text-sm text-muted-foreground">This usually takes 5-10 seconds</p>
             </div>
           </Card>
         ) : pansyAnalysis ? (
-          <Card className="p-6 bg-card border-border rounded-2xl space-y-6">
+          <Card className="p-6 bg-card border-[#c8953a] border-2 rounded-2xl space-y-6 animate-slide-up shadow-lg shadow-[#c8953a]/20">
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-xl shrink-0">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-xl shrink-0 shadow-lg">
                 🌺
               </div>
               <div className="flex-1 space-y-2">
@@ -225,16 +231,16 @@ export default function StockDetail() {
             </div>
 
             <Tabs defaultValue="technical" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="technical">
-                  <Activity className="w-4 h-4 mr-2" />
-                  Technical
+              <TabsList className="grid w-full grid-cols-3 bg-muted/50">
+                <TabsTrigger value="technical" className="data-[state=active]:bg-[#3d7a54] data-[state=active]:text-white">
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Pansy's Take
                 </TabsTrigger>
-                <TabsTrigger value="fundamental">
+                <TabsTrigger value="fundamental" className="data-[state=active]:bg-[#c8953a] data-[state=active]:text-white">
                   <Target className="w-4 h-4 mr-2" />
-                  Fundamental
+                  Entry & Exit
                 </TabsTrigger>
-                <TabsTrigger value="risk">
+                <TabsTrigger value="risk" className="data-[state=active]:bg-[#d4788a] data-[state=active]:text-white">
                   <AlertTriangle className="w-4 h-4 mr-2" />
                   Risk & Mindset
                 </TabsTrigger>
@@ -325,7 +331,28 @@ export default function StockDetail() {
               </p>
             </div>
           </Card>
-        ) : null}
+        ) : (
+          <Card className="p-8 bg-gradient-to-br from-[#c8953a]/10 to-[#3d7a54]/10 border-[#c8953a] border-2 animate-pulse-glow">
+            <div className="flex flex-col items-center gap-6 text-center">
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-3xl shadow-lg">
+                🌺
+              </div>
+              <div className="space-y-2">
+                <h3 className="font-serif text-xl font-semibold text-foreground">Want to know what Pansy thinks?</h3>
+                <p className="text-sm text-muted-foreground max-w-md">
+                  Get her expert analysis on this stock — written in plain English, no confusing jargon.
+                </p>
+              </div>
+              <Button 
+                onClick={() => loadPansyAnalysis(ticker as string, stockData)}
+                className="bg-[#c8953a] hover:bg-[#c8953a]/90 text-white font-semibold px-8 py-6 text-lg shadow-lg"
+              >
+                <span className="mr-2">Get Pansy's Take</span>
+                🌺
+              </Button>
+            </div>
+          </Card>
+        )}
 
         {/* Latest News */}
         {news.length > 0 && (
