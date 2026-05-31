@@ -22,6 +22,7 @@ export function Layout({ children }: LayoutProps) {
     if (path === "/home") return currentPath === "/home";
     if (path === "/discover") return currentPath.startsWith("/discover") || currentPath.startsWith("/stock");
     if (path === "/portfolio") return currentPath.startsWith("/portfolio");
+    if (path === "/learn") return currentPath === "/learn";
     if (path === "/brokers") return currentPath === "/brokers";
     if (path === "/profile") return currentPath.startsWith("/profile") || currentPath.startsWith("/subscription");
     return false;
@@ -83,8 +84,8 @@ export function Layout({ children }: LayoutProps) {
       <Toaster />
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card backdrop-blur supports-[backdrop-filter]:bg-card/95">
-        <div className="flex items-center justify-around h-16 overflow-x-auto hide-scrollbar px-2">
+      <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-40 safe-area-bottom">
+        <div className="grid grid-cols-6 gap-1 px-2 py-2 max-w-2xl mx-auto">
           <Link href="/home" passHref>
             <button className={`flex flex-col items-center gap-1 px-2 py-1 rounded-lg transition-colors ${
               isActivePath("/home") ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
@@ -109,6 +110,15 @@ export function Layout({ children }: LayoutProps) {
             }`}>
               <PieChart className="w-5 h-5" />
               <span className="text-xs">Portfolio</span>
+            </button>
+          </Link>
+
+          <Link href="/learn" passHref>
+            <button className={`flex flex-col items-center gap-1 px-2 py-1 rounded-lg transition-colors ${
+              isActivePath("/learn") ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
+            }`}>
+              <GraduationCap className="w-5 h-5" />
+              <span className="text-xs">Learn</span>
             </button>
           </Link>
 
