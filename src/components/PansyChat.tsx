@@ -23,7 +23,28 @@ export function PansyChat({ ticker, companyName, currentPrice, analysisContext }
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [hasAutoTriggered, setHasAutoTriggered] = useState(false);
+  const [showCoachmark, setShowCoachmark] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Check if coachmark should be shown (first time only)
+  useEffect(() => {
+    const hasSeenCoachmark = localStorage.getItem('bloom-pansy-coachmark-seen');
+    if (!hasSeenCoachmark) {
+      setShowCoachmark(true);
+    }
+  }, []);
+
+  const dismissCoachmark = () => {
+    setShowCoachmark(false);
+    localStorage.setItem('bloom-pansy-coachmark-seen', 'true');
+  };
+
+  const handleButtonClick = () => {
+    if (showCoachmark) {
+      dismissCoachmark();
+    }
+    setIsOpen(true);
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -120,13 +141,37 @@ export function PansyChat({ ticker, companyName, currentPrice, analysisContext }
 
   if (!isOpen) {
     return (
-      <Button
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-[90px] right-4 w-16 h-16 rounded-full bg-gradient-to-br from-accent to-primary shadow-lg hover:shadow-xl transition-all z-50 p-0"
-        aria-label="Chat with Pansy"
-      >
-        <span className="text-2xl">🌺</span>
-      </Button>
+      <div className="fixed bottom-[90px] right-4 z-50">
+        {/* One-time Coachmark */}
+        {showCoachmark && (
+          <div className="absolute bottom-full right-0 mb-3 animate-bounce-subtle">
+            <Card className="relative p-3 bg-accent/20 border-accent shadow-lg max-w-[200px]">
+              <button
+                onClick={dismissCoachmark}
+                className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-background border border-border flex items-center justify-center hover:bg-muted transition-colors"
+                aria-label="Dismiss tip"
+              >
+                <X className="w-3 h-3" />
+              </button>
+              <p className="text-sm text-foreground font-medium">
+                Hi love — tap me to analyze any stock
+              </p>
+              {/* Speech bubble tail */}
+              <div className="absolute -bottom-2 right-6 w-4 h-4 bg-accent/20 border-r border-b border-accent rotate-45" />
+            </Card>
+          </div>
+        )}
+
+        {/* Pill-shaped button with icon + text */}
+        <Button
+          onClick={handleButtonClick}
+          className="h-14 px-5 rounded-full bg-gradient-to-br from-accent to-primary shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
+          aria-label="Ask Pansy about this stock"
+        >
+          <span className="text-2xl">🌺</span>
+          <span className="font-semibold text-white">Ask Pansy</span>
+        </Button>
+      </div>
     );
   }
 
