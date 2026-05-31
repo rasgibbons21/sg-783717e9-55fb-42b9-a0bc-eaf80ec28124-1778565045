@@ -22,8 +22,8 @@ export default async function handler(
 
   try {
     const { data, error } = await supabaseAdmin
-      .from("users")
-      .update({ plan_type: planType })
+      .from("profiles")
+      .update({ risk_tolerance: planType })
       .eq("id", userId)
       .select()
       .single();

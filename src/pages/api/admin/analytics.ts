@@ -16,7 +16,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     // Total registered users
     const { count: totalUsers } = await supabase
-      .from('users')
+      .from('profiles')
       .select('*', { count: 'exact', head: true });
 
     // New signups by period
@@ -27,22 +27,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const yearStart = new Date(now.setMonth(0, 1)).toISOString();
 
     const { count: signupsToday } = await supabase
-      .from('users')
+      .from('profiles')
       .select('*', { count: 'exact', head: true })
       .gte('created_at', todayStart);
 
     const { count: signupsWeek } = await supabase
-      .from('users')
+      .from('profiles')
       .select('*', { count: 'exact', head: true })
       .gte('created_at', weekStart);
 
     const { count: signupsMonth } = await supabase
-      .from('users')
+      .from('profiles')
       .select('*', { count: 'exact', head: true })
       .gte('created_at', monthStart);
 
     const { count: signupsYear } = await supabase
-      .from('users')
+      .from('profiles')
       .select('*', { count: 'exact', head: true })
       .gte('created_at', yearStart);
 

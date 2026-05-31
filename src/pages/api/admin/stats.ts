@@ -17,9 +17,9 @@ export default async function handler(
   try {
     // Fetch all users
     const { data: usersData, error: usersError } = await supabaseAdmin
-      .from("users")
+      .from("profiles")
       .select("*")
-      .order("join_date", { ascending: false });
+      .order("created_at", { ascending: false });
 
     if (usersError) throw usersError;
 
@@ -39,7 +39,7 @@ export default async function handler(
     if (subsError) throw subsError;
 
     // Calculate stats
-    const proCount = usersData?.filter(u => u.plan_type === "pro").length || 0;
+    const proCount = subsData?.length || 0;
     const monthlyRevenue = proCount * 7.99;
     const yearlyRevenue = (subsData?.filter(s => s.plan === "yearly").length || 0) * 57.99;
     const totalRevenue = monthlyRevenue + yearlyRevenue;

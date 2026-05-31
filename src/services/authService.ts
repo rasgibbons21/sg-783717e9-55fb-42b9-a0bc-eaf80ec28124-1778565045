@@ -194,6 +194,17 @@ export const authService = {
         return { user: null, error: formatAuthError(error) };
       }
 
+      // Create profile row in profiles table after successful auth signup
+      if (data.user) {
+        await supabase.from('profiles').insert({
+          id: data.user.id,
+          email: data.user.email || email,
+          full_name: fullName,
+          onboarding_complete: false,
+          created_at: new Date().toISOString()
+        });
+      }
+
       const authUser = data.user ? {
         id: data.user.id,
         email: data.user.email || "",
@@ -376,7 +387,7 @@ export const authService = {
   async getUserByEmail(email: string) {
     try {
       const { data, error } = await supabase
-        .from('users')
+        .from('profiles')
         .select('*')
         .eq('email', email)
         .single();

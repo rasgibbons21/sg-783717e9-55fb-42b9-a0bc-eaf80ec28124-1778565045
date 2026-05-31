@@ -32,13 +32,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       filename = 'broker-clicks.csv';
     } else if (type === 'users') {
       const { data } = await supabase
-        .from('users')
+        .from('profiles')
         .select('*')
         .order('created_at', { ascending: false });
 
-      csvContent = 'Email,Full Name,Plan Type,Risk Tolerance,Created At\n';
+      csvContent = 'Email,Full Name,Risk Tolerance,Onboarding Complete,Created At\n';
       data?.forEach(user => {
-        csvContent += `"${user.email}","${user.full_name || ''}","${user.plan_type}","${user.risk_tolerance || ''}","${user.created_at}"\n`;
+        csvContent += `"${user.email}","${user.full_name || ''}","${user.risk_tolerance || ''}","${user.onboarding_complete || false}","${user.created_at}"\n`;
       });
       filename = 'users.csv';
     } else if (type === 'subscriptions') {
