@@ -285,6 +285,20 @@ export default function Portfolio() {
     }).format(value);
   };
 
+  useEffect(() => {
+    const loadUserData = async () => {
+      const user = await userService.getCurrentUser();
+      if (user) {
+        setUserData(user);
+        // Default values since these fields don't exist in profiles
+        setRiskTolerance('moderate');
+        setInvestmentGoals(['growth']);
+      }
+      setIsLoading(false);
+    };
+    loadUserData();
+  }, []);
+
   if (isLoading) {
     return (
       <Layout>

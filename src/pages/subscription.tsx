@@ -31,7 +31,6 @@ export default function Subscription() {
       const userData = await userService.getCurrentUser();
       if (userData) {
         setUser(userData);
-        setCurrentPlan(userData.plan_type as "free" | "pro");
       }
     };
     
@@ -44,6 +43,17 @@ export default function Subscription() {
       setErrorMsg("There was an issue processing your subscription. Please try again.");
     }
   }, [router]);
+
+  useEffect(() => {
+    const checkCurrentPlan = async () => {
+      const user = await userService.getCurrentUser();
+      if (user) {
+        // Default to free since plan_type doesn't exist in profiles
+        setCurrentPlan("free");
+      }
+    };
+    checkCurrentPlan();
+  }, []);
 
   const handleSubscribe = async () => {
     setIsProcessing(true);

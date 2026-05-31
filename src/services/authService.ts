@@ -200,7 +200,6 @@ export const authService = {
           id: data.user.id,
           email: data.user.email || email,
           full_name: fullName,
-          onboarding_complete: false,
           created_at: new Date().toISOString()
         });
       }

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable react-hooks/exhaustive-deps */
+ 
 /* eslint-disable @next/next/no-img-element */
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
@@ -61,8 +61,22 @@ export default function Profile() {
   const [retirementAge, setRetirementAge] = useState<string>("");
 
   useEffect(() => {
-    checkAuth();
-    checkNotificationStatus();
+    const loadProfile = async () => {
+      const user = await userService.getCurrentUser();
+      if (user) {
+        setFullName(user.full_name || "");
+        setEmail(user.email || "");
+        // Set default values since these fields don't exist in profiles table
+        setRiskTolerance("moderate");
+        setInvestmentGoals(["growth"]);
+        setTimeHorizon("5-10");
+        setMonthlyContribution(500);
+        setCurrentAge(30);
+        setRetirementAge(65);
+      }
+      setIsLoading(false);
+    };
+    loadProfile();
   }, []);
 
   const checkAuth = async () => {

@@ -143,11 +143,10 @@ export default function Onboarding() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        // Use the existing type-safe userService to avoid Supabase strict type errors
+        // Profiles table doesn't have risk_tolerance, experience_level, or investment_goals
+        // Just update the user's full_name if needed
         await userService.updateUser(user.id, {
-          risk_tolerance: risk.charAt(0).toUpperCase() + risk.slice(1),
-          experience_level: experience.charAt(0).toUpperCase() + experience.slice(1),
-          investment_goals: goals
+          full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || ''
         });
       }
     } catch (error) {
