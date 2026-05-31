@@ -14,11 +14,32 @@ export const userService = {
       .from("profiles")
       .select("*")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     if (error) {
       console.error("Error fetching user:", error);
       return null;
+    }
+
+    // If no profile row exists, create one
+    if (!data) {
+      const { data: newProfile, error: insertError } = await supabase
+        .from("profiles")
+        .upsert({
+          id: user.id,
+          email: user.email || "",
+          full_name: user.user_metadata?.full_name || user.email?.split("@")[0] || "",
+          created_at: new Date().toISOString(),
+        })
+        .select()
+        .single();
+
+      if (insertError) {
+        console.error("Error creating profile:", insertError);
+        return null;
+      }
+
+      return newProfile;
     }
 
     return data;
