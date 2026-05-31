@@ -69,6 +69,7 @@ export default function Profile() {
       if (user) {
         setFullName(user.full_name || "");
         setEmail(user.email || "");
+        setUser(user);
         // Set default values since these fields don't exist in profiles table
         setRiskTolerance("moderate");
         setInvestmentGoals(["growth"]);
@@ -80,29 +81,8 @@ export default function Profile() {
       setIsLoading(false);
     };
     loadProfile();
+    checkNotificationStatus();
   }, []);
-
-  const checkAuth = async () => {
-    const session = await authService.getCurrentSession();
-    if (!session) {
-      router.push("/");
-      return;
-    }
-    const profile = await userService.getCurrentUser();
-    setUser(profile);
-    
-    // Populate form with existing data
-    if (profile) {
-      setRiskTolerance(profile.risk_tolerance || "");
-      setSelectedGoals(profile.investment_goals || []);
-      setTimeHorizon(profile.time_horizon || "");
-      setMonthlyContribution(profile.monthly_contribution?.toString() || "");
-      setCurrentAge(profile.current_age?.toString() || "");
-      setRetirementAge(profile.retirement_age?.toString() || "");
-    }
-    
-    setIsLoading(false);
-  };
 
   const checkNotificationStatus = () => {
     if ("Notification" in window) {

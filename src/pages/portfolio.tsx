@@ -78,12 +78,12 @@ export default function Portfolio() {
     const profile = await userService.getCurrentUser();
     setUser(profile);
     
-    // Load user's profile data for goals
+    // Load user's profile data for goals - use defaults since these fields don't exist in profiles
     if (profile) {
       setGoalsProfile(prev => ({
         ...prev,
-        riskTolerance: profile.risk_tolerance || "Moderate",
-        investmentGoals: profile.investment_goals || ["Retirement"],
+        riskTolerance: "Moderate",
+        investmentGoals: ["Retirement"],
       }));
     }
     
