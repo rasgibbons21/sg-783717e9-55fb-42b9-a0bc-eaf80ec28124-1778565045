@@ -52,6 +52,7 @@ export default function StockDetail() {
   const [isLoading, setIsLoading] = useState(true);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [userPlan, setUserPlan] = useState<string>("free");
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const { viewCount, trackView, showUpgradeModal, setShowUpgradeModal } = useViewTracker();
   
   useEffect(() => {
@@ -59,6 +60,9 @@ export default function StockDetail() {
       const user = await userService.getCurrentUser();
       if (user) {
         setUserPlan(user.plan_type || "free");
+        setIsLoggedIn(true);
+      } else {
+        setIsLoggedIn(false);
       }
     };
     checkUserPlan();
@@ -373,8 +377,41 @@ export default function StockDetail() {
         ) : null}
 
         {/* Upgrade Banner for Free Users After Analysis */}
-        {pansyAnalysis && userPlan === "free" && (
+        {pansyAnalysis && userPlan === "free" && isLoggedIn && (
           <UpgradeBanner message="Loved Pansy's take? Get unlimited analysis with Bloom Pro — $7.99/month" />
+        )}
+
+        {/* Sign-Up CTA for Logged-Out Users */}
+        {pansyAnalysis && !isLoggedIn && (
+          <Card className="p-6 bg-gradient-to-br from-accent/20 to-primary/20 border-accent border-2 rounded-2xl space-y-4 shadow-lg">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-2xl shrink-0 shadow-lg">
+                🌺
+              </div>
+              <div className="flex-1 space-y-2">
+                <h3 className="font-serif text-xl font-bold text-foreground">
+                  Want the full breakdown?
+                </h3>
+                <p className="text-sm text-foreground/90 leading-relaxed">
+                  Pansy can walk you through entry zones, exit planning, and the real risk — free the moment you sign up.
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Link href="/" className="flex-1">
+                <Button className="w-full bg-accent hover:bg-accent/90 text-white font-semibold shadow-lg">
+                  Create free account
+                </Button>
+              </Link>
+              <Button 
+                variant="outline"
+                onClick={() => loadPansyAnalysis(ticker as string, stockData!)}
+                className="flex-1 border-accent/50 hover:bg-accent/10"
+              >
+                Quick take
+              </Button>
+            </div>
+          </Card>
         )}
 
         {/* Upgrade Modal */}
