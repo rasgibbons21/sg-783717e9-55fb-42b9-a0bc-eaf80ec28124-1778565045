@@ -40,6 +40,9 @@ interface GoalsProfile {
 export default function Portfolio() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
+  const [userData, setUserData] = useState<any>(null);
+  const [riskTolerance, setRiskTolerance] = useState<string>("moderate");
+  const [investmentGoals, setInvestmentGoals] = useState<string[]>(["growth"]);
   const [watchlist, setWatchlist] = useState<WatchlistItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [newTicker, setNewTicker] = useState("");

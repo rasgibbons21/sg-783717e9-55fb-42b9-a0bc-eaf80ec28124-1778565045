@@ -53,8 +53,11 @@ export default function Profile() {
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>("default");
 
   // Form state
+  const [fullName, setFullName] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
   const [riskTolerance, setRiskTolerance] = useState<string>("");
   const [selectedGoals, setSelectedGoals] = useState<string[]>([]);
+  const [investmentGoals, setInvestmentGoals] = useState<string[]>([]);
   const [timeHorizon, setTimeHorizon] = useState<string>("");
   const [monthlyContribution, setMonthlyContribution] = useState<string>("");
   const [currentAge, setCurrentAge] = useState<string>("");
@@ -70,9 +73,9 @@ export default function Profile() {
         setRiskTolerance("moderate");
         setInvestmentGoals(["growth"]);
         setTimeHorizon("5-10");
-        setMonthlyContribution(500);
-        setCurrentAge(30);
-        setRetirementAge(65);
+        setMonthlyContribution("500");
+        setCurrentAge("30");
+        setRetirementAge("65");
       }
       setIsLoading(false);
     };
