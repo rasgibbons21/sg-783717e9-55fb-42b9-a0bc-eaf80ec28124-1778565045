@@ -518,6 +518,15 @@ export default function Onboarding() {
             >
               Continue
             </Button>
+
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => router.push("/home")}
+              className="w-full text-muted-foreground hover:text-foreground"
+            >
+              Skip for now
+            </Button>
           </div>
         )}
 
@@ -580,6 +589,15 @@ export default function Onboarding() {
               className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-12 rounded-xl"
             >
               Continue
+            </Button>
+
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => router.push("/home")}
+              className="w-full text-muted-foreground hover:text-foreground"
+            >
+              Skip for now
             </Button>
           </div>
         )}
@@ -649,6 +667,15 @@ export default function Onboarding() {
               ) : (
                 "Complete Setup"
               )}
+            </Button>
+
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => router.push("/home")}
+              className="w-full text-muted-foreground hover:text-foreground"
+            >
+              Skip for now
             </Button>
           </div>
         )}

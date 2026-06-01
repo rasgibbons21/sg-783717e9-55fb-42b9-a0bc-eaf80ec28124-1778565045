@@ -21,13 +21,8 @@ export default function AuthCallback() {
       if (code) {
         const { data, error } = await supabase.auth.exchangeCodeForSession(code);
         if (!error && data.session) {
-          // Check if this is first time login
-          const createdAt = new Date(data.user?.created_at || "");
-          const lastSignIn = new Date(data.user?.last_sign_in_at || "");
-          const diffSeconds = Math.abs(lastSignIn.getTime() - createdAt.getTime()) / 1000;
-          const isNewUser = diffSeconds < 60;
-          
-          router.push(isNewUser ? "/onboarding" : "/home");
+          // Send all users to home - questionnaire is now optional
+          router.push("/home");
         } else {
           router.push("/?error=confirmation_failed");
         }
