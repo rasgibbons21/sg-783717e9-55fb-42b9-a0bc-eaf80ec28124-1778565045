@@ -1,4 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
+ 
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
@@ -14,10 +14,10 @@ export default function AuthConfirm() {
     );
     supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
-        router.push('/onboarding');
+        router.push('/home');
       }
     });
-  }, []);
+  }, [router]);
 
   return (
     <div style={{background:'#06060a', minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', color:'white'}}>
