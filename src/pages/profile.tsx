@@ -19,6 +19,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { authService } from "@/services/authService";
 import { userService } from "@/services/userService";
 import { notificationService } from "@/services/notificationService";
+import { supabase } from "@/integrations/supabase/client";
 import { User, Mail, Calendar, Crown, Settings, LogOut, Camera, Share, CreditCard, Bell, Shield, CheckCircle2, BellRing, BellOff, Target, TrendingUp, Clock, DollarSign, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -47,6 +48,7 @@ export default function Profile() {
   const router = useRouter();
   const { toast } = useToast();
   const [user, setUser] = useState<any>(null);
+  const [authCreatedAt, setAuthCreatedAt] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
@@ -65,6 +67,12 @@ export default function Profile() {
 
   useEffect(() => {
     const loadProfile = async () => {
+      // Fetch auth user to get true sign-up date
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (authUser) {
+        setAuthCreatedAt(authUser.created_at);
+      }
+
       const user = await userService.getCurrentUser();
       if (user) {
         setFullName(user.full_name || "");
@@ -211,9 +219,11 @@ export default function Profile() {
                 )}
               </div>
               <p className="text-muted-foreground">{user?.email}</p>
-              <p className="text-sm text-muted-foreground">
-                Member since {new Date(user?.join_date).toLocaleDateString()}
-              </p>
+              {authCreatedAt && (
+                <p className="text-sm text-muted-foreground">
+                  Member since {new Date(authCreatedAt).toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+                </p>
+              )}
             </div>
           </div>
         </Card>
