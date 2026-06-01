@@ -173,6 +173,41 @@ export default function Profile() {
     router.push("/");
   };
 
+  const handleShare = async () => {
+    const shareUrl = "https://shebloomswealth.app";
+    const shareText = "Check out Bloom — investing made simple.";
+
+    // Try native share first (mobile/supported browsers)
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "Bloom",
+          text: shareText,
+          url: shareUrl,
+        });
+      } catch (error: any) {
+        // User cancelled or error occurred - silently fail
+        console.log("Share cancelled or failed:", error);
+      }
+    } else {
+      // Fallback to clipboard copy (desktop browsers)
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        toast({
+          title: "Link copied! 🌸",
+          description: "Share link has been copied to your clipboard.",
+        });
+      } catch (error) {
+        console.error("Failed to copy to clipboard:", error);
+        toast({
+          title: "Could not copy link",
+          description: "Please try again.",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
   if (isLoading) {
     return (
       <Layout>
@@ -478,13 +513,12 @@ export default function Profile() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Link href="/share">
-              <Button
-                className="w-full bg-gradient-to-r from-accent to-primary hover:from-accent/90 hover:to-primary/90"
-              >
-                View Share Page
-              </Button>
-            </Link>
+            <Button
+              onClick={handleShare}
+              className="w-full bg-gradient-to-r from-accent to-primary hover:from-accent/90 hover:to-primary/90"
+            >
+              Share Bloom
+            </Button>
           </CardContent>
         </Card>
 
