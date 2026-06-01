@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PansyChat } from "@/components/PansyChat";
 import { TextWithPansyTooltips } from "@/components/TextWithPansyTooltips";
 import { UpgradeModal, UpgradeBanner, useViewTracker } from "@/components/UpgradeModal";
+import { LockedFeatureModal } from "@/components/LockedFeatureModal";
 import { marketService } from "@/services/marketService";
 import { userService } from "@/services/userService";
 import { TrendingUp, TrendingDown, AlertTriangle, ExternalLink, BarChart3, Activity, Target, Sparkles } from "lucide-react";
@@ -53,6 +54,7 @@ export default function StockDetail() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [userPlan, setUserPlan] = useState<string>("free");
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [showLockedFeatureModal, setShowLockedFeatureModal] = useState(false);
   const { viewCount, trackView, showUpgradeModal, setShowUpgradeModal } = useViewTracker();
   
   useEffect(() => {
@@ -115,6 +117,12 @@ export default function StockDetail() {
   };
 
   const loadPansyAnalysis = async (symbol: string, quote: StockData) => {
+    // Check if user is logged in before allowing analysis
+    if (!isLoggedIn) {
+      setShowLockedFeatureModal(true);
+      return;
+    }
+
     setIsAnalyzing(true);
     try {
       const response = await fetch("/api/analyze", {
@@ -420,6 +428,14 @@ export default function StockDetail() {
           isOpen={showUpgradeModal} 
           onClose={() => setShowUpgradeModal(false)}
           trigger={pansyAnalysis ? "after_analysis" : "view_limit"}
+        />
+
+        {/* Locked Feature Modal for Logged-Out Users */}
+        <LockedFeatureModal
+          isOpen={showLockedFeatureModal}
+          onClose={() => setShowLockedFeatureModal(false)}
+          featureName={`Pansy's full breakdown of ${ticker}`}
+          featureDescription="Get her expert analysis with entry zones, exit planning, and real risk assessment."
         />
 
         {/* Latest News */}

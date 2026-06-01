@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { LockedFeatureModal } from "@/components/LockedFeatureModal";
 import { authService } from "@/services/authService";
 import { userService } from "@/services/userService";
 import { marketService } from "@/services/marketService";
@@ -51,6 +52,7 @@ export default function Portfolio() {
   const [showAlertDialog, setShowAlertDialog] = useState(false);
   const [selectedTicker, setSelectedTicker] = useState("");
   const [alertThreshold, setAlertThreshold] = useState("5");
+  const [showLockedFeatureModal, setShowLockedFeatureModal] = useState(false);
   
   // Goals & Projections state
   const [activeTab, setActiveTab] = useState<"watchlist" | "goals">("watchlist");
@@ -129,6 +131,12 @@ export default function Portfolio() {
 
   const addToWatchlist = async () => {
     if (!newTicker.trim()) return;
+
+    // Check if user is logged in
+    if (!user) {
+      setShowLockedFeatureModal(true);
+      return;
+    }
 
     const ticker = newTicker.trim().toUpperCase();
     
@@ -808,6 +816,14 @@ export default function Portfolio() {
             This is educational content only and does not constitute financial advice. Bloom is not liable for any investment decisions or losses.
           </p>
         </Card>
+
+        {/* Locked Feature Modal for Logged-Out Users */}
+        <LockedFeatureModal
+          isOpen={showLockedFeatureModal}
+          onClose={() => setShowLockedFeatureModal(false)}
+          featureName="your watchlist"
+          featureDescription="Save stocks, track your favorites, and get price alerts — all free."
+        />
       </div>
     </Layout>
   );
