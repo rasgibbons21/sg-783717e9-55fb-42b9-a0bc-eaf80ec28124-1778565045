@@ -38,6 +38,7 @@ export default function Onboarding() {
   const [error, setError] = useState("");
   const [resetEmailSent, setResetEmailSent] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   
   const submitLock = useRef(false);
 
@@ -369,7 +370,7 @@ export default function Onboarding() {
                             {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                           </button>
                         </div>
-                        {authMode === "signin" && (
+                        {authMode === "login" && (
                           <div className="text-right">
                             <Link href="/forgot-password" className="text-sm text-accent hover:text-accent/80 font-medium">
                               Forgot password?
