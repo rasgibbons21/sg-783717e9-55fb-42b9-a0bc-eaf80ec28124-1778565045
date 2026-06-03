@@ -10,12 +10,15 @@ export default async function handler(
 
   const { ticker, from, to } = req.query;
 
-  // Input validation
+  // Input validation - ensure ticker is a string, not an array
   if (ticker && typeof ticker !== "string") {
     return res.status(400).json({ error: "Invalid ticker parameter" });
   }
 
-  if (ticker && !/^[A-Z0-9]{1,10}$/.test(ticker.toUpperCase())) {
+  // Now TypeScript knows ticker is string | undefined
+  const tickerStr = ticker ? ticker.toUpperCase() : null;
+
+  if (tickerStr && !/^[A-Z0-9]{1,10}$/.test(tickerStr)) {
     return res.status(400).json({ error: "Invalid ticker symbol format" });
   }
 
@@ -27,12 +30,12 @@ export default async function handler(
   try {
     let url: string;
     
-    if (ticker) {
+    if (tickerStr) {
       // Company-specific news
       if (!from || !to) {
         return res.status(400).json({ error: "from and to dates required for company news" });
       }
-      url = `https://finnhub.io/api/v1/company-news?symbol=${ticker.toUpperCase()}&from=${from}&to=${to}&token=${apiKey}`;
+      url = `https://finnhub.io/api/v1/company-news?symbol=${tickerStr}&from=${from}&to=${to}&token=${apiKey}`;
     } else {
       // General market news
       url = `https://finnhub.io/api/v1/news?category=general&token=${apiKey}`;
