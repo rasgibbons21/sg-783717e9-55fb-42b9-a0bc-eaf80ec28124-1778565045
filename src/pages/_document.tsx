@@ -16,7 +16,9 @@ export default function Document() {
         <link rel="apple-touch-icon" href="/icon-192.png" />
         
         {/* Favicon */}
-        <link rel="icon" href="/icon-192.png" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192" />
+        <link rel="icon" href="/icon-512.png" type="image/png" sizes="512x512" />
       </Head>
       <body>
         <Main />
