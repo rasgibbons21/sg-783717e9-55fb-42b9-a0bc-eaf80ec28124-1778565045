@@ -50,8 +50,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const health = {
       anthropic: !!(process.env.ANTHROPIC_API_KEY || process.env.NEXT_PUBLIC_ANTHROPIC_API_KEY),
-      finnhub: !!process.env.NEXT_PUBLIC_FINNHUB_API_KEY,
-      fmp: !!process.env.NEXT_PUBLIC_FMP_API_KEY
+      apiKeys: {
+        finnhub: !!process.env.FINNHUB_API_KEY,
+        fmp: !!process.env.FMP_API_KEY
+      }
     };
 
     return res.status(200).json({

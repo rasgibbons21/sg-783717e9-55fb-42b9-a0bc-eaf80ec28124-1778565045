@@ -79,7 +79,20 @@ export default async function handler(
       const picksWithPrices = await Promise.all(
         picks.map(async (pick: Record<string, string>) => {
           try {
-            const finnhubKey = process.env.NEXT_PUBLIC_FINNHUB_API_KEY;
+            const finnhubKey = process.env.FINNHUB_API_KEY;
+            if (!finnhubKey) {
+              return {
+                ticker: pick.ticker,
+                name: pick.name,
+                price: 0,
+                change: 0,
+                changePercent: 0,
+                type: pick.type,
+                trend: pick.trend,
+                riskLevel: pick.riskLevel,
+                pansyQuote: pick.pansyQuote,
+              };
+            }
             const quoteRes = await fetch(
               `https://finnhub.io/api/v1/quote?symbol=${pick.ticker}&token=${finnhubKey}`
             );
