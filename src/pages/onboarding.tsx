@@ -15,7 +15,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { authService } from "@/services/authService";
 import { userService } from "@/services/userService";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from "lucide-react";
+import { Loader2, Eye, EyeOff } from "lucide-react";
 
 type Step = "auth" | "check-email" | "experience" | "goals" | "risk";
 type AuthMode = "signup" | "login" | "forgot";
@@ -351,30 +351,31 @@ export default function Onboarding() {
                     {authMode !== "forgot" && (
                       <div className="space-y-2">
                         <Label htmlFor="password" className="text-foreground">Password</Label>
-                        <Input
-                          id="password"
-                          type="password"
-                          placeholder="••••••••"
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          disabled={isSubmitting}
-                          className="bg-popover border-border rounded-xl"
-                        />
-                      </div>
-                    )}
-
-                    {authMode === "login" && (
-                      <div className="flex justify-end">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setAuthMode("forgot");
-                            setError("");
-                          }}
-                          className="text-sm text-accent hover:underline"
-                        >
-                          Forgot password?
-                        </button>
+                        <div className="flex items-stretch">
+                          <Input
+                            id="password"
+                            type={showPassword ? "text" : "password"}
+                            placeholder="••••••••"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                            className="pl-10 pr-10"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                          >
+                            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                          </button>
+                        </div>
+                        {authMode === "signin" && (
+                          <div className="text-right">
+                            <Link href="/forgot-password" className="text-sm text-accent hover:text-accent/80 font-medium">
+                              Forgot password?
+                            </Link>
+                          </div>
+                        )}
                       </div>
                     )}
 
