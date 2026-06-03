@@ -15,8 +15,8 @@ export default async function handler(
     return res.status(400).json({ error: "Invalid ticker parameter" });
   }
 
-  // Now TypeScript knows ticker is string | undefined
-  const tickerStr = ticker ? ticker.toUpperCase() : null;
+  // Type-safe conversion to uppercase
+  const tickerStr = (ticker && typeof ticker === "string") ? ticker.toUpperCase() : null;
 
   if (tickerStr && !/^[A-Z0-9]{1,10}$/.test(tickerStr)) {
     return res.status(400).json({ error: "Invalid ticker symbol format" });
