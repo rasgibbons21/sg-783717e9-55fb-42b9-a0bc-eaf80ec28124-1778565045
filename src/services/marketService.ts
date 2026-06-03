@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// Removed direct frontend API key dependency
+// All API calls now go through internal proxy routes - no direct external API access
 
 interface ChartDataPoint {
   date: string;
@@ -64,14 +64,12 @@ export const marketService = {
     }
 
     try {
-      const apiKey = process.env.NEXT_PUBLIC_FINNHUB_API_KEY;
-      if (!apiKey) throw new Error("Finnhub API key missing");
-
-      const url = `https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${apiKey}`;
+      // Call internal proxy route instead of Finnhub directly
+      const url = `/api/proxy/finnhub-quote?ticker=${ticker}`;
       const response = await this.apiFetch(url);
       const data = await response.json();
 
-      console.log(`[API Response] Finnhub quote for ${ticker}:`, data);
+      console.log(`[API Response] Proxy quote for ${ticker}:`, data);
 
       if (data && typeof data.c === "number" && data.c !== 0) {
         const result = {
@@ -139,7 +137,7 @@ export const marketService = {
           });
         }
         
-        // 300ms delay between calls to avoid Finnhub free tier rate limits
+        // 300ms delay between calls to avoid rate limits
         await new Promise((resolve) => setTimeout(resolve, 300));
       } catch (error) {
         console.error(`Error fetching index ${index.symbol}:`, error);
@@ -205,7 +203,7 @@ export const marketService = {
 
   async getMarketSummary() {
     try {
-      // Reuse getMarketIndices to safely fetch sequentially and avoid Finnhub rate limits
+      // Reuse getMarketIndices to safely fetch sequentially and avoid rate limits
       const indices = await this.getMarketIndices();
       
       const vix = indices.find(i => i.symbol === "VIXY");
@@ -227,10 +225,8 @@ export const marketService = {
 
   async getGeneralNews() {
     try {
-      const apiKey = process.env.NEXT_PUBLIC_FINNHUB_API_KEY;
-      if (!apiKey) return [];
-
-      const url = `https://finnhub.io/api/v1/news?category=general&token=${apiKey}`;
+      // Call internal proxy route instead of Finnhub directly
+      const url = `/api/proxy/finnhub-news`;
       const response = await fetch(url);
       const data = await response.json();
 

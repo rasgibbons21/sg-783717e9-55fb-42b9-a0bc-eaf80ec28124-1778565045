@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-const POLYGON_API_KEY = process.env.NEXT_PUBLIC_POLYGON_API_KEY || "";
-const FINNHUB_API_KEY = process.env.NEXT_PUBLIC_FINNHUB_API_KEY || "";
-const FMP_API_KEY = process.env.NEXT_PUBLIC_FMP_API_KEY || "";
+// All API calls now go through internal proxy routes - no direct external API access
 
 interface PriceData {
   currentPrice: number;
@@ -45,12 +43,10 @@ export interface PansyAnalysis {
 }
 
 export const pansyAnalysisService = {
-  // Get real-time price data from Polygon.io
+  // Get real-time price data via proxy route
   async getPriceData(ticker: string): Promise<PriceData | null> {
     try {
-      const response = await fetch(
-        `https://api.polygon.io/v2/aggs/ticker/${ticker}/prev?adjusted=true&apiKey=${POLYGON_API_KEY}`
-      );
+      const response = await fetch(`/api/proxy/polygon-aggs?ticker=${ticker}&type=prev`);
       const data = await response.json();
 
       if (data.results && data.results[0]) {
@@ -69,12 +65,12 @@ export const pansyAnalysisService = {
       }
       return null;
     } catch (error) {
-      console.error("Error fetching price data from Polygon:", error);
+      console.error("Error fetching price data:", error);
       return null;
     }
   },
 
-  // Get latest news and analyze sentiment
+  // Get latest news and analyze sentiment via proxy route
   async getNewsWithSentiment(ticker: string): Promise<NewsItem[]> {
     try {
       const today = new Date();
@@ -82,9 +78,7 @@ export const pansyAnalysisService = {
       const from = weekAgo.toISOString().split("T")[0];
       const to = today.toISOString().split("T")[0];
 
-      const response = await fetch(
-        `https://finnhub.io/api/v1/company-news?symbol=${ticker}&from=${from}&to=${to}&token=${FINNHUB_API_KEY}`
-      );
+      const response = await fetch(`/api/proxy/finnhub-news?ticker=${ticker}&from=${from}&to=${to}`);
       const data = await response.json();
 
       if (!Array.isArray(data)) return [];
@@ -124,12 +118,12 @@ export const pansyAnalysisService = {
     return "neutral";
   },
 
-  // Get fundamental data from FMP
+  // Get fundamental data via proxy route
   async getFundamentals(ticker: string): Promise<FundamentalData | null> {
     try {
       const [ratiosResponse, metricsResponse] = await Promise.all([
-        fetch(`https://financialmodelingprep.com/api/v3/ratios/${ticker}?apikey=${FMP_API_KEY}`),
-        fetch(`https://financialmodelingprep.com/api/v3/key-metrics/${ticker}?apikey=${FMP_API_KEY}`)
+        fetch(`/api/proxy/fmp-ratios?ticker=${ticker}&endpoint=ratios`),
+        fetch(`/api/proxy/fmp-ratios?ticker=${ticker}&endpoint=key-metrics`)
       ]);
 
       const ratios = await ratiosResponse.json();
@@ -154,7 +148,7 @@ export const pansyAnalysisService = {
     }
   },
 
-  // Detect chart pattern from price data
+  // Detect chart pattern from price data via proxy route
   async detectChartPattern(ticker: string): Promise<ChartPattern> {
     try {
       // Get last 30 days of data
@@ -162,7 +156,7 @@ export const pansyAnalysisService = {
       const startDate = new Date(endDate.getTime() - 30 * 24 * 60 * 60 * 1000);
       
       const response = await fetch(
-        `https://api.polygon.io/v2/aggs/ticker/${ticker}/range/1/day/${startDate.toISOString().split('T')[0]}/${endDate.toISOString().split('T')[0]}?adjusted=true&sort=asc&apiKey=${POLYGON_API_KEY}`
+        `/api/proxy/polygon-aggs?ticker=${ticker}&type=range&from=${startDate.toISOString().split('T')[0]}&to=${endDate.toISOString().split('T')[0]}`
       );
       const data = await response.json();
 
@@ -272,12 +266,10 @@ End with: "This is just educational info — not financial advice. Always invest
     }
   },
 
-  // Get ETF sector exposure
+  // Get ETF sector exposure via proxy route
   async getETFSectorExposure(ticker: string): Promise<ETFSectorData[]> {
     try {
-      const response = await fetch(
-        `https://financialmodelingprep.com/api/v3/etf-sector-weightings/${ticker}?apikey=${FMP_API_KEY}`
-      );
+      const response = await fetch(`/api/proxy/fmp-ratios?ticker=${ticker}&endpoint=etf-sector-weightings`);
       const data = await response.json();
 
       if (!Array.isArray(data) || data.length === 0) return [];
