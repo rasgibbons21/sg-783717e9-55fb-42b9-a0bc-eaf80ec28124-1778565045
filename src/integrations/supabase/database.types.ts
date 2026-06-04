@@ -1,4 +1,4 @@
- 
+/* eslint-disable @typescript-eslint/no-empty-object-type */
 export type Json =
   | string
   | number
@@ -230,25 +230,40 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string | null
+          current_period_end: string | null
           email: string | null
           full_name: string | null
           id: string
+          is_pro: boolean | null
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          subscription_status: string | null
           updated_at: string | null
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string | null
+          current_period_end?: string | null
           email?: string | null
           full_name?: string | null
           id: string
+          is_pro?: boolean | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_status?: string | null
           updated_at?: string | null
         }
         Update: {
           avatar_url?: string | null
           created_at?: string | null
+          current_period_end?: string | null
           email?: string | null
           full_name?: string | null
           id?: string
+          is_pro?: boolean | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_status?: string | null
           updated_at?: string | null
         }
         Relationships: []
