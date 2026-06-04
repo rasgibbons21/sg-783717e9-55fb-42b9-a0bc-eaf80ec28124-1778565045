@@ -128,12 +128,19 @@ export default function StockDetail() {
   };
 
   const loadPansyAnalysis = async (symbol: string, quote: StockData) => {
-    // Check if user is logged in before allowing analysis
+    // Check if user is logged in first
     if (!isLoggedIn) {
       setShowLockedFeatureModal(true);
       return;
     }
 
+    // Check if user is Pro - only Pro users can access full analysis
+    if (userPlan !== "pro") {
+      setShowUpgradeModal(true);
+      return;
+    }
+
+    // Pro users proceed with analysis
     setIsAnalyzing(true);
     try {
       const response = await fetch("/api/analyze", {
