@@ -53,6 +53,7 @@ export default function Portfolio() {
   const [selectedTicker, setSelectedTicker] = useState("");
   const [alertThreshold, setAlertThreshold] = useState("5");
   const [showLockedFeatureModal, setShowLockedFeatureModal] = useState(false);
+  const [userPlan, setUserPlan] = useState<"free" | "pro">("free");
   
   // Goals & Projections state
   const [activeTab, setActiveTab] = useState<"watchlist" | "goals">("watchlist");
