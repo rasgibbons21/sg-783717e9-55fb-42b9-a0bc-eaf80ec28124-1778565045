@@ -128,19 +128,35 @@ export default function StockDetail() {
   };
 
   const loadPansyAnalysis = async (symbol: string, quote: StockData) => {
-    // Check if user is logged in first
-    if (!isLoggedIn) {
+    // Fetch fresh session and profile data to avoid race condition with state
+    const session = await authService.getCurrentSession();
+    
+    // Check if user is logged in
+    if (!session) {
       setShowLockedFeatureModal(true);
       return;
     }
 
+    // Fetch user's profile to check Pro status
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("is_pro, subscription_status")
+      .eq("id", session.user.id)
+      .single();
+
+    // Compute Pro status from fresh data
+    const isPro = profile?.is_pro || profile?.subscription_status === "active";
+
     // Check if user is Pro - only Pro users can access full analysis
-    if (userPlan !== "pro") {
+    if (!isPro) {
       setShowUpgradeModal(true);
       return;
     }
 
-    // Pro users proceed with analysis
+    // Pro users: close any modals and proceed with analysis
+    setShowLockedFeatureModal(false);
+    setShowUpgradeModal(false);
+
     setIsAnalyzing(true);
     try {
       const response = await fetch("/api/analyze", {
