@@ -2,6 +2,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { supabase } from "@/integrations/supabase/client";
+import { authService } from "@/services/authService";
 import { Layout } from "@/components/Layout";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -59,11 +61,20 @@ export default function StockDetail() {
   
   useEffect(() => {
     const checkUserPlan = async () => {
-      const user = await userService.getCurrentUser();
-      if (user) {
-        // Check is_pro column from profiles table
-        setUserPlan(user.is_pro ? "pro" : "free");
-        setIsLoggedIn(true);
+      const session = await authService.getCurrentSession();
+      if (session) {
+        // Force fresh profile fetch - no cache
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", session.user.id)
+          .single();
+        
+        if (profile) {
+          // Check is_pro column or active subscription status
+          setUserPlan(profile.is_pro || profile.subscription_status === "active" ? "pro" : "free");
+          setIsLoggedIn(true);
+        }
       } else {
         setIsLoggedIn(false);
       }

@@ -17,10 +17,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LockedFeatureModal } from "@/components/LockedFeatureModal";
 import { authService } from "@/services/authService";
 import { userService } from "@/services/userService";
+import { supabase } from "@/integrations/supabase/client";
 import { marketService } from "@/services/marketService";
 import { pansyAnalysisService } from "@/services/pansyAnalysisService";
 import { notificationService } from "@/services/notificationService";
-import { supabase } from "@/integrations/supabase/client";
 import { TrendingUp, TrendingDown, Plus, Trash2, Loader2, Bell, BellOff, Target, DollarSign, Calendar, Sparkles } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from "recharts";
 
@@ -78,11 +78,18 @@ export default function Portfolio() {
       router.push("/");
       return;
     }
-    const profile = await userService.getCurrentUser();
+    
+    // Force fresh profile fetch - no cache
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", session.user.id)
+      .single();
+    
     setUser(profile);
     
-    // Check if user is Pro based on is_pro column in profiles
-    if (profile?.is_pro) {
+    // Check if user is Pro based on is_pro column or active subscription
+    if (profile?.is_pro || profile?.subscription_status === "active") {
       setUserPlan("pro");
     } else {
       setUserPlan("free");
