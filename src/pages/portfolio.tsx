@@ -80,6 +80,13 @@ export default function Portfolio() {
     const profile = await userService.getCurrentUser();
     setUser(profile);
     
+    // Check if user is Pro based on is_pro column in profiles
+    if (profile?.is_pro) {
+      setUserPlan("pro");
+    } else {
+      setUserPlan("free");
+    }
+    
     // Load user's profile data for goals - use defaults since these fields don't exist in profiles
     if (profile) {
       setGoalsProfile(prev => ({

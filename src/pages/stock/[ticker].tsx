@@ -61,8 +61,8 @@ export default function StockDetail() {
     const checkUserPlan = async () => {
       const user = await userService.getCurrentUser();
       if (user) {
-        // Default to free plan since plan_type doesn't exist in profiles
-        setUserPlan("free");
+        // Check is_pro column from profiles table
+        setUserPlan(user.is_pro ? "pro" : "free");
         setIsLoggedIn(true);
       } else {
         setIsLoggedIn(false);
