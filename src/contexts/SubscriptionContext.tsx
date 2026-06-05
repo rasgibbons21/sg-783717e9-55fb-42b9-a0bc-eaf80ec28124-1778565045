@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { useRouter } from "next/router";
 import { authService } from "@/services/authService";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -6,12 +7,13 @@ interface SubscriptionContextType {
   isPro: boolean;
   isLoggedIn: boolean;
   isLoading: boolean;
-  refreshSubscription: () => Promise<void>;
+  refresh: () => Promise<void>;
 }
 
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
 
 export function SubscriptionProvider({ children }: { children: ReactNode }) {
+  const router = useRouter();
   const [isPro, setIsPro] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -29,14 +31,14 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
 
       setIsLoggedIn(true);
 
-      // Fetch fresh profile from Supabase
+      // Fetch fresh profile from Supabase - no cache
       const { data: profile } = await supabase
         .from("profiles")
         .select("is_pro, subscription_status")
         .eq("id", session.user.id)
         .single();
 
-      // Check Pro status
+      // Compute Pro status: is_pro OR subscription_status = 'active'
       const userIsPro = profile?.is_pro === true || profile?.subscription_status === "active";
       setIsPro(userIsPro);
     } catch (error) {
@@ -48,40 +50,42 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const refreshSubscription = async () => {
+  const refresh = async () => {
     setIsLoading(true);
     await loadSubscriptionStatus();
   };
 
   useEffect(() => {
+    // Load on mount
     loadSubscriptionStatus();
 
-    // Listen for auth state changes
+    // Re-fetch on auth state changes
     const { data: authListener } = supabase.auth.onAuthStateChange(() => {
       loadSubscriptionStatus();
     });
 
+    // Re-fetch on window focus
+    const handleFocus = () => {
+      loadSubscriptionStatus();
+    };
+    window.addEventListener("focus", handleFocus);
+
+    // Re-fetch on route change
+    const handleRouteChange = () => {
+      loadSubscriptionStatus();
+    };
+    router.events?.on("routeChangeComplete", handleRouteChange);
+
     return () => {
       authListener?.subscription?.unsubscribe();
+      window.removeEventListener("focus", handleFocus);
+      router.events?.off("routeChangeComplete", handleRouteChange);
     };
-  }, []);
+  }, [router.events]);
 
-  // Show loading state until data is ready
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-background">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-3xl animate-pulse">
-            🌸
-          </div>
-          <p className="text-foreground font-medium">Loading Bloom...</p>
-        </div>
-      </div>
-    );
-  }
-
+  // Always render children - components handle their own loading states
   return (
-    <SubscriptionContext.Provider value={{ isPro, isLoggedIn, isLoading, refreshSubscription }}>
+    <SubscriptionContext.Provider value={{ isPro, isLoggedIn, isLoading, refresh }}>
       {children}
     </SubscriptionContext.Provider>
   );
