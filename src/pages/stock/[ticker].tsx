@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { supabase } from "@/integrations/supabase/client";
 import { authService } from "@/services/authService";
+import { userService } from "@/services/userService";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 import { Layout } from "@/components/Layout";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,7 +17,6 @@ import { TextWithPansyTooltips } from "@/components/TextWithPansyTooltips";
 import { UpgradeModal, UpgradeBanner, useViewTracker } from "@/components/UpgradeModal";
 import { LockedFeatureModal } from "@/components/LockedFeatureModal";
 import { marketService } from "@/services/marketService";
-import { userService } from "@/services/userService";
 import { TrendingUp, TrendingDown, AlertTriangle, ExternalLink, BarChart3, Activity, Target, Sparkles } from "lucide-react";
 import Link from "next/link";
 
@@ -46,51 +47,24 @@ interface PansyAnalysis {
   timestamp: string;
 }
 
-export default function StockDetail() {
+export default function StockPage() {
   const router = useRouter();
   const { ticker } = router.query;
+  const { isPro, isLoggedIn } = useSubscription();
+  
   const [stockData, setStockData] = useState<StockData | null>(null);
   const [pansyAnalysis, setPansyAnalysis] = useState<PansyAnalysis | null>(null);
   const [news, setNews] = useState<NewsItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [userPlan, setUserPlan] = useState<string>("free");
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [showLockedFeatureModal, setShowLockedFeatureModal] = useState(false);
   const { viewCount, trackView, showUpgradeModal, setShowUpgradeModal } = useViewTracker();
   
   useEffect(() => {
-    const checkUserPlan = async () => {
-      const session = await authService.getCurrentSession();
-      if (session) {
-        // Force fresh profile fetch - no cache
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", session.user.id)
-          .single();
-        
-        if (profile) {
-          // Check is_pro column or active subscription status
-          setUserPlan(profile.is_pro || profile.subscription_status === "active" ? "pro" : "free");
-          setIsLoggedIn(true);
-        }
-      } else {
-        setIsLoggedIn(false);
-      }
-    };
-    checkUserPlan();
-  }, []);
-
-  useEffect(() => {
     if (ticker && typeof ticker === "string") {
       loadStockData(ticker.toUpperCase());
-      // Track view for free users
-      if (userPlan === "free") {
-        trackView();
-      }
     }
-  }, [ticker, userPlan]);
+  }, [ticker]);
 
   const loadStockData = async (symbol: string) => {
     setIsLoading(true);
@@ -145,10 +119,10 @@ export default function StockDetail() {
       .single();
 
     // Compute Pro status from fresh data
-    const isPro = profile?.is_pro || profile?.subscription_status === "active";
+    const userIsPro = profile?.is_pro || profile?.subscription_status === "active";
 
     // Check if user is Pro - only Pro users can access full analysis
-    if (!isPro) {
+    if (!userIsPro) {
       setShowUpgradeModal(true);
       return;
     }
@@ -420,7 +394,7 @@ export default function StockDetail() {
         ) : null}
 
         {/* Upgrade Banner for Free Users After Analysis */}
-        {pansyAnalysis && userPlan === "free" && isLoggedIn && (
+        {pansyAnalysis && !isPro && isLoggedIn && (
           <UpgradeBanner message="Loved Pansy's take? Get unlimited analysis with Bloom Pro — $7.99/month" />
         )}
 

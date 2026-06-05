@@ -2,11 +2,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @next/next/no-img-element */
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,6 +41,7 @@ interface GoalsProfile {
 
 export default function Portfolio() {
   const router = useRouter();
+  const { isPro } = useSubscription();
   const [user, setUser] = useState<any>(null);
   const [userData, setUserData] = useState<any>(null);
   const [riskTolerance, setRiskTolerance] = useState<string>("moderate");
@@ -53,7 +55,6 @@ export default function Portfolio() {
   const [selectedTicker, setSelectedTicker] = useState("");
   const [alertThreshold, setAlertThreshold] = useState("5");
   const [showLockedFeatureModal, setShowLockedFeatureModal] = useState(false);
-  const [userPlan, setUserPlan] = useState<"free" | "pro">("free");
   
   // Goals & Projections state
   const [activeTab, setActiveTab] = useState<"watchlist" | "goals">("watchlist");
@@ -87,13 +88,6 @@ export default function Portfolio() {
       .single();
     
     setUser(profile);
-    
-    // Check if user is Pro based on is_pro column or active subscription
-    if (profile?.is_pro || profile?.subscription_status === "active") {
-      setUserPlan("pro");
-    } else {
-      setUserPlan("free");
-    }
     
     // Load user's profile data for goals - use defaults since these fields don't exist in profiles
     if (profile) {
