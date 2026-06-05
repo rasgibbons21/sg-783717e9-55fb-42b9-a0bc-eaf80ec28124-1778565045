@@ -138,11 +138,17 @@ export function UpgradeBanner({ message, className = "" }: { message: string; cl
   );
 }
 
-export function useViewTracker() {
+export function useViewTracker(isPro: boolean = false) {
   const [viewCount, setViewCount] = useState(0);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   useEffect(() => {
+    // Pro users never count views
+    if (isPro) {
+      setViewCount(0);
+      return;
+    }
+
     const count = parseInt(localStorage.getItem("bloom-daily-views") || "0");
     const lastReset = localStorage.getItem("bloom-views-reset");
     const today = new Date().toDateString();
@@ -154,9 +160,14 @@ export function useViewTracker() {
     } else {
       setViewCount(count);
     }
-  }, []);
+  }, [isPro]);
 
   const trackView = () => {
+    // Pro users: skip counting entirely
+    if (isPro) {
+      return;
+    }
+
     const newCount = viewCount + 1;
     setViewCount(newCount);
     localStorage.setItem("bloom-daily-views", newCount.toString());
