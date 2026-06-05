@@ -48,6 +48,7 @@ const TIME_HORIZON_OPTIONS = [
 export default function Profile() {
   const router = useRouter();
   const { toast } = useToast();
+  const { isPro, isLoading: subscriptionLoading } = useSubscription();
   const [user, setUser] = useState<any>(null);
   const [authCreatedAt, setAuthCreatedAt] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -220,8 +221,6 @@ export default function Profile() {
       </Layout>
     );
   }
-
-  const isPro = user?.plan_type === "pro";
 
   return (
     <Layout>
@@ -462,7 +461,19 @@ export default function Profile() {
             <CardTitle className="text-xl text-foreground">Subscription</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {isPro ? (
+            {subscriptionLoading ? (
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <Skeleton className="w-12 h-12 rounded-full" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-5 w-32" />
+                    <Skeleton className="h-4 w-48" />
+                  </div>
+                </div>
+                <Skeleton className="h-24 w-full rounded-lg" />
+                <Skeleton className="h-10 w-full rounded-lg" />
+              </div>
+            ) : isPro ? (
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center">
