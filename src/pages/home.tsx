@@ -1,10 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -83,6 +84,7 @@ const DEFAULT_STOCK_PICKS: StockPick[] = [
 
 export default function Home() {
   const router = useRouter();
+  const { isPro, isLoggedIn } = useSubscription();
   const [user, setUser] = useState<any>(null);
   const [marketData, setMarketData] = useState<MarketIndex[]>(DEFAULT_MARKET_DATA);
   const [stockPicks, setStockPicks] = useState<StockPick[]>(DEFAULT_STOCK_PICKS);
@@ -226,16 +228,14 @@ export default function Home() {
       <div className="w-full mx-auto space-y-8 pb-24 px-[5%] pt-6">
         
         {/* Greeting */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+        <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
-            <h1 className="text-3xl md:text-4xl font-serif font-bold text-foreground mb-2">
-              Welcome back, {user?.full_name?.split(" ")[0] || "Investor"} 🌸
+            <h1 className="font-serif text-3xl md:text-4xl font-bold text-foreground">
+              {isPro ? "Welcome to Bloom Pro" : `Welcome back, ${user?.full_name?.split(" ")[0] || "Investor"}`} 🌸
             </h1>
-            {user?.plan_type === "pro" && (
-              <Badge className="bg-accent text-accent-foreground">
-                Bloom Pro ✨
-              </Badge>
-            )}
+            <p className="text-muted-foreground mt-1">
+              {isPro ? "Your premium investing companion" : "Your daily market insights"}
+            </p>
           </div>
         </div>
 

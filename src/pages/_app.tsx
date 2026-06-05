@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { useEffect, useState } from "react";
 import { InstallPrompt } from "@/components/InstallPrompt";
 import SplashScreen from "@/components/SplashScreen";
+import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 
 export default function App({ Component, pageProps }: AppProps) {
   const [showSplash, setShowSplash] = useState(true);
@@ -50,7 +51,9 @@ gtag('config', 'G-9ZG1992263');`
                   }}
               />
 {/* End Google Analytics 4 */}
-<Component {...pageProps} />
+      <SubscriptionProvider>
+        <Component {...pageProps} />
+      </SubscriptionProvider>
       <Toaster />
       <InstallPrompt />
     </ThemeProvider>

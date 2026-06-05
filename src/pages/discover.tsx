@@ -2,8 +2,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
  
 import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import Link from "next/link";
 import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,7 +15,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { marketService } from "@/services/marketService";
 import { Search, TrendingUp, TrendingDown } from "lucide-react";
-import Link from "next/link";
 import { userService } from "@/services/userService";
 import { UpgradeBanner } from "@/components/UpgradeModal";
 
@@ -109,6 +111,8 @@ const PANSYS_DEFAULT_PICKS: Asset[] = [
 ];
 
 export default function Discover() {
+  const router = useRouter();
+  const { isPro } = useSubscription();
   const [activeTab, setActiveTab] = useState("stocks");
   const [activeFilter, setActiveFilter] = useState("top-performers");
   const [searchQuery, setSearchQuery] = useState("");
@@ -438,12 +442,25 @@ export default function Discover() {
           </div>
         </div>
 
-        {/* Upgrade Banner for Free Users */}
-        {userPlan === "free" && (
-          <UpgradeBanner 
-            message="Want Pansy's full breakdown on every stock? Upgrade to Pro 🌸"
-            className="mb-4"
-          />
+        {/* Upgrade Banner - Hidden for Pro users */}
+        {!isPro && (
+          <Card className="p-5 bg-gradient-to-br from-accent/20 to-primary/10 border-accent rounded-2xl">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-2xl shrink-0">
+                🌺
+              </div>
+              <div className="flex-1">
+                <p className="text-sm text-foreground font-medium">
+                  Want Pansy's full breakdown on every stock? Upgrade to Pro 🌸
+                </p>
+              </div>
+              <Link href="/subscription">
+                <Button className="bg-accent hover:bg-accent/90 text-white shrink-0">
+                  Upgrade
+                </Button>
+              </Link>
+            </div>
+          </Card>
         )}
 
         {/* Tabs */}

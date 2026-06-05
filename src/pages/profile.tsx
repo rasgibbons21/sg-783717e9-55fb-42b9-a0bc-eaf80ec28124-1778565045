@@ -22,6 +22,7 @@ import { notificationService } from "@/services/notificationService";
 import { supabase } from "@/integrations/supabase/client";
 import { User, Mail, Calendar, Crown, Settings, LogOut, Camera, Share, CreditCard, Bell, Shield, CheckCircle2, BellRing, BellOff, Target, TrendingUp, Clock, DollarSign, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 
 const RISK_TOLERANCE_OPTIONS = [
   { value: "Conservative", label: "Conservative", description: "Prioritize stability and capital preservation" },
@@ -455,50 +456,68 @@ export default function Profile() {
           </div>
         </Card>
 
-        {/* Subscription Status */}
-        <Card className="p-6 bg-card border-border rounded-2xl">
-          <div className="flex items-start gap-4">
-            <CreditCard className="w-6 h-6 text-foreground mt-1" />
-            <div className="flex-1 space-y-2">
-              <h3 className="font-semibold text-foreground text-lg">
-                Subscription
-              </h3>
-              <div className="flex items-center gap-2">
-                <Badge
-                  variant="outline"
-                  className={
-                    isPro
-                      ? "bg-accent/10 text-accent border-accent"
-                      : "bg-muted text-muted-foreground"
-                  }
-                >
-                  {isPro ? "Bloom Pro" : "Free Plan"}
-                </Badge>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                {isPro
-                  ? "Unlimited daily picks, full analysis, and exclusive features"
-                  : "3 picks per week, basic market summary"}
-              </p>
-              {!isPro && (
-                <Button
+        {/* Subscription Section */}
+        <Card className="border-border">
+          <CardHeader>
+            <CardTitle className="text-xl text-foreground">Subscription</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {isPro ? (
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center">
+                    <span className="text-2xl">✨</span>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-foreground text-lg">Bloom Pro Member</p>
+                    <p className="text-sm text-muted-foreground">Unlimited access to all features</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4 p-4 bg-gradient-to-br from-accent/10 to-primary/10 rounded-lg border border-accent/20">
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Daily Picks</p>
+                    <p className="text-sm font-semibold text-foreground">Unlimited</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Full Analysis</p>
+                    <p className="text-sm font-semibold text-foreground">✓ Included</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">ETF Picks</p>
+                    <p className="text-sm font-semibold text-foreground">✓ Included</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">News & Charts</p>
+                    <p className="text-sm font-semibold text-foreground">Real-time</p>
+                  </div>
+                </div>
+                <Button 
+                  variant="outline" 
+                  className="w-full border-accent text-accent hover:bg-accent/10"
                   onClick={() => router.push("/subscription")}
-                  className="mt-4 bg-primary hover:bg-primary/90"
-                >
-                  Upgrade to Pro
-                </Button>
-              )}
-              {isPro && (
-                <Button
-                  variant="outline"
-                  onClick={() => router.push("/subscription")}
-                  className="mt-4 border-border text-foreground"
                 >
                   Manage Subscription
                 </Button>
-              )}
-            </div>
-          </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
+                    <span className="text-2xl">🌸</span>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-foreground text-lg">Free Plan</p>
+                    <p className="text-sm text-muted-foreground">3 picks per week, basic features</p>
+                  </div>
+                </div>
+                <Link href="/subscription">
+                  <Button className="w-full bg-gradient-to-r from-accent to-primary hover:from-accent/90 hover:to-primary/90">
+                    Upgrade to Pro
+                  </Button>
+                </Link>
+              </div>
+            )}
+          </CardContent>
         </Card>
 
         {/* Share Bloom */}
