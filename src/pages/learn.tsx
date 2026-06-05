@@ -16,7 +16,7 @@ import { RiskRewardCalculator } from "@/components/RiskRewardCalculator";
 import { PositionSizeCalculator } from "@/components/PositionSizeCalculator";
 import { authService } from "@/services/authService";
 import { supabase } from "@/integrations/supabase/client";
-import { Search, ArrowLeft, Clock, CheckCircle2, Circle, ChevronRight, Bookmark, BookmarkCheck, Award } from "lucide-react";
+import { Search, ArrowLeft, Clock, CheckCircle2, Circle, ChevronRight, Bookmark, BookmarkCheck, Award, Lock, DollarSign, Home as HomeIcon, Briefcase, TrendingUp, Shield } from "lucide-react";
 
 type Category = "All" | "Stocks" | "ETFs" | "Mutual Funds" | "Dividends" | "Bonds" | "Retirement" | "Trading Psychology" | "Income Streams";
 
@@ -2344,6 +2344,7 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
     const relatedLessons = lessons.filter((l) =>
       lesson.relatedTopics.includes(l.id)
     );
+    const isLocked = lesson.isPro && !isPro;
 
     return (
       <Layout>
@@ -2385,6 +2386,11 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
                     >
                       {lesson.difficulty}
                     </Badge>
+                    {lesson.isPro && (
+                      <Badge className="bg-accent/20 text-accent border-accent/30">
+                        PRO
+                      </Badge>
+                    )}
                     <div className="flex items-center gap-1 text-sm text-muted-foreground">
                       <Clock className="w-4 h-4" />
                       {lesson.readTime} min read
@@ -2394,22 +2400,24 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
                     {lesson.title}
                   </h1>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => toggleBookmark(lesson.id)}
-                  className={
-                    isBookmarked
-                      ? "text-accent hover:text-accent/80"
-                      : "text-muted-foreground hover:text-accent"
-                  }
-                >
-                  {isBookmarked ? (
-                    <BookmarkCheck className="w-5 h-5" />
-                  ) : (
-                    <Bookmark className="w-5 h-5" />
-                  )}
-                </Button>
+                {!isLocked && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => toggleBookmark(lesson.id)}
+                    className={
+                      isBookmarked
+                        ? "text-accent hover:text-accent/80"
+                        : "text-muted-foreground hover:text-accent"
+                    }
+                  >
+                    {isBookmarked ? (
+                      <BookmarkCheck className="w-5 h-5" />
+                    ) : (
+                      <Bookmark className="w-5 h-5" />
+                    )}
+                  </Button>
+                )}
               </div>
 
               <div className="flex items-center gap-3">
@@ -2427,189 +2435,213 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
               </div>
             </Card>
 
-            <Card className="p-6 bg-card border-border rounded-2xl">
-              <div className="prose prose-invert max-w-none">
-                <p className="text-foreground leading-relaxed whitespace-pre-line">
-                  {lesson.content}
-                </p>
-              </div>
-
-              <div className="mt-8 p-4 bg-primary/10 border-l-4 border-primary rounded-r-lg">
-                <p className="text-sm font-semibold text-primary mb-2">
-                  Key Takeaway
-                </p>
-                <p className="text-sm text-foreground leading-relaxed">
-                  {lesson.keyTakeaway}
-                </p>
-              </div>
-
-              <p className="mt-6 text-xs text-muted-foreground text-center">
-                This is educational content only and does not constitute
-                financial advice. Always invest what feels right for you 💛
-              </p>
-            </Card>
-
-            <Card className="p-6 bg-card border-accent/30 rounded-2xl space-y-6">
-              <div className="flex items-center gap-3">
-                <Award className="w-6 h-6 text-accent" />
+            {isLocked ? (
+              <Card className="p-8 bg-gradient-to-br from-accent/10 to-primary/10 border-accent/30 rounded-2xl text-center space-y-4">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center mx-auto">
+                  <Lock className="w-8 h-8 text-white" />
+                </div>
                 <div>
-                  <h2 className="text-xl font-semibold text-foreground">
-                    Test Your Knowledge
-                  </h2>
-                  <p className="text-sm text-muted-foreground">
-                    See how much you learned from this lesson!
+                  <h3 className="text-xl font-bold text-foreground mb-2">
+                    This is a Pro Lesson
+                  </h3>
+                  <p className="text-muted-foreground">
+                    {lesson.summary}
                   </p>
                 </div>
-              </div>
-
-              <div className="space-y-6">
-                {lesson.quiz.map((question, qIndex) => (
-                  <div key={qIndex} className="space-y-3">
-                    <p className="font-medium text-foreground">
-                      {qIndex + 1}. {question.question}
+                <Button
+                  onClick={() => router.push("/subscription")}
+                  className="bg-gradient-to-r from-accent to-primary hover:from-accent/90 hover:to-primary/90 text-white"
+                >
+                  Unlock with Bloom Pro
+                </Button>
+              </Card>
+            ) : (
+              <>
+                <Card className="p-6 bg-card border-border rounded-2xl">
+                  <div className="prose prose-invert max-w-none">
+                    <p className="text-foreground leading-relaxed whitespace-pre-line">
+                      {lesson.content}
                     </p>
-                    <div className="space-y-2">
-                      {question.options.map((option, oIndex) => {
-                        const isSelected = quizAnswers[qIndex] === oIndex;
-                        const isCorrect = oIndex === question.correctAnswer;
-                        const showFeedback = quizSubmitted;
+                  </div>
 
-                        return (
-                          <button
-                            key={oIndex}
-                            onClick={() => {
-                              if (!quizSubmitted) {
-                                const newAnswers = [...quizAnswers];
-                                newAnswers[qIndex] = oIndex;
-                                setQuizAnswers(newAnswers);
-                              }
-                            }}
-                            disabled={quizSubmitted}
-                            className={`w-full text-left p-3 rounded-lg border transition-all ${
-                              showFeedback && isCorrect
-                                ? "border-primary bg-primary/10 text-foreground"
-                                : showFeedback && isSelected && !isCorrect
-                                ? "border-destructive bg-destructive/10 text-foreground"
-                                : isSelected
-                                ? "border-accent bg-accent/10 text-foreground"
-                                : "border-border bg-muted/30 text-muted-foreground hover:border-accent hover:bg-accent/5"
-                            } ${quizSubmitted ? "cursor-default" : "cursor-pointer"}`}
-                          >
-                            <div className="flex items-center gap-2">
-                              <div
-                                className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                                  showFeedback && isCorrect
-                                    ? "border-primary bg-primary"
-                                    : showFeedback && isSelected && !isCorrect
-                                    ? "border-destructive bg-destructive"
-                                    : isSelected
-                                    ? "border-accent bg-accent"
-                                    : "border-muted-foreground"
-                                }`}
-                              >
-                                {showFeedback && isCorrect && (
-                                  <CheckCircle2 className="w-3 h-3 text-white" />
-                                )}
-                                {showFeedback && isSelected && !isCorrect && (
-                                  <span className="text-white text-xs">✗</span>
-                                )}
-                              </div>
-                              <span className="text-sm">{option}</span>
-                            </div>
-                          </button>
-                        );
-                      })}
+                  <div className="mt-8 p-4 bg-primary/10 border-l-4 border-primary rounded-r-lg">
+                    <p className="text-sm font-semibold text-primary mb-2">
+                      Key Takeaway
+                    </p>
+                    <p className="text-sm text-foreground leading-relaxed">
+                      {lesson.keyTakeaway}
+                    </p>
+                  </div>
+
+                  <p className="mt-6 text-xs text-muted-foreground text-center">
+                    This is educational content only and does not constitute
+                    financial advice. Always invest what feels right for you 💛
+                  </p>
+                </Card>
+
+                <Card className="p-6 bg-card border-accent/30 rounded-2xl space-y-6">
+                  <div className="flex items-center gap-3">
+                    <Award className="w-6 h-6 text-accent" />
+                    <div>
+                      <h2 className="text-xl font-semibold text-foreground">
+                        Test Your Knowledge
+                      </h2>
+                      <p className="text-sm text-muted-foreground">
+                        See how much you learned from this lesson!
+                      </p>
                     </div>
-                    {quizSubmitted && (
-                      <div className="p-3 bg-accent/10 border-l-4 border-accent rounded-r-lg">
+                  </div>
+
+                  <div className="space-y-6">
+                    {lesson.quiz.map((question, qIndex) => (
+                      <div key={qIndex} className="space-y-3">
+                        <p className="font-medium text-foreground">
+                          {qIndex + 1}. {question.question}
+                        </p>
+                        <div className="space-y-2">
+                          {question.options.map((option, oIndex) => {
+                            const isSelected = quizAnswers[qIndex] === oIndex;
+                            const isCorrect = oIndex === question.correctAnswer;
+                            const showFeedback = quizSubmitted;
+
+                            return (
+                              <button
+                                key={oIndex}
+                                onClick={() => {
+                                  if (!quizSubmitted) {
+                                    const newAnswers = [...quizAnswers];
+                                    newAnswers[qIndex] = oIndex;
+                                    setQuizAnswers(newAnswers);
+                                  }
+                                }}
+                                disabled={quizSubmitted}
+                                className={`w-full text-left p-3 rounded-lg border transition-all ${
+                                  showFeedback && isCorrect
+                                    ? "border-primary bg-primary/10 text-foreground"
+                                    : showFeedback && isSelected && !isCorrect
+                                    ? "border-destructive bg-destructive/10 text-foreground"
+                                    : isSelected
+                                    ? "border-accent bg-accent/10 text-foreground"
+                                    : "border-border bg-muted/30 text-muted-foreground hover:border-accent hover:bg-accent/5"
+                                } ${quizSubmitted ? "cursor-default" : "cursor-pointer"}`}
+                              >
+                                <div className="flex items-center gap-2">
+                                  <div
+                                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                                      showFeedback && isCorrect
+                                        ? "border-primary bg-primary"
+                                        : showFeedback && isSelected && !isCorrect
+                                        ? "border-destructive bg-destructive"
+                                        : isSelected
+                                        ? "border-accent bg-accent"
+                                        : "border-muted-foreground"
+                                    }`}
+                                  >
+                                    {showFeedback && isCorrect && (
+                                      <CheckCircle2 className="w-3 h-3 text-white" />
+                                    )}
+                                    {showFeedback && isSelected && !isCorrect && (
+                                      <span className="text-white text-xs">✗</span>
+                                    )}
+                                  </div>
+                                  <span className="text-sm">{option}</span>
+                                </div>
+                              </button>
+                            );
+                          })}
+                        </div>
+                        {quizSubmitted && (
+                          <div className="p-3 bg-accent/10 border-l-4 border-accent rounded-r-lg">
+                            <p className="text-sm text-foreground">
+                              {question.explanation}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  {!quizSubmitted ? (
+                    <Button
+                      onClick={handleSubmitQuiz}
+                      disabled={quizAnswers.includes(null)}
+                      className="w-full bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Submit Quiz
+                    </Button>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="p-4 bg-primary/10 border border-primary/30 rounded-lg text-center">
+                        <Award className="w-8 h-8 text-primary mx-auto mb-2" />
+                        <p className="text-lg font-semibold text-primary mb-1">
+                          You scored {quizScore} out of 3!
+                        </p>
                         <p className="text-sm text-foreground">
-                          {question.explanation}
+                          {quizScore === 3
+                            ? "Perfect score girl! You absolutely crushed this lesson 🎉"
+                            : quizScore === 2
+                            ? "Nice work! You got most of it down 💪"
+                            : "That's okay! Go back and review the lesson anytime 💛"}
                         </p>
                       </div>
-                    )}
-                  </div>
-                ))}
-              </div>
+                      <Button
+                        onClick={resetQuiz}
+                        variant="outline"
+                        className="w-full border-border"
+                      >
+                        Retake Quiz
+                      </Button>
+                    </div>
+                  )}
+                </Card>
 
-              {!quizSubmitted ? (
-                <Button
-                  onClick={handleSubmitQuiz}
-                  disabled={quizAnswers.includes(null)}
-                  className="w-full bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Submit Quiz
-                </Button>
-              ) : (
-                <div className="space-y-4">
-                  <div className="p-4 bg-primary/10 border border-primary/30 rounded-lg text-center">
-                    <Award className="w-8 h-8 text-primary mx-auto mb-2" />
-                    <p className="text-lg font-semibold text-primary mb-1">
-                      You scored {quizScore} out of 3!
-                    </p>
-                    <p className="text-sm text-foreground">
-                      {quizScore === 3
-                        ? "Perfect score girl! You absolutely crushed this lesson 🎉"
-                        : quizScore === 2
-                        ? "Nice work! You got most of it down 💪"
-                        : "That's okay! Go back and review the lesson anytime 💛"}
-                    </p>
-                  </div>
-                  <Button
-                    onClick={resetQuiz}
-                    variant="outline"
-                    className="w-full border-border"
-                  >
-                    Retake Quiz
-                  </Button>
-                </div>
-              )}
-            </Card>
-
-            {relatedLessons.length > 0 && (
-              <Card className="p-6 bg-card border-border rounded-2xl">
-                <h3 className="text-lg font-semibold text-foreground mb-4">
-                  Related Topics
-                </h3>
-                <div className="space-y-3">
-                  {relatedLessons.map((related) => (
-                    <button
-                      key={related.id}
-                      onClick={() => {
-                        setSelectedLesson(related.id);
-                        setHasScrolledToBottom(false);
-                        resetQuiz();
-                        window.scrollTo(0, 0);
-                      }}
-                      className="w-full flex items-center justify-between p-3 hover:bg-muted/50 rounded-lg transition-colors group"
-                    >
-                      <div className="flex items-center gap-3">
-                        {completedLessons.includes(related.id) ? (
-                          <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0" />
-                        ) : (
-                          <Circle className="w-5 h-5 text-muted-foreground flex-shrink-0" />
-                        )}
-                        <div className="text-left">
-                          <p className="font-medium text-foreground group-hover:text-accent transition-colors">
-                            {related.title}
-                          </p>
-                          <div className="flex items-center gap-2 mt-1">
-                            <Badge
-                              variant="outline"
-                              className="text-xs border-muted-foreground/30 text-muted-foreground"
-                            >
-                              {related.category}
-                            </Badge>
-                            <span className="text-xs text-muted-foreground">
-                              {related.readTime} min
-                            </span>
+                {relatedLessons.length > 0 && (
+                  <Card className="p-6 bg-card border-border rounded-2xl">
+                    <h3 className="text-lg font-semibold text-foreground mb-4">
+                      Related Topics
+                    </h3>
+                    <div className="space-y-3">
+                      {relatedLessons.map((related) => (
+                        <button
+                          key={related.id}
+                          onClick={() => {
+                            setSelectedLesson(related.id);
+                            setHasScrolledToBottom(false);
+                            resetQuiz();
+                            window.scrollTo(0, 0);
+                          }}
+                          className="w-full flex items-center justify-between p-3 hover:bg-muted/50 rounded-lg transition-colors group"
+                        >
+                          <div className="flex items-center gap-3">
+                            {completedLessons.includes(related.id) ? (
+                              <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0" />
+                            ) : (
+                              <Circle className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+                            )}
+                            <div className="text-left">
+                              <p className="font-medium text-foreground group-hover:text-accent transition-colors">
+                                {related.title}
+                              </p>
+                              <div className="flex items-center gap-2 mt-1">
+                                <Badge
+                                  variant="outline"
+                                  className="text-xs border-muted-foreground/30 text-muted-foreground"
+                                >
+                                  {related.category}
+                                </Badge>
+                                <span className="text-xs text-muted-foreground">
+                                  {related.readTime} min
+                                </span>
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      </div>
-                      <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-accent transition-all group-hover:translate-x-1" />
-                    </button>
-                  ))}
-                </div>
-              </Card>
+                          <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-accent transition-all group-hover:translate-x-1" />
+                        </button>
+                      ))}
+                    </div>
+                  </Card>
+                )}
+              </>
             )}
           </div>
         </div>
@@ -2687,6 +2719,247 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
           <div className="mb-8">
             <PositionSizeCalculator />
           </div>
+
+          {/* Beyond the Market: Building Multiple Income Streams - Distinct Section */}
+          {activeCategory === "All" || activeCategory === "Income Streams" ? (
+            <Card className="p-6 bg-gradient-to-br from-primary/5 to-accent/5 border-accent/30 rounded-2xl mb-8">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center">
+                  <DollarSign className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-foreground">Beyond the Market</h2>
+                  <p className="text-sm text-muted-foreground">Building Multiple Income Streams</p>
+                </div>
+              </div>
+              
+              <p className="text-foreground/80 mb-6">
+                Real estate, digital products, passive income — Pansy breaks down how to build wealth beyond the stock market 🏡
+              </p>
+
+              <div className="space-y-6">
+                {/* Module 1 */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 mb-3">
+                    <HomeIcon className="w-5 h-5 text-accent" />
+                    <h3 className="font-semibold text-foreground">Module 1: Real Estate Income & Loans</h3>
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {lessons
+                      .filter(l => l.moduleNumber === 1 && l.category === "Income Streams")
+                      .map(lesson => {
+                        const isCompleted = completedLessons.includes(lesson.id);
+                        const isLocked = lesson.isPro && !isPro;
+                        return (
+                          <Card
+                            key={lesson.id}
+                            className={`p-4 ${isLocked ? 'bg-muted/30 border-accent/20' : 'bg-card border-border hover:border-accent/50'} rounded-xl transition-all cursor-pointer group`}
+                            onClick={() => !isLocked && setSelectedLesson(lesson.id)}
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  {isLocked && (
+                                    <Lock className="w-4 h-4 text-accent flex-shrink-0" />
+                                  )}
+                                  {!isLocked && isCompleted && (
+                                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
+                                  )}
+                                  {lesson.isPro && (
+                                    <Badge className="bg-accent/20 text-accent border-accent/30 text-xs">PRO</Badge>
+                                  )}
+                                  {!lesson.isPro && (
+                                    <Badge className="bg-primary/20 text-primary border-primary/30 text-xs">FREE</Badge>
+                                  )}
+                                </div>
+                                <h4 className={`font-medium ${isLocked ? 'text-muted-foreground' : 'text-foreground group-hover:text-accent'} transition-colors text-sm`}>
+                                  {lesson.title}
+                                </h4>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  {isLocked ? "Unlock with Bloom Pro to access" : lesson.summary}
+                                </p>
+                                <div className="flex items-center gap-2 mt-2">
+                                  <Clock className="w-3 h-3 text-muted-foreground" />
+                                  <span className="text-xs text-muted-foreground">{lesson.readTime} min</span>
+                                </div>
+                              </div>
+                              {!isLocked && (
+                                <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-accent transition-all group-hover:translate-x-1 flex-shrink-0" />
+                              )}
+                            </div>
+                          </Card>
+                        );
+                      })}
+                  </div>
+                </div>
+
+                {/* Module 2 */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Briefcase className="w-5 h-5 text-accent" />
+                    <h3 className="font-semibold text-foreground">Module 2: Income From What You Already Know</h3>
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {lessons
+                      .filter(l => l.moduleNumber === 2 && l.category === "Income Streams")
+                      .map(lesson => {
+                        const isCompleted = completedLessons.includes(lesson.id);
+                        const isLocked = lesson.isPro && !isPro;
+                        return (
+                          <Card
+                            key={lesson.id}
+                            className={`p-4 ${isLocked ? 'bg-muted/30 border-accent/20' : 'bg-card border-border hover:border-accent/50'} rounded-xl transition-all cursor-pointer group`}
+                            onClick={() => !isLocked && setSelectedLesson(lesson.id)}
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  {isLocked && (
+                                    <Lock className="w-4 h-4 text-accent flex-shrink-0" />
+                                  )}
+                                  {!isLocked && isCompleted && (
+                                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
+                                  )}
+                                  {lesson.isPro && (
+                                    <Badge className="bg-accent/20 text-accent border-accent/30 text-xs">PRO</Badge>
+                                  )}
+                                  {!lesson.isPro && (
+                                    <Badge className="bg-primary/20 text-primary border-primary/30 text-xs">FREE</Badge>
+                                  )}
+                                </div>
+                                <h4 className={`font-medium ${isLocked ? 'text-muted-foreground' : 'text-foreground group-hover:text-accent'} transition-colors text-sm`}>
+                                  {lesson.title}
+                                </h4>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  {isLocked ? "Unlock with Bloom Pro to access" : lesson.summary}
+                                </p>
+                                <div className="flex items-center gap-2 mt-2">
+                                  <Clock className="w-3 h-3 text-muted-foreground" />
+                                  <span className="text-xs text-muted-foreground">{lesson.readTime} min</span>
+                                </div>
+                              </div>
+                              {!isLocked && (
+                                <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-accent transition-all group-hover:translate-x-1 flex-shrink-0" />
+                              )}
+                            </div>
+                          </Card>
+                        );
+                      })}
+                  </div>
+                </div>
+
+                {/* Module 3 */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 mb-3">
+                    <TrendingUp className="w-5 h-5 text-accent" />
+                    <h3 className="font-semibold text-foreground">Module 3: Money That Earns While You Sleep</h3>
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {lessons
+                      .filter(l => l.moduleNumber === 3 && l.category === "Income Streams")
+                      .map(lesson => {
+                        const isCompleted = completedLessons.includes(lesson.id);
+                        const isLocked = lesson.isPro && !isPro;
+                        return (
+                          <Card
+                            key={lesson.id}
+                            className={`p-4 ${isLocked ? 'bg-muted/30 border-accent/20' : 'bg-card border-border hover:border-accent/50'} rounded-xl transition-all cursor-pointer group`}
+                            onClick={() => !isLocked && setSelectedLesson(lesson.id)}
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  {isLocked && (
+                                    <Lock className="w-4 h-4 text-accent flex-shrink-0" />
+                                  )}
+                                  {!isLocked && isCompleted && (
+                                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
+                                  )}
+                                  {lesson.isPro && (
+                                    <Badge className="bg-accent/20 text-accent border-accent/30 text-xs">PRO</Badge>
+                                  )}
+                                  {!lesson.isPro && (
+                                    <Badge className="bg-primary/20 text-primary border-primary/30 text-xs">FREE</Badge>
+                                  )}
+                                </div>
+                                <h4 className={`font-medium ${isLocked ? 'text-muted-foreground' : 'text-foreground group-hover:text-accent'} transition-colors text-sm`}>
+                                  {lesson.title}
+                                </h4>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  {isLocked ? "Unlock with Bloom Pro to access" : lesson.summary}
+                                </p>
+                                <div className="flex items-center gap-2 mt-2">
+                                  <Clock className="w-3 h-3 text-muted-foreground" />
+                                  <span className="text-xs text-muted-foreground">{lesson.readTime} min</span>
+                                </div>
+                              </div>
+                              {!isLocked && (
+                                <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-accent transition-all group-hover:translate-x-1 flex-shrink-0" />
+                              )}
+                            </div>
+                          </Card>
+                        );
+                      })}
+                  </div>
+                </div>
+
+                {/* Module 4 */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Shield className="w-5 h-5 text-accent" />
+                    <h3 className="font-semibold text-foreground">Module 4: Protection & Ownership</h3>
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {lessons
+                      .filter(l => l.moduleNumber === 4 && l.category === "Income Streams")
+                      .map(lesson => {
+                        const isCompleted = completedLessons.includes(lesson.id);
+                        const isLocked = lesson.isPro && !isPro;
+                        return (
+                          <Card
+                            key={lesson.id}
+                            className={`p-4 ${isLocked ? 'bg-muted/30 border-accent/20' : 'bg-card border-border hover:border-accent/50'} rounded-xl transition-all cursor-pointer group`}
+                            onClick={() => !isLocked && setSelectedLesson(lesson.id)}
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  {isLocked && (
+                                    <Lock className="w-4 h-4 text-accent flex-shrink-0" />
+                                  )}
+                                  {!isLocked && isCompleted && (
+                                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
+                                  )}
+                                  {lesson.isPro && (
+                                    <Badge className="bg-accent/20 text-accent border-accent/30 text-xs">PRO</Badge>
+                                  )}
+                                  {!lesson.isPro && (
+                                    <Badge className="bg-primary/20 text-primary border-primary/30 text-xs">FREE</Badge>
+                                  )}
+                                </div>
+                                <h4 className={`font-medium ${isLocked ? 'text-muted-foreground' : 'text-foreground group-hover:text-accent'} transition-colors text-sm`}>
+                                  {lesson.title}
+                                </h4>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  {isLocked ? "Unlock with Bloom Pro to access" : lesson.summary}
+                                </p>
+                                <div className="flex items-center gap-2 mt-2">
+                                  <Clock className="w-3 h-3 text-muted-foreground" />
+                                  <span className="text-xs text-muted-foreground">{lesson.readTime} min</span>
+                                </div>
+                              </div>
+                              {!isLocked && (
+                                <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-accent transition-all group-hover:translate-x-1 flex-shrink-0" />
+                              )}
+                            </div>
+                          </Card>
+                        );
+                      })}
+                  </div>
+                </div>
+              </div>
+            </Card>
+          ) : null}
 
           {/* Lessons Grid */}
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
