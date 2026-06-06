@@ -10,8 +10,8 @@ export interface SEOProps {
 const defaultSEO = {
   title: "Bloom — Investment Analysis for Women",
   description: "Mobile-first investment app designed for women investors. Get warm, approachable analysis from Pansy, your expert guide who explains everything in plain language.",
-  image: "/og-image.png",
-  url: "https://bloom.app",
+  image: "https://shebloomswealth.app/og-image.png",
+  url: "https://shebloomswealth.app",
 };
 
 export function SEOElements() {
@@ -37,7 +37,9 @@ export function SEOElements() {
 export function SEO({ title, description, image, url }: SEOProps) {
   const seoTitle = title || defaultSEO.title;
   const seoDescription = description || defaultSEO.description;
-  const seoImage = image || defaultSEO.image;
+  const seoImage = image 
+    ? (image.startsWith('http') ? image : `https://shebloomswealth.app${image}`)
+    : defaultSEO.image;
   const seoUrl = url || defaultSEO.url;
 
   return (
