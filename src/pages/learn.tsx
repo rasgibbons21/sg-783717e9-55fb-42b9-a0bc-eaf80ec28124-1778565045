@@ -6,7 +6,6 @@ import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/router";
 import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
-import { useSubscription } from "@/contexts/SubscriptionContext";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,9 +15,9 @@ import { RiskRewardCalculator } from "@/components/RiskRewardCalculator";
 import { PositionSizeCalculator } from "@/components/PositionSizeCalculator";
 import { authService } from "@/services/authService";
 import { supabase } from "@/integrations/supabase/client";
-import { Search, ArrowLeft, Clock, CheckCircle2, Circle, ChevronRight, Bookmark, BookmarkCheck, Award, Lock, DollarSign, Home as HomeIcon, Briefcase, TrendingUp, Shield } from "lucide-react";
+import { Search, ArrowLeft, Clock, CheckCircle2, Circle, ChevronRight, Bookmark, BookmarkCheck, Award } from "lucide-react";
 
-type Category = "All" | "Stocks" | "ETFs" | "Mutual Funds" | "Dividends" | "Bonds" | "Retirement" | "Trading Psychology" | "Income Streams";
+type Category = "All" | "Stocks" | "ETFs" | "Mutual Funds" | "Dividends" | "Bonds" | "Retirement" | "Trading Psychology";
 
 interface QuizQuestion {
   question: string;
@@ -38,14 +37,10 @@ interface Lesson {
   keyTakeaway: string;
   relatedTopics: string[];
   quiz: QuizQuestion[];
-  isPro?: boolean;
-  moduleNumber?: number;
-  moduleName?: string;
 }
 
 export default function Learn() {
   const router = useRouter();
-  const { isPro, isLoading: subscriptionLoading } = useSubscription();
   const [user, setUser] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<Category>("All");
@@ -1134,1033 +1129,6 @@ Follow this and you're automatically in the top 10% of traders. Most people skip
         }
       ]
     },
-
-    // MODULE 1 — Real Estate Income & Loans
-    {
-      id: "income-real-estate-cash-flow",
-      title: "What Is Real Estate Cash Flow?",
-      category: "Income Streams",
-      readTime: 4,
-      difficulty: "Beginner",
-      summary: "How rental property makes money explained simply",
-      isPro: false,
-      moduleNumber: 1,
-      moduleName: "Real Estate Income & Loans",
-      content: `Okay girl let's talk about making money from real estate — and I don't mean flipping houses or being a landlord with 50 properties. I mean simple rental income that pays you every month 🏡
-
-**Cash flow = rent minus expenses.** That's it. If you rent out a property for $1,800 a month and your mortgage + insurance + taxes + maintenance costs $1,400 you're cash flowing $400 per month. That's $4,800 a year just for owning that property.
-
-Here's what a lot of people don't get: you don't need to own the property outright to make money from it. If you put 20% down on a $200,000 property that's $40,000 of your money. But that property generates income every single month even though you're using the bank's money for the other $160,000.
-
-**Your expenses usually are:**
-- Mortgage payment (principal + interest)
-- Property taxes
-- Insurance
-- HOA fees (if any)
-- Maintenance (budget 1% of property value per year)
-- Vacancy (assume property sits empty 1 month per year)
-- Property management (if you hire someone — usually 8-10% of rent)
-
-If your rent covers all that AND leaves money left over you're cash flowing. If it doesn't you're feeding the property money every month which defeats the whole purpose.
-
-Real estate isn't passive income at first — there's work involved finding the property setting it up managing tenants. But once it's running smoothly it becomes monthly income that shows up whether you worked that day or not 💰
-
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
-      keyTakeaway: "Cash flow = rent minus all expenses. Positive cash flow = property pays you monthly. Negative = you feed it money. Aim for positive.",
-      relatedTopics: ["income-dscr-loans", "income-down-payment", "income-house-hacking"],
-      quiz: [
-        {
-          question: "What does cash flow mean in real estate?",
-          options: ["Total property value", "Rent minus all expenses", "Your mortgage payment", "How fast you can sell"],
-          correctAnswer: 1,
-          explanation: "Yes! Cash flow = rent minus expenses. If it's positive the property pays you. If it's negative you're feeding it money 🏡"
-        },
-        {
-          question: "Do you need to own a property outright to make money from it?",
-          options: ["Yes you must own 100%", "No you can use the bank's money and still cash flow", "Only if property value goes up", "Only in certain states"],
-          correctAnswer: 1,
-          explanation: "That's right! You can put 20% down and cash flow using the bank's money for the rest. That's the leverage power of real estate 💰"
-        },
-        {
-          question: "What should you budget for maintenance per year?",
-          options: ["Nothing - tenants pay for everything", "About 1% of property value", "About 10% of property value", "Just fix things as they break"],
-          correctAnswer: 1,
-          explanation: "Exactly! Budget about 1% of property value per year for maintenance. A $200k house = $2k/year. Things break and it's your responsibility 🏡"
-        }
-      ]
-    },
-    {
-      id: "income-dscr-loans",
-      title: "DSCR Loans Explained",
-      category: "Income Streams",
-      readTime: 5,
-      difficulty: "Beginner",
-      summary: "Qualifies on property rent, not your income",
-      isPro: false,
-      moduleNumber: 1,
-      moduleName: "Real Estate Income & Loans",
-      content: `A DSCR loan qualifies you on whether the property's rent covers the mortgage — NOT your personal income or tax returns. This is huge if you're self-employed or your tax returns don't show enough income 📄
-
-**DSCR = Debt Service Coverage Ratio.** It's just: Monthly rent ÷ Monthly mortgage payment = DSCR
-
-If rent is $1,800 and the mortgage payment is $1,500 your DSCR is 1.2 (you qualify). If rent is $1,500 and mortgage is $1,800 your DSCR is 0.83 (won't qualify).
-
-**Typical DSCR requirements:**
-- Ratio of 1.0 or higher (rent covers mortgage at minimum)
-- Ratio of 1.25+ gets you better rates
-- Credit score usually 640-660 minimum
-- 20-25% down payment (sometimes 15% floor)
-- Property must be investment property (not your primary home)
-
-**What they DON'T require:**
-- Tax returns
-- W-2s
-- Pay stubs
-- Employment verification
-
-They literally don't care if you're employed or what you claim on taxes. They care if the rent covers the debt. That's it.
-
-The catch? Interest rates are usually 0.5-1% higher than conventional loans. You're paying a premium for the flexibility of not showing income.
-
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
-      keyTakeaway: "DSCR loans qualify you on the property's rent not your income. No tax returns needed. Ratio 1.0+ required, 1.25+ for best rates.",
-      relatedTopics: ["income-real-estate-cash-flow", "income-down-payment", "income-where-to-get-loan"],
-      quiz: [
-        {
-          question: "What does DSCR stand for?",
-          options: ["Debt Service Coverage Ratio", "Down Payment Service Calculation", "Direct Seller Credit Rating", "Debt Security Credit Record"],
-          correctAnswer: 0,
-          explanation: "Yes! Debt Service Coverage Ratio. It's just rent ÷ mortgage payment. Simple math that determines if you qualify 📄"
-        },
-        {
-          question: "What documents do DSCR loans NOT require?",
-          options: ["Credit report", "Tax returns and W-2s", "Property appraisal", "Down payment proof"],
-          correctAnswer: 1,
-          explanation: "That's right! No tax returns, W-2s, or pay stubs needed. They only care if the property's rent covers the mortgage 🏡"
-        },
-        {
-          question: "What DSCR ratio do you need to qualify?",
-          options: ["0.5 or higher", "1.0 or higher", "2.0 or higher", "Any ratio works"],
-          correctAnswer: 1,
-          explanation: "Exactly! You need 1.0+ minimum (rent covers mortgage). 1.25+ gets you better rates. Below 1.0 = no go 💰"
-        }
-      ]
-    },
-    {
-      id: "income-down-payment",
-      title: "How Much You Really Need Down",
-      category: "Income Streams",
-      readTime: 4,
-      difficulty: "Beginner",
-      summary: "The loan type sets the down payment",
-      isPro: true,
-      moduleNumber: 1,
-      moduleName: "Real Estate Income & Loans",
-      content: `The down payment depends on the loan type — not the property. Same house, different loan, different down payment 💰
-
-**DSCR Loans (investment property):**
-- Typical requirement: 20-25% down
-- Floor: Sometimes as low as 15%
-- This is your money at risk
-
-**Owner-Occupied Conventional:**
-- Can go as low as 10% down
-- Sometimes 15% if credit isn't perfect
-- Better rates than DSCR
-
-**FHA Loans (primary residence only):**
-- As low as 3.5% down
-- Credit score can be as low as 580
-- Must live in property for at least 1 year
-
-**The strategy:** Buy as owner-occupied with lower down payment. Live in it for 1 year. Then move out and rent it. Now it's an investment property cash flowing but you got in with way less money down.
-
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
-      keyTakeaway: "DSCR: 20-25% down. Owner-occupied: 10-15%. FHA: 3.5%. The loan type sets the down payment not the property.",
-      relatedTopics: ["income-dscr-loans", "income-house-hacking", "income-real-estate-cash-flow"],
-      quiz: [
-        {
-          question: "What's the typical down payment for a DSCR investment loan?",
-          options: ["3.5%", "10%", "20-25%", "50%"],
-          correctAnswer: 2,
-          explanation: "Yes! DSCR loans typically need 20-25% down, sometimes 15% with strong credit 💰"
-        },
-        {
-          question: "Can you use an FHA loan for a pure investment property?",
-          options: ["Yes anytime", "No you must live in it for at least 1 year", "Only if it's your second property", "Only in certain states"],
-          correctAnswer: 1,
-          explanation: "That's right! FHA requires you to live in the property as your primary residence for at least 1 year 🏡"
-        },
-        {
-          question: "What determines your down payment requirement?",
-          options: ["The property's location", "The loan type you choose", "The seller's preference", "Always 20% regardless"],
-          correctAnswer: 1,
-          explanation: "Exactly! The loan type determines down payment. Same house could need 25% (DSCR) or 3.5% (FHA owner-occupied) 💰"
-        }
-      ]
-    },
-    {
-      id: "income-house-hacking",
-      title: "House Hacking",
-      category: "Income Streams",
-      readTime: 5,
-      difficulty: "Beginner",
-      summary: "Live in one unit, rent the others",
-      isPro: true,
-      moduleNumber: 1,
-      moduleName: "Real Estate Income & Loans",
-      content: `House hacking = buy a property with multiple units, live in one, rent the others. Your tenants cover most or all of your mortgage 🏡
-
-**Option 1: Multi-family**
-Buy a duplex with an FHA loan (3.5% down). Live in unit A. Unit B rents for $1,400/month. Your total mortgage is $1,800. You're only paying $400/month to live there and you own the building.
-
-After 1 year move out rent your unit too and now both units cash flow. Buy another property and repeat.
-
-**Option 2: Single-family with roommates**
-Buy a 3-bedroom house. Live in one room rent 2 others for $700 each = $1,400/month. Your mortgage is $1,600. You're paying $200/month and building equity.
-
-This lets beginners use low-down owner-occupied financing to get into real estate without waiting years to save a huge down payment.
-
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
-      keyTakeaway: "House hacking = live in one unit/room, rent the others. Tenants cover your mortgage. Lowest down payment path.",
-      relatedTopics: ["income-down-payment", "income-dscr-loans", "income-real-estate-cash-flow"],
-      quiz: [
-        {
-          question: "What is house hacking?",
-          options: ["Flipping houses for profit", "Living in a property while renting out other units/rooms", "Buying houses with no down payment", "Illegally avoiding property taxes"],
-          correctAnswer: 1,
-          explanation: "Yes! House hacking = live in one unit/room, rent the others. Tenants cover most or all of your mortgage 🏡"
-        },
-        {
-          question: "What's the minimum down payment for house hacking with FHA?",
-          options: ["0%", "3.5%", "10%", "20%"],
-          correctAnswer: 1,
-          explanation: "That's right! FHA lets you put just 3.5% down on a property you'll live in. Perfect for house hacking a duplex 💰"
-        },
-        {
-          question: "How long must you live in the property before moving out?",
-          options: ["No requirement", "At least 6 months", "At least 1 year", "At least 5 years"],
-          correctAnswer: 2,
-          explanation: "Exactly! FHA and conventional owner-occupied loans require you to live there at least 1 year 🏡"
-        }
-      ]
-    },
-    {
-      id: "income-where-to-get-loan",
-      title: "Where to Get the Loan",
-      category: "Income Streams",
-      readTime: 5,
-      difficulty: "Intermediate",
-      summary: "Vetted lender options for DSCR and conventional",
-      isPro: true,
-      moduleNumber: 1,
-      moduleName: "Real Estate Income & Loans",
-      content: `Here are vetted options for getting rental property loans. Always compare at least 3 lenders for rates and fees 🏦
-
-**DSCR Lenders (investment property):**
-- [Visio Lending](#) — 15-25% down, credit 660+
-- [Kiavi](#) — Investor-focused, 15-25% down
-- [RCN Capital](#) — 620+ credit, rental income focus
-- [LendingOne](#) — 640+ credit, fast close
-- [Angel Oak](#) — Non-QM specialist, flexible
-
-**Conventional/Owner-Occupied:**
-- [Rocket Mortgage](#) — Fast online, FHA available
-- [Better](#) — Low fees, competitive rates
-- [Navy Federal](#) — For military/veterans, VA loans
-
-**What to compare:**
-1. Interest rate + fees as a package
-2. Down payment requirement
-3. Credit score minimum
-4. Speed to close
-
-Get quotes from 3 lenders minimum. A few hours of work can save thousands of dollars.
-
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
-      keyTakeaway: "Vetted DSCR: Visio, Kiavi, RCN, LendingOne, Angel Oak. Conventional: Rocket, Better, Navy Federal. Compare 3 quotes minimum.",
-      relatedTopics: ["income-dscr-loans", "income-down-payment", "income-real-estate-cash-flow"],
-      quiz: [
-        {
-          question: "How many lender quotes should you get minimum?",
-          options: ["Just 1 is fine", "At least 2", "At least 3", "At least 10"],
-          correctAnswer: 2,
-          explanation: "Exactly! Get at least 3 quotes to compare. It takes a few hours but saves you thousands 💰"
-        },
-        {
-          question: "What should you compare when shopping lenders?",
-          options: ["Just the interest rate", "Rate + down payment + fees as a package", "How fast they answer the phone", "The lender's website design"],
-          correctAnswer: 1,
-          explanation: "Yes! Compare rate + down payment + fees together. A low rate with high fees can cost more 🏦"
-        },
-        {
-          question: "Which lenders are vetted for DSCR loans?",
-          options: ["Only local banks", "Visio, Kiavi, RCN, LendingOne, Angel Oak", "Only credit unions", "No options available"],
-          correctAnswer: 1,
-          explanation: "That's right! These are vetted DSCR options. Each has different minimums so compare them 💪"
-        }
-      ]
-    },
-
-    // MODULE 2 — Income From What You Already Know
-    {
-      id: "income-skills-to-income",
-      title: "Turning Skills Into Income",
-      category: "Income Streams",
-      readTime: 3,
-      difficulty: "Beginner",
-      summary: "You already have sellable knowledge",
-      isPro: false,
-      moduleNumber: 2,
-      moduleName: "Income From What You Already Know",
-      content: `You already have skills that people will pay for. The thing you're good at that feels easy to you? Someone else is struggling with it and would gladly pay you 💼
-
-Skills that work: writing, design, editing, admin work, teaching, bookkeeping, social media, web design, photography. You don't need to be an expert. You just need to be better than someone with zero experience.
-
-**Price yourself:** Start at $25-30/hour minimum. Beginner rates: $25-40/hour. Intermediate: $50-75/hour. Advanced: $100-150+/hour.
-
-Package pricing beats hourly. Instead of "$40/hour" offer "$800/month for 10 posts." Clients like knowing the total cost and you're not capped by hours.
-
-The first client is the hardest. Once you have one good testimonial the next is easier. Start with your network — post on your personal social that you're offering X service.
-
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
-      keyTakeaway: "You have sellable skills. Price yourself at least $25-30/hour. Package pricing beats hourly. First client is hardest.",
-      relatedTopics: ["income-digital-products", "income-content-affiliate"],
-      quiz: [
-        {
-          question: "What's a good minimum hourly rate for beginners?",
-          options: ["$10-15/hour", "$25-30/hour", "$75-100/hour", "$200+/hour"],
-          correctAnswer: 1,
-          explanation: "Yes! Don't go below $25-30/hour minimum. Your time is valuable 💼"
-        },
-        {
-          question: "Why is package pricing better than hourly?",
-          options: ["Clients like knowing total cost and you're not capped by hours", "It's required by law", "Hourly is illegal", "Package pricing is always more"],
-          correctAnswer: 0,
-          explanation: "That's right! Clients know total upfront and you're not limited by hours. Win-win 💰"
-        },
-        {
-          question: "Where should you start finding clients?",
-          options: ["Cold calling", "Your network and personal social media", "TV ads", "Door to door"],
-          correctAnswer: 1,
-          explanation: "Exactly! Start with your network. Post on social that you're offering X service. First client comes from warm connections 💪"
-        }
-      ]
-    },
-    {
-      id: "income-digital-products",
-      title: "Digital Products 101",
-      category: "Income Streams",
-      readTime: 4,
-      difficulty: "Beginner",
-      summary: "Make once, sell repeatedly",
-      isPro: false,
-      moduleNumber: 2,
-      moduleName: "Income From What You Already Know",
-      content: `Digital products = create once, sell forever. No inventory no shipping no refunds. Pure margin 📚
-
-**What sells:** Ebooks, printables, templates, planners, courses. Solve a specific problem for a specific person. "Meal prep templates for busy moms" beats "healthy eating guide."
-
-**Realistic earnings:**
-Beginner: $100-500/month from 1-3 products
-Intermediate: $500-2,000/month with 5-10 products
-Advanced: $2,000-10,000+/month
-
-**Where to sell:**
-- Gumroad (easiest, 10% fee)
-- Etsy (great for printables)
-- Amazon KDP (self-publish ebooks)
-
-**Pricing:**
-Ebooks: $7-47
-Printables: $3-15
-Templates: $15-97
-
-The 1,000th sale doesn't require extra effort from you. That's the leverage 💪
-
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
-      keyTakeaway: "Digital products = create once, sell forever. Realistic: $100-500/month beginner. Gumroad, Etsy, KDP to sell.",
-      relatedTopics: ["income-skills-to-income", "income-self-publishing", "income-content-affiliate"],
-      quiz: [
-        {
-          question: "What's the main advantage of digital products?",
-          options: ["Guaranteed immediate sales", "Create once, sell repeatedly with pure profit", "They're free to create", "No competition"],
-          correctAnswer: 1,
-          explanation: "Yes! Create once, sell forever. The 1,000th sale requires no extra effort 📚"
-        },
-        {
-          question: "What's realistic beginner income from 1-3 products?",
-          options: ["$10,000+/month", "$5,000/month", "$100-500/month", "$0 always"],
-          correctAnswer: 2,
-          explanation: "That's right! Beginner realistic = $100-500/month. It compounds as you add more products 💰"
-        },
-        {
-          question: "What type of topic works best?",
-          options: ["Broad general topics", "Specific problem for specific person", "Only marketing topics", "Everyone needs it"],
-          correctAnswer: 1,
-          explanation: "Exactly! Narrow beats broad. Solve a specific problem sis 💪"
-        }
-      ]
-    },
-    {
-      id: "income-self-publishing",
-      title: "Self-Publishing Walkthrough",
-      category: "Income Streams",
-      readTime: 5,
-      difficulty: "Beginner",
-      summary: "Getting a digital product live step-by-step",
-      isPro: true,
-      moduleNumber: 2,
-      moduleName: "Income From What You Already Know",
-      content: `Here's the step-by-step to get your first digital product live 📚
-
-**Step 1: Create the product**
-- Ebook: Use Canva or Google Docs, export as PDF
-- Template: Create in Notion, Sheets, or Canva
-- Time: 20-40 hours for first product
-
-**Step 2: Choose platform**
-- [Gumroad](#) — easiest, 10% fee, instant setup
-- [Etsy](#) — listing fees + transaction fees, huge traffic
-- [Amazon KDP](#) — ebooks/paperbacks, Amazon handles everything
-
-**Step 3: Create listing**
-- Title: Clear and keyword-rich
-- Description: Problem + solution + what's included
-- Price: $7-47 depending on value
-
-**Step 4: First sale**
-- Share on your social
-- Post in relevant Facebook groups
-- Pinterest for printables
-
-One weekend of focused work = product that earns for years 💪
-
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
-      keyTakeaway: "Create product (20-40 hours) → Choose platform (Gumroad easiest) → Create listing → Share on social. One weekend = years of income.",
-      relatedTopics: ["income-digital-products", "income-content-affiliate"],
-      quiz: [
-        {
-          question: "How long does the first digital product typically take?",
-          options: ["2-4 hours", "20-40 hours", "200 hours", "5 minutes"],
-          correctAnswer: 1,
-          explanation: "Yes! First product takes 20-40 hours including learning the platform 📚"
-        },
-        {
-          question: "Which platform is easiest for beginners?",
-          options: ["Amazon KDP", "Etsy", "Gumroad", "Build your own website"],
-          correctAnswer: 2,
-          explanation: "That's right! Gumroad is easiest — 10% fee, instant setup, no complexity 💰"
-        },
-        {
-          question: "What's a good price range for ebooks?",
-          options: ["$1-3", "$7-47", "$100-200", "$500+"],
-          correctAnswer: 1,
-          explanation: "Exactly! $7-47 depending on length and value. Price for the transformation not page count 💪"
-        }
-      ]
-    },
-    {
-      id: "income-content-affiliate",
-      title: "Content & Affiliate Income",
-      category: "Income Streams",
-      readTime: 5,
-      difficulty: "Intermediate",
-      summary: "Building an audience and earning through partnerships",
-      isPro: true,
-      moduleNumber: 2,
-      moduleName: "Income From What You Already Know",
-      content: `Content creation can become income but it's a long game. Timeline: 0-6 months = $0-100/month. Year 1-2 = $500-2,000/month if consistent 📱
-
-**Income sources:**
-1. Ad revenue (YouTube, blog) — Need views. 10k views = $50, 100k views = $500
-2. Affiliate income — Commission when people buy through your link. Must disclose.
-3. Sponsorships (when bigger) — Brands pay you
-4. Your own products — Best margin
-
-**Timeline reality:**
-Months 0-6: Creating, learning. Income = $0-100
-Months 6-12: Traction building. Income = $100-500
-Year 1-2: Momentum. Income = $500-2,000
-Year 2-3: Established. Income = $2,000-10,000+
-
-Pick ONE platform. YouTube or TikTok or blog — not all three. Pick ONE niche. Stay in your lane.
-
-This isn't fast money. But you build an audience once and monetize it 10 different ways 💪
-
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
-      keyTakeaway: "Content income = long game. 0-6 months = $0-100. Year 1-2 = $500-2k if consistent. Must disclose affiliates. Pick one platform.",
-      relatedTopics: ["income-digital-products", "income-skills-to-income"],
-      quiz: [
-        {
-          question: "What's realistic income in the first 6 months?",
-          options: ["$10k/month", "$0-100/month", "$5,000/month", "Immediate income"],
-          correctAnswer: 1,
-          explanation: "Yes! First 6 months = $0-100 usually. Year 1-2 = $500-2k if consistent. Long game 📱"
-        },
-        {
-          question: "Must you disclose affiliate relationships?",
-          options: ["No disclosure needed", "Only if you want to", "Yes it's legally required", "Only for products over $100"],
-          correctAnswer: 2,
-          explanation: "That's right! You MUST disclose affiliate relationships. It's an FTC requirement 💪"
-        },
-        {
-          question: "How many platforms should you start with?",
-          options: ["All of them at once", "Pick ONE platform to start", "At least 5", "None - don't do content"],
-          correctAnswer: 1,
-          explanation: "Exactly! Pick ONE platform. YouTube or TikTok or blog. Don't dilute sis 🌸"
-        }
-      ]
-    },
-
-    // MODULE 3 — Money That Earns While You Sleep
-    {
-      id: "income-passive-reality",
-      title: "What Is Passive Income, Really?",
-      category: "Income Streams",
-      readTime: 3,
-      difficulty: "Beginner",
-      summary: "Hype vs reality — the spectrum",
-      isPro: false,
-      moduleNumber: 3,
-      moduleName: "Money That Earns While You Sleep",
-      content: `Passive income isn't truly passive at the start. There's a spectrum from active to semi-passive to truly passive 💰
-
-**Truly Passive:**
-- Dividends from stocks
-- Interest from bonds/savings
-- REITs
-
-You buy once money comes in automatically. Minimal ongoing work.
-
-**Semi-Passive:**
-- Rental property (tenants call maintenance needed)
-- Digital products (create once but market ongoing)
-- Content/affiliate (build audience upfront)
-
-Work upfront then minimal ongoing management.
-
-**Active Income Disguised:**
-- "Passive" courses that need constant marketing
-- MLMs calling themselves passive
-- Dropshipping requiring daily work
-
-Use active income to build passive. Don't quit your job to chase passive before it's reliable 💪
-
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
-      keyTakeaway: "Passive = spectrum. Truly passive: dividends. Semi-passive: rentals, digital products. Use active income to build passive.",
-      relatedTopics: ["income-dividends-paycheck", "income-cash-earns", "income-reits"],
-      quiz: [
-        {
-          question: "What's truly passive income?",
-          options: ["Dropshipping", "Dividends and interest", "MLMs", "Requires daily work"],
-          correctAnswer: 1,
-          explanation: "Yes! Dividends and interest are truly passive. Buy once, money comes in automatically 💰"
-        },
-        {
-          question: "Are rental properties truly passive?",
-          options: ["Yes completely", "No they're semi-passive (tenants call, maintenance needed)", "They're fully active", "No income at all"],
-          correctAnswer: 1,
-          explanation: "That's right! Rentals are semi-passive. Income comes in but you handle issues 🏡"
-        },
-        {
-          question: "When should you quit your job to do passive income?",
-          options: ["Day 1", "After passive income is reliable", "Never", "After 1 week"],
-          correctAnswer: 1,
-          explanation: "Exactly! Use active income to build passive. Don't quit until passive is reliable sis 💪"
-        }
-      ]
-    },
-    {
-      id: "income-dividends-paycheck",
-      title: "Dividends — A Paycheck From Your Portfolio",
-      category: "Income Streams",
-      readTime: 4,
-      difficulty: "Beginner",
-      summary: "Getting paid quarterly just for holding",
-      isPro: false,
-      moduleNumber: 3,
-      moduleName: "Money That Earns While You Sleep",
-      content: `Dividends = quarterly cash from owning stocks. If you own 100 shares paying $1/share you get $100 deposited 4 times a year = $400/year just for holding 💰
-
-**Dividend yield:** $4 dividend ÷ $100 stock = 4% yield. That 4% shows up regardless of whether price goes up or down.
-
-**Building dividend income:**
-Want $1,000/month? That's $12,000/year. At 4% yield you need $300,000 invested. Sounds huge but: invest $500/month for 20 years at 8% = $300k. Now that generates $12k/year passive.
-
-**DRIP (Dividend Reinvestment Plan):**
-Dividends automatically buy more shares. Your share count grows every quarter. More shares = more dividends = more shares bought = compound growth 🔄
-
-**When to use DRIP:** When building wealth (under 50). **Turn off when:** You retire and need the income.
-
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
-      keyTakeaway: "Dividends = quarterly cash. 4% yield on $300k = $1k/month. DRIP reinvests to buy more shares automatically.",
-      relatedTopics: ["income-cash-earns", "income-reits"],
-      quiz: [
-        {
-          question: "How much needed at 4% yield to earn $1,000/month?",
-          options: ["$100,000", "$200,000", "$300,000", "$1,000,000"],
-          correctAnswer: 2,
-          explanation: "Yes! $1k/month = $12k/year. At 4% yield need $300k invested 💰"
-        },
-        {
-          question: "What does DRIP do?",
-          options: ["Sells dividends", "Automatically reinvests dividends to buy more shares", "Pays taxes", "Increases rates"],
-          correctAnswer: 1,
-          explanation: "That's right! DRIP reinvests dividends to buy more shares. Compound growth on autopilot 🔄"
-        },
-        {
-          question: "When should you turn DRIP off?",
-          options: ["Never", "When you retire and need income", "Immediately", "Only weekends"],
-          correctAnswer: 1,
-          explanation: "Exactly! Use DRIP while building. Turn off in retirement when you need cash sis 💪"
-        }
-      ]
-    },
-    {
-      id: "income-cash-earns",
-      title: "Cash That Earns",
-      category: "Income Streams",
-      readTime: 4,
-      difficulty: "Beginner",
-      summary: "High-yield savings, CDs, Treasuries, I-bonds",
-      isPro: false,
-      moduleNumber: 3,
-      moduleName: "Money That Earns While You Sleep",
-      content: `Cash sitting at 0.01% is dying. Put it where it earns 4-5% with zero stock market risk 🏦
-
-**High-yield savings:**
-- 4-5% APY currently
-- FDIC insured $250k
-- Instant access
-- Use for emergency fund
-
-**CDs (Certificates of Deposit):**
-- Lock money 3 months to 5 years
-- 4-5.5% rates
-- FDIC insured
-- Penalty for early withdrawal
-
-**Treasury bills:**
-- US government debt (safest)
-- 4 weeks to 52 weeks
-- 4-5% rates
-- State tax exempt
-
-**I-bonds:**
-- Inflation-protected
-- 5-6% currently (adjusts every 6 months)
-- Must hold 1 year minimum
-- $10,000 annual limit
-
-$10,000 at 0.01% = $1/year. $10,000 at 4.5% = $450/year. Move your money 💰
-
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
-      keyTakeaway: "High-yield savings = 4-5%, FDIC insured. CDs = 4-5.5% locked. T-bills = 4-5%, state tax exempt. I-bonds = inflation-protected.",
-      relatedTopics: ["income-dividends-paycheck", "income-where-to-park-cash"],
-      quiz: [
-        {
-          question: "What's a typical high-yield savings rate currently?",
-          options: ["0.01%", "1%", "4-5%", "10%"],
-          correctAnswer: 2,
-          explanation: "Yes! High-yield pays 4-5% currently. 400-500x more than regular banks 🏦"
-        },
-        {
-          question: "What's the benefit of I-bonds?",
-          options: ["They're inflation-protected", "20% interest", "No limits", "Sell anytime"],
-          correctAnswer: 0,
-          explanation: "That's right! I-bonds adjust with inflation. When inflation is high they pay more 💰"
-        },
-        {
-          question: "Where should emergency funds go?",
-          options: ["Stocks", "High-yield savings", "Under mattress", "Crypto"],
-          correctAnswer: 1,
-          explanation: "Exactly! Emergency fund = high-yield savings. Safe, FDIC insured, instant access, 4-5% 💪"
-        }
-      ]
-    },
-    {
-      id: "income-where-to-park-cash",
-      title: "Where to Park It",
-      category: "Income Streams",
-      readTime: 4,
-      difficulty: "Beginner",
-      summary: "Vetted cash and HYSA partners",
-      isPro: true,
-      moduleNumber: 3,
-      moduleName: "Money That Earns While You Sleep",
-      content: `Here are vetted options for parking cash safely while earning 4-5% 🏦
-
-**High-Yield Savings:**
-- [Ally Bank](#) — 4.5% APY, no minimums, FDIC insured
-- [SoFi](#) — 4.6% APY with direct deposit
-- [Marcus by Goldman Sachs](#) — 4.4% APY, established name
-
-**Money Market Funds:**
-- [Vanguard](#) — VMFXX, 5%+ yield
-- [Fidelity](#) — SPAXX, 5%+ yield
-- [Schwab](#) — Value Advantage, 5%+ yield
-
-**Where to put what:**
-- Emergency fund (3-6 months) → High-yield savings
-- House down payment (1-3 years) → CDs or T-bills
-- Cash waiting to invest → Money market fund
-
-Rates change. Shop around every 6-12 months for best current rate 💰
-
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
-      keyTakeaway: "Ally, SoFi, Marcus for HYSA (4.5%+). Vanguard, Fidelity, Schwab for money market (5%+). Shop every 6-12 months.",
-      relatedTopics: ["income-cash-earns", "income-dividends-paycheck"],
-      quiz: [
-        {
-          question: "What's a typical HYSA rate from vetted partners?",
-          options: ["0.5%", "2%", "4.5%+", "10%"],
-          correctAnswer: 2,
-          explanation: "Yes! Vetted HYSA partners pay 4.5%+ currently 🏦"
-        },
-        {
-          question: "Where should emergency funds go?",
-          options: ["Stocks", "High-yield savings account", "Under mattress", "CDs locked for 5 years"],
-          correctAnswer: 1,
-          explanation: "That's right! Emergency fund = HYSA. Instant access + 4.5%+ yield 💰"
-        },
-        {
-          question: "How often should you shop rates?",
-          options: ["Never", "Every 6-12 months", "Every day", "Once and forget"],
-          correctAnswer: 1,
-          explanation: "Exactly! Rates change. Shop every 6-12 months for best current rate sis 💪"
-        }
-      ]
-    },
-    {
-      id: "income-reits",
-      title: "REITs & Tax-Advantaged Accounts",
-      category: "Income Streams",
-      readTime: 5,
-      difficulty: "Intermediate",
-      summary: "Real estate income + sheltering growth",
-      isPro: true,
-      moduleNumber: 3,
-      moduleName: "Money That Earns While You Sleep",
-      content: `REITs = own real estate income without being a landlord. Buy shares, collect dividends from properties they own 🏢
-
-**How REITs work:**
-Company owns apartments, offices, warehouses. Collects rent. Must pay out 90% as dividends by law. You get 3-7% yield.
-
-**Types:**
-- Residential (apartments) — 3-5% yield
-- Commercial (offices) — 4-6% yield
-- Industrial (warehouses) — 2-4% yield, high growth
-- Data centers — 2-3% yield, cloud boom
-
-**Tax treatment:**
-REIT dividends = ordinary income (higher tax). Hold REITs in Roth IRA or traditional IRA when possible to avoid tax.
-
-**Tax-advantaged accounts:**
-- Roth IRA — $6,500/year, tax-free growth forever
-- Traditional IRA/401k — Pre-tax, deferred
-- HSA — Triple tax advantage
-
-Use these to shelter dividend and REIT income from taxes 💰
-
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
-      keyTakeaway: "REITs = real estate income, 3-7% yield. Taxed as ordinary income (hold in IRA). Roth IRA, 401k, HSA shelter growth.",
-      relatedTopics: ["income-dividends-paycheck", "income-cash-earns"],
-      quiz: [
-        {
-          question: "What must REITs pay as dividends by law?",
-          options: ["50%", "70%", "90%", "100%"],
-          correctAnswer: 2,
-          explanation: "Yes! REITs must pay out 90% of profits by law. That's why they're high-yield 🏢"
-        },
-        {
-          question: "How are REIT dividends taxed?",
-          options: ["Tax-free", "Qualified (15-20%)", "Ordinary income (higher)", "No taxes"],
-          correctAnswer: 2,
-          explanation: "That's right! REIT dividends = ordinary income rate. Hold in Roth IRA when possible 💰"
-        },
-        {
-          question: "What's the Roth IRA contribution limit?",
-          options: ["$3,000", "$6,500", "$10,000", "Unlimited"],
-          correctAnswer: 1,
-          explanation: "Exactly! $6,500/year ($7,000 if 50+). Max it out for tax-free growth 💪"
-        }
-      ]
-    },
-
-    // MODULE 4 — Protection & Ownership
-    {
-      id: "income-protection-first",
-      title: "Why Protection Comes First",
-      category: "Income Streams",
-      readTime: 3,
-      difficulty: "Beginner",
-      summary: "Can't build wealth you don't keep",
-      isPro: false,
-      moduleNumber: 4,
-      moduleName: "Protection & Ownership",
-      content: `You can't build wealth you don't keep. Protection comes before growth 🛡️
-
-**What protection means:**
-- Insurance (term life, disability)
-- Legal structure (LLC for liability)
-- Emergency fund (3-6 months expenses)
-
-**Why it matters:**
-One lawsuit, one medical emergency, one business liability can wipe out years of building. Protection = preserving what you've built.
-
-**Insurance basics:**
-- Term life — cheap, pure protection
-- Disability — replaces income if you can't work
-- Umbrella — extra liability coverage
-
-**Legal structure:**
-LLC separates personal assets from business. If business gets sued they can't take your house.
-
-Build wealth protected. Don't skip this step 💪
-
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
-      keyTakeaway: "Protection = insurance + legal structure + emergency fund. Can't build wealth you don't keep. Protection before growth.",
-      relatedTopics: ["income-insurance-explained", "income-llc-basics"],
-      quiz: [
-        {
-          question: "Why does protection come first?",
-          options: ["It's required by law", "One lawsuit/emergency can wipe out years of building", "Insurance guarantees wealth", "Protection costs nothing"],
-          correctAnswer: 1,
-          explanation: "Yes! One lawsuit or emergency can erase years of work. Protect what you build 🛡️"
-        },
-        {
-          question: "What's the cheapest protection insurance?",
-          options: ["Whole life", "Term life", "Universal life", "No insurance"],
-          correctAnswer: 1,
-          explanation: "That's right! Term life = pure protection, dirt cheap. $20-50/month for $500k coverage 💰"
-        },
-        {
-          question: "What does an LLC protect?",
-          options: ["Guarantees business profit", "Separates personal assets from business liability", "No protection", "Only for corporations"],
-          correctAnswer: 1,
-          explanation: "Exactly! LLC separates personal from business. Lawsuit can't touch your house 💪"
-        }
-      ]
-    },
-    {
-      id: "income-insurance-explained",
-      title: "Insurance, Honestly Explained",
-      category: "Income Streams",
-      readTime: 5,
-      difficulty: "Beginner",
-      summary: "Protection vs savings-driven insurance",
-      isPro: false,
-      moduleNumber: 4,
-      moduleName: "Protection & Ownership",
-      content: `Let's break down insurance honestly. Two types: protection-based (cheap, pure coverage) and savings-driven (expensive, has cash value) 🛡️
-
-**Protection-Based:**
-- Term life — pure death benefit, expires after term, $20-50/month for $500k
-- Disability — pays if you can't work, 1 in 4 need it
-
-**Savings-Driven:**
-- Whole life — death benefit + cash value, 10x cost of term, 2-4% growth
-- IUL — tied to stock market, capped gains
-
-**The honest truth:**
-Most people should buy term + invest the difference. $50 term + $450 invested beats $500 whole life for wealth building.
-
-**But** cash-value has uses: estate planning, forced savings, tax-advantaged borrowing. Just don't let an agent sell it as "retirement" when Roth IRA + index funds is better 💰
-
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
-      keyTakeaway: "Term life = pure protection, cheap. Whole life = protection + cash, expensive. Most: buy term + invest difference.",
-      relatedTopics: ["income-getting-covered", "income-protection-first"],
-      quiz: [
-        {
-          question: "What's the difference between term and whole life?",
-          options: ["They're the same", "Term = pure protection (cheap), whole = protection + cash (expensive)", "Term costs more", "Whole expires"],
-          correctAnswer: 1,
-          explanation: "Yes! Term = pure death benefit, cheap. Whole = death + cash value, 10x cost 🛡️"
-        },
-        {
-          question: "What insurance are you more likely to need?",
-          options: ["Life", "Disability (1 in 4 before retirement)", "Neither", "Only life"],
-          correctAnswer: 1,
-          explanation: "That's right! 1 in 4 become disabled before retirement. Disability often more important 💪"
-        },
-        {
-          question: "What's Pansy's recommendation for most people?",
-          options: ["Buy whole life immediately", "Never get insurance", "Buy term + invest the difference", "Wait until 50"],
-          correctAnswer: 2,
-          explanation: "Exactly! Buy term life + invest difference in Roth IRA/index funds. Better wealth building 💰"
-        }
-      ]
-    },
-    {
-      id: "income-getting-covered",
-      title: "Getting Covered",
-      category: "Income Streams",
-      readTime: 4,
-      difficulty: "Beginner",
-      summary: "Vetted insurance platforms",
-      isPro: true,
-      moduleNumber: 4,
-      moduleName: "Protection & Ownership",
-      content: `Here are vetted platforms to compare term life and disability insurance 🛡️
-
-**Term Life Insurance:**
-- [Policygenius](#) — Compare 30+ insurers, no fees
-- [Ethos](#) — Online application, fast approval
-- [Ladder](#) — Flexible coverage amounts
-
-**Disability Insurance:**
-- [Policygenius](#) — Also compares disability quotes
-- Check employer coverage first (often 50-60% income)
-- Private policy fills the gap to 70%
-
-**What to compare:**
-- Monthly premium
-- Coverage amount
-- Term length (20-30 years for term life)
-- Elimination period (disability — 90 days typical)
-
-Get quotes from 3 sources. 30 minutes of work can save thousands 💰
-
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
-      keyTakeaway: "Policygenius, Ethos, Ladder for term life. Check employer disability first. Compare 3 quotes.",
-      relatedTopics: ["income-insurance-explained", "income-protection-first"],
-      quiz: [
-        {
-          question: "Which platforms are vetted for term life?",
-          options: ["No options", "Policygenius, Ethos, Ladder", "Only local agents", "Insurance is a scam"],
-          correctAnswer: 1,
-          explanation: "Yes! These platforms let you compare quotes from 30+ insurers 🛡️"
-        },
-        {
-          question: "Where should you check for disability first?",
-          options: ["Buy private immediately", "Check employer coverage first", "Never get disability", "Wait until disabled"],
-          correctAnswer: 1,
-          explanation: "That's right! Employer often covers 50-60%. Private policy fills gap to 70% 💰"
-        },
-        {
-          question: "How many quotes should you compare?",
-          options: ["Just 1", "At least 3", "10+", "None"],
-          correctAnswer: 1,
-          explanation: "Exactly! Get at least 3 quotes. 30 minutes can save thousands 💪"
-        }
-      ]
-    },
-    {
-      id: "income-llc-basics",
-      title: "Starting an LLC",
-      category: "Income Streams",
-      readTime: 5,
-      difficulty: "Intermediate",
-      summary: "Liability separation and formation basics",
-      isPro: true,
-      moduleNumber: 4,
-      moduleName: "Protection & Ownership",
-      content: `LLC = Limited Liability Company. Separates personal assets from business. If business gets sued they can't take your house 🏢
-
-**When to form:**
-- Freelancing with clients
-- Running a side business
-- Hiring contractors
-- Want professional appearance
-
-**Don't need if:**
-- Just starting/testing
-- Making under $5k/year
-- W-2 employee with no side business
-
-**How to form:**
-1. Choose name (check availability)
-2. File Articles of Organization with state ($50-500)
-3. Get EIN from IRS (free, 5 minutes)
-4. Open business bank account
-5. File annual reports ($50-300/year)
-
-Form when income is steady $10k+/year. Don't rush on day 1 💰
-
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
-      keyTakeaway: "LLC = liability protection. File with state ($50-500). Get EIN (free). Form when income is $10k+/year steady.",
-      relatedTopics: ["income-protection-first", "income-cash-flow-businesses"],
-      quiz: [
-        {
-          question: "What's the main benefit of an LLC?",
-          options: ["Automatic tax savings", "Separates personal assets from business liabilities", "Guarantees success", "No paperwork"],
-          correctAnswer: 1,
-          explanation: "Yes! LLC = liability shield. Business debts/lawsuits can't touch personal assets 🏢"
-        },
-        {
-          question: "What's an EIN and where do you get it?",
-          options: ["Employer ID from IRS (free, 5 min)", "Expensive license", "Not needed", "Only for corporations"],
-          correctAnswer: 0,
-          explanation: "That's right! EIN = business tax ID from IRS.gov. Free, takes 5 minutes 💰"
-        },
-        {
-          question: "When should you form an LLC?",
-          options: ["Day 1 of idea", "When income is steady $10k+/year", "Never", "After $1M revenue"],
-          correctAnswer: 1,
-          explanation: "Exactly! Form when income is steady $10k+/year. Test your idea first sis 💪"
-        }
-      ]
-    },
-    {
-      id: "income-cash-flow-businesses",
-      title: "Cash-Flow Businesses",
-      category: "Income Streams",
-      readTime: 5,
-      difficulty: "Intermediate",
-      summary: "Small businesses that throw off income",
-      isPro: true,
-      moduleNumber: 4,
-      moduleName: "Protection & Ownership",
-      content: `Some small businesses generate monthly cash flow without being a full-time job. High capital needed but proven models 🏢
-
-**Vending machines:**
-- $3k-10k per machine
-- $100-500/month per machine
-- Location is everything
-
-**Laundromats:**
-- $200k-500k to buy existing
-- $3k-10k/month profit
-- Recession-proof (people need clean clothes)
-
-**Self-storage:**
-- $500k-2M+ startup
-- 70%+ profit margins
-- Growing areas with limited storage
-
-**What they have in common:**
-- Real physical assets
-- Recurring need (not trendy)
-- Low labor once running
-- Cash flow positive within 1-2 years
-
-Not "start with $500" businesses. These are "invest $200k earn $5k/month" businesses. If you have capital or partners they beat trying to go viral 💰
-
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
-      keyTakeaway: "Vending ($3k-10k/machine), laundromats ($200k-500k), storage ($500k-2M). High capital but cash flow positive.",
-      relatedTopics: ["income-real-estate-cash-flow", "income-llc-basics"],
-      quiz: [
-        {
-          question: "What's typical monthly income per vending machine?",
-          options: ["$10-50", "$100-500", "$1,000-2,000", "$5,000+"],
-          correctAnswer: 1,
-          explanation: "Yes! $100-500/month per machine. 10 machines = $1k-5k/month 💰"
-        },
-        {
-          question: "What's the key to vending success?",
-          options: ["Fanciest machines", "Location (high traffic + captive audience)", "Cheapest snacks", "Social media"],
-          correctAnswer: 1,
-          explanation: "That's right! Location is everything. Offices + gyms + hotels = high sales 🏢"
-        },
-        {
-          question: "What do these businesses have in common?",
-          options: ["Tech-based", "Zero startup", "Physical assets solving universal needs with low competition", "Huge teams"],
-          correctAnswer: 2,
-          explanation: "Exactly! Physical assets, universal needs, low competition. Not sexy but profitable sis 💪"
-        }
-      ]
-    },
   ];
 
   useEffect(() => {
@@ -2328,7 +1296,6 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
     "Bonds",
     "Retirement",
     "Trading Psychology",
-    "Income Streams",
   ];
 
   const completionPercentage = Math.round(
@@ -2344,7 +1311,6 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
     const relatedLessons = lessons.filter((l) =>
       lesson.relatedTopics.includes(l.id)
     );
-    const isLocked = lesson.isPro && !isPro;
 
     return (
       <Layout>
@@ -2386,11 +1352,6 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
                     >
                       {lesson.difficulty}
                     </Badge>
-                    {lesson.isPro && (
-                      <Badge className="bg-accent/20 text-accent border-accent/30">
-                        PRO
-                      </Badge>
-                    )}
                     <div className="flex items-center gap-1 text-sm text-muted-foreground">
                       <Clock className="w-4 h-4" />
                       {lesson.readTime} min read
@@ -2400,24 +1361,22 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
                     {lesson.title}
                   </h1>
                 </div>
-                {!isLocked && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => toggleBookmark(lesson.id)}
-                    className={
-                      isBookmarked
-                        ? "text-accent hover:text-accent/80"
-                        : "text-muted-foreground hover:text-accent"
-                    }
-                  >
-                    {isBookmarked ? (
-                      <BookmarkCheck className="w-5 h-5" />
-                    ) : (
-                      <Bookmark className="w-5 h-5" />
-                    )}
-                  </Button>
-                )}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => toggleBookmark(lesson.id)}
+                  className={
+                    isBookmarked
+                      ? "text-accent hover:text-accent/80"
+                      : "text-muted-foreground hover:text-accent"
+                  }
+                >
+                  {isBookmarked ? (
+                    <BookmarkCheck className="w-5 h-5" />
+                  ) : (
+                    <Bookmark className="w-5 h-5" />
+                  )}
+                </Button>
               </div>
 
               <div className="flex items-center gap-3">
@@ -2435,213 +1394,189 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
               </div>
             </Card>
 
-            {isLocked ? (
-              <Card className="p-8 bg-gradient-to-br from-accent/10 to-primary/10 border-accent/30 rounded-2xl text-center space-y-4">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center mx-auto">
-                  <Lock className="w-8 h-8 text-white" />
-                </div>
+            <Card className="p-6 bg-card border-border rounded-2xl">
+              <div className="prose prose-invert max-w-none">
+                <p className="text-foreground leading-relaxed whitespace-pre-line">
+                  {lesson.content}
+                </p>
+              </div>
+
+              <div className="mt-8 p-4 bg-primary/10 border-l-4 border-primary rounded-r-lg">
+                <p className="text-sm font-semibold text-primary mb-2">
+                  Key Takeaway
+                </p>
+                <p className="text-sm text-foreground leading-relaxed">
+                  {lesson.keyTakeaway}
+                </p>
+              </div>
+
+              <p className="mt-6 text-xs text-muted-foreground text-center">
+                This is educational content only and does not constitute
+                financial advice. Always invest what feels right for you 💛
+              </p>
+            </Card>
+
+            <Card className="p-6 bg-card border-accent/30 rounded-2xl space-y-6">
+              <div className="flex items-center gap-3">
+                <Award className="w-6 h-6 text-accent" />
                 <div>
-                  <h3 className="text-xl font-bold text-foreground mb-2">
-                    This is a Pro Lesson
-                  </h3>
-                  <p className="text-muted-foreground">
-                    {lesson.summary}
+                  <h2 className="text-xl font-semibold text-foreground">
+                    Test Your Knowledge
+                  </h2>
+                  <p className="text-sm text-muted-foreground">
+                    See how much you learned from this lesson!
                   </p>
                 </div>
-                <Button
-                  onClick={() => router.push("/subscription")}
-                  className="bg-gradient-to-r from-accent to-primary hover:from-accent/90 hover:to-primary/90 text-white"
-                >
-                  Unlock with Bloom Pro
-                </Button>
-              </Card>
-            ) : (
-              <>
-                <Card className="p-6 bg-card border-border rounded-2xl">
-                  <div className="prose prose-invert max-w-none">
-                    <p className="text-foreground leading-relaxed whitespace-pre-line">
-                      {lesson.content}
+              </div>
+
+              <div className="space-y-6">
+                {lesson.quiz.map((question, qIndex) => (
+                  <div key={qIndex} className="space-y-3">
+                    <p className="font-medium text-foreground">
+                      {qIndex + 1}. {question.question}
                     </p>
-                  </div>
+                    <div className="space-y-2">
+                      {question.options.map((option, oIndex) => {
+                        const isSelected = quizAnswers[qIndex] === oIndex;
+                        const isCorrect = oIndex === question.correctAnswer;
+                        const showFeedback = quizSubmitted;
 
-                  <div className="mt-8 p-4 bg-primary/10 border-l-4 border-primary rounded-r-lg">
-                    <p className="text-sm font-semibold text-primary mb-2">
-                      Key Takeaway
-                    </p>
-                    <p className="text-sm text-foreground leading-relaxed">
-                      {lesson.keyTakeaway}
-                    </p>
-                  </div>
-
-                  <p className="mt-6 text-xs text-muted-foreground text-center">
-                    This is educational content only and does not constitute
-                    financial advice. Always invest what feels right for you 💛
-                  </p>
-                </Card>
-
-                <Card className="p-6 bg-card border-accent/30 rounded-2xl space-y-6">
-                  <div className="flex items-center gap-3">
-                    <Award className="w-6 h-6 text-accent" />
-                    <div>
-                      <h2 className="text-xl font-semibold text-foreground">
-                        Test Your Knowledge
-                      </h2>
-                      <p className="text-sm text-muted-foreground">
-                        See how much you learned from this lesson!
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-6">
-                    {lesson.quiz.map((question, qIndex) => (
-                      <div key={qIndex} className="space-y-3">
-                        <p className="font-medium text-foreground">
-                          {qIndex + 1}. {question.question}
-                        </p>
-                        <div className="space-y-2">
-                          {question.options.map((option, oIndex) => {
-                            const isSelected = quizAnswers[qIndex] === oIndex;
-                            const isCorrect = oIndex === question.correctAnswer;
-                            const showFeedback = quizSubmitted;
-
-                            return (
-                              <button
-                                key={oIndex}
-                                onClick={() => {
-                                  if (!quizSubmitted) {
-                                    const newAnswers = [...quizAnswers];
-                                    newAnswers[qIndex] = oIndex;
-                                    setQuizAnswers(newAnswers);
-                                  }
-                                }}
-                                disabled={quizSubmitted}
-                                className={`w-full text-left p-3 rounded-lg border transition-all ${
+                        return (
+                          <button
+                            key={oIndex}
+                            onClick={() => {
+                              if (!quizSubmitted) {
+                                const newAnswers = [...quizAnswers];
+                                newAnswers[qIndex] = oIndex;
+                                setQuizAnswers(newAnswers);
+                              }
+                            }}
+                            disabled={quizSubmitted}
+                            className={`w-full text-left p-3 rounded-lg border transition-all ${
+                              showFeedback && isCorrect
+                                ? "border-primary bg-primary/10 text-foreground"
+                                : showFeedback && isSelected && !isCorrect
+                                ? "border-destructive bg-destructive/10 text-foreground"
+                                : isSelected
+                                ? "border-accent bg-accent/10 text-foreground"
+                                : "border-border bg-muted/30 text-muted-foreground hover:border-accent hover:bg-accent/5"
+                            } ${quizSubmitted ? "cursor-default" : "cursor-pointer"}`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <div
+                                className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
                                   showFeedback && isCorrect
-                                    ? "border-primary bg-primary/10 text-foreground"
+                                    ? "border-primary bg-primary"
                                     : showFeedback && isSelected && !isCorrect
-                                    ? "border-destructive bg-destructive/10 text-foreground"
+                                    ? "border-destructive bg-destructive"
                                     : isSelected
-                                    ? "border-accent bg-accent/10 text-foreground"
-                                    : "border-border bg-muted/30 text-muted-foreground hover:border-accent hover:bg-accent/5"
-                                } ${quizSubmitted ? "cursor-default" : "cursor-pointer"}`}
+                                    ? "border-accent bg-accent"
+                                    : "border-muted-foreground"
+                                }`}
                               >
-                                <div className="flex items-center gap-2">
-                                  <div
-                                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                                      showFeedback && isCorrect
-                                        ? "border-primary bg-primary"
-                                        : showFeedback && isSelected && !isCorrect
-                                        ? "border-destructive bg-destructive"
-                                        : isSelected
-                                        ? "border-accent bg-accent"
-                                        : "border-muted-foreground"
-                                    }`}
-                                  >
-                                    {showFeedback && isCorrect && (
-                                      <CheckCircle2 className="w-3 h-3 text-white" />
-                                    )}
-                                    {showFeedback && isSelected && !isCorrect && (
-                                      <span className="text-white text-xs">✗</span>
-                                    )}
-                                  </div>
-                                  <span className="text-sm">{option}</span>
-                                </div>
-                              </button>
-                            );
-                          })}
-                        </div>
-                        {quizSubmitted && (
-                          <div className="p-3 bg-accent/10 border-l-4 border-accent rounded-r-lg">
-                            <p className="text-sm text-foreground">
-                              {question.explanation}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-
-                  {!quizSubmitted ? (
-                    <Button
-                      onClick={handleSubmitQuiz}
-                      disabled={quizAnswers.includes(null)}
-                      className="w-full bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Submit Quiz
-                    </Button>
-                  ) : (
-                    <div className="space-y-4">
-                      <div className="p-4 bg-primary/10 border border-primary/30 rounded-lg text-center">
-                        <Award className="w-8 h-8 text-primary mx-auto mb-2" />
-                        <p className="text-lg font-semibold text-primary mb-1">
-                          You scored {quizScore} out of 3!
-                        </p>
-                        <p className="text-sm text-foreground">
-                          {quizScore === 3
-                            ? "Perfect score girl! You absolutely crushed this lesson 🎉"
-                            : quizScore === 2
-                            ? "Nice work! You got most of it down 💪"
-                            : "That's okay! Go back and review the lesson anytime 💛"}
-                        </p>
-                      </div>
-                      <Button
-                        onClick={resetQuiz}
-                        variant="outline"
-                        className="w-full border-border"
-                      >
-                        Retake Quiz
-                      </Button>
-                    </div>
-                  )}
-                </Card>
-
-                {relatedLessons.length > 0 && (
-                  <Card className="p-6 bg-card border-border rounded-2xl">
-                    <h3 className="text-lg font-semibold text-foreground mb-4">
-                      Related Topics
-                    </h3>
-                    <div className="space-y-3">
-                      {relatedLessons.map((related) => (
-                        <button
-                          key={related.id}
-                          onClick={() => {
-                            setSelectedLesson(related.id);
-                            setHasScrolledToBottom(false);
-                            resetQuiz();
-                            window.scrollTo(0, 0);
-                          }}
-                          className="w-full flex items-center justify-between p-3 hover:bg-muted/50 rounded-lg transition-colors group"
-                        >
-                          <div className="flex items-center gap-3">
-                            {completedLessons.includes(related.id) ? (
-                              <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0" />
-                            ) : (
-                              <Circle className="w-5 h-5 text-muted-foreground flex-shrink-0" />
-                            )}
-                            <div className="text-left">
-                              <p className="font-medium text-foreground group-hover:text-accent transition-colors">
-                                {related.title}
-                              </p>
-                              <div className="flex items-center gap-2 mt-1">
-                                <Badge
-                                  variant="outline"
-                                  className="text-xs border-muted-foreground/30 text-muted-foreground"
-                                >
-                                  {related.category}
-                                </Badge>
-                                <span className="text-xs text-muted-foreground">
-                                  {related.readTime} min
-                                </span>
+                                {showFeedback && isCorrect && (
+                                  <CheckCircle2 className="w-3 h-3 text-white" />
+                                )}
+                                {showFeedback && isSelected && !isCorrect && (
+                                  <span className="text-white text-xs">✗</span>
+                                )}
                               </div>
+                              <span className="text-sm">{option}</span>
                             </div>
-                          </div>
-                          <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-accent transition-all group-hover:translate-x-1" />
-                        </button>
-                      ))}
+                          </button>
+                        );
+                      })}
                     </div>
-                  </Card>
-                )}
-              </>
+                    {quizSubmitted && (
+                      <div className="p-3 bg-accent/10 border-l-4 border-accent rounded-r-lg">
+                        <p className="text-sm text-foreground">
+                          {question.explanation}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {!quizSubmitted ? (
+                <Button
+                  onClick={handleSubmitQuiz}
+                  disabled={quizAnswers.includes(null)}
+                  className="w-full bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Submit Quiz
+                </Button>
+              ) : (
+                <div className="space-y-4">
+                  <div className="p-4 bg-primary/10 border border-primary/30 rounded-lg text-center">
+                    <Award className="w-8 h-8 text-primary mx-auto mb-2" />
+                    <p className="text-lg font-semibold text-primary mb-1">
+                      You scored {quizScore} out of 3!
+                    </p>
+                    <p className="text-sm text-foreground">
+                      {quizScore === 3
+                        ? "Perfect score girl! You absolutely crushed this lesson 🎉"
+                        : quizScore === 2
+                        ? "Nice work! You got most of it down 💪"
+                        : "That's okay! Go back and review the lesson anytime 💛"}
+                    </p>
+                  </div>
+                  <Button
+                    onClick={resetQuiz}
+                    variant="outline"
+                    className="w-full border-border"
+                  >
+                    Retake Quiz
+                  </Button>
+                </div>
+              )}
+            </Card>
+
+            {relatedLessons.length > 0 && (
+              <Card className="p-6 bg-card border-border rounded-2xl">
+                <h3 className="text-lg font-semibold text-foreground mb-4">
+                  Related Topics
+                </h3>
+                <div className="space-y-3">
+                  {relatedLessons.map((related) => (
+                    <button
+                      key={related.id}
+                      onClick={() => {
+                        setSelectedLesson(related.id);
+                        setHasScrolledToBottom(false);
+                        resetQuiz();
+                        window.scrollTo(0, 0);
+                      }}
+                      className="w-full flex items-center justify-between p-3 hover:bg-muted/50 rounded-lg transition-colors group"
+                    >
+                      <div className="flex items-center gap-3">
+                        {completedLessons.includes(related.id) ? (
+                          <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0" />
+                        ) : (
+                          <Circle className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+                        )}
+                        <div className="text-left">
+                          <p className="font-medium text-foreground group-hover:text-accent transition-colors">
+                            {related.title}
+                          </p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <Badge
+                              variant="outline"
+                              className="text-xs border-muted-foreground/30 text-muted-foreground"
+                            >
+                              {related.category}
+                            </Badge>
+                            <span className="text-xs text-muted-foreground">
+                              {related.readTime} min
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-accent transition-all group-hover:translate-x-1" />
+                    </button>
+                  ))}
+                </div>
+              </Card>
             )}
           </div>
         </div>
@@ -2719,247 +1654,6 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
           <div className="mb-8">
             <PositionSizeCalculator />
           </div>
-
-          {/* Beyond the Market: Building Multiple Income Streams - Distinct Section */}
-          {activeCategory === "All" || activeCategory === "Income Streams" ? (
-            <Card className="p-6 bg-gradient-to-br from-primary/5 to-accent/5 border-accent/30 rounded-2xl mb-8">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center">
-                  <DollarSign className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-foreground">Beyond the Market</h2>
-                  <p className="text-sm text-muted-foreground">Building Multiple Income Streams</p>
-                </div>
-              </div>
-              
-              <p className="text-foreground/80 mb-6">
-                Real estate, digital products, passive income — Pansy breaks down how to build wealth beyond the stock market 🏡
-              </p>
-
-              <div className="space-y-6">
-                {/* Module 1 */}
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 mb-3">
-                    <HomeIcon className="w-5 h-5 text-accent" />
-                    <h3 className="font-semibold text-foreground">Module 1: Real Estate Income & Loans</h3>
-                  </div>
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    {lessons
-                      .filter(l => l.moduleNumber === 1 && l.category === "Income Streams")
-                      .map(lesson => {
-                        const isCompleted = completedLessons.includes(lesson.id);
-                        const isLocked = lesson.isPro && !isPro;
-                        return (
-                          <Card
-                            key={lesson.id}
-                            className={`p-4 ${isLocked ? 'bg-muted/30 border-accent/20' : 'bg-card border-border hover:border-accent/50'} rounded-xl transition-all cursor-pointer group`}
-                            onClick={() => !isLocked && setSelectedLesson(lesson.id)}
-                          >
-                            <div className="flex items-start justify-between gap-2">
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-1">
-                                  {isLocked && (
-                                    <Lock className="w-4 h-4 text-accent flex-shrink-0" />
-                                  )}
-                                  {!isLocked && isCompleted && (
-                                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
-                                  )}
-                                  {lesson.isPro && (
-                                    <Badge className="bg-accent/20 text-accent border-accent/30 text-xs">PRO</Badge>
-                                  )}
-                                  {!lesson.isPro && (
-                                    <Badge className="bg-primary/20 text-primary border-primary/30 text-xs">FREE</Badge>
-                                  )}
-                                </div>
-                                <h4 className={`font-medium ${isLocked ? 'text-muted-foreground' : 'text-foreground group-hover:text-accent'} transition-colors text-sm`}>
-                                  {lesson.title}
-                                </h4>
-                                <p className="text-xs text-muted-foreground mt-1">
-                                  {isLocked ? "Unlock with Bloom Pro to access" : lesson.summary}
-                                </p>
-                                <div className="flex items-center gap-2 mt-2">
-                                  <Clock className="w-3 h-3 text-muted-foreground" />
-                                  <span className="text-xs text-muted-foreground">{lesson.readTime} min</span>
-                                </div>
-                              </div>
-                              {!isLocked && (
-                                <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-accent transition-all group-hover:translate-x-1 flex-shrink-0" />
-                              )}
-                            </div>
-                          </Card>
-                        );
-                      })}
-                  </div>
-                </div>
-
-                {/* Module 2 */}
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Briefcase className="w-5 h-5 text-accent" />
-                    <h3 className="font-semibold text-foreground">Module 2: Income From What You Already Know</h3>
-                  </div>
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    {lessons
-                      .filter(l => l.moduleNumber === 2 && l.category === "Income Streams")
-                      .map(lesson => {
-                        const isCompleted = completedLessons.includes(lesson.id);
-                        const isLocked = lesson.isPro && !isPro;
-                        return (
-                          <Card
-                            key={lesson.id}
-                            className={`p-4 ${isLocked ? 'bg-muted/30 border-accent/20' : 'bg-card border-border hover:border-accent/50'} rounded-xl transition-all cursor-pointer group`}
-                            onClick={() => !isLocked && setSelectedLesson(lesson.id)}
-                          >
-                            <div className="flex items-start justify-between gap-2">
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-1">
-                                  {isLocked && (
-                                    <Lock className="w-4 h-4 text-accent flex-shrink-0" />
-                                  )}
-                                  {!isLocked && isCompleted && (
-                                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
-                                  )}
-                                  {lesson.isPro && (
-                                    <Badge className="bg-accent/20 text-accent border-accent/30 text-xs">PRO</Badge>
-                                  )}
-                                  {!lesson.isPro && (
-                                    <Badge className="bg-primary/20 text-primary border-primary/30 text-xs">FREE</Badge>
-                                  )}
-                                </div>
-                                <h4 className={`font-medium ${isLocked ? 'text-muted-foreground' : 'text-foreground group-hover:text-accent'} transition-colors text-sm`}>
-                                  {lesson.title}
-                                </h4>
-                                <p className="text-xs text-muted-foreground mt-1">
-                                  {isLocked ? "Unlock with Bloom Pro to access" : lesson.summary}
-                                </p>
-                                <div className="flex items-center gap-2 mt-2">
-                                  <Clock className="w-3 h-3 text-muted-foreground" />
-                                  <span className="text-xs text-muted-foreground">{lesson.readTime} min</span>
-                                </div>
-                              </div>
-                              {!isLocked && (
-                                <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-accent transition-all group-hover:translate-x-1 flex-shrink-0" />
-                              )}
-                            </div>
-                          </Card>
-                        );
-                      })}
-                  </div>
-                </div>
-
-                {/* Module 3 */}
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 mb-3">
-                    <TrendingUp className="w-5 h-5 text-accent" />
-                    <h3 className="font-semibold text-foreground">Module 3: Money That Earns While You Sleep</h3>
-                  </div>
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    {lessons
-                      .filter(l => l.moduleNumber === 3 && l.category === "Income Streams")
-                      .map(lesson => {
-                        const isCompleted = completedLessons.includes(lesson.id);
-                        const isLocked = lesson.isPro && !isPro;
-                        return (
-                          <Card
-                            key={lesson.id}
-                            className={`p-4 ${isLocked ? 'bg-muted/30 border-accent/20' : 'bg-card border-border hover:border-accent/50'} rounded-xl transition-all cursor-pointer group`}
-                            onClick={() => !isLocked && setSelectedLesson(lesson.id)}
-                          >
-                            <div className="flex items-start justify-between gap-2">
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-1">
-                                  {isLocked && (
-                                    <Lock className="w-4 h-4 text-accent flex-shrink-0" />
-                                  )}
-                                  {!isLocked && isCompleted && (
-                                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
-                                  )}
-                                  {lesson.isPro && (
-                                    <Badge className="bg-accent/20 text-accent border-accent/30 text-xs">PRO</Badge>
-                                  )}
-                                  {!lesson.isPro && (
-                                    <Badge className="bg-primary/20 text-primary border-primary/30 text-xs">FREE</Badge>
-                                  )}
-                                </div>
-                                <h4 className={`font-medium ${isLocked ? 'text-muted-foreground' : 'text-foreground group-hover:text-accent'} transition-colors text-sm`}>
-                                  {lesson.title}
-                                </h4>
-                                <p className="text-xs text-muted-foreground mt-1">
-                                  {isLocked ? "Unlock with Bloom Pro to access" : lesson.summary}
-                                </p>
-                                <div className="flex items-center gap-2 mt-2">
-                                  <Clock className="w-3 h-3 text-muted-foreground" />
-                                  <span className="text-xs text-muted-foreground">{lesson.readTime} min</span>
-                                </div>
-                              </div>
-                              {!isLocked && (
-                                <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-accent transition-all group-hover:translate-x-1 flex-shrink-0" />
-                              )}
-                            </div>
-                          </Card>
-                        );
-                      })}
-                  </div>
-                </div>
-
-                {/* Module 4 */}
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Shield className="w-5 h-5 text-accent" />
-                    <h3 className="font-semibold text-foreground">Module 4: Protection & Ownership</h3>
-                  </div>
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    {lessons
-                      .filter(l => l.moduleNumber === 4 && l.category === "Income Streams")
-                      .map(lesson => {
-                        const isCompleted = completedLessons.includes(lesson.id);
-                        const isLocked = lesson.isPro && !isPro;
-                        return (
-                          <Card
-                            key={lesson.id}
-                            className={`p-4 ${isLocked ? 'bg-muted/30 border-accent/20' : 'bg-card border-border hover:border-accent/50'} rounded-xl transition-all cursor-pointer group`}
-                            onClick={() => !isLocked && setSelectedLesson(lesson.id)}
-                          >
-                            <div className="flex items-start justify-between gap-2">
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-1">
-                                  {isLocked && (
-                                    <Lock className="w-4 h-4 text-accent flex-shrink-0" />
-                                  )}
-                                  {!isLocked && isCompleted && (
-                                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
-                                  )}
-                                  {lesson.isPro && (
-                                    <Badge className="bg-accent/20 text-accent border-accent/30 text-xs">PRO</Badge>
-                                  )}
-                                  {!lesson.isPro && (
-                                    <Badge className="bg-primary/20 text-primary border-primary/30 text-xs">FREE</Badge>
-                                  )}
-                                </div>
-                                <h4 className={`font-medium ${isLocked ? 'text-muted-foreground' : 'text-foreground group-hover:text-accent'} transition-colors text-sm`}>
-                                  {lesson.title}
-                                </h4>
-                                <p className="text-xs text-muted-foreground mt-1">
-                                  {isLocked ? "Unlock with Bloom Pro to access" : lesson.summary}
-                                </p>
-                                <div className="flex items-center gap-2 mt-2">
-                                  <Clock className="w-3 h-3 text-muted-foreground" />
-                                  <span className="text-xs text-muted-foreground">{lesson.readTime} min</span>
-                                </div>
-                              </div>
-                              {!isLocked && (
-                                <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-accent transition-all group-hover:translate-x-1 flex-shrink-0" />
-                              )}
-                            </div>
-                          </Card>
-                        );
-                      })}
-                  </div>
-                </div>
-              </div>
-            </Card>
-          ) : null}
 
           {/* Lessons Grid */}
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

@@ -50,7 +50,7 @@ interface PansyAnalysis {
 export default function StockPage() {
   const router = useRouter();
   const { ticker } = router.query;
-  const { isPro, isLoggedIn, isLoading: subscriptionLoading } = useSubscription();
+  const { isPro, isLoggedIn } = useSubscription();
   
   const [stockData, setStockData] = useState<StockData | null>(null);
   const [pansyAnalysis, setPansyAnalysis] = useState<PansyAnalysis | null>(null);
@@ -58,7 +58,7 @@ export default function StockPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showLockedFeatureModal, setShowLockedFeatureModal] = useState(false);
-  const { viewCount, trackView, showUpgradeModal, setShowUpgradeModal } = useViewTracker(isPro);
+  const { viewCount, trackView, showUpgradeModal, setShowUpgradeModal } = useViewTracker();
   
   useEffect(() => {
     if (ticker && typeof ticker === "string") {
@@ -102,14 +102,27 @@ export default function StockPage() {
   };
 
   const loadPansyAnalysis = async (symbol: string, quote: StockData) => {
+    // Fetch fresh session and profile data to avoid race condition with state
+    const session = await authService.getCurrentSession();
+    
     // Check if user is logged in
-    if (!isLoggedIn) {
+    if (!session) {
       setShowLockedFeatureModal(true);
       return;
     }
 
-    // Check if user is Pro using context (single source of truth)
-    if (!isPro) {
+    // Fetch user's profile to check Pro status
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("is_pro, subscription_status")
+      .eq("id", session.user.id)
+      .single();
+
+    // Compute Pro status from fresh data
+    const userIsPro = profile?.is_pro || profile?.subscription_status === "active";
+
+    // Check if user is Pro - only Pro users can access full analysis
+    if (!userIsPro) {
       setShowUpgradeModal(true);
       return;
     }
@@ -149,7 +162,7 @@ export default function StockPage() {
     return "text-muted-foreground bg-muted border-border";
   };
 
-  if (isLoading || subscriptionLoading) {
+  if (isLoading) {
     return (
       <Layout>
         <div className="container-full py-8 space-y-6 pb-24">
