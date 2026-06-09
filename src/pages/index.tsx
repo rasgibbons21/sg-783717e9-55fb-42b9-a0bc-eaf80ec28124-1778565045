@@ -1,19 +1,22 @@
-/* eslint-disable @next/next/no-img-element */
+ 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { supabase } from "@/integrations/supabase/client";
 import { marketService } from "@/services/marketService";
-import { TrendingUp, Sparkles, Shield, BarChart3, Users, DollarSign, Star } from "lucide-react";
+import { 
+  BookOpen, 
+  BarChart3, 
+  PieChart, 
+  Target, 
+  TrendingUp,
+  Bell,
+  ArrowRight,
+  Sparkles
+} from "lucide-react";
 import { SEO } from "@/components/SEO";
 
 interface FeaturedStock {
@@ -26,13 +29,12 @@ interface FeaturedStock {
 
 export default function LandingPage() {
   const router = useRouter();
-  const [showPansyModal, setShowPansyModal] = useState(false);
-  const [featuredStocks, setFeaturedStocks] = useState<FeaturedStock[]>([]);
+  const [featuredETF, setFeaturedETF] = useState<FeaturedStock | null>(null);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
     checkAuthAndRedirect();
-    loadFeaturedStocks();
+    loadFeaturedETF();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -55,24 +57,17 @@ export default function LandingPage() {
     setIsCheckingAuth(false);
   };
 
-  const loadFeaturedStocks = async () => {
-    const tickers = ["AAPL", "SCHD", "NVDA"];
-    const stocks: FeaturedStock[] = [];
-
-    for (const ticker of tickers) {
-      const quote = await marketService.getRealTimeQuote(ticker);
-      if (quote) {
-        stocks.push({
-          ticker,
-          name: ticker === "AAPL" ? "Apple Inc." : ticker === "SCHD" ? "Schwab US Dividend ETF" : "NVIDIA Corporation",
-          price: quote.c,
-          change: quote.d ?? 0,
-          changePercent: quote.dp ?? 0,
-        });
-      }
+  const loadFeaturedETF = async () => {
+    const quote = await marketService.getRealTimeQuote("VOO");
+    if (quote) {
+      setFeaturedETF({
+        ticker: "VOO",
+        name: "Vanguard S&P 500 ETF",
+        price: quote.c,
+        change: quote.d ?? 0,
+        changePercent: quote.dp ?? 0,
+      });
     }
-
-    setFeaturedStocks(stocks);
   };
 
   const formatPrice = (price: number) => {
@@ -85,10 +80,10 @@ export default function LandingPage() {
 
   if (isCheckingAuth) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-background">
+      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: "#FAF7F2" }}>
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-accent border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-muted-foreground">Loading Bloom...</p>
+          <div className="w-16 h-16 border-4 border-t-transparent rounded-full animate-spin mx-auto mb-4" style={{ borderColor: "#C4714A", borderTopColor: "transparent" }} />
+          <p style={{ color: "#2D4A3E" }}>Loading Bloom...</p>
         </div>
       </div>
     );
@@ -98,464 +93,326 @@ export default function LandingPage() {
     <>
       <SEO 
         title="Bloom - Investing Made Simple for Women" 
-        description="Your money. Your terms. Your future. Join thousands of women taking control of their financial future with Pansy, your personal investing guide."
+        description="Invest with Confidence. Bloom Into Wealth. Your all-in-one space to learn investing, analyze stocks, build wealth, and become the woman your future self is proud of."
       />
       
-      <div className="min-h-screen bg-background">
-        {/* Header */}
-        <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-          <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+      <div className="min-h-screen" style={{ backgroundColor: "#FAF7F2" }}>
+        {/* Top Navigation */}
+        <header className="sticky top-0 z-50 backdrop-blur-sm" style={{ backgroundColor: "rgba(250, 247, 242, 0.95)", borderBottom: "1px solid rgba(45, 74, 62, 0.1)" }}>
+          <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            {/* Left - Logo + Tagline */}
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, #2D4A3E 0%, #D4AF6A 100%)" }}>
                 <span className="text-2xl">🌸</span>
               </div>
-              <span className="font-serif text-2xl font-bold text-foreground">Bloom</span>
-            </div>
-            <Link href="/onboarding">
-              <Button variant="outline" className="border-accent text-accent hover:bg-accent hover:text-accent-foreground">
-                Sign In
-              </Button>
-            </Link>
-          </div>
-        </header>
-
-        {/* Hero Section */}
-        <section className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-accent/5 to-background" />
-          <div className="relative max-w-6xl mx-auto px-4 py-20 lg:py-32">
-            <div className="space-y-12">
-              {/* Hero Section */}
-              <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-                {/* Left side - Text content */}
-                <div className="space-y-8 order-2 lg:order-1">
-                  <div className="space-y-4">
-                    <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground leading-tight">
-                      Your money. Your terms. Your future.
-                    </h1>
-                    <p className="text-xl text-muted-foreground leading-relaxed">
-                      Bloom is the investing-education app that teaches women to understand stocks, ETFs, dividends, and wealth-building in plain language — with Pansy as your personal guide.
-                    </p>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row gap-4">
-                    <Link href="/onboarding">
-                      <Button
-                        size="lg"
-                        className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-lg px-8 py-6"
-                      >
-                        Start Investing
-                      </Button>
-                    </Link>
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      onClick={() => setShowPansyModal(true)}
-                      className="w-full sm:w-auto border-accent text-accent hover:bg-accent/10 font-semibold text-lg px-8 py-6"
-                    >
-                      Meet Pansy
-                    </Button>
-                  </div>
-
-                  {/* Clarity Row - Three Clear Benefits */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-                    <div className="flex items-center gap-3 p-3 rounded-lg bg-card/50 border border-border/50">
-                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                        <Sparkles className="w-5 h-5 text-primary" />
-                      </div>
-                      <p className="text-sm font-medium text-foreground leading-snug">
-                        Learn investing in plain language
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-3 p-3 rounded-lg bg-card/50 border border-border/50">
-                      <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0">
-                        <BarChart3 className="w-5 h-5 text-accent" />
-                      </div>
-                      <p className="text-sm font-medium text-foreground leading-snug">
-                        Analyze any stock with Pansy
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-3 p-3 rounded-lg bg-card/50 border border-border/50">
-                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                        <TrendingUp className="w-5 h-5 text-primary" />
-                      </div>
-                      <p className="text-sm font-medium text-foreground leading-snug">
-                        Build confidence, not hype
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-4 pt-4">
-                    <div className="text-center space-y-1">
-                      <div className="flex items-center justify-center mb-2">
-                        <Users className="w-5 h-5 text-accent" />
-                      </div>
-                      <p className="text-2xl font-bold text-foreground">12K+</p>
-                      <p className="text-xs text-muted-foreground">Women Investors</p>
-                    </div>
-                    <div className="text-center space-y-1">
-                      <div className="flex items-center justify-center mb-2">
-                        <TrendingUp className="w-5 h-5 text-accent" />
-                      </div>
-                      <p className="text-2xl font-bold text-foreground">$2.4M</p>
-                      <p className="text-xs text-muted-foreground">Analyzed Weekly</p>
-                    </div>
-                    <div className="text-center space-y-1">
-                      <div className="flex items-center justify-center mb-2">
-                        <Star className="w-5 h-5 text-accent" />
-                      </div>
-                      <p className="text-2xl font-bold text-foreground">500+</p>
-                      <p className="text-xs text-muted-foreground">Daily Picks</p>
-                    </div>
-                  </div>
-
-                  <Card className="p-4 bg-gradient-to-br from-accent/10 to-accent/5 border-accent/20">
-                    <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent/80 to-accent flex items-center justify-center flex-shrink-0">
-                        <span className="text-xl">🌺</span>
-                      </div>
-                      <div className="space-y-1 flex-1">
-                        <div className="flex items-center gap-2">
-                          <p className="font-semibold text-foreground">Pansy</p>
-                          <Sparkles className="w-4 h-4 text-accent" />
-                        </div>
-                        <p className="text-sm text-muted-foreground italic leading-relaxed">
-                          "Hi I'm Pansy — I know everything about investing and I'm going
-                          to break it all down for you in a way that actually makes sense.
-                          No confusing terms, no pressure 💛"
-                        </p>
-                      </div>
-                    </div>
-                  </Card>
-                </div>
-
-                {/* Right side - Hero image */}
-                <div className="order-1 lg:order-2">
-                  <div className="relative">
-                    <img
-                      src="/images/hero-woman.png"
-                      alt="Woman managing investments"
-                      className="w-full h-auto rounded-2xl shadow-2xl object-cover"
-                    />
-                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-background/20 to-transparent pointer-events-none"></div>
-                  </div>
-                </div>
+              <div>
+                <span className="font-serif text-2xl font-bold block" style={{ color: "#2D4A3E" }}>Bloom</span>
+                <span className="text-xs tracking-wide" style={{ color: "#2D4A3E", opacity: 0.6 }}>Invest. Grow.</span>
               </div>
             </div>
-          </div>
-        </section>
 
-        {/* How Bloom Works */}
-        <section className="py-20 bg-muted/30">
-          <div className="max-w-6xl mx-auto px-4">
-            <div className="text-center space-y-4 mb-16">
-              <h2 className="font-serif text-4xl font-bold text-foreground">
-                How Bloom Works
-              </h2>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                Three simple steps to start investing with confidence
-              </p>
-            </div>
+            {/* Center - Navigation */}
+            <nav className="hidden lg:flex items-center gap-8">
+              <Link href="/home" className="text-sm font-medium transition-colors" style={{ color: "#2D4A3E" }}>
+                Home
+              </Link>
+              <Link href="/learn" className="text-sm font-medium transition-colors" style={{ color: "#2D4A3E" }}>
+                Learn
+              </Link>
+              <Link href="/discover" className="text-sm font-medium transition-colors" style={{ color: "#2D4A3E" }}>
+                Analyze
+              </Link>
+              <Link href="/portfolio" className="text-sm font-medium transition-colors" style={{ color: "#2D4A3E" }}>
+                Portfolio
+              </Link>
+              <Link href="/goals" className="text-sm font-medium transition-colors" style={{ color: "#2D4A3E" }}>
+                Discipline
+              </Link>
+              <Link href="/subscription" className="text-sm font-semibold transition-colors" style={{ color: "#D4AF6A" }}>
+                Bloom Pro
+              </Link>
+            </nav>
 
-            <div className="grid md:grid-cols-3 gap-8">
-              <Card className="p-8 space-y-4 border-l-4 border-l-accent hover:shadow-lg transition-shadow">
-                <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center">
-                  <span className="text-2xl font-bold text-accent">1</span>
-                </div>
-                <h3 className="font-serif text-2xl font-bold text-foreground">
-                  Share Your Goals
-                </h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  Tell us about your investing experience, goals, and comfort level. 
-                  No judgment—just honesty about where you're starting from.
-                </p>
-              </Card>
-
-              <Card className="p-8 space-y-4 border-l-4 border-l-primary hover:shadow-lg transition-shadow">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                  <span className="text-2xl font-bold text-primary">2</span>
-                </div>
-                <h3 className="font-serif text-2xl font-bold text-foreground">
-                  Get Personalized Picks
-                </h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  Pansy analyzes the market daily and shares picks tailored to your profile. 
-                  Every recommendation comes with plain-language analysis you'll actually understand.
-                </p>
-              </Card>
-
-              <Card className="p-8 space-y-4 border-l-4 border-l-accent hover:shadow-lg transition-shadow">
-                <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center">
-                  <span className="text-2xl font-bold text-accent">3</span>
-                </div>
-                <h3 className="font-serif text-2xl font-bold text-foreground">
-                  Invest With Confidence
-                </h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  Use any broker you like—we connect you to the best platforms. 
-                  Track your portfolio, learn as you go, and build wealth on your own terms.
-                </p>
-              </Card>
-            </div>
-          </div>
-        </section>
-
-        {/* Featured Stocks */}
-        <section className="py-20">
-          <div className="max-w-6xl mx-auto px-4">
-            <div className="text-center space-y-4 mb-16">
-              <h2 className="font-serif text-4xl font-bold text-foreground">
-                Today's Featured Picks
-              </h2>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                See what Pansy's watching today—real-time data, real insights
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-6">
-              {featuredStocks.map((stock) => (
-                <Card key={stock.ticker} className="p-6 hover:shadow-lg transition-shadow">
-                  <div className="space-y-4">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <p className="font-bold text-xl text-foreground">{stock.ticker}</p>
-                        <p className="text-sm text-muted-foreground">{stock.name}</p>
-                      </div>
-                      <Badge
-                        variant={stock.changePercent >= 0 ? "default" : "destructive"}
-                        className={
-                          stock.changePercent >= 0
-                            ? "bg-green-100 text-green-800 hover:bg-green-100"
-                            : ""
-                        }
-                      >
-                        {stock.changePercent >= 0 ? "+" : ""}
-                        {stock.changePercent.toFixed(2)}%
-                      </Badge>
-                    </div>
-
-                    <div>
-                      <p className="text-3xl font-bold text-foreground tabular-nums">
-                        {formatPrice(stock.price)}
-                      </p>
-                      <p
-                        className={`text-sm font-semibold tabular-nums ${
-                          stock.change >= 0 ? "text-green-600" : "text-red-600"
-                        }`}
-                      >
-                        {stock.change >= 0 ? "+" : ""}
-                        {formatPrice(stock.change)} today
-                      </p>
-                    </div>
-
-                    <Link href="/onboarding">
-                      <Button variant="outline" className="w-full">
-                        See Pansy's Analysis →
-                      </Button>
-                    </Link>
-                  </div>
-                </Card>
-              ))}
-            </div>
-
-            <div className="text-center mt-12">
+            {/* Right - Bell + Sign In */}
+            <div className="flex items-center gap-4">
+              <button className="w-10 h-10 rounded-full flex items-center justify-center transition-colors" style={{ backgroundColor: "rgba(45, 74, 62, 0.05)" }}>
+                <Bell className="w-5 h-5" style={{ color: "#2D4A3E" }} />
+              </button>
               <Link href="/onboarding">
-                <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold">
-                  Get Started Free
+                <Button className="font-semibold" style={{ backgroundColor: "#C4714A", color: "white" }}>
+                  Sign In
                 </Button>
               </Link>
             </div>
           </div>
+        </header>
+
+        {/* Hero Section - Two Columns */}
+        <section className="py-16 lg:py-24">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="grid lg:grid-cols-2 gap-12 items-start">
+              {/* Left Column - Welcome */}
+              <div className="space-y-8">
+                <div className="space-y-4">
+                  <p className="text-xs font-semibold tracking-widest uppercase" style={{ color: "#C4714A" }}>
+                    WELCOME TO SHE BLOOMS WEALTH
+                  </p>
+                  <h1 className="font-serif text-5xl lg:text-6xl font-bold leading-tight" style={{ color: "#2D4A3E" }}>
+                    Invest with Confidence.{" "}
+                    <span style={{ color: "#C4714A" }}>Bloom Into Wealth.</span>
+                  </h1>
+                  <p className="text-lg leading-relaxed" style={{ color: "#2D4A3E", opacity: 0.8 }}>
+                    Your all-in-one space to learn investing, analyze stocks, build wealth, and become the woman your future self is proud of.
+                  </p>
+                </div>
+
+                {/* Pill Row */}
+                <div className="flex flex-wrap gap-3">
+                  {["Learn", "Analyze", "Invest", "Grow"].map((item) => (
+                    <div key={item} className="px-4 py-2 rounded-full text-sm font-medium" style={{ backgroundColor: "white", border: "1px solid rgba(45, 74, 62, 0.15)", color: "#2D4A3E" }}>
+                      {item}
+                    </div>
+                  ))}
+                </div>
+
+                {/* CTAs */}
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Link href="/learn">
+                    <Button size="lg" className="w-full sm:w-auto font-semibold text-base px-8 py-6" style={{ backgroundColor: "#C4714A", color: "white" }}>
+                      Start Learning
+                    </Button>
+                  </Link>
+                  <Link href="/discover">
+                    <Button size="lg" variant="outline" className="w-full sm:w-auto font-semibold text-base px-8 py-6" style={{ borderColor: "#2D4A3E", color: "#2D4A3E" }}>
+                      Analyze a Stock
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+
+              {/* Right Column - Pansy's Daily Market Thought */}
+              <Card className="p-8 space-y-6 shadow-lg" style={{ backgroundColor: "white", border: "1px solid rgba(45, 74, 62, 0.1)" }}>
+                <div className="flex items-center gap-3">
+                  <div className="w-14 h-14 rounded-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, #D4AF6A 0%, #C4714A 100%)" }}>
+                    <span className="text-2xl">🌺</span>
+                  </div>
+                  <div>
+                    <h3 className="font-serif text-xl font-bold" style={{ color: "#2D4A3E" }}>
+                      Pansy's Daily Market Thought
+                    </h3>
+                    <p className="text-sm" style={{ color: "#2D4A3E", opacity: 0.6 }}>Your guide to today's market</p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <p className="text-base leading-relaxed italic" style={{ color: "#2D4A3E", opacity: 0.9 }}>
+                    "Good morning! The S&P is holding steady this week, which is exactly what we want to see — no drama, just consistent growth. Remember, boring markets build wealth faster than exciting ones 💛"
+                  </p>
+
+                  <div className="pt-4 space-y-3" style={{ borderTop: "1px solid rgba(45, 74, 62, 0.1)" }}>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium" style={{ color: "#2D4A3E", opacity: 0.7 }}>Today's Sentiment</span>
+                      <Badge className="font-medium" style={{ backgroundColor: "rgba(45, 74, 62, 0.1)", color: "#2D4A3E" }}>
+                        Steady & Optimistic
+                      </Badge>
+                    </div>
+
+                    {featuredETF && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium" style={{ color: "#2D4A3E", opacity: 0.7 }}>Featured ETF</span>
+                        <div className="text-right">
+                          <p className="font-semibold font-mono" style={{ color: "#2D4A3E" }}>{featuredETF.ticker}</p>
+                          <p className="text-xs font-mono" style={{ color: featuredETF.changePercent >= 0 ? "#10b981" : "#ef4444" }}>
+                            {formatPrice(featuredETF.price)} {featuredETF.changePercent >= 0 ? "+" : ""}{featuredETF.changePercent.toFixed(2)}%
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="pt-4" style={{ borderTop: "1px solid rgba(45, 74, 62, 0.1)" }}>
+                  <p className="text-xs text-center" style={{ color: "#2D4A3E", opacity: 0.6 }}>
+                    Pansy is here to guide you every step of your wealth journey.
+                  </p>
+                </div>
+              </Card>
+            </div>
+          </div>
         </section>
 
-        {/* Trust Section */}
-        <section className="py-20 bg-muted/30">
-          <div className="max-w-4xl mx-auto px-4">
-            <div className="grid md:grid-cols-3 gap-8 text-center">
-              <div className="space-y-3">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-                  <Shield className="w-6 h-6 text-primary" />
+        {/* Feature Cards - 5 Cards Row */}
+        <section className="py-16">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+              {/* Card 1 - Learn Stocks & ETFs */}
+              <Card className="p-6 space-y-4 hover:shadow-xl transition-shadow" style={{ backgroundColor: "white", border: "1px solid rgba(45, 74, 62, 0.1)" }}>
+                <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: "rgba(45, 74, 62, 0.1)" }}>
+                  <BookOpen className="w-6 h-6" style={{ color: "#2D4A3E" }} />
                 </div>
-                <h3 className="font-semibold text-foreground">Secure & Private</h3>
-                <p className="text-sm text-muted-foreground">
-                  Your data is encrypted and we never share your information
-                </p>
+                <div className="space-y-2">
+                  <h3 className="font-serif text-lg font-bold" style={{ color: "#2D4A3E" }}>
+                    Learn Stocks & ETFs
+                  </h3>
+                  <p className="text-sm leading-relaxed" style={{ color: "#2D4A3E", opacity: 0.7 }}>
+                    Plain-language lessons on investing fundamentals
+                  </p>
+                </div>
+                <Link href="/learn" className="inline-flex items-center gap-2 text-sm font-semibold transition-colors" style={{ color: "#C4714A" }}>
+                  Explore <ArrowRight className="w-4 h-4" />
+                </Link>
+              </Card>
+
+              {/* Card 2 - Analyze Any Stock */}
+              <Card className="p-6 space-y-4 hover:shadow-xl transition-shadow" style={{ backgroundColor: "white", border: "1px solid rgba(45, 74, 62, 0.1)" }}>
+                <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: "rgba(45, 74, 62, 0.1)" }}>
+                  <BarChart3 className="w-6 h-6" style={{ color: "#2D4A3E" }} />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="font-serif text-lg font-bold" style={{ color: "#2D4A3E" }}>
+                    Analyze Any Stock
+                  </h3>
+                  <p className="text-sm leading-relaxed" style={{ color: "#2D4A3E", opacity: 0.7 }}>
+                    Get Pansy's breakdown on any ticker in seconds
+                  </p>
+                </div>
+                <Link href="/discover" className="inline-flex items-center gap-2 text-sm font-semibold transition-colors" style={{ color: "#C4714A" }}>
+                  Search <ArrowRight className="w-4 h-4" />
+                </Link>
+              </Card>
+
+              {/* Card 3 - Portfolio Tracker */}
+              <Card className="p-6 space-y-4 hover:shadow-xl transition-shadow" style={{ backgroundColor: "white", border: "1px solid rgba(45, 74, 62, 0.1)" }}>
+                <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: "rgba(45, 74, 62, 0.1)" }}>
+                  <PieChart className="w-6 h-6" style={{ color: "#2D4A3E" }} />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="font-serif text-lg font-bold" style={{ color: "#2D4A3E" }}>
+                    Portfolio Tracker
+                  </h3>
+                  <p className="text-sm leading-relaxed" style={{ color: "#2D4A3E", opacity: 0.7 }}>
+                    Track your investments and watch them grow
+                  </p>
+                </div>
+                <Link href="/portfolio" className="inline-flex items-center gap-2 text-sm font-semibold transition-colors" style={{ color: "#C4714A" }}>
+                  Track <ArrowRight className="w-4 h-4" />
+                </Link>
+              </Card>
+
+              {/* Card 4 - Discipline Center */}
+              <Card className="p-6 space-y-4 hover:shadow-xl transition-shadow" style={{ backgroundColor: "white", border: "1px solid rgba(45, 74, 62, 0.1)" }}>
+                <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: "rgba(45, 74, 62, 0.1)" }}>
+                  <Target className="w-6 h-6" style={{ color: "#2D4A3E" }} />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="font-serif text-lg font-bold" style={{ color: "#2D4A3E" }}>
+                    Discipline Center
+                  </h3>
+                  <p className="text-sm leading-relaxed" style={{ color: "#2D4A3E", opacity: 0.7 }}>
+                    Set goals, track progress, build wealth habits
+                  </p>
+                </div>
+                <Link href="/goals" className="inline-flex items-center gap-2 text-sm font-semibold transition-colors" style={{ color: "#C4714A" }}>
+                  Start <ArrowRight className="w-4 h-4" />
+                </Link>
+              </Card>
+
+              {/* Card 5 - Side Hustle Investments */}
+              <Card className="p-6 space-y-4 hover:shadow-xl transition-shadow" style={{ backgroundColor: "white", border: "1px solid rgba(45, 74, 62, 0.1)" }}>
+                <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: "rgba(45, 74, 62, 0.1)" }}>
+                  <TrendingUp className="w-6 h-6" style={{ color: "#2D4A3E" }} />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="font-serif text-lg font-bold" style={{ color: "#2D4A3E" }}>
+                    Side Hustle Investments
+                  </h3>
+                  <p className="text-sm leading-relaxed" style={{ color: "#2D4A3E", opacity: 0.7 }}>
+                    Learn income streams beyond the stock market
+                  </p>
+                </div>
+                <Link href="/learn" className="inline-flex items-center gap-2 text-sm font-semibold transition-colors" style={{ color: "#C4714A" }}>
+                  Learn <ArrowRight className="w-4 h-4" />
+                </Link>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        {/* Social Proof */}
+        <section className="py-16" style={{ backgroundColor: "rgba(45, 74, 62, 0.03)" }}>
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+              <div className="space-y-2">
+                <p className="font-serif text-4xl font-bold font-mono" style={{ color: "#2D4A3E" }}>12K+</p>
+                <p className="text-sm" style={{ color: "#2D4A3E", opacity: 0.7 }}>Women Investors</p>
               </div>
-              <div className="space-y-3">
-                <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center mx-auto">
-                  <BarChart3 className="w-6 h-6 text-accent" />
-                </div>
-                <h3 className="font-semibold text-foreground">Educational Only</h3>
-                <p className="text-sm text-muted-foreground">
-                  We provide insights, not financial advice—you stay in control
-                </p>
+              <div className="space-y-2">
+                <p className="font-serif text-4xl font-bold font-mono" style={{ color: "#2D4A3E" }}>$2.4M</p>
+                <p className="text-sm" style={{ color: "#2D4A3E", opacity: 0.7 }}>Analyzed Weekly</p>
               </div>
-              <div className="space-y-3">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-                  <DollarSign className="w-6 h-6 text-primary" />
-                </div>
-                <h3 className="font-semibold text-foreground">Start Free</h3>
-                <p className="text-sm text-muted-foreground">
-                  No credit card required to explore Bloom and meet Pansy
-                </p>
+              <div className="space-y-2">
+                <p className="font-serif text-4xl font-bold font-mono" style={{ color: "#2D4A3E" }}>500+</p>
+                <p className="text-sm" style={{ color: "#2D4A3E", opacity: 0.7 }}>Daily Picks</p>
+              </div>
+              <div className="space-y-2">
+                <p className="font-serif text-4xl font-bold font-mono" style={{ color: "#D4AF6A" }}>Pro</p>
+                <p className="text-sm" style={{ color: "#2D4A3E", opacity: 0.7 }}>Premium Tools</p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* FAQ Section */}
+        {/* Final CTA */}
         <section className="py-20">
-          <div className="max-w-4xl mx-auto px-4">
-            <div className="text-center space-y-4 mb-12">
-              <h2 className="font-serif text-4xl font-bold text-foreground">
-                Questions? We've Got You
+          <div className="max-w-4xl mx-auto px-6 text-center space-y-8">
+            <div className="space-y-4">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full" style={{ backgroundColor: "rgba(212, 175, 106, 0.1)" }}>
+                <Sparkles className="w-4 h-4" style={{ color: "#D4AF6A" }} />
+                <span className="text-sm font-semibold" style={{ color: "#D4AF6A" }}>Ready to Start?</span>
+              </div>
+              <h2 className="font-serif text-4xl lg:text-5xl font-bold" style={{ color: "#2D4A3E" }}>
+                Join Thousands of Women Building Wealth
               </h2>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                Everything you need to know about Bloom, answered honestly
+              <p className="text-lg max-w-2xl mx-auto" style={{ color: "#2D4A3E", opacity: 0.7 }}>
+                Start learning, analyzing, and investing today. No credit card required.
               </p>
             </div>
-
-            <Card className="p-6 bg-card border-border">
-              <Accordion type="single" collapsible className="w-full">
-                <AccordionItem value="item-1" className="border-border">
-                  <AccordionTrigger className="text-left font-semibold text-foreground hover:text-accent hover:no-underline">
-                    Is Bloom financial advice?
-                  </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground leading-relaxed">
-                    No, girl — Bloom is education, not advice. We explain how investing works in plain language so you can make your own confident decisions. Always do your own research, and talk to a licensed professional before investing.
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="item-2" className="border-border">
-                  <AccordionTrigger className="text-left font-semibold text-foreground hover:text-accent hover:no-underline">
-                    Do I need experience or a lot of money to start?
-                  </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground leading-relaxed">
-                    Not at all. Bloom is built for total beginners. You can start learning with zero experience, and you decide how much — if anything — to invest, on your own terms.
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="item-3" className="border-border">
-                  <AccordionTrigger className="text-left font-semibold text-foreground hover:text-accent hover:no-underline">
-                    Does Bloom tell me what to buy?
-                  </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground leading-relaxed">
-                    No. Bloom and Pansy help you understand stocks, ETFs, and the market so you can decide for yourself. We never promise profits, and we always include the risks.
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="item-4" className="border-border">
-                  <AccordionTrigger className="text-left font-semibold text-foreground hover:text-accent hover:no-underline">
-                    Who is Pansy?
-                  </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground leading-relaxed">
-                    Pansy is your guide inside Bloom — she breaks down stocks, ETFs, charts, and market news in plain, jargon-free language, like a smart friend who actually explains things.
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="item-5" className="border-border">
-                  <AccordionTrigger className="text-left font-semibold text-foreground hover:text-accent hover:no-underline">
-                    What's free, and what's in Bloom Pro?
-                  </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground leading-relaxed">
-                    You can learn and explore for free. Bloom Pro ($7.99/month or $57.99/year) unlocks full Pansy analysis, unlimited stock searches, the portfolio tracker, advanced indicators, watchlist alerts, and the side-hustle lessons.
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="item-6" className="border-border">
-                  <AccordionTrigger className="text-left font-semibold text-foreground hover:text-accent hover:no-underline">
-                    Can I cancel anytime?
-                  </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground leading-relaxed">
-                    Yes. Manage or cancel Bloom Pro anytime from your billing page — no lock-in.
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="item-7" className="border-b-0">
-                  <AccordionTrigger className="text-left font-semibold text-foreground hover:text-accent hover:no-underline">
-                    Is my information safe?
-                  </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground leading-relaxed">
-                    Payments are handled securely by Stripe (we never see your card details), and your account is protected by secure sign-in.
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-            </Card>
-
-            <div className="text-center mt-8">
-              <p className="text-sm text-muted-foreground">
-                Still have questions?{" "}
-                <Link href="/contact" className="text-accent hover:underline">
-                  Get in touch
-                </Link>
-              </p>
-            </div>
+            <Link href="/onboarding">
+              <Button size="lg" className="font-semibold text-lg px-10 py-7" style={{ backgroundColor: "#C4714A", color: "white" }}>
+                Get Started Free
+              </Button>
+            </Link>
           </div>
         </section>
 
         {/* Footer */}
-        <footer className="border-t border-border py-12 bg-background">
-          <div className="max-w-6xl mx-auto px-4">
+        <footer className="py-12" style={{ backgroundColor: "rgba(45, 74, 62, 0.03)", borderTop: "1px solid rgba(45, 74, 62, 0.1)" }}>
+          <div className="max-w-7xl mx-auto px-6">
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, #2D4A3E 0%, #D4AF6A 100%)" }}>
                   <span className="text-xl">🌸</span>
                 </div>
-                <span className="font-serif text-xl font-bold text-foreground">Bloom</span>
+                <span className="font-serif text-xl font-bold" style={{ color: "#2D4A3E" }}>Bloom</span>
               </div>
-              <p className="text-sm text-muted-foreground text-center">
+              <p className="text-sm text-center" style={{ color: "#2D4A3E", opacity: 0.6 }}>
                 © 2026 Bloom. Educational content only. Not financial advice.
               </p>
               <div className="flex items-center gap-6">
-                <Link href="/onboarding" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Sign In
+                <Link href="/privacy" className="text-sm transition-colors" style={{ color: "#2D4A3E", opacity: 0.7 }}>
+                  Privacy
+                </Link>
+                <Link href="/terms" className="text-sm transition-colors" style={{ color: "#2D4A3E", opacity: 0.7 }}>
+                  Terms
+                </Link>
+                <Link href="/contact" className="text-sm transition-colors" style={{ color: "#2D4A3E", opacity: 0.7 }}>
+                  Contact
                 </Link>
               </div>
             </div>
           </div>
         </footer>
       </div>
-
-      {/* Pansy Modal */}
-      {showPansyModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowPansyModal(false)}>
-          <Card className="max-w-lg w-full p-8 space-y-6 relative" onClick={(e) => e.stopPropagation()}>
-            <button
-              onClick={() => setShowPansyModal(false)}
-              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
-            >
-              ✕
-            </button>
-
-            <div className="flex items-center gap-4">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-accent to-accent/70 flex items-center justify-center shadow-lg">
-                <span className="text-4xl">🌺</span>
-              </div>
-              <div>
-                <h3 className="font-serif text-3xl font-bold text-foreground">Pansy</h3>
-                <p className="text-accent font-semibold">Bloom's Investing Expert</p>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <p className="text-foreground leading-relaxed">
-                Hi, I'm Pansy! 🌸 I know everything about investing, but I promise to explain it like we're chatting over coffee—no confusing finance-bro talk.
-              </p>
-              <p className="text-foreground leading-relaxed">
-                Every day, I analyze thousands of stocks, ETFs, and funds to find opportunities that match your goals. Then I break down what's happening in plain language you'll actually understand.
-              </p>
-              <p className="text-foreground leading-relaxed">
-                Whether you're just starting or you've been investing for years, I'm here to make sense of the market and help you make confident decisions about your money. No pressure, no judgment—just honest guidance 💛
-              </p>
-            </div>
-
-            <Link href="/onboarding">
-              <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-12" onClick={() => setShowPansyModal(false)}>
-                Start Investing With Pansy
-              </Button>
-            </Link>
-          </Card>
-        </div>
-      )}
     </>
   );
 }
