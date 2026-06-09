@@ -13,11 +13,12 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { RiskRewardCalculator } from "@/components/RiskRewardCalculator";
 import { PositionSizeCalculator } from "@/components/PositionSizeCalculator";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 import { authService } from "@/services/authService";
 import { supabase } from "@/integrations/supabase/client";
 import { Search, ArrowLeft, Clock, CheckCircle2, Circle, ChevronRight, Bookmark, BookmarkCheck, Award } from "lucide-react";
 
-type Category = "All" | "Stocks" | "ETFs" | "Mutual Funds" | "Dividends" | "Bonds" | "Retirement" | "Trading Psychology";
+type Category = "All" | "Stocks" | "ETFs" | "Mutual Funds" | "Dividends" | "Bonds" | "Retirement" | "Trading Psychology" | "Income Streams";
 
 interface QuizQuestion {
   question: string;
@@ -37,10 +38,12 @@ interface Lesson {
   keyTakeaway: string;
   relatedTopics: string[];
   quiz: QuizQuestion[];
+  isPro?: boolean;
 }
 
 export default function Learn() {
   const router = useRouter();
+  const { isPro, isLoading: subscriptionLoading } = useSubscription();
   const [user, setUser] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<Category>("All");
@@ -1126,6 +1129,1429 @@ Follow this and you're automatically in the top 10% of traders. Most people skip
           ],
           correctAnswer: 2,
           explanation: "Exactly! Journal every trade (win or lose) and absolutely NO revenge trading after losses. Reflection builds edge sis 💪"
+        }
+      ]
+    },
+
+    // MODULE 1 — Real Estate Income & Loans
+    {
+      id: "income-real-estate-cash-flow",
+      title: "What Is Real Estate Cash Flow?",
+      category: "Income Streams",
+      readTime: 4,
+      difficulty: "Beginner",
+      summary: "How rental property makes money explained simply",
+      isPro: false,
+      content: `Okay girl let's talk about making money from real estate — and I don't mean flipping houses or being a landlord with 50 properties. I mean simple rental income that pays you every month 🏡
+
+Cash flow = rent minus expenses. That's it. If you rent out a property for $1,800 a month and your mortgage + insurance + taxes + maintenance costs $1,400 you're cash flowing $400 per month. That's $4,800 a year just for owning that property.
+
+Here's what a lot of people don't get: you don't need to own the property outright to make money from it. If you put 20% down on a $200,000 property that's $40,000 of your money. But that property generates income every single month even though you're using the bank's money for the other $160,000.
+
+**Your expenses usually are:**
+- Mortgage payment (principal + interest)
+- Property taxes
+- Insurance
+- HOA fees (if any)
+- Maintenance (budget 1% of property value per year)
+- Vacancy (assume property sits empty 1 month per year)
+- Property management (if you hire someone — usually 8-10% of rent)
+
+If your rent covers all that AND leaves money left over you're cash flowing. If it doesn't you're feeding the property money every month which defeats the whole purpose.
+
+Real estate isn't passive income at first — there's work involved finding the property setting it up managing tenants. But once it's running smoothly it becomes monthly income that shows up whether you worked that day or not 💰
+
+**Real talk:** This isn't get-rich-quick. It's build-wealth-slowly. One rental property cash flowing $300/month won't change your life. But 3 properties doing that is $10,800 a year. Over 10 years that compounds. Plus the property value usually goes up and your tenants are paying down your mortgage for you.
+
+Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
+      keyTakeaway: "Cash flow = rent minus all expenses. Positive cash flow = property pays you monthly. Negative = you feed it money. Aim for positive.",
+      relatedTopics: ["income-ways-into-real-estate", "income-dscr-loans"],
+      quiz: [
+        {
+          question: "What does cash flow mean in real estate?",
+          options: ["Total property value", "Rent minus all expenses", "Your mortgage payment", "How fast you can sell"],
+          correctAnswer: 1,
+          explanation: "Yes! Cash flow = rent minus expenses. If it's positive the property pays you. If it's negative you're feeding it money 🏡"
+        },
+        {
+          question: "Do you need to own a property outright to make money from it?",
+          options: ["Yes you must own 100%", "No you can use the bank's money and still cash flow", "Only if property value goes up", "Only in certain states"],
+          correctAnswer: 1,
+          explanation: "That's right! You can put 20% down and cash flow using the bank's money for the rest. That's the leverage power of real estate 💰"
+        },
+        {
+          question: "What should you budget for maintenance per year?",
+          options: ["Nothing - tenants pay for everything", "About 1% of property value", "About 10% of property value", "Just fix things as they break"],
+          correctAnswer: 1,
+          explanation: "Exactly! Budget about 1% of property value per year for maintenance. A $200k house = $2k/year. Things break and it's your responsibility 🏡"
+        }
+      ]
+    },
+    {
+      id: "income-ways-into-real-estate",
+      title: "Ways Women Get Into Real Estate",
+      category: "Income Streams",
+      readTime: 4,
+      difficulty: "Beginner",
+      summary: "House hacking, rentals, and REITs vs owning property",
+      isPro: false,
+      content: `There are three main paths into real estate income and they're very different from each other. Let me break them down so you can see which one feels right for you 🏠
+
+**Path 1: House Hacking (Lowest Barrier)**
+
+This is where you live in one unit of a multi-family property (duplex triplex fourplex) and rent out the others. Or you buy a single-family house and rent out the extra bedrooms. Your tenants cover most or all of your mortgage.
+
+Example: You buy a duplex with a 3.5% FHA loan (only $10,500 down on a $300k property). You live in one unit rent the other for $1,400/month. Your total mortgage is $1,800. You're only paying $400/month to live there and you're building equity.
+
+After 1 year you can move out rent your unit too and both units cash flow. That's your first rental property and you barely needed any money down.
+
+**Path 2: Traditional Rental Property**
+
+You buy a property specifically to rent out. This usually requires 20-25% down and the property needs to cash flow from day one since you're not living there. More money upfront but you're not sharing walls with tenants.
+
+This is the "investor" path. You're treating real estate like a business. Higher barrier to entry but more flexibility in choosing properties and locations.
+
+**Path 3: REITs (Real Estate Investment Trusts)**
+
+You buy shares of a REIT like a stock and earn dividends from the properties they own. No being a landlord no property management no maintenance calls. Just collect quarterly dividend checks.
+
+REITs typically yield 3-7% and you can buy them with as little as $100. The downside? You don't own actual property you own shares. And REIT dividends are taxed as ordinary income not capital gains.
+
+**Which Path Is Right For You?**
+
+- Want to minimize cash needed upfront? House hack.
+- Have 20%+ saved and ready to be a landlord? Traditional rental.
+- Want real estate exposure with zero landlord work? REITs.
+
+You can mix these too. Start with house hacking or REITs while you save for a traditional rental. Real estate is one of the few wealth-building tools where you can literally use other people's money (the bank's + your tenants' rent) to build your net worth 💪
+
+Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
+      keyTakeaway: "Three paths: House hacking (live in one unit, rent others — lowest barrier). Traditional rental (20-25% down, investor path). REITs (stock-like shares, no landlord work).",
+      relatedTopics: ["income-real-estate-cash-flow", "income-dscr-loans", "income-reits"],
+      quiz: [
+        {
+          question: "What is house hacking?",
+          options: ["Flipping houses for profit", "Living in a property while renting out other units/rooms", "Buying houses with no down payment", "Illegally avoiding property taxes"],
+          correctAnswer: 1,
+          explanation: "Yes! House hacking = live in one unit/room, rent the others. Tenants cover most or all of your mortgage. Lowest barrier entry 🏠"
+        },
+        {
+          question: "What's the typical down payment for a traditional rental property?",
+          options: ["0%", "3.5%", "20-25%", "50%"],
+          correctAnswer: 2,
+          explanation: "That's right! Traditional rentals typically need 20-25% down. Higher barrier but you're not living with tenants 💰"
+        },
+        {
+          question: "What's the main advantage of REITs?",
+          options: ["You own actual property", "No landlord work - just collect dividends", "Guaranteed 10% returns", "No taxes on dividends"],
+          correctAnswer: 1,
+          explanation: "Exactly! REITs = zero landlord work. Just buy shares and collect quarterly dividends. Perfect if you want real estate exposure without tenants 🏡"
+        }
+      ]
+    },
+    {
+      id: "income-dscr-loans",
+      title: "DSCR Loans Explained",
+      category: "Income Streams",
+      readTime: 5,
+      difficulty: "Intermediate",
+      summary: "Qualify on property income, not yours — for investors",
+      isPro: true,
+      content: `DSCR loans are a game changer if you want to buy rental property but your tax returns don't show enough income (because hello write-offs) or you're self-employed and your "official" income looks low on paper 📄
+
+**DSCR = Debt Service Coverage Ratio.** Sounds fancy but it's simple: does the rent from this property cover the mortgage payment?
+
+Here's the math: Monthly rent ÷ Monthly mortgage payment = DSCR
+
+If rent is $1,800 and the mortgage payment is $1,500 your DSCR is 1.2 (you're good). If rent is $1,500 and mortgage is $1,800 your DSCR is 0.83 (won't qualify).
+
+**Why this is huge:** Traditional mortgages qualify you based on YOUR income from your W-2 or tax returns. DSCR loans qualify you based on what the PROPERTY makes. The property's rent is what matters not your paycheck.
+
+**Typical DSCR requirements:**
+- Ratio of 1.0 or higher (rent covers mortgage at minimum)
+- Ratio of 1.25+ gets you better rates
+- Credit score usually 640-660 minimum
+- 20-25% down payment (sometimes 15% floor)
+- Property must be investment property (not your primary home)
+
+**What they DON'T require:**
+- Tax returns
+- W-2s
+- Pay stubs
+- Employment verification
+
+They literally don't care if you're employed or what you claim on taxes. They care if the rent covers the debt. That's it.
+
+**The catch:** Interest rates are usually 0.5-1% higher than conventional loans. You're paying a premium for the flexibility of not showing income. But if your tax returns wouldn't qualify you anyway this is often your only path.
+
+**Vetted DSCR lender options:**
+
+- [Visio Lending](#) — Specializes in DSCR loans, 15-25% down, credit 660+
+- [Kiavi](#) — Investor-focused, DSCR and fix-and-flip, 15-25% down
+- [LendingOne](#) — DSCR 640+ credit, fast close times
+- [RCN Capital](#) — DSCR loans 620+ credit, rental income focus
+- [Angel Oak](#) — Non-QM and DSCR specialist, flexible requirements
+
+Who uses DSCR loans? Self-employed people, real estate investors with multiple properties, people who write off a ton of business expenses, anyone whose "official" income doesn't reflect their actual cash situation 🏡
+
+Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
+      keyTakeaway: "DSCR loans qualify you on the property's rent not your income. No tax returns needed. Ratio 1.0+ required, 1.25+ for best rates. Down payment 20-25%. Higher interest but flexible.",
+      relatedTopics: ["income-real-estate-cash-flow", "income-conventional-loans", "income-ways-into-real-estate"],
+      quiz: [
+        {
+          question: "What does DSCR stand for?",
+          options: ["Debt Service Coverage Ratio", "Down Payment Service Calculation", "Direct Seller Credit Rating", "Debt Security Credit Record"],
+          correctAnswer: 0,
+          explanation: "Yes! Debt Service Coverage Ratio. It's just rent ÷ mortgage payment. Simple math that determines if you qualify 📄"
+        },
+        {
+          question: "What documents do DSCR loans NOT require?",
+          options: ["Credit report", "Tax returns and W-2s", "Property appraisal", "Down payment proof"],
+          correctAnswer: 1,
+          explanation: "That's right! No tax returns, W-2s, or pay stubs needed. They only care if the property's rent covers the mortgage 🏡"
+        },
+        {
+          question: "What DSCR ratio do you need to qualify?",
+          options: ["0.5 or higher", "1.0 or higher", "2.0 or higher", "Any ratio works"],
+          correctAnswer: 1,
+          explanation: "Exactly! You need 1.0+ minimum (rent covers mortgage). 1.25+ gets you better rates. Below 1.0 = no go 💰"
+        }
+      ]
+    },
+    {
+      id: "income-conventional-loans",
+      title: "Conventional & First-Property Paths",
+      category: "Income Streams",
+      readTime: 5,
+      difficulty: "Intermediate",
+      summary: "Owner-occupied loans and how to prepare",
+      isPro: true,
+      content: `If you're buying your first property and plan to live in it (or house hack it) you have way better loan options than DSCR. Let me show you the conventional and first-property paths that most women use 🏠
+
+**Conventional Owner-Occupied Loans:**
+
+These are traditional mortgages where you're living in the property as your primary residence. The rates are better and down payment can be lower because lenders view owner-occupied as less risky than pure investment.
+
+**Requirements:**
+- Credit score 620+ (640+ for best rates)
+- Down payment as low as 10% (sometimes 15% if credit isn't perfect)
+- Must live in property for at least 1 year
+- Debt-to-income ratio under 43% (your monthly debts ÷ monthly income)
+- You'll need tax returns, W-2s, pay stubs, bank statements
+
+**FHA Loans (First-Time Buyer Friendly):**
+
+FHA is government-backed which means lower down payment and more flexible credit requirements.
+
+**Requirements:**
+- Down payment as low as 3.5%
+- Credit score can be as low as 580
+- Mortgage insurance required (adds to monthly payment)
+- Must live in property for at least 1 year
+- Cannot be used for pure investment properties
+
+**The House Hacking Strategy:**
+
+Here's how savvy women combine these loans with house hacking:
+
+1. Buy a duplex or triplex with FHA (3.5% down)
+2. Live in one unit rent the others
+3. Rent covers most or all of your mortgage
+4. Live there for 1 year minimum (FHA requirement)
+5. Move out rent your unit too
+6. Now you have a cash-flowing rental property with minimal money down
+
+**How to Prepare:**
+
+- Get your credit score to 640+ (pay down cards, dispute errors)
+- Save 3.5-20% for down payment + closing costs (add 2-4%)
+- Gather 2 years tax returns and pay stubs
+- Calculate your debt-to-income ratio (keep under 43%)
+- Get pre-approved before house hunting
+
+**Vetted Conventional Lenders:**
+
+- [Rocket Mortgage](#) — Fast online process, conventional and FHA
+- [Better](#) — Low fees, conventional and FHA, competitive rates
+- [Navy Federal](#) — For military/veterans, excellent rates and VA loans
+
+The beauty of owner-occupied loans is you get the best rates and lowest down payment options. Then after you live there for a year you can turn it into a rental. That's how you build a real estate portfolio without needing huge cash upfront sis 💪
+
+Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
+      keyTakeaway: "Conventional owner-occupied: 10-15% down, 620+ credit, must live 1 year. FHA: 3.5% down, 580+ credit. House hack strategy = live in one unit, rent others, then move out after 1 year.",
+      relatedTopics: ["income-dscr-loans", "income-ways-into-real-estate", "income-real-estate-cash-flow"],
+      quiz: [
+        {
+          question: "What's the minimum down payment for an FHA loan?",
+          options: ["0%", "3.5%", "10%", "20%"],
+          correctAnswer: 1,
+          explanation: "Yes! FHA allows just 3.5% down if your credit is 580+. Perfect for first-time buyers and house hacking 🏠"
+        },
+        {
+          question: "How long must you live in an owner-occupied property?",
+          options: ["No requirement", "At least 6 months", "At least 1 year", "At least 5 years"],
+          correctAnswer: 2,
+          explanation: "That's right! Both FHA and conventional owner-occupied loans require you to live there at least 1 year before moving out 💰"
+        },
+        {
+          question: "What's the house hacking strategy with FHA loans?",
+          options: [
+            "Buy and immediately rent all units",
+            "Buy a multi-family, live in one unit, rent others, move out after 1 year",
+            "Only works for single-family homes",
+            "Requires 20% down"
+          ],
+          correctAnswer: 1,
+          explanation: "Exactly! Buy multi-family with 3.5% down FHA, live in one unit, rent the others. After 1 year move out and it's a full rental 🏡"
+        }
+      ]
+    },
+
+    // MODULE 2 — Income From What You Already Know
+    {
+      id: "income-skills-to-income",
+      title: "Turning Your Skills Into Income",
+      category: "Income Streams",
+      readTime: 4,
+      difficulty: "Beginner",
+      summary: "You already have sellable knowledge — the mindset shift",
+      isPro: false,
+      content: `Girl this might sound wild but you already have skills that people will pay for. I'm serious. The thing you're good at that feels easy to you? Someone else is struggling with it and would gladly pay you to do it or teach them 💼
+
+**The mindset shift:**
+
+We tend to think "that's just something I can do — it's not special." But here's the truth: your "basic" skill is someone else's struggle. Your experience in an area is valuable to someone who's starting from zero.
+
+**Skills that people pay for (and you might already have):**
+
+- Writing (blog posts, social captions, website copy)
+- Design (Canva graphics, logos, presentations)
+- Social media (posting, engagement, content planning)
+- Admin work (emails, scheduling, data entry)
+- Teaching or tutoring (language, music, test prep, any subject)
+- Bookkeeping or basic accounting
+- Photography or video editing
+- Web design or no-code tools
+- Resume writing or career coaching
+- Virtual assistant services
+
+You don't need to be an expert. You just need to be better than someone who has zero experience. Beginner-level skills can still earn $20-40/hour.
+
+**Where you are right now:**
+
+Maybe you're thinking "I don't have anything valuable to sell." But I bet if I asked you what you're good at or what people come to you for help with you'd have an answer. That's your starting point.
+
+**The permission you need:**
+
+You don't need a degree, a certification, or years of experience to start. You need confidence that your skills have value and willingness to try. That's it.
+
+In the next lessons we'll talk about how to actually package your skills and find clients. But this lesson is just about the belief shift: you already have something people will pay for. You just need to start seeing it that way 💛
+
+Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
+      keyTakeaway: "You already have skills people will pay for. Your 'basic' skill is someone else's struggle. Beginner-level skills = $20-40/hour. You don't need to be an expert.",
+      relatedTopics: ["income-side-hustle-map", "income-digital-products"],
+      quiz: [
+        {
+          question: "What's the main mindset shift Pansy talks about?",
+          options: [
+            "You need a degree to earn income",
+            "Your 'basic' skills are valuable to someone who's starting from zero",
+            "Only experts can charge for their skills",
+            "You need years of experience first"
+          ],
+          correctAnswer: 1,
+          explanation: "Yes! Your easy = someone else's hard. Your experience in an area is valuable to beginners. That's the shift 💼"
+        },
+        {
+          question: "What can beginner-level skills earn per hour?",
+          options: ["$5-10/hour", "$20-40/hour", "$100+/hour", "Nothing until you're an expert"],
+          correctAnswer: 1,
+          explanation: "That's right! Beginner skills can earn $20-40/hour. You don't need to be an expert to provide value sis 💰"
+        },
+        {
+          question: "What do you need to start selling your skills according to Pansy?",
+          options: [
+            "A college degree and certification",
+            "10+ years of experience",
+            "Confidence that your skills have value and willingness to try",
+            "Permission from an industry board"
+          ],
+          correctAnswer: 2,
+          explanation: "Exactly! You need belief in your value + willingness to try. That's it. No degree or years of experience required 💛"
+        }
+      ]
+    },
+    {
+      id: "income-side-hustle-map",
+      title: "Side Hustle Starter Map",
+      category: "Income Streams",
+      readTime: 4,
+      difficulty: "Beginner",
+      summary: "Overview of digital products, content, affiliate, and services",
+      isPro: false,
+      content: `Let me give you the big picture of how women are building side income right now. These are the four main paths and you can pick one or mix them 🗺️
+
+**Path 1: Services (Quickest Cash)**
+
+You do work for clients and get paid directly. Writing, design, virtual assistant, social media management, tutoring, coaching. You trade your time and skills for money.
+
+**Timeline:** First dollar in 1-4 weeks
+**Income potential:** $500-5,000+/month
+**Time commitment:** 5-20 hours/week
+**Best for:** Women who want immediate income and like working with clients
+
+**Path 2: Digital Products (Create Once, Sell Forever)**
+
+You create something once (ebook, printable, template, course) and sell it repeatedly. After the upfront work it's passive-ish.
+
+**Timeline:** First sale in 1-3 months
+**Income potential:** $100-2,000+/month
+**Time commitment:** 20-40 hours upfront then 2-5 hours/week
+**Best for:** Women who want to build assets that earn while they sleep
+
+**Path 3: Content & Affiliate (Build an Audience)**
+
+You create content (YouTube, blog, Instagram, TikTok) build an audience and monetize through ads, sponsorships, and affiliate commissions.
+
+**Timeline:** First dollar in 3-12 months
+**Income potential:** $100-10,000+/month
+**Time commitment:** 10-20 hours/week consistently
+**Best for:** Women who enjoy creating content and have patience for audience growth
+
+**Path 4: E-commerce & Print-on-Demand (Physical Products)**
+
+You sell physical products either through print-on-demand (no inventory) or traditional e-commerce (buy and ship products).
+
+**Timeline:** First sale in 2-8 weeks
+**Income potential:** $200-3,000+/month
+**Time commitment:** 10-15 hours/week
+**Best for:** Women who like product-based businesses and visual design
+
+**My honest take:**
+
+Start with Services if you need cash now. Build Digital Products while you do services. Add Content/Affiliate when you're ready to play the long game. E-commerce is great if you love product businesses.
+
+You don't have to pick just one. Most successful side hustlers mix 2-3 of these. Services pay the bills. Digital products build passive income. Content brings customers to both. That's the flywheel sis 💪
+
+Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
+      keyTakeaway: "Four paths: Services (quick cash, $500-5k/mo), Digital Products (create once sell forever), Content/Affiliate (build audience long game), E-commerce (physical products). Start with services, add products, then content.",
+      relatedTopics: ["income-skills-to-income", "income-digital-products", "income-content-affiliate"],
+      quiz: [
+        {
+          question: "Which path gives you cash the fastest?",
+          options: ["Digital Products", "Services (client work)", "Content & Affiliate", "E-commerce"],
+          correctAnswer: 1,
+          explanation: "Yes! Services = quickest cash. You can land your first client and get paid within 1-4 weeks 💼"
+        },
+        {
+          question: "What's the main advantage of digital products?",
+          options: [
+            "Instant income on day one",
+            "Create once, sell repeatedly - passive income",
+            "Requires no upfront work",
+            "Only works for tech experts"
+          ],
+          correctAnswer: 1,
+          explanation: "That's right! Digital products = create once, sell forever. After upfront work it earns while you sleep 🗺️"
+        },
+        {
+          question: "What's Pansy's recommended strategy for beginners?",
+          options: [
+            "Pick one path and never add others",
+            "Start with services, add digital products, then content",
+            "Only do content creation",
+            "Wait until you're an expert"
+          ],
+          correctAnswer: 1,
+          explanation: "Exactly! Start with services for cash, build products for passive income, add content to bring customers. That's the flywheel 💪"
+        }
+      ]
+    },
+    {
+      id: "income-digital-products",
+      title: "Digital Products & Self-Publishing",
+      category: "Income Streams",
+      readTime: 5,
+      difficulty: "Intermediate",
+      summary: "Ebooks/KDP, printables, step-by-step to first sale",
+      isPro: true,
+      content: `Digital products are the dream: create something once, sell it forever, keep 100% of the profit. No inventory no shipping no refunds (usually). Pure margin 📚
+
+**What actually sells:**
+
+**Ebooks & Self-Publishing:**
+- How-to guides and workbooks (meal planning, budgeting, fitness)
+- Niche fiction (romance, cozy mystery, YA)
+- Professional guides (resume templates, business plans)
+
+**Printables:**
+- Planners and organizers (budget sheets, goal trackers)
+- Wall art and quotes (minimalist prints, motivational designs)
+- Party decorations and invitations
+- Educational worksheets
+
+**Templates:**
+- Notion templates (dashboards, habit trackers, databases)
+- Canva templates (social media posts, presentations)
+- Spreadsheets (budget calculators, meal planners)
+
+**Where to sell:**
+
+**[Amazon KDP](#) — Self-Publishing:**
+- Upload ebook or paperback, Amazon prints and ships
+- Ebook royalty: 35-70% depending on price
+- Paperback royalty: ~40% after printing costs
+- Best for: Books, guides, journals
+
+**[Etsy](#) — Digital Downloads:**
+- Upload PDF, buyer downloads instantly
+- You keep 80% after Etsy fees
+- Best for: Printables, templates, planners
+
+**[Gumroad](#) — Creator Platform:**
+- Sell any digital file, zero listing fees
+- You keep 90% (10% fee)
+- Best for: Ebooks, templates, courses
+
+**[Shopify](#) — Your Own Store:**
+- Full control, no marketplace fees
+- You keep 97% (payment processing only)
+- Best for: When you have traffic/audience already
+
+**Realistic timeline & earnings:**
+
+Month 1: Create product, set up listing, first 0-2 sales = $0-50
+Months 2-3: Refine listing, get first reviews, 5-15 sales/month = $50-300
+Months 4-6: Momentum building, 15-40 sales/month = $200-800
+Months 6-12: Established product, 40-100+ sales/month = $500-2,000+
+
+These are realistic numbers for ONE product. Create 5-10 products and those numbers multiply.
+
+**The reality check:**
+
+Most products don't sell immediately. You create it. You list it. Crickets. Then maybe 1 sale. Then nothing for a week. Then 2 sales. It's slow until it's not.
+
+But here's the magic: once it's made you're not trading time for money anymore. You can sell it 10 times or 10,000 times — same effort from you. The 1,000th sale doesn't require you to do anything extra.
+
+**First product checklist:**
+
+1. Pick ONE platform to start (KDP or Etsy)
+2. Solve a specific problem for a specific person
+3. Create a simple first version (don't overcomplicate)
+4. Price it low to get first sales and reviews ($3-15)
+5. Improve based on feedback
+
+One weekend of focused work can create a product that earns income for years. That's the leverage sis 💪
+
+Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
+      keyTakeaway: "Digital products = create once, sell forever. Platforms: KDP (books), Etsy (printables), Gumroad (templates), Shopify (own store). Realistic: $50-300/mo months 2-3, $500-2k/mo by month 12.",
+      relatedTopics: ["income-side-hustle-map", "income-content-affiliate", "income-skills-to-income"],
+      quiz: [
+        {
+          question: "What's the main advantage of digital products?",
+          options: [
+            "Guaranteed sales immediately",
+            "Create once, sell repeatedly with pure profit margin",
+            "They're free to create",
+            "No competition"
+          ],
+          correctAnswer: 1,
+          explanation: "Yes! Create once, sell forever. The 1,000th sale requires no extra effort from you. That's the leverage 📚"
+        },
+        {
+          question: "What's a realistic beginner income timeline?",
+          options: [
+            "$10,000 in month 1",
+            "$50-300/month by months 2-3",
+            "$0 always - they never sell",
+            "$5,000/month immediately"
+          ],
+          correctAnswer: 1,
+          explanation: "That's right! Realistic = $50-300/mo by months 2-3. It's slow at first but compounds as you add more products 💰"
+        },
+        {
+          question: "Which platform is best for printables according to Pansy?",
+          options: ["Amazon KDP", "Etsy", "LinkedIn", "Twitter"],
+          correctAnswer: 1,
+          explanation: "Exactly! Etsy is perfect for printables - buyers download instantly, you keep 80% after fees 🗺️"
+        }
+      ]
+    },
+    {
+      id: "income-content-affiliate",
+      title: "Content & Affiliate Income",
+      category: "Income Streams",
+      readTime: 5,
+      difficulty: "Intermediate",
+      summary: "YouTube/blog/social, affiliate marketing, email lists",
+      isPro: true,
+      content: `Content creation can become income but it's a long game. Most people quit before they see a dollar. Let me give you the real timeline and math so you know what you're getting into 📱
+
+**How content makes money:**
+
+**1. Ad Revenue (YouTube, Blog):**
+YouTube Partner Program requires 1,000 subscribers + 4,000 watch hours. Realistic CPM (cost per 1,000 views): $2-10 depending on niche.
+
+10,000 views/month at $5 CPM = $50/month
+100,000 views/month at $5 CPM = $500/month
+1 million views/month at $5 CPM = $5,000/month
+
+**2. Affiliate Income:**
+You recommend products and earn commission when people buy through your link. Must disclose affiliate relationships (legally required).
+
+Commission rates: 1-5% (Amazon), 10-30% (digital products), 30-50% (software subscriptions)
+
+**Platforms to share affiliate links:**
+- [YouTube](#) — Video reviews and tutorials
+- [Instagram/TikTok](#) — Short-form content
+- [Blog](#) — Long-form written guides
+- [Email list](#) — Direct recommendations to subscribers
+
+Example: Promote a $97 course at 40% commission. 10 sales/month = $388. 100 sales/month = $3,880.
+
+**3. Sponsorships (When You're Bigger):**
+Brands pay you to talk about their product. Micro-influencers (10k-50k followers) might get $100-500 per post. 100k+ followers can command $1,000-10,000+ depending on engagement.
+
+**4. Your Own Products (Best Margin):**
+Use your audience to sell your ebook, course, or coaching. If you have 10,000 followers and 1% buy your $47 product that's 100 sales = $4,700.
+
+**The timeline reality:**
+
+Months 0-6: Creating content, learning, building skills. Income = $0-100/month
+Months 6-12: Starting to see traction. Income = $100-500/month
+Year 1-2: Momentum building. Income = $500-2,000/month
+Year 2-3: Established presence. Income = $2,000-10,000+/month
+
+This assumes consistent posting (3-5x/week minimum) and quality content. Most people quit at month 3 when they have 47 followers and $0 income.
+
+**What to create:**
+
+Pick ONE platform to start (YouTube or TikTok or Blog). Pick ONE niche (money, fitness, parenting, productivity, tech). Stay in your lane. Algorithms reward consistency.
+
+**Real talk:**
+
+This is NOT fast money. If you need income in 30 days this isn't it. But if you can commit to 1-2 years of posting without much income knowing it compounds this is one of the best leverage plays.
+
+You build an audience once and monetize it 10 different ways: ad revenue + affiliates + sponsorships + your products = diversified income from one asset (your audience) 💪
+
+Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
+      keyTakeaway: "Content income timeline: 0-6 months = $0-100, year 1-2 = $500-2k/month. Revenue: ads + affiliates + sponsorships + own products. Must disclose affiliates. Long game but compounds.",
+      relatedTopics: ["income-digital-products", "income-side-hustle-map", "income-skills-to-income"],
+      quiz: [
+        {
+          question: "What's a realistic income timeline for content creators?",
+          options: [
+            "$10k/month in first month",
+            "$0-100/month first 6 months, $500-2k/month year 1-2",
+            "$1 million in first year",
+            "Income starts immediately"
+          ],
+          correctAnswer: 1,
+          explanation: "Yes! First 6 months = $0-100 usually. Year 1-2 = $500-2k/month if consistent. It's a long game that compounds 📱"
+        },
+        {
+          question: "Must you disclose affiliate relationships?",
+          options: [
+            "No disclosure needed",
+            "Only if you want to",
+            "Yes it's legally required",
+            "Only for products over $100"
+          ],
+          correctAnswer: 2,
+          explanation: "That's right! You MUST disclose affiliate relationships. It's an FTC requirement. Be transparent with your audience 💪"
+        },
+        {
+          question: "What's the best monetization strategy for content creators?",
+          options: [
+            "Only ad revenue",
+            "Only sponsorships",
+            "Diversify: ad revenue + affiliates + sponsorships + your own products",
+            "Don't monetize at all"
+          ],
+          correctAnswer: 2,
+          explanation: "Exactly! Diversify income from your audience: ads + affiliates + sponsors + your products = stable income sis 🗺️"
+        }
+      ]
+    },
+
+    // MODULE 3 — Money That Earns While You Sleep
+    {
+      id: "income-passive-really",
+      title: "What Is Passive Income, Really?",
+      category: "Income Streams",
+      readTime: 4,
+      difficulty: "Beginner",
+      summary: "An honest definition — passive is not effortless",
+      isPro: false,
+      content: `Let me be real with you about passive income because there's a lot of BS out there. "Passive" does NOT mean you do nothing and money appears. Let me break down what it actually means 💰
+
+**True passive income = money that comes in with minimal ongoing effort AFTER you've built the system.**
+
+Key word: AFTER. You put in significant work upfront (or money) to build the income stream. Then it runs with little maintenance.
+
+**Examples of actual passive income:**
+
+**Rental Property:** You buy the property (big upfront work + money). Tenants pay rent monthly. You still handle maintenance and tenant issues but it's way less work than a full-time job.
+
+**Dividend Stocks:** You invest money (upfront). Companies pay you quarterly dividends just for holding shares. You do literally nothing except hold.
+
+**Digital Products:** You create an ebook or course (upfront work). It sells while you sleep. Occasional updates but mostly hands-off.
+
+**The passive income lie:**
+
+"Make $10,000/month working 2 hours/week!" That's not how it works girl. Either:
+1. They're lying about the income
+2. They're lying about the time
+3. They put in YEARS of work upfront to get there
+4. They invested massive capital to generate that return
+
+**The reality of "passive" income:**
+
+- Rental property: 5-10 hours/month managing
+- Dividend portfolio: 0-2 hours/month monitoring
+- Digital products: 2-5 hours/week marketing and updates
+- Affiliate/content: 0-10 hours/week depending on stage
+
+It's not zero effort. It's just WAY less effort than trading your time 1:1 for money at a job.
+
+**Active vs Passive comparison:**
+
+**Active:** Work 1 hour = Get paid for 1 hour. Stop working = Stop getting paid.
+
+**Passive:** Work 100 hours upfront (or invest $50k) = Get paid repeatedly for years with 0-10 hours/month maintenance.
+
+**Why passive income matters:**
+
+It breaks the 1:1 time-for-money trap. You're creating assets that generate income whether you're working that day or not. That's how you build wealth — you can't trade time forever but assets can earn forever 💪
+
+Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
+      keyTakeaway: "Passive ≠ effortless. Passive = money with minimal ongoing effort AFTER you build the system. You put in work/money upfront then it runs with 0-10 hours/month maintenance.",
+      relatedTopics: ["income-dividends-101", "income-hysa-safe-yield", "income-real-estate-cash-flow"],
+      quiz: [
+        {
+          question: "What does passive income really mean?",
+          options: [
+            "You do nothing and money appears",
+            "Money with minimal ongoing effort AFTER building the system",
+            "Working 1 hour gets you paid for 1 hour",
+            "It's a myth that doesn't exist"
+          ],
+          correctAnswer: 1,
+          explanation: "Yes! Passive = minimal effort AFTER you build it. You put in work/money upfront then it runs with little maintenance 💰"
+        },
+        {
+          question: "How many hours per month does rental property income typically require?",
+          options: ["0 hours - truly passive", "5-10 hours managing", "40 hours like a full job", "100+ hours"],
+          correctAnswer: 1,
+          explanation: "That's right! Rental property = 5-10 hours/month. Not zero but way less than a job. That's the passive part 🏡"
+        },
+        {
+          question: "Why does passive income matter according to Pansy?",
+          options: [
+            "It's easy money with no work",
+            "It breaks the 1:1 time-for-money trap - assets earn whether you work or not",
+            "Everyone gets rich quick",
+            "It requires no upfront effort"
+          ],
+          correctAnswer: 1,
+          explanation: "Exactly! Passive breaks the time trap. Assets earn whether you're working that day or not. That's how you build wealth 💪"
+        }
+      ]
+    },
+    {
+      id: "income-dividends-101",
+      title: "Dividends 101",
+      category: "Income Streams",
+      readTime: 4,
+      difficulty: "Beginner",
+      summary: "How dividend stocks and ETFs pay you, and what DRIP means",
+      isPro: false,
+      content: `Dividends are one of my favorite forms of passive income because they're truly passive. You buy shares you hold them you get paid quarterly. That's it 💰
+
+**What are dividends?**
+
+Companies share their profits with shareholders every quarter. If you own 100 shares of a stock paying $1/share in dividends you get $100 deposited in your account 4 times a year = $400/year total.
+
+**Dividend yield = how much you're getting paid**
+
+If a stock costs $100 and pays $4/year in dividends that's a 4% yield.
+
+$4 annual dividend ÷ $100 stock price = 4% yield
+
+Compare that to a savings account paying 0.5% and you see why dividend investing is popular.
+
+**Dividend stocks vs Dividend ETFs:**
+
+**Individual Dividend Stocks:**
+- Companies like Coca-Cola, Johnson & Johnson, Procter & Gamble
+- Typically yield 2-5%
+- Higher risk (one company could cut dividends)
+- You pick which companies to own
+
+**Dividend ETFs:**
+- Bundle of 50-100+ dividend-paying stocks
+- Typically yield 2-4%
+- Lower risk (diversified across many companies)
+- Examples: SCHD, VYM, VIG
+
+For beginners I recommend dividend ETFs. You get instant diversification and professional rebalancing.
+
+**DRIP = Dividend Reinvestment Plan**
+
+Instead of taking dividends as cash they automatically buy more shares. Your money compounds on autopilot 🔄
+
+Example: You own 100 shares. Dividend pays $100. Stock costs $50/share. Your $100 buys 2 more shares. Now you own 102 shares. Next quarter those 102 shares pay dividends. And so on forever.
+
+**When to use DRIP:**
+
+- When you're building wealth (under 50 and don't need the income)
+- When you want maximum compound growth
+
+**When to turn DRIP off:**
+
+- When you retire and need the dividend income for living expenses
+- When you want cash flow right now
+
+**Building dividend income:**
+
+To generate $1,000/month in dividends at 4% yield you need $300,000 invested. Sounds huge right?
+
+But if you invest $500/month for 20 years at 8% total return (4% dividend + 4% growth) you'll have $300,000. That $300k then generates $1,000/month passive income forever.
+
+Dividends are patient wealth-building. You're not getting rich overnight. But you're getting paid every quarter just for owning shares. That's real passive income girl 💛
+
+Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
+      keyTakeaway: "Dividends = quarterly cash from stocks. 4% yield on $300k = $1k/month income. DRIP = reinvest dividends to buy more shares automatically. Use DRIP when building, turn off when you need income.",
+      relatedTopics: ["income-passive-really", "income-reits-tax-advantaged", "income-hysa-safe-yield"],
+      quiz: [
+        {
+          question: "How often are dividends typically paid?",
+          options: ["Once a year", "Every month", "Every quarter (4 times a year)", "Every day"],
+          correctAnswer: 2,
+          explanation: "Yes! Most dividend stocks pay quarterly. That cash hits your account 4 times a year 💰"
+        },
+        {
+          question: "What does DRIP do?",
+          options: [
+            "Sells your dividends",
+            "Automatically reinvests dividends to buy more shares",
+            "Pays taxes on dividends",
+            "Increases dividend rates"
+          ],
+          correctAnswer: 1,
+          explanation: "That's right! DRIP reinvests dividends to buy more shares. More shares = more dividends = compound growth on autopilot 🔄"
+        },
+        {
+          question: "How much do you need invested at 4% yield to earn $1,000/month?",
+          options: ["$100,000", "$200,000", "$300,000", "$1,000,000"],
+          correctAnswer: 2,
+          explanation: "Exactly! $1k/month = $12k/year. At 4% yield you need $300k invested. Build there with $500/month over 20 years 💛"
+        }
+      ]
+    },
+    {
+      id: "income-hysa-safe-yield",
+      title: "HYSA, T-Bills & Safe Yield",
+      category: "Income Streams",
+      readTime: 5,
+      difficulty: "Intermediate",
+      summary: "High-yield savings, Treasury bills, money market — where to park cash",
+      isPro: true,
+      content: `Cash sitting in a regular bank account earning 0.01% is dying slowly. Inflation eats it. But there are safe places where your cash can earn 4-5% with zero stock market risk 🏦
+
+**High-Yield Savings Accounts:**
+
+**Current rates:** 4-5% APY (as of 2024-2025)
+**Safety:** FDIC insured up to $250k
+**Access:** Instant - transfer anytime
+**Best for:** Emergency fund, short-term savings
+
+**Top options:**
+- [Ally Bank](#) — 4.5% APY, no fees, great app
+- [Marcus by Goldman Sachs](#) — 4.5% APY, no minimum
+- [American Express Personal Savings](#) — 4.4% APY
+- [Capital One 360](#) — 4.3% APY
+
+**Treasury Bills (T-Bills):**
+
+**What they are:** US government debt (safest in the world)
+**Terms:** 4 weeks to 52 weeks
+**Current rates:** 4-5%
+**Tax benefit:** State tax exempt (no state income tax on interest)
+**Where to buy:** [TreasuryDirect.gov](#) or your brokerage
+
+**Money Market Funds:**
+
+**What they are:** Investment funds that hold cash equivalents
+**Safety:** Not FDIC insured but extremely safe
+**Current rates:** 4-5%
+**Access:** Can write checks or transfer easily
+**Where:** [Vanguard](#), [Fidelity](#), [Schwab](#) brokerages
+
+**I-Bonds (Inflation-Protected):**
+
+**What they are:** Bonds that adjust with inflation automatically
+**Current rate:** 5-6% (changes every 6 months)
+**Lock-in:** Must hold 1 year minimum, penalty if sold before 5 years
+**Purchase limit:** $10,000/year per person
+**Where:** [TreasuryDirect.gov](#)
+
+**Where to put what:**
+
+- **Emergency fund (3-6 months expenses):** High-yield savings
+- **House down payment (1-3 years out):** T-bills or high-yield savings
+- **Cash you won't touch for 1-5 years:** I-bonds
+- **Brokerage cash waiting to invest:** Money market fund
+
+**Why this matters:**
+
+$10,000 in regular bank at 0.01% = $1/year
+$10,000 in high-yield savings at 4.5% = $450/year
+
+That's $449 extra just for moving your money to a better bank. Same safety same FDIC insurance. No reason not to do it.
+
+**Pro move:** Keep 1-2 months expenses in regular checking for bills. Move the rest to high-yield savings. Set up auto-transfers so your emergency fund earns 4-5% instead of nothing 💪
+
+Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
+      keyTakeaway: "Don't let cash die at 0.01%. High-yield savings = 4-5%, FDIC insured. T-bills = 4-5%, state tax exempt. I-bonds = inflation-protected. All safe options for parking cash.",
+      relatedTopics: ["income-dividends-101", "income-reits-tax-advantaged", "income-passive-really"],
+      quiz: [
+        {
+          question: "What's a typical high-yield savings rate as of 2024-2025?",
+          options: ["0.01%", "1%", "4-5%", "10%"],
+          correctAnswer: 2,
+          explanation: "Yes! High-yield savings currently pay 4-5% APY. That's 400-500 times more than regular bank accounts 🏦"
+        },
+        {
+          question: "What's the main tax benefit of Treasury bills?",
+          options: [
+            "No taxes at all",
+            "State tax exempt (no state income tax on interest)",
+            "20% tax credit",
+            "Capital gains treatment"
+          ],
+          correctAnswer: 1,
+          explanation: "That's right! T-bill interest is exempt from state income tax. Federal tax applies but you save on state 💰"
+        },
+        {
+          question: "Where should you keep your emergency fund?",
+          options: ["Stocks", "High-yield savings account", "Under your mattress", "Crypto"],
+          correctAnswer: 1,
+          explanation: "Exactly! Emergency fund = high-yield savings. Safe, FDIC insured, instant access, earning 4-5% 🏦"
+        }
+      ]
+    },
+    {
+      id: "income-reits-tax-advantaged",
+      title: "REITs & Tax-Advantaged Accounts",
+      category: "Income Streams",
+      readTime: 5,
+      difficulty: "Intermediate",
+      summary: "REITs for real-estate income without owning, plus IRA/Roth/401k basics",
+      isPro: true,
+      content: `Let me show you two ways to build passive income: REITs for real estate exposure without being a landlord and tax-advantaged accounts that supercharge your growth 🏢
+
+**REITs (Real Estate Investment Trusts):**
+
+**What they are:** Companies that own income-producing real estate. By law they must pay 90% of profits as dividends.
+
+**How it works:** You buy shares like a stock. REIT collects rent from tenants. REIT pays you dividends quarterly.
+
+**Types:**
+- Residential (apartments): O, EQR, AVB
+- Commercial (offices/retail): SPG, BXP  
+- Industrial (warehouses): PLD, DRE
+- Data centers: DLR, EQIX
+- Diversified (mix): VNQ (ETF)
+
+**Typical yield:** 3-7% depending on type
+
+**Tax treatment:** REIT dividends are taxed as ordinary income NOT qualified dividends. Higher tax rate. Hold REITs in tax-advantaged accounts (Roth IRA, traditional IRA) when possible.
+
+**Who should own REITs:**
+
+If you want real estate exposure without:
+- Buying physical property
+- Being a landlord
+- Dealing with maintenance
+- Having $200k+ for down payment
+
+REITs give you real estate income with stock market liquidity. Try selling a house in 3 days — good luck 💪
+
+**Tax-Advantaged Accounts for Income Growth:**
+
+**Roth IRA:**
+- Contributions: After-tax (you already paid taxes)
+- Growth: Tax-free forever
+- Withdrawals: Tax-free in retirement
+- Limit: $6,500/year ($7,000 if 50+)
+
+**Traditional IRA:**
+- Contributions: Pre-tax (reduces taxable income now)
+- Growth: Tax-deferred
+- Withdrawals: Taxed as ordinary income in retirement
+- Limit: $6,500/year ($7,000 if 50+)
+
+**401(k):**
+- Contributions: Pre-tax
+- Growth: Tax-deferred
+- Withdrawals: Taxed as ordinary income
+- Limit: $22,500/year ($30,000 if 50+)
+- Employer match = free money
+
+**Why this matters for passive income:**
+
+$6,500/year in Roth IRA from age 25-65 at 10% = $3.5 million TAX FREE
+
+Same money in taxable account = $2.66 million after taxes (24% bracket)
+
+That's $840,000 kept vs given to IRS. Same contributions different account massive difference.
+
+**Strategy:**
+
+1. Max employer 401k match (free money)
+2. Max Roth IRA ($6,500)
+3. Hold dividend stocks and REITs inside Roth IRA for tax-free income growth
+4. In retirement turn off DRIP and take dividends as cash tax-free
+
+**Brokers to open accounts:**
+- [Vanguard](#)
+- [Fidelity](#)
+- [Schwab](#)
+- [Betterment](#) (automated)
+
+Tax-advantaged accounts + dividend/REIT income = wealth-building machine sis 💛
+
+Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
+      keyTakeaway: "REITs = real estate income without owning property, yield 3-7%, taxed as ordinary income (hold in IRA). Tax-advantaged: Roth IRA = tax-free growth, Traditional IRA/401k = tax-deferred. Max accounts for wealth building.",
+      relatedTopics: ["income-dividends-101", "income-hysa-safe-yield", "income-ways-into-real-estate"],
+      quiz: [
+        {
+          question: "What percentage of profits must REITs pay as dividends by law?",
+          options: ["50%", "70%", "90%", "100%"],
+          correctAnswer: 2,
+          explanation: "Yes! REITs must pay 90% of profits as dividends by law. That's why they're high-yield investments 🏢"
+        },
+        {
+          question: "How are REIT dividends taxed?",
+          options: [
+            "Tax-free",
+            "Qualified dividend rate (15-20%)",
+            "Ordinary income rate (higher)",
+            "No taxes ever"
+          ],
+          correctAnswer: 2,
+          explanation: "That's right! REIT dividends = ordinary income tax (higher). Hold REITs in Roth IRA or traditional IRA when possible 💰"
+        },
+        {
+          question: "What's the 2024 Roth IRA contribution limit?",
+          options: ["$3,000", "$6,500", "$22,500", "Unlimited"],
+          correctAnswer: 1,
+          explanation: "Exactly! $6,500/year ($7,000 if 50+). Max it out for tax-free growth forever sis 💛"
+        }
+      ]
+    },
+
+    // MODULE 4 — Protection & Ownership
+    {
+      id: "income-protecting-money",
+      title: "Why Protecting Your Money Matters",
+      category: "Income Streams",
+      readTime: 4,
+      difficulty: "Beginner",
+      summary: "Income means little if it isn't protected",
+      isPro: false,
+      content: `Here's what nobody talks about when they're hyping passive income: protection matters just as much as building. You can make $10,000/month but if one lawsuit or medical emergency wipes you out what was the point? 🛡️
+
+**The harsh reality:**
+
+You're one car accident, one health crisis, one business lawsuit, or one bad decision away from losing everything you've built. That's not fear-mongering — that's just how life works.
+
+**What protection actually means:**
+
+It's not just insurance (though that's part of it). It's:
+- Legal structures that separate your personal assets from business risk
+- Insurance that covers your income if you can't work
+- Estate planning so your wealth goes where you want
+- Emergency funds so one bad month doesn't destroy you
+
+**The protection hierarchy:**
+
+**Level 1: Emergency Fund**
+3-6 months expenses in high-yield savings. This handles life's normal chaos (car breaks, lose job, medical bill).
+
+**Level 2: Insurance**
+- Term life if anyone depends on your income
+- Disability insurance (1 in 4 will become disabled before retirement)
+- Health insurance (medical bankruptcy is real)
+
+**Level 3: Legal Structure**
+LLC or other business entity if you're earning income outside a W-2 job. Separates personal assets from business liability.
+
+**Level 4: Asset Protection**
+Trusts, proper titling, umbrella insurance. This is advanced but matters when you have real wealth to protect.
+
+**Why women skip protection:**
+
+We're taught to be nice, to trust people, to not think about worst-case scenarios. "That won't happen to me." Until it does.
+
+The women who build lasting wealth? They protect their downside FIRST then focus on upside. They're not paranoid — they're prepared.
+
+**The real cost of no protection:**
+
+I've seen women lose rental properties because they didn't have an LLC. Lose everything because they skipped disability insurance and got sick. Watch businesses collapse because they had no legal protection.
+
+Don't let that be you sis. Build income AND protect it. Both matter equally 💛
+
+Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
+      keyTakeaway: "Protection = emergency fund + insurance (life, disability, health) + legal structure (LLC) + asset protection. Protect downside first then focus on upside. Both matter equally.",
+      relatedTopics: ["income-insurance-explained", "income-llc-basics", "income-cash-flow-business"],
+      quiz: [
+        {
+          question: "What's Level 1 of the protection hierarchy?",
+          options: [
+            "LLC formation",
+            "Emergency fund (3-6 months expenses)",
+            "Trusts and estate planning",
+            "Stock investments"
+          ],
+          correctAnswer: 1,
+          explanation: "Yes! Emergency fund first. 3-6 months expenses in high-yield savings. This handles life's normal chaos 🛡️"
+        },
+        {
+          question: "What percentage of people will become disabled before retirement?",
+          options: ["1 in 100", "1 in 20", "1 in 4", "1 in 2"],
+          correctAnswer: 2,
+          explanation: "That's right! 1 in 4 will become disabled before retirement. Disability insurance is more important than most people think 💰"
+        },
+        {
+          question: "What should you do first according to Pansy?",
+          options: [
+            "Focus only on making money",
+            "Protect your downside FIRST then focus on upside",
+            "Ignore protection until you're wealthy",
+            "Only buy insurance"
+          ],
+          correctAnswer: 1,
+          explanation: "Exactly! Protect downside first then build upside. Women who build lasting wealth think this way 💛"
+        }
+      ]
+    },
+    {
+      id: "income-insurance-explained",
+      title: "Insurance, Honestly Explained",
+      category: "Income Streams",
+      readTime: 5,
+      difficulty: "Beginner",
+      summary: "Term life and key policy types in plain language, no scare tactics",
+      isPro: false,
+      content: `Insurance is boring until you need it. Let me break down the types that actually matter for protecting your income — no scare tactics just honest info 🛡️
+
+**Term Life Insurance:**
+
+**What it is:** Pure death benefit. You pay a small monthly premium (like $20-50). If you die during the term (10, 20, or 30 years) your family gets a payout (like $500k).
+
+**Who needs it:** Anyone whose income supports other people (kids, partner, aging parents).
+
+**Who doesn't need it:** Single with no dependents. Nobody's relying on your income so there's no one to protect.
+
+**Cost:** $20-50/month for $500k coverage when you're young and healthy.
+
+**Vetted quoting platforms:**
+- [Policygenius](#) — Compare multiple carriers
+- [Haven Life](#) — Online application, quick approval
+- [Ladder](#) — Flexible coverage, easy to adjust
+
+**Disability Insurance:**
+
+**What it is:** Replaces 50-70% of your income if you become disabled and can't work.
+
+**Why it matters:** 1 in 4 will become disabled before retirement. More likely to need this than life insurance.
+
+**Who needs it:** Anyone whose ability to work = their income source. Especially self-employed or anyone without employer coverage.
+
+**Cost:** 1-3% of your income. If you make $50k/year expect $500-1,500/year in premiums.
+
+**Where to get it:**
+- Check employer first (often included or cheap add-on)
+- [Policygenius](#) for individual policies
+
+**Health Insurance:**
+
+**What it is:** Covers medical bills so one hospital visit doesn't bankrupt you.
+
+**Who needs it:** Everyone. Medical bankruptcy is the #1 cause of personal bankruptcy in America.
+
+**Where to get it:**
+- Employer plan first (usually best deal)
+- Healthcare.gov if self-employed or between jobs
+- Consider HSA-eligible high-deductible plan + max out HSA for triple tax benefit
+
+**What You DON'T Need (Usually):**
+
+**Whole Life Insurance:** Expensive, slow cash value growth, most people better off with term life + investing the difference.
+
+**Cancer Insurance:** Redundant if you have good health insurance.
+
+**Life Insurance on Kids:** Kids don't earn income — there's nothing to replace. Skip unless you want to cover funeral costs.
+
+**The honest approach:**
+
+Buy term life if people depend on your income. Buy disability insurance if your income depends on your ability to work. Buy health insurance because medical bills are insane. That's the protection trifecta.
+
+Don't let insurance salespeople scare you into expensive policies you don't need. Stick to the basics and invest the rest sis 💛
+
+Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
+      keyTakeaway: "Protection trifecta: Term life (if dependents rely on your income), Disability (1 in 4 need it), Health (medical bankruptcy is real). Skip expensive whole life and redundant policies. Basics only.",
+      relatedTopics: ["income-protecting-money", "income-llc-basics", "income-cash-flow-business"],
+      quiz: [
+        {
+          question: "Who needs term life insurance?",
+          options: [
+            "Everyone regardless of situation",
+            "Anyone whose income supports other people (kids, partner, parents)",
+            "Only people over 50",
+            "Single people with no dependents"
+          ],
+          correctAnswer: 1,
+          explanation: "Yes! Term life is for people whose income supports others. If you're single with no dependents you don't need it 🛡️"
+        },
+        {
+          question: "What percentage of people will become disabled before retirement?",
+          options: ["1 in 100", "1 in 20", "1 in 4", "None - disabilities don't happen"],
+          correctAnswer: 2,
+          explanation: "That's right! 1 in 4 will become disabled. Disability insurance is MORE important than life insurance for most people 💰"
+        },
+        {
+          question: "What's the protection trifecta according to Pansy?",
+          options: [
+            "Whole life + cancer insurance + life on kids",
+            "Term life + disability + health insurance",
+            "Only health insurance",
+            "No insurance needed"
+          ],
+          correctAnswer: 1,
+          explanation: "Exactly! Term life (if dependents), disability (income protection), health (medical bills). That's the basics sis 💛"
+        }
+      ]
+    },
+    {
+      id: "income-llc-basics",
+      title: "Starting an LLC",
+      category: "Income Streams",
+      readTime: 5,
+      difficulty: "Intermediate",
+      summary: "When and why to form an LLC, the basics, what it protects",
+      isPro: true,
+      content: `Starting an LLC sounds intimidating but it's simpler than you think. Let me show you when you need one, what it actually protects, and how to set it up 🏢
+
+**What is an LLC:**
+
+Limited Liability Company = a legal structure that separates your personal assets from business assets. If your business gets sued they can't take your house or personal savings. It's a legal shield.
+
+**When you NEED an LLC:**
+
+- You're freelancing or consulting with clients
+- You're running a side business generating income
+- You want liability protection
+- You're hiring contractors or employees
+- You want to look more professional (LLC vs just your name)
+
+**When you DON'T need an LLC:**
+
+- You're just starting out testing an idea
+- You're making under $5k/year
+- You're a W-2 employee with no side business
+
+**What it protects:**
+
+LLC protects you from business liabilities. Someone sues your business? They can't take your personal assets. But it does NOT protect you from personal negligence (if YOU personally did something illegal or negligent).
+
+**How to form an LLC (step by step):**
+
+1. **Choose a name** — Check your state's business registry. Must include "LLC" in the name. Most states let you reserve for $10-50.
+
+2. **File Articles of Organization** — Legal document that creates your LLC. File with your state (usually Secretary of State office). Costs $50-500 depending on state. Online in most states. Takes 1-3 weeks.
+
+3. **Get an EIN** — Free from IRS.gov. Takes 5 minutes. This is your business tax ID.
+
+4. **Open business bank account** — Separate business and personal finances (legally required for LLCs). Need: EIN, Articles of Organization, driver's license. Banks: [Chase Business](#), [Bank of America Business](#), [Capital One Business](#).
+
+5. **Create Operating Agreement** — Not always required but smart. Free templates online or hire lawyer ($500-1,500).
+
+6. **Get necessary licenses** — Varies by industry and location. Check your city/county. Costs $50-500/year usually.
+
+7. **File annual reports** — Most states require annual or biennial reports. Costs $50-300/year. Miss this and your LLC gets dissolved.
+
+**Ongoing costs:**
+
+- State filing fee: $50-500 one-time
+- Annual report: $50-300/year
+- Registered agent (if required): $50-300/year
+- Business banking: $10-50/month
+- Accounting/bookkeeping: $100-500/month if you hire someone
+
+**DIY LLC services:**
+- [LegalZoom](#) — $79-$349 + state fees
+- [ZenBusiness](#) — $49-$299 + state fees
+- DIY directly with your state — Free (just pay state filing fee)
+
+**Tax structure:**
+
+By default LLCs are "pass-through" — profits pass through to your personal tax return. You file Schedule C with your 1040. LLC doesn't pay separate taxes.
+
+**When to form:**
+
+Form an LLC when your side income is consistent ($10k+/year) and you want professional protection. Don't rush to form on day 1 of your idea.
+
+LLC = legal protection + professional credibility. It's not magic but it matters when your income grows sis 💪
+
+Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
+      keyTakeaway: "LLC = liability protection. File Articles of Organization with state ($50-500). Get EIN from IRS (free). Open business bank. File annual reports ($50-300/year). Form when income is $10k+/year consistent.",
+      relatedTopics: ["income-protecting-money", "income-cash-flow-business", "income-insurance-explained"],
+      quiz: [
+        {
+          question: "What's the main benefit of forming an LLC?",
+          options: [
+            "Automatic tax savings",
+            "Separates personal assets from business liabilities",
+            "Guarantees business success",
+            "No paperwork required"
+          ],
+          correctAnswer: 1,
+          explanation: "Yes! LLC = liability protection. Business debts/lawsuits can't touch your personal assets. That's the shield 🏢"
+        },
+        {
+          question: "What's an EIN and where do you get it?",
+          options: [
+            "Employer Identification Number from IRS (free, takes 5 minutes)",
+            "Employee Insurance Number from state ($500)",
+            "Not needed for LLCs",
+            "Must hire lawyer to get one"
+          ],
+          correctAnswer: 0,
+          explanation: "That's right! EIN = business tax ID from IRS.gov. Free, takes 5 minutes. You'll need it for banking 💰"
+        },
+        {
+          question: "When should you form an LLC according to Pansy?",
+          options: [
+            "Day 1 of having a business idea",
+            "When side income is consistent ($10k+/year)",
+            "Never form an LLC",
+            "Only after making $1 million"
+          ],
+          correctAnswer: 1,
+          explanation: "Exactly! Form when income is steady $10k+/year. Don't rush on day 1 — test your idea first sis 💪"
+        }
+      ]
+    },
+    {
+      id: "income-cash-flow-business",
+      title: "Building a Cash-Flow Business",
+      category: "Income Streams",
+      readTime: 5,
+      difficulty: "Intermediate",
+      summary: "Turning a hustle into a small business, reinvesting, simple systems",
+      isPro: true,
+      content: `There's a difference between having a side hustle and building a business. Let me show you how to turn your hustle into something that cash flows and grows 💼
+
+**The hustle → business transition:**
+
+**Hustle stage:** You trade time for money. Every dollar requires your direct effort. If you stop working income stops.
+
+**Business stage:** Systems + people do the work. You manage strategy. Income continues even when you're not directly working.
+
+**How to make the transition:**
+
+**Step 1: Systematize Everything**
+
+Write down your process for every task. Client onboarding. Service delivery. Invoicing. Follow-up. If it's only in your head you can't scale it.
+
+Create templates, checklists, SOPs (Standard Operating Procedures). Boring but essential.
+
+**Step 2: Reinvest Profits**
+
+Don't take every dollar as personal income. Reinvest 30-50% back into the business:
+- Tools and software that save time
+- Contractors to handle repeatable tasks
+- Marketing to bring in more clients
+- Training to improve skills
+
+**Step 3: Hire Your First Helper**
+
+Start with contractors not employees (way simpler). Outsource the tasks you hate or that take the most time:
+- Admin work (VA from Upwork/Fiverr)
+- Customer service (support from OnlineJobs.ph)
+- Content creation (writers from Upwork)
+- Design work (designers from Fiverr)
+
+Pay $15-30/hour for good contractors. If they save you 10 hours/week that's $150-300/week you can spend on higher-value work.
+
+**Step 4: Build Simple Systems**
+
+You don't need fancy software. You need:
+- CRM or spreadsheet to track clients
+- Project management tool (Trello, Asana, Notion)
+- Automated invoicing (FreshBooks, Wave, QuickBooks)
+- Email templates for common questions
+- Onboarding checklist for new clients
+
+**Step 5: Track Numbers Weekly**
+
+- Revenue (how much came in)
+- Expenses (what went out)
+- Profit (what's left)
+- Client count (how many you're serving)
+- Hours worked (your time investment)
+
+If you don't measure you can't improve.
+
+**The cash flow business model:**
+
+**Month 1:** $3k revenue, you work 60 hours
+**Month 6:** $5k revenue, contractor handles 20 hours, you work 40 hours
+**Month 12:** $8k revenue, 2 contractors handle 40 hours, you work 30 hours
+**Month 24:** $12k revenue, team handles 60 hours, you work 20 hours managing
+
+You're earning MORE while working LESS because systems + people scale.
+
+**Real talk:**
+
+This takes 1-2 years minimum. It's not sexy. It's documenting processes, training people, fixing mistakes, refining systems. But this is how you build something that outlasts your hustle energy.
+
+You can't hustle forever. But systems and teams can run indefinitely sis 💪
+
+Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
+      keyTakeaway: "Hustle = time for money. Business = systems + people do work. Transition: systematize → reinvest 30-50% → hire contractors → build simple systems → track numbers. Takes 1-2 years but scales.",
+      relatedTopics: ["income-llc-basics", "income-protecting-money", "income-skills-to-income"],
+      quiz: [
+        {
+          question: "What's the main difference between a hustle and a business?",
+          options: [
+            "Businesses make more money",
+            "Hustles are illegal",
+            "Hustle = time for money, Business = systems + people do work",
+            "There is no difference"
+          ],
+          correctAnswer: 2,
+          explanation: "Yes! Hustle = you trade time for money. Business = systems + people scale the work. That's the shift 💼"
+        },
+        {
+          question: "How much of profits should you reinvest according to Pansy?",
+          options: ["0% - take it all", "10%", "30-50%", "100%"],
+          correctAnswer: 2,
+          explanation: "That's right! Reinvest 30-50% into tools, contractors, marketing, training. That's how you grow 💰"
+        },
+        {
+          question: "What should you hire out first?",
+          options: [
+            "CEO position",
+            "Tasks you hate or that take the most time (admin, support, content)",
+            "Everything immediately",
+            "Never hire anyone"
+          ],
+          correctAnswer: 1,
+          explanation: "Exactly! Outsource tasks you hate or that eat time. VA, support, content. Frees you for high-value work sis 💪"
         }
       ]
     },
