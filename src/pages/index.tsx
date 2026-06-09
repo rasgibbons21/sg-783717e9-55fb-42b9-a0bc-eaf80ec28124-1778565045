@@ -5,6 +5,12 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { supabase } from "@/integrations/supabase/client";
 import { marketService } from "@/services/marketService";
 import { TrendingUp, Sparkles, Shield, BarChart3, Users, DollarSign, Star } from "lucide-react";
@@ -392,6 +398,96 @@ export default function LandingPage() {
                   No credit card required to explore Bloom and meet Pansy
                 </p>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ Section */}
+        <section className="py-20">
+          <div className="max-w-4xl mx-auto px-4">
+            <div className="text-center space-y-4 mb-12">
+              <h2 className="font-serif text-4xl font-bold text-foreground">
+                Questions? We've Got You
+              </h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                Everything you need to know about Bloom, answered honestly
+              </p>
+            </div>
+
+            <Card className="p-6 bg-card border-border">
+              <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="item-1" className="border-border">
+                  <AccordionTrigger className="text-left font-semibold text-foreground hover:text-accent hover:no-underline">
+                    Is Bloom financial advice?
+                  </AccordionTrigger>
+                  <AccordionContent className="text-muted-foreground leading-relaxed">
+                    No, girl — Bloom is education, not advice. We explain how investing works in plain language so you can make your own confident decisions. Always do your own research, and talk to a licensed professional before investing.
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="item-2" className="border-border">
+                  <AccordionTrigger className="text-left font-semibold text-foreground hover:text-accent hover:no-underline">
+                    Do I need experience or a lot of money to start?
+                  </AccordionTrigger>
+                  <AccordionContent className="text-muted-foreground leading-relaxed">
+                    Not at all. Bloom is built for total beginners. You can start learning with zero experience, and you decide how much — if anything — to invest, on your own terms.
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="item-3" className="border-border">
+                  <AccordionTrigger className="text-left font-semibold text-foreground hover:text-accent hover:no-underline">
+                    Does Bloom tell me what to buy?
+                  </AccordionTrigger>
+                  <AccordionContent className="text-muted-foreground leading-relaxed">
+                    No. Bloom and Pansy help you understand stocks, ETFs, and the market so you can decide for yourself. We never promise profits, and we always include the risks.
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="item-4" className="border-border">
+                  <AccordionTrigger className="text-left font-semibold text-foreground hover:text-accent hover:no-underline">
+                    Who is Pansy?
+                  </AccordionTrigger>
+                  <AccordionContent className="text-muted-foreground leading-relaxed">
+                    Pansy is your guide inside Bloom — she breaks down stocks, ETFs, charts, and market news in plain, jargon-free language, like a smart friend who actually explains things.
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="item-5" className="border-border">
+                  <AccordionTrigger className="text-left font-semibold text-foreground hover:text-accent hover:no-underline">
+                    What's free, and what's in Bloom Pro?
+                  </AccordionTrigger>
+                  <AccordionContent className="text-muted-foreground leading-relaxed">
+                    You can learn and explore for free. Bloom Pro ($7.99/month or $57.99/year) unlocks full Pansy analysis, unlimited stock searches, the portfolio tracker, advanced indicators, watchlist alerts, and the side-hustle lessons.
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="item-6" className="border-border">
+                  <AccordionTrigger className="text-left font-semibold text-foreground hover:text-accent hover:no-underline">
+                    Can I cancel anytime?
+                  </AccordionTrigger>
+                  <AccordionContent className="text-muted-foreground leading-relaxed">
+                    Yes. Manage or cancel Bloom Pro anytime from your billing page — no lock-in.
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="item-7" className="border-b-0">
+                  <AccordionTrigger className="text-left font-semibold text-foreground hover:text-accent hover:no-underline">
+                    Is my information safe?
+                  </AccordionTrigger>
+                  <AccordionContent className="text-muted-foreground leading-relaxed">
+                    Payments are handled securely by Stripe (we never see your card details), and your account is protected by secure sign-in.
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </Card>
+
+            <div className="text-center mt-8">
+              <p className="text-sm text-muted-foreground">
+                Still have questions?{" "}
+                <Link href="/contact" className="text-accent hover:underline">
+                  Get in touch
+                </Link>
+              </p>
             </div>
           </div>
         </section>
