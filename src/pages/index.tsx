@@ -126,10 +126,8 @@ export default function LandingPage() {
                     <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground leading-tight">
                       Your money. Your terms. Your future.
                     </h1>
-                    <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed max-w-xl">
-                      Investing made simple with Pansy, your expert guide who explains
-                      everything in plain language. No confusing jargon. Just real talk
-                      about building wealth.
+                    <p className="text-xl text-muted-foreground leading-relaxed">
+                      Bloom is the investing-education app that teaches women to understand stocks, ETFs, dividends, and wealth-building in plain language — with Pansy as your personal guide.
                     </p>
                   </div>
 
@@ -150,6 +148,34 @@ export default function LandingPage() {
                     >
                       Meet Pansy
                     </Button>
+                  </div>
+
+                  {/* Clarity Row - Three Clear Benefits */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-card/50 border border-border/50">
+                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <Sparkles className="w-5 h-5 text-primary" />
+                      </div>
+                      <p className="text-sm font-medium text-foreground leading-snug">
+                        Learn investing in plain language
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-card/50 border border-border/50">
+                      <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0">
+                        <BarChart3 className="w-5 h-5 text-accent" />
+                      </div>
+                      <p className="text-sm font-medium text-foreground leading-snug">
+                        Analyze any stock with Pansy
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-card/50 border border-border/50">
+                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <TrendingUp className="w-5 h-5 text-primary" />
+                      </div>
+                      <p className="text-sm font-medium text-foreground leading-snug">
+                        Build confidence, not hype
+                      </p>
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-3 gap-4 pt-4">
@@ -204,7 +230,7 @@ export default function LandingPage() {
                       alt="Woman managing investments"
                       className="w-full h-auto rounded-2xl shadow-2xl object-cover"
                     />
-                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-accent/10 to-transparent pointer-events-none"></div>
+                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-background/20 to-transparent pointer-events-none"></div>
                   </div>
                 </div>
               </div>
