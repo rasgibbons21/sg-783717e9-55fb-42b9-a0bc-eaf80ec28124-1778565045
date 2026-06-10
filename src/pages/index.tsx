@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -32,6 +33,7 @@ export default function LandingPage() {
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [marketQuotes, setMarketQuotes] = useState<Record<string, FeaturedStock>>({});
   const [selectedStock, setSelectedStock] = useState("AAPL");
+  const [selectedTimeframe, setSelectedTimeframe] = useState("1D");
 
   useEffect(() => {
     checkAuthAndRedirect();
@@ -183,7 +185,7 @@ export default function LandingPage() {
         {/* Hero Section - Two Columns */}
         <section className="py-16 lg:py-24">
           <div className="max-w-7xl mx-auto px-6">
-            <div className="grid lg:grid-cols-2 gap-12 items-start">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
               {/* Left Column - Welcome */}
               <div className="space-y-8">
                 <div className="space-y-4">
@@ -223,54 +225,69 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              {/* Right Column - Pansy's Daily Market Thought */}
-              <Card className="p-8 space-y-6 shadow-lg" style={{ backgroundColor: "white", border: "1px solid rgba(45, 74, 62, 0.1)" }}>
-                <div className="flex items-center gap-3">
-                  <div className="w-14 h-14 rounded-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, #D4AF6A 0%, #C4714A 100%)" }}>
-                    <span className="text-2xl">🌺</span>
-                  </div>
-                  <div>
-                    <h3 className="font-serif text-xl font-bold" style={{ color: "#2D4A3E" }}>
-                      Pansy's Daily Market Thought
-                    </h3>
-                    <p className="text-sm" style={{ color: "#2D4A3E", opacity: 0.6 }}>Your guide to today's market</p>
-                  </div>
-                </div>
+              {/* Right Column - Hero Image */}
+              <div className="relative w-full h-[500px] rounded-[20px] overflow-hidden shadow-2xl" style={{ border: "1px solid rgba(45, 74, 62, 0.15)" }}>
+                <Image
+                  src="/bloom-hero.jpg"
+                  alt="Woman working on laptop in warm sunlit room"
+                  fill
+                  style={{ objectFit: "cover" }}
+                  priority
+                />
+              </div>
+            </div>
+          </div>
+        </section>
 
+        {/* Pansy's Daily Market Thought - Full Width Strip */}
+        <section className="py-12" style={{ backgroundColor: "rgba(45, 74, 62, 0.03)" }}>
+          <div className="max-w-7xl mx-auto px-6">
+            <Card className="p-8 space-y-6 shadow-lg" style={{ backgroundColor: "white", border: "1px solid rgba(45, 74, 62, 0.1)" }}>
+              <div className="flex items-center gap-3">
+                <div className="w-14 h-14 rounded-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, #D4AF6A 0%, #C4714A 100%)" }}>
+                  <span className="text-2xl">🌺</span>
+                </div>
+                <div>
+                  <h3 className="font-serif text-xl font-bold" style={{ color: "#2D4A3E" }}>
+                    Pansy's Daily Market Thought
+                  </h3>
+                  <p className="text-sm" style={{ color: "#2D4A3E", opacity: 0.6 }}>Your guide to today's market</p>
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <p className="text-base leading-relaxed italic" style={{ color: "#2D4A3E", opacity: 0.9 }}>
                     "Good morning! The S&P is holding steady this week, which is exactly what we want to see — no drama, just consistent growth. Remember, boring markets build wealth faster than exciting ones 💛"
                   </p>
-
-                  <div className="pt-4 space-y-3" style={{ borderTop: "1px solid rgba(45, 74, 62, 0.1)" }}>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium" style={{ color: "#2D4A3E", opacity: 0.7 }}>Today's Sentiment</span>
-                      <Badge className="font-medium" style={{ backgroundColor: "rgba(45, 74, 62, 0.1)", color: "#2D4A3E" }}>
-                        Steady & Optimistic
-                      </Badge>
-                    </div>
-
-                    {featuredETF && (
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium" style={{ color: "#2D4A3E", opacity: 0.7 }}>Featured ETF</span>
-                        <div className="text-right">
-                          <p className="font-semibold font-mono" style={{ color: "#2D4A3E" }}>{featuredETF.ticker}</p>
-                          <p className="text-xs font-mono" style={{ color: featuredETF.changePercent >= 0 ? "#10b981" : "#ef4444" }}>
-                            {formatPrice(featuredETF.price)} {featuredETF.changePercent >= 0 ? "+" : ""}{featuredETF.changePercent.toFixed(2)}%
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
                 </div>
 
-                <div className="pt-4" style={{ borderTop: "1px solid rgba(45, 74, 62, 0.1)" }}>
-                  <p className="text-xs text-center" style={{ color: "#2D4A3E", opacity: 0.6 }}>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 rounded-lg" style={{ backgroundColor: "rgba(45, 74, 62, 0.05)" }}>
+                    <span className="text-sm font-medium" style={{ color: "#2D4A3E", opacity: 0.7 }}>Today's Sentiment</span>
+                    <Badge className="font-medium" style={{ backgroundColor: "rgba(45, 74, 62, 0.1)", color: "#2D4A3E" }}>
+                      Steady & Optimistic
+                    </Badge>
+                  </div>
+
+                  {featuredETF && (
+                    <div className="flex items-center justify-between p-3 rounded-lg" style={{ backgroundColor: "rgba(45, 74, 62, 0.05)" }}>
+                      <span className="text-sm font-medium" style={{ color: "#2D4A3E", opacity: 0.7 }}>Featured ETF</span>
+                      <div className="text-right">
+                        <p className="font-semibold font-mono" style={{ color: "#2D4A3E" }}>{featuredETF.ticker}</p>
+                        <p className="text-xs font-mono" style={{ color: featuredETF.changePercent >= 0 ? "#10b981" : "#ef4444" }}>
+                          {formatPrice(featuredETF.price)} {featuredETF.changePercent >= 0 ? "+" : ""}{featuredETF.changePercent.toFixed(2)}%
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  <p className="text-xs text-center pt-2" style={{ color: "#2D4A3E", opacity: 0.6 }}>
                     Pansy is here to guide you every step of your wealth journey.
                   </p>
                 </div>
-              </Card>
-            </div>
+              </div>
+            </Card>
           </div>
         </section>
 
@@ -450,11 +467,12 @@ export default function LandingPage() {
                         {["1D", "5D", "1M", "3M", "6M", "YTD", "1Y", "5Y", "Max"].map((tf) => (
                           <button
                             key={tf}
+                            onClick={() => setSelectedTimeframe(tf)}
                             className="px-3 py-1.5 rounded text-xs font-semibold whitespace-nowrap transition-all"
                             style={{ 
-                              backgroundColor: tf === "1D" ? "rgba(45, 74, 62, 0.1)" : "transparent",
+                              backgroundColor: selectedTimeframe === tf ? "rgba(45, 74, 62, 0.1)" : "transparent",
                               color: "#2D4A3E",
-                              border: tf === "1D" ? "1px solid rgba(45, 74, 62, 0.2)" : "1px solid transparent"
+                              border: selectedTimeframe === tf ? "1px solid rgba(45, 74, 62, 0.2)" : "1px solid transparent"
                             }}
                           >
                             {tf}
