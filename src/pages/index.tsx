@@ -142,7 +142,7 @@ export default function LandingPage() {
               </div>
               <div>
                 <span className="font-serif text-2xl font-bold block" style={{ color: "#2D4A3E" }}>Bloom</span>
-                <span className="text-xs tracking-wide" style={{ color: "#2D4A3E", opacity: 0.6 }}>Invest. Grow.</span>
+                <span className="text-xs tracking-wide" style={{ color: "#2D4A3E", opacity: 0.6 }}>Learn. Grow. Thrive.</span>
               </div>
             </div>
 
