@@ -142,28 +142,28 @@ export default function LandingPage() {
               </div>
               <div>
                 <span className="font-serif text-2xl font-bold block" style={{ color: "#2D4A3E" }}>Bloom</span>
-                <span className="text-xs tracking-wide" style={{ color: "#2D4A3E", opacity: 0.6 }}>Invest. Grow.</span>
+                <span className="text-xs tracking-wide" style={{ color: "#2D4A3E", opacity: 0.6 }}>Learn. Grow. Thrive.</span>
               </div>
             </div>
 
             {/* Center - Navigation */}
             <nav className="hidden lg:flex items-center gap-8">
-              <Link href="/home" className="text-sm font-medium transition-colors" style={{ color: "#2D4A3E" }}>
+              <Link href="/" className="text-sm font-medium transition-colors" style={{ color: "#2D4A3E" }}>
                 Home
               </Link>
               <Link href="/learn" className="text-sm font-medium transition-colors" style={{ color: "#2D4A3E" }}>
                 Learn
               </Link>
-              <Link href="/discover" className="text-sm font-medium transition-colors" style={{ color: "#2D4A3E" }}>
+              <Link href="/analyze" className="text-sm font-medium transition-colors" style={{ color: "#2D4A3E" }}>
                 Analyze
               </Link>
               <Link href="/portfolio" className="text-sm font-medium transition-colors" style={{ color: "#2D4A3E" }}>
                 Portfolio
               </Link>
-              <Link href="/goals" className="text-sm font-medium transition-colors" style={{ color: "#2D4A3E" }}>
+              <Link href="/discipline" className="text-sm font-medium transition-colors" style={{ color: "#2D4A3E" }}>
                 Discipline
               </Link>
-              <Link href="/subscription" className="text-sm font-semibold transition-colors" style={{ color: "#D4AF6A" }}>
+              <Link href="/pro" className="text-sm font-semibold transition-colors" style={{ color: "#D4AF6A" }}>
                 Bloom Pro
               </Link>
             </nav>
@@ -193,11 +193,13 @@ export default function LandingPage() {
                     WELCOME TO SHE BLOOMS WEALTH
                   </p>
                   <h1 className="font-serif text-5xl lg:text-6xl font-bold leading-tight" style={{ color: "#2D4A3E" }}>
-                    Invest with Confidence.{" "}
-                    <span style={{ color: "#C4714A" }}>Bloom Into Wealth.</span>
+                    Become the Woman Your Future Self Thanks You For.
                   </h1>
+                  <p className="text-xl font-medium leading-relaxed" style={{ color: "#C4714A" }}>
+                    Learn money skills. Build confidence. Create lasting wealth.
+                  </p>
                   <p className="text-lg leading-relaxed" style={{ color: "#2D4A3E", opacity: 0.8 }}>
-                    Your all-in-one space to learn investing, analyze stocks, build wealth, and become the woman your future self is proud of.
+                    Your all-in-one space to learn investing, understand money, analyze opportunities, and build the future you deserve.
                   </p>
                 </div>
 
@@ -217,9 +219,9 @@ export default function LandingPage() {
                       Start Learning
                     </Button>
                   </Link>
-                  <Link href="/discover">
+                  <Link href="#how-it-works">
                     <Button size="lg" variant="outline" className="w-full sm:w-auto font-semibold text-base px-8 py-6" style={{ borderColor: "#2D4A3E", color: "#2D4A3E" }}>
-                      Analyze a Stock
+                      See How It Works
                     </Button>
                   </Link>
                 </div>
@@ -624,10 +626,10 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Bottom Row - Four Columns */}
+        {/* Bottom Row - Three Columns */}
         <section className="py-16">
           <div className="max-w-7xl mx-auto px-6">
-            <div className="grid lg:grid-cols-4 gap-6">
+            <div className="grid lg:grid-cols-3 gap-6">
               {/* Column 1 - Bloom Academy */}
               <Card className="p-6 space-y-6" style={{ backgroundColor: "white", border: "1px solid rgba(45, 74, 62, 0.1)" }}>
                 <h3 className="font-serif text-xl font-bold" style={{ color: "#2D4A3E" }}>
@@ -685,17 +687,7 @@ export default function LandingPage() {
                 </Button>
               </Card>
 
-              {/* Column 3 - What Women Are Saying (Hidden - no testimonials yet) */}
-              <Card className="p-6 flex items-center justify-center" style={{ backgroundColor: "white", border: "1px solid rgba(45, 74, 62, 0.1)" }}>
-                <div className="text-center space-y-3">
-                  <Sparkles className="w-12 h-12 mx-auto" style={{ color: "#D4AF6A" }} />
-                  <p className="text-sm" style={{ color: "#2D4A3E", opacity: 0.6 }}>
-                    Reviews coming soon
-                  </p>
-                </div>
-              </Card>
-
-              {/* Column 4 - Bloom Pro */}
+              {/* Column 3 - Bloom Pro */}
               <Card className="p-6 space-y-6" style={{ background: "linear-gradient(135deg, rgba(45, 74, 62, 0.05) 0%, rgba(212, 175, 106, 0.05) 100%)", border: "1px solid rgba(212, 175, 106, 0.3)" }}>
                 <div className="space-y-3">
                   <p className="text-xs font-semibold tracking-widest uppercase" style={{ color: "#D4AF6A" }}>
@@ -743,7 +735,7 @@ export default function LandingPage() {
                   </div>
                 </div>
 
-                <Link href="/subscription">
+                <Link href="/pro">
                   <Button className="w-full font-semibold" style={{ backgroundColor: "#C4714A", color: "white" }}>
                     Upgrade to Bloom Pro
                   </Button>

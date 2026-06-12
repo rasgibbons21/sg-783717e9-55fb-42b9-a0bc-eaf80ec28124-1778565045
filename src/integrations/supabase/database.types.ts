@@ -233,6 +233,7 @@ export type Database = {
           current_period_end: string | null
           email: string | null
           full_name: string | null
+          has_seen_pro_welcome: boolean | null
           id: string
           is_pro: boolean | null
           stripe_customer_id: string | null
@@ -246,6 +247,7 @@ export type Database = {
           current_period_end?: string | null
           email?: string | null
           full_name?: string | null
+          has_seen_pro_welcome?: boolean | null
           id: string
           is_pro?: boolean | null
           stripe_customer_id?: string | null
@@ -259,6 +261,7 @@ export type Database = {
           current_period_end?: string | null
           email?: string | null
           full_name?: string | null
+          has_seen_pro_welcome?: boolean | null
           id?: string
           is_pro?: boolean | null
           stripe_customer_id?: string | null
