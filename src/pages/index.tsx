@@ -205,10 +205,15 @@ export default function LandingPage() {
 
                 {/* Pill Row */}
                 <div className="flex flex-wrap gap-3">
-                  {["Learn", "Analyze", "Invest", "Grow"].map((item) => (
-                    <div key={item} className="px-4 py-2 rounded-full text-sm font-medium" style={{ backgroundColor: "white", border: "1px solid rgba(45, 74, 62, 0.15)", color: "#2D4A3E" }}>
-                      {item}
-                    </div>
+                  {([
+                    { label: "Learn", href: "/learn" },
+                    { label: "Analyze", href: "/discover" },
+                    { label: "Invest", href: "/portfolio" },
+                    { label: "Grow", href: "/goals" },
+                  ] as const).map(({ label, href }) => (
+                    <Link key={label} href={href} className="px-4 py-2 rounded-full text-sm font-medium transition-opacity hover:opacity-80" style={{ backgroundColor: "white", border: "1px solid rgba(45, 74, 62, 0.15)", color: "#2D4A3E" }}>
+                      {label}
+                    </Link>
                   ))}
                 </div>
 
