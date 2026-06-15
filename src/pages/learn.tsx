@@ -16,7 +16,8 @@ import { PositionSizeCalculator } from "@/components/PositionSizeCalculator";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { authService } from "@/services/authService";
 import { supabase } from "@/integrations/supabase/client";
-import { Search, ArrowLeft, Clock, CheckCircle2, Circle, ChevronRight, Bookmark, BookmarkCheck, Award } from "lucide-react";
+import { Search, ArrowLeft, Clock, CheckCircle2, Circle, ChevronRight, Bookmark, BookmarkCheck, Award, Lock } from "lucide-react";
+import { UpgradeModal } from "@/components/UpgradeModal";
 
 type Category = "All" | "Stocks" | "ETFs" | "Mutual Funds" | "Dividends" | "Bonds" | "Retirement" | "Trading Psychology" | "Income Streams";
 
@@ -41,10 +42,13 @@ interface Lesson {
   isPro?: boolean;
 }
 
+const FREE_LESSON_IDS = ["what-is-stock", "what-is-etf", "what-is-mutual-fund"];
+
 export default function Learn() {
   const router = useRouter();
   const { isPro, isLoading: subscriptionLoading } = useSubscription();
   const [user, setUser] = useState<any>(null);
+  const [showLearnUpgradeModal, setShowLearnUpgradeModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<Category>("All");
   const [completedLessons, setCompletedLessons] = useState<string[]>([]);
@@ -3087,11 +3091,18 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
               filteredLessons.map((lesson) => {
                 const isCompleted = completedLessons.includes(lesson.id);
                 const isBookmarked = bookmarkedLessons.includes(lesson.id);
+                const isGated = !isPro && !FREE_LESSON_IDS.includes(lesson.id);
                 return (
                   <Card
                     key={lesson.id}
-                    className="p-4 bg-card border-border rounded-xl hover:border-accent/50 transition-all cursor-pointer group"
-                    onClick={() => setSelectedLesson(lesson.id)}
+                    className={`p-4 bg-card border-border rounded-xl hover:border-accent/50 transition-all cursor-pointer group ${isGated ? "opacity-50" : ""}`}
+                    onClick={() => {
+                      if (isGated) {
+                        setShowLearnUpgradeModal(true);
+                      } else {
+                        setSelectedLesson(lesson.id);
+                      }
+                    }}
                   >
                     <div className="flex items-center gap-4">
                       <img
@@ -3106,6 +3117,11 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
                               <Badge className="bg-accent/20 text-accent border-accent/30 text-xs">
                                 {lesson.category}
                               </Badge>
+                              {isGated && (
+                                <Badge className="bg-muted text-muted-foreground border-muted-foreground/30 text-xs flex items-center gap-1">
+                                  <Lock className="w-3 h-3" />Pro
+                                </Badge>
+                              )}
                             </div>
                             <h3 className="font-semibold text-foreground group-hover:text-accent transition-colors">
                               {lesson.title}
@@ -3203,6 +3219,12 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
           </Card>
         </div>
       </div>
+
+      <UpgradeModal
+        isOpen={showLearnUpgradeModal}
+        onClose={() => setShowLearnUpgradeModal(false)}
+        trigger="view_limit"
+      />
     </Layout>
   );
 }
