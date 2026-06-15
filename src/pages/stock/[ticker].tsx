@@ -17,7 +17,7 @@ import { TextWithPansyTooltips } from "@/components/TextWithPansyTooltips";
 import { UpgradeModal, UpgradeBanner, useViewTracker } from "@/components/UpgradeModal";
 import { LockedFeatureModal } from "@/components/LockedFeatureModal";
 import { marketService } from "@/services/marketService";
-import { TrendingUp, TrendingDown, AlertTriangle, ExternalLink, BarChart3, Activity, Target, Sparkles } from "lucide-react";
+import { TrendingUp, TrendingDown, AlertTriangle, ExternalLink, BarChart3, Activity, Target, Sparkles, Lock } from "lucide-react";
 import Link from "next/link";
 
 interface StockData {
@@ -231,11 +231,15 @@ export default function StockPage() {
                 <h3 className="font-serif text-lg font-semibold text-foreground">Want Pansy's full breakdown?</h3>
                 <p className="text-sm text-muted-foreground">Get her expert take in plain English — no jargon.</p>
               </div>
-              <Button 
+              <Button
                 onClick={() => loadPansyAnalysis(ticker as string, stockData)}
                 className="bg-[#c8953a] hover:bg-[#c8953a]/90 text-white font-semibold px-6 py-3 text-base shadow-lg shrink-0"
               >
-                ✨ Get Pansy's Take
+                {isPro ? (
+                  <>✨ Get Pansy's Take</>
+                ) : (
+                  <><Lock className="w-4 h-4 mr-2 inline" />Get Pansy's Take <Badge className="ml-2 bg-white/20 text-white text-xs">Pro</Badge></>
+                )}
               </Button>
             </div>
           </Card>
