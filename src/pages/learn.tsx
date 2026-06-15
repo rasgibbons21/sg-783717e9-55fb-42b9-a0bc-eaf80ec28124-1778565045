@@ -16,7 +16,8 @@ import { PositionSizeCalculator } from "@/components/PositionSizeCalculator";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { authService } from "@/services/authService";
 import { supabase } from "@/integrations/supabase/client";
-import { Search, ArrowLeft, Clock, CheckCircle2, Circle, ChevronRight, Bookmark, BookmarkCheck, Award } from "lucide-react";
+import { Search, ArrowLeft, Clock, CheckCircle2, Circle, ChevronRight, Bookmark, BookmarkCheck, Award, Lock } from "lucide-react";
+import { UpgradeModal } from "@/components/UpgradeModal";
 
 type Category = "All" | "Stocks" | "ETFs" | "Mutual Funds" | "Dividends" | "Bonds" | "Retirement" | "Trading Psychology" | "Income Streams";
 
@@ -41,10 +42,12 @@ interface Lesson {
   isPro?: boolean;
 }
 
+
 export default function Learn() {
   const router = useRouter();
   const { isPro, isLoading: subscriptionLoading } = useSubscription();
   const [user, setUser] = useState<any>(null);
+  const [showLearnUpgradeModal, setShowLearnUpgradeModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<Category>("All");
   const [completedLessons, setCompletedLessons] = useState<string[]>([]);
@@ -61,6 +64,7 @@ export default function Learn() {
       id: "what-is-stock",
       title: "What is a Stock",
       category: "Stocks",
+      isPro: false,
       readTime: 3,
       difficulty: "Beginner",
       summary: "Understanding company ownership and how stocks work",
@@ -100,6 +104,7 @@ The key is thinking long term. Day to day the price bounces around like crazy bu
       id: "what-is-etf",
       title: "What is an ETF",
       category: "ETFs",
+      isPro: false,
       readTime: 4,
       difficulty: "Beginner",
       summary: "The combo meal of investing explained",
@@ -139,6 +144,7 @@ Bottom line: ETFs are perfect for beginners because you get instant diversificat
       id: "what-is-mutual-fund",
       title: "What is a Mutual Fund",
       category: "Mutual Funds",
+      isPro: false,
       readTime: 4,
       difficulty: "Beginner",
       summary: "Professional money management explained simply",
@@ -178,6 +184,7 @@ That said some women prefer having a professional manage their money especially 
       id: "what-are-dividends",
       title: "What are Dividends",
       category: "Dividends",
+      isPro: false,
       readTime: 4,
       difficulty: "Beginner",
       summary: "Getting paid just for holding stocks",
@@ -217,6 +224,7 @@ You can take the dividends as cash or reinvest them to buy more shares (that's c
       id: "bull-vs-bear",
       title: "Bull vs Bear Market",
       category: "Stocks",
+      isPro: false,
       readTime: 3,
       difficulty: "Beginner",
       summary: "What people mean when they say the market is bullish or bearish",
@@ -256,6 +264,7 @@ So when you see red don't panic and sell everything. That's literally when stock
       id: "market-cap",
       title: "What is Market Cap",
       category: "Stocks",
+      isPro: false,
       readTime: 3,
       difficulty: "Beginner",
       summary: "How to measure a company's total value",
@@ -300,6 +309,7 @@ Don't confuse market cap with stock price btw. A $10 stock of a huge company mig
       id: "pe-ratio",
       title: "What is PE Ratio",
       category: "Stocks",
+      isPro: false,
       readTime: 4,
       difficulty: "Intermediate",
       summary: "Is this stock expensive or a bargain?",
@@ -341,6 +351,7 @@ Use PE to compare companies in the same industry. Comparing Apple's PE to a util
       id: "index-funds",
       title: "Index Funds Explained",
       category: "ETFs",
+      isPro: false,
       readTime: 4,
       difficulty: "Beginner",
       summary: "Why boring investing wins",
@@ -384,6 +395,7 @@ Index funds are my #1 recommendation for beginners. They're boring they're simpl
       id: "dollar-cost-averaging",
       title: "Dollar Cost Averaging",
       category: "Retirement",
+      isPro: false,
       readTime: 4,
       difficulty: "Beginner",
       summary: "The strategy that removes timing stress",
@@ -425,6 +437,7 @@ Set it and forget it girl. That's the secret to building wealth without the stre
       id: "roth-ira",
       title: "What is a Roth IRA",
       category: "Retirement",
+      isPro: false,
       readTime: 5,
       difficulty: "Beginner",
       summary: "Tax-free growth for your future self",
@@ -468,6 +481,7 @@ Start a Roth IRA as early as possible. Time is your biggest advantage here. Even
       id: "drip-investing",
       title: "DRIP Investing",
       category: "Dividends",
+      isPro: false,
       readTime: 4,
       difficulty: "Beginner",
       summary: "Automatically reinvesting dividends for compound growth",
@@ -509,6 +523,7 @@ When you're young and don't need the income DRIP is the move. When you retire yo
       id: "active-vs-passive",
       title: "Active vs Passive Investing",
       category: "ETFs",
+      isPro: false,
       readTime: 5,
       difficulty: "Intermediate",
       summary: "Two completely different philosophies",
@@ -565,6 +580,7 @@ My take: If you're new go passive with index funds. Put 80-90% of your portfolio
       id: "risk-reward-rule",
       title: "The 3:1 Risk to Reward Rule",
       category: "Trading Psychology",
+      isPro: true,
       readTime: 4,
       difficulty: "Intermediate",
       summary: "Win rate matters less than you think",
@@ -635,6 +651,7 @@ This isn't about being smart or picking perfectly. It's about math and disciplin
       id: "investment-rules",
       title: "Investment Rules That Work",
       category: "Trading Psychology",
+      isPro: true,
       readTime: 5,
       difficulty: "Intermediate",
       summary: "Systematic rules eliminate emotional decisions",
@@ -713,6 +730,7 @@ Set your rules before you invest. Write them down. Follow them no matter how you
       id: "what-is-fomo",
       title: "What is FOMO",
       category: "Trading Psychology",
+      isPro: false,
       readTime: 4,
       difficulty: "Beginner",
       summary: "Fear of missing out destroys portfolios",
@@ -787,6 +805,7 @@ Missing a move feels bad but losing money feels worse. Protect your capital sis.
       id: "revenge-trading",
       title: "Revenge Trading Warning",
       category: "Trading Psychology",
+      isPro: true,
       readTime: 4,
       difficulty: "Intermediate",
       summary: "The fastest way to blow up your account",
@@ -874,6 +893,7 @@ Protect your capital. Your ego can recover but your account might not 🛡️`,
       id: "self-assessment",
       title: "Self Assessment Before Every Trade",
       category: "Trading Psychology",
+      isPro: true,
       readTime: 5,
       difficulty: "Intermediate",
       summary: "The 6-question checklist that saves accounts",
@@ -954,6 +974,7 @@ Print these six questions out. Put them on your screen. Make yourself answer the
       id: "risk-management",
       title: "Risk Management Like a Pro",
       category: "Trading Psychology",
+      isPro: true,
       readTime: 5,
       difficulty: "Intermediate",
       summary: "The 3% rule that professional traders live by",
@@ -1050,6 +1071,7 @@ That's it. Risk 3% max per trade. It's boring. It's not exciting. It won't make 
       id: "trading-psychology-checklist",
       title: "Trading Psychology Checklist",
       category: "Trading Psychology",
+      isPro: true,
       readTime: 3,
       difficulty: "Beginner",
       summary: "Your pre-trade, during-trade, and post-trade system",
@@ -3087,11 +3109,18 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
               filteredLessons.map((lesson) => {
                 const isCompleted = completedLessons.includes(lesson.id);
                 const isBookmarked = bookmarkedLessons.includes(lesson.id);
+                const isGated = lesson.isPro === true && !isPro;
                 return (
                   <Card
                     key={lesson.id}
-                    className="p-4 bg-card border-border rounded-xl hover:border-accent/50 transition-all cursor-pointer group"
-                    onClick={() => setSelectedLesson(lesson.id)}
+                    className={`p-4 bg-card border-border rounded-xl hover:border-accent/50 transition-all cursor-pointer group ${isGated ? "opacity-50" : ""}`}
+                    onClick={() => {
+                      if (isGated) {
+                        setShowLearnUpgradeModal(true);
+                      } else {
+                        setSelectedLesson(lesson.id);
+                      }
+                    }}
                   >
                     <div className="flex items-center gap-4">
                       <img
@@ -3106,6 +3135,11 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
                               <Badge className="bg-accent/20 text-accent border-accent/30 text-xs">
                                 {lesson.category}
                               </Badge>
+                              {isGated && (
+                                <Badge className="bg-muted text-muted-foreground border-muted-foreground/30 text-xs flex items-center gap-1">
+                                  <Lock className="w-3 h-3" />Pro
+                                </Badge>
+                              )}
                             </div>
                             <h3 className="font-semibold text-foreground group-hover:text-accent transition-colors">
                               {lesson.title}
@@ -3203,6 +3237,12 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
           </Card>
         </div>
       </div>
+
+      <UpgradeModal
+        isOpen={showLearnUpgradeModal}
+        onClose={() => setShowLearnUpgradeModal(false)}
+        trigger="view_limit"
+      />
     </Layout>
   );
 }
