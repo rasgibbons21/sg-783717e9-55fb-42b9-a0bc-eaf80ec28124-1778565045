@@ -83,7 +83,12 @@ export function UpgradeModal({ isOpen, onClose, trigger = "view_limit" }: Upgrad
           <div className="flex gap-3">
             <Button
               variant="outline"
-              onClick={onClose}
+              onClick={() => {
+                if (trigger === "view_limit") {
+                  localStorage.setItem("bloom-upgrade-dismissed", new Date().toDateString());
+                }
+                onClose();
+              }}
               className="flex-1"
             >
               Maybe Later
@@ -150,6 +155,7 @@ export function useViewTracker() {
     if (lastReset !== today) {
       localStorage.setItem("bloom-daily-views", "0");
       localStorage.setItem("bloom-views-reset", today);
+      localStorage.removeItem("bloom-upgrade-dismissed");
       setViewCount(0);
     } else {
       setViewCount(count);
@@ -161,7 +167,8 @@ export function useViewTracker() {
     setViewCount(newCount);
     localStorage.setItem("bloom-daily-views", newCount.toString());
 
-    if (newCount >= 3) {
+    const dismissedToday = localStorage.getItem("bloom-upgrade-dismissed") === new Date().toDateString();
+    if (newCount >= 3 && !dismissedToday) {
       setShowUpgradeModal(true);
     }
   };
