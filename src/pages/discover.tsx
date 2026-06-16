@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { marketService } from "@/services/marketService";
 import { Search, TrendingUp, TrendingDown } from "lucide-react";
 import { userService } from "@/services/userService";
+import { supabase } from "@/integrations/supabase/client";
 import { UpgradeBanner } from "@/components/UpgradeModal";
 
 interface Asset {
@@ -263,7 +264,12 @@ export default function Discover() {
 
       // Try to get additional picks from API
       try {
-        const response = await fetch("/api/pansy-picks");
+        const { data: { session } } = await supabase.auth.getSession();
+        const response = await fetch("/api/pansy-picks", {
+          headers: session?.access_token
+            ? { Authorization: `Bearer ${session.access_token}` }
+            : {},
+        });
         if (response.ok) {
           const additionalPicks = await response.json();
           const processedAdditionalPicks = additionalPicks.map((p: any) => ({

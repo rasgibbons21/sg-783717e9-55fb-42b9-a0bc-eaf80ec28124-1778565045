@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import Anthropic from "@anthropic-ai/sdk";
+import { requireLoggedInUser, sendAuthError, isRateLimited } from "@/lib/requireProUser";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -55,6 +56,14 @@ export default async function handler(
 ) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  const auth = await requireLoggedInUser(req);
+  if (auth.error) return sendAuthError(res, auth.error);
+
+  // 10 comparisons per user per hour
+  if (isRateLimited(auth.user.id, "compare-analysis", 10, 60 * 60 * 1000)) {
+    return res.status(429).json({ error: "Too many requests — try again later" });
   }
 
   try {
