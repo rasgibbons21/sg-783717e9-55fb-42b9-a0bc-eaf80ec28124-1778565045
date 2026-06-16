@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Check, Sparkles, X } from "lucide-react";
 import { useRouter } from "next/router";
+import { PRO_PLAN } from "@/config/proPlan";
 
 interface UpgradeModalProps {
   isOpen: boolean;
@@ -14,23 +15,6 @@ interface UpgradeModalProps {
 
 export function UpgradeModal({ isOpen, onClose, trigger = "view_limit" }: UpgradeModalProps) {
   const router = useRouter();
-
-  const getTriggerMessage = () => {
-    switch (trigger) {
-      case "view_limit":
-        return "You've used your free previews for today 🌸";
-      case "after_analysis":
-        return "Loved Pansy's take?";
-      case "discover":
-        return "Want Pansy's full breakdown on this?";
-      case "portfolio":
-        return "Track unlimited positions with Bloom Pro";
-      case "goals":
-        return "Set unlimited goals with Bloom Pro";
-      default:
-        return "Ready to unlock everything?";
-    }
-  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -45,32 +29,20 @@ export function UpgradeModal({ isOpen, onClose, trigger = "view_limit" }: Upgrad
             </Button>
           </div>
           <DialogTitle className="font-serif text-2xl text-foreground mt-4">
-            {getTriggerMessage()}
+            Go from learning to building it.
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
           <p className="text-muted-foreground">
-            Upgrade to Bloom Pro for unlimited Pansy analysis, real-time insights, and exclusive features.
+            You&apos;ve got the foundation. Pro is where you put it to work.
           </p>
 
           <Card className="p-4 border-accent/20 bg-accent/5">
             <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <h4 className="font-serif text-lg font-semibold text-foreground">Bloom Pro</h4>
-                <Badge className="bg-accent text-accent-foreground">
-                  <Sparkles className="w-3 h-3 mr-1" />
-                  $7.99/mo
-                </Badge>
-              </div>
+              <h4 className="font-serif text-lg font-semibold text-foreground">Bloom Pro</h4>
               <ul className="space-y-2">
-                {[
-                  "Unlimited daily picks from Pansy",
-                  "Full analysis on every stock & ETF",
-                  "Real-time news and charts",
-                  "Portfolio tracker",
-                  "Exclusive broker deals",
-                ].map((feature) => (
+                {PRO_PLAN.benefits.map((feature) => (
                   <li key={feature} className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" />
                     <span className="text-sm text-foreground">{feature}</span>
@@ -80,19 +52,39 @@ export function UpgradeModal({ isOpen, onClose, trigger = "view_limit" }: Upgrad
             </div>
           </Card>
 
+          <div className="grid grid-cols-2 gap-3">
+            <div className="rounded-lg border border-border p-3 text-center">
+              <p className="text-xs text-muted-foreground">Monthly</p>
+              <p className="font-serif text-xl font-semibold text-foreground">${PRO_PLAN.monthlyPrice}<span className="text-sm font-normal text-muted-foreground">/mo</span></p>
+            </div>
+            <div className="relative rounded-lg border border-accent p-3 text-center bg-accent/5">
+              <Badge className="absolute -top-2 right-2 bg-accent text-accent-foreground text-[10px] px-1.5 py-0.5">
+                <Sparkles className="w-3 h-3 mr-1" />
+                {PRO_PLAN.yearlySavingsLabel}
+              </Badge>
+              <p className="text-xs text-muted-foreground">Yearly</p>
+              <p className="font-serif text-xl font-semibold text-foreground">${PRO_PLAN.yearlyPrice}<span className="text-sm font-normal text-muted-foreground">/yr</span></p>
+            </div>
+          </div>
+
           <div className="flex gap-3">
             <Button
               variant="outline"
-              onClick={onClose}
+              onClick={() => {
+                if (trigger === "view_limit") {
+                  localStorage.setItem("bloom-upgrade-dismissed", new Date().toDateString());
+                }
+                onClose();
+              }}
               className="flex-1"
             >
-              Maybe Later
+              Maybe later
             </Button>
             <Button
               className="flex-1 bg-accent hover:bg-accent/90 text-accent-foreground"
               onClick={() => router.push("/subscription")}
             >
-              Upgrade Now
+              Upgrade to Pro
             </Button>
           </div>
         </div>
@@ -150,6 +142,7 @@ export function useViewTracker() {
     if (lastReset !== today) {
       localStorage.setItem("bloom-daily-views", "0");
       localStorage.setItem("bloom-views-reset", today);
+      localStorage.removeItem("bloom-upgrade-dismissed");
       setViewCount(0);
     } else {
       setViewCount(count);
@@ -161,7 +154,8 @@ export function useViewTracker() {
     setViewCount(newCount);
     localStorage.setItem("bloom-daily-views", newCount.toString());
 
-    if (newCount >= 3) {
+    const dismissedToday = localStorage.getItem("bloom-upgrade-dismissed") === new Date().toDateString();
+    if (newCount >= 3 && !dismissedToday) {
       setShowUpgradeModal(true);
     }
   };
