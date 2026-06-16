@@ -141,7 +141,8 @@ export default function Onboarding() {
 
   const handleCompleteOnboarding = async () => {
     setIsSubmitting(true);
-    try {
+
+    const saveProfile = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         // Profiles table doesn't have risk_tolerance, experience_level, or investment_goals
@@ -150,6 +151,13 @@ export default function Onboarding() {
           full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || ''
         });
       }
+    };
+
+    const timeout = (ms: number) =>
+      new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+    try {
+      await Promise.race([saveProfile(), timeout(4000)]);
     } catch (error) {
       console.error('Profile save error:', error);
     } finally {
