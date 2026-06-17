@@ -9,9 +9,12 @@ const supabaseAdmin = createClient(
   { auth: { autoRefreshToken: false, persistSession: false } }
 );
 
-type AuthResult =
-  | { user: { id: string; email?: string }; error?: never }
-  | { error: 401 | 403; user?: never };
+// Explicit null sentinels on both branches so TypeScript narrows correctly.
+// After `if (auth.error) return`, the remaining type is AuthSuccess and
+// auth.user is guaranteed to be { id: string; email?: string }.
+type AuthSuccess = { user: { id: string; email?: string }; error: null };
+type AuthFailure = { error: 401 | 403; user: null };
+export type AuthResult = AuthSuccess | AuthFailure;
 
 function extractToken(req: NextApiRequest): string | null {
   const auth = req.headers.authorization;
@@ -24,10 +27,10 @@ function extractToken(req: NextApiRequest): string | null {
  */
 export async function requireProUser(req: NextApiRequest): Promise<AuthResult> {
   const token = extractToken(req);
-  if (!token) return { error: 401 };
+  if (!token) return { error: 401, user: null };
 
   const { data: { user }, error: userErr } = await supabaseAdmin.auth.getUser(token);
-  if (userErr || !user) return { error: 401 };
+  if (userErr || !user) return { error: 401, user: null };
 
   const { data: profile } = await supabaseAdmin
     .from("profiles")
@@ -36,9 +39,9 @@ export async function requireProUser(req: NextApiRequest): Promise<AuthResult> {
     .single();
 
   const isPro = profile?.is_pro === true || profile?.subscription_status === "active";
-  if (!isPro) return { error: 403 };
+  if (!isPro) return { error: 403, user: null };
 
-  return { user };
+  return { user, error: null };
 }
 
 /**
@@ -47,12 +50,12 @@ export async function requireProUser(req: NextApiRequest): Promise<AuthResult> {
  */
 export async function requireLoggedInUser(req: NextApiRequest): Promise<AuthResult> {
   const token = extractToken(req);
-  if (!token) return { error: 401 };
+  if (!token) return { error: 401, user: null };
 
   const { data: { user }, error: userErr } = await supabaseAdmin.auth.getUser(token);
-  if (userErr || !user) return { error: 401 };
+  if (userErr || !user) return { error: 401, user: null };
 
-  return { user };
+  return { user, error: null };
 }
 
 /**
@@ -62,19 +65,19 @@ export async function requireLoggedInUser(req: NextApiRequest): Promise<AuthResu
  */
 export async function requireAdminUser(req: NextApiRequest): Promise<AuthResult> {
   const token = extractToken(req);
-  if (!token) return { error: 401 };
+  if (!token) return { error: 401, user: null };
 
   const { data: { user }, error: userErr } = await supabaseAdmin.auth.getUser(token);
-  if (userErr || !user) return { error: 401 };
+  if (userErr || !user) return { error: 401, user: null };
 
   const allowlist = (process.env.ADMIN_USER_IDS ?? "")
     .split(",")
     .map((id) => id.trim())
     .filter(Boolean);
 
-  if (!allowlist.includes(user.id)) return { error: 403 };
+  if (!allowlist.includes(user.id)) return { error: 403, user: null };
 
-  return { user };
+  return { user, error: null };
 }
 
 export function sendAuthError(res: NextApiResponse, status: 401 | 403) {
