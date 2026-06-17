@@ -1,51 +1,17 @@
-const CACHE_NAME = 'bloom-app-shell-v1';
-const urlsToCache = [
-  '/',
-  '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png'
-];
+// Kill-switch: unregisters this worker, wipes all caches, reloads open clients.
+// Replaced the old cache-first shell worker which caused stale code to persist
+// after deployments. Web push is not live; no caching SW is needed.
 
-// Install event
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(urlsToCache);
-    })
-  );
-});
+self.addEventListener('install', () => self.skipWaiting());
 
-// Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
-  );
-});
-
-// Fetch event - serve from cache, fallback to network
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request).then((response) => {
-      if (response) {
-        return response; // Return cached app shell
-      }
-      return fetch(event.request).then(
-        (networkResponse) => {
-          // Optional: cache new network requests dynamically here if needed
-          return networkResponse;
-        }
-      ).catch(() => {
-        // If both cache and network fail (offline and not cached)
-        // you could return a fallback offline page if one existed
-      });
-    })
+    caches.keys()
+      .then((keys) => Promise.all(keys.map((k) => caches.delete(k))))
+      .then(() => self.clients.matchAll({ type: 'window' }))
+      .then((clients) => {
+        self.registration.unregister();
+        clients.forEach((client) => client.navigate(client.url));
+      })
   );
 });
