@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import Anthropic from "@anthropic-ai/sdk";
+import { requireProUser, sendAuthError } from "@/lib/requireProUser";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -36,6 +37,9 @@ export default async function handler(
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
+
+  const auth = await requireProUser(req);
+  if (auth.error) return sendAuthError(res, auth.error);
 
   try {
     const { ticker, companyName, price, changePercent, userProfile } = req.body;
