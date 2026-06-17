@@ -133,12 +133,11 @@ export default function StockPage() {
 
     setIsAnalyzing(true);
     try {
-      const { data: { session: freshSession } } = await supabase.auth.getSession();
       const response = await fetch("/api/analyze", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(freshSession?.access_token && { Authorization: `Bearer ${freshSession.access_token}` }),
+          Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
           ticker: symbol,
