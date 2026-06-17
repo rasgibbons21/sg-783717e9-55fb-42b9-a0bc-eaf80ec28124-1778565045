@@ -581,7 +581,10 @@ Please provide:
 
 Use web search to find currently top-performing ETFs that match her profile. Consider new ETFs launched in the last 12 months if they're worth recommending. Be specific with allocation percentages and realistic with projections.`;
 
-      const { data: { session } } = await supabase.auth.getSession();
+      let { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        ({ data: { session } } = await supabase.auth.refreshSession());
+      }
       const response = await fetch("/api/analyze-portfolio", {
         method: "POST",
         headers: {

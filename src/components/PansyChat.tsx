@@ -77,7 +77,10 @@ export function PansyChat({ ticker, companyName, currentPrice, analysisContext }
     setIsLoading(true);
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      let { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        ({ data: { session } } = await supabase.auth.refreshSession());
+      }
       const response = await fetch("/api/pansy", {
         method: "POST",
         headers: {
