@@ -15,6 +15,7 @@ import { userService } from "@/services/userService";
 import { marketService } from "@/services/marketService";
 import { supabase } from "@/integrations/supabase/client";
 import { TrendingUp, TrendingDown, ChevronDown } from "lucide-react";
+import { TimeGreeting } from "@/components/TimeGreeting";
 
 interface MarketIndex {
   symbol: string;
@@ -230,9 +231,7 @@ export default function Home() {
         {/* Greeting */}
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
-            <h1 className="font-serif text-3xl md:text-4xl font-bold text-foreground">
-              {isPro ? "Welcome to Bloom Pro" : `Welcome back, ${user?.full_name?.split(" ")[0] || "Investor"}`} 🌸
-            </h1>
+            <TimeGreeting fullName={user?.full_name} />
             <p className="text-muted-foreground mt-1">
               {isPro ? "Your premium investing companion" : "Your daily market insights"}
             </p>
