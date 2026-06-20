@@ -139,6 +139,14 @@ export default function Onboarding() {
     }
   };
 
+  const handleSkip = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      await supabase.from("profiles").upsert({ id: user.id, onboarding_complete: true });
+    }
+    window.location.href = "/home";
+  };
+
   const handleCompleteOnboarding = async () => {
     setIsSubmitting(true);
 
@@ -536,7 +544,7 @@ export default function Onboarding() {
 
             <button
               type="button"
-              onClick={() => { window.location.href = "/home"; }}
+              onClick={handleSkip}
               className="w-full text-center text-sm text-muted-foreground hover:text-foreground mt-2 py-2"
             >
               Skip for now →
@@ -545,7 +553,7 @@ export default function Onboarding() {
             <Button
               type="button"
               variant="ghost"
-              onClick={() => router.push("/home")}
+              onClick={handleSkip}
               className="w-full text-muted-foreground hover:text-foreground"
             >
               Skip for now
@@ -616,7 +624,7 @@ export default function Onboarding() {
 
             <button
               type="button"
-              onClick={() => { window.location.href = "/home"; }}
+              onClick={handleSkip}
               className="w-full text-center text-sm text-muted-foreground hover:text-foreground mt-2 py-2"
             >
               Skip for now →
@@ -625,7 +633,7 @@ export default function Onboarding() {
             <Button
               type="button"
               variant="ghost"
-              onClick={() => router.push("/home")}
+              onClick={handleSkip}
               className="w-full text-muted-foreground hover:text-foreground"
             >
               Skip for now
@@ -702,7 +710,7 @@ export default function Onboarding() {
 
             <button
               type="button"
-              onClick={() => { window.location.href = "/home"; }}
+              onClick={handleSkip}
               className="w-full text-center text-sm text-muted-foreground hover:text-foreground mt-2 py-2"
             >
               Skip for now →
@@ -711,7 +719,7 @@ export default function Onboarding() {
             <Button
               type="button"
               variant="ghost"
-              onClick={() => router.push("/home")}
+              onClick={handleSkip}
               className="w-full text-muted-foreground hover:text-foreground"
             >
               Skip for now
