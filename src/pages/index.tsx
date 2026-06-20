@@ -77,16 +77,12 @@ export default function LandingPage() {
     const { data: { session } } = await supabase.auth.getSession();
     
     if (session) {
-      const { data: user } = await supabase
-        .from("users")
-        .select("*")
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("onboarding_complete")
         .eq("id", session.user.id)
         .single();
-
-      if (user?.experience_level) {
-        router.push("/home");
-        return;
-      }
+      if (profile?.onboarding_complete) { router.push("/home"); return; }
     }
     
     setIsCheckingAuth(false);
