@@ -141,8 +141,15 @@ export default function Onboarding() {
 
   const handleSkip = async () => {
     const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      await supabase.from("profiles").upsert({ id: user.id, onboarding_complete: true });
+    if (!user) {
+      setError("Session expired — please sign in again.");
+      return;
+    }
+    const { error } = await supabase.from("profiles").upsert({ id: user.id, onboarding_complete: true });
+    if (error) {
+      console.error("Failed to save skip:", error);
+      setError("Something went wrong. Please try again.");
+      return;
     }
     window.location.href = "/home";
   };
