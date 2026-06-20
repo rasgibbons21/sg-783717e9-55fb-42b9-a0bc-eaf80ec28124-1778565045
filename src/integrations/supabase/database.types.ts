@@ -229,12 +229,18 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          bookmarked_lessons: string[] | null
           created_at: string | null
+          current_age: number | null
           current_period_end: string | null
           email: string | null
+          experience_level: string | null
           full_name: string | null
           id: string
+          investment_goals: string[] | null
           is_pro: boolean | null
+          onboarding_complete: boolean
+          risk_tolerance: string | null
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
           subscription_status: string | null
@@ -242,12 +248,18 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          bookmarked_lessons?: string[] | null
           created_at?: string | null
+          current_age?: number | null
           current_period_end?: string | null
           email?: string | null
+          experience_level?: string | null
           full_name?: string | null
           id: string
+          investment_goals?: string[] | null
           is_pro?: boolean | null
+          onboarding_complete?: boolean
+          risk_tolerance?: string | null
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           subscription_status?: string | null
@@ -255,12 +267,18 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          bookmarked_lessons?: string[] | null
           created_at?: string | null
+          current_age?: number | null
           current_period_end?: string | null
           email?: string | null
+          experience_level?: string | null
           full_name?: string | null
           id?: string
+          investment_goals?: string[] | null
           is_pro?: boolean | null
+          onboarding_complete?: boolean
+          risk_tolerance?: string | null
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           subscription_status?: string | null

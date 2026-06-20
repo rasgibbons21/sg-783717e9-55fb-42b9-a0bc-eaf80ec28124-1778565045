@@ -11,8 +11,14 @@ export default function AuthCallback() {
       const { data: { session } } = await supabase.auth.getSession();
       
       if (session) {
-        // Already have a session — go home immediately
-        router.push("/home");
+        // Already have a session — check onboarding status
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("onboarding_complete")
+          .eq("id", session.user.id)
+          .single();
+
+        router.push(profile?.onboarding_complete ? "/home" : "/onboarding");
         return;
       }
       
@@ -21,8 +27,13 @@ export default function AuthCallback() {
       if (code) {
         const { data, error } = await supabase.auth.exchangeCodeForSession(code);
         if (!error && data.session) {
-          // Send all users to home - questionnaire is now optional
-          router.push("/home");
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("onboarding_complete")
+            .eq("id", data.session.user.id)
+            .single();
+
+          router.push(profile?.onboarding_complete ? "/home" : "/onboarding");
         } else {
           router.push("/?error=confirmation_failed");
         }

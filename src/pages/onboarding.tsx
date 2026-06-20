@@ -142,28 +142,33 @@ export default function Onboarding() {
   const handleCompleteOnboarding = async () => {
     setIsSubmitting(true);
 
-    const saveProfile = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        // Profiles table doesn't have risk_tolerance, experience_level, or investment_goals
-        // Just update the user's full_name if needed
-        await userService.updateUser(user.id, {
-          full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || ''
-        });
-      }
-    };
-
-    const timeout = (ms: number) =>
-      new Promise<void>((resolve) => setTimeout(resolve, ms));
-
     try {
-      await Promise.race([saveProfile(), timeout(4000)]);
-    } catch (error) {
-      console.error('Profile save error:', error);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setError("Session expired — please sign in again.");
+        return;
+      }
+
+      const { error: saveError } = await supabase.from("profiles").upsert({
+        id: user.id,
+        experience_level: experience,
+        investment_goals: goals,
+        risk_tolerance: risk,
+        onboarding_complete: true,
+      });
+
+      if (saveError) {
+        console.error("Failed to save onboarding profile:", saveError);
+        setError("We couldn't save your answers. Please try again.");
+        return;
+      }
+
+      window.location.href = "/subscription-offer";
+    } catch (err) {
+      console.error("Onboarding error:", err);
+      setError("Something went wrong. Please try again.");
     } finally {
       setIsSubmitting(false);
-      // Redirect to subscription offer page instead of home
-      window.location.href = '/subscription-offer';
     }
   };
 
@@ -529,6 +534,14 @@ export default function Onboarding() {
               Continue
             </Button>
 
+            <button
+              type="button"
+              onClick={() => { window.location.href = "/home"; }}
+              className="w-full text-center text-sm text-muted-foreground hover:text-foreground mt-2 py-2"
+            >
+              Skip for now →
+            </button>
+
             <Button
               type="button"
               variant="ghost"
@@ -600,6 +613,14 @@ export default function Onboarding() {
             >
               Continue
             </Button>
+
+            <button
+              type="button"
+              onClick={() => { window.location.href = "/home"; }}
+              className="w-full text-center text-sm text-muted-foreground hover:text-foreground mt-2 py-2"
+            >
+              Skip for now →
+            </button>
 
             <Button
               type="button"
@@ -678,6 +699,14 @@ export default function Onboarding() {
                 "Complete Setup"
               )}
             </Button>
+
+            <button
+              type="button"
+              onClick={() => { window.location.href = "/home"; }}
+              className="w-full text-center text-sm text-muted-foreground hover:text-foreground mt-2 py-2"
+            >
+              Skip for now →
+            </button>
 
             <Button
               type="button"

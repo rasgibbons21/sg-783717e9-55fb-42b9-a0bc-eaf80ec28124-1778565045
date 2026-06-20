@@ -2622,18 +2622,18 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
         .eq("user_id", userId)
         .eq("completed", true);
 
-      const { data: userData } = await (supabase
-        .from("users")
+      const { data: profileData } = await supabase
+        .from("profiles")
         .select("bookmarked_lessons")
         .eq("id", userId)
-        .single() as any);
+        .single();
 
       if (progressData) {
         setCompletedLessons(progressData.map((p) => p.lesson_id));
       }
 
-      if (userData?.bookmarked_lessons) {
-        setBookmarkedLessons(userData.bookmarked_lessons);
+      if (profileData?.bookmarked_lessons) {
+        setBookmarkedLessons(profileData.bookmarked_lessons);
       }
     } catch (error) {
       console.error("Error loading progress:", error);
@@ -2713,8 +2713,8 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
       : [...bookmarkedLessons, lessonId];
 
     try {
-      const { error } = await (supabase
-        .from("users") as any)
+      const { error } = await supabase
+        .from("profiles")
         .update({ bookmarked_lessons: newBookmarks })
         .eq("id", user.id);
 
