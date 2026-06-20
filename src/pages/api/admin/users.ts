@@ -24,17 +24,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const { data: publicUsers } = await supabaseAdmin
       .from("profiles")
-      .select("id, full_name, risk_tolerance, experience_level, onboarding_complete, created_at, join_date, is_pro, subscription_status");
+      .select("id, full_name, risk_tolerance, experience_level, onboarding_complete, created_at, is_pro, subscription_status");
 
     const users = authData.users.map(au => {
-      const pub = (publicUsers ?? []).find(u => u.id === au.id) || {};
+      const pub = (publicUsers ?? []).find(u => u.id === au.id);
       return {
         id: au.id,
         email: au.email || "",
-        full_name: pub.full_name || au.user_metadata?.full_name || "",
-        risk_tolerance: pub.risk_tolerance || "",
-        onboarding_complete: !!pub.onboarding_complete,
-        created_at: au.created_at || pub.created_at || pub.join_date || new Date().toISOString(),
+        full_name: pub?.full_name || au.user_metadata?.full_name || "",
+        risk_tolerance: pub?.risk_tolerance || "",
+        onboarding_complete: !!pub?.onboarding_complete,
+        created_at: au.created_at || pub?.created_at || new Date().toISOString(),
         last_sign_in: au.last_sign_in_at || null,
         email_confirmed: !!au.email_confirmed_at
       };
