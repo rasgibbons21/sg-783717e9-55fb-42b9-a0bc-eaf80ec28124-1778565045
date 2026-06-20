@@ -1,465 +1,385 @@
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Users, TrendingUp, DollarSign, Activity, BarChart3, 
-  Download, Mail, Settings, Target, Eye, BookOpen, Sparkles,
-  ArrowUp, ArrowDown, ExternalLink, Lock
-} from "lucide-react";
-import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { useEffect, useState, useCallback } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
-interface AnalyticsData {
-  overview: {
-    totalUsers: number;
-    signupsToday: number;
-    signupsWeek: number;
-    signupsMonth: number;
-    signupsYear: number;
-    proUsers: number;
-    freeUsers: number;
-    mrr: string;
+// ── Types ──────────────────────────────────────────────────────────────────
+
+interface AdminUser {
+  id: string;
+  email: string;
+  full_name: string;
+  is_pro: boolean;
+  onboarding_complete: boolean;
+  created_at: string;
+  last_sign_in: string | null;
+  email_confirmed: boolean;
+}
+
+interface DashboardData {
+  users: AdminUser[];
+  onboarding: {
+    totalSignups: number;
+    completedOnboarding: number;
+    stuckOnOnboarding: number;
   };
-  brokers: Record<string, number>;
-  stocks: [string, number][];
+  health: {
+    anthropic: boolean;
+    apiKeys: { finnhub: boolean; fmp: boolean };
+  };
 }
 
-interface BrokerData {
-  name: string;
-  totalClicks: number;
-  thisWeek: number;
-  thisMonth: number;
-  dailyClicks: Record<string, number>;
+// ── Helpers ────────────────────────────────────────────────────────────────
+
+function fmt(iso: string | null): string {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  const now = new Date();
+  const diffMs = now.getTime() - d.getTime();
+  const diffH = diffMs / 3_600_000;
+  if (diffH < 1) return `${Math.round(diffH * 60)}m ago`;
+  if (diffH < 24) return `${Math.round(diffH)}h ago`;
+  const diffD = Math.floor(diffH / 24);
+  if (diffD < 7) return `${diffD}d ago`;
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: diffD > 365 ? "numeric" : undefined });
 }
 
-const COLORS = {
-  primary: '#3d7a54',
-  accent: '#c8953a',
-  rose: '#d4788a',
-  bg: '#0a0a0f',
-};
+function fmtJoined(iso: string): string {
+  return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
 
-export default function AdminDashboard() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [password, setPassword] = useState("");
-  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
-  const [brokerData, setBrokerData] = useState<BrokerData[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+// ── Component ──────────────────────────────────────────────────────────────
 
-  useEffect(() => {
-    const savedAuth = localStorage.getItem('bloom-admin-auth');
-    if (savedAuth === 'true') {
-      setIsAuthenticated(true);
-      loadAnalytics();
+export default function AdminPage() {
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [authError, setAuthError] = useState<401 | 403 | null>(null);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [loadedAt, setLoadedAt] = useState<Date | null>(null);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    setFetchError(null);
+
+    let { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      ({ data: { session } } = await supabase.auth.refreshSession());
+    }
+
+    if (!session?.access_token) {
+      setAuthError(401);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/admin/users", {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+
+      if (res.status === 401) { setAuthError(401); return; }
+      if (res.status === 403) { setAuthError(403); return; }
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        setFetchError(body.error || `HTTP ${res.status}`);
+        return;
+      }
+
+      const json = await res.json();
+      setData(json);
+      setLoadedAt(new Date());
+    } catch (e) {
+      setFetchError(e instanceof Error ? e.message : "Network error");
+    } finally {
+      setLoading(false);
     }
   }, []);
 
-  const handleLogin = () => {
-    const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'bloomadmin2026';
-    if (password === ADMIN_PASSWORD) {
-      setIsAuthenticated(true);
-      localStorage.setItem('bloom-admin-auth', 'true');
-      loadAnalytics();
-    } else {
-      alert('Incorrect password');
-    }
-  };
+  useEffect(() => { load(); }, [load]);
 
-  const loadAnalytics = async () => {
-    setIsLoading(true);
-    const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'bloomadmin2026';
-    try {
-      const [analyticsRes, brokersRes] = await Promise.all([
-        fetch('/api/admin/analytics', {
-          headers: { 'Authorization': `Bearer ${ADMIN_PASSWORD}` }
-        }),
-        fetch('/api/admin/broker-clicks', {
-          headers: { 'Authorization': `Bearer ${ADMIN_PASSWORD}` }
-        })
-      ]);
+  // ── Auth error states ────────────────────────────────────────────────────
 
-      if (analyticsRes.ok) {
-        const data = await analyticsRes.json();
-        setAnalytics(data);
-      }
-
-      if (brokersRes.ok) {
-        const data = await brokersRes.json();
-        setBrokerData(data.brokers);
-      }
-    } catch (error) {
-      console.error('Failed to load analytics:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleExport = async (type: string) => {
-    const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'bloomadmin2026';
-    try {
-      const res = await fetch(`/api/admin/export-csv?type=${type}`, {
-        headers: { 'Authorization': `Bearer ${ADMIN_PASSWORD}` }
-      });
-      
-      const blob = await res.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${type}-${new Date().toISOString().split('T')[0]}.csv`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    } catch (error) {
-      console.error('Export failed:', error);
-    }
-  };
-
-  if (!isAuthenticated) {
+  if (authError) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-2xl">
-                🌸
-              </div>
-              <div>
-                <CardTitle className="text-xl">Bloom Admin</CardTitle>
-                <p className="text-sm text-muted-foreground">Cinder Vault Enterprises LLC</p>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Password</label>
-              <Input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
-                placeholder="Enter admin password"
-                className="bg-muted/50"
-              />
-            </div>
-            <Button onClick={handleLogin} className="w-full bg-primary hover:bg-primary/90">
-              <Lock className="w-4 h-4 mr-2" />
-              Unlock Dashboard
-            </Button>
-          </CardContent>
-        </Card>
+      <div style={styles.page}>
+        <div style={styles.errorBox}>
+          <span style={{ fontSize: 32, marginBottom: 12 }}>🔒</span>
+          <p style={{ color: "#d4788a", fontFamily: "DM Sans, sans-serif", fontSize: 15, margin: 0 }}>
+            {authError === 403 ? "Not authorized." : "Not authenticated."}
+          </p>
+          <p style={{ color: "#666", fontFamily: "DM Sans, sans-serif", fontSize: 13, marginTop: 6 }}>
+            {authError === 403
+              ? "Your account is not in the admin allowlist."
+              : "Sign in first, then return to this page."}
+          </p>
+        </div>
       </div>
     );
   }
 
-  const planData = analytics ? [
-    { name: 'Pro', value: analytics.overview.proUsers, color: COLORS.accent },
-    { name: 'Free', value: analytics.overview.freeUsers, color: COLORS.primary },
-  ] : [];
+  // ── Loading ──────────────────────────────────────────────────────────────
+
+  if (loading) {
+    return (
+      <div style={styles.page}>
+        <p style={{ color: "#666", fontFamily: "DM Sans, sans-serif" }}>Loading…</p>
+      </div>
+    );
+  }
+
+  // ── Fetch error ──────────────────────────────────────────────────────────
+
+  if (fetchError || !data) {
+    return (
+      <div style={styles.page}>
+        <div style={styles.errorBox}>
+          <p style={{ color: "#d4788a", fontFamily: "DM Sans, sans-serif", fontSize: 15, margin: 0 }}>
+            Failed to load: {fetchError ?? "no data"}
+          </p>
+          <button onClick={load} style={styles.refreshBtn}>Retry</button>
+        </div>
+      </div>
+    );
+  }
+
+  const { users, onboarding, health } = data;
+  const proCount = users.filter(u => u.is_pro).length;
+  const funnelPct = onboarding.totalSignups > 0
+    ? Math.round((onboarding.completedOnboarding / onboarding.totalSignups) * 100)
+    : 0;
+
+  // ── Dashboard ────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-background">
+    <div style={styles.page}>
       {/* Header */}
-      <div className="border-b border-border bg-card">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-2xl">
-                🌺
-              </div>
-              <div>
-                <h1 className="text-2xl font-serif font-semibold text-foreground">Bloom Admin Dashboard</h1>
-                <p className="text-sm text-muted-foreground">Welcome back, Admin. Here's how Bloom is growing 🌸</p>
-              </div>
-            </div>
-            <Button variant="outline" onClick={loadAnalytics} disabled={isLoading}>
-              <Activity className="w-4 h-4 mr-2" />
-              {isLoading ? 'Loading...' : 'Refresh'}
-            </Button>
-          </div>
+      <div style={styles.header}>
+        <div>
+          <h1 style={styles.title}>Bloom Ops</h1>
+          {loadedAt && (
+            <p style={styles.subtitle}>
+              {loadedAt.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", timeZoneName: "short" })}
+            </p>
+          )}
+        </div>
+        <button onClick={load} style={styles.refreshBtn} disabled={loading}>
+          {loading ? "Loading…" : "↺ Refresh"}
+        </button>
+      </div>
+
+      {/* Stat tiles */}
+      <div style={styles.tileRow}>
+        <Tile label="Total signups" value={onboarding.totalSignups} />
+        <Tile label={`Onboarding complete (${funnelPct}%)`} value={onboarding.completedOnboarding} color="#3d7a54" />
+        <Tile label="Stuck" value={onboarding.stuckOnOnboarding} color={onboarding.stuckOnOnboarding > 0 ? "#d4788a" : "#3d7a54"} />
+        <Tile label="Pro" value={proCount} color="#c8953a" />
+      </div>
+
+      {/* Integration health */}
+      <div style={styles.section}>
+        <p style={styles.sectionLabel}>Integration health</p>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <HealthPill label="Anthropic" ok={health.anthropic} />
+          <HealthPill label="Finnhub" ok={health.apiKeys.finnhub} />
+          <HealthPill label="FMP" ok={health.apiKeys.fmp} />
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
-        <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid grid-cols-5 w-full max-w-4xl">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="brokers">Brokers</TabsTrigger>
-            <TabsTrigger value="engagement">Engagement</TabsTrigger>
-            <TabsTrigger value="revenue">Revenue</TabsTrigger>
-            <TabsTrigger value="exports">Exports</TabsTrigger>
-          </TabsList>
-
-          {/* Overview Tab */}
-          <TabsContent value="overview" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">Total Users</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold text-foreground">{analytics?.overview.totalUsers || 0}</div>
-                  <p className="text-xs text-muted-foreground mt-1">All time registrations</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">New Today</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold" style={{ color: COLORS.primary }}>{analytics?.overview.signupsToday || 0}</div>
-                  <p className="text-xs text-muted-foreground mt-1">Week: {analytics?.overview.signupsWeek || 0} | Month: {analytics?.overview.signupsMonth || 0}</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">Pro Subscribers</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold" style={{ color: COLORS.accent }}>{analytics?.overview.proUsers || 0}</div>
-                  <p className="text-xs text-muted-foreground mt-1">Free: {analytics?.overview.freeUsers || 0}</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">MRR</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold" style={{ color: COLORS.accent }}>${analytics?.overview.mrr || '0.00'}</div>
-                  <p className="text-xs text-muted-foreground mt-1">Monthly recurring revenue</p>
-                </CardContent>
-              </Card>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Users className="w-5 h-5" />
-                    User Distribution
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ResponsiveContainer width="100%" height={250}>
-                    <PieChart>
-                      <Pie
-                        data={planData}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        label={(entry) => `${entry.name}: ${entry.value}`}
-                        outerRadius={80}
-                        fill="#8884d8"
-                        dataKey="value"
-                      >
-                        {planData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Target className="w-5 h-5" />
-                    Most Watched Stocks
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {analytics?.stocks.slice(0, 8).map(([ticker, count], index) => (
-                      <div key={ticker} className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <Badge variant="outline" className="w-8 text-center">{index + 1}</Badge>
-                          <span className="font-semibold text-foreground">{ticker}</span>
-                        </div>
-                        <span className="text-sm text-muted-foreground">{count} views</span>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          {/* Brokers Tab */}
-          <TabsContent value="brokers" className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-serif font-semibold">Broker Performance Dashboard</h2>
-              <Button onClick={() => handleExport('brokers')} variant="outline">
-                <Download className="w-4 h-4 mr-2" />
-                Export CSV
-              </Button>
-            </div>
-
-            <div className="grid grid-cols-1 gap-4">
-              {brokerData.map((broker, index) => {
-                const trend = broker.thisWeek > broker.thisMonth / 4 ? 'up' : 'down';
-                return (
-                  <Card key={broker.name}>
-                    <CardContent className="pt-6">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-4">
-                            <Badge variant="outline" className="w-8 text-center">{index + 1}</Badge>
-                            <h3 className="text-lg font-semibold text-foreground">{broker.name}</h3>
-                            {trend === 'up' ? (
-                              <ArrowUp className="w-5 h-5" style={{ color: COLORS.primary }} />
-                            ) : (
-                              <ArrowDown className="w-5 h-5" style={{ color: COLORS.rose }} />
-                            )}
-                          </div>
-                          <div className="grid grid-cols-3 gap-4">
-                            <div>
-                              <p className="text-xs text-muted-foreground">Total Clicks</p>
-                              <p className="text-2xl font-bold text-foreground">{broker.totalClicks}</p>
-                            </div>
-                            <div>
-                              <p className="text-xs text-muted-foreground">This Week</p>
-                              <p className="text-2xl font-bold" style={{ color: COLORS.primary }}>{broker.thisWeek}</p>
-                            </div>
-                            <div>
-                              <p className="text-xs text-muted-foreground">This Month</p>
-                              <p className="text-2xl font-bold" style={{ color: COLORS.accent }}>{broker.thisMonth}</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-          </TabsContent>
-
-          {/* Engagement Tab */}
-          <TabsContent value="engagement" className="space-y-6">
-            <h2 className="text-2xl font-serif font-semibold">User Engagement Analytics</h2>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Eye className="w-5 h-5" />
-                  Most Viewed Stocks
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={analytics?.stocks.slice(0, 10).map(([ticker, count]) => ({ ticker, views: count }))}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
-                    <XAxis dataKey="ticker" stroke="#ffffff40" />
-                    <YAxis stroke="#ffffff40" />
-                    <Tooltip 
-                      contentStyle={{ backgroundColor: '#1a1a1f', border: '1px solid #ffffff20' }}
-                      labelStyle={{ color: '#ffffff' }}
-                    />
-                    <Bar dataKey="views" fill={COLORS.primary} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Revenue Tab */}
-          <TabsContent value="revenue" className="space-y-6">
-            <h2 className="text-2xl font-serif font-semibold">Revenue Dashboard</h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">Active Subscriptions</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold" style={{ color: COLORS.accent }}>{analytics?.overview.proUsers || 0}</div>
-                  <p className="text-xs text-muted-foreground mt-1">Paying customers</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">Monthly Revenue</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold" style={{ color: COLORS.accent }}>${analytics?.overview.mrr || '0.00'}</div>
-                  <p className="text-xs text-muted-foreground mt-1">MRR estimate</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">Annual Run Rate</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold" style={{ color: COLORS.accent }}>
-                    ${((parseFloat(analytics?.overview.mrr || '0') * 12).toFixed(2))}
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-1">ARR projection</p>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          {/* Exports Tab */}
-          <TabsContent value="exports" className="space-y-6">
-            <h2 className="text-2xl font-serif font-semibold">Data Exports & Reports</h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">Broker Clicks Data</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Export all broker click data with timestamps for pitch decks and partnership reports.
-                  </p>
-                  <Button onClick={() => handleExport('brokers')} className="w-full bg-primary hover:bg-primary/90">
-                    <Download className="w-4 h-4 mr-2" />
-                    Export Broker Clicks
-                  </Button>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">User List</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Complete user database export with email, plan type, and signup dates.
-                  </p>
-                  <Button onClick={() => handleExport('users')} className="w-full bg-primary hover:bg-primary/90">
-                    <Download className="w-4 h-4 mr-2" />
-                    Export Users
-                  </Button>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">Subscription Data</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    All subscription records with plan details and payment processor info.
-                  </p>
-                  <Button onClick={() => handleExport('subscriptions')} className="w-full bg-primary hover:bg-primary/90">
-                    <Download className="w-4 h-4 mr-2" />
-                    Export Subscriptions
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-        </Tabs>
+      {/* Members table */}
+      <div style={styles.section}>
+        <p style={styles.sectionLabel}>Members — {users.length}</p>
+        <div style={styles.tableWrapper}>
+          <table style={styles.table}>
+            <thead>
+              <tr>
+                {["Name", "Email", "Plan", "Joined", "Last seen", "Onboarding"].map(h => (
+                  <th key={h} style={styles.th}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {users.map((u, i) => (
+                <tr key={u.id} style={{ background: i % 2 === 0 ? "transparent" : "rgba(255,255,255,0.025)" }}>
+                  <td style={styles.td}>{u.full_name || <span style={{ color: "#555" }}>—</span>}</td>
+                  <td style={{ ...styles.td, color: "#a0a0b0" }}>{u.email}</td>
+                  <td style={styles.td}>
+                    <span style={u.is_pro ? styles.badgePro : styles.badgeFree}>
+                      {u.is_pro ? "Pro" : "Free"}
+                    </span>
+                  </td>
+                  <td style={{ ...styles.td, color: "#a0a0b0" }}>{fmtJoined(u.created_at)}</td>
+                  <td style={{ ...styles.td, color: "#a0a0b0" }}>{fmt(u.last_sign_in)}</td>
+                  <td style={styles.td}>
+                    {u.onboarding_complete
+                      ? <span style={{ color: "#3d7a54" }}>✓</span>
+                      : <span style={{ color: "#d4788a" }}>✗</span>}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
 }
+
+// ── Sub-components ─────────────────────────────────────────────────────────
+
+function Tile({ label, value, color = "#f5f0e8" }: { label: string; value: number; color?: string }) {
+  return (
+    <div style={styles.tile}>
+      <span style={{ ...styles.tileValue, color }}>{value}</span>
+      <span style={styles.tileLabel}>{label}</span>
+    </div>
+  );
+}
+
+function HealthPill({ label, ok }: { label: string; ok: boolean }) {
+  return (
+    <span style={{
+      display: "inline-flex", alignItems: "center", gap: 6,
+      padding: "4px 12px", borderRadius: 20, fontSize: 12,
+      fontFamily: "DM Sans, sans-serif",
+      background: ok ? "rgba(61,122,84,0.15)" : "rgba(212,120,138,0.15)",
+      color: ok ? "#3d7a54" : "#d4788a",
+      border: `1px solid ${ok ? "rgba(61,122,84,0.3)" : "rgba(212,120,138,0.3)"}`,
+    }}>
+      {ok ? "●" : "●"} {label}
+    </span>
+  );
+}
+
+// ── Styles ─────────────────────────────────────────────────────────────────
+
+const styles = {
+  page: {
+    minHeight: "100vh",
+    background: "#06060a",
+    padding: "40px 32px",
+    boxSizing: "border-box" as const,
+    maxWidth: 1100,
+    margin: "0 auto",
+  },
+  header: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: 32,
+  },
+  title: {
+    fontFamily: "Cormorant Garamond, Georgia, serif",
+    fontSize: 28,
+    fontWeight: 600,
+    color: "#f5f0e8",
+    margin: 0,
+  },
+  subtitle: {
+    fontFamily: "DM Sans, sans-serif",
+    fontSize: 12,
+    color: "#555",
+    margin: "4px 0 0",
+  },
+  tileRow: {
+    display: "grid",
+    gridTemplateColumns: "repeat(4, 1fr)",
+    gap: 12,
+    marginBottom: 32,
+  },
+  tile: {
+    background: "#0f0f17",
+    border: "1px solid #1e1e2e",
+    borderRadius: 8,
+    padding: "20px 20px 16px",
+    display: "flex",
+    flexDirection: "column" as const,
+    gap: 6,
+  },
+  tileValue: {
+    fontFamily: "Cormorant Garamond, Georgia, serif",
+    fontSize: 36,
+    fontWeight: 600,
+    lineHeight: 1,
+  },
+  tileLabel: {
+    fontFamily: "DM Sans, sans-serif",
+    fontSize: 11,
+    color: "#666",
+    textTransform: "uppercase" as const,
+    letterSpacing: "0.06em",
+  },
+  section: {
+    marginBottom: 36,
+  },
+  sectionLabel: {
+    fontFamily: "DM Sans, sans-serif",
+    fontSize: 11,
+    color: "#555",
+    textTransform: "uppercase" as const,
+    letterSpacing: "0.08em",
+    marginBottom: 10,
+  },
+  tableWrapper: {
+    overflowX: "auto" as const,
+    border: "1px solid #1e1e2e",
+    borderRadius: 8,
+  },
+  table: {
+    width: "100%",
+    borderCollapse: "collapse" as const,
+    fontFamily: "DM Sans, sans-serif",
+    fontSize: 13,
+  },
+  th: {
+    textAlign: "left" as const,
+    padding: "10px 14px",
+    color: "#555",
+    fontWeight: 500,
+    fontSize: 11,
+    textTransform: "uppercase" as const,
+    letterSpacing: "0.06em",
+    borderBottom: "1px solid #1e1e2e",
+    whiteSpace: "nowrap" as const,
+  },
+  td: {
+    padding: "10px 14px",
+    color: "#d0ccc5",
+    borderBottom: "1px solid #111118",
+    whiteSpace: "nowrap" as const,
+  },
+  badgePro: {
+    display: "inline-block",
+    padding: "2px 8px",
+    borderRadius: 10,
+    fontSize: 11,
+    background: "rgba(200,149,58,0.15)",
+    color: "#c8953a",
+    border: "1px solid rgba(200,149,58,0.3)",
+    fontWeight: 500,
+  },
+  badgeFree: {
+    display: "inline-block",
+    padding: "2px 8px",
+    borderRadius: 10,
+    fontSize: 11,
+    background: "rgba(255,255,255,0.05)",
+    color: "#666",
+    border: "1px solid #222",
+  },
+  errorBox: {
+    display: "flex",
+    flexDirection: "column" as const,
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: "40vh",
+    gap: 8,
+  },
+  refreshBtn: {
+    background: "transparent",
+    border: "1px solid #2a2a3a",
+    borderRadius: 6,
+    color: "#888",
+    fontFamily: "DM Sans, sans-serif",
+    fontSize: 12,
+    padding: "6px 14px",
+    cursor: "pointer",
+  },
+} as const;

@@ -25,9 +25,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let publicUsers: any[] = [];
     const { data: uData, error: uError } = await supabaseAdmin.from("users").select("*");
-    
+
     if (uError) {
-      const { data: pData, error: pError } = await supabaseAdmin.from("profiles").select("*");
+      const { data: pData, error: pError } = await supabaseAdmin.from("profiles").select("id, full_name, risk_tolerance, experience_level, created_at, join_date, is_pro, subscription_status");
       if (!pError && pData) publicUsers = pData;
     } else if (uData) {
       publicUsers = uData;
@@ -35,12 +35,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const users = authData.users.map(au => {
       const pub = publicUsers.find(u => u.id === au.id) || {};
+      const isPro = pub.is_pro === true || pub.subscription_status === "active";
       return {
         id: au.id,
         email: au.email || "",
         full_name: pub.full_name || au.user_metadata?.full_name || "",
         risk_tolerance: pub.risk_tolerance || "",
         onboarding_complete: !!pub.experience_level,
+        is_pro: isPro,
+        subscription_status: pub.subscription_status || null,
         created_at: au.created_at || pub.created_at || pub.join_date || new Date().toISOString(),
         last_sign_in: au.last_sign_in_at || null,
         email_confirmed: !!au.email_confirmed_at
