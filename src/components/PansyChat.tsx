@@ -59,7 +59,7 @@ export function PansyChat({ ticker, companyName, currentPrice, analysisContext }
   useEffect(() => {
     if (isOpen && !hasAutoTriggered && messages.length === 0) {
       setHasAutoTriggered(true);
-      const autoMessage = `Analyze ${ticker} for me right now — give me the full breakdown including trend, momentum, entry consideration, exit consideration, and risk level in your warm girlfriend style`;
+      const autoMessage = `Walk me through ${ticker} — what's the story, where does it stand, and what would a trader be thinking about?`;
       sendMessage(autoMessage);
     }
   }, [isOpen, hasAutoTriggered, messages.length, ticker]);
@@ -89,6 +89,8 @@ export function PansyChat({ ticker, companyName, currentPrice, analysisContext }
         },
         body: JSON.stringify({
           ticker,
+          companyName,
+          currentPrice,
           message: messageText,
         }),
       });
@@ -141,10 +143,10 @@ export function PansyChat({ ticker, companyName, currentPrice, analysisContext }
   };
 
   const suggestedQuestions = [
-    "What price should I watch for entry?",
-    "Is this too risky for a beginner?",
-    "How does this compare to similar stocks?",
-    "What's a good stop-loss level?",
+    "What's the bull and bear case?",
+    "What should I understand before forming a view?",
+    "How do I read what this chart's doing?",
+    "What makes this name riskier or safer?",
   ];
 
   if (!isOpen) {
@@ -316,7 +318,7 @@ export function PansyChat({ ticker, companyName, currentPrice, analysisContext }
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="Ask about entry price, risk, comparison..."
+            placeholder="Ask about the business, the risks, how to think about it..."
             className="flex-1 bg-background border-border text-foreground"
             disabled={isLoading}
           />
