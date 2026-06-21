@@ -232,7 +232,7 @@ export default function StockPage() {
               </div>
               <div className="flex-1">
                 <h3 className="font-serif text-lg font-semibold text-foreground">Want Pansy's full breakdown?</h3>
-                <p className="text-sm text-muted-foreground">Get her expert take in plain English — no jargon.</p>
+                <p className="text-sm text-muted-foreground">Get her take in plain English — no jargon.</p>
               </div>
               <Button
                 onClick={() => loadPansyAnalysis(ticker as string, stockData)}
@@ -417,7 +417,7 @@ export default function StockPage() {
                   Want the full breakdown?
                 </h3>
                 <p className="text-sm text-foreground/90 leading-relaxed">
-                  Pansy can walk you through entry zones, exit planning, and the real risk — free the moment you sign up.
+                  Pansy breaks down the business, the bull and bear case, and the real risks in plain English — free the moment you sign up.
                 </p>
               </div>
             </div>
@@ -450,7 +450,7 @@ export default function StockPage() {
           isOpen={showLockedFeatureModal}
           onClose={() => setShowLockedFeatureModal(false)}
           featureName={`Pansy's full breakdown of ${ticker}`}
-          featureDescription="Get her expert analysis with entry zones, exit planning, and real risk assessment."
+          featureDescription="Get her take in plain English — no jargon."
         />
 
         {/* Latest News */}
