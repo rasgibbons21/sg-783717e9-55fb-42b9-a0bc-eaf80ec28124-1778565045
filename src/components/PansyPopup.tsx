@@ -57,7 +57,7 @@ export function PansyPopup({ type = "first-visit", userName, marketTip }: PansyP
                   Pansy
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  Bloom's Investing Expert
+                  Your Investing Education Guide
                 </p>
               </div>
               <Button
