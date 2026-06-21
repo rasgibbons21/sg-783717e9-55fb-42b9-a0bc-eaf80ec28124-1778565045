@@ -268,9 +268,9 @@ export default function Home() {
             ) : (
               <div className="flex items-start gap-3">
                 <img
-                  src="/bloom-logo.png"
+                  src="/pansy-coffee.png"
                   alt="Pansy"
-                  className="w-10 h-10 rounded-full border border-border object-cover bg-white shrink-0 mt-0.5"
+                  className="w-10 h-10 rounded-full border border-border object-cover shrink-0 mt-0.5"
                 />
                 <div className="bg-muted/40 rounded-2xl rounded-tl-sm px-4 py-3 border border-border">
                   <p className="text-sm text-foreground leading-relaxed whitespace-pre-line">{briefing}</p>
