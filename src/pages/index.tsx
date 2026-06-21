@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { supabase } from "@/integrations/supabase/client";
 import { SEO } from "@/components/SEO";
+import { Menu, X } from "lucide-react";
 
 /* ─── palette ──────────────────────────────────────────────────────────────── */
 const C = {
@@ -30,6 +31,7 @@ const gradientBg: React.CSSProperties = {
 export default function LandingPage() {
   const router = useRouter();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     checkAuthAndRedirect();
@@ -68,44 +70,80 @@ export default function LandingPage() {
 
         {/* ── NAV ──────────────────────────────────────────────────────────── */}
         <nav
-          className="sticky top-0 z-50 flex items-center justify-between px-6 py-4 md:px-12"
+          className="sticky top-0 z-50 px-4 py-4 md:px-12"
           style={{ background: `${C.deep}f0`, backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}
         >
-          <div className="flex items-center gap-2.5">
-            <Image src="/bloom-logo.png" alt="Bloom" width={36} height={36} className="rounded-full" />
-            <span className="text-lg font-bold tracking-tight" style={{ color: C.ivory }}>
-              She Blooms <span style={{ color: C.teal }}>Wealth</span>
-            </span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <Image src="/bloom-logo.png" alt="Bloom" width={36} height={36} className="rounded-full" />
+              <span className="text-lg font-bold tracking-tight" style={{ color: C.ivory }}>
+                She Blooms <span style={{ color: C.teal }}>Wealth</span>
+              </span>
+            </div>
+            {/* Desktop nav */}
+            <div className="hidden md:flex items-center gap-3">
+              <Link href="/onboarding">
+                <button
+                  className="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                  style={{ color: C.ivory, border: `1px solid rgba(255,255,255,0.14)` }}
+                >
+                  Sign in
+                </button>
+              </Link>
+              <Link href="/onboarding">
+                <button
+                  className="px-4 py-2 rounded-lg text-sm font-semibold"
+                  style={gradientBg}
+                >
+                  <span style={{ color: C.deep }}>Get started free</span>
+                </button>
+              </Link>
+            </div>
+            {/* Mobile hamburger */}
+            <button
+              className="md:hidden p-2 rounded-lg"
+              style={{ color: C.ivory }}
+              onClick={() => setMenuOpen((o) => !o)}
+              aria-label="Toggle menu"
+            >
+              {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
           </div>
-          <div className="flex items-center gap-3">
-            <Link href="/onboarding">
-              <button
-                className="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-                style={{ color: C.ivory, border: `1px solid rgba(255,255,255,0.14)` }}
-              >
-                Sign in
-              </button>
-            </Link>
-            <Link href="/onboarding">
-              <button
-                className="px-4 py-2 rounded-lg text-sm font-semibold"
-                style={gradientBg}
-              >
-                <span style={{ color: C.deep }}>Get started free</span>
-              </button>
-            </Link>
-          </div>
+          {/* Mobile menu dropdown */}
+          {menuOpen && (
+            <div
+              className="md:hidden mt-3 flex flex-col gap-2 pb-3 border-t pt-3"
+              style={{ borderColor: "rgba(255,255,255,0.08)" }}
+            >
+              <Link href="/onboarding" onClick={() => setMenuOpen(false)}>
+                <button
+                  className="w-full px-4 py-2.5 rounded-lg text-sm font-medium text-left transition-colors"
+                  style={{ color: C.ivory, border: `1px solid rgba(255,255,255,0.14)` }}
+                >
+                  Sign in
+                </button>
+              </Link>
+              <Link href="/onboarding" onClick={() => setMenuOpen(false)}>
+                <button
+                  className="w-full px-4 py-2.5 rounded-lg text-sm font-semibold"
+                  style={gradientBg}
+                >
+                  <span style={{ color: C.deep }}>Get started free</span>
+                </button>
+              </Link>
+            </div>
+          )}
         </nav>
 
         {/* ── 1. HERO ──────────────────────────────────────────────────────── */}
-        <section className="flex flex-col md:flex-row items-center gap-10 px-6 py-20 md:px-12 md:py-28 max-w-6xl mx-auto">
+        <section className="flex flex-col md:flex-row items-center gap-10 px-4 py-14 md:px-12 md:py-28 max-w-6xl mx-auto">
           {/* Left copy */}
-          <div className="flex-1 space-y-7">
-            <h1 className="text-4xl md:text-5xl lg:text-[3.5rem] font-bold leading-tight tracking-tight">
+          <div className="flex-1 space-y-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.5rem] font-bold leading-tight tracking-tight">
               Understand today.<br />Invest tomorrow.<br />
               <span style={gradientText}>Bloom forever.</span>
             </h1>
-            <p className="text-lg md:text-xl leading-relaxed max-w-lg" style={{ color: "rgba(244,247,250,0.72)" }}>
+            <p className="text-base md:text-xl leading-relaxed max-w-lg" style={{ color: "rgba(244,247,250,0.72)" }}>
               Bloom teaches women how money really works, so you can grow your wealth with confidence.
               One lesson, one step, one bloom at a time.
             </p>
@@ -122,10 +160,10 @@ export default function LandingPage() {
             </div>
 
             {/* CTA */}
-            <div className="flex flex-col sm:flex-row items-start gap-3 pt-1">
-              <Link href="/onboarding">
+            <div className="pt-1">
+              <Link href="/onboarding" className="block sm:inline-block">
                 <button
-                  className="px-7 py-3.5 rounded-xl text-base font-semibold shadow-lg"
+                  className="w-full sm:w-auto px-7 py-3.5 rounded-xl text-base font-semibold shadow-lg"
                   style={{ ...gradientBg, color: "#0E1B30" }}
                 >
                   Start Learning Free
@@ -144,8 +182,8 @@ export default function LandingPage() {
           </div>
 
           {/* Right image */}
-          <div className="flex-1 flex justify-center md:justify-end">
-            <div className="relative w-full max-w-sm">
+          <div className="flex-1 flex justify-center md:justify-end w-full">
+            <div className="relative w-full max-w-xs sm:max-w-sm">
               <div
                 className="absolute inset-0 rounded-3xl blur-3xl opacity-25"
                 style={{ background: `radial-gradient(circle at 50% 50%, ${C.teal}, transparent 70%)` }}
@@ -164,7 +202,7 @@ export default function LandingPage() {
 
         {/* ── 2. COST OF NOT KNOWING ───────────────────────────────────────── */}
         <section style={{ background: C.surface }}>
-          <div className="max-w-6xl mx-auto px-6 py-20 md:px-12">
+          <div className="max-w-6xl mx-auto px-4 py-14 md:px-12 md:py-20">
             <div className="max-w-2xl mx-auto text-center space-y-4 mb-14">
               <h2 className="text-3xl md:text-4xl font-bold" style={{ color: C.ivory }}>
                 The cost of not knowing
@@ -227,8 +265,8 @@ export default function LandingPage() {
         </section>
 
         {/* ── 3. MEET PANSY ────────────────────────────────────────────────── */}
-        <section className="max-w-6xl mx-auto px-6 py-20 md:px-12">
-          <div className="flex flex-col md:flex-row items-start gap-14">
+        <section className="max-w-6xl mx-auto px-4 py-14 md:px-12 md:py-20">
+          <div className="flex flex-col md:flex-row items-start gap-10 md:gap-14">
             {/* Image */}
             <div className="flex-1 flex justify-center">
               <div className="relative w-full max-w-xs">
@@ -290,7 +328,7 @@ export default function LandingPage() {
 
         {/* ── 4. DAILY WITH PANSY ──────────────────────────────────────────── */}
         <section style={{ background: C.surface }}>
-          <div className="max-w-6xl mx-auto px-6 py-20 md:px-12">
+          <div className="max-w-6xl mx-auto px-4 py-14 md:px-12 md:py-20">
             <div className="text-center space-y-4 mb-14">
               <h2 className="text-3xl md:text-4xl font-bold" style={{ color: C.ivory }}>
                 Your day with Pansy
@@ -354,7 +392,7 @@ export default function LandingPage() {
         </section>
 
         {/* ── 5. BLOOM MAKES LEARNING BEAUTIFUL ────────────────────────────── */}
-        <section className="max-w-6xl mx-auto px-6 py-20 md:px-12">
+        <section className="max-w-6xl mx-auto px-4 py-14 md:px-12 md:py-20">
           <div className="text-center space-y-4 mb-14">
             <h2 className="text-3xl md:text-4xl font-bold" style={{ color: C.ivory }}>
               Bloom makes learning beautiful
@@ -422,8 +460,8 @@ export default function LandingPage() {
 
         {/* ── 6. PHONE MOCKUP ──────────────────────────────────────────────── */}
         <section style={{ background: C.surface }}>
-          <div className="max-w-6xl mx-auto px-6 py-20 md:px-12">
-            <div className="flex flex-col md:flex-row items-center gap-14">
+          <div className="max-w-6xl mx-auto px-4 py-14 md:px-12 md:py-20">
+            <div className="flex flex-col md:flex-row items-center gap-10 md:gap-14">
               {/* Phone frame */}
               <div className="flex-1 flex justify-center">
                 <div
@@ -516,9 +554,9 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <Link href="/onboarding">
+                <Link href="/onboarding" className="block sm:inline-block">
                   <button
-                    className="mt-2 px-7 py-3.5 rounded-xl text-base font-semibold shadow-lg"
+                    className="w-full sm:w-auto mt-2 px-7 py-3.5 rounded-xl text-base font-semibold shadow-lg"
                     style={{ ...gradientBg, color: C.deep }}
                   >
                     Start Learning Free
@@ -531,7 +569,7 @@ export default function LandingPage() {
 
         {/* ── 7. CLOSING CTA BAND ──────────────────────────────────────────── */}
         <section style={{ background: C.brand }}>
-          <div className="max-w-3xl mx-auto px-6 py-24 md:px-12 text-center space-y-8">
+          <div className="max-w-3xl mx-auto px-4 py-16 md:px-12 md:py-24 text-center space-y-8">
             <p className="text-4xl">🌺</p>
             <h2 className="text-3xl md:text-4xl font-bold leading-tight" style={{ color: C.ivory }}>
               The best time to learn was years ago.<br />
@@ -539,9 +577,9 @@ export default function LandingPage() {
             </h2>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
-              <Link href="/onboarding">
+              <Link href="/onboarding" className="w-full sm:w-auto">
                 <button
-                  className="px-8 py-4 rounded-xl text-base font-semibold shadow-xl"
+                  className="w-full sm:w-auto px-8 py-4 rounded-xl text-base font-semibold shadow-xl"
                   style={{ ...gradientBg, color: C.deep }}
                 >
                   Start Learning Free
@@ -570,17 +608,68 @@ export default function LandingPage() {
 
         {/* ── FOOTER ───────────────────────────────────────────────────────── */}
         <footer style={{ background: C.deep, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-          <div className="max-w-6xl mx-auto px-6 py-10 md:px-12 flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <Image src="/bloom-logo.png" alt="Bloom" width={24} height={24} className="rounded-full bg-white" />
-              <p className="text-sm font-semibold" style={{ color: "rgba(244,247,250,0.45)" }}>She Blooms Wealth</p>
+          <div className="max-w-6xl mx-auto px-4 py-10 md:px-12">
+            {/* Top row */}
+            <div className="flex flex-col md:flex-row md:items-start gap-8 md:gap-12 mb-8">
+              {/* Brand */}
+              <div className="flex-1 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Image src="/bloom-logo.png" alt="Bloom" width={24} height={24} className="rounded-full bg-white" />
+                  <p className="text-sm font-semibold" style={{ color: "rgba(244,247,250,0.60)" }}>She Blooms Wealth</p>
+                </div>
+                <p className="text-xs" style={{ color: "rgba(244,247,250,0.35)" }}>
+                  Invest in yourself first 🌸
+                </p>
+              </div>
+              {/* Legal links */}
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: "rgba(244,247,250,0.35)" }}>Legal</p>
+                <div className="flex flex-col gap-1.5">
+                  {[
+                    { label: "Privacy Policy", href: "/privacy" },
+                    { label: "Terms of Service", href: "/terms" },
+                    { label: "Disclaimer", href: "/disclaimer" },
+                  ].map(({ label, href }) => (
+                    <Link
+                      key={href}
+                      href={href}
+                      className="text-xs transition-colors hover:text-white"
+                      style={{ color: "rgba(244,247,250,0.40)" }}
+                    >
+                      {label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+              {/* Account links */}
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: "rgba(244,247,250,0.35)" }}>Account</p>
+                <div className="flex flex-col gap-1.5">
+                  {[
+                    { label: "Sign in", href: "/onboarding" },
+                    { label: "Get started free", href: "/onboarding" },
+                    { label: "Bloom Pro", href: "/subscription" },
+                  ].map(({ label, href }) => (
+                    <Link
+                      key={label}
+                      href={href}
+                      className="text-xs transition-colors hover:text-white"
+                      style={{ color: "rgba(244,247,250,0.40)" }}
+                    >
+                      {label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
             </div>
-            <p className="text-xs text-center" style={{ color: "rgba(244,247,250,0.28)" }}>
-              For educational purposes only. Not financial advice. Investing involves risk including possible loss of principal.
-            </p>
-            <div className="flex gap-5 text-sm" style={{ color: "rgba(244,247,250,0.38)" }}>
-              <Link href="/onboarding" className="hover:text-white transition-colors">Sign in</Link>
-              <Link href="/onboarding" className="hover:text-white transition-colors">Sign up</Link>
+            {/* Bottom row */}
+            <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }} className="pt-6 space-y-2">
+              <p className="text-xs" style={{ color: "rgba(244,247,250,0.28)" }}>
+                © 2026 Cinder Vault Enterprises LLC. All rights reserved. Bloom is a product of Cinder Vault Enterprises LLC.
+              </p>
+              <p className="text-xs" style={{ color: "rgba(244,247,250,0.22)" }}>
+                Bloom is for educational purposes only and does not constitute financial advice. All investing involves risk of loss, including possible loss of principal. Past performance does not guarantee future results. The decision is always yours.
+              </p>
             </div>
           </div>
         </footer>
