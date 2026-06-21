@@ -1,81 +1,21 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
-import { marketService } from "@/services/marketService";
-import { 
-  BookOpen, 
-  BarChart3, 
-  PieChart, 
-  Target, 
-  TrendingUp,
-  Bell,
-  ArrowRight,
-  Sparkles
-} from "lucide-react";
 import { SEO } from "@/components/SEO";
-
-interface FeaturedStock {
-  ticker: string;
-  name: string;
-  price: number;
-  change: number;
-  changePercent: number;
-}
 
 export default function LandingPage() {
   const router = useRouter();
-  const [featuredETF, setFeaturedETF] = useState<FeaturedStock | null>(null);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-  const [marketQuotes, setMarketQuotes] = useState<Record<string, FeaturedStock>>({});
-  const [selectedStock, setSelectedStock] = useState("AAPL");
-  const [selectedTimeframe, setSelectedTimeframe] = useState("1D");
 
   useEffect(() => {
     checkAuthAndRedirect();
-    loadFeaturedETF();
-    loadMarketQuotes();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const loadMarketQuotes = async () => {
-    const tickers = ["AAPL", "SPY", "QQQ", "NVDA", "MSFT"];
-    const quotes: Record<string, FeaturedStock> = {};
-    
-    for (const ticker of tickers) {
-      const quote = await marketService.getRealTimeQuote(ticker);
-      if (quote) {
-        quotes[ticker] = {
-          ticker,
-          name: getStockName(ticker),
-          price: quote.c,
-          change: quote.d ?? 0,
-          changePercent: quote.dp ?? 0,
-        };
-      }
-    }
-    
-    setMarketQuotes(quotes);
-  };
-
-  const getStockName = (ticker: string) => {
-    const names: Record<string, string> = {
-      AAPL: "Apple Inc.",
-      SPY: "SPDR S&P 500 ETF",
-      QQQ: "Invesco QQQ Trust",
-      NVDA: "NVIDIA Corporation",
-      MSFT: "Microsoft Corporation",
-    };
-    return names[ticker] || ticker;
-  };
-
   const checkAuthAndRedirect = async () => {
     const { data: { session } } = await supabase.auth.getSession();
-    
     if (session) {
       const { data: profile } = await supabase
         .from("profiles")
@@ -84,795 +24,329 @@ export default function LandingPage() {
         .single();
       if (profile?.onboarding_complete) { router.push("/home"); return; }
     }
-    
     setIsCheckingAuth(false);
-  };
-
-  const loadFeaturedETF = async () => {
-    const quote = await marketService.getRealTimeQuote("VOO");
-    if (quote) {
-      setFeaturedETF({
-        ticker: "VOO",
-        name: "Vanguard S&P 500 ETF",
-        price: quote.c,
-        change: quote.d ?? 0,
-        changePercent: quote.dp ?? 0,
-      });
-    }
-  };
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-    }).format(price);
   };
 
   if (isCheckingAuth) {
     return (
-      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: "#FAF7F2" }}>
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-t-transparent rounded-full animate-spin mx-auto mb-4" style={{ borderColor: "#C4714A", borderTopColor: "transparent" }} />
-          <p style={{ color: "#2D4A3E" }}>Loading Bloom...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "#0E1B30" }}>
+        <div className="w-8 h-8 rounded-full border-2 border-[#27B7C8] border-t-transparent animate-spin" />
       </div>
     );
   }
 
   return (
     <>
-      <SEO 
-        title="Bloom - Investing Made Simple for Women" 
-        description="Invest with Confidence. Bloom Into Wealth. Your all-in-one space to learn investing, analyze stocks, build wealth, and become the woman your future self is proud of."
+      <SEO
+        title="She Blooms Wealth — Investing Education for Women"
+        description="Learn to invest with confidence. Pansy, your AI education guide, makes markets make sense — one lesson at a time."
       />
-      
-      <div className="min-h-screen" style={{ backgroundColor: "#FAF7F2" }}>
-        {/* Top Navigation */}
-        <header className="sticky top-0 z-50 backdrop-blur-sm" style={{ backgroundColor: "rgba(250, 247, 242, 0.95)", borderBottom: "1px solid rgba(45, 74, 62, 0.1)" }}>
-          <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-            {/* Left - Logo + Tagline */}
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, #2D4A3E 0%, #D4AF6A 100%)" }}>
-                <span className="text-2xl">🌸</span>
-              </div>
-              <div>
-                <span className="font-serif text-2xl font-bold block" style={{ color: "#2D4A3E" }}>Bloom</span>
-                <span className="text-xs tracking-wide" style={{ color: "#2D4A3E", opacity: 0.6 }}>Learn. Grow. Thrive.</span>
-              </div>
-            </div>
 
-            {/* Center - Navigation */}
-            <nav className="hidden lg:flex items-center gap-8">
-              <Link href="/" className="text-sm font-medium transition-colors hover:opacity-80" style={{ color: "#2D4A3E" }}>
-                Home
-              </Link>
-              <Link href="/learn" className="text-sm font-medium transition-colors hover:opacity-80" style={{ color: "#2D4A3E" }}>
-                Learn
-              </Link>
-              <Link href="/discover" className="text-sm font-medium transition-colors hover:opacity-80" style={{ color: "#2D4A3E" }}>
-                Analyze
-              </Link>
-              <Link href="/portfolio" className="text-sm font-medium transition-colors hover:opacity-80" style={{ color: "#2D4A3E" }}>
-                Portfolio
-              </Link>
-              <Link href="/goals" className="text-sm font-medium transition-colors hover:opacity-80" style={{ color: "#2D4A3E" }}>
-                Discipline
-              </Link>
-              <Link href="/subscription" className="text-sm font-semibold transition-colors hover:opacity-80" style={{ color: "#D4AF6A" }}>
-                Bloom Pro
-              </Link>
-            </nav>
+      <div className="min-h-screen font-sans" style={{ background: "#0E1B30", color: "#F4F7FA" }}>
 
-            {/* Right - Bell + Sign In */}
-            <div className="flex items-center gap-4">
-              <button className="w-10 h-10 rounded-full flex items-center justify-center transition-colors" style={{ backgroundColor: "rgba(45, 74, 62, 0.05)" }}>
-                <Bell className="w-5 h-5" style={{ color: "#2D4A3E" }} />
+        {/* Nav */}
+        <nav className="flex items-center justify-between px-6 py-5 md:px-12" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+          <span className="text-xl font-bold tracking-tight" style={{ color: "#F4F7FA" }}>
+            She Blooms <span style={{ color: "#27B7C8" }}>Wealth</span>
+          </span>
+          <div className="flex items-center gap-3">
+            <Link href="/auth/login">
+              <button
+                className="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                style={{ color: "#F4F7FA", border: "1px solid rgba(255,255,255,0.15)" }}
+              >
+                Sign in
               </button>
-              <Link href="/onboarding">
-                <Button className="font-semibold" style={{ backgroundColor: "#C4714A", color: "white" }}>
-                  Sign In
-                </Button>
+            </Link>
+            <Link href="/auth/signup">
+              <button
+                className="px-4 py-2 rounded-lg text-sm font-semibold"
+                style={{ background: "#27B7C8", color: "#0E1B30" }}
+              >
+                Get started free
+              </button>
+            </Link>
+          </div>
+        </nav>
+
+        {/* 1 — Hero */}
+        <section className="flex flex-col md:flex-row items-center gap-10 px-6 py-20 md:px-12 md:py-28 max-w-6xl mx-auto">
+          <div className="flex-1 space-y-7">
+            <div
+              className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold tracking-wide uppercase"
+              style={{ background: "rgba(39,183,200,0.12)", color: "#27B7C8", border: "1px solid rgba(39,183,200,0.25)" }}
+            >
+              🌺 Investing education for women
+            </div>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-tight" style={{ color: "#F4F7FA" }}>
+              The market isn&apos;t a boys&apos;<br />
+              <span style={{ color: "#27B7C8" }}>club anymore.</span>
+            </h1>
+            <p className="text-lg md:text-xl leading-relaxed max-w-xl" style={{ color: "rgba(244,247,250,0.72)" }}>
+              She Blooms Wealth gives you the knowledge to understand what you&apos;re investing in — and why.
+              No jargon. No pressure. Just real education, built for you.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+              <Link href="/auth/signup">
+                <button
+                  className="px-7 py-3.5 rounded-xl text-base font-semibold shadow-lg"
+                  style={{ background: "#49B06E", color: "#F4F7FA" }}
+                >
+                  Start learning free →
+                </button>
+              </Link>
+              <Link href="/auth/login">
+                <button
+                  className="px-7 py-3.5 rounded-xl text-base font-medium"
+                  style={{ color: "rgba(244,247,250,0.72)", border: "1px solid rgba(255,255,255,0.12)" }}
+                >
+                  Already a member? Sign in
+                </button>
               </Link>
             </div>
           </div>
-        </header>
 
-        {/* Hero Section - Two Columns */}
-        <section className="py-16 lg:py-24">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
-              {/* Left Column - Welcome */}
-              <div className="space-y-8">
-                <div className="space-y-4">
-                  <p className="text-xs font-semibold tracking-widest uppercase" style={{ color: "#C4714A" }}>
-                    WELCOME TO SHE BLOOMS WEALTH
-                  </p>
-                  <h1 className="font-serif text-5xl lg:text-6xl font-bold leading-tight" style={{ color: "#2D4A3E" }}>
-                    Become the Woman Your Future Self Thanks You For.
-                  </h1>
-                  <p className="text-xl font-medium leading-relaxed" style={{ color: "#C4714A" }}>
-                    Learn money skills. Build confidence. Create lasting wealth.
-                  </p>
-                  <p className="text-lg leading-relaxed" style={{ color: "#2D4A3E", opacity: 0.8 }}>
-                    Your all-in-one space to learn investing, understand money, analyze opportunities, and build the future you deserve.
-                  </p>
+          <div className="flex-1 flex justify-center md:justify-end">
+            <div className="relative w-full max-w-sm">
+              <div
+                className="absolute inset-0 rounded-3xl blur-2xl opacity-30"
+                style={{ background: "radial-gradient(circle at 50% 50%, #27B7C8, transparent 70%)" }}
+              />
+              <Image
+                src="/pansy-hero.png"
+                alt="Pansy, your AI investing education guide"
+                width={440}
+                height={480}
+                className="relative rounded-3xl object-cover w-full"
+                priority
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* 2 — Cost of not knowing */}
+        <section style={{ background: "#16264A" }}>
+          <div className="max-w-6xl mx-auto px-6 py-20 md:px-12">
+            <div className="max-w-3xl mx-auto text-center space-y-6">
+              <h2 className="text-3xl md:text-4xl font-bold" style={{ color: "#F4F7FA" }}>
+                The cost of waiting to learn
+              </h2>
+              <p className="text-lg leading-relaxed" style={{ color: "rgba(244,247,250,0.72)" }}>
+                Women outlive men by an average of five years — but retire with two-thirds of the wealth.
+                It&apos;s not about discipline or desire. It&apos;s about access to knowledge that was never written for us.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-6 mt-14">
+              {[
+                { stat: "2×", label: "Women who say they lack investing confidence compared to men", color: "#27B7C8" },
+                { stat: "30 yrs", label: "The average time women spend out of the workforce for caregiving", color: "#49B06E" },
+                { stat: "$1.1T", label: "The gender wealth gap in the United States", color: "#27B7C8" },
+              ].map(({ stat, label, color }) => (
+                <div
+                  key={stat}
+                  className="rounded-2xl p-7 space-y-3"
+                  style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}
+                >
+                  <p className="text-5xl font-bold" style={{ color }}>{stat}</p>
+                  <p className="text-sm leading-relaxed" style={{ color: "rgba(244,247,250,0.65)" }}>{label}</p>
                 </div>
+              ))}
+            </div>
 
-                {/* Pill Row */}
-                <div className="flex flex-wrap gap-3">
-                  {([
-                    { label: "Learn", href: "/learn" },
-                    { label: "Analyze", href: "/discover" },
-                    { label: "Invest", href: "/portfolio" },
-                    { label: "Grow", href: "/goals" },
-                  ] as const).map(({ label, href }) => (
-                    <Link key={label} href={href} className="px-4 py-2 rounded-full text-sm font-medium transition-opacity hover:opacity-80" style={{ backgroundColor: "white", border: "1px solid rgba(45, 74, 62, 0.15)", color: "#2D4A3E" }}>
-                      {label}
-                    </Link>
-                  ))}
-                </div>
+            <p className="text-center mt-10 text-base font-medium" style={{ color: "#49B06E" }}>
+              Knowledge is the first step. She Blooms is where you take it.
+            </p>
+          </div>
+        </section>
 
-                {/* CTAs */}
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <Link href="/learn">
-                    <Button size="lg" className="w-full sm:w-auto font-semibold text-base px-8 py-6" style={{ backgroundColor: "#C4714A", color: "white" }}>
-                      Start Learning
-                    </Button>
-                  </Link>
-                  <Link href="#how-it-works">
-                    <Button size="lg" variant="outline" className="w-full sm:w-auto font-semibold text-base px-8 py-6" style={{ borderColor: "#2D4A3E", color: "#2D4A3E" }}>
-                      See How It Works
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-
-              {/* Right Column - Hero Image */}
-              <div className="relative w-full h-[500px] rounded-[20px] overflow-hidden shadow-2xl" style={{ border: "1px solid rgba(45, 74, 62, 0.15)" }}>
+        {/* 3 — Meet Pansy */}
+        <section className="max-w-6xl mx-auto px-6 py-20 md:px-12">
+          <div className="flex flex-col md:flex-row items-center gap-12">
+            <div className="flex-1 flex justify-center">
+              <div className="relative w-full max-w-xs">
+                <div
+                  className="absolute inset-0 rounded-3xl blur-2xl opacity-25"
+                  style={{ background: "radial-gradient(circle at 50% 60%, #49B06E, transparent 70%)" }}
+                />
                 <Image
-                  src="/bloom-hero.jpg"
-                  alt="Woman working on laptop in warm sunlit room"
-                  fill
-                  style={{ objectFit: "cover" }}
-                  priority
+                  src="/pansy-coffee.png"
+                  alt="Pansy sharing a morning market briefing"
+                  width={360}
+                  height={400}
+                  className="relative rounded-3xl object-cover w-full"
                 />
               </div>
             </div>
-          </div>
-        </section>
 
-        {/* Pansy's Daily Market Thought - Full Width Strip */}
-        <section className="py-12" style={{ backgroundColor: "rgba(45, 74, 62, 0.03)" }}>
-          <div className="max-w-7xl mx-auto px-6">
-            <Card className="p-8 space-y-6 shadow-lg" style={{ backgroundColor: "white", border: "1px solid rgba(45, 74, 62, 0.1)" }}>
-              <div className="flex items-center gap-3">
-                <div className="w-14 h-14 rounded-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, #D4AF6A 0%, #C4714A 100%)" }}>
-                  <span className="text-2xl">🌺</span>
-                </div>
-                <div>
-                  <h3 className="font-serif text-xl font-bold" style={{ color: "#2D4A3E" }}>
-                    Pansy's Daily Market Thought
-                  </h3>
-                  <p className="text-sm" style={{ color: "#2D4A3E", opacity: 0.6 }}>Your guide to today's market</p>
-                </div>
+            <div className="flex-1 space-y-6">
+              <div
+                className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold tracking-wide uppercase"
+                style={{ background: "rgba(73,176,110,0.12)", color: "#49B06E", border: "1px solid rgba(73,176,110,0.25)" }}
+              >
+                🌺 Meet your guide
               </div>
-
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <p className="text-base leading-relaxed italic" style={{ color: "#2D4A3E", opacity: 0.9 }}>
-                    "Good morning! The S&P is holding steady this week, which is exactly what we want to see — no drama, just consistent growth. Remember, boring markets build wealth faster than exciting ones 💛"
-                  </p>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 rounded-lg" style={{ backgroundColor: "rgba(45, 74, 62, 0.05)" }}>
-                    <span className="text-sm font-medium" style={{ color: "#2D4A3E", opacity: 0.7 }}>Today's Sentiment</span>
-                    <Badge className="font-medium" style={{ backgroundColor: "rgba(45, 74, 62, 0.1)", color: "#2D4A3E" }}>
-                      Steady & Optimistic
-                    </Badge>
-                  </div>
-
-                  {featuredETF && (
-                    <div className="flex items-center justify-between p-3 rounded-lg" style={{ backgroundColor: "rgba(45, 74, 62, 0.05)" }}>
-                      <span className="text-sm font-medium" style={{ color: "#2D4A3E", opacity: 0.7 }}>Featured ETF</span>
-                      <div className="text-right">
-                        <p className="font-semibold font-mono" style={{ color: "#2D4A3E" }}>{featuredETF.ticker}</p>
-                        <p className="text-xs font-mono" style={{ color: featuredETF.changePercent >= 0 ? "#10b981" : "#ef4444" }}>
-                          {formatPrice(featuredETF.price)} {featuredETF.changePercent >= 0 ? "+" : ""}{featuredETF.changePercent.toFixed(2)}%
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  <p className="text-xs text-center pt-2" style={{ color: "#2D4A3E", opacity: 0.6 }}>
-                    Pansy is here to guide you every step of your wealth journey.
-                  </p>
-                </div>
-              </div>
-            </Card>
-          </div>
-        </section>
-
-        {/* Feature Cards - 5 Cards Row */}
-        <section className="py-16">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-              {/* Card 1 - Learn Stocks & ETFs */}
-              <Card className="p-6 space-y-4 hover:shadow-xl transition-shadow" style={{ backgroundColor: "white", border: "1px solid rgba(45, 74, 62, 0.1)" }}>
-                <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: "rgba(45, 74, 62, 0.1)" }}>
-                  <BookOpen className="w-6 h-6" style={{ color: "#2D4A3E" }} />
-                </div>
-                <div className="space-y-2">
-                  <h3 className="font-serif text-lg font-bold" style={{ color: "#2D4A3E" }}>
-                    Learn Stocks & ETFs
-                  </h3>
-                  <p className="text-sm leading-relaxed" style={{ color: "#2D4A3E", opacity: 0.7 }}>
-                    Plain-language lessons on investing fundamentals
-                  </p>
-                </div>
-                <Link href="/learn" className="inline-flex items-center gap-2 text-sm font-semibold transition-colors" style={{ color: "#C4714A" }}>
-                  Explore <ArrowRight className="w-4 h-4" />
-                </Link>
-              </Card>
-
-              {/* Card 2 - Analyze Any Stock */}
-              <Card className="p-6 space-y-4 hover:shadow-xl transition-shadow" style={{ backgroundColor: "white", border: "1px solid rgba(45, 74, 62, 0.1)" }}>
-                <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: "rgba(45, 74, 62, 0.1)" }}>
-                  <BarChart3 className="w-6 h-6" style={{ color: "#2D4A3E" }} />
-                </div>
-                <div className="space-y-2">
-                  <h3 className="font-serif text-lg font-bold" style={{ color: "#2D4A3E" }}>
-                    Analyze Any Stock
-                  </h3>
-                  <p className="text-sm leading-relaxed" style={{ color: "#2D4A3E", opacity: 0.7 }}>
-                    Get Pansy's breakdown on any ticker in seconds
-                  </p>
-                </div>
-                <Link href="/discover" className="inline-flex items-center gap-2 text-sm font-semibold transition-colors" style={{ color: "#C4714A" }}>
-                  Search <ArrowRight className="w-4 h-4" />
-                </Link>
-              </Card>
-
-              {/* Card 3 - Portfolio Tracker */}
-              <Card className="p-6 space-y-4 hover:shadow-xl transition-shadow" style={{ backgroundColor: "white", border: "1px solid rgba(45, 74, 62, 0.1)" }}>
-                <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: "rgba(45, 74, 62, 0.1)" }}>
-                  <PieChart className="w-6 h-6" style={{ color: "#2D4A3E" }} />
-                </div>
-                <div className="space-y-2">
-                  <h3 className="font-serif text-lg font-bold" style={{ color: "#2D4A3E" }}>
-                    Portfolio Tracker
-                  </h3>
-                  <p className="text-sm leading-relaxed" style={{ color: "#2D4A3E", opacity: 0.7 }}>
-                    Track your investments and watch them grow
-                  </p>
-                </div>
-                <Link href="/portfolio" className="inline-flex items-center gap-2 text-sm font-semibold transition-colors" style={{ color: "#C4714A" }}>
-                  Track <ArrowRight className="w-4 h-4" />
-                </Link>
-              </Card>
-
-              {/* Card 4 - Discipline Center */}
-              <Card className="p-6 space-y-4 hover:shadow-xl transition-shadow" style={{ backgroundColor: "white", border: "1px solid rgba(45, 74, 62, 0.1)" }}>
-                <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: "rgba(45, 74, 62, 0.1)" }}>
-                  <Target className="w-6 h-6" style={{ color: "#2D4A3E" }} />
-                </div>
-                <div className="space-y-2">
-                  <h3 className="font-serif text-lg font-bold" style={{ color: "#2D4A3E" }}>
-                    Discipline Center
-                  </h3>
-                  <p className="text-sm leading-relaxed" style={{ color: "#2D4A3E", opacity: 0.7 }}>
-                    Set goals, track progress, build wealth habits
-                  </p>
-                </div>
-                <Link href="/goals" className="inline-flex items-center gap-2 text-sm font-semibold transition-colors" style={{ color: "#C4714A" }}>
-                  Start <ArrowRight className="w-4 h-4" />
-                </Link>
-              </Card>
-
-              {/* Card 5 - Side Hustle Investments */}
-              <Card className="p-6 space-y-4 hover:shadow-xl transition-shadow" style={{ backgroundColor: "white", border: "1px solid rgba(45, 74, 62, 0.1)" }}>
-                <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: "rgba(45, 74, 62, 0.1)" }}>
-                  <TrendingUp className="w-6 h-6" style={{ color: "#2D4A3E" }} />
-                </div>
-                <div className="space-y-2">
-                  <h3 className="font-serif text-lg font-bold" style={{ color: "#2D4A3E" }}>
-                    Side Hustle Investments
-                  </h3>
-                  <p className="text-sm leading-relaxed" style={{ color: "#2D4A3E", opacity: 0.7 }}>
-                    Learn income streams beyond the stock market
-                  </p>
-                </div>
-                <Link href="/learn" className="inline-flex items-center gap-2 text-sm font-semibold transition-colors" style={{ color: "#C4714A" }}>
-                  Learn <ArrowRight className="w-4 h-4" />
-                </Link>
-              </Card>
-            </div>
-          </div>
-        </section>
-
-        {/* Dashboard Row - Three Columns */}
-        <section className="py-16">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="grid lg:grid-cols-3 gap-6">
-              {/* Column 1 - Live Market Overview */}
-              <Card className="p-6 space-y-6" style={{ backgroundColor: "white", border: "1px solid rgba(45, 74, 62, 0.1)" }}>
-                <div className="space-y-4">
-                  <h3 className="font-serif text-xl font-bold" style={{ color: "#2D4A3E" }}>
-                    Live Market Overview
-                  </h3>
-                  
-                  {/* Search Box */}
-                  <div className="relative">
-                    <input
-                      type="text"
-                      placeholder="Search ticker..."
-                      className="w-full px-4 py-3 pr-10 rounded-lg text-sm"
-                      style={{ backgroundColor: "rgba(45, 74, 62, 0.05)", border: "1px solid rgba(45, 74, 62, 0.1)", color: "#2D4A3E" }}
-                    />
-                    <BarChart3 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: "#2D4A3E", opacity: 0.4 }} />
-                  </div>
-
-                  {/* Ticker List */}
-                  <div className="space-y-3">
-                    {Object.values(marketQuotes).map((quote) => (
-                      <button
-                        key={quote.ticker}
-                        onClick={() => setSelectedStock(quote.ticker)}
-                        className="w-full p-3 rounded-lg text-left transition-all hover:shadow-md"
-                        style={{ 
-                          backgroundColor: selectedStock === quote.ticker ? "rgba(196, 113, 74, 0.1)" : "rgba(45, 74, 62, 0.03)",
-                          border: selectedStock === quote.ticker ? "1px solid #C4714A" : "1px solid transparent"
-                        }}
-                      >
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="font-semibold font-mono" style={{ color: "#2D4A3E" }}>{quote.ticker}</span>
-                          <span className="text-sm font-mono" style={{ color: quote.changePercent >= 0 ? "#10b981" : "#ef4444" }}>
-                            {quote.changePercent >= 0 ? "+" : ""}{quote.changePercent.toFixed(2)}%
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs" style={{ color: "#2D4A3E", opacity: 0.6 }}>{quote.name}</span>
-                          <span className="text-sm font-mono font-semibold" style={{ color: "#2D4A3E" }}>{formatPrice(quote.price)}</span>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-
-                  <Link href="/discover" className="inline-flex items-center gap-2 text-sm font-semibold transition-colors pt-2" style={{ color: "#C4714A" }}>
-                    View All Markets <ArrowRight className="w-4 h-4" />
-                  </Link>
-                </div>
-              </Card>
-
-              {/* Column 2 - Stock Detail */}
-              <Card className="p-6 space-y-6" style={{ backgroundColor: "white", border: "1px solid rgba(45, 74, 62, 0.1)" }}>
-                <div className="space-y-4">
-                  {marketQuotes[selectedStock] && (
-                    <>
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <h3 className="font-serif text-xl font-bold" style={{ color: "#2D4A3E" }}>
-                            {selectedStock}
-                          </h3>
-                          <Badge className="font-mono" style={{ backgroundColor: marketQuotes[selectedStock].changePercent >= 0 ? "#10b981" : "#ef4444", color: "white" }}>
-                            {marketQuotes[selectedStock].changePercent >= 0 ? "+" : ""}{marketQuotes[selectedStock].changePercent.toFixed(2)}%
-                          </Badge>
-                        </div>
-                        <p className="text-sm" style={{ color: "#2D4A3E", opacity: 0.6 }}>{marketQuotes[selectedStock].name}</p>
-                        <p className="font-serif text-3xl font-bold font-mono" style={{ color: "#2D4A3E" }}>
-                          {formatPrice(marketQuotes[selectedStock].price)}
-                        </p>
-                      </div>
-
-                      {/* Timeframe Tabs */}
-                      <div className="flex items-center gap-2 overflow-x-auto pb-2">
-                        {["1D", "5D", "1M", "3M", "6M", "YTD", "1Y", "5Y", "Max"].map((tf) => (
-                          <button
-                            key={tf}
-                            onClick={() => setSelectedTimeframe(tf)}
-                            className="px-3 py-1.5 rounded text-xs font-semibold whitespace-nowrap transition-all"
-                            style={{ 
-                              backgroundColor: selectedTimeframe === tf ? "rgba(45, 74, 62, 0.1)" : "transparent",
-                              color: "#2D4A3E",
-                              border: selectedTimeframe === tf ? "1px solid rgba(45, 74, 62, 0.2)" : "1px solid transparent"
-                            }}
-                          >
-                            {tf}
-                          </button>
-                        ))}
-                      </div>
-
-                      {/* Chart Placeholder */}
-                      <div className="h-48 rounded-lg flex items-center justify-center" style={{ backgroundColor: "rgba(45, 74, 62, 0.05)" }}>
-                        <div className="text-center space-y-2">
-                          <BarChart3 className="w-12 h-12 mx-auto" style={{ color: "#2D4A3E", opacity: 0.3 }} />
-                          <p className="text-xs" style={{ color: "#2D4A3E", opacity: 0.5 }}>Live chart powered by TradingView</p>
-                        </div>
-                      </div>
-
-                      {/* Indicators / Compare Buttons */}
-                      <div className="flex items-center gap-3">
-                        <Button variant="outline" size="sm" className="flex-1 text-xs" style={{ borderColor: "#2D4A3E", color: "#2D4A3E" }}>
-                          Indicators
-                        </Button>
-                        <Button variant="outline" size="sm" className="flex-1 text-xs" style={{ borderColor: "#2D4A3E", color: "#2D4A3E" }}>
-                          Compare
-                        </Button>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </Card>
-
-              {/* Column 3 - Pansy's Analysis (SAMPLE) */}
-              <Card className="p-6 space-y-6" style={{ backgroundColor: "white", border: "1px solid rgba(45, 74, 62, 0.1)" }}>
-                <div className="space-y-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <h3 className="font-serif text-xl font-bold" style={{ color: "#2D4A3E" }}>
-                      Pansy's Analysis
-                    </h3>
-                    <Badge className="text-xs font-semibold" style={{ backgroundColor: "rgba(212, 175, 106, 0.2)", color: "#D4AF6A", border: "1px solid #D4AF6A" }}>
-                      Example
-                    </Badge>
-                  </div>
-
-                  <div className="p-4 rounded-lg space-y-3" style={{ backgroundColor: "rgba(196, 113, 74, 0.05)", border: "1px solid rgba(196, 113, 74, 0.2)" }}>
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, #D4AF6A 0%, #C4714A 100%)" }}>
-                        <span className="text-sm">🌺</span>
-                      </div>
-                      <span className="text-sm font-semibold" style={{ color: "#2D4A3E" }}>Pansy Says...</span>
-                    </div>
-                    <p className="text-sm leading-relaxed italic" style={{ color: "#2D4A3E", opacity: 0.9 }}>
-                      "This tech giant is holding steady above key support. The recent earnings beat expectations and the dividend yield provides nice passive income while you wait for growth 💛"
-                    </p>
-                  </div>
-
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold" style={{ color: "#2D4A3E", opacity: 0.7 }}>RECOMMENDATION</span>
-                      <Badge style={{ backgroundColor: "rgba(16, 185, 129, 0.1)", color: "#10b981", border: "1px solid #10b981" }}>
-                        Hold
-                      </Badge>
-                    </div>
-
-                    <div className="flex items-center justify-center py-4">
-                      <div className="relative w-24 h-24">
-                        <svg className="w-full h-full transform -rotate-90">
-                          <circle
-                            cx="48"
-                            cy="48"
-                            r="40"
-                            stroke="rgba(45, 74, 62, 0.1)"
-                            strokeWidth="8"
-                            fill="none"
-                          />
-                          <circle
-                            cx="48"
-                            cy="48"
-                            r="40"
-                            stroke="#10b981"
-                            strokeWidth="8"
-                            fill="none"
-                            strokeDasharray={`${2 * Math.PI * 40 * 0.75} ${2 * Math.PI * 40}`}
-                          />
-                        </svg>
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <span className="font-serif text-2xl font-bold font-mono" style={{ color: "#2D4A3E" }}>75%</span>
-                        </div>
-                      </div>
-                    </div>
-                    <p className="text-xs text-center" style={{ color: "#2D4A3E", opacity: 0.6 }}>Confidence Level</p>
-
-                    {/* Entry/Stop/Take-Profit Grid */}
-                    <div className="grid grid-cols-2 gap-2 text-xs" style={{ borderTop: "1px solid rgba(45, 74, 62, 0.1)", paddingTop: "12px" }}>
-                      <div>
-                        <p style={{ color: "#2D4A3E", opacity: 0.6 }}>Entry Zone</p>
-                        <p className="font-semibold font-mono" style={{ color: "#2D4A3E" }}>$170-175</p>
-                      </div>
-                      <div>
-                        <p style={{ color: "#2D4A3E", opacity: 0.6 }}>Stop Loss</p>
-                        <p className="font-semibold font-mono" style={{ color: "#ef4444" }}>$165</p>
-                      </div>
-                      <div>
-                        <p style={{ color: "#2D4A3E", opacity: 0.6 }}>Take Profit</p>
-                        <p className="font-semibold font-mono" style={{ color: "#10b981" }}>$195</p>
-                      </div>
-                      <div>
-                        <p style={{ color: "#2D4A3E", opacity: 0.6 }}>Risk Level</p>
-                        <p className="font-semibold" style={{ color: "#D4AF6A" }}>Moderate</p>
-                      </div>
-                      <div className="col-span-2">
-                        <p style={{ color: "#2D4A3E", opacity: 0.6 }}>Best For</p>
-                        <p className="font-semibold" style={{ color: "#2D4A3E" }}>Long-term investors</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="p-3 rounded-lg text-xs text-center" style={{ backgroundColor: "rgba(212, 175, 106, 0.1)", color: "#D4AF6A" }}>
-                    ⚠️ Example only — not a recommendation
-                  </div>
-
-                  <Link href="/discover" className="inline-flex items-center gap-2 text-sm font-semibold transition-colors w-full justify-center pt-2" style={{ color: "#C4714A" }}>
-                    View Full Analysis <ArrowRight className="w-4 h-4" />
-                  </Link>
-                </div>
-              </Card>
-            </div>
-          </div>
-        </section>
-
-        {/* Social Proof */}
-        <section className="py-16" style={{ backgroundColor: "rgba(45, 74, 62, 0.03)" }}>
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-              <div className="space-y-2">
-                <p className="font-serif text-4xl font-bold font-mono" style={{ color: "#2D4A3E" }}>12K+</p>
-                <p className="text-sm" style={{ color: "#2D4A3E", opacity: 0.7 }}>Women Investors</p>
-              </div>
-              <div className="space-y-2">
-                <p className="font-serif text-4xl font-bold font-mono" style={{ color: "#2D4A3E" }}>$2.4M</p>
-                <p className="text-sm" style={{ color: "#2D4A3E", opacity: 0.7 }}>Analyzed Weekly</p>
-              </div>
-              <div className="space-y-2">
-                <p className="font-serif text-4xl font-bold font-mono" style={{ color: "#2D4A3E" }}>500+</p>
-                <p className="text-sm" style={{ color: "#2D4A3E", opacity: 0.7 }}>Daily Picks</p>
-              </div>
-              <div className="space-y-2">
-                <p className="font-serif text-4xl font-bold font-mono" style={{ color: "#D4AF6A" }}>Pro</p>
-                <p className="text-sm" style={{ color: "#2D4A3E", opacity: 0.7 }}>Premium Tools</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Bottom Row - Three Columns */}
-        <section className="py-16">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="grid lg:grid-cols-3 gap-6">
-              {/* Column 1 - Bloom Academy */}
-              <Card className="p-6 space-y-6" style={{ backgroundColor: "white", border: "1px solid rgba(45, 74, 62, 0.1)" }}>
-                <h3 className="font-serif text-xl font-bold" style={{ color: "#2D4A3E" }}>
-                  Bloom Academy
-                </h3>
-                <div className="space-y-3">
-                  {[
-                    "What Is a Stock?",
-                    "What Is an ETF?",
-                    "How Dividends Build Wealth",
-                    "Beginner Chart Reading",
-                    "Side Hustle Investing",
-                    "Trading Psychology",
-                    "Women & Wealth Building"
-                  ].map((lesson) => (
-                    <Link key={lesson} href="/learn" className="block p-3 rounded-lg transition-all hover:shadow-md" style={{ backgroundColor: "rgba(45, 74, 62, 0.03)" }}>
-                      <p className="text-sm font-medium" style={{ color: "#2D4A3E" }}>{lesson}</p>
-                    </Link>
-                  ))}
-                </div>
-                <Link href="/learn" className="inline-flex items-center gap-2 text-sm font-semibold transition-colors pt-2" style={{ color: "#C4714A" }}>
-                  View All Lessons <ArrowRight className="w-4 h-4" />
-                </Link>
-              </Card>
-
-              {/* Column 2 - Trader Psychology */}
-              <Card className="p-6 space-y-6" style={{ backgroundColor: "white", border: "1px solid rgba(45, 74, 62, 0.1)" }}>
-                <h3 className="font-serif text-xl font-bold" style={{ color: "#2D4A3E" }}>
-                  Trader Psychology
-                </h3>
-                <div className="p-4 rounded-lg space-y-3" style={{ backgroundColor: "rgba(45, 74, 62, 0.05)" }}>
-                  <p className="text-xs font-semibold" style={{ color: "#2D4A3E", opacity: 0.7 }}>TODAY'S DISCIPLINE REMINDER</p>
-                  <p className="text-sm leading-relaxed italic" style={{ color: "#2D4A3E" }}>
-                    "The market rewards patience, not impulse. Your plan exists for moments like this 💛"
-                  </p>
-                </div>
-
-                <div className="space-y-3">
-                  <p className="text-xs font-semibold" style={{ color: "#2D4A3E", opacity: 0.7 }}>QUICK CHECK-IN</p>
-                  {[
-                    "Am I following my plan?",
-                    "Am I chasing a trade?",
-                    "Did I set my risk first?",
-                    "Am I trading emotionally?"
-                  ].map((question) => (
-                    <label key={question} className="flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all hover:shadow-md" style={{ backgroundColor: "rgba(45, 74, 62, 0.03)" }}>
-                      <input type="checkbox" className="mt-1" style={{ accentColor: "#2D4A3E" }} />
-                      <span className="text-sm" style={{ color: "#2D4A3E" }}>{question}</span>
-                    </label>
-                  ))}
-                </div>
-
-                <Button className="w-full font-semibold" style={{ backgroundColor: "#2D4A3E", color: "white" }}>
-                  Start Check-In
-                </Button>
-              </Card>
-
-              {/* Column 3 - Bloom Pro */}
-              <Card className="p-6 space-y-6" style={{ background: "linear-gradient(135deg, rgba(45, 74, 62, 0.05) 0%, rgba(212, 175, 106, 0.05) 100%)", border: "1px solid rgba(212, 175, 106, 0.3)" }}>
-                <div className="space-y-3">
-                  <p className="text-xs font-semibold tracking-widest uppercase" style={{ color: "#D4AF6A" }}>
-                    UNLOCK YOUR POTENTIAL
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-serif text-2xl font-bold" style={{ color: "#2D4A3E" }}>
-                      Bloom Pro
-                    </h3>
-                    <span className="text-2xl">👑</span>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  {[
-                    "Unlimited Stock Analysis",
-                    "Advanced Indicators",
-                    "Portfolio Tracking",
-                    "Daily Pansy Market Notes",
-                    "ETF Research Center",
-                    "Wealth Building Roadmaps",
-                    "Watchlist Alerts",
-                    "Priority Support"
-                  ].map((feature) => (
-                    <div key={feature} className="flex items-start gap-2">
-                      <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style={{ backgroundColor: "rgba(212, 175, 106, 0.2)" }}>
-                        <span className="text-xs">✓</span>
-                      </div>
-                      <p className="text-sm" style={{ color: "#2D4A3E" }}>{feature}</p>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="pt-4 space-y-3" style={{ borderTop: "1px solid rgba(45, 74, 62, 0.1)" }}>
-                  <div className="flex items-baseline gap-2">
-                    <span className="font-serif text-3xl font-bold font-mono" style={{ color: "#2D4A3E" }}>$7.99</span>
-                    <span className="text-sm" style={{ color: "#2D4A3E", opacity: 0.6 }}>/month</span>
-                  </div>
-                  <div className="flex items-baseline gap-2">
-                    <span className="font-serif text-3xl font-bold font-mono" style={{ color: "#2D4A3E" }}>$57.99</span>
-                    <span className="text-sm" style={{ color: "#2D4A3E", opacity: 0.6 }}>/year</span>
-                    <Badge className="text-xs" style={{ backgroundColor: "rgba(212, 175, 106, 0.2)", color: "#D4AF6A" }}>
-                      Save ~40%
-                    </Badge>
-                  </div>
-                </div>
-
-                <Link href="/subscription">
-                  <Button className="w-full font-semibold" style={{ backgroundColor: "#C4714A", color: "white" }}>
-                    Upgrade to Bloom Pro
-                  </Button>
-                </Link>
-
-                <p className="text-xs text-center" style={{ color: "#2D4A3E", opacity: 0.6 }}>
-                  Cancel Anytime
-                </p>
-              </Card>
-            </div>
-          </div>
-        </section>
-
-        {/* Final CTA */}
-        <section className="py-20">
-          <div className="max-w-4xl mx-auto px-6 text-center space-y-8">
-            <div className="space-y-4">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full" style={{ backgroundColor: "rgba(212, 175, 106, 0.1)" }}>
-                <Sparkles className="w-4 h-4" style={{ color: "#D4AF6A" }} />
-                <span className="text-sm font-semibold" style={{ color: "#D4AF6A" }}>Ready to Start?</span>
-              </div>
-              <h2 className="font-serif text-4xl lg:text-5xl font-bold" style={{ color: "#2D4A3E" }}>
-                Join Thousands of Women Building Wealth
+              <h2 className="text-3xl md:text-4xl font-bold leading-tight" style={{ color: "#F4F7FA" }}>
+                Meet Pansy — the friend who actually knows markets
               </h2>
-              <p className="text-lg max-w-2xl mx-auto" style={{ color: "#2D4A3E", opacity: 0.7 }}>
-                Start learning, analyzing, and investing today. No credit card required.
+              <p className="text-lg leading-relaxed" style={{ color: "rgba(244,247,250,0.72)" }}>
+                Pansy is your AI education companion inside She Blooms. She explains what&apos;s happening in the market
+                the way a sharp, caring friend would — over coffee, without the condescension.
+              </p>
+              <ul className="space-y-3">
+                {[
+                  "Breaks down market moves in plain language",
+                  "Explains concepts at your pace, not Wall Street's",
+                  "Never tells you what to buy — teaches you how to think",
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-3 text-base" style={{ color: "rgba(244,247,250,0.80)" }}>
+                    <span className="mt-0.5 text-lg" style={{ color: "#49B06E" }}>✓</span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <p className="text-xs pt-2" style={{ color: "rgba(244,247,250,0.40)" }}>
+                Educational only. Not financial advice. Pansy never tells you what to buy or sell.
               </p>
             </div>
-            <Link href="/onboarding">
-              <Button size="lg" className="font-semibold text-lg px-10 py-7" style={{ backgroundColor: "#C4714A", color: "white" }}>
-                Get Started Free
-              </Button>
-            </Link>
           </div>
         </section>
 
-        {/* Comprehensive Footer */}
-        <footer className="py-16" style={{ backgroundColor: "rgba(45, 74, 62, 0.05)", borderTop: "1px solid rgba(45, 74, 62, 0.1)" }}>
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="grid md:grid-cols-4 gap-12 mb-12">
-              {/* Column 1 - Logo + Mission */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, #2D4A3E 0%, #D4AF6A 100%)" }}>
-                    <span className="text-2xl">🌸</span>
-                  </div>
-                  <span className="font-serif text-2xl font-bold" style={{ color: "#2D4A3E" }}>Bloom</span>
-                </div>
-                <p className="text-sm font-semibold" style={{ color: "#2D4A3E" }}>
-                  She Blooms Wealth
-                </p>
-                <p className="text-xs" style={{ color: "#2D4A3E", opacity: 0.6 }}>
-                  by Cinder Vault Enterprises LLC
-                </p>
-                <p className="text-sm leading-relaxed" style={{ color: "#2D4A3E", opacity: 0.7 }}>
-                  Empowering women to invest with confidence, build wealth, and bloom into their financial future.
-                </p>
-              </div>
-
-              {/* Column 2 - Resources */}
-              <div className="space-y-4">
-                <p className="text-sm font-semibold" style={{ color: "#2D4A3E" }}>Resources</p>
-                <div className="space-y-2">
-                  <Link href="/about" className="block text-sm transition-colors" style={{ color: "#2D4A3E", opacity: 0.7 }}>
-                    About
-                  </Link>
-                  <Link href="/contact" className="block text-sm transition-colors" style={{ color: "#2D4A3E", opacity: 0.7 }}>
-                    Contact
-                  </Link>
-                  <Link href="/blog" className="block text-sm transition-colors" style={{ color: "#2D4A3E", opacity: 0.7 }}>
-                    Blog
-                  </Link>
-                  <Link href="/faq" className="block text-sm transition-colors" style={{ color: "#2D4A3E", opacity: 0.7 }}>
-                    FAQs
-                  </Link>
-                </div>
-              </div>
-
-              {/* Column 3 - Legal */}
-              <div className="space-y-4">
-                <p className="text-sm font-semibold" style={{ color: "#2D4A3E" }}>Legal</p>
-                <div className="space-y-2">
-                  <Link href="/terms" className="block text-sm transition-colors" style={{ color: "#2D4A3E", opacity: 0.7 }}>
-                    Terms of Service
-                  </Link>
-                  <Link href="/privacy" className="block text-sm transition-colors" style={{ color: "#2D4A3E", opacity: 0.7 }}>
-                    Privacy Policy
-                  </Link>
-                  <Link href="/disclaimer" className="block text-sm transition-colors" style={{ color: "#2D4A3E", opacity: 0.7 }}>
-                    Financial Disclaimer
-                  </Link>
-                  <Link href="/refund" className="block text-sm transition-colors" style={{ color: "#2D4A3E", opacity: 0.7 }}>
-                    Refund Policy
-                  </Link>
-                </div>
-              </div>
-
-              {/* Column 4 - Follow Us + Download */}
-              <div className="space-y-4">
-                <p className="text-sm font-semibold" style={{ color: "#2D4A3E" }}>Follow Us</p>
-                <div className="space-y-2">
-                  <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="block text-sm transition-colors" style={{ color: "#2D4A3E", opacity: 0.7 }}>
-                    Instagram
-                  </a>
-                  <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" className="block text-sm transition-colors" style={{ color: "#2D4A3E", opacity: 0.7 }}>
-                    TikTok
-                  </a>
-                  <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="block text-sm transition-colors" style={{ color: "#2D4A3E", opacity: 0.7 }}>
-                    YouTube
-                  </a>
-                  <a href="https://pinterest.com" target="_blank" rel="noopener noreferrer" className="block text-sm transition-colors" style={{ color: "#2D4A3E", opacity: 0.7 }}>
-                    Pinterest
-                  </a>
-                </div>
-                <div className="pt-4">
-                  <p className="text-sm font-semibold mb-2" style={{ color: "#2D4A3E" }}>Download the App</p>
-                  <div className="space-y-2">
-                    <a href="#" className="block px-4 py-2 rounded-lg text-xs font-semibold text-center transition-all" style={{ backgroundColor: "rgba(45, 74, 62, 0.1)", color: "#2D4A3E", border: "1px solid rgba(45, 74, 62, 0.2)" }}>
-                      Google Play
-                    </a>
-                    <a href="#" className="block px-4 py-2 rounded-lg text-xs font-semibold text-center transition-all" style={{ backgroundColor: "rgba(45, 74, 62, 0.1)", color: "#2D4A3E", border: "1px solid rgba(45, 74, 62, 0.2)" }}>
-                      App Store
-                    </a>
-                  </div>
-                </div>
-              </div>
+        {/* 4 — Daily with Pansy */}
+        <section style={{ background: "#16264A" }}>
+          <div className="max-w-6xl mx-auto px-6 py-20 md:px-12">
+            <div className="text-center space-y-4 mb-14">
+              <h2 className="text-3xl md:text-4xl font-bold" style={{ color: "#F4F7FA" }}>
+                A daily habit that compounds
+              </h2>
+              <p className="text-lg max-w-xl mx-auto" style={{ color: "rgba(244,247,250,0.65)" }}>
+                Five minutes each morning with Pansy&apos;s briefing builds the market intuition
+                that took others years to develop.
+              </p>
             </div>
 
-            {/* Bottom Bar - Full Disclaimer */}
-            <div className="pt-8" style={{ borderTop: "1px solid rgba(45, 74, 62, 0.1)" }}>
-              <p className="text-xs leading-relaxed text-center max-w-4xl mx-auto" style={{ color: "#2D4A3E", opacity: 0.6 }}>
-                She Blooms Wealth is for educational purposes only. We are not financial advisors. All investing involves risk. Always do your own research before making financial decisions. © 2026 Cinder Vault Enterprises LLC.
-              </p>
+            <div className="grid md:grid-cols-3 gap-6">
+              {[
+                {
+                  icon: "☀️",
+                  title: "Morning Coffee Briefing",
+                  body: "A warm, plain-English recap of what happened in the market's last session. No predictions. Just context you can actually use.",
+                },
+                {
+                  icon: "📚",
+                  title: "Guided Lessons",
+                  body: "From 'what is a stock' to reading earnings reports — structured courses that meet you where you are and move at your pace.",
+                },
+                {
+                  icon: "🔍",
+                  title: "Stock Education Tool",
+                  body: "Look up any ticker and Pansy explains the company, the sector, and the story behind the numbers — for learning, not trading.",
+                },
+              ].map(({ icon, title, body }) => (
+                <div
+                  key={title}
+                  className="rounded-2xl p-7 space-y-4"
+                  style={{ background: "rgba(14,27,48,0.7)", border: "1px solid rgba(39,183,200,0.12)" }}
+                >
+                  <span className="text-3xl">{icon}</span>
+                  <h3 className="text-lg font-semibold" style={{ color: "#F4F7FA" }}>{title}</h3>
+                  <p className="text-sm leading-relaxed" style={{ color: "rgba(244,247,250,0.60)" }}>{body}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* 5 — Bloom makes learning beautiful */}
+        <section className="max-w-6xl mx-auto px-6 py-20 md:px-12">
+          <div className="text-center space-y-4 mb-14">
+            <h2 className="text-3xl md:text-4xl font-bold" style={{ color: "#F4F7FA" }}>
+              Built so learning feels good
+            </h2>
+            <p className="text-lg max-w-xl mx-auto" style={{ color: "rgba(244,247,250,0.65)" }}>
+              Finance tools are usually cold, cluttered, and built for people who already know everything.
+              She Blooms was designed differently — from the first pixel.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            {[
+              {
+                title: "Designed for clarity",
+                body: "Clean layout, no noise. Every screen is organized around what you need to understand right now — not every possible data point.",
+                accent: "#27B7C8",
+              },
+              {
+                title: "Progress you can see",
+                body: "Track your lessons, revisit concepts, and watch your understanding grow. Learning is cumulative — and so is confidence.",
+                accent: "#49B06E",
+              },
+              {
+                title: "Your profile, your pace",
+                body: "Tell us where you're starting from and where you want to go. Pansy tailors the experience to your goals, not a generic curriculum.",
+                accent: "#49B06E",
+              },
+              {
+                title: "Safe to explore",
+                body: "No pressure to act. No 'buy now' buttons. Just a space where you can ask questions, make mistakes in learning, and grow.",
+                accent: "#27B7C8",
+              },
+            ].map(({ title, body, accent }) => (
+              <div
+                key={title}
+                className="rounded-2xl p-7 space-y-3"
+                style={{ background: "#16264A", border: `1px solid ${accent}22` }}
+              >
+                <div className="w-8 h-1 rounded-full" style={{ background: accent }} />
+                <h3 className="text-lg font-semibold" style={{ color: "#F4F7FA" }}>{title}</h3>
+                <p className="text-sm leading-relaxed" style={{ color: "rgba(244,247,250,0.60)" }}>{body}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* 6 — Closing CTA */}
+        <section style={{ background: "#1E2C6B" }}>
+          <div className="max-w-3xl mx-auto px-6 py-24 md:px-12 text-center space-y-8">
+            <p className="text-4xl">🌺</p>
+            <h2 className="text-3xl md:text-4xl font-bold leading-tight" style={{ color: "#F4F7FA" }}>
+              Your financial future is worth<br />
+              <span style={{ color: "#27B7C8" }}>understanding.</span>
+            </h2>
+            <p className="text-lg leading-relaxed" style={{ color: "rgba(244,247,250,0.70)" }}>
+              Join She Blooms Wealth and start building the knowledge that changes everything.
+              Free to start. No credit card required.
+            </p>
+            <Link href="/auth/signup">
+              <button
+                className="inline-flex items-center gap-2 px-8 py-4 rounded-xl text-base font-semibold shadow-xl"
+                style={{ background: "#49B06E", color: "#F4F7FA" }}
+              >
+                Start learning free →
+              </button>
+            </Link>
+            <p className="text-xs" style={{ color: "rgba(244,247,250,0.35)" }}>
+              Educational platform. Not a brokerage. Not financial advice.
+            </p>
+          </div>
+        </section>
+
+        {/* Footer */}
+        <footer style={{ background: "#0E1B30", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+          <div className="max-w-6xl mx-auto px-6 py-10 md:px-12 flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-sm font-semibold" style={{ color: "rgba(244,247,250,0.50)" }}>
+              She Blooms Wealth
+            </p>
+            <p className="text-xs text-center" style={{ color: "rgba(244,247,250,0.30)" }}>
+              For educational purposes only. Not financial advice. Investing involves risk including possible loss of principal.
+            </p>
+            <div className="flex gap-5 text-sm" style={{ color: "rgba(244,247,250,0.40)" }}>
+              <Link href="/auth/login" className="hover:text-white transition-colors">Sign in</Link>
+              <Link href="/auth/signup" className="hover:text-white transition-colors">Sign up</Link>
             </div>
           </div>
         </footer>
+
       </div>
     </>
   );
