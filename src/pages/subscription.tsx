@@ -226,7 +226,7 @@ export default function Subscription() {
                     "Stocks, ETFs, and mutual funds",
                     "Real-time news and charts",
                     "Portfolio tracker",
-                    "Exclusive broker deals",
+                    "Curated broker education",
                   ].map((feature) => (
                     <li key={feature} className="flex items-start gap-2">
                       <Check className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />

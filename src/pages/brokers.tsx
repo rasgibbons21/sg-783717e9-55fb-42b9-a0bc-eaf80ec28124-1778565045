@@ -3,10 +3,7 @@ import { SEO } from "@/components/SEO";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink, Star, TrendingUp, BarChart3, PiggyBank } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { useState, useEffect } from "react";
-import { authService } from "@/services/authService";
+import { ExternalLink, TrendingUp, BarChart3, PiggyBank } from "lucide-react";
 
 interface Broker {
   name: string;
@@ -14,7 +11,6 @@ interface Broker {
   description: string;
   features: string[];
   link: string;
-  isAffiliate: boolean;
   category: string;
 }
 
@@ -26,7 +22,6 @@ const BROKERS: Broker[] = [
     description: "Zero commissions, excellent research tools, and retirement planning",
     features: ["$0 commissions", "24/7 support", "Fractional shares", "Robust research"],
     link: "https://www.fidelity.com",
-    isAffiliate: false,
     category: "Beginner-friendly"
   },
   {
@@ -35,7 +30,6 @@ const BROKERS: Broker[] = [
     description: "Full-service brokerage with extensive educational resources",
     features: ["$0 commissions", "Banking services", "Retirement planning", "Educational content"],
     link: "https://www.schwab.com",
-    isAffiliate: false,
     category: "Beginner-friendly"
   },
   {
@@ -44,16 +38,14 @@ const BROKERS: Broker[] = [
     description: "Modern platform with automated investing and crypto options",
     features: ["$0 commissions", "Crypto trading", "Automated investing", "Career coaching"],
     link: "https://www.sofi.com/invest",
-    isAffiliate: true,
     category: "Beginner-friendly"
   },
   {
     name: "Robinhood",
     logo: "🦅",
-    description: "Simple mobile-first platform perfect for beginners",
+    description: "Simple mobile-first platform with fractional shares",
     features: ["$0 commissions", "Easy interface", "Fractional shares", "Instant deposits"],
     link: "https://www.robinhood.com",
-    isAffiliate: true,
     category: "Beginner-friendly"
   },
   {
@@ -62,7 +54,6 @@ const BROKERS: Broker[] = [
     description: "Social investing platform with community insights",
     features: ["$0 commissions", "Social features", "Fractional shares", "Live audio events"],
     link: "https://www.public.com",
-    isAffiliate: false,
     category: "Beginner-friendly"
   },
 
@@ -73,7 +64,6 @@ const BROKERS: Broker[] = [
     description: "Professional-grade platform for active traders",
     features: ["Low margin rates", "Advanced tools", "Global markets", "Options trading"],
     link: "https://www.interactivebrokers.com",
-    isAffiliate: true,
     category: "Active traders"
   },
   {
@@ -82,7 +72,6 @@ const BROKERS: Broker[] = [
     description: "Advanced charting and extended trading hours",
     features: ["$0 commissions", "Extended hours", "Advanced charts", "Paper trading"],
     link: "https://www.webull.com",
-    isAffiliate: true,
     category: "Active traders"
   },
   {
@@ -91,7 +80,6 @@ const BROKERS: Broker[] = [
     description: "Options-focused platform with educational content",
     features: ["Options tools", "Low fees", "Education", "Desktop platform"],
     link: "https://www.tastytrade.com",
-    isAffiliate: false,
     category: "Active traders"
   },
   {
@@ -100,7 +88,6 @@ const BROKERS: Broker[] = [
     description: "Advanced trading technology for serious traders",
     features: ["Advanced tools", "Algo trading", "Options", "Futures"],
     link: "https://www.tradestation.com",
-    isAffiliate: false,
     category: "Active traders"
   },
   {
@@ -109,7 +96,6 @@ const BROKERS: Broker[] = [
     description: "Comprehensive platform with powerful trading tools",
     features: ["Advanced tools", "Options", "Futures", "Managed portfolios"],
     link: "https://www.etrade.com",
-    isAffiliate: false,
     category: "Active traders"
   },
 
@@ -120,7 +106,6 @@ const BROKERS: Broker[] = [
     description: "Industry leader in low-cost index funds and ETFs",
     features: ["Low-cost ETFs", "Index funds", "Retirement accounts", "Long-term focus"],
     link: "https://www.vanguard.com",
-    isAffiliate: false,
     category: "Long-term"
   },
   {
@@ -129,7 +114,6 @@ const BROKERS: Broker[] = [
     description: "Bank of America's investment platform with rewards",
     features: ["$0 commissions", "Banking integration", "Preferred Rewards", "Research"],
     link: "https://www.merrilledge.com",
-    isAffiliate: false,
     category: "Long-term"
   },
 ];
@@ -142,38 +126,12 @@ const categoryIcons = {
 
 const categoryColors = {
   "Beginner-friendly": "text-[#3d7a54] bg-[#3d7a54]/10 border-[#3d7a54]/20",
-  "Active traders": "text-[#d4788a] bg-[#d4788a]/10 border-[#d4788a]/20",
+  "Active traders": "text-[#27B7C8] bg-[#27B7C8]/10 border-[#27B7C8]/20",
   "Long-term": "text-[#c8953a] bg-[#c8953a]/10 border-[#c8953a]/20",
 };
 
 export default function Brokers() {
-  const [userId, setUserId] = useState<string | null>(null);
-
-  useEffect(() => {
-    const loadUser = async () => {
-      const user = await authService.getCurrentUser();
-      if (user) setUserId(user.id);
-    };
-    loadUser();
-  }, []);
-
-  const trackBrokerClick = async (brokerName: string, isAffiliate: boolean) => {
-    if (!userId) return;
-
-    try {
-      await supabase.from("broker_clicks").insert({
-        user_id: userId,
-        broker_name: brokerName,
-        is_affiliate: isAffiliate,
-        clicked_at: new Date().toISOString(),
-      });
-    } catch (error) {
-      console.error("Error tracking broker click:", error);
-    }
-  };
-
   const handleBrokerClick = (broker: Broker) => {
-    trackBrokerClick(broker.name, broker.isAffiliate);
     window.open(broker.link, "_blank");
   };
 
@@ -193,37 +151,20 @@ export default function Brokers() {
             Brokers
           </h1>
           <p className="text-muted-foreground max-w-2xl">
-            Find the right brokerage for your investing journey. We've organized them by investor type to make it easier.
+            A neutral overview of brokerage platforms organized by investor type. Bloom has no relationship with any broker listed here — this is educational information only to help you understand your options.
           </p>
         </div>
 
-        {/* Disclaimer */}
-        <Card className="p-4 border-accent/20 bg-accent/5">
-          <div className="flex gap-3">
-            <Star className="w-5 h-5 text-accent shrink-0 mt-0.5" />
-            <div className="space-y-1">
-              <p className="text-sm font-medium text-foreground">
-                Affiliate Disclosure
-              </p>
-              <p className="text-sm text-foreground/80 leading-relaxed">
-                Bloom may earn a commission from some broker partnerships (marked with a gold star). We list both affiliate and independent brokers to keep things fair. Your decision should be based on which platform best fits your needs.
-              </p>
-            </div>
-          </div>
-        </Card>
-
-        {/* Pansy's Broker Tip */}
+        {/* Pansy's guidance */}
         <Card className="p-6 bg-primary/5 border-primary/20 rounded-2xl">
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-xl shrink-0">
               🌺
             </div>
             <div className="space-y-2 flex-1">
-              <div className="flex items-center gap-2">
-                <p className="font-semibold text-foreground">Pansy's Broker Guide</p>
-              </div>
+              <p className="font-semibold text-foreground">How to think about choosing a broker</p>
               <p className="text-sm text-foreground leading-relaxed">
-                The best broker is the one you'll actually use! If you're just starting out, go with something simple like Fidelity or Charles Schwab. If you love charts and trading, check out Webull or Interactive Brokers. And if you're building long-term wealth, Vanguard is the gold standard for low-cost index funds 💛
+                The right broker depends on where you are in your journey and what you need. Beginners often benefit from simple interfaces, low minimums, and good educational resources. Active traders prioritize tools, speed, and options access. Long-term investors tend to care most about cost — low expense ratios on index funds matter enormously over decades. Before opening an account, compare a few based on your actual goals, not marketing.
               </p>
               <p className="text-sm font-medium text-primary">— Pansy 🌺</p>
             </div>
@@ -258,19 +199,14 @@ export default function Brokers() {
                             {broker.logo}
                           </div>
                           <div>
-                            <div className="flex items-center gap-2">
-                              <h3 className="font-semibold text-foreground text-lg">
-                                {broker.name}
-                              </h3>
-                              {broker.isAffiliate && (
-                                <Badge className={`${colorClass} text-xs`}>
-                                  <Star className="w-3 h-3 mr-1" />
-                                  Partner
-                                </Badge>
-                              )}
-                            </div>
+                            <h3 className="font-semibold text-foreground text-lg">
+                              {broker.name}
+                            </h3>
                           </div>
                         </div>
+                        <Badge variant="outline" className={`${colorClass} text-xs`}>
+                          {category}
+                        </Badge>
                       </div>
 
                       {/* Description */}
@@ -294,13 +230,9 @@ export default function Brokers() {
                       {/* CTA Button */}
                       <Button
                         onClick={() => handleBrokerClick(broker)}
-                        className={
-                          broker.isAffiliate
-                            ? "w-full bg-gradient-to-r from-accent to-primary hover:from-accent/90 hover:to-primary/90"
-                            : "w-full bg-primary hover:bg-primary/90"
-                        }
+                        className="w-full bg-primary hover:bg-primary/90"
                       >
-                        {broker.isAffiliate ? "Start Investing" : "Learn More"}
+                        Visit Website
                         <ExternalLink className="w-4 h-4 ml-2" />
                       </Button>
                     </div>
@@ -314,7 +246,7 @@ export default function Brokers() {
         {/* Disclaimer */}
         <Card className="p-4 bg-muted/50 border-muted-foreground/20 rounded-2xl">
           <p className="text-xs text-muted-foreground text-center leading-relaxed">
-            This is educational content only and does not constitute financial advice. Bloom is not liable for any investment decisions or losses. Always do your own research before opening a brokerage account.
+            This page is for educational purposes only. Bloom has no partnership, affiliate relationship, or financial arrangement with any broker listed here. Always do your own research and consider consulting a licensed financial advisor before opening a brokerage account.
           </p>
         </Card>
       </div>

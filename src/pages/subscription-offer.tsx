@@ -137,7 +137,7 @@ export default function SubscriptionOffer() {
                 "Full analysis on every stock & ETF",
                 "Real-time news and charts",
                 "Portfolio tracker",
-                "Exclusive broker deals",
+                "Curated broker education",
                 "Priority support",
               ].map((feature) => (
                 <li key={feature} className="flex items-start gap-3">

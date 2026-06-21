@@ -215,7 +215,7 @@ export function Layout({ children }: LayoutProps) {
               © 2026 Cinder Vault Enterprises LLC. All rights reserved. Bloom is a product of Cinder Vault Enterprises LLC.
             </p>
             <p className="mt-2 text-xs text-muted-foreground">
-              Bloom is for educational purposes only and does not constitute financial advice. All investing involves risk of loss. Some broker links may be affiliate partnerships where Bloom earns a commission.
+              Bloom is for educational purposes only and does not constitute financial advice. All investing involves risk of loss.
             </p>
           </div>
         </div>
