@@ -25,18 +25,18 @@ interface MarketIndex {
   error?: boolean;
 }
 
-// Default fallback data
+// Default fallback data — symbols match getMarketIndices() (ETF proxies, free-tier safe)
 const DEFAULT_MARKET_DATA: MarketIndex[] = [
-  { symbol: "^GSPC", name: "S&P 500", price: 5200.00, change: 0, changePercent: 0 },
-  { symbol: "^IXIC", name: "NASDAQ", price: 16400.00, change: 0, changePercent: 0 },
-  { symbol: "^DJI", name: "DOW", price: 38500.00, change: 0, changePercent: 0 },
-  { symbol: "^VIX", name: "VIX", price: 14.50, change: 0, changePercent: 0 },
+  { symbol: "SPY", name: "S&P 500", price: 0, change: 0, changePercent: 0 },
+  { symbol: "QQQ", name: "NASDAQ", price: 0, change: 0, changePercent: 0 },
+  { symbol: "DIA", name: "DOW", price: 0, change: 0, changePercent: 0 },
+  { symbol: "VIXY", name: "VIX", price: 0, change: 0, changePercent: 0 },
 ];
 
 
 export default function Home() {
   const router = useRouter();
-  const { isPro, isLoggedIn } = useSubscription();
+  const { isPro } = useSubscription();
   const [user, setUser] = useState<any>(null);
   const [marketData, setMarketData] = useState<MarketIndex[]>(DEFAULT_MARKET_DATA);
   const [watchlistNews, setWatchlistNews] = useState<any[]>([]);
@@ -145,7 +145,11 @@ export default function Home() {
   const loadBriefing = async () => {
     setBriefingLoading(true);
     try {
-      const res = await fetch("/api/daily-briefing");
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+      const res = await fetch("/api/daily-briefing", {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
       if (!res.ok) return; // hidden-card state — no error shown to user
       const data = await res.json();
       if (data.content) setBriefing(data.content);
@@ -171,7 +175,7 @@ export default function Home() {
           <div>
             <TimeGreeting fullName={user?.full_name} />
             <p className="text-muted-foreground mt-1">
-              {isPro ? "Your premium investing companion" : "Your daily market insights"}
+              {isPro ? "Keep learning. Keep growing." : "Your daily market education"}
             </p>
           </div>
         </div>
@@ -180,20 +184,26 @@ export default function Home() {
         <div className="flex items-start gap-4">
           <div className="relative shrink-0 mt-1">
             <img src="/bloom-logo.png" alt="Pansy" className="w-16 h-16 rounded-full border-2 border-background shadow-sm object-cover bg-white" />
-            <div className="absolute bottom-0 right-1 bg-green-500 w-4 h-4 rounded-full border-2 border-background"></div>
+            <div className="absolute bottom-0 right-1 bg-emerald-500 w-4 h-4 rounded-full border-2 border-background"></div>
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1 pl-1">
               <h3 className="font-serif font-bold text-foreground text-lg">Pansy</h3>
-              <Badge variant="secondary" className="text-[10px] bg-accent/10 text-accent-foreground border-accent/20 h-5 font-medium shadow-sm">
-                Available 24/7
+              <Badge variant="secondary" className="text-[10px] bg-emerald-500/10 text-emerald-600 border-emerald-500/20 h-5 font-medium shadow-sm">
+                Your guide
               </Badge>
             </div>
             <div className="bg-card backdrop-blur-sm p-4 rounded-2xl rounded-tl-sm shadow-sm inline-block border border-border">
               <p className="text-sm md:text-base text-foreground leading-relaxed">
-                The market is moving today, but remember our golden rule: we don't panic, we prepare. I've analyzed the latest trends and picked out some beautiful opportunities for your portfolio. What are we feeling today? 💛
+                The market is always telling a story — my job is to help you learn to read it. I&apos;m here to explain what&apos;s happening, answer your questions, and help your confidence grow alongside your knowledge. What would you like to understand today? 💛
               </p>
             </div>
+            <a
+              href="/learn"
+              className="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors ml-1"
+            >
+              Explore lessons →
+            </a>
           </div>
         </div>
 
@@ -225,8 +235,8 @@ export default function Home() {
                         <Badge
                           className={
                             index.changePercent >= 0
-                              ? "bg-[#3d7a54]/10 text-[#3d7a54] text-xs font-medium border-0"
-                              : "bg-[#d4788a]/10 text-[#d4788a] text-xs font-medium border-0"
+                              ? "bg-emerald-500/10 text-emerald-700 text-xs font-medium border-0"
+                              : "bg-red-500/10 text-red-600 text-xs font-medium border-0"
                           }
                         >
                           {index.changePercent >= 0 ? "+" : ""}
@@ -277,7 +287,7 @@ export default function Home() {
               Market Indices
             </h2>
             <div className="space-y-3">
-              {marketData.map((index) => (
+              {marketData.filter(i => ["SPY","QQQ","DIA"].includes(i.symbol)).map((index) => (
                 <div
                   key={index.symbol}
                   className="flex items-center justify-between p-3 rounded-xl"
@@ -298,8 +308,8 @@ export default function Home() {
                           <Badge
                             className={
                               index.changePercent >= 0
-                                ? "bg-[#3d7a54]/10 text-[#3d7a54] border-0"
-                                : "bg-[#d4788a]/10 text-[#d4788a] border-0"
+                                ? "bg-emerald-500/10 text-emerald-700 border-0"
+                                : "bg-red-500/10 text-red-600 border-0"
                             }
                           >
                             {index.changePercent >= 0 ? "+" : ""}
