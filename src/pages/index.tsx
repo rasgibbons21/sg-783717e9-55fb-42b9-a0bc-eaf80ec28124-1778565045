@@ -78,7 +78,7 @@ export default function LandingPage() {
             </span>
           </div>
           <div className="flex items-center gap-3">
-            <Link href="/auth/login">
+            <Link href="/onboarding">
               <button
                 className="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                 style={{ color: C.ivory, border: `1px solid rgba(255,255,255,0.14)` }}
@@ -86,7 +86,7 @@ export default function LandingPage() {
                 Sign in
               </button>
             </Link>
-            <Link href="/auth/signup">
+            <Link href="/onboarding">
               <button
                 className="px-4 py-2 rounded-lg text-sm font-semibold"
                 style={gradientBg}
@@ -123,16 +123,13 @@ export default function LandingPage() {
 
             {/* CTA */}
             <div className="flex flex-col sm:flex-row items-start gap-3 pt-1">
-              <Link href="/auth/signup">
+              <Link href="/onboarding">
                 <button
                   className="px-7 py-3.5 rounded-xl text-base font-semibold shadow-lg"
                   style={{ ...gradientBg, color: "#0E1B30" }}
                 >
                   Start Learning Free
                 </button>
-              </Link>
-              <Link href="/auth/login" className="text-sm self-center" style={{ color: "rgba(244,247,250,0.45)" }}>
-                Watch How It Works
               </Link>
             </div>
 
@@ -342,7 +339,7 @@ export default function LandingPage() {
                 </div>
               ))}
 
-              <Link href="/auth/signup">
+              <Link href="/onboarding">
                 <div
                   className="rounded-2xl p-6 flex flex-col items-center justify-center text-center space-y-3 h-full cursor-pointer"
                   style={{ background: `linear-gradient(135deg, ${C.teal}22, ${C.green}22)`, border: `1px solid ${C.green}33` }}
@@ -519,7 +516,7 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <Link href="/auth/signup">
+                <Link href="/onboarding">
                   <button
                     className="mt-2 px-7 py-3.5 rounded-xl text-base font-semibold shadow-lg"
                     style={{ ...gradientBg, color: C.deep }}
@@ -542,7 +539,7 @@ export default function LandingPage() {
             </h2>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
-              <Link href="/auth/signup">
+              <Link href="/onboarding">
                 <button
                   className="px-8 py-4 rounded-xl text-base font-semibold shadow-xl"
                   style={{ ...gradientBg, color: C.deep }}
@@ -550,7 +547,7 @@ export default function LandingPage() {
                   Start Learning Free
                 </button>
               </Link>
-              <Link href="/auth/signup" className="text-sm font-medium" style={{ color: "rgba(244,247,250,0.55)" }}>
+              <Link href="/subscription" className="text-sm font-medium" style={{ color: "rgba(244,247,250,0.55)" }}>
                 Explore Bloom Pro
               </Link>
             </div>
@@ -582,8 +579,8 @@ export default function LandingPage() {
               For educational purposes only. Not financial advice. Investing involves risk including possible loss of principal.
             </p>
             <div className="flex gap-5 text-sm" style={{ color: "rgba(244,247,250,0.38)" }}>
-              <Link href="/auth/login" className="hover:text-white transition-colors">Sign in</Link>
-              <Link href="/auth/signup" className="hover:text-white transition-colors">Sign up</Link>
+              <Link href="/onboarding" className="hover:text-white transition-colors">Sign in</Link>
+              <Link href="/onboarding" className="hover:text-white transition-colors">Sign up</Link>
             </div>
           </div>
         </footer>
