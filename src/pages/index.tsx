@@ -604,7 +604,7 @@ export default function LandingPage() {
                   <div style={{ width:"40%", height:"100%", background:`linear-gradient(90deg, ${C.teal}, ${C.green})`, borderRadius:2 }} />
                 </div>
               </div>
-              <Link href="/onboarding">
+              <Link href="/learn/what-are-dividends">
                 <button style={{ width:"100%", padding:"9px", borderRadius:8, background:`${C.teal}18`, border:`1px solid ${C.teal}28`, color:C.teal, fontSize:13, fontWeight:600, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:5, transition:"background 0.2s" }}
                   onMouseEnter={e => (e.currentTarget.style.background = `${C.teal}28`)}
                   onMouseLeave={e => (e.currentTarget.style.background = `${C.teal}18`)}
