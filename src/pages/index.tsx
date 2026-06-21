@@ -5,7 +5,7 @@ import Image from "next/image";
 import Head from "next/head";
 import { supabase } from "@/integrations/supabase/client";
 import { SEO } from "@/components/SEO";
-import { Menu, X, ArrowRight, Play } from "lucide-react";
+import { Menu, X, ArrowRight } from "lucide-react";
 
 /* ─── Palette ─────────────────────────────────────────────────────────────── */
 const C = {
@@ -338,12 +338,21 @@ export default function LandingPage() {
 
             {/* Desktop nav links */}
             <div className="hidden md:flex" style={{ alignItems:"center", gap:26 }}>
-              {["Home","Learn","Daily Bloom","Market Insights","About"].map(l => (
-                <a key={l} href="#" style={{ fontSize:13, fontWeight:500, color:"rgba(244,247,250,0.58)", textDecoration:"none", transition:"color 0.2s" }}
-                  onMouseEnter={e => (e.currentTarget.style.color = C.ivory)}
-                  onMouseLeave={e => (e.currentTarget.style.color = "rgba(244,247,250,0.58)")}
-                >{l}</a>
-              ))}
+              {([
+                { label:"Home",            href:"/"                 },
+                { label:"Learn",           href:"/learn"            },
+                { label:"Daily Bloom",     href:"/daily-bloom"      },
+                { label:"Market Insights", href:"/market-insights"  },
+                { label:"About",           href:"/about"            },
+              ] as const).map(({ label, href }) => {
+                const active = href === "/";
+                return (
+                  <Link key={label} href={href} style={{ fontSize:13, fontWeight: active ? 600 : 500, color: active ? C.teal : "rgba(244,247,250,0.58)", textDecoration:"none", transition:"color 0.2s", borderBottom: active ? `2px solid ${C.teal}` : "2px solid transparent", paddingBottom:2 }}
+                    onMouseEnter={e => (e.currentTarget.style.color = C.ivory)}
+                    onMouseLeave={e => (e.currentTarget.style.color = active ? C.teal : "rgba(244,247,250,0.58)")}
+                  >{label}</Link>
+                );
+              })}
             </div>
 
             {/* Right side */}
@@ -375,11 +384,17 @@ export default function LandingPage() {
           {/* Mobile menu */}
           {menuOpen && (
             <div style={{ background:"rgba(14,27,48,0.97)", backdropFilter:"blur(20px)", padding:"0.75rem 1.5rem 1rem", borderTop:"1px solid rgba(255,255,255,0.05)" }}>
-              {["Home","Learn","Daily Bloom","Market Insights","About"].map(l => (
-                <a key={l} href="#" onClick={() => setMenuOpen(false)}
+              {([
+                { label:"Home",            href:"/"                },
+                { label:"Learn",           href:"/learn"           },
+                { label:"Daily Bloom",     href:"/daily-bloom"     },
+                { label:"Market Insights", href:"/market-insights" },
+                { label:"About",           href:"/about"           },
+              ] as const).map(({ label, href }) => (
+                <Link key={label} href={href} onClick={() => setMenuOpen(false)}
                   style={{ display:"block", padding:"11px 0", fontSize:15, fontWeight:500, color:"rgba(244,247,250,0.68)", textDecoration:"none", borderBottom:"1px solid rgba(255,255,255,0.04)" }}>
-                  {l}
-                </a>
+                  {label}
+                </Link>
               ))}
               <Link href="/onboarding">
                 <button style={{ width:"100%", marginTop:12, padding:13, borderRadius:9, ...gradientBg, color:C.deep, fontSize:14, fontWeight:700, border:"none", cursor:"pointer" }}>
@@ -436,7 +451,7 @@ export default function LandingPage() {
               </p>
 
               {/* Buttons */}
-              <div style={{ display:"flex", flexWrap:"wrap", gap:12, marginBottom:"2.8rem", animation:"fade-up 0.55s ease-out 0.44s both" }}>
+              <div style={{ display:"flex", marginBottom:"2.8rem", animation:"fade-up 0.55s ease-out 0.44s both" }}>
                 <Link href="/onboarding">
                   <button style={{ display:"flex", alignItems:"center", gap:8, padding:"14px 26px", borderRadius:10, ...gradientBg, color:C.deep, fontSize:15, fontWeight:700, border:"none", cursor:"pointer", boxShadow:`0 8px 30px rgba(39,183,200,0.28)`, transition:"transform 0.2s, box-shadow 0.2s" }}
                     onMouseEnter={e => { e.currentTarget.style.transform="translateY(-2px)"; e.currentTarget.style.boxShadow=`0 14px 40px rgba(39,183,200,0.44)`; }}
@@ -445,12 +460,6 @@ export default function LandingPage() {
                     Start Learning Free <ArrowRight size={16} />
                   </button>
                 </Link>
-                <button style={{ display:"flex", alignItems:"center", gap:8, padding:"14px 26px", borderRadius:10, ...glass, border:`1px solid ${C.teal}38`, color:C.teal, fontSize:15, fontWeight:600, cursor:"pointer", transition:"background 0.2s" }}
-                  onMouseEnter={e => (e.currentTarget.style.background = `rgba(39,183,200,0.10)`)}
-                  onMouseLeave={e => (e.currentTarget.style.background = "rgba(22,38,74,0.55)")}
-                >
-                  <Play size={14} fill={C.teal} /> Watch How It Works
-                </button>
               </div>
 
               {/* Floating index cards */}
