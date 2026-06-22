@@ -4,6 +4,8 @@ import Link from "next/link";
 import { requireProUserSSR } from "@/lib/requireProUserSSR";
 import { UNIVERSITY_MODULES, getModuleBySlug } from "@/data/university/modules";
 import { getM1LessonBySlug, UniversityLesson } from "@/data/university/m1-chart-reading";
+import { getM2LessonBySlug } from "@/data/university/m2-chart-patterns";
+import { getM4LessonBySlug } from "@/data/university/m4-trading-signals";
 import { supabase } from "@/integrations/supabase/client";
 import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
@@ -170,7 +172,10 @@ export default function LessonPage({ moduleSlug, lessonSlug, requiresClientAuth 
 
   // Load lesson client-side (always from static data, no API call needed)
   const lesson =
-    moduleSlug === "m1-chart-reading" ? getM1LessonBySlug(lessonSlug) : undefined;
+    moduleSlug === "m1-chart-reading" ? getM1LessonBySlug(lessonSlug)
+    : moduleSlug === "m2-chart-patterns" ? getM2LessonBySlug(lessonSlug)
+    : moduleSlug === "m4-trading-signals" ? getM4LessonBySlug(lessonSlug)
+    : undefined;
 
   const markProgress = useCallback(
     async (tok: string) => {
