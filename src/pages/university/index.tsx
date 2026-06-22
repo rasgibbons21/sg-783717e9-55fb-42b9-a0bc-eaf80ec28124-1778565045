@@ -138,22 +138,23 @@ export default function UniversityIndex({ requiresClientAuth }: Props) {
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {UNIVERSITY_MODULES.map((mod) => {
-              const isM1 = mod.slug === "m1-chart-reading";
+              const UNLOCKED = new Set(["m1-chart-reading", "m2-chart-patterns", "m4-trading-signals"]);
+              const isUnlocked = UNLOCKED.has(mod.slug);
               const progress = progressMap[mod.slug] ?? [];
               const completed = progress.length;
-              const pct = isM1 ? Math.round((completed / mod.lessonCount) * 100) : 0;
+              const pct = isUnlocked ? Math.round((completed / mod.lessonCount) * 100) : 0;
 
               return (
                 <div
                   key={mod.slug}
                   className={`relative rounded-2xl border p-5 transition-all ${
-                    isM1
+                    isUnlocked
                       ? "border-[#27B7C8]/30 bg-[#162540] hover:border-[#27B7C8]/60 cursor-pointer"
                       : "border-white/10 bg-[#0F1E33] opacity-60"
                   }`}
                 >
                   {/* Lock badge */}
-                  {!isM1 && (
+                  {!isUnlocked && (
                     <div className="absolute top-3 right-3">
                       <Lock className="w-4 h-4 text-[#F4F7FA]/30" />
                     </div>
@@ -179,7 +180,7 @@ export default function UniversityIndex({ requiresClientAuth }: Props) {
                     </span>
                   </div>
 
-                  {isM1 && (
+                  {isUnlocked && (
                     <>
                       {/* Progress bar */}
                       <div className="h-1.5 bg-white/10 rounded-full overflow-hidden mb-3">
@@ -188,7 +189,7 @@ export default function UniversityIndex({ requiresClientAuth }: Props) {
                           style={{ width: `${pct}%` }}
                         />
                       </div>
-                      <Link href="/university/m1-chart-reading">
+                      <Link href={`/university/${mod.slug}`}>
                         <button className="w-full py-2 text-sm font-medium rounded-xl bg-[#27B7C8] text-[#0E1B30] hover:bg-[#27B7C8]/90 transition-colors">
                           {completed === 0 ? "Start Module" : completed === mod.lessonCount ? "Review Module" : "Continue"}
                         </button>
@@ -196,7 +197,7 @@ export default function UniversityIndex({ requiresClientAuth }: Props) {
                     </>
                   )}
 
-                  {!isM1 && (
+                  {!isUnlocked && (
                     <div className="text-xs text-[#F4F7FA]/30 text-center py-1">Coming soon</div>
                   )}
                 </div>
