@@ -340,7 +340,6 @@ export default function LandingPage() {
             <div className="hidden md:flex" style={{ alignItems:"center", gap:26 }}>
               {([
                 { label:"Home",            href:"/"                 },
-                { label:"Learn",           href:"/learn"            },
                 { label:"Daily Bloom",     href:"/daily-bloom"      },
                 { label:"Market Insights", href:"/market-insights"  },
                 { label:"About",           href:"/about"            },
@@ -386,7 +385,6 @@ export default function LandingPage() {
             <div style={{ background:"rgba(14,27,48,0.97)", backdropFilter:"blur(20px)", padding:"0.75rem 1.5rem 1rem", borderTop:"1px solid rgba(255,255,255,0.05)" }}>
               {([
                 { label:"Home",            href:"/"                },
-                { label:"Learn",           href:"/learn"           },
                 { label:"Daily Bloom",     href:"/daily-bloom"     },
                 { label:"Market Insights", href:"/market-insights" },
                 { label:"About",           href:"/about"           },
@@ -604,7 +602,7 @@ export default function LandingPage() {
                   <div style={{ width:"40%", height:"100%", background:`linear-gradient(90deg, ${C.teal}, ${C.green})`, borderRadius:2 }} />
                 </div>
               </div>
-              <Link href="/learn/what-are-dividends">
+              <Link href="/home">
                 <button style={{ width:"100%", padding:"9px", borderRadius:8, background:`${C.teal}18`, border:`1px solid ${C.teal}28`, color:C.teal, fontSize:13, fontWeight:600, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:5, transition:"background 0.2s" }}
                   onMouseEnter={e => (e.currentTarget.style.background = `${C.teal}28`)}
                   onMouseLeave={e => (e.currentTarget.style.background = `${C.teal}18`)}

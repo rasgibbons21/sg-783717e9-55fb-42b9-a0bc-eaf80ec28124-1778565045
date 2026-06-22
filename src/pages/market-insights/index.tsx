@@ -80,7 +80,6 @@ export default function MarketInsightsIndex() {
             <div style={{ display: "flex", gap: 20, alignItems: "center" }}>
               {([
                 { label: "Home",            href: "/"                },
-                { label: "Learn",           href: "/learn"           },
                 { label: "Daily Bloom",     href: "/daily-bloom"     },
                 { label: "Market Insights", href: "/market-insights" },
                 { label: "About",           href: "/about"           },
