@@ -60,7 +60,6 @@ export default function InsightPage({ insight, prev, next }: Props) {
             <div style={{ display: "flex", gap: 20, alignItems: "center" }}>
               {([
                 { label: "Home",            href: "/"                },
-                { label: "Learn",           href: "/learn"           },
                 { label: "Daily Bloom",     href: "/daily-bloom"     },
                 { label: "Market Insights", href: "/market-insights" },
                 { label: "About",           href: "/about"           },
@@ -142,7 +141,7 @@ export default function InsightPage({ insight, prev, next }: Props) {
                 ← All Topics
               </button>
             </Link>
-            <Link href="/learn">
+            <Link href="/home">
               <button style={{ padding: "12px 24px", borderRadius: 10, ...gradientBg, color: C.deep, fontSize: 14, fontWeight: 700, border: "none", cursor: "pointer" }}>
                 Explore Lessons →
               </button>

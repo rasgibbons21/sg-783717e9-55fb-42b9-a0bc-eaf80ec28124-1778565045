@@ -99,7 +99,6 @@ export default function DailyBloom({ briefing, briefingDate, featuredLesson }: P
             <div style={{ display: "flex", gap: 20, alignItems: "center" }}>
               {([
                 { label: "Home",            href: "/"                },
-                { label: "Learn",           href: "/learn"           },
                 { label: "Daily Bloom",     href: "/daily-bloom"     },
                 { label: "Market Insights", href: "/market-insights" },
                 { label: "About",           href: "/about"           },
@@ -177,7 +176,7 @@ export default function DailyBloom({ briefing, briefingDate, featuredLesson }: P
                 <p style={{ fontSize: 13, color: "rgba(244,247,250,0.55)", lineHeight: 1.6, margin: "0 0 16px" }}>
                   {featuredLesson.subtitle}
                 </p>
-                <Link href={`/learn/${featuredLesson.slug}`}>
+                <Link href="/home">
                   <button style={{ padding: "9px 18px", borderRadius: 8, ...gradientBg, color: C.deep, fontSize: 13, fontWeight: 700, border: "none", cursor: "pointer" }}>
                     Read Lesson →
                   </button>
