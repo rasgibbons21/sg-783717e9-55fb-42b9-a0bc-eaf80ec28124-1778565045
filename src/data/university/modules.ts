@@ -109,18 +109,6 @@ export const UNIVERSITY_MODULES: UniversityModule[] = [
     certificateName: "Certificate of Completion — Exiting",
   },
   {
-    slug: "m9-psychology",
-    number: 9,
-    title: "Psychology",
-    subtitle: "Fear, greed, FOMO, revenge trading, patience, journaling — the mental game that separates consistent investors from impulsive ones.",
-    icon: "🧠",
-    lessonCount: 9,
-    estimatedHours: 2,
-    difficulty: "Advanced",
-    badgeName: "Mindset Mastery",
-    certificateName: "Certificate of Completion — Psychology",
-  },
-  {
     slug: "m10-candlestick-patterns",
     number: 10,
     title: "Candlestick Patterns",
