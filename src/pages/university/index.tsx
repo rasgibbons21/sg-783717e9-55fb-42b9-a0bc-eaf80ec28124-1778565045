@@ -138,7 +138,7 @@ export default function UniversityIndex({ requiresClientAuth }: Props) {
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {UNIVERSITY_MODULES.map((mod) => {
-              const UNLOCKED = new Set(["m1-chart-reading", "m2-chart-patterns", "m4-trading-signals", "m5-strategies", "m10-candlestick-patterns"]);
+              const UNLOCKED = new Set(["m1-chart-reading", "m2-chart-patterns", "m4-trading-signals", "m5-strategies", "m6-entering", "m10-candlestick-patterns"]);
               const isUnlocked = UNLOCKED.has(mod.slug);
               const progress = progressMap[mod.slug] ?? [];
               const completed = progress.length;

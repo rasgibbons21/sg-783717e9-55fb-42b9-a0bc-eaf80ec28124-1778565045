@@ -7,6 +7,7 @@ import { M1_LESSONS } from "@/data/university/m1-chart-reading";
 import { M2_LESSONS } from "@/data/university/m2-chart-patterns";
 import { M4_LESSONS } from "@/data/university/m4-trading-signals";
 import { M5_LESSONS } from "@/data/university/m5-strategies";
+import { M6_LESSONS } from "@/data/university/m6-entering";
 import { M10_LESSONS } from "@/data/university/m10-candlestick-patterns";
 import { supabase } from "@/integrations/supabase/client";
 import { Layout } from "@/components/Layout";
@@ -35,6 +36,7 @@ export default function ModulePage({ moduleSlug, requiresClientAuth }: Props) {
     : moduleSlug === "m2-chart-patterns" ? M2_LESSONS
     : moduleSlug === "m4-trading-signals" ? M4_LESSONS
     : moduleSlug === "m5-strategies" ? M5_LESSONS
+    : moduleSlug === "m6-entering" ? M6_LESSONS
     : moduleSlug === "m10-candlestick-patterns" ? M10_LESSONS
     : [];
 
