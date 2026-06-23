@@ -88,7 +88,7 @@ export default function Goals() {
       spread: 360, 
       ticks: 60, 
       zIndex: 9999,
-      colors: ['#3d7a54', '#c8953a', '#d4788a', '#f0f0f8']
+      colors: ['#49B06E', '#27B7C8', '#ef4444', '#F4F7FA']
     };
 
     const randomInRange = (min: number, max: number) => {
@@ -395,8 +395,8 @@ export default function Goals() {
 
           <Card className="p-4 bg-card border-border rounded-2xl">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-rose/10 flex items-center justify-center">
-                <Check className="w-5 h-5 text-rose" />
+              <div className="w-10 h-10 rounded-full bg-[#49B06E]/10 flex items-center justify-center">
+                <Check className="w-5 h-5 text-[#49B06E]" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Completed</p>

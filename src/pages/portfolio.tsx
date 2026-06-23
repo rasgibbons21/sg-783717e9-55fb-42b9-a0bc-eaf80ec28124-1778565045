@@ -413,7 +413,7 @@ export default function Portfolio() {
                                   className={`text-xs ${
                                     item.quote.dp >= 0
                                       ? "bg-primary/20 text-primary hover:bg-primary/20"
-                                      : "bg-rose/20 text-rose hover:bg-rose/20"
+                                      : "bg-[#ef4444]/20 text-[#ef4444] hover:bg-[#ef4444]/20"
                                   }`}
                                 >
                                   {item.quote.dp >= 0 ? <TrendingUp className="w-3 h-3 mr-1" /> : <TrendingDown className="w-3 h-3 mr-1" />}
@@ -486,9 +486,9 @@ export default function Portfolio() {
                               {item.quote.d >= 0 ? (
                                 <TrendingUp className="w-4 h-4 text-primary" />
                               ) : (
-                                <TrendingDown className="w-4 h-4 text-rose" />
+                                <TrendingDown className="w-4 h-4 text-[#ef4444]" />
                               )}
-                              <span className={`text-sm font-semibold tabular-nums ${item.quote.d >= 0 ? "text-primary" : "text-rose"}`}>
+                              <span className={`text-sm font-semibold tabular-nums ${item.quote.d >= 0 ? "text-primary" : "text-[#ef4444]"}`}>
                                 {item.quote.d >= 0 ? "+" : ""}{item.quote.d.toFixed(2)}
                               </span>
                             </div>
@@ -643,7 +643,7 @@ export default function Portfolio() {
                     </div>
                   </Card>
 
-                  <Card className="p-5 bg-gradient-to-br from-rose/10 to-rose/5 border-rose/20 rounded-2xl">
+                  <Card className="p-5 bg-gradient-to-br from-[#27B7C8]/10 to-[#27B7C8]/5 border-[#27B7C8]/20 rounded-2xl">
                     <div className="space-y-2">
                       <p className="text-sm text-muted-foreground">Growth from Compounding</p>
                       <p className="text-3xl font-bold text-foreground">
@@ -657,7 +657,7 @@ export default function Portfolio() {
                 </div>
 
                 {/* Growth Chart */}
-                <Card className="p-6 bg-[#0a0a0f] border-border rounded-2xl">
+                <Card className="p-6 bg-[#0E1B30] border-border rounded-2xl">
                   <CardHeader className="px-0 pt-0">
                     <CardTitle className="text-xl text-foreground">Your Wealth Growth Curve</CardTitle>
                     <p className="text-sm text-muted-foreground">
@@ -670,12 +670,12 @@ export default function Portfolio() {
                         <AreaChart data={projectionData}>
                           <defs>
                             <linearGradient id="growthGradient" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#3d7a54" stopOpacity={0.3}/>
-                              <stop offset="95%" stopColor="#3d7a54" stopOpacity={0}/>
+                              <stop offset="5%" stopColor="#49B06E" stopOpacity={0.3}/>
+                              <stop offset="95%" stopColor="#49B06E" stopOpacity={0}/>
                             </linearGradient>
                             <linearGradient id="contributionGradient" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#c8953a" stopOpacity={0.3}/>
-                              <stop offset="95%" stopColor="#c8953a" stopOpacity={0}/>
+                              <stop offset="5%" stopColor="#27B7C8" stopOpacity={0.3}/>
+                              <stop offset="95%" stopColor="#27B7C8" stopOpacity={0}/>
                             </linearGradient>
                           </defs>
                           <CartesianGrid strokeDasharray="3 3" stroke="#1e1e2c" />
@@ -700,7 +700,7 @@ export default function Portfolio() {
                           <Area
                             type="monotone"
                             dataKey="contributions"
-                            stroke="#c8953a"
+                            stroke="#27B7C8"
                             strokeWidth={2}
                             fill="url(#contributionGradient)"
                             name="Total Contributions"
@@ -708,7 +708,7 @@ export default function Portfolio() {
                           <Area
                             type="monotone"
                             dataKey="totalValue"
-                            stroke="#3d7a54"
+                            stroke="#49B06E"
                             strokeWidth={3}
                             fill="url(#growthGradient)"
                             name="Portfolio Value"
@@ -749,9 +749,9 @@ export default function Portfolio() {
                 )}
 
                 {/* Behavioral Finance Tip */}
-                <Card className="p-6 bg-gradient-to-br from-rose/10 to-rose/5 border-rose/20 rounded-2xl">
+                <Card className="p-6 bg-gradient-to-br from-[#162540] to-[#0E1B30] border-[#27B7C8]/20 rounded-2xl">
                   <div className="flex gap-4">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-rose to-accent flex items-center justify-center text-2xl flex-shrink-0">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#27B7C8] to-[#49B06E] flex items-center justify-center text-2xl flex-shrink-0">
                       💡
                     </div>
                     <div className="flex-1 space-y-2">

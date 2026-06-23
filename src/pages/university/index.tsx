@@ -145,12 +145,12 @@ export default function UniversityIndex({ requiresClientAuth }: Props) {
               const pct = isUnlocked ? Math.round((completed / mod.lessonCount) * 100) : 0;
 
               return (
+                <Link key={mod.slug} href={isUnlocked ? `/university/${mod.slug}` : "/pricing"}>
                 <div
-                  key={mod.slug}
                   className={`relative rounded-2xl border p-5 transition-all ${
                     isUnlocked
                       ? "border-[#27B7C8]/30 bg-[#162540] hover:border-[#27B7C8]/60 cursor-pointer"
-                      : "border-white/10 bg-[#0F1E33] opacity-60"
+                      : "border-white/10 bg-[#0F1E33] opacity-60 cursor-pointer hover:opacity-80"
                   }`}
                 >
                   {/* Lock badge */}
@@ -189,11 +189,9 @@ export default function UniversityIndex({ requiresClientAuth }: Props) {
                           style={{ width: `${pct}%` }}
                         />
                       </div>
-                      <Link href={`/university/${mod.slug}`}>
-                        <button className="w-full py-2 text-sm font-medium rounded-xl bg-[#27B7C8] text-[#0E1B30] hover:bg-[#27B7C8]/90 transition-colors">
-                          {completed === 0 ? "Start Module" : completed === mod.lessonCount ? "Review Module" : "Continue"}
-                        </button>
-                      </Link>
+                      <button className="w-full py-2 text-sm font-medium rounded-xl bg-[#27B7C8] text-[#0E1B30] hover:bg-[#27B7C8]/90 transition-colors">
+                        {completed === 0 ? "Start Module" : completed === mod.lessonCount ? "Review Module" : "Continue"}
+                      </button>
                     </>
                   )}
 
@@ -201,6 +199,7 @@ export default function UniversityIndex({ requiresClientAuth }: Props) {
                     <div className="text-xs text-[#F4F7FA]/30 text-center py-1">Coming soon</div>
                   )}
                 </div>
+                </Link>
               );
             })}
           </div>
