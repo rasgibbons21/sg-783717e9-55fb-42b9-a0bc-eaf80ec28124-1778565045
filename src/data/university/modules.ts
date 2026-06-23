@@ -78,7 +78,7 @@ export const UNIVERSITY_MODULES: UniversityModule[] = [
     title: "Entering",
     subtitle: "How traders think about entry — position sizing, risk-to-reward, and the conditions that justify a thesis.",
     icon: "🚪",
-    lessonCount: 6,
+    lessonCount: 8,
     estimatedHours: 1.5,
     difficulty: "Advanced",
     badgeName: "Entry Thinker",
