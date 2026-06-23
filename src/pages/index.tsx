@@ -248,7 +248,7 @@ function CandleBg() {
 export default function LandingPage() {
   const router = useRouter();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-  const [userName, setUserName]     = useState<string | null>(null);
+  const [userName, setUserName]             = useState<string | null>(null);
   const [hour, setHour]             = useState(new Date().getHours());
   const [mktOpen, setMktOpen]       = useState(isMarketOpen());
   const [timer, setTimer]           = useState(calcCountdown());
@@ -258,13 +258,10 @@ export default function LandingPage() {
     (async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("onboarding_complete, full_name")
-          .eq("id", session.user.id)
-          .single();
-        if (profile?.onboarding_complete) { router.push("/home"); return; }
-        if (profile?.full_name) setUserName((profile.full_name as string).split(" ")[0]);
+        // Any logged-in user belongs in the dashboard, not the marketing page.
+        // home.tsx handles onboarding state from there.
+        router.push("/home");
+        return;
       }
       setIsCheckingAuth(false);
     })();
@@ -921,7 +918,7 @@ export default function LandingPage() {
               <div className="space-y-2">
                 <p className="text-xs font-semibold uppercase tracking-wide" style={{ color:"rgba(244,247,250,0.35)" }}>Account</p>
                 <div className="flex flex-col gap-1.5">
-                  {[{ label:"Sign in", href:"/onboarding" }, { label:"Get started free", href:"/onboarding" }, { label:"Bloom Pro", href:"/subscription" }].map(({ label, href }) => (
+                  {[{ label:"Get started free", href:"/onboarding" }, { label:"Sign in", href:"/onboarding" }, { label:"Bloom Pro", href:"/subscription" }].map(({ label, href }) => (
                     <Link key={label} href={href} className="text-xs transition-colors hover:text-white" style={{ color:"rgba(244,247,250,0.40)" }}>{label}</Link>
                   ))}
                 </div>
