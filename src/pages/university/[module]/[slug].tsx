@@ -5,6 +5,7 @@ import { requireProUserSSR } from "@/lib/requireProUserSSR";
 import { UNIVERSITY_MODULES, getModuleBySlug } from "@/data/university/modules";
 import { getM1LessonBySlug, UniversityLesson } from "@/data/university/m1-chart-reading";
 import { getM2LessonBySlug } from "@/data/university/m2-chart-patterns";
+import { getM3LessonBySlug } from "@/data/university/m3-indicators";
 import { getM4LessonBySlug } from "@/data/university/m4-trading-signals";
 import { getM5LessonBySlug } from "@/data/university/m5-strategies";
 import { getM6LessonBySlug } from "@/data/university/m6-entering";
@@ -177,6 +178,7 @@ export default function LessonPage({ moduleSlug, lessonSlug, requiresClientAuth 
   const lesson =
     moduleSlug === "m1-chart-reading" ? getM1LessonBySlug(lessonSlug)
     : moduleSlug === "m2-chart-patterns" ? getM2LessonBySlug(lessonSlug)
+    : moduleSlug === "m3-indicators" ? getM3LessonBySlug(lessonSlug)
     : moduleSlug === "m4-trading-signals" ? getM4LessonBySlug(lessonSlug)
     : moduleSlug === "m5-strategies" ? getM5LessonBySlug(lessonSlug)
     : moduleSlug === "m6-entering" ? getM6LessonBySlug(lessonSlug)
