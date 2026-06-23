@@ -13,44 +13,44 @@
 @layer base {
   :root {
     --radius: 1rem;
-    
-    /* Premium Dark Theme */
-    --background: 240 15% 4%;        /* #0a0a0f - Deep dark */
-    --foreground: 240 10% 95%;       /* #f0f0f8 - Primary text */
-    
-    --card: 240 15% 9%;              /* #16161f - Card backgrounds */
-    --card-foreground: 240 10% 95%;  /* #f0f0f8 */
-    
-    --popover: 240 15% 7%;           /* #111118 - Secondary background */
-    --popover-foreground: 240 10% 95%;
-    
-    --primary: 153 23% 36%;          /* #3d7a54 - Sage green accent */
-    --primary-foreground: 240 10% 95%;
-    
-    --secondary: 240 15% 12%;        /* Subtle secondary */
-    --secondary-foreground: 240 10% 95%;
-    
-    --muted: 240 15% 7%;             /* #111118 */
-    --muted-foreground: 250 10% 63%; /* #8080a0 - Muted text */
-    
-    --accent: 45 55% 51%;            /* #c8953a - Gold accent */
-    --accent-foreground: 240 15% 4%;
-    
-    --rose: 345 48% 68%;             /* #d4788a - Rose/pink accent */
-    --rose-foreground: 240 15% 4%;
-    
-    --destructive: 0 72% 51%;
+
+    /* Bloom Locked Palette */
+    --background: 217 55% 12%;       /* #0E1B30 - Navy */
+    --foreground: 210 38% 97%;       /* #F4F7FA - Ivory */
+
+    --card: 218 49% 17%;             /* #162540 - Surface */
+    --card-foreground: 210 38% 97%;  /* #F4F7FA */
+
+    --popover: 217 55% 12%;          /* #0E1B30 */
+    --popover-foreground: 210 38% 97%;
+
+    --primary: 142 41% 49%;          /* #49B06E - Green */
+    --primary-foreground: 217 55% 12%;
+
+    --secondary: 218 46% 19%;        /* slightly lighter navy */
+    --secondary-foreground: 210 38% 97%;
+
+    --muted: 218 46% 15%;            /* darker surface */
+    --muted-foreground: 215 20% 55%; /* mid-tone text */
+
+    --accent: 186 67% 47%;           /* #27B7C8 - Teal */
+    --accent-foreground: 217 55% 12%;
+
+    --rose: 0 84% 60%;               /* #ef4444 - Loss red */
+    --rose-foreground: 217 55% 12%;
+
+    --destructive: 0 84% 60%;        /* #ef4444 */
     --destructive-foreground: 0 0% 100%;
-    
-    --border: 240 15% 16%;           /* #2a2a3a - Border color */
-    --input: 240 15% 16%;
-    --ring: 153 23% 36%;
-    
-    --chart-1: 153 23% 36%;          /* Green */
-    --chart-2: 45 55% 51%;           /* Gold */
-    --chart-3: 345 48% 68%;          /* Rose */
-    --chart-4: 200 40% 55%;          /* Blue */
-    --chart-5: 280 45% 60%;          /* Purple */
+
+    --border: 218 40% 22%;           /* subtle navy border */
+    --input: 218 40% 22%;
+    --ring: 186 67% 47%;             /* teal ring */
+
+    --chart-1: 142 41% 49%;          /* #49B06E green */
+    --chart-2: 186 67% 47%;          /* #27B7C8 teal */
+    --chart-3: 0 84% 60%;            /* #ef4444 red */
+    --chart-4: 210 38% 75%;          /* light ivory-blue */
+    --chart-5: 218 49% 35%;          /* mid-navy */
   }
 }
 
@@ -76,10 +76,10 @@
 
 @keyframes pulse-glow {
   0%, 100% {
-    box-shadow: 0 0 0 0 rgba(200, 149, 58, 0.4);
+    box-shadow: 0 0 0 0 rgba(39, 183, 200, 0.4);
   }
   50% {
-    box-shadow: 0 0 20px 10px rgba(200, 149, 58, 0.2);
+    box-shadow: 0 0 20px 10px rgba(39, 183, 200, 0.2);
   }
 }
 

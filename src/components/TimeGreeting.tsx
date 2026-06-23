@@ -19,7 +19,7 @@ export function TimeGreeting({ fullName }: { fullName?: string | null }) {
 
   return (
     <h1 className="font-serif text-3xl md:text-4xl font-bold text-foreground">
-      <span className="text-[#c8953a]">{greeting}</span>
+      <span className="text-[#27B7C8]">{greeting}</span>
       {firstName ? `, ${firstName}` : ""} 🌸
     </h1>
   );

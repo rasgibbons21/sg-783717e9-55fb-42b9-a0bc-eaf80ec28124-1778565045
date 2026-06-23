@@ -37,7 +37,7 @@ export default function UniversityIndex({ requiresClientAuth }: Props) {
     const verify = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        window.location.href = "/pricing";
+        window.location.href = "/subscription";
         return;
       }
 
@@ -46,7 +46,7 @@ export default function UniversityIndex({ requiresClientAuth }: Props) {
       });
 
       if (res.status === 401 || res.status === 403) {
-        window.location.href = "/pricing";
+        window.location.href = "/subscription";
         return;
       }
 
@@ -145,7 +145,7 @@ export default function UniversityIndex({ requiresClientAuth }: Props) {
               const pct = isUnlocked ? Math.round((completed / mod.lessonCount) * 100) : 0;
 
               return (
-                <Link key={mod.slug} href={isUnlocked ? `/university/${mod.slug}` : "/pricing"}>
+                <Link key={mod.slug} href={isUnlocked ? `/university/${mod.slug}` : "/subscription"}>
                 <div
                   className={`relative rounded-2xl border p-5 transition-all ${
                     isUnlocked
@@ -221,7 +221,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const result = await requireProUserSSR(req);
 
   if (result.status === "not-pro" || result.status === "unauthenticated") {
-    return { redirect: { destination: "/pricing", permanent: false } };
+    return { redirect: { destination: "/subscription", permanent: false } };
   }
 
   if (result.status === "no-cookie") {

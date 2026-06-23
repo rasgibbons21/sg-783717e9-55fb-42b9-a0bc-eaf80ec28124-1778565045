@@ -905,7 +905,7 @@ export default function LandingPage() {
             <div className="flex flex-col md:flex-row md:items-start gap-8 md:gap-12 mb-8">
               <div className="flex-1 space-y-2">
                 <div className="flex items-center gap-2">
-                  <Image src="/bloom-logo.png" alt="Bloom" width={24} height={24} className="rounded-full bg-white" />
+                  <Image src="/bloom-logo.png" alt="Bloom" width={24} height={24} className="rounded-full bg-[#F4F7FA]" />
                   <p className="text-sm font-semibold" style={{ color:"rgba(244,247,250,0.60)" }}>She Blooms Wealth</p>
                 </div>
                 <p className="text-xs" style={{ color:"rgba(244,247,250,0.35)" }}>Invest in yourself first 🌸</p>
