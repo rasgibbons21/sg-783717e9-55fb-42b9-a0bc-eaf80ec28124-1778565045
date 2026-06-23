@@ -187,8 +187,8 @@ export default function Compare() {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const getMetricColor = (value: number, _isPercentage: boolean = false) => {
-    if (value > 0) return "text-[#3d7a54]";
-    if (value < 0) return "text-[#d4788a]";
+    if (value > 0) return "text-[#49B06E]";
+    if (value < 0) return "text-[#ef4444]";
     return "text-muted-foreground";
   };
 
@@ -320,8 +320,8 @@ export default function Compare() {
                     <Badge
                       className={
                         asset.changePercent >= 0
-                          ? "bg-[#3d7a54]/20 text-[#3d7a54]"
-                          : "bg-[#d4788a]/20 text-[#d4788a]"
+                          ? "bg-[#49B06E]/20 text-[#49B06E]"
+                          : "bg-[#ef4444]/20 text-[#ef4444]"
                       }
                     >
                       {asset.changePercent >= 0 ? <TrendingUp className="w-3 h-3 mr-1" /> : <TrendingDown className="w-3 h-3 mr-1" />}
@@ -470,8 +470,8 @@ export default function Compare() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card className="p-4 border-[#3d7a54]/30 bg-[#3d7a54]/10">
-                  <h4 className="text-sm font-semibold text-[#3d7a54] mb-2">Strengths</h4>
+                <Card className="p-4 border-[#49B06E]/30 bg-[#49B06E]/10">
+                  <h4 className="text-sm font-semibold text-[#49B06E] mb-2">Strengths</h4>
                   <div className="space-y-2">
                     {Object.entries(analysis.strengths).map(([ticker, strength]) => (
                       <div key={ticker}>
@@ -482,8 +482,8 @@ export default function Compare() {
                   </div>
                 </Card>
 
-                <Card className="p-4 border-[#d4788a]/30 bg-[#d4788a]/10">
-                  <h4 className="text-sm font-semibold text-[#d4788a] mb-2">Risks</h4>
+                <Card className="p-4 border-[#ef4444]/30 bg-[#ef4444]/10">
+                  <h4 className="text-sm font-semibold text-[#ef4444] mb-2">Risks</h4>
                   <div className="space-y-2">
                     {Object.entries(analysis.risks).map(([ticker, risk]) => (
                       <div key={ticker}>
@@ -494,8 +494,8 @@ export default function Compare() {
                   </div>
                 </Card>
 
-                <Card className="p-4 border-[#c8953a]/30 bg-[#c8953a]/10">
-                  <h4 className="text-sm font-semibold text-[#c8953a] mb-2">Best For</h4>
+                <Card className="p-4 border-[#27B7C8]/30 bg-[#27B7C8]/10">
+                  <h4 className="text-sm font-semibold text-[#27B7C8] mb-2">Best For</h4>
                   <div className="space-y-2">
                     {Object.entries(analysis.bestFor).map(([ticker, use]) => (
                       <div key={ticker}>
@@ -507,8 +507,8 @@ export default function Compare() {
                 </Card>
               </div>
 
-              <Card className="p-4 border-[#c8953a]/50 bg-[#c8953a]/20">
-                <h3 className="text-sm font-semibold text-[#c8953a] mb-2">Pansy's Verdict</h3>
+              <Card className="p-4 border-[#27B7C8]/50 bg-[#27B7C8]/20">
+                <h3 className="text-sm font-semibold text-[#27B7C8] mb-2">Pansy's Verdict</h3>
                 <p className="text-sm text-foreground leading-relaxed">
                   {analysis.verdict}
                 </p>

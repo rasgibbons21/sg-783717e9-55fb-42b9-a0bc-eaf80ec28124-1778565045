@@ -35,10 +35,10 @@ interface BrokerData {
 }
 
 const COLORS = {
-  primary: '#3d7a54',
-  accent: '#c8953a',
-  rose: '#d4788a',
-  bg: '#0a0a0f',
+  primary: '#49B06E',
+  accent: '#27B7C8',
+  rose: '#ef4444',
+  bg: '#0E1B30',
 };
 
 export default function AdminDashboard() {

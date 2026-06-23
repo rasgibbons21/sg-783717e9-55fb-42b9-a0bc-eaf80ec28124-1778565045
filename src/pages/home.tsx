@@ -308,8 +308,8 @@ export default function Home() {
                           <Badge
                             className={
                               index.changePercent >= 0
-                                ? "bg-emerald-500/10 text-emerald-700 border-0"
-                                : "bg-red-500/10 text-red-600 border-0"
+                                ? "bg-[#49B06E]/10 text-[#49B06E] border-0"
+                                : "bg-[#ef4444]/10 text-[#ef4444] border-0"
                             }
                           >
                             {index.changePercent >= 0 ? "+" : ""}

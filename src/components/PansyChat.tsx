@@ -186,7 +186,7 @@ export function PansyChat({ ticker, companyName, currentPrice, analysisContext }
   }
 
   return (
-    <Card className="fixed bottom-[90px] right-4 w-[380px] h-[600px] flex flex-col bg-[#0a0a0f] border-border shadow-2xl z-50 rounded-2xl overflow-hidden">
+    <Card className="fixed bottom-[90px] right-4 w-[380px] h-[600px] flex flex-col bg-[#0E1B30] border-border shadow-2xl z-50 rounded-2xl overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between p-4 bg-gradient-to-r from-primary/20 to-accent/20 border-b border-border">
         <div className="flex items-center gap-3">

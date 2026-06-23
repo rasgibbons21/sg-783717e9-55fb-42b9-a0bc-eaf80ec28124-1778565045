@@ -44,16 +44,16 @@ export default function AdminDashboard() {
 
   return (
     <div style={{background:'#06060a',minHeight:'100vh',color:'white',padding:40}}>
-      <h1 style={{color:'#c8953a',marginBottom:8}}>🌸 Bloom Admin</h1>
+      <h1 style={{color:'#27B7C8',marginBottom:8}}>🌸 Bloom Admin</h1>
       <p style={{color:'#666',marginBottom:32}}>Total users in profiles table: {users.length}</p>
       <table style={{width:'100%',borderCollapse:'collapse'}}>
         <thead>
           <tr style={{borderBottom:'1px solid #333'}}>
-            <th style={{textAlign:'left',padding:'8px',color:'#c8953a'}}>Email / ID</th>
-            <th style={{textAlign:'left',padding:'8px',color:'#c8953a'}}>Name</th>
-            <th style={{textAlign:'left',padding:'8px',color:'#c8953a'}}>Risk</th>
-            <th style={{textAlign:'left',padding:'8px',color:'#c8953a'}}>Onboarding</th>
-            <th style={{textAlign:'left',padding:'8px',color:'#c8953a'}}>Joined</th>
+            <th style={{textAlign:'left',padding:'8px',color:'#27B7C8'}}>Email / ID</th>
+            <th style={{textAlign:'left',padding:'8px',color:'#27B7C8'}}>Name</th>
+            <th style={{textAlign:'left',padding:'8px',color:'#27B7C8'}}>Risk</th>
+            <th style={{textAlign:'left',padding:'8px',color:'#27B7C8'}}>Onboarding</th>
+            <th style={{textAlign:'left',padding:'8px',color:'#27B7C8'}}>Joined</th>
           </tr>
         </thead>
         <tbody>

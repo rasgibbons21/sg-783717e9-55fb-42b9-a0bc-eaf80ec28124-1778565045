@@ -207,7 +207,7 @@ export default function LessonPage({ moduleSlug, lessonSlug, requiresClientAuth 
     const init = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        window.location.href = "/pricing";
+        window.location.href = "/subscription";
         return;
       }
 
@@ -219,7 +219,7 @@ export default function LessonPage({ moduleSlug, lessonSlug, requiresClientAuth 
           headers: { Authorization: `Bearer ${tok}` },
         });
         if (check.status === 401 || check.status === 403) {
-          window.location.href = "/pricing";
+          window.location.href = "/subscription";
           return;
         }
         setIsAuthorized(true);
@@ -394,7 +394,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, params }) =>
   const result = await requireProUserSSR(req);
 
   if (result.status === "not-pro" || result.status === "unauthenticated") {
-    return { redirect: { destination: "/pricing", permanent: false } };
+    return { redirect: { destination: "/subscription", permanent: false } };
   }
 
   if (result.status === "no-cookie") {

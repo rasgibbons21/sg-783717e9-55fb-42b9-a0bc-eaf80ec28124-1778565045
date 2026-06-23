@@ -346,15 +346,15 @@ export default function Discover() {
   const displayAssets = getDisplayAssets();
 
   const getTrendColor = (trend: string) => {
-    if (trend === "Bullish") return "bg-[#3d7a54]/10 text-[#3d7a54] border-[#3d7a54]/20";
-    if (trend === "Bearish") return "bg-[#d4788a]/10 text-[#d4788a] border-[#d4788a]/20";
+    if (trend === "Bullish") return "bg-[#49B06E]/10 text-[#49B06E] border-[#49B06E]/20";
+    if (trend === "Bearish") return "bg-[#ef4444]/10 text-[#ef4444] border-[#ef4444]/20";
     return "bg-muted text-muted-foreground border-border";
   };
 
   const getRiskColor = (risk: string) => {
-    if (risk === "Aggressive") return "bg-[#d4788a]/10 text-[#d4788a] border-[#d4788a]/20";
-    if (risk === "Conservative") return "bg-[#3d7a54]/10 text-[#3d7a54] border-[#3d7a54]/20";
-    return "bg-[#c8953a]/10 text-[#c8953a] border-[#c8953a]/20";
+    if (risk === "Aggressive") return "bg-[#ef4444]/10 text-[#ef4444] border-[#ef4444]/20";
+    if (risk === "Conservative") return "bg-[#49B06E]/10 text-[#49B06E] border-[#49B06E]/20";
+    return "bg-[#27B7C8]/10 text-[#27B7C8] border-[#27B7C8]/20";
   };
 
   return (
@@ -389,8 +389,8 @@ export default function Discover() {
                       <Badge
                         className={
                           index.changePercent >= 0
-                            ? "bg-[#3d7a54]/20 text-[#3d7a54] text-xs"
-                            : "bg-[#d4788a]/20 text-[#d4788a] text-xs"
+                            ? "bg-[#49B06E]/20 text-[#49B06E] text-xs"
+                            : "bg-[#ef4444]/20 text-[#ef4444] text-xs"
                         }
                       >
                         {index.changePercent >= 0 ? "+" : ""}
@@ -571,8 +571,8 @@ function AssetCard({ asset }: { asset: Asset }) {
                 <Badge
                   className={
                     asset.changePercent >= 0
-                      ? "bg-[#3d7a54]/20 text-[#3d7a54]"
-                      : "bg-[#d4788a]/20 text-[#d4788a]"
+                      ? "bg-[#49B06E]/20 text-[#49B06E]"
+                      : "bg-[#ef4444]/20 text-[#ef4444]"
                   }
                 >
                   {asset.changePercent >= 0 ? <TrendingUp className="w-3 h-3 mr-1" /> : <TrendingDown className="w-3 h-3 mr-1" />}
@@ -633,13 +633,13 @@ function AssetCard({ asset }: { asset: Asset }) {
 }
 
 function getTrendColor(trend: string) {
-  if (trend === "Bullish") return "bg-[#3d7a54]/10 text-[#3d7a54] border-[#3d7a54]/20";
-  if (trend === "Bearish") return "bg-[#d4788a]/10 text-[#d4788a] border-[#d4788a]/20";
+  if (trend === "Bullish") return "bg-[#49B06E]/10 text-[#49B06E] border-[#49B06E]/20";
+  if (trend === "Bearish") return "bg-[#ef4444]/10 text-[#ef4444] border-[#ef4444]/20";
   return "bg-muted text-muted-foreground border-border";
 }
 
 function getRiskColor(risk: string) {
-  if (risk === "Aggressive") return "bg-[#d4788a]/10 text-[#d4788a] border-[#d4788a]/20";
-  if (risk === "Conservative") return "bg-[#3d7a54]/10 text-[#3d7a54] border-[#3d7a54]/20";
-  return "bg-[#c8953a]/10 text-[#c8953a] border-[#c8953a]/20";
+  if (risk === "Aggressive") return "bg-[#ef4444]/10 text-[#ef4444] border-[#ef4444]/20";
+  if (risk === "Conservative") return "bg-[#49B06E]/10 text-[#49B06E] border-[#49B06E]/20";
+  return "bg-[#27B7C8]/10 text-[#27B7C8] border-[#27B7C8]/20";
 }

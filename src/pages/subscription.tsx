@@ -120,9 +120,9 @@ export default function Subscription() {
           </div>
           
           {errorMsg && (
-            <Card className="p-4 bg-[#d4788a]/10 border-[#d4788a]/30 flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-[#d4788a] shrink-0 mt-0.5" />
-              <p className="text-sm text-[#d4788a]">{errorMsg}</p>
+            <Card className="p-4 bg-[#ef4444]/10 border-[#ef4444]/30 flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-[#ef4444] shrink-0 mt-0.5" />
+              <p className="text-sm text-[#ef4444]">{errorMsg}</p>
             </Card>
           )}
 

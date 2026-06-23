@@ -125,9 +125,9 @@ const categoryIcons = {
 };
 
 const categoryColors = {
-  "Beginner-friendly": "text-[#3d7a54] bg-[#3d7a54]/10 border-[#3d7a54]/20",
+  "Beginner-friendly": "text-[#49B06E] bg-[#49B06E]/10 border-[#49B06E]/20",
   "Active traders": "text-[#27B7C8] bg-[#27B7C8]/10 border-[#27B7C8]/20",
-  "Long-term": "text-[#c8953a] bg-[#c8953a]/10 border-[#c8953a]/20",
+  "Long-term": "text-[#27B7C8] bg-[#27B7C8]/10 border-[#27B7C8]/20",
 };
 
 export default function Brokers() {
