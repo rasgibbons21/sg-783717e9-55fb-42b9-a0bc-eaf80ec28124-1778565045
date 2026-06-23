@@ -42,7 +42,7 @@ export const UNIVERSITY_MODULES: UniversityModule[] = [
     title: "Indicators",
     subtitle: "Moving averages, RSI, MACD, Bollinger Bands, and more — what they measure, how to read them, and when not to use them.",
     icon: "📈",
-    lessonCount: 13,
+    lessonCount: 12,
     estimatedHours: 3,
     difficulty: "Intermediate",
     badgeName: "Indicator Analyst",
