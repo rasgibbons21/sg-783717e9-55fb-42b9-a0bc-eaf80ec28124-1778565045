@@ -6,6 +6,7 @@ import { UNIVERSITY_MODULES, getModuleBySlug } from "@/data/university/modules";
 import { getM1LessonBySlug, UniversityLesson } from "@/data/university/m1-chart-reading";
 import { getM2LessonBySlug } from "@/data/university/m2-chart-patterns";
 import { getM4LessonBySlug } from "@/data/university/m4-trading-signals";
+import { getM10LessonBySlug } from "@/data/university/m10-candlestick-patterns";
 import { supabase } from "@/integrations/supabase/client";
 import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
@@ -175,6 +176,7 @@ export default function LessonPage({ moduleSlug, lessonSlug, requiresClientAuth 
     moduleSlug === "m1-chart-reading" ? getM1LessonBySlug(lessonSlug)
     : moduleSlug === "m2-chart-patterns" ? getM2LessonBySlug(lessonSlug)
     : moduleSlug === "m4-trading-signals" ? getM4LessonBySlug(lessonSlug)
+    : moduleSlug === "m10-candlestick-patterns" ? getM10LessonBySlug(lessonSlug)
     : undefined;
 
   const markProgress = useCallback(
