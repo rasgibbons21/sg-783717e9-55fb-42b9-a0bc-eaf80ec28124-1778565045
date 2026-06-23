@@ -120,6 +120,18 @@ export const UNIVERSITY_MODULES: UniversityModule[] = [
     badgeName: "Mindset Mastery",
     certificateName: "Certificate of Completion — Psychology",
   },
+  {
+    slug: "m10-candlestick-patterns",
+    number: 10,
+    title: "Candlestick Patterns",
+    subtitle: "The individual candle formations that signal exhaustion, indecision, and momentum shifts — the vocabulary of price action.",
+    icon: "🕯️",
+    lessonCount: 12,
+    estimatedHours: 3,
+    difficulty: "Advanced",
+    badgeName: "Candle Reader",
+    certificateName: "Certificate of Completion — Candlestick Patterns",
+  },
 ];
 
 export function getModuleBySlug(slug: string): UniversityModule | undefined {
