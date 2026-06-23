@@ -90,7 +90,7 @@ export const UNIVERSITY_MODULES: UniversityModule[] = [
     title: "Managing",
     subtitle: "What happens after entry — scaling, trailing, and protecting what you have without micromanaging every tick.",
     icon: "⚖️",
-    lessonCount: 6,
+    lessonCount: 8,
     estimatedHours: 1.5,
     difficulty: "Advanced",
     badgeName: "Position Manager",

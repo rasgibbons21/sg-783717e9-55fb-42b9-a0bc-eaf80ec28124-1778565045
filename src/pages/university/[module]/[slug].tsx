@@ -9,6 +9,7 @@ import { getM3LessonBySlug } from "@/data/university/m3-indicators";
 import { getM4LessonBySlug } from "@/data/university/m4-trading-signals";
 import { getM5LessonBySlug } from "@/data/university/m5-strategies";
 import { getM6LessonBySlug } from "@/data/university/m6-entering";
+import { getM7LessonBySlug } from "@/data/university/m7-managing";
 import { getM10LessonBySlug } from "@/data/university/m10-candlestick-patterns";
 import { supabase } from "@/integrations/supabase/client";
 import { Layout } from "@/components/Layout";
@@ -182,6 +183,7 @@ export default function LessonPage({ moduleSlug, lessonSlug, requiresClientAuth 
     : moduleSlug === "m4-trading-signals" ? getM4LessonBySlug(lessonSlug)
     : moduleSlug === "m5-strategies" ? getM5LessonBySlug(lessonSlug)
     : moduleSlug === "m6-entering" ? getM6LessonBySlug(lessonSlug)
+    : moduleSlug === "m7-managing" ? getM7LessonBySlug(lessonSlug)
     : moduleSlug === "m10-candlestick-patterns" ? getM10LessonBySlug(lessonSlug)
     : undefined;
 
