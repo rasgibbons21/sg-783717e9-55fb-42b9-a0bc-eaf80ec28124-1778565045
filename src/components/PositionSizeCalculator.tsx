@@ -49,7 +49,7 @@ export function PositionSizeCalculator() {
     if (riskPercent < 1) {
       return {
         text: "Ultra conservative approach. You'll need a lot of wins to grow but your account is super safe 🛡️",
-        color: "text-blue-600",
+        color: "text-[#27B7C8]",
       };
     } else if (riskPercent >= 1 && riskPercent <= 2) {
       return {
@@ -64,7 +64,7 @@ export function PositionSizeCalculator() {
     } else if (riskPercent > 3 && riskPercent <= 5) {
       return {
         text: "Getting aggressive girl. Make sure you can emotionally handle these losses 😬",
-        color: "text-yellow-600",
+        color: "text-[#F4F7FA]/70",
       };
     } else {
       return {

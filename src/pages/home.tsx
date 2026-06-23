@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import Link from "next/link";
 import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
 import { useSubscription } from "@/contexts/SubscriptionContext";
@@ -15,6 +14,7 @@ import { userService } from "@/services/userService";
 import { marketService } from "@/services/marketService";
 import { supabase } from "@/integrations/supabase/client";
 import { TrendingUp, TrendingDown, ChevronDown } from "lucide-react";
+import { TimeGreeting } from "@/components/TimeGreeting";
 
 interface MarketIndex {
   symbol: string;
@@ -25,73 +25,26 @@ interface MarketIndex {
   error?: boolean;
 }
 
-interface StockPick {
-  ticker: string;
-  name: string;
-  price: number;
-  change: number;
-  changePercent: number;
-  pansyQuote: string;
-  type?: string;
-  trend?: string;
-  riskLevel?: string;
-  error?: boolean;
-}
-
-// Default fallback data
+// Default fallback data — symbols match getMarketIndices() (ETF proxies, free-tier safe)
 const DEFAULT_MARKET_DATA: MarketIndex[] = [
-  { symbol: "^GSPC", name: "S&P 500", price: 5200.00, change: 0, changePercent: 0 },
-  { symbol: "^IXIC", name: "NASDAQ", price: 16400.00, change: 0, changePercent: 0 },
-  { symbol: "^DJI", name: "DOW", price: 38500.00, change: 0, changePercent: 0 },
-  { symbol: "^VIX", name: "VIX", price: 14.50, change: 0, changePercent: 0 },
+  { symbol: "SPY", name: "S&P 500", price: 0, change: 0, changePercent: 0 },
+  { symbol: "QQQ", name: "NASDAQ", price: 0, change: 0, changePercent: 0 },
+  { symbol: "DIA", name: "DOW", price: 0, change: 0, changePercent: 0 },
+  { symbol: "VIXY", name: "VIX", price: 0, change: 0, changePercent: 0 },
 ];
 
-const DEFAULT_STOCK_PICKS: StockPick[] = [
-  {
-    ticker: "NVDA",
-    name: "NVIDIA Corporation",
-    price: 450.00,
-    change: 0,
-    changePercent: 0,
-    pansyQuote: "Powering the AI revolution. Every tech company needs their chips.",
-    type: "Stock",
-    trend: "Bullish",
-    riskLevel: "Aggressive",
-  },
-  {
-    ticker: "VOO",
-    name: "Vanguard S&P 500 ETF",
-    price: 420.00,
-    change: 0,
-    changePercent: 0,
-    pansyQuote: "Tracks the 500 biggest US companies. A foundational piece for any portfolio.",
-    type: "ETF",
-    trend: "Bullish",
-    riskLevel: "Moderate",
-  },
-  {
-    ticker: "FXAIX",
-    name: "Fidelity 500 Index Fund",
-    price: 180.00,
-    change: 0,
-    changePercent: 0,
-    pansyQuote: "One of the lowest cost index funds. Perfect for set-and-forget retirement accounts.",
-    type: "Mutual Fund",
-    trend: "Sideways",
-    riskLevel: "Conservative",
-  },
-];
 
 export default function Home() {
   const router = useRouter();
-  const { isPro, isLoggedIn } = useSubscription();
+  const { isPro } = useSubscription();
   const [user, setUser] = useState<any>(null);
   const [marketData, setMarketData] = useState<MarketIndex[]>(DEFAULT_MARKET_DATA);
-  const [stockPicks, setStockPicks] = useState<StockPick[]>(DEFAULT_STOCK_PICKS);
   const [watchlistNews, setWatchlistNews] = useState<any[]>([]);
   const [isLoadingNews, setIsLoadingNews] = useState(true);
   const [isLoadingIndices, setIsLoadingIndices] = useState(true);
   const [rulesOpen, setRulesOpen] = useState(false);
+  const [briefing, setBriefing] = useState<string | null>(null);
+  const [briefingLoading, setBriefingLoading] = useState(true);
 
   useEffect(() => {
     checkAuth();
@@ -124,8 +77,8 @@ export default function Home() {
       
       await Promise.all([
         loadMarketData(),
-        loadStockPicks(),
         loadWatchlistNews(userProfile?.id),
+        loadBriefing(),
       ]);
       clearTimeout(timeoutId);
     } catch (error) {
@@ -189,31 +142,21 @@ export default function Home() {
     }
   };
 
-  const loadStockPicks = async () => {
+  const loadBriefing = async () => {
+    setBriefingLoading(true);
     try {
-      const tickers = ["NVDA", "VOO", "FXAIX"];
-      const picks = [];
-      
-      for (let i = 0; i < tickers.length; i++) {
-        const ticker = tickers[i];
-        try {
-          const quote = await marketService.getRealTimeQuote(ticker);
-          picks.push({
-            ...DEFAULT_STOCK_PICKS[i],
-            price: quote?.c || DEFAULT_STOCK_PICKS[i].price,
-            change: quote?.d || 0,
-            changePercent: quote?.dp || 0,
-            error: !quote || quote.c === 0
-          });
-        } catch (error) {
-          console.error(`Error loading ${ticker}:`, error);
-          picks.push({ ...DEFAULT_STOCK_PICKS[i], error: true });
-        }
-      }
-
-      setStockPicks(picks);
-    } catch (error) {
-      console.error("Error loading stock picks:", error);
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+      const res = await fetch("/api/daily-briefing", {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      if (!res.ok) return; // hidden-card state — no error shown to user
+      const data = await res.json();
+      if (data.content) setBriefing(data.content);
+    } catch {
+      // silent — briefing is a nice-to-have, not a core feature
+    } finally {
+      setBriefingLoading(false);
     }
   };
 
@@ -230,11 +173,9 @@ export default function Home() {
         {/* Greeting */}
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
-            <h1 className="font-serif text-3xl md:text-4xl font-bold text-foreground">
-              {isPro ? "Welcome to Bloom Pro" : `Welcome back, ${user?.full_name?.split(" ")[0] || "Investor"}`} 🌸
-            </h1>
+            <TimeGreeting fullName={user?.full_name} />
             <p className="text-muted-foreground mt-1">
-              {isPro ? "Your premium investing companion" : "Your daily market insights"}
+              {isPro ? "Keep learning. Keep growing." : "Your daily market education"}
             </p>
           </div>
         </div>
@@ -242,21 +183,27 @@ export default function Home() {
         {/* Pansy Chat Bubble */}
         <div className="flex items-start gap-4">
           <div className="relative shrink-0 mt-1">
-            <img src="/bloom-logo.png" alt="Pansy" className="w-16 h-16 rounded-full border-2 border-background shadow-sm object-cover bg-white" />
-            <div className="absolute bottom-0 right-1 bg-green-500 w-4 h-4 rounded-full border-2 border-background"></div>
+            <img src="/bloom-logo.png" alt="Pansy" className="w-16 h-16 rounded-full border-2 border-background shadow-sm object-cover bg-[#0E1B30]" />
+            <div className="absolute bottom-0 right-1 bg-[#49B06E] w-4 h-4 rounded-full border-2 border-background"></div>
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1 pl-1">
               <h3 className="font-serif font-bold text-foreground text-lg">Pansy</h3>
-              <Badge variant="secondary" className="text-[10px] bg-accent/10 text-accent-foreground border-accent/20 h-5 font-medium shadow-sm">
-                Available 24/7
+              <Badge variant="secondary" className="text-[10px] bg-[#49B06E]/10 text-[#49B06E] border-[#49B06E]/20 h-5 font-medium shadow-sm">
+                Your guide
               </Badge>
             </div>
             <div className="bg-card backdrop-blur-sm p-4 rounded-2xl rounded-tl-sm shadow-sm inline-block border border-border">
               <p className="text-sm md:text-base text-foreground leading-relaxed">
-                The market is moving today, but remember our golden rule: we don't panic, we prepare. I've analyzed the latest trends and picked out some beautiful opportunities for your portfolio. What are we feeling today? 💛
+                The market is always telling a story — my job is to help you learn to read it. I&apos;m here to explain what&apos;s happening, answer your questions, and help your confidence grow alongside your knowledge. What would you like to understand today? 💛
               </p>
             </div>
+            <a
+              href="/learn"
+              className="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#49B06E] hover:bg-[#49B06E]/90 text-[#0E1B30] text-sm font-semibold transition-colors ml-1"
+            >
+              Explore lessons →
+            </a>
           </div>
         </div>
 
@@ -288,8 +235,8 @@ export default function Home() {
                         <Badge
                           className={
                             index.changePercent >= 0
-                              ? "bg-[#3d7a54]/10 text-[#3d7a54] text-xs font-medium border-0"
-                              : "bg-[#d4788a]/10 text-[#d4788a] text-xs font-medium border-0"
+                              ? "bg-[#49B06E]/10 text-[#49B06E] text-xs font-medium border-0"
+                              : "bg-[#ef4444]/10 text-[#ef4444] text-xs font-medium border-0"
                           }
                         >
                           {index.changePercent >= 0 ? "+" : ""}
@@ -304,127 +251,75 @@ export default function Home() {
           </div>
         </Card>
 
-        {/* Pansy's Picks Today (Grid) */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground">
-              Pansy's Picks Today
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {stockPicks.map((stock) => (
-              <Link
-                key={stock.ticker}
-                href={`/stock/${stock.ticker}`}
-                className="block group h-full"
-              >
-                <Card className="p-5 hover:border-accent/50 hover:shadow-md transition-all border-border rounded-2xl h-full flex flex-col bg-card">
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <p className="font-serif font-bold text-foreground text-xl group-hover:text-accent transition-colors">
-                          {stock.ticker}
-                        </p>
-                        <Badge variant="secondary" className="text-[10px] bg-muted uppercase tracking-wider">
-                          {stock.type}
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-muted-foreground line-clamp-1">
-                        {stock.name}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      {stock.error ? (
-                        <p className="text-sm font-medium text-destructive mt-1">Unavailable</p>
-                      ) : (
-                        <>
-                          <p className="font-semibold text-foreground text-lg">
-                            ${stock.price.toFixed(2)}
-                          </p>
-                          {stock.price > 0 && stock.changePercent !== 0 && (
-                            <Badge
-                              className={
-                                stock.changePercent >= 0
-                                  ? "bg-[#3d7a54]/10 text-[#3d7a54] text-xs font-medium mt-1 border-0"
-                                  : "bg-[#d4788a]/10 text-[#d4788a] text-xs font-medium mt-1 border-0"
-                              }
-                            >
-                              {stock.changePercent >= 0 ? "+" : ""}
-                              {stock.changePercent.toFixed(2)}%
-                            </Badge>
-                          )}
-                        </>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex gap-2 mb-4">
-                    <Badge variant="outline" className="text-xs font-normal border-border/50 text-muted-foreground">
-                      {stock.trend}
-                    </Badge>
-                    <Badge variant="outline" className="text-xs font-normal border-border/50 text-muted-foreground">
-                      {stock.riskLevel}
-                    </Badge>
-                  </div>
-
-                  <div className="mt-auto">
-                    <div className="p-4 bg-accent/5 rounded-xl border border-accent/10 relative">
-                      <div className="absolute -top-3 -left-2 text-2xl drop-shadow-sm">🌺</div>
-                      <p className="text-sm italic text-foreground leading-relaxed pl-4">
-                        "{stock.pansyQuote}"
-                      </p>
-                    </div>
-                  </div>
-                </Card>
-              </Link>
-            ))}
-          </div>
-        </div>
+        {/* Morning Coffee with Pansy */}
+        {(briefingLoading || briefing) && (
+          <Card className="p-6 bg-card border-border rounded-2xl shadow-sm">
+            <div className="flex items-center gap-2 mb-4">
+              <h2 className="font-serif text-xl font-bold text-foreground">Morning Coffee with Pansy</h2>
+              <span className="text-xl">☕</span>
+            </div>
+            <p className="text-xs text-muted-foreground mb-4">Today&apos;s market context</p>
+            {briefingLoading ? (
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-5/6" />
+                <Skeleton className="h-4 w-4/6" />
+              </div>
+            ) : (
+              <div className="flex items-start gap-3">
+                <img
+                  src="/pansy-coffee.png"
+                  alt="Pansy"
+                  className="w-10 h-10 rounded-full border border-border object-cover shrink-0 mt-0.5"
+                />
+                <div className="bg-muted/40 rounded-2xl rounded-tl-sm px-4 py-3 border border-border">
+                  <p className="text-sm text-foreground leading-relaxed whitespace-pre-line">{briefing}</p>
+                </div>
+              </div>
+            )}
+          </Card>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Market Movers */}
           <Card className="p-6 bg-card border-border rounded-2xl h-fit">
             <h2 className="text-xl font-semibold mb-4 text-foreground">
-              Market Movers
+              Market Indices
             </h2>
             <div className="space-y-3">
-              {stockPicks.slice(0, 5).map((stock) => (
-                <Link
-                  key={stock.ticker}
-                  href={`/stock/${stock.ticker}`}
-                  className="flex items-center justify-between p-3 hover:bg-muted/50 rounded-xl transition-colors group"
+              {marketData.filter(i => ["SPY","QQQ","DIA"].includes(i.symbol)).map((index) => (
+                <div
+                  key={index.symbol}
+                  className="flex items-center justify-between p-3 rounded-xl"
                 >
                   <div>
-                    <p className="font-semibold text-foreground group-hover:text-accent transition-colors">
-                      {stock.ticker}
-                    </p>
-                    <p className="text-sm text-muted-foreground">{stock.name}</p>
+                    <p className="font-semibold text-foreground">{index.name}</p>
+                    <p className="text-sm text-muted-foreground">{index.symbol}</p>
                   </div>
                   <div className="text-right">
-                    {stock.error ? (
+                    {index.error ? (
                       <p className="text-sm font-medium text-destructive">Unavailable</p>
                     ) : (
                       <>
                         <p className="font-semibold text-foreground">
-                          ${stock.price.toFixed(2)}
+                          {index.price > 0 ? `$${index.price.toFixed(2)}` : "—"}
                         </p>
-                        {stock.price > 0 && stock.changePercent !== 0 && (
+                        {index.price > 0 && index.changePercent !== 0 && (
                           <Badge
                             className={
-                              stock.changePercent >= 0
-                                ? "bg-[#3d7a54]/10 text-[#3d7a54] border-0"
-                                : "bg-[#d4788a]/10 text-[#d4788a] border-0"
+                              index.changePercent >= 0
+                                ? "bg-emerald-500/10 text-emerald-700 border-0"
+                                : "bg-red-500/10 text-red-600 border-0"
                             }
                           >
-                            {stock.changePercent >= 0 ? "+" : ""}
-                            {stock.changePercent.toFixed(2)}%
+                            {index.changePercent >= 0 ? "+" : ""}
+                            {index.changePercent.toFixed(2)}%
                           </Badge>
                         )}
                       </>
                     )}
                   </div>
-                </Link>
+                </div>
               ))}
             </div>
           </Card>

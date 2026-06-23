@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // All API calls now go through internal proxy routes - no direct external API access
+import { supabase } from "@/integrations/supabase/client";
 
 interface PriceData {
   currentPrice: number;
@@ -580,9 +581,16 @@ Please provide:
 
 Use web search to find currently top-performing ETFs that match her profile. Consider new ETFs launched in the last 12 months if they're worth recommending. Be specific with allocation percentages and realistic with projections.`;
 
+      let { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        ({ data: { session } } = await supabase.auth.refreshSession());
+      }
       const response = await fetch("/api/analyze-portfolio", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(session?.access_token && { Authorization: `Bearer ${session.access_token}` }),
+        },
         body: JSON.stringify({ userMessage }),
       });
 

@@ -44,6 +44,7 @@ export function Layout({ children }: LayoutProps) {
     if (path === "/learn") return currentPath === "/learn";
     if (path === "/brokers") return currentPath === "/brokers";
     if (path === "/profile") return currentPath.startsWith("/profile") || currentPath.startsWith("/subscription");
+    if (path === "/university") return currentPath.startsWith("/university");
     return false;
   };
 
@@ -107,7 +108,7 @@ export function Layout({ children }: LayoutProps) {
 
       {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-40 safe-area-bottom">
-        <div className="grid grid-cols-6 gap-1 px-2 py-2 max-w-2xl mx-auto">
+        <div className="grid grid-cols-7 gap-1 px-1 py-2 max-w-2xl mx-auto">
           <Link href="/home" passHref>
             <button className={`flex flex-col items-center gap-1 px-2 py-1 rounded-lg transition-colors ${
               isActivePath("/home") ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
@@ -150,6 +151,15 @@ export function Layout({ children }: LayoutProps) {
             }`}>
               <Building2 className="w-5 h-5" />
               <span className="text-xs">Brokers</span>
+            </button>
+          </Link>
+
+          <Link href="/university" passHref>
+            <button className={`flex flex-col items-center gap-1 px-2 py-1 rounded-lg transition-colors ${
+              isActivePath("/university") ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
+            }`}>
+              <GraduationCap className="w-5 h-5" />
+              <span className="text-xs">Bloom U</span>
             </button>
           </Link>
 
@@ -215,7 +225,7 @@ export function Layout({ children }: LayoutProps) {
               © 2026 Cinder Vault Enterprises LLC. All rights reserved. Bloom is a product of Cinder Vault Enterprises LLC.
             </p>
             <p className="mt-2 text-xs text-muted-foreground">
-              Bloom is for educational purposes only and does not constitute financial advice. All investing involves risk of loss. Some broker links may be affiliate partnerships where Bloom earns a commission.
+              Bloom is for educational purposes only and does not constitute financial advice. All investing involves risk of loss.
             </p>
           </div>
         </div>

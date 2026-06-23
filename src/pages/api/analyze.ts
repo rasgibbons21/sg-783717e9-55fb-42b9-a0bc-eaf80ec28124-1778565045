@@ -1,33 +1,42 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import Anthropic from "@anthropic-ai/sdk";
+import { requireProUser, sendAuthError } from "@/lib/requireProUser";
+import { fetchStockBundle, buildDataBlock } from "@/lib/fetchStockData";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
-// Comprehensive Technical + Fundamental Analysis System Prompt
-const PANSY_ANALYSIS_SYSTEM_PROMPT = `You are Pansy, a warm, sharp friend who happens to know markets really well. You're talking to someone you care about — explain things the way you'd text a close girlfriend who asked you about a stock over coffee.
+const PANSY_SYSTEM_PROMPT_TEMPLATE = `You are Pansy — a sharp, warm friend who knows markets deeply and helps people learn to think for themselves. You're not a tutor reading a textbook, and you're not a broker pushing a trade. You're the friend who's been in the markets, knows how they work and how they mess with your head, and helps someone build their own judgment instead of borrowing yours.
 
-VOICE
-- Write in flowing, natural paragraphs. NEVER use markdown headers, bullet lists, or bold section labels. No "## Current Trend" — just talk.
-- Show warmth through how you explain, not through pet names. One term of endearment at most, only if it fits — never in every sentence, never stacked.
-- Cut the hype filler. No "the full scoop," "quite the journey," "the AI darling everyone's talking about." Say something real instead.
-- Sound like a person, not a report. Vary your sentence length. Be direct.
+You're talking with someone about {companyName} ({ticker}). Here is the real, current data — use ONLY these numbers. Never recall a price, multiple, or level from memory. If a figure isn't here, you don't have it, so don't state it:
 
-SUBSTANCE (weave these in naturally — do NOT label them as sections)
-- Where the trend has been and what it's doing now
-- Momentum — cooling, heating up, or stalling
-- What a thoughtful entry might look like and what you'd watch for
-- Where you'd think about stepping out, or what would change your read
-- The honest risk — what could actually go wrong
+{dataBlock}
 
-BOUNDARIES
-- You're educational, not a financial advisor. Frame things as "here's how I'd think about it," never "you should buy." Never promise outcomes.
-- Be honest about uncertainty. If the price action is murky, say so.
+What you do — weave these together as natural conversation, never as labeled sections:
 
-Keep it to a few tight paragraphs — substantial but never exhausting.
+Read the situation as it is. Where the stock has been, where it stands now, what its valuation is telling you — is the market paying up, and what does that imply about the expectations baked in? How has it been moving? Ground every observation in the numbers above.
 
-Always end with: "This is for educational purposes only and is not financial advice. Investing involves risk including possible loss of principal. Historical performance does not guarantee future results. Always do your own research and consult a financial professional before investing 🌸"`;
+Give your real take, both sides. The bull case: what someone who likes it here sees. The bear case: what worries the skeptics. You can have a point of view on which tensions matter most. Laying out both sides honestly is the most useful thing you can do.
+
+Teach the thinking, on this live example. Show the questions a trader actually asks looking at a setup like this — what has to keep going right to justify the price, what would break the thesis, what the real risk is. Make {ticker} the worksheet.
+
+Hand them the decision; don't make it. Frame it as what they'd need to believe: "if you think X about this business or sector, here's how that view plays out; if you think Y, here's the other side." The real question is usually about their thesis and time horizon, not 'is this stock good.' Surface that. When it fits, ask them — what's their thinking, what would change their mind, how would they feel if it dropped hard next week?
+
+Name the psychology when it's live. A hot name at the top of its range, or a beaten-down one, does specific things to people. Say what the environment does and how a disciplined trader checks their own emotions in it.
+
+Hard lines — non-negotiable:
+- Never give entry or exit prices, price targets, stop-loss levels, or "levels to watch for buying." Not as a range, not hedged, not at all.
+- Never say what they should do — no "buy," "sell," "hold," "get in," "wait for."
+- Never predict where the price is going.
+- Never invent a number. Only the data above is real to you.
+Be as specific and opinionated as you want about what IS — the business, the valuation, the risk, the history. You stop at the line of what they should DO.
+
+Voice: talk like a real person, in flowing paragraphs — no headers, no bullet lists, no bold labels. Warmth comes from real care and from making hard things clear, never from performing it. Don't announce that you're being a friend. Don't pile on pet names — one, rarely, only if it lands. Cut hype filler. Vary your rhythm. Be direct. If the picture's murky, say so.
+
+Keep it to a few tight paragraphs — substantial, never exhausting.
+
+Close with: "Educational only — not financial advice. Markets carry real risk, including loss of principal, and past moves don't predict future ones. The decision's always yours."`;
 
 export default async function handler(
   req: NextApiRequest,
@@ -37,6 +46,9 @@ export default async function handler(
     return res.status(405).json({ error: "Method not allowed" });
   }
 
+  const auth = await requireProUser(req);
+  if (auth.error) return sendAuthError(res, auth.error);
+
   try {
     const { ticker, companyName, price, changePercent, userProfile } = req.body;
 
@@ -44,78 +56,34 @@ export default async function handler(
       return res.status(400).json({ error: "Ticker is required" });
     }
 
-    // Build user context for personalized analysis
-    let userContext = "";
+    // Fetch real data bundle server-side
+    const bundle = await fetchStockBundle(ticker, price, changePercent);
+    const dataBlock = buildDataBlock(bundle);
+
+    // Build system prompt with live data
+    let systemPrompt = PANSY_SYSTEM_PROMPT_TEMPLATE
+      .replace(/{companyName}/g, companyName || ticker)
+      .replace(/{ticker}/g, ticker)
+      .replace(/{dataBlock}/g, dataBlock);
+
+    // Append user profile context if provided
     if (userProfile) {
-      userContext = `\n\nUSER PROFILE:
-- Risk Tolerance: ${userProfile.riskTolerance || "Moderate"}
-- Experience Level: ${userProfile.experienceLevel || "Beginner"}
-- Investment Goals: ${userProfile.investmentGoals?.join(", ") || "Wealth Building"}
-- Time Horizon: ${userProfile.timeHorizon || "Long-term"}`;
-
-      if (userProfile.currentAge && userProfile.retirementAge) {
-        const yearsToRetirement = userProfile.retirementAge - userProfile.currentAge;
-        userContext += `\n- Years to Retirement: ${yearsToRetirement}`;
-      }
-
-      if (userProfile.monthlyContribution) {
-        userContext += `\n- Monthly Contribution: $${userProfile.monthlyContribution}`;
+      const profileLines: string[] = [];
+      if (userProfile.riskTolerance) profileLines.push(`Risk tolerance: ${userProfile.riskTolerance}`);
+      if (userProfile.experienceLevel) profileLines.push(`Experience level: ${userProfile.experienceLevel}`);
+      if (userProfile.timeHorizon) profileLines.push(`Time horizon: ${userProfile.timeHorizon}`);
+      if (userProfile.investmentGoals?.length) profileLines.push(`Goals: ${userProfile.investmentGoals.join(", ")}`);
+      if (profileLines.length > 0) {
+        systemPrompt += `\n\nUSER CONTEXT (shape how you explain — do not change the hard lines above):\n${profileLines.join("\n")}`;
       }
     }
 
-    const userMessage = `Perform a comprehensive technical and fundamental analysis on:
-
-Ticker: ${ticker}
-Company: ${companyName || ticker}
-Current Price: $${price || "N/A"}
-Today's Change: ${changePercent ? changePercent.toFixed(2) : "N/A"}%
-
-${userContext}
-
-Please provide:
-
-**TECHNICAL ANALYSIS:**
-- Current trend direction and market structure
-- Support and resistance levels with specific price points
-- Volume analysis and institutional activity
-- RSI condition (overbought/oversold/neutral)
-- MACD momentum (accelerating/fading)
-- Moving average positioning
-- Chart strength assessment
-- Breakout and breakdown zones
-
-**FUNDAMENTAL ANALYSIS:**
-- Business overview
-- Revenue and earnings trends
-- Profitability and debt
-- Valuation (P/E ratio, market cap)
-- Sector strength
-- Recent catalysts or news
-- Dividend information if applicable
-
-**TWO SCENARIOS:**
-- Bullish scenario with price targets
-- Bearish scenario with risk levels
-
-**BEHAVIORAL TIP:**
-One key emotional discipline insight
-
-**FINAL SCORECARD:**
-Structured scorecard with verdict
-
-Use web search to get the latest chart data, technical indicators, fundamental metrics, and news. Sound like a knowledgeable girlfriend giving real talk about both the chart and the business behind it.`;
+    const userMessage = `Give me your honest read on ${companyName || ticker} (${ticker}) — the business, where it stands, what the bull and bear cases are, and what someone learning to think about this kind of stock should actually be asking themselves.`;
 
     const response = await anthropic.messages.create({
-      model: "claude-3-7-sonnet-20250219",
-      max_tokens: 3000,
-      temperature: 0.7,
-      system: PANSY_ANALYSIS_SYSTEM_PROMPT,
-      tools: [
-        {
-          type: "web_search_20250305",
-          name: "web_search",
-        },
-      ],
+      model: "claude-sonnet-4-5",
+      max_tokens: 2000,
+      system: systemPrompt,
       messages: [
         {
           role: "user",
@@ -124,7 +92,6 @@ Use web search to get the latest chart data, technical indicators, fundamental m
       ],
     });
 
-    // Extract text content from response
     let analysisText = "";
     for (const block of response.content) {
       if (block.type === "text") {
@@ -133,93 +100,26 @@ Use web search to get the latest chart data, technical indicators, fundamental m
     }
 
     if (!analysisText) {
-      throw new Error("No analysis text received from Pansy");
+      throw new Error("No analysis received from Pansy");
     }
 
-    // Parse the analysis into structured sections
-    const analysis = {
-      technical: extractSection(analysisText, ["TECHNICAL ANALYSIS", "Technical Analysis", "Chart Analysis"]),
-      fundamental: extractSection(analysisText, ["FUNDAMENTAL ANALYSIS", "Fundamental Analysis", "Business Analysis"]),
-      bullishScenario: extractSection(analysisText, ["Bullish Scenario", "Bullish Case"]),
-      bearishScenario: extractSection(analysisText, ["Bearish Scenario", "Bearish Case", "Risk Scenario"]),
-      behavioralTip: extractSection(analysisText, ["BEHAVIORAL", "Behavioral Tip", "Emotional Discipline"]),
-      scorecard: extractSection(analysisText, ["SCORECARD", "Scorecard", "FINAL SCORECARD"]),
-      verdict: extractVerdict(analysisText),
+    return res.status(200).json({
       fullText: analysisText,
-      timestamp: new Date().toISOString(),
-    };
-
-    // Determine overall rating
-    let rating = "Watch";
-    const verdictLower = analysis.verdict.toLowerCase();
-    if (verdictLower.includes("strong watchlist") || verdictLower.includes("momentum setup")) {
-      rating = "Strong Watch";
-    } else if (verdictLower.includes("high risk") || verdictLower.includes("avoid") || verdictLower.includes("weak")) {
-      rating = "Avoid";
-    } else if (verdictLower.includes("too risky")) {
-      rating = "High Risk";
-    } else if (verdictLower.includes("neutral") || verdictLower.includes("wait")) {
-      rating = "Neutral";
-    }
-
-    const result = {
-      ...analysis,
-      rating,
       ticker,
       companyName: companyName || ticker,
-      price: price || 0,
-      changePercent: changePercent || 0,
-    };
-
-    return res.status(200).json(result);
+      price: bundle.price,
+      changePercent: bundle.changePercent,
+      dataBundle: dataBlock,
+      timestamp: new Date().toISOString(),
+      rating: "Educational",
+    });
   } catch (error: unknown) {
     console.error("Error in Pansy analysis:", error);
 
     return res.status(500).json({
       error: (error as Error).message || "Analysis temporarily unavailable",
-      technical: "I'm gathering the latest chart data for you. This usually takes a moment — try refreshing 🌸",
-      fundamental: "I need to research this company's fundamentals. Check back in a few seconds.",
-      behavioralTip: "While you wait: remember that patience is key. The best setups reveal themselves when you're not rushing 💛",
-      verdict: "Analysis in progress",
-      rating: "Neutral",
+      fullText: "I'm having trouble pulling the latest data right now. Try again in a moment — the market's always moving 🌸",
+      rating: "Unavailable",
     });
   }
-}
-
-// Helper function to extract sections from Pansy's response
-function extractSection(text: string, sectionTitles: string[]): string {
-  for (const title of sectionTitles) {
-    const regex = new RegExp(`\\*\\*${title}[:\\*]*\\*\\*([\\s\\S]*?)(?=\\*\\*[A-Z]|$)`, "i");
-    const match = text.match(regex);
-    if (match && match[1]) {
-      return match[1].trim();
-    }
-  }
-
-  // Fallback: look for section headers without bold
-  for (const title of sectionTitles) {
-    const regex = new RegExp(`${title}[:\\s]*([^\\n]+(?:\\n(?!\\*\\*|#)[^\\n]+)*)`, "i");
-    const match = text.match(regex);
-    if (match && match[1]) {
-      return match[1].trim();
-    }
-  }
-
-  return "Analysis in progress 🌸";
-}
-
-function extractVerdict(text: string): string {
-  const verdictRegex = /Pansy's Verdict[:\s]*(.*?)(?=\n|$)/i;
-  const match = text.match(verdictRegex);
-  if (match && match[1]) {
-    return match[1].trim();
-  }
-
-  // Look in scorecard section
-  const scorecardMatch = text.match(/Verdict[:\s]*(.*?)(?=\n|$)/i);
-  if (scorecardMatch && scorecardMatch[1]) {
-    return scorecardMatch[1].trim();
-  }
-
-  return "Analysis in progress";
 }

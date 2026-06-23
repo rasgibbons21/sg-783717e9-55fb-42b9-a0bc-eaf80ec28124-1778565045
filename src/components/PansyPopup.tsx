@@ -33,9 +33,9 @@ export function PansyPopup({ type = "first-visit", userName, marketTip }: PansyP
   const getMessage = () => {
     switch (type) {
       case "first-visit":
-        return "Hi I'm Pansy — I'm here to help investing make sense, one plain-language step at a time 🌺";
+        return "Hi, I'm Pansy — your investing education guide. I'm here to help make the market make sense, one concept at a time 🌺";
       case "returning":
-        return `Welcome back ${userName} 🌸 Ready to keep learning, or want a quick analysis on a stock you're curious about?`;
+        return `Welcome back${userName ? ` ${userName}` : ""} 🌸 Ready to keep learning? Let's see what the market has been up to.`;
       case "market-tip":
         return marketTip || "Market tip coming soon!";
       default:
@@ -57,7 +57,7 @@ export function PansyPopup({ type = "first-visit", userName, marketTip }: PansyP
                   Pansy
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  Bloom's Investing Expert
+                  Your Investing Education Guide
                 </p>
               </div>
               <Button

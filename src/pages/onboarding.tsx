@@ -139,31 +139,51 @@ export default function Onboarding() {
     }
   };
 
+  const handleSkip = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      setError("Session expired — please sign in again.");
+      return;
+    }
+    const { error } = await supabase.from("profiles").upsert({ id: user.id, onboarding_complete: true });
+    if (error) {
+      console.error("Failed to save skip:", error);
+      setError("Something went wrong. Please try again.");
+      return;
+    }
+    window.location.href = "/home";
+  };
+
   const handleCompleteOnboarding = async () => {
     setIsSubmitting(true);
 
-    const saveProfile = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        // Profiles table doesn't have risk_tolerance, experience_level, or investment_goals
-        // Just update the user's full_name if needed
-        await userService.updateUser(user.id, {
-          full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || ''
-        });
-      }
-    };
-
-    const timeout = (ms: number) =>
-      new Promise<void>((resolve) => setTimeout(resolve, ms));
-
     try {
-      await Promise.race([saveProfile(), timeout(4000)]);
-    } catch (error) {
-      console.error('Profile save error:', error);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setError("Session expired — please sign in again.");
+        return;
+      }
+
+      const { error: saveError } = await supabase.from("profiles").upsert({
+        id: user.id,
+        experience_level: experience,
+        investment_goals: goals,
+        risk_tolerance: risk,
+        onboarding_complete: true,
+      });
+
+      if (saveError) {
+        console.error("Failed to save onboarding profile:", saveError);
+        setError("We couldn't save your answers. Please try again.");
+        return;
+      }
+
+      window.location.href = "/subscription-offer";
+    } catch (err) {
+      console.error("Onboarding error:", err);
+      setError("Something went wrong. Please try again.");
     } finally {
       setIsSubmitting(false);
-      // Redirect to subscription offer page instead of home
-      window.location.href = '/subscription-offer';
     }
   };
 
@@ -513,7 +533,7 @@ export default function Onboarding() {
                       }`}
                     >
                       {experience === option.value && (
-                        <div className="w-3 h-3 rounded-full bg-white" />
+                        <div className="w-3 h-3 rounded-full bg-[#F4F7FA]" />
                       )}
                     </div>
                   </div>
@@ -529,10 +549,18 @@ export default function Onboarding() {
               Continue
             </Button>
 
+            <button
+              type="button"
+              onClick={handleSkip}
+              className="w-full text-center text-sm text-muted-foreground hover:text-foreground mt-2 py-2"
+            >
+              Skip for now →
+            </button>
+
             <Button
               type="button"
               variant="ghost"
-              onClick={() => router.push("/home")}
+              onClick={handleSkip}
               className="w-full text-muted-foreground hover:text-foreground"
             >
               Skip for now
@@ -584,7 +612,7 @@ export default function Onboarding() {
                       }`}
                     >
                       {goals.includes(option.value) && (
-                        <div className="w-3 h-3 rounded-full bg-white" />
+                        <div className="w-3 h-3 rounded-full bg-[#F4F7FA]" />
                       )}
                     </div>
                   </div>
@@ -601,10 +629,18 @@ export default function Onboarding() {
               Continue
             </Button>
 
+            <button
+              type="button"
+              onClick={handleSkip}
+              className="w-full text-center text-sm text-muted-foreground hover:text-foreground mt-2 py-2"
+            >
+              Skip for now →
+            </button>
+
             <Button
               type="button"
               variant="ghost"
-              onClick={() => router.push("/home")}
+              onClick={handleSkip}
               className="w-full text-muted-foreground hover:text-foreground"
             >
               Skip for now
@@ -652,7 +688,7 @@ export default function Onboarding() {
                       }`}
                     >
                       {risk === option.value && (
-                        <div className="w-3 h-3 rounded-full bg-white" />
+                        <div className="w-3 h-3 rounded-full bg-[#F4F7FA]" />
                       )}
                     </div>
                   </div>
@@ -661,8 +697,8 @@ export default function Onboarding() {
             </div>
 
             {error && (
-              <Card className="p-4 border-rose bg-rose/5 rounded-2xl">
-                <p className="text-sm text-rose">{error}</p>
+              <Card className="p-4 border-[#ef4444] bg-[#ef4444]/5 rounded-2xl">
+                <p className="text-sm text-[#ef4444]">{error}</p>
               </Card>
             )}
 
@@ -679,10 +715,18 @@ export default function Onboarding() {
               )}
             </Button>
 
+            <button
+              type="button"
+              onClick={handleSkip}
+              className="w-full text-center text-sm text-muted-foreground hover:text-foreground mt-2 py-2"
+            >
+              Skip for now →
+            </button>
+
             <Button
               type="button"
               variant="ghost"
-              onClick={() => router.push("/home")}
+              onClick={handleSkip}
               className="w-full text-muted-foreground hover:text-foreground"
             >
               Skip for now

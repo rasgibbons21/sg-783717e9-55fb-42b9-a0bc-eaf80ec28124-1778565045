@@ -16,7 +16,8 @@ import { PositionSizeCalculator } from "@/components/PositionSizeCalculator";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { authService } from "@/services/authService";
 import { supabase } from "@/integrations/supabase/client";
-import { Search, ArrowLeft, Clock, CheckCircle2, Circle, ChevronRight, Bookmark, BookmarkCheck, Award } from "lucide-react";
+import { Search, ArrowLeft, Clock, CheckCircle2, Circle, ChevronRight, Bookmark, BookmarkCheck, Award, Lock } from "lucide-react";
+import { UpgradeModal } from "@/components/UpgradeModal";
 
 type Category = "All" | "Stocks" | "ETFs" | "Mutual Funds" | "Dividends" | "Bonds" | "Retirement" | "Trading Psychology" | "Income Streams";
 
@@ -41,10 +42,12 @@ interface Lesson {
   isPro?: boolean;
 }
 
+
 export default function Learn() {
   const router = useRouter();
   const { isPro, isLoading: subscriptionLoading } = useSubscription();
   const [user, setUser] = useState<any>(null);
+  const [showLearnUpgradeModal, setShowLearnUpgradeModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<Category>("All");
   const [completedLessons, setCompletedLessons] = useState<string[]>([]);
@@ -61,6 +64,7 @@ export default function Learn() {
       id: "what-is-stock",
       title: "What is a Stock",
       category: "Stocks",
+      isPro: false,
       readTime: 3,
       difficulty: "Beginner",
       summary: "Understanding company ownership and how stocks work",
@@ -100,6 +104,7 @@ The key is thinking long term. Day to day the price bounces around like crazy bu
       id: "what-is-etf",
       title: "What is an ETF",
       category: "ETFs",
+      isPro: false,
       readTime: 4,
       difficulty: "Beginner",
       summary: "The combo meal of investing explained",
@@ -139,6 +144,7 @@ Bottom line: ETFs are perfect for beginners because you get instant diversificat
       id: "what-is-mutual-fund",
       title: "What is a Mutual Fund",
       category: "Mutual Funds",
+      isPro: false,
       readTime: 4,
       difficulty: "Beginner",
       summary: "Professional money management explained simply",
@@ -178,6 +184,7 @@ That said some women prefer having a professional manage their money especially 
       id: "what-are-dividends",
       title: "What are Dividends",
       category: "Dividends",
+      isPro: false,
       readTime: 4,
       difficulty: "Beginner",
       summary: "Getting paid just for holding stocks",
@@ -217,6 +224,7 @@ You can take the dividends as cash or reinvest them to buy more shares (that's c
       id: "bull-vs-bear",
       title: "Bull vs Bear Market",
       category: "Stocks",
+      isPro: false,
       readTime: 3,
       difficulty: "Beginner",
       summary: "What people mean when they say the market is bullish or bearish",
@@ -256,6 +264,7 @@ So when you see red don't panic and sell everything. That's literally when stock
       id: "market-cap",
       title: "What is Market Cap",
       category: "Stocks",
+      isPro: false,
       readTime: 3,
       difficulty: "Beginner",
       summary: "How to measure a company's total value",
@@ -300,6 +309,7 @@ Don't confuse market cap with stock price btw. A $10 stock of a huge company mig
       id: "pe-ratio",
       title: "What is PE Ratio",
       category: "Stocks",
+      isPro: false,
       readTime: 4,
       difficulty: "Intermediate",
       summary: "Is this stock expensive or a bargain?",
@@ -341,6 +351,7 @@ Use PE to compare companies in the same industry. Comparing Apple's PE to a util
       id: "index-funds",
       title: "Index Funds Explained",
       category: "ETFs",
+      isPro: false,
       readTime: 4,
       difficulty: "Beginner",
       summary: "Why boring investing wins",
@@ -384,6 +395,7 @@ Index funds are my #1 recommendation for beginners. They're boring they're simpl
       id: "dollar-cost-averaging",
       title: "Dollar Cost Averaging",
       category: "Retirement",
+      isPro: false,
       readTime: 4,
       difficulty: "Beginner",
       summary: "The strategy that removes timing stress",
@@ -425,6 +437,7 @@ Set it and forget it girl. That's the secret to building wealth without the stre
       id: "roth-ira",
       title: "What is a Roth IRA",
       category: "Retirement",
+      isPro: false,
       readTime: 5,
       difficulty: "Beginner",
       summary: "Tax-free growth for your future self",
@@ -468,6 +481,7 @@ Start a Roth IRA as early as possible. Time is your biggest advantage here. Even
       id: "drip-investing",
       title: "DRIP Investing",
       category: "Dividends",
+      isPro: false,
       readTime: 4,
       difficulty: "Beginner",
       summary: "Automatically reinvesting dividends for compound growth",
@@ -509,6 +523,7 @@ When you're young and don't need the income DRIP is the move. When you retire yo
       id: "active-vs-passive",
       title: "Active vs Passive Investing",
       category: "ETFs",
+      isPro: false,
       readTime: 5,
       difficulty: "Intermediate",
       summary: "Two completely different philosophies",
@@ -565,6 +580,7 @@ My take: If you're new go passive with index funds. Put 80-90% of your portfolio
       id: "risk-reward-rule",
       title: "The 3:1 Risk to Reward Rule",
       category: "Trading Psychology",
+      isPro: true,
       readTime: 4,
       difficulty: "Intermediate",
       summary: "Win rate matters less than you think",
@@ -635,6 +651,7 @@ This isn't about being smart or picking perfectly. It's about math and disciplin
       id: "investment-rules",
       title: "Investment Rules That Work",
       category: "Trading Psychology",
+      isPro: true,
       readTime: 5,
       difficulty: "Intermediate",
       summary: "Systematic rules eliminate emotional decisions",
@@ -713,6 +730,7 @@ Set your rules before you invest. Write them down. Follow them no matter how you
       id: "what-is-fomo",
       title: "What is FOMO",
       category: "Trading Psychology",
+      isPro: false,
       readTime: 4,
       difficulty: "Beginner",
       summary: "Fear of missing out destroys portfolios",
@@ -787,6 +805,7 @@ Missing a move feels bad but losing money feels worse. Protect your capital sis.
       id: "revenge-trading",
       title: "Revenge Trading Warning",
       category: "Trading Psychology",
+      isPro: true,
       readTime: 4,
       difficulty: "Intermediate",
       summary: "The fastest way to blow up your account",
@@ -874,6 +893,7 @@ Protect your capital. Your ego can recover but your account might not 🛡️`,
       id: "self-assessment",
       title: "Self Assessment Before Every Trade",
       category: "Trading Psychology",
+      isPro: true,
       readTime: 5,
       difficulty: "Intermediate",
       summary: "The 6-question checklist that saves accounts",
@@ -954,6 +974,7 @@ Print these six questions out. Put them on your screen. Make yourself answer the
       id: "risk-management",
       title: "Risk Management Like a Pro",
       category: "Trading Psychology",
+      isPro: true,
       readTime: 5,
       difficulty: "Intermediate",
       summary: "The 3% rule that professional traders live by",
@@ -1050,6 +1071,7 @@ That's it. Risk 3% max per trade. It's boring. It's not exciting. It won't make 
       id: "trading-psychology-checklist",
       title: "Trading Psychology Checklist",
       category: "Trading Psychology",
+      isPro: true,
       readTime: 3,
       difficulty: "Beginner",
       summary: "Your pre-trade, during-trade, and post-trade system",
@@ -1163,7 +1185,7 @@ Real estate isn't passive income at first — there's work involved finding the 
 
 **Real talk:** This isn't get-rich-quick. It's build-wealth-slowly. One rental property cash flowing $300/month won't change your life. But 3 properties doing that is $10,800 a year. Over 10 years that compounds. Plus the property value usually goes up and your tenants are paying down your mortgage for you.
 
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
+Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
       keyTakeaway: "Cash flow = rent minus all expenses. Positive cash flow = property pays you monthly. Negative = you feed it money. Aim for positive.",
       relatedTopics: ["income-ways-into-real-estate", "income-dscr-loans"],
       quiz: [
@@ -1225,7 +1247,7 @@ REITs typically yield 3-7% and you can buy them with as little as $100. The down
 
 You can mix these too. Start with house hacking or REITs while you save for a traditional rental. Real estate is one of the few wealth-building tools where you can literally use other people's money (the bank's + your tenants' rent) to build your net worth 💪
 
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
+Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
       keyTakeaway: "Three paths: House hacking (live in one unit, rent others — lowest barrier). Traditional rental (20-25% down, investor path). REITs (stock-like shares, no landlord work).",
       relatedTopics: ["income-real-estate-cash-flow", "income-dscr-loans", "income-reits"],
       quiz: [
@@ -1294,7 +1316,7 @@ They literally don't care if you're employed or what you claim on taxes. They ca
 
 Who uses DSCR loans? Self-employed people, real estate investors with multiple properties, people who write off a ton of business expenses, anyone whose "official" income doesn't reflect their actual cash situation 🏡
 
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
+Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
       keyTakeaway: "DSCR loans qualify you on the property's rent not your income. No tax returns needed. Ratio 1.0+ required, 1.25+ for best rates. Down payment 20-25%. Higher interest but flexible.",
       relatedTopics: ["income-real-estate-cash-flow", "income-conventional-loans", "income-ways-into-real-estate"],
       quiz: [
@@ -1377,7 +1399,7 @@ Here's how savvy women combine these loans with house hacking:
 
 The beauty of owner-occupied loans is you get the best rates and lowest down payment options. Then after you live there for a year you can turn it into a rental. That's how you build a real estate portfolio without needing huge cash upfront sis 💪
 
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
+Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
       keyTakeaway: "Conventional owner-occupied: 10-15% down, 620+ credit, must live 1 year. FHA: 3.5% down, 580+ credit. House hack strategy = live in one unit, rent others, then move out after 1 year.",
       relatedTopics: ["income-dscr-loans", "income-ways-into-real-estate", "income-real-estate-cash-flow"],
       quiz: [
@@ -1447,7 +1469,7 @@ You don't need a degree, a certification, or years of experience to start. You n
 
 In the next lessons we'll talk about how to actually package your skills and find clients. But this lesson is just about the belief shift: you already have something people will pay for. You just need to start seeing it that way 💛
 
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
+Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
       keyTakeaway: "You already have skills people will pay for. Your 'basic' skill is someone else's struggle. Beginner-level skills = $20-40/hour. You don't need to be an expert.",
       relatedTopics: ["income-side-hustle-map", "income-digital-products"],
       quiz: [
@@ -1533,7 +1555,7 @@ Start with Services if you need cash now. Build Digital Products while you do se
 
 You don't have to pick just one. Most successful side hustlers mix 2-3 of these. Services pay the bills. Digital products build passive income. Content brings customers to both. That's the flywheel sis 💪
 
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
+Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
       keyTakeaway: "Four paths: Services (quick cash, $500-5k/mo), Digital Products (create once sell forever), Content/Affiliate (build audience long game), E-commerce (physical products). Start with services, add products, then content.",
       relatedTopics: ["income-skills-to-income", "income-digital-products", "income-content-affiliate"],
       quiz: [
@@ -1643,7 +1665,7 @@ But here's the magic: once it's made you're not trading time for money anymore. 
 
 One weekend of focused work can create a product that earns income for years. That's the leverage sis 💪
 
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
+Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
       keyTakeaway: "Digital products = create once, sell forever. Platforms: KDP (books), Etsy (printables), Gumroad (templates), Shopify (own store). Realistic: $50-300/mo months 2-3, $500-2k/mo by month 12.",
       relatedTopics: ["income-side-hustle-map", "income-content-affiliate", "income-skills-to-income"],
       quiz: [
@@ -1734,7 +1756,7 @@ This is NOT fast money. If you need income in 30 days this isn't it. But if you 
 
 You build an audience once and monetize it 10 different ways: ad revenue + affiliates + sponsorships + your products = diversified income from one asset (your audience) 💪
 
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
+Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
       keyTakeaway: "Content income timeline: 0-6 months = $0-100, year 1-2 = $500-2k/month. Revenue: ads + affiliates + sponsorships + own products. Must disclose affiliates. Long game but compounds.",
       relatedTopics: ["income-digital-products", "income-side-hustle-map", "income-skills-to-income"],
       quiz: [
@@ -1824,7 +1846,7 @@ It's not zero effort. It's just WAY less effort than trading your time 1:1 for m
 
 It breaks the 1:1 time-for-money trap. You're creating assets that generate income whether you're working that day or not. That's how you build wealth — you can't trade time forever but assets can earn forever 💪
 
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
+Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
       keyTakeaway: "Passive ≠ effortless. Passive = money with minimal ongoing effort AFTER you build the system. You put in work/money upfront then it runs with 0-10 hours/month maintenance.",
       relatedTopics: ["income-dividends-101", "income-hysa-safe-yield", "income-real-estate-cash-flow"],
       quiz: [
@@ -1920,7 +1942,7 @@ But if you invest $500/month for 20 years at 8% total return (4% dividend + 4% g
 
 Dividends are patient wealth-building. You're not getting rich overnight. But you're getting paid every quarter just for owning shares. That's real passive income girl 💛
 
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
+Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
       keyTakeaway: "Dividends = quarterly cash from stocks. 4% yield on $300k = $1k/month income. DRIP = reinvest dividends to buy more shares automatically. Use DRIP when building, turn off when you need income.",
       relatedTopics: ["income-passive-really", "income-reits-tax-advantaged", "income-hysa-safe-yield"],
       quiz: [
@@ -2012,7 +2034,7 @@ That's $449 extra just for moving your money to a better bank. Same safety same 
 
 **Pro move:** Keep 1-2 months expenses in regular checking for bills. Move the rest to high-yield savings. Set up auto-transfers so your emergency fund earns 4-5% instead of nothing 💪
 
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
+Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
       keyTakeaway: "Don't let cash die at 0.01%. High-yield savings = 4-5%, FDIC insured. T-bills = 4-5%, state tax exempt. I-bonds = inflation-protected. All safe options for parking cash.",
       relatedTopics: ["income-dividends-101", "income-reits-tax-advantaged", "income-passive-really"],
       quiz: [
@@ -2122,7 +2144,7 @@ That's $840,000 kept vs given to IRS. Same contributions different account massi
 
 Tax-advantaged accounts + dividend/REIT income = wealth-building machine sis 💛
 
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
+Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
       keyTakeaway: "REITs = real estate income without owning property, yield 3-7%, taxed as ordinary income (hold in IRA). Tax-advantaged: Roth IRA = tax-free growth, Traditional IRA/401k = tax-deferred. Max accounts for wealth building.",
       relatedTopics: ["income-dividends-101", "income-hysa-safe-yield", "income-ways-into-real-estate"],
       quiz: [
@@ -2203,7 +2225,7 @@ I've seen women lose rental properties because they didn't have an LLC. Lose eve
 
 Don't let that be you sis. Build income AND protect it. Both matter equally 💛
 
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
+Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
       keyTakeaway: "Protection = emergency fund + insurance (life, disability, health) + legal structure (LLC) + asset protection. Protect downside first then focus on upside. Both matter equally.",
       relatedTopics: ["income-insurance-explained", "income-llc-basics", "income-cash-flow-business"],
       quiz: [
@@ -2301,7 +2323,7 @@ Buy term life if people depend on your income. Buy disability insurance if your 
 
 Don't let insurance salespeople scare you into expensive policies you don't need. Stick to the basics and invest the rest sis 💛
 
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
+Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
       keyTakeaway: "Protection trifecta: Term life (if dependents rely on your income), Disability (1 in 4 need it), Health (medical bankruptcy is real). Skip expensive whole life and redundant policies. Basics only.",
       relatedTopics: ["income-protecting-money", "income-llc-basics", "income-cash-flow-business"],
       quiz: [
@@ -2406,7 +2428,7 @@ Form an LLC when your side income is consistent ($10k+/year) and you want profes
 
 LLC = legal protection + professional credibility. It's not magic but it matters when your income grows sis 💪
 
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
+Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
       keyTakeaway: "LLC = liability protection. File Articles of Organization with state ($50-500). Get EIN from IRS (free). Open business bank. File annual reports ($50-300/year). Form when income is $10k+/year consistent.",
       relatedTopics: ["income-protecting-money", "income-cash-flow-business", "income-insurance-explained"],
       quiz: [
@@ -2521,7 +2543,7 @@ This takes 1-2 years minimum. It's not sexy. It's documenting processes, trainin
 
 You can't hustle forever. But systems and teams can run indefinitely sis 💪
 
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions. Some lender and insurance links may be affiliate partnerships where Cinder Vault Enterprises LLC may earn a commission at no extra cost to you.`,
+Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
       keyTakeaway: "Hustle = time for money. Business = systems + people do work. Transition: systematize → reinvest 30-50% → hire contractors → build simple systems → track numbers. Takes 1-2 years but scales.",
       relatedTopics: ["income-llc-basics", "income-protecting-money", "income-skills-to-income"],
       quiz: [
@@ -2600,18 +2622,18 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
         .eq("user_id", userId)
         .eq("completed", true);
 
-      const { data: userData } = await (supabase
-        .from("users")
+      const { data: profileData } = await supabase
+        .from("profiles")
         .select("bookmarked_lessons")
         .eq("id", userId)
-        .single() as any);
+        .single();
 
       if (progressData) {
         setCompletedLessons(progressData.map((p) => p.lesson_id));
       }
 
-      if (userData?.bookmarked_lessons) {
-        setBookmarkedLessons(userData.bookmarked_lessons);
+      if (profileData?.bookmarked_lessons) {
+        setBookmarkedLessons(profileData.bookmarked_lessons);
       }
     } catch (error) {
       console.error("Error loading progress:", error);
@@ -2691,8 +2713,8 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
       : [...bookmarkedLessons, lessonId];
 
     try {
-      const { error } = await (supabase
-        .from("users") as any)
+      const { error } = await supabase
+        .from("profiles")
         .update({ bookmarked_lessons: newBookmarks })
         .eq("id", user.id);
 
@@ -3087,11 +3109,18 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
               filteredLessons.map((lesson) => {
                 const isCompleted = completedLessons.includes(lesson.id);
                 const isBookmarked = bookmarkedLessons.includes(lesson.id);
+                const isGated = lesson.isPro === true && !isPro;
                 return (
                   <Card
                     key={lesson.id}
-                    className="p-4 bg-card border-border rounded-xl hover:border-accent/50 transition-all cursor-pointer group"
-                    onClick={() => setSelectedLesson(lesson.id)}
+                    className={`p-4 bg-card border-border rounded-xl hover:border-accent/50 transition-all cursor-pointer group ${isGated ? "opacity-50" : ""}`}
+                    onClick={() => {
+                      if (isGated) {
+                        setShowLearnUpgradeModal(true);
+                      } else {
+                        setSelectedLesson(lesson.id);
+                      }
+                    }}
                   >
                     <div className="flex items-center gap-4">
                       <img
@@ -3106,6 +3135,11 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
                               <Badge className="bg-accent/20 text-accent border-accent/30 text-xs">
                                 {lesson.category}
                               </Badge>
+                              {isGated && (
+                                <Badge className="bg-muted text-muted-foreground border-muted-foreground/30 text-xs flex items-center gap-1">
+                                  <Lock className="w-3 h-3" />Pro
+                                </Badge>
+                              )}
                             </div>
                             <h3 className="font-semibold text-foreground group-hover:text-accent transition-colors">
                               {lesson.title}
@@ -3203,6 +3237,12 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
           </Card>
         </div>
       </div>
+
+      <UpgradeModal
+        isOpen={showLearnUpgradeModal}
+        onClose={() => setShowLearnUpgradeModal(false)}
+        trigger="view_limit"
+      />
     </Layout>
   );
 }

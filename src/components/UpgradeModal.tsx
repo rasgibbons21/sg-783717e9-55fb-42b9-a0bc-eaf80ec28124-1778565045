@@ -5,7 +5,6 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Check, Sparkles, X } from "lucide-react";
 import { useRouter } from "next/router";
-import { PRO_PLAN } from "@/config/proPlan";
 
 interface UpgradeModalProps {
   isOpen: boolean;
@@ -42,7 +41,13 @@ export function UpgradeModal({ isOpen, onClose, trigger = "view_limit" }: Upgrad
             <div className="space-y-3">
               <h4 className="font-serif text-lg font-semibold text-foreground">Bloom Pro</h4>
               <ul className="space-y-2">
-                {PRO_PLAN.benefits.map((feature) => (
+                {[
+                  "Save your portfolio — your holdings and progress, there every time you come back.",
+                  "Unlock every locked lesson — the income-stream playbooks (real estate, digital products, affiliate, REITs, LLC, cash-flow business) plus the full trading-psychology system.",
+                  "Unlimited analysis — research any stock or ETF, as often as you want.",
+                  "Pansy, unlimited — ask your guide anything, anytime, with no daily limit (free is capped).",
+                  "Your whole journey, tracked — completed lessons, saved analyses, progress over time.",
+                ].map((feature) => (
                   <li key={feature} className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" />
                     <span className="text-sm text-foreground">{feature}</span>
@@ -55,15 +60,15 @@ export function UpgradeModal({ isOpen, onClose, trigger = "view_limit" }: Upgrad
           <div className="grid grid-cols-2 gap-3">
             <div className="rounded-lg border border-border p-3 text-center">
               <p className="text-xs text-muted-foreground">Monthly</p>
-              <p className="font-serif text-xl font-semibold text-foreground">${PRO_PLAN.monthlyPrice}<span className="text-sm font-normal text-muted-foreground">/mo</span></p>
+              <p className="font-serif text-xl font-semibold text-foreground">$7.99<span className="text-sm font-normal text-muted-foreground">/mo</span></p>
             </div>
             <div className="relative rounded-lg border border-accent p-3 text-center bg-accent/5">
               <Badge className="absolute -top-2 right-2 bg-accent text-accent-foreground text-[10px] px-1.5 py-0.5">
                 <Sparkles className="w-3 h-3 mr-1" />
-                {PRO_PLAN.yearlySavingsLabel}
+                Save 40% · nearly 5 months free
               </Badge>
               <p className="text-xs text-muted-foreground">Yearly</p>
-              <p className="font-serif text-xl font-semibold text-foreground">${PRO_PLAN.yearlyPrice}<span className="text-sm font-normal text-muted-foreground">/yr</span></p>
+              <p className="font-serif text-xl font-semibold text-foreground">$57.99<span className="text-sm font-normal text-muted-foreground">/yr</span></p>
             </div>
           </div>
 

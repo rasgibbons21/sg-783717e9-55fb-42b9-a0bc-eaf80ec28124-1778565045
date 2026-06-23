@@ -17,7 +17,7 @@ import { TextWithPansyTooltips } from "@/components/TextWithPansyTooltips";
 import { UpgradeModal, UpgradeBanner, useViewTracker } from "@/components/UpgradeModal";
 import { LockedFeatureModal } from "@/components/LockedFeatureModal";
 import { marketService } from "@/services/marketService";
-import { TrendingUp, TrendingDown, AlertTriangle, ExternalLink, BarChart3, Activity, Target, Sparkles } from "lucide-react";
+import { TrendingUp, TrendingDown, AlertTriangle, ExternalLink, BarChart3, Activity, Target, Sparkles, Lock } from "lucide-react";
 import Link from "next/link";
 
 interface StockData {
@@ -135,7 +135,10 @@ export default function StockPage() {
     try {
       const response = await fetch("/api/analyze", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
         body: JSON.stringify({
           ticker: symbol,
           companyName: quote.name || symbol,
@@ -156,9 +159,9 @@ export default function StockPage() {
   };
 
   const getRatingColor = (rating: string) => {
-    if (rating === "Strong Watch") return "text-[#3d7a54] bg-[#3d7a54]/10 border-[#3d7a54]/20";
-    if (rating === "Watch") return "text-[#c8953a] bg-[#c8953a]/10 border-[#c8953a]/20";
-    if (rating === "High Risk" || rating === "Avoid") return "text-[#d4788a] bg-[#d4788a]/10 border-[#d4788a]/20";
+    if (rating === "Strong Watch") return "text-[#49B06E] bg-[#49B06E]/10 border-[#49B06E]/20";
+    if (rating === "Watch") return "text-[#27B7C8] bg-[#27B7C8]/10 border-[#27B7C8]/20";
+    if (rating === "High Risk" || rating === "Avoid") return "text-[#ef4444] bg-[#ef4444]/10 border-[#ef4444]/20";
     return "text-muted-foreground bg-muted border-border";
   };
 
@@ -205,8 +208,8 @@ export default function StockPage() {
             <Badge
               className={
                 stockData.dp >= 0
-                  ? "bg-[#3d7a54]/20 text-[#3d7a54]"
-                  : "bg-[#d4788a]/20 text-[#d4788a]"
+                  ? "bg-[#49B06E]/20 text-[#49B06E]"
+                  : "bg-[#ef4444]/20 text-[#ef4444]"
               }
             >
               {stockData.dp >= 0 ? "+" : ""}
@@ -222,27 +225,31 @@ export default function StockPage() {
 
         {/* Prominent Pansy Analysis CTA */}
         {!pansyAnalysis && !isAnalyzing && (
-          <Card className="p-6 bg-gradient-to-br from-[#c8953a]/20 to-[#c8953a]/10 border-[#c8953a] border-2 animate-pulse-glow">
+          <Card className="p-6 bg-gradient-to-br from-[#27B7C8]/20 to-[#27B7C8]/10 border-[#27B7C8] border-2 animate-pulse-glow">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-2xl shrink-0 shadow-lg">
                 🌺
               </div>
               <div className="flex-1">
                 <h3 className="font-serif text-lg font-semibold text-foreground">Want Pansy's full breakdown?</h3>
-                <p className="text-sm text-muted-foreground">Get her expert take in plain English — no jargon.</p>
+                <p className="text-sm text-muted-foreground">Get her take in plain English — no jargon.</p>
               </div>
-              <Button 
+              <Button
                 onClick={() => loadPansyAnalysis(ticker as string, stockData)}
-                className="bg-[#c8953a] hover:bg-[#c8953a]/90 text-white font-semibold px-6 py-3 text-base shadow-lg shrink-0"
+                className="bg-[#27B7C8] hover:bg-[#27B7C8]/90 text-[#0E1B30] font-semibold px-6 py-3 text-base shadow-lg shrink-0"
               >
-                ✨ Get Pansy's Take
+                {isPro ? (
+                  <>✨ Get Pansy's Take</>
+                ) : (
+                  <><Lock className="w-4 h-4 mr-2 inline" />Get Pansy's Take <Badge className="ml-2 bg-white/20 text-white text-xs">Pro</Badge></>
+                )}
               </Button>
             </div>
           </Card>
         )}
 
         {/* TradingView Chart */}
-        <Card className="p-6 bg-[#0a0a0f] border-border rounded-2xl space-y-4">
+        <Card className="p-6 bg-[#0E1B30] border-border rounded-2xl space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div className="flex items-center gap-2">
               <BarChart3 className="w-5 h-5 text-foreground" />
@@ -250,7 +257,7 @@ export default function StockPage() {
             </div>
           </div>
           
-          <div className="w-full h-[400px] rounded-lg overflow-hidden mt-4 bg-[#0a0a0f] relative border border-white/5">
+          <div className="w-full h-[400px] rounded-lg overflow-hidden mt-4 bg-[#0E1B30] relative border border-white/5">
             {ticker && (
               <iframe 
                 src={`https://s.tradingview.com/widgetembed/?symbol=${ticker}&interval=D&theme=dark&studies=RSI@tv-basicstudies&studies=VWAP@tv-basicstudies`}
@@ -264,7 +271,7 @@ export default function StockPage() {
 
         {/* Pansy's Analysis */}
         {isAnalyzing ? (
-          <Card className="p-8 border-[#c8953a] animate-pulse-glow">
+          <Card className="p-8 border-[#27B7C8] animate-pulse-glow">
             <div className="flex flex-col items-center gap-4">
               <div className="w-16 h-16 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-3xl animate-bounce">
                 🌺
@@ -277,7 +284,7 @@ export default function StockPage() {
             </div>
           </Card>
         ) : pansyAnalysis ? (
-          <Card className="p-6 bg-card border-[#c8953a] border-2 rounded-2xl space-y-6 animate-slide-up shadow-lg shadow-[#c8953a]/20">
+          <Card className="p-6 bg-card border-[#27B7C8] border-2 rounded-2xl space-y-6 animate-slide-up shadow-lg shadow-[#27B7C8]/20">
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-xl shrink-0 shadow-lg">
                 🌺
@@ -292,23 +299,23 @@ export default function StockPage() {
 
             <Tabs defaultValue="technical" className="w-full">
               <TabsList className="grid w-full grid-cols-3 bg-muted/50">
-                <TabsTrigger value="technical" className="data-[state=active]:bg-[#3d7a54] data-[state=active]:text-white">
+                <TabsTrigger value="technical" className="data-[state=active]:bg-[#49B06E] data-[state=active]:text-white">
                   <Sparkles className="w-4 h-4 mr-2" />
                   Pansy's Take
                 </TabsTrigger>
-                <TabsTrigger value="fundamental" className="data-[state=active]:bg-[#c8953a] data-[state=active]:text-white">
+                <TabsTrigger value="fundamental" className="data-[state=active]:bg-[#27B7C8] data-[state=active]:text-white">
                   <Target className="w-4 h-4 mr-2" />
                   Entry & Exit
                 </TabsTrigger>
-                <TabsTrigger value="risk" className="data-[state=active]:bg-[#d4788a] data-[state=active]:text-white">
+                <TabsTrigger value="risk" className="data-[state=active]:bg-[#ef4444] data-[state=active]:text-white">
                   <AlertTriangle className="w-4 h-4 mr-2" />
                   Risk & Mindset
                 </TabsTrigger>
               </TabsList>
 
               <TabsContent value="technical" className="space-y-4 mt-4">
-                <Card className="p-4 border-[#3d7a54]/30 bg-[#3d7a54]/10">
-                  <h3 className="text-sm font-semibold text-[#3d7a54] mb-2 flex items-center gap-2">
+                <Card className="p-4 border-[#49B06E]/30 bg-[#49B06E]/10">
+                  <h3 className="text-sm font-semibold text-[#49B06E] mb-2 flex items-center gap-2">
                     <BarChart3 className="w-4 h-4" />
                     Chart Analysis
                   </h3>
@@ -319,8 +326,8 @@ export default function StockPage() {
               </TabsContent>
 
               <TabsContent value="fundamental" className="space-y-4 mt-4">
-                <Card className="p-4 border-[#c8953a]/30 bg-[#c8953a]/10">
-                  <h3 className="text-sm font-semibold text-[#c8953a] mb-2 flex items-center gap-2">
+                <Card className="p-4 border-[#27B7C8]/30 bg-[#27B7C8]/10">
+                  <h3 className="text-sm font-semibold text-[#27B7C8] mb-2 flex items-center gap-2">
                     <Target className="w-4 h-4" />
                     Business Analysis
                   </h3>
@@ -330,8 +337,8 @@ export default function StockPage() {
                 </Card>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Card className="p-4 border-[#3d7a54]/30 bg-[#3d7a54]/10">
-                    <h3 className="text-sm font-semibold text-[#3d7a54] mb-2 flex items-center gap-2">
+                  <Card className="p-4 border-[#49B06E]/30 bg-[#49B06E]/10">
+                    <h3 className="text-sm font-semibold text-[#49B06E] mb-2 flex items-center gap-2">
                       <TrendingUp className="w-4 h-4" />
                       Bullish Scenario
                     </h3>
@@ -340,8 +347,8 @@ export default function StockPage() {
                     </p>
                   </Card>
 
-                  <Card className="p-4 border-[#d4788a]/30 bg-[#d4788a]/10">
-                    <h3 className="text-sm font-semibold text-[#d4788a] mb-2 flex items-center gap-2">
+                  <Card className="p-4 border-[#ef4444]/30 bg-[#ef4444]/10">
+                    <h3 className="text-sm font-semibold text-[#ef4444] mb-2 flex items-center gap-2">
                       <TrendingDown className="w-4 h-4" />
                       Bearish Scenario
                     </h3>
@@ -354,8 +361,8 @@ export default function StockPage() {
 
               <TabsContent value="risk" className="space-y-4 mt-4">
                 {pansyAnalysis.scorecard && (
-                  <Card className="p-4 border-[#c8953a]/40 bg-[#c8953a]/10">
-                    <h4 className="text-sm font-semibold text-[#c8953a] mb-2 flex items-center gap-2">
+                  <Card className="p-4 border-[#27B7C8]/40 bg-[#27B7C8]/10">
+                    <h4 className="text-sm font-semibold text-[#27B7C8] mb-2 flex items-center gap-2">
                       📋 Scorecard
                     </h4>
                     <p className="text-sm text-foreground/90">
@@ -378,8 +385,8 @@ export default function StockPage() {
                   </div>
                 </Card>
 
-                <Card className="p-4 border-[#c8953a]/50 bg-[#c8953a]/20 shadow-lg">
-                  <h3 className="text-sm font-semibold text-[#c8953a] mb-1">Pansy's Verdict</h3>
+                <Card className="p-4 border-[#27B7C8]/50 bg-[#27B7C8]/20 shadow-lg">
+                  <h3 className="text-sm font-semibold text-[#27B7C8] mb-1">Pansy's Verdict</h3>
                   <p className="text-lg font-bold text-foreground">{pansyAnalysis.verdict}</p>
                 </Card>
               </TabsContent>
@@ -410,7 +417,7 @@ export default function StockPage() {
                   Want the full breakdown?
                 </h3>
                 <p className="text-sm text-foreground/90 leading-relaxed">
-                  Pansy can walk you through entry zones, exit planning, and the real risk — free the moment you sign up.
+                  Pansy breaks down the business, the bull and bear case, and the real risks in plain English — free the moment you sign up.
                 </p>
               </div>
             </div>
@@ -443,7 +450,7 @@ export default function StockPage() {
           isOpen={showLockedFeatureModal}
           onClose={() => setShowLockedFeatureModal(false)}
           featureName={`Pansy's full breakdown of ${ticker}`}
-          featureDescription="Get her expert analysis with entry zones, exit planning, and real risk assessment."
+          featureDescription="Get her take in plain English — no jargon."
         />
 
         {/* Latest News */}

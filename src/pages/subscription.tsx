@@ -9,7 +9,6 @@ import { authService } from "@/services/authService";
 import { userService } from "@/services/userService";
 import { Check, Loader2, AlertCircle } from "lucide-react";
 import { SEO } from "@/components/SEO";
-import { PRO_PLAN } from "@/config/proPlan";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -99,15 +98,15 @@ export default function Subscription() {
     }
   };
 
-  const monthlyPrice = PRO_PLAN.monthlyPrice;
-  const yearlyPrice = PRO_PLAN.yearlyPrice;
+  const monthlyPrice = 7.99;
+  const yearlyPrice = 57.99;
   const yearlyMonthly = (yearlyPrice / 12).toFixed(2);
 
   return (
     <Layout>
       <SEO 
         title="Subscription Plans - Bloom" 
-        description="Choose between Free and Bloom Pro to unlock unlimited analysis and every locked lesson"
+        description="Choose between Free and Bloom Pro to unlock unlimited daily picks and full analysis"
       />
       <div className="max-w-lg mx-auto p-4">
         <div className="space-y-6">
@@ -166,7 +165,7 @@ export default function Subscription() {
 
                 <ul className="space-y-2">
                   {[
-                    "Free core lessons (stocks, ETFs, mutual funds, and more)",
+                    "3 picks per week",
                     "Basic market summary",
                     "Broker directory",
                   ].map((feature) => (
@@ -176,10 +175,10 @@ export default function Subscription() {
                     </li>
                   ))}
                   <li className="flex items-start gap-2 opacity-50">
-                    <span className="text-sm text-muted-foreground line-through">Pansy's analysis</span>
+                    <span className="text-sm text-muted-foreground line-through">Pansy's full analysis</span>
                   </li>
                   <li className="flex items-start gap-2 opacity-50">
-                    <span className="text-sm text-muted-foreground line-through">Pro-only lessons</span>
+                    <span className="text-sm text-muted-foreground line-through">ETF picks</span>
                   </li>
                 </ul>
 
@@ -221,7 +220,14 @@ export default function Subscription() {
                 </div>
 
                 <ul className="space-y-2">
-                  {PRO_PLAN.benefits.map((feature) => (
+                  {[
+                    "Unlimited daily picks",
+                    "Pansy's full analysis on every pick",
+                    "Stocks, ETFs, and mutual funds",
+                    "Real-time news and charts",
+                    "Portfolio tracker",
+                    "Curated broker education",
+                  ].map((feature) => (
                     <li key={feature} className="flex items-start gap-2">
                       <Check className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
                       <span className="text-sm text-foreground">{feature}</span>
