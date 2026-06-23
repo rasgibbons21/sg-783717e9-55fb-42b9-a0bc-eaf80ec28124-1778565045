@@ -533,7 +533,7 @@ export default function Onboarding() {
                       }`}
                     >
                       {experience === option.value && (
-                        <div className="w-3 h-3 rounded-full bg-white" />
+                        <div className="w-3 h-3 rounded-full bg-[#F4F7FA]" />
                       )}
                     </div>
                   </div>
@@ -612,7 +612,7 @@ export default function Onboarding() {
                       }`}
                     >
                       {goals.includes(option.value) && (
-                        <div className="w-3 h-3 rounded-full bg-white" />
+                        <div className="w-3 h-3 rounded-full bg-[#F4F7FA]" />
                       )}
                     </div>
                   </div>
@@ -688,7 +688,7 @@ export default function Onboarding() {
                       }`}
                     >
                       {risk === option.value && (
-                        <div className="w-3 h-3 rounded-full bg-white" />
+                        <div className="w-3 h-3 rounded-full bg-[#F4F7FA]" />
                       )}
                     </div>
                   </div>
@@ -697,8 +697,8 @@ export default function Onboarding() {
             </div>
 
             {error && (
-              <Card className="p-4 border-rose bg-rose/5 rounded-2xl">
-                <p className="text-sm text-rose">{error}</p>
+              <Card className="p-4 border-[#ef4444] bg-[#ef4444]/5 rounded-2xl">
+                <p className="text-sm text-[#ef4444]">{error}</p>
               </Card>
             )}
 

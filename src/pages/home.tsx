@@ -183,13 +183,13 @@ export default function Home() {
         {/* Pansy Chat Bubble */}
         <div className="flex items-start gap-4">
           <div className="relative shrink-0 mt-1">
-            <img src="/bloom-logo.png" alt="Pansy" className="w-16 h-16 rounded-full border-2 border-background shadow-sm object-cover bg-white" />
-            <div className="absolute bottom-0 right-1 bg-emerald-500 w-4 h-4 rounded-full border-2 border-background"></div>
+            <img src="/bloom-logo.png" alt="Pansy" className="w-16 h-16 rounded-full border-2 border-background shadow-sm object-cover bg-[#0E1B30]" />
+            <div className="absolute bottom-0 right-1 bg-[#49B06E] w-4 h-4 rounded-full border-2 border-background"></div>
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1 pl-1">
               <h3 className="font-serif font-bold text-foreground text-lg">Pansy</h3>
-              <Badge variant="secondary" className="text-[10px] bg-emerald-500/10 text-emerald-600 border-emerald-500/20 h-5 font-medium shadow-sm">
+              <Badge variant="secondary" className="text-[10px] bg-[#49B06E]/10 text-[#49B06E] border-[#49B06E]/20 h-5 font-medium shadow-sm">
                 Your guide
               </Badge>
             </div>
@@ -200,7 +200,7 @@ export default function Home() {
             </div>
             <a
               href="/learn"
-              className="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors ml-1"
+              className="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#49B06E] hover:bg-[#49B06E]/90 text-[#0E1B30] text-sm font-semibold transition-colors ml-1"
             >
               Explore lessons →
             </a>
@@ -235,8 +235,8 @@ export default function Home() {
                         <Badge
                           className={
                             index.changePercent >= 0
-                              ? "bg-emerald-500/10 text-emerald-700 text-xs font-medium border-0"
-                              : "bg-red-500/10 text-red-600 text-xs font-medium border-0"
+                              ? "bg-[#49B06E]/10 text-[#49B06E] text-xs font-medium border-0"
+                              : "bg-[#ef4444]/10 text-[#ef4444] text-xs font-medium border-0"
                           }
                         >
                           {index.changePercent >= 0 ? "+" : ""}
