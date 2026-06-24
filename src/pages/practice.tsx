@@ -1,14 +1,16 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import type { GetServerSideProps } from "next";
 import Head from "next/head";
 import Link from "next/link";
 import { Layout } from "@/components/Layout";
 import { PreTradeChecklist, type ChecklistResult } from "@/components/PreTradeChecklist";
+import { ActiveTradeCard } from "@/components/ActiveTradeCard";
 import { requireProUserSSR } from "@/lib/requireProUserSSR";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { supabase } from "@/integrations/supabase/client";
+import { marketService } from "@/services/marketService";
 import {
-  TrendingUp, BookOpen, X, ChevronDown, ChevronUp,
+  TrendingUp, BookOpen, X,
   AlertTriangle, Plus, Lock, Search
 } from "lucide-react";
 
@@ -80,42 +82,6 @@ function MetricCard({ label, value, sub, positive }: { label: string; value: str
   );
 }
 
-// ── Open Trade Row ─────────────────────────────────────────────────────────
-function OpenTradeRow({ trade, onClose }: { trade: Trade; onClose: (t: Trade) => void }) {
-  const [expanded, setExpanded] = useState(false);
-  return (
-    <div className="rounded-lg bg-[#16264A] border border-[#27B7C8]/20 overflow-hidden">
-      <div className="flex items-center gap-3 p-3 cursor-pointer" onClick={() => setExpanded(e => !e)}>
-        <span className={`w-2 h-2 rounded-full flex-shrink-0 ${trade.direction === "long" ? "bg-[#49B06E]" : "bg-[#ef4444]"}`} />
-        <span className="font-mono font-semibold text-[#F4F7FA]">{trade.ticker}</span>
-        <span className={`text-xs px-2 py-0.5 rounded-full ${trade.direction === "long" ? "bg-[#49B06E]/20 text-[#49B06E]" : "bg-[#ef4444]/20 text-[#ef4444]"}`}>
-          {trade.direction.toUpperCase()}
-        </span>
-        <span className="ml-auto text-sm text-[#F4F7FA]/60">{trade.shares}sh @ {fmt(trade.entry_price)}</span>
-        {expanded ? <ChevronUp className="w-4 h-4 text-[#F4F7FA]/40" /> : <ChevronDown className="w-4 h-4 text-[#F4F7FA]/40" />}
-      </div>
-      {expanded && (
-        <div className="border-t border-[#27B7C8]/10 p-3 space-y-2 text-sm">
-          <div className="grid grid-cols-2 gap-2 text-xs text-[#F4F7FA]/60">
-            <span>Stop: {fmt(trade.stop_price)}</span>
-            <span>Target: {fmt(trade.target_price)}</span>
-            <span>Risk: {fmt(trade.risk_amount)}</span>
-            <span>Cost: {fmt(trade.entry_price * trade.shares)}</span>
-          </div>
-          {trade.thesis && (
-            <p className="text-xs text-[#F4F7FA]/50 italic border-l-2 border-[#27B7C8]/30 pl-2">{trade.thesis}</p>
-          )}
-          <button
-            onClick={() => onClose(trade)}
-            className="w-full mt-2 py-2 rounded-lg bg-[#27B7C8]/20 text-[#27B7C8] text-sm font-semibold hover:bg-[#27B7C8]/30 transition-colors"
-          >
-            Close Position
-          </button>
-        </div>
-      )}
-    </div>
-  );
-}
 
 // ── Closed Trade Row ───────────────────────────────────────────────────────
 function ClosedTradeRow({ trade }: { trade: Trade }) {
@@ -278,6 +244,9 @@ export default function PracticePage(_props: PageProps) {
   const [showOpenModal, setShowOpenModal] = useState(false);
   const [closingTrade, setClosingTrade] = useState<Trade | null>(null);
   const [tab, setTab] = useState<"open" | "closed">("open");
+  const [livePrices, setLivePrices] = useState<Record<string, number>>({});
+  const [pricesLoading, setPricesLoading] = useState(false);
+  const priceIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -300,10 +269,45 @@ export default function PracticePage(_props: PageProps) {
     }
   }, []);
 
+  // Fetch live prices for all open positions
+  const refreshPrices = useCallback(async (openTrades: Trade[]) => {
+    if (openTrades.length === 0) return;
+    setPricesLoading(true);
+    const tickers = [...new Set(openTrades.map(t => t.ticker))];
+    try {
+      const results = await Promise.all(
+        tickers.map(async ticker => {
+          const q = await marketService.getRealTimeQuote(ticker);
+          return { ticker, price: q?.c ?? null };
+        })
+      );
+      setLivePrices(prev => {
+        const next = { ...prev };
+        results.forEach(({ ticker, price }) => {
+          if (price != null) next[ticker] = price;
+        });
+        return next;
+      });
+    } catch { /* non-fatal */ } finally {
+      setPricesLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     if (!authLoading && isPro) loadData();
     else if (!authLoading && !isPro) setLoading(false);
   }, [authLoading, isPro, loadData]);
+
+  // Live price polling — start once data loads, refresh every 60s
+  useEffect(() => {
+    const open = trades.filter(t => t.status === "open");
+    if (open.length === 0) return;
+    refreshPrices(open);
+    priceIntervalRef.current = setInterval(() => refreshPrices(open), 60000);
+    return () => {
+      if (priceIntervalRef.current) clearInterval(priceIntervalRef.current);
+    };
+  }, [trades, refreshPrices]);
 
   const handleOpenTrade = async (result: ChecklistResult) => {
     const res = await apiFetch("/api/practice/trades", {
@@ -334,6 +338,46 @@ export default function PracticePage(_props: PageProps) {
     if (!res.ok) throw new Error(data.error || "Failed to close trade");
     setClosingTrade(null);
     await loadData();
+  };
+
+  const handleCloseHalf = async (trade: Trade, exitPrice: number, exitReason: string) => {
+    const res = await apiFetch("/api/practice/close-half", {
+      method: "POST",
+      body: JSON.stringify({ trade_id: trade.id, exit_price: exitPrice, exit_reason: exitReason || undefined }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Failed to close half");
+    await loadData();
+  };
+
+  const handleMoveStop = async (trade: Trade, newStop: number) => {
+    const res = await apiFetch("/api/practice/update", {
+      method: "POST",
+      body: JSON.stringify({ trade_id: trade.id, stop_price: newStop }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Failed to update stop");
+    setTrades(prev => prev.map(t => t.id === trade.id ? data.trade : t));
+  };
+
+  const handleAdjustTarget = async (trade: Trade, newTarget: number) => {
+    const res = await apiFetch("/api/practice/update", {
+      method: "POST",
+      body: JSON.stringify({ trade_id: trade.id, target_price: newTarget }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Failed to update target");
+    setTrades(prev => prev.map(t => t.id === trade.id ? data.trade : t));
+  };
+
+  const handleAddNote = async (trade: Trade, note: string) => {
+    const res = await apiFetch("/api/practice/update", {
+      method: "POST",
+      body: JSON.stringify({ trade_id: trade.id, note }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Failed to save note");
+    setTrades(prev => prev.map(t => t.id === trade.id ? data.trade : t));
   };
 
   const showProGate = !authLoading && !isPro;
@@ -489,7 +533,17 @@ export default function PracticePage(_props: PageProps) {
                     </div>
                   ) : (
                     metrics.open.map(t => (
-                      <OpenTradeRow key={t.id} trade={t} onClose={setClosingTrade} />
+                      <ActiveTradeCard
+                        key={t.id}
+                        trade={t}
+                        currentPrice={livePrices[t.ticker] ?? null}
+                        priceLoading={pricesLoading}
+                        onClose={setClosingTrade}
+                        onCloseHalf={handleCloseHalf}
+                        onMoveStop={handleMoveStop}
+                        onAdjustTarget={handleAdjustTarget}
+                        onAddNote={handleAddNote}
+                      />
                     ))
                   )}
                 </div>
