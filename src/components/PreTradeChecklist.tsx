@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { X, ArrowLeft, ArrowRight, AlertTriangle, CheckCircle2, TrendingUp, TrendingDown, BarChart2 } from "lucide-react";
-import { CandlestickChart, type OHLCBar } from "@/components/CandlestickChart";
+import DynamicChart, { type OHLCBar } from "@/components/DynamicChart";
 import { supabase } from "@/integrations/supabase/client";
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -160,7 +160,7 @@ function MiniChart({ ticker, priceLines }: { ticker: string; priceLines?: { entr
               Loading chart…
             </div>
           ) : bars.length > 1 ? (
-            <CandlestickChart data={bars} height={220} priceLines={priceLines} />
+            <DynamicChart data={bars} height={220} priceLines={priceLines} />
           ) : (
             <div className="flex items-center justify-center h-[220px] text-[#F4F7FA]/20 text-xs">
               No data
