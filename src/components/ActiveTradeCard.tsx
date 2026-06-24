@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   TrendingUp, TrendingDown, ChevronDown, ChevronUp,
   X, AlertTriangle, Loader2,
-  SplitSquareVertical, StopCircle, Target, StickyNote,
+  SplitSquareVertical, StopCircle, Target, StickyNote, Sparkles,
 } from "lucide-react";
 
 // ── Shared types ───────────────────────────────────────────────────────────
@@ -290,9 +290,102 @@ function AddNoteModal({ trade, onSubmit, onClose }: {
   );
 }
 
+// ── Pansy coaching modal ───────────────────────────────────────────────────
+function PansyCoachModal({ trade, currentPrice, onClose }: {
+  trade: Trade; currentPrice: number | null; onClose: () => void;
+}) {
+  const [loading, setLoading] = useState(true);
+  const [coaching, setCoaching] = useState<string[]>([]);
+  const [noThesis, setNoThesis] = useState(false);
+  const [err, setErr] = useState("");
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch("/api/practice/pansy-coach", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            trade_id: trade.id,
+            current_price: currentPrice ?? undefined,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) { setErr(data.error ?? "Coaching unavailable — try again"); }
+        else {
+          setCoaching(data.coaching ?? []);
+          setNoThesis(!!data.noThesis);
+        }
+      } catch {
+        setErr("Coaching unavailable — try again");
+      } finally {
+        setLoading(false);
+      }
+    })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <MiniModal title="Pansy — Trade Reflection" onClose={onClose}>
+      {/* Identity bar */}
+      <div className="flex items-center gap-2 mb-4 px-3 py-2 rounded-lg bg-[#27B7C8]/8 border border-[#27B7C8]/20">
+        <Sparkles className="w-4 h-4 text-[#27B7C8] flex-shrink-0" />
+        <p className="text-[11px] text-[#27B7C8]/80 leading-snug">
+          Pansy reflects your written plan back to you — she never evaluates the market.
+        </p>
+      </div>
+
+      {loading && (
+        <div className="flex items-center gap-2 py-6 justify-center">
+          <Loader2 className="w-5 h-5 text-[#27B7C8] animate-spin" />
+          <span className="text-sm text-[#F4F7FA]/50">Reviewing your plan…</span>
+        </div>
+      )}
+
+      {!loading && err && (
+        <p className="text-xs text-[#ef4444] bg-[#ef4444]/10 rounded-lg px-3 py-3">{err}</p>
+      )}
+
+      {!loading && !err && noThesis && (
+        <div className="rounded-lg bg-[#16264A] border border-[#27B7C8]/10 px-4 py-4">
+          <p className="text-sm text-[#F4F7FA]/60 leading-relaxed">{coaching[0]}</p>
+        </div>
+      )}
+
+      {!loading && !err && !noThesis && coaching.length > 0 && (
+        <ul className="space-y-3">
+          {coaching.map((q, i) => (
+            <li key={i} className="flex gap-3 rounded-lg bg-[#16264A] px-3 py-3 border border-[#27B7C8]/10">
+              <span className="text-[#27B7C8] font-bold text-sm flex-shrink-0 mt-0.5">{i + 1}.</span>
+              <p className="text-sm text-[#F4F7FA]/80 leading-relaxed">{q}</p>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {/* Thesis context (collapsed) */}
+      {trade.thesis && !noThesis && (
+        <details className="mt-4">
+          <summary className="text-[10px] text-[#F4F7FA]/30 uppercase tracking-wide cursor-pointer select-none hover:text-[#F4F7FA]/50">
+            Your plan
+          </summary>
+          <div className="mt-2 max-h-32 overflow-y-auto rounded-lg bg-[#16264A] border border-[#27B7C8]/10 px-3 py-2 text-xs text-[#F4F7FA]/45 whitespace-pre-wrap">
+            {trade.thesis}
+          </div>
+        </details>
+      )}
+
+      {/* Disclaimer */}
+      <p className="mt-4 text-[10px] text-[#F4F7FA]/25 leading-snug text-center">
+        Educational simulator — not a brokerage, not financial advice.
+      </p>
+    </MiniModal>
+  );
+}
+
 // ── Action button ──────────────────────────────────────────────────────────
 function ActionBtn({ icon, label, onClick, variant = "default" }: {
-  icon: React.ReactNode; label: string; onClick: () => void; variant?: "default" | "danger";
+  icon: React.ReactNode; label: string; onClick: () => void; variant?: "default" | "danger" | "coach";
 }) {
   return (
     <button
@@ -300,6 +393,8 @@ function ActionBtn({ icon, label, onClick, variant = "default" }: {
       className={`flex flex-col items-center gap-1 flex-1 py-2 rounded-lg text-[10px] font-semibold transition-colors ${
         variant === "danger"
           ? "bg-[#ef4444]/10 text-[#ef4444] hover:bg-[#ef4444]/20 border border-[#ef4444]/20"
+          : variant === "coach"
+          ? "bg-[#27B7C8]/10 text-[#27B7C8] hover:bg-[#27B7C8]/20 border border-[#27B7C8]/30"
           : "bg-[#0E1B30] text-[#F4F7FA]/60 hover:text-[#F4F7FA] border border-[#27B7C8]/10 hover:border-[#27B7C8]/30"
       }`}
     >
@@ -315,7 +410,7 @@ export function ActiveTradeCard({
   onClose, onCloseHalf, onMoveStop, onAdjustTarget, onAddNote,
 }: Props) {
   const [expanded, setExpanded] = useState(false);
-  const [modal, setModal] = useState<"close-half" | "stop" | "target" | "note" | null>(null);
+  const [modal, setModal] = useState<"close-half" | "stop" | "target" | "note" | "coach" | null>(null);
 
   const hasPrice = currentPrice != null;
   const { pnl, pnlPct } = hasPrice ? livePnL(trade, currentPrice) : { pnl: 0, pnlPct: 0 };
@@ -445,7 +540,7 @@ export function ActiveTradeCard({
             )}
 
             {/* Action buttons */}
-            <div className="p-3 grid grid-cols-5 gap-1.5">
+            <div className="p-3 grid grid-cols-3 gap-1.5">
               <ActionBtn
                 icon={<X className="w-4 h-4" />}
                 label="Close"
@@ -457,6 +552,14 @@ export function ActiveTradeCard({
                 label="Close ½"
                 onClick={() => setModal("close-half")}
               />
+              <ActionBtn
+                icon={<Sparkles className="w-4 h-4" />}
+                label="Ask Pansy"
+                onClick={() => setModal("coach")}
+                variant="coach"
+              />
+            </div>
+            <div className="px-3 pb-3 grid grid-cols-3 gap-1.5">
               <ActionBtn
                 icon={<StopCircle className="w-4 h-4" />}
                 label="Move Stop"
@@ -504,6 +607,13 @@ export function ActiveTradeCard({
         <AddNoteModal
           trade={trade}
           onSubmit={async (v) => { await onAddNote(trade, v); setModal(null); }}
+          onClose={() => setModal(null)}
+        />
+      )}
+      {modal === "coach" && (
+        <PansyCoachModal
+          trade={trade}
+          currentPrice={currentPrice}
           onClose={() => setModal(null)}
         />
       )}
