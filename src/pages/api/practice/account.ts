@@ -16,23 +16,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const userId = auth.user!.id;
 
   // Idempotent: get existing account or create with $10,000
-  let { data: account, error } = await supabaseAdmin
+  const { data: existing, error: fetchErr } = await supabaseAdmin
     .from("practice_account")
     .select("*")
     .eq("user_id", userId)
     .single();
 
-  if (!account) {
-    const { data: created, error: createErr } = await supabaseAdmin
-      .from("practice_account")
-      .insert({ user_id: userId, cash_balance: 10000, initial_balance: 10000 })
-      .select()
-      .single();
-    if (createErr) return res.status(500).json({ error: createErr.message });
-    account = created;
-  } else if (error && error.code !== "PGRST116") {
-    return res.status(500).json({ error: error.message });
+  if (existing) {
+    return res.status(200).json({ account: existing });
   }
 
-  return res.status(200).json({ account });
+  if (fetchErr && fetchErr.code !== "PGRST116") {
+    return res.status(500).json({ error: fetchErr.message });
+  }
+
+  const { data: created, error: createErr } = await supabaseAdmin
+    .from("practice_account")
+    .insert({ user_id: userId, cash_balance: 10000, initial_balance: 10000 })
+    .select()
+    .single();
+  if (createErr) return res.status(500).json({ error: createErr.message });
+
+  return res.status(200).json({ account: created });
 }

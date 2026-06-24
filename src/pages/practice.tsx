@@ -1,12 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
 import type { GetServerSideProps } from "next";
 import Head from "next/head";
+import Link from "next/link";
 import { Layout } from "@/components/Layout";
 import { requireProUserSSR } from "@/lib/requireProUserSSR";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  TrendingUp, TrendingDown, DollarSign, BarChart2, BookOpen, X, ChevronDown, ChevronUp,
+  TrendingUp, BookOpen, X, ChevronDown, ChevronUp,
   AlertTriangle, Plus, Lock
 } from "lucide-react";
 
@@ -387,18 +388,18 @@ function ProGate() {
           Practice trading with $10,000 in virtual cash — no real money, no real risk. Upgrade to Bloom Pro to unlock.
         </p>
       </div>
-      <a
+      <Link
         href="/subscription"
         className="px-8 py-3 rounded-xl bg-[#49B06E] text-white font-semibold hover:bg-[#49B06E]/90 transition-colors"
       >
         Upgrade to Pro
-      </a>
+      </Link>
     </div>
   );
 }
 
 // ── Main Page ──────────────────────────────────────────────────────────────
-export default function PracticePage({ requiresClientAuth }: PageProps) {
+export default function PracticePage(_props: PageProps) {
   const { isPro, isLoading: authLoading } = useSubscription();
   const [account, setAccount] = useState<Account | null>(null);
   const [trades, setTrades] = useState<Trade[]>([]);
