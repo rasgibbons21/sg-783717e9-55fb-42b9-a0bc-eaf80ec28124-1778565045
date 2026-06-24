@@ -11,7 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { marketService } from "@/services/marketService";
 import {
   TrendingUp, BookOpen, X,
-  AlertTriangle, Plus, Lock, Search
+  AlertTriangle, Plus, Lock, Search, Sparkles, NotebookPen, Loader2,
 } from "lucide-react";
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -182,6 +182,135 @@ function CloseTradeModal({ trade, onSubmit, onCancel }: {
   );
 }
 
+// ── Trade Review Modal ─────────────────────────────────────────────────────
+interface TradeReview {
+  score_pl: number; score_rr: number; score_entry: number;
+  score_exit: number; score_discipline: number; overall_grade: string;
+  what_went_well: string; what_to_improve: string;
+  followed_plan: string; remember_next: string;
+}
+interface ReviewState {
+  review: TradeReview | null;
+  journal_id: string | null;
+  loading: boolean;
+  error: string;
+  ticker: string;
+  pnl: number;
+}
+
+function ScoreBar({ label, score }: { label: string; score: number }) {
+  const color = score >= 80 ? "bg-[#49B06E]" : score >= 55 ? "bg-yellow-400" : "bg-[#ef4444]";
+  return (
+    <div>
+      <div className="flex justify-between mb-1">
+        <span className="text-[10px] text-[#F4F7FA]/50 uppercase tracking-wide">{label}</span>
+        <span className="text-[10px] font-mono text-[#F4F7FA]/70">{score}</span>
+      </div>
+      <div className="h-1.5 rounded-full bg-[#0E1B30] overflow-hidden">
+        <div className={`h-full rounded-full ${color} transition-all`} style={{ width: `${score}%` }} />
+      </div>
+    </div>
+  );
+}
+
+function gradeColor(g: string) {
+  if (g === "A") return "text-[#49B06E] bg-[#49B06E]/10 border-[#49B06E]/30";
+  if (g === "B") return "text-[#27B7C8] bg-[#27B7C8]/10 border-[#27B7C8]/30";
+  if (g === "C") return "text-yellow-400 bg-yellow-400/10 border-yellow-400/30";
+  if (g === "D") return "text-orange-400 bg-orange-400/10 border-orange-400/30";
+  return "text-[#ef4444] bg-[#ef4444]/10 border-[#ef4444]/30";
+}
+
+function TradeReviewModal({ state, onClose }: { state: ReviewState; onClose: () => void }) {
+  const { review, journal_id, loading, error, ticker, pnl } = state;
+  const win = pnl >= 0;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+      <div className="w-full max-w-md bg-[#0E1B30] rounded-2xl border border-[#27B7C8]/30 p-5 max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-[#27B7C8]" />
+            <h2 className="font-serif text-base font-bold text-[#F4F7FA]">Trade Review — {ticker}</h2>
+          </div>
+          <button onClick={onClose} className="text-[#F4F7FA]/30 hover:text-[#F4F7FA]">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* P/L banner */}
+        <div className={`flex items-center justify-between rounded-lg px-4 py-3 mb-4 ${win ? "bg-[#49B06E]/10 border border-[#49B06E]/20" : "bg-[#ef4444]/10 border border-[#ef4444]/20"}`}>
+          <span className="text-xs text-[#F4F7FA]/50">Final P/L</span>
+          <span className={`font-mono font-bold ${win ? "text-[#49B06E]" : "text-[#ef4444]"}`}>
+            {win ? "+" : ""}${Math.abs(pnl).toFixed(2)}
+          </span>
+        </div>
+
+        {loading && (
+          <div className="flex items-center gap-3 py-8 justify-center">
+            <Loader2 className="w-5 h-5 text-[#27B7C8] animate-spin" />
+            <span className="text-sm text-[#F4F7FA]/50">Pansy is reviewing your process…</span>
+          </div>
+        )}
+
+        {!loading && error && (
+          <p className="text-xs text-[#ef4444] bg-[#ef4444]/10 rounded-lg px-3 py-3 mb-4">{error}</p>
+        )}
+
+        {!loading && review && (
+          <>
+            {/* Grade + discipline score */}
+            <div className="flex items-center gap-4 mb-5">
+              <div className={`text-3xl font-bold font-mono w-16 h-16 rounded-xl border flex items-center justify-center flex-shrink-0 ${gradeColor(review.overall_grade)}`}>
+                {review.overall_grade}
+              </div>
+              <div className="flex-1 space-y-2">
+                <ScoreBar label="P/L Quality" score={review.score_pl} />
+                <ScoreBar label="Risk/Reward" score={review.score_rr} />
+                <ScoreBar label="Entry" score={review.score_entry} />
+                <ScoreBar label="Exit" score={review.score_exit} />
+                <ScoreBar label="Discipline" score={review.score_discipline} />
+              </div>
+            </div>
+
+            {/* Pansy commentary */}
+            <div className="space-y-3 mb-4">
+              {[
+                { label: "What went well", text: review.what_went_well, color: "text-[#49B06E]" },
+                { label: "What to improve", text: review.what_to_improve, color: "text-[#ef4444]" },
+                { label: "Did you follow your plan?", text: review.followed_plan, color: "text-[#27B7C8]" },
+                { label: "Remember next time", text: review.remember_next, color: "text-yellow-400" },
+              ].map(({ label, text, color }) => (
+                <div key={label} className="rounded-lg bg-[#16264A] border border-[#27B7C8]/10 px-4 py-3">
+                  <p className={`text-[10px] uppercase tracking-wide font-semibold mb-1 ${color}`}>{label}</p>
+                  <p className="text-sm text-[#F4F7FA]/80 leading-relaxed">{text}</p>
+                </div>
+              ))}
+            </div>
+
+            {journal_id && (
+              <Link href="/journal" className="flex items-center gap-2 text-xs text-[#27B7C8] hover:underline mb-3">
+                <NotebookPen className="w-3.5 h-3.5" />
+                Open journal entry to add notes
+              </Link>
+            )}
+          </>
+        )}
+
+        <button
+          onClick={onClose}
+          className="w-full py-3 rounded-xl bg-[#16264A] border border-[#27B7C8]/20 text-[#F4F7FA]/70 font-semibold text-sm hover:bg-[#27B7C8]/10 transition-colors"
+        >
+          Close
+        </button>
+        <p className="mt-3 text-[10px] text-[#F4F7FA]/25 text-center">
+          Educational simulator — not a brokerage, not financial advice.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 // ── Compute metrics ────────────────────────────────────────────────────────
 function computeMetrics(account: Account | null, trades: Trade[]) {
   const open = trades.filter(t => t.status === "open");
@@ -243,6 +372,7 @@ export default function PracticePage(_props: PageProps) {
   const [error, setError] = useState("");
   const [showOpenModal, setShowOpenModal] = useState(false);
   const [closingTrade, setClosingTrade] = useState<Trade | null>(null);
+  const [reviewState, setReviewState] = useState<ReviewState | null>(null);
   const [tab, setTab] = useState<"open" | "closed">("open");
   const [livePrices, setLivePrices] = useState<Record<string, number>>({});
   const [pricesLoading, setPricesLoading] = useState(false);
@@ -330,14 +460,31 @@ export default function PracticePage(_props: PageProps) {
 
   const handleCloseTrade = async (exitPrice: number, exitReason: string) => {
     if (!closingTrade) return;
+    const tradeId = closingTrade.id;
+    const ticker = closingTrade.ticker;
+
     const res = await apiFetch("/api/practice/close", {
       method: "POST",
-      body: JSON.stringify({ trade_id: closingTrade.id, exit_price: exitPrice, exit_reason: exitReason || undefined }),
+      body: JSON.stringify({ trade_id: tradeId, exit_price: exitPrice, exit_reason: exitReason || undefined }),
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || "Failed to close trade");
+
     setClosingTrade(null);
     await loadData();
+
+    // Show review modal immediately (loading state), then fetch review async
+    setReviewState({ review: null, journal_id: null, loading: true, error: "", ticker, pnl: data.pnl });
+    apiFetch("/api/practice/review", {
+      method: "POST",
+      body: JSON.stringify({ trade_id: tradeId }),
+    }).then(async r => {
+      const d = await r.json();
+      if (!r.ok) setReviewState(prev => prev ? { ...prev, loading: false, error: d.error || "Review unavailable" } : null);
+      else setReviewState(prev => prev ? { ...prev, loading: false, review: d.review, journal_id: d.journal_id } : null);
+    }).catch(() => {
+      setReviewState(prev => prev ? { ...prev, loading: false, error: "Review unavailable — try again" } : null);
+    });
   };
 
   const handleCloseHalf = async (trade: Trade, exitPrice: number, exitReason: string) => {
@@ -507,6 +654,13 @@ export default function PracticePage(_props: PageProps) {
                   <Search className="w-4 h-4" />
                   Research
                 </Link>
+                <Link
+                  href="/journal"
+                  className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#16264A] border border-[#27B7C8]/30 text-[#27B7C8] font-semibold text-sm hover:bg-[#27B7C8]/10 transition-colors"
+                >
+                  <NotebookPen className="w-4 h-4" />
+                  Journal
+                </Link>
               </div>
 
               {/* Trades Tabs */}
@@ -583,6 +737,12 @@ export default function PracticePage(_props: PageProps) {
           trade={closingTrade}
           onSubmit={handleCloseTrade}
           onCancel={() => setClosingTrade(null)}
+        />
+      )}
+      {reviewState && (
+        <TradeReviewModal
+          state={reviewState}
+          onClose={() => setReviewState(null)}
         />
       )}
     </>
