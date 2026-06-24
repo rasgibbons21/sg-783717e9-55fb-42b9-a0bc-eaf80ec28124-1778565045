@@ -24,7 +24,7 @@ export function Layout({ children }: LayoutProps) {
   const isActivePath = (path: string) => {
     if (path === "/home") return currentPath === "/home";
     if (path === "/discover") return currentPath.startsWith("/discover") || currentPath.startsWith("/stock");
-    if (path === "/practice") return currentPath.startsWith("/practice");
+    if (path === "/practice") return currentPath.startsWith("/practice") || currentPath.startsWith("/research");
     if (path === "/learn") return currentPath === "/learn";
     if (path === "/brokers") return currentPath === "/brokers";
     if (path === "/profile") return currentPath.startsWith("/profile") || currentPath.startsWith("/subscription");

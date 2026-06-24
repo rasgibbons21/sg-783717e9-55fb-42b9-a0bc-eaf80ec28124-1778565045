@@ -1,0 +1,545 @@
+import { useState, useCallback, useRef } from "react";
+import type { GetServerSideProps } from "next";
+import Head from "next/head";
+import Link from "next/link";
+import {
+  AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
+} from "recharts";
+import {
+  Search, TrendingUp, TrendingDown, Newspaper, Info,
+  ChevronRight, AlertTriangle, Loader2, Lock, ArrowLeft,
+} from "lucide-react";
+import { Layout } from "@/components/Layout";
+import { requireProUserSSR } from "@/lib/requireProUserSSR";
+import { useSubscription } from "@/contexts/SubscriptionContext";
+import { marketService } from "@/services/marketService";
+import { supabase } from "@/integrations/supabase/client";
+
+// ── Types ──────────────────────────────────────────────────────────────────
+interface Quote {
+  c: number;   // current price
+  d: number;   // change
+  dp: number;  // change %
+  h: number;   // high
+  l: number;   // low
+  o: number;   // open
+  v: number;   // volume
+}
+
+interface ChartPoint { date: string; price: number }
+
+interface NewsItem {
+  headline: string;
+  source: string;
+  datetime: number;
+  url: string;
+}
+
+interface PansyProfile {
+  sector: string | null;
+  shortDescription: string | null;
+  marketCap: string | null;
+  pe: string | null;
+  fpe: string | null;
+  high52: string | null;
+  low52: string | null;
+  perf1m: string | null;
+  perfYTD: string | null;
+  perf1y: string | null;
+}
+
+interface PansyPanel {
+  bullCase: string[];
+  bearCase: string[];
+  watchList: string[];
+  profile: PansyProfile;
+}
+
+// Popular tickers for quick access
+const QUICK_PICKS = [
+  { sym: "SPY", label: "S&P 500" },
+  { sym: "QQQ", label: "NASDAQ" },
+  { sym: "AAPL", label: "Apple" },
+  { sym: "MSFT", label: "Microsoft" },
+  { sym: "NVDA", label: "NVIDIA" },
+  { sym: "TSLA", label: "Tesla" },
+];
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+async function getToken() {
+  const { data: { session } } = await supabase.auth.getSession();
+  return session?.access_token ?? null;
+}
+
+function pct(n: number | null | undefined) {
+  if (n == null) return "—";
+  return `${n >= 0 ? "+" : ""}${typeof n === "number" ? n.toFixed(2) : n}%`;
+}
+
+function formatVol(n: number) {
+  if (n >= 1e9) return `${(n / 1e9).toFixed(2)}B`;
+  if (n >= 1e6) return `${(n / 1e6).toFixed(1)}M`;
+  if (n >= 1e3) return `${(n / 1e3).toFixed(0)}K`;
+  return String(n);
+}
+
+// ── Sub-components ─────────────────────────────────────────────────────────
+function StatRow({ label, value }: { label: string; value: string | null }) {
+  if (!value) return null;
+  return (
+    <div className="flex justify-between items-center py-1.5 border-b border-[#27B7C8]/10 last:border-0">
+      <span className="text-xs text-[#F4F7FA]/50">{label}</span>
+      <span className="text-xs font-mono text-[#F4F7FA]">{value}</span>
+    </div>
+  );
+}
+
+function PansyCard({
+  title, items, color, icon,
+}: {
+  title: string; items: string[]; color: string; icon: React.ReactNode;
+}) {
+  return (
+    <div className={`rounded-xl border p-4 ${color}`}>
+      <div className="flex items-center gap-2 mb-3">
+        {icon}
+        <span className="text-sm font-semibold text-[#F4F7FA]">{title}</span>
+      </div>
+      <ul className="space-y-2">
+        {items.map((item, i) => (
+          <li key={i} className="flex gap-2 text-xs text-[#F4F7FA]/80 leading-relaxed">
+            <span className="mt-0.5 flex-shrink-0 w-1.5 h-1.5 rounded-full bg-current opacity-60" />
+            {item}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+// ── Pro Gate ───────────────────────────────────────────────────────────────
+function ProGate() {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center gap-6">
+      <div className="rounded-full bg-[#27B7C8]/10 p-6 border border-[#27B7C8]/20">
+        <Lock className="w-10 h-10 text-[#27B7C8]" />
+      </div>
+      <div>
+        <h2 className="font-serif text-2xl font-bold text-[#F4F7FA] mb-2">Stock Research</h2>
+        <p className="text-[#F4F7FA]/60 max-w-sm">
+          Search any stock, ETF, or index — live quotes, interactive charts, news, and Pansy&apos;s educational analysis. Upgrade to unlock.
+        </p>
+      </div>
+      <Link
+        href="/subscription"
+        className="px-8 py-3 rounded-xl bg-[#49B06E] text-white font-semibold hover:bg-[#49B06E]/90 transition-colors"
+      >
+        Upgrade to Pro
+      </Link>
+    </div>
+  );
+}
+
+// ── Custom chart tooltip ───────────────────────────────────────────────────
+function ChartTooltip({ active, payload, label }: {
+  active?: boolean;
+  payload?: Array<{ value: number }>;
+  label?: string;
+}) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="bg-[#0E1B30] border border-[#27B7C8]/30 rounded-lg px-3 py-2 text-xs">
+      <p className="text-[#F4F7FA]/60">{label}</p>
+      <p className="font-mono font-bold text-[#27B7C8]">
+        ${payload[0].value.toFixed(2)}
+      </p>
+    </div>
+  );
+}
+
+// ── Main Page ──────────────────────────────────────────────────────────────
+export default function ResearchPage() {
+  const { isPro, isLoading: authLoading } = useSubscription();
+
+  const [search, setSearch] = useState("");
+  const [ticker, setTicker] = useState("");
+  const [quote, setQuote] = useState<Quote | null>(null);
+  const [chart, setChart] = useState<ChartPoint[]>([]);
+  const [news, setNews] = useState<NewsItem[]>([]);
+  const [panel, setPanel] = useState<PansyPanel | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [panelLoading, setPanelLoading] = useState(false);
+  const [error, setError] = useState("");
+  const abortRef = useRef<AbortController | null>(null);
+
+  const loadStock = useCallback(async (sym: string) => {
+    const clean = sym.toUpperCase().trim();
+    if (!clean) return;
+
+    // Cancel any previous request
+    abortRef.current?.abort();
+    abortRef.current = new AbortController();
+
+    setLoading(true);
+    setError("");
+    setTicker(clean);
+    setQuote(null);
+    setChart([]);
+    setNews([]);
+    setPanel(null);
+
+    try {
+      // Quote + chart + news in parallel
+      const today = new Date();
+      const from = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+      const toStr = today.toISOString().split("T")[0];
+      const fromStr = from.toISOString().split("T")[0];
+
+      const [q, chartData, newsRes] = await Promise.all([
+        marketService.getRealTimeQuote(clean),
+        marketService.getHistoricalData(clean, 30),
+        fetch(`/api/proxy/finnhub-news?ticker=${clean}&from=${fromStr}&to=${toStr}`).then(r => r.json()),
+      ]);
+
+      if (!q) {
+        setError(`No quote data found for "${clean}". Check the ticker symbol.`);
+        setLoading(false);
+        return;
+      }
+
+      setQuote(q);
+      setChart(chartData);
+      setNews(Array.isArray(newsRes) ? newsRes.slice(0, 6) : []);
+      setLoading(false);
+
+      // Load Pansy panel separately (slower — LLM call)
+      setPanelLoading(true);
+      const token = await getToken();
+      const panelRes = await fetch("/api/research/pansy-panel", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ ticker: clean }),
+      });
+      const panelData = await panelRes.json();
+      if (panelRes.ok) setPanel(panelData);
+    } catch {
+      setError("Failed to load stock data. Try again.");
+    } finally {
+      setLoading(false);
+      setPanelLoading(false);
+    }
+  }, []);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const val = search.toUpperCase().trim();
+    if (val) loadStock(val);
+  };
+
+  const isUp = (quote?.dp ?? 0) >= 0;
+  const priceColor = isUp ? "text-[#49B06E]" : "text-[#ef4444]";
+  const showProGate = !authLoading && !isPro;
+
+  return (
+    <>
+      <Head>
+        <title>Bloom Research</title>
+      </Head>
+      <Layout>
+        <div className="min-h-screen bg-[#0E1B30] px-4 py-6 max-w-2xl mx-auto">
+
+          {/* Header */}
+          <div className="flex items-center gap-3 mb-1">
+            <Link href="/practice" className="text-[#F4F7FA]/40 hover:text-[#27B7C8] transition-colors">
+              <ArrowLeft className="w-5 h-5" />
+            </Link>
+            <h1 className="font-serif text-2xl font-bold text-[#F4F7FA]">Stock Research</h1>
+          </div>
+          <p className="text-[#F4F7FA]/40 text-sm mb-6 pl-8">Educational only — not financial advice</p>
+
+          {authLoading && (
+            <div className="flex justify-center py-20">
+              <Loader2 className="w-6 h-6 text-[#27B7C8] animate-spin" />
+            </div>
+          )}
+
+          {showProGate && <ProGate />}
+
+          {!authLoading && isPro && (
+            <>
+              {/* Search */}
+              <form onSubmit={handleSubmit} className="mb-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#F4F7FA]/30" />
+                  <input
+                    className="w-full bg-[#16264A] border border-[#27B7C8]/20 rounded-xl pl-10 pr-4 py-3 text-[#F4F7FA] font-mono uppercase placeholder:text-[#F4F7FA]/20 placeholder:normal-case focus:outline-none focus:border-[#27B7C8] text-sm"
+                    placeholder="Search ticker — AAPL, SPY, BTC-USD…"
+                    value={search}
+                    onChange={e => setSearch(e.target.value.toUpperCase())}
+                    autoCapitalize="characters"
+                    autoCorrect="off"
+                    spellCheck={false}
+                  />
+                  <button
+                    type="submit"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1.5 rounded-lg bg-[#27B7C8] text-[#0E1B30] text-xs font-bold hover:bg-[#27B7C8]/90 transition-colors"
+                  >
+                    Go
+                  </button>
+                </div>
+              </form>
+
+              {/* Quick picks */}
+              <div className="flex gap-2 flex-wrap mb-6">
+                {QUICK_PICKS.map(({ sym, label }) => (
+                  <button
+                    key={sym}
+                    onClick={() => { setSearch(sym); loadStock(sym); }}
+                    className="text-xs px-3 py-1.5 rounded-full bg-[#16264A] border border-[#27B7C8]/15 text-[#F4F7FA]/60 hover:border-[#27B7C8]/50 hover:text-[#F4F7FA] transition-colors"
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Error */}
+              {error && (
+                <div className="rounded-xl bg-[#ef4444]/10 border border-[#ef4444]/20 px-4 py-3 text-sm text-[#ef4444] mb-4">
+                  {error}
+                </div>
+              )}
+
+              {/* Loading skeleton */}
+              {loading && (
+                <div className="space-y-4">
+                  <div className="h-24 rounded-xl bg-[#16264A] animate-pulse" />
+                  <div className="h-48 rounded-xl bg-[#16264A] animate-pulse" />
+                  <div className="h-32 rounded-xl bg-[#16264A] animate-pulse" />
+                </div>
+              )}
+
+              {/* Stock detail */}
+              {!loading && quote && (
+                <div className="space-y-5">
+
+                  {/* Quote hero */}
+                  <div className="rounded-xl bg-[#16264A] border border-[#27B7C8]/20 p-5">
+                    <div className="flex items-start justify-between mb-1">
+                      <div>
+                        <span className="font-mono text-3xl font-bold text-[#F4F7FA]">
+                          ${quote.c.toFixed(2)}
+                        </span>
+                        <div className={`flex items-center gap-1 mt-1 ${priceColor}`}>
+                          {isUp ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+                          <span className="font-mono text-sm font-semibold">
+                            {isUp ? "+" : ""}{quote.d.toFixed(2)} ({pct(quote.dp)})
+                          </span>
+                        </div>
+                      </div>
+                      <span className="font-mono text-lg font-bold text-[#27B7C8] bg-[#27B7C8]/10 px-3 py-1 rounded-lg">
+                        {ticker}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-[#27B7C8]/10 text-center">
+                      <div>
+                        <p className="text-[10px] text-[#F4F7FA]/40 uppercase tracking-wide">Open</p>
+                        <p className="font-mono text-sm text-[#F4F7FA]">${quote.o.toFixed(2)}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-[#F4F7FA]/40 uppercase tracking-wide">Range</p>
+                        <p className="font-mono text-sm text-[#F4F7FA]">${quote.l.toFixed(2)}–${quote.h.toFixed(2)}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-[#F4F7FA]/40 uppercase tracking-wide">Volume</p>
+                        <p className="font-mono text-sm text-[#F4F7FA]">{formatVol(quote.v)}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Price chart */}
+                  {chart.length > 1 && (
+                    <div className="rounded-xl bg-[#16264A] border border-[#27B7C8]/20 p-4">
+                      <p className="text-xs text-[#F4F7FA]/50 mb-3">30-Day Price History</p>
+                      <ResponsiveContainer width="100%" height={160}>
+                        <AreaChart data={chart} margin={{ top: 4, right: 0, left: 0, bottom: 0 }}>
+                          <defs>
+                            <linearGradient id="priceGrad" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="#27B7C8" stopOpacity={0.3} />
+                              <stop offset="95%" stopColor="#27B7C8" stopOpacity={0} />
+                            </linearGradient>
+                          </defs>
+                          <XAxis
+                            dataKey="date"
+                            tick={{ fontSize: 9, fill: "rgba(244,247,250,0.3)" }}
+                            tickLine={false}
+                            axisLine={false}
+                            interval={Math.floor(chart.length / 5)}
+                          />
+                          <YAxis
+                            domain={["auto", "auto"]}
+                            tick={{ fontSize: 9, fill: "rgba(244,247,250,0.3)" }}
+                            tickLine={false}
+                            axisLine={false}
+                            tickFormatter={v => `$${v.toFixed(0)}`}
+                            width={48}
+                          />
+                          <Tooltip content={<ChartTooltip />} />
+                          <Area
+                            type="monotone"
+                            dataKey="price"
+                            stroke="#27B7C8"
+                            strokeWidth={2}
+                            fill="url(#priceGrad)"
+                            dot={false}
+                            activeDot={{ r: 4, fill: "#27B7C8" }}
+                          />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
+                  )}
+
+                  {/* Fundamentals + About from Pansy panel */}
+                  {panel?.profile && (
+                    <div className="rounded-xl bg-[#16264A] border border-[#27B7C8]/20 p-4">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Info className="w-4 h-4 text-[#27B7C8]" />
+                        <span className="text-sm font-semibold text-[#F4F7FA]">Key Stats</span>
+                        {panel.profile.sector && (
+                          <span className="ml-auto text-[10px] px-2 py-0.5 rounded-full bg-[#27B7C8]/15 text-[#27B7C8]">
+                            {panel.profile.sector}
+                          </span>
+                        )}
+                      </div>
+                      <StatRow label="Market Cap" value={panel.profile.marketCap} />
+                      <StatRow label="P/E Ratio" value={panel.profile.pe} />
+                      <StatRow label="Forward P/E" value={panel.profile.fpe} />
+                      <StatRow label="52-Week High" value={panel.profile.high52} />
+                      <StatRow label="52-Week Low" value={panel.profile.low52} />
+                      <StatRow label="Perf. 1M" value={panel.profile.perf1m} />
+                      <StatRow label="Perf. YTD" value={panel.profile.perfYTD} />
+                      <StatRow label="Perf. 1Y" value={panel.profile.perf1y} />
+                      {panel.profile.shortDescription && (
+                        <p className="mt-3 pt-3 border-t border-[#27B7C8]/10 text-xs text-[#F4F7FA]/50 leading-relaxed">
+                          {panel.profile.shortDescription}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* News */}
+                  {news.length > 0 && (
+                    <div className="rounded-xl bg-[#16264A] border border-[#27B7C8]/20 p-4">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Newspaper className="w-4 h-4 text-[#27B7C8]" />
+                        <span className="text-sm font-semibold text-[#F4F7FA]">Latest News</span>
+                      </div>
+                      <div className="space-y-3">
+                        {news.map((item, i) => (
+                          <a
+                            key={i}
+                            href={item.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-start gap-3 group"
+                          >
+                            <ChevronRight className="w-3 h-3 mt-1 flex-shrink-0 text-[#27B7C8]/40 group-hover:text-[#27B7C8] transition-colors" />
+                            <div>
+                              <p className="text-xs text-[#F4F7FA]/80 group-hover:text-[#F4F7FA] leading-snug transition-colors line-clamp-2">
+                                {item.headline}
+                              </p>
+                              <p className="text-[10px] text-[#F4F7FA]/30 mt-0.5">
+                                {item.source} · {new Date(item.datetime * 1000).toLocaleDateString()}
+                              </p>
+                            </div>
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Pansy's Analysis */}
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-lg">🌸</span>
+                      <span className="font-serif text-base font-bold text-[#F4F7FA]">Pansy&apos;s Analysis</span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#27B7C8]/10 text-[#27B7C8] border border-[#27B7C8]/20 ml-1">
+                        Educational only
+                      </span>
+                    </div>
+
+                    {panelLoading && (
+                      <div className="rounded-xl bg-[#16264A] border border-[#27B7C8]/10 p-6 flex items-center gap-3">
+                        <Loader2 className="w-5 h-5 text-[#27B7C8] animate-spin flex-shrink-0" />
+                        <span className="text-sm text-[#F4F7FA]/50">Pansy is reading the tape…</span>
+                      </div>
+                    )}
+
+                    {!panelLoading && panel && (
+                      <div className="space-y-3">
+                        <PansyCard
+                          title="Bull Case"
+                          items={panel.bullCase}
+                          color="bg-[#49B06E]/5 border border-[#49B06E]/20"
+                          icon={<TrendingUp className="w-4 h-4 text-[#49B06E]" />}
+                        />
+                        <PansyCard
+                          title="Bear Case"
+                          items={panel.bearCase}
+                          color="bg-[#ef4444]/5 border border-[#ef4444]/20"
+                          icon={<TrendingDown className="w-4 h-4 text-[#ef4444]" />}
+                        />
+                        <PansyCard
+                          title="What Traders Watch"
+                          items={panel.watchList}
+                          color="bg-[#27B7C8]/5 border border-[#27B7C8]/20"
+                          icon={<Search className="w-4 h-4 text-[#27B7C8]" />}
+                        />
+                        <div className="flex items-start gap-2 rounded-lg bg-[#27B7C8]/8 border border-[#27B7C8]/15 px-3 py-2 mt-1">
+                          <AlertTriangle className="w-3.5 h-3.5 text-[#27B7C8]/70 flex-shrink-0 mt-0.5" />
+                          <p className="text-[10px] text-[#F4F7FA]/40 leading-relaxed">
+                            Educational only — not financial advice. Markets carry real risk, including loss of principal, and past moves don&apos;t predict future ones. The decision&apos;s always yours.
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Practice CTA */}
+                  <div className="rounded-xl bg-[#16264A] border border-[#49B06E]/20 p-4 flex items-center justify-between mt-2">
+                    <div>
+                      <p className="text-sm font-semibold text-[#F4F7FA]">Ready to practice?</p>
+                      <p className="text-xs text-[#F4F7FA]/40">Open a virtual {ticker} position</p>
+                    </div>
+                    <Link
+                      href="/practice"
+                      className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#49B06E] text-white text-xs font-semibold hover:bg-[#49B06E]/90 transition-colors"
+                    >
+                      <TrendingUp className="w-3.5 h-3.5" />
+                      Practice Trader
+                    </Link>
+                  </div>
+
+                </div>
+              )}
+
+              {/* Empty state */}
+              {!loading && !quote && !error && (
+                <div className="text-center py-16 text-[#F4F7FA]/20 text-sm">
+                  Search a ticker above to get started
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </Layout>
+    </>
+  );
+}
+
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+  const result = await requireProUserSSR(req as Parameters<typeof requireProUserSSR>[0]);
+  if (result.status === "unauthenticated") {
+    return { redirect: { destination: "/auth", permanent: false } };
+  }
+  return { props: {} };
+};
