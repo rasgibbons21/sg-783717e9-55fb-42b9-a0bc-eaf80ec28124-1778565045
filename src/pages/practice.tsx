@@ -3,6 +3,7 @@ import type { GetServerSideProps } from "next";
 import Head from "next/head";
 import Link from "next/link";
 import { Layout } from "@/components/Layout";
+import { PreTradeChecklist, type ChecklistResult } from "@/components/PreTradeChecklist";
 import { requireProUserSSR } from "@/lib/requireProUserSSR";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -130,137 +131,6 @@ function ClosedTradeRow({ trade }: { trade: Trade }) {
         {win ? "+" : ""}{fmt(trade.pnl)}
       </span>
       <span className="text-xs text-[#F4F7FA]/40 w-14 text-right">{fmtPct(trade.pnl_pct)}</span>
-    </div>
-  );
-}
-
-// ── Open Trade Modal ───────────────────────────────────────────────────────
-function OpenTradeModal({ onSubmit, onClose }: {
-  onSubmit: (form: Record<string, string>) => Promise<void>;
-  onClose: () => void;
-}) {
-  const [form, setForm] = useState({ ticker: "", direction: "long", shares: "", entry_price: "", stop_price: "", target_price: "", thesis: "" });
-  const [loading, setLoading] = useState(false);
-  const [err, setErr] = useState("");
-
-  const set = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }));
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErr("");
-    setLoading(true);
-    try {
-      await onSubmit(form);
-    } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : "Failed to open trade");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="w-full max-w-md bg-[#0E1B30] rounded-2xl border border-[#27B7C8]/30 p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="font-serif text-lg font-bold text-[#F4F7FA]">Open New Position</h2>
-          <button onClick={onClose} className="text-[#F4F7FA]/40 hover:text-[#F4F7FA]"><X className="w-5 h-5" /></button>
-        </div>
-        {err && <p className="mb-3 text-sm text-[#ef4444] bg-[#ef4444]/10 rounded-lg px-3 py-2">{err}</p>}
-        <form onSubmit={handleSubmit} className="space-y-3">
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-xs text-[#F4F7FA]/50 mb-1 block">Ticker *</label>
-              <input
-                className="w-full bg-[#16264A] border border-[#27B7C8]/20 rounded-lg px-3 py-2 text-[#F4F7FA] font-mono uppercase text-sm focus:outline-none focus:border-[#27B7C8]"
-                value={form.ticker}
-                onChange={e => set("ticker", e.target.value)}
-                placeholder="AAPL"
-                required
-                maxLength={10}
-              />
-            </div>
-            <div>
-              <label className="text-xs text-[#F4F7FA]/50 mb-1 block">Direction *</label>
-              <select
-                className="w-full bg-[#16264A] border border-[#27B7C8]/20 rounded-lg px-3 py-2 text-[#F4F7FA] text-sm focus:outline-none focus:border-[#27B7C8]"
-                value={form.direction}
-                onChange={e => set("direction", e.target.value)}
-              >
-                <option value="long">Long</option>
-                <option value="short">Short</option>
-              </select>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-xs text-[#F4F7FA]/50 mb-1 block">Shares *</label>
-              <input
-                type="number" min="0.0001" step="any"
-                className="w-full bg-[#16264A] border border-[#27B7C8]/20 rounded-lg px-3 py-2 text-[#F4F7FA] text-sm focus:outline-none focus:border-[#27B7C8]"
-                value={form.shares}
-                onChange={e => set("shares", e.target.value)}
-                placeholder="10"
-                required
-              />
-            </div>
-            <div>
-              <label className="text-xs text-[#F4F7FA]/50 mb-1 block">Entry Price *</label>
-              <input
-                type="number" min="0.0001" step="any"
-                className="w-full bg-[#16264A] border border-[#27B7C8]/20 rounded-lg px-3 py-2 text-[#F4F7FA] text-sm focus:outline-none focus:border-[#27B7C8]"
-                value={form.entry_price}
-                onChange={e => set("entry_price", e.target.value)}
-                placeholder="150.00"
-                required
-              />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-xs text-[#F4F7FA]/50 mb-1 block">Stop Price</label>
-              <input
-                type="number" min="0" step="any"
-                className="w-full bg-[#16264A] border border-[#27B7C8]/20 rounded-lg px-3 py-2 text-[#F4F7FA] text-sm focus:outline-none focus:border-[#27B7C8]"
-                value={form.stop_price}
-                onChange={e => set("stop_price", e.target.value)}
-                placeholder="145.00"
-              />
-            </div>
-            <div>
-              <label className="text-xs text-[#F4F7FA]/50 mb-1 block">Target Price</label>
-              <input
-                type="number" min="0" step="any"
-                className="w-full bg-[#16264A] border border-[#27B7C8]/20 rounded-lg px-3 py-2 text-[#F4F7FA] text-sm focus:outline-none focus:border-[#27B7C8]"
-                value={form.target_price}
-                onChange={e => set("target_price", e.target.value)}
-                placeholder="165.00"
-              />
-            </div>
-          </div>
-          <div>
-            <label className="text-xs text-[#F4F7FA]/50 mb-1 block">Thesis (why are you entering?)</label>
-            <textarea
-              className="w-full bg-[#16264A] border border-[#27B7C8]/20 rounded-lg px-3 py-2 text-[#F4F7FA] text-sm focus:outline-none focus:border-[#27B7C8] resize-none"
-              value={form.thesis}
-              onChange={e => set("thesis", e.target.value)}
-              rows={2}
-              placeholder="Breakout above resistance, strong earnings..."
-            />
-          </div>
-          {form.shares && form.entry_price && (
-            <p className="text-xs text-[#27B7C8]/80 bg-[#27B7C8]/10 rounded-lg px-3 py-2">
-              Total cost: {fmt(parseFloat(form.shares) * parseFloat(form.entry_price))}
-            </p>
-          )}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 rounded-xl bg-[#49B06E] text-white font-semibold text-sm disabled:opacity-50 hover:bg-[#49B06E]/90 transition-colors"
-          >
-            {loading ? "Opening…" : "Open Position"}
-          </button>
-        </form>
-      </div>
     </div>
   );
 }
@@ -435,17 +305,17 @@ export default function PracticePage(_props: PageProps) {
     else if (!authLoading && !isPro) setLoading(false);
   }, [authLoading, isPro, loadData]);
 
-  const handleOpenTrade = async (form: Record<string, string>) => {
+  const handleOpenTrade = async (result: ChecklistResult) => {
     const res = await apiFetch("/api/practice/trades", {
       method: "POST",
       body: JSON.stringify({
-        ticker: form.ticker,
-        direction: form.direction,
-        shares: parseFloat(form.shares),
-        entry_price: parseFloat(form.entry_price),
-        stop_price: form.stop_price ? parseFloat(form.stop_price) : undefined,
-        target_price: form.target_price ? parseFloat(form.target_price) : undefined,
-        thesis: form.thesis || undefined,
+        ticker: result.ticker,
+        direction: result.direction,
+        shares: result.shares,
+        entry_price: result.entry_price,
+        stop_price: result.stop_price,
+        target_price: result.target_price,
+        thesis: result.thesis || undefined,
       }),
     });
     const data = await res.json();
@@ -649,7 +519,7 @@ export default function PracticePage(_props: PageProps) {
       </Layout>
 
       {showOpenModal && (
-        <OpenTradeModal
+        <PreTradeChecklist
           onSubmit={handleOpenTrade}
           onClose={() => setShowOpenModal(false)}
         />
