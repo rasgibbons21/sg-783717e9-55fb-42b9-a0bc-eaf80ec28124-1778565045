@@ -8,7 +8,7 @@ import { useSubscription } from "@/contexts/SubscriptionContext";
 import { supabase } from "@/integrations/supabase/client";
 import {
   TrendingUp, BookOpen, X, ChevronDown, ChevronUp,
-  AlertTriangle, Plus, Lock
+  AlertTriangle, Plus, Lock, Search
 } from "lucide-react";
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -577,14 +577,23 @@ export default function PracticePage(_props: PageProps) {
                 </p>
               </div>
 
-              {/* New Trade Button */}
-              <button
-                onClick={() => setShowOpenModal(true)}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-[#49B06E] text-white font-semibold mb-6 hover:bg-[#49B06E]/90 transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-                Open New Position
-              </button>
+              {/* Action Buttons */}
+              <div className="flex gap-3 mb-6">
+                <button
+                  onClick={() => setShowOpenModal(true)}
+                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-[#49B06E] text-white font-semibold hover:bg-[#49B06E]/90 transition-colors"
+                >
+                  <Plus className="w-4 h-4" />
+                  Open Position
+                </button>
+                <Link
+                  href="/research"
+                  className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#16264A] border border-[#27B7C8]/30 text-[#27B7C8] font-semibold text-sm hover:bg-[#27B7C8]/10 transition-colors"
+                >
+                  <Search className="w-4 h-4" />
+                  Research
+                </Link>
+              </div>
 
               {/* Trades Tabs */}
               <div className="flex gap-2 mb-4">
