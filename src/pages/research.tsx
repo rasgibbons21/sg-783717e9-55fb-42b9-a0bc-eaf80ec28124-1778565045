@@ -1,10 +1,7 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import type { GetServerSideProps } from "next";
 import Head from "next/head";
 import Link from "next/link";
-import {
-  AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
-} from "recharts";
 import {
   Search, TrendingUp, TrendingDown, Newspaper, Info,
   ChevronRight, AlertTriangle, Loader2, Lock, ArrowLeft,
@@ -14,6 +11,7 @@ import { requireProUserSSR } from "@/lib/requireProUserSSR";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { marketService } from "@/services/marketService";
 import { supabase } from "@/integrations/supabase/client";
+import { CandlestickChart, type OHLCBar } from "@/components/CandlestickChart";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 interface Quote {
@@ -26,7 +24,13 @@ interface Quote {
   v: number;   // volume
 }
 
-interface ChartPoint { date: string; price: number }
+type Timeframe = "daily" | "1hour" | "15min" | "5min";
+const TIMEFRAMES: { key: Timeframe; label: string }[] = [
+  { key: "daily",  label: "Daily" },
+  { key: "1hour",  label: "1H" },
+  { key: "15min",  label: "15m" },
+  { key: "5min",   label: "5m" },
+];
 
 interface NewsItem {
   headline: string;
@@ -140,23 +144,6 @@ function ProGate() {
   );
 }
 
-// ── Custom chart tooltip ───────────────────────────────────────────────────
-function ChartTooltip({ active, payload, label }: {
-  active?: boolean;
-  payload?: Array<{ value: number }>;
-  label?: string;
-}) {
-  if (!active || !payload?.length) return null;
-  return (
-    <div className="bg-[#0E1B30] border border-[#27B7C8]/30 rounded-lg px-3 py-2 text-xs">
-      <p className="text-[#F4F7FA]/60">{label}</p>
-      <p className="font-mono font-bold text-[#27B7C8]">
-        ${payload[0].value.toFixed(2)}
-      </p>
-    </div>
-  );
-}
-
 // ── Main Page ──────────────────────────────────────────────────────────────
 export default function ResearchPage() {
   const { isPro, isLoading: authLoading } = useSubscription();
@@ -164,13 +151,40 @@ export default function ResearchPage() {
   const [search, setSearch] = useState("");
   const [ticker, setTicker] = useState("");
   const [quote, setQuote] = useState<Quote | null>(null);
-  const [chart, setChart] = useState<ChartPoint[]>([]);
+  const [ohlc, setOhlc] = useState<OHLCBar[]>([]);
+  const [timeframe, setTimeframe] = useState<Timeframe>("daily");
+  const [ohlcLoading, setOhlcLoading] = useState(false);
   const [news, setNews] = useState<NewsItem[]>([]);
   const [panel, setPanel] = useState<PansyPanel | null>(null);
   const [loading, setLoading] = useState(false);
   const [panelLoading, setPanelLoading] = useState(false);
   const [error, setError] = useState("");
   const abortRef = useRef<AbortController | null>(null);
+
+  const fetchOhlc = useCallback(async (sym: string, tf: Timeframe) => {
+    if (!sym) return;
+    setOhlcLoading(true);
+    try {
+      const token = await getToken();
+      const res = await fetch(`/api/practice/ohlc?ticker=${sym}&timeframe=${tf}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const { bars } = await res.json() as { bars: OHLCBar[] };
+        setOhlc(bars ?? []);
+      }
+    } catch {
+      // non-fatal — chart just won't show
+    } finally {
+      setOhlcLoading(false);
+    }
+  }, []);
+
+  // Re-fetch when timeframe changes (ticker is already loaded)
+  useEffect(() => {
+    if (ticker) fetchOhlc(ticker, timeframe);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [timeframe]);
 
   const loadStock = useCallback(async (sym: string) => {
     const clean = sym.toUpperCase().trim();
@@ -184,7 +198,7 @@ export default function ResearchPage() {
     setError("");
     setTicker(clean);
     setQuote(null);
-    setChart([]);
+    setOhlc([]);
     setNews([]);
     setPanel(null);
 
@@ -195,9 +209,8 @@ export default function ResearchPage() {
       const toStr = today.toISOString().split("T")[0];
       const fromStr = from.toISOString().split("T")[0];
 
-      const [q, chartData, newsRes] = await Promise.all([
+      const [q, newsRes] = await Promise.all([
         marketService.getRealTimeQuote(clean),
-        marketService.getHistoricalData(clean, 30),
         fetch(`/api/proxy/finnhub-news?ticker=${clean}&from=${fromStr}&to=${toStr}`).then(r => r.json()),
       ]);
 
@@ -208,9 +221,9 @@ export default function ResearchPage() {
       }
 
       setQuote(q);
-      setChart(chartData);
       setNews(Array.isArray(newsRes) ? newsRes.slice(0, 6) : []);
       setLoading(false);
+      fetchOhlc(clean, timeframe);
 
       // Load Pansy panel separately (slower — LLM call)
       setPanelLoading(true);
@@ -356,47 +369,38 @@ export default function ResearchPage() {
                     </div>
                   </div>
 
-                  {/* Price chart */}
-                  {chart.length > 1 && (
-                    <div className="rounded-xl bg-[#16264A] border border-[#27B7C8]/20 p-4">
-                      <p className="text-xs text-[#F4F7FA]/50 mb-3">30-Day Price History</p>
-                      <ResponsiveContainer width="100%" height={160}>
-                        <AreaChart data={chart} margin={{ top: 4, right: 0, left: 0, bottom: 0 }}>
-                          <defs>
-                            <linearGradient id="priceGrad" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#27B7C8" stopOpacity={0.3} />
-                              <stop offset="95%" stopColor="#27B7C8" stopOpacity={0} />
-                            </linearGradient>
-                          </defs>
-                          <XAxis
-                            dataKey="date"
-                            tick={{ fontSize: 9, fill: "rgba(244,247,250,0.3)" }}
-                            tickLine={false}
-                            axisLine={false}
-                            interval={Math.floor(chart.length / 5)}
-                          />
-                          <YAxis
-                            domain={["auto", "auto"]}
-                            tick={{ fontSize: 9, fill: "rgba(244,247,250,0.3)" }}
-                            tickLine={false}
-                            axisLine={false}
-                            tickFormatter={v => `$${v.toFixed(0)}`}
-                            width={48}
-                          />
-                          <Tooltip content={<ChartTooltip />} />
-                          <Area
-                            type="monotone"
-                            dataKey="price"
-                            stroke="#27B7C8"
-                            strokeWidth={2}
-                            fill="url(#priceGrad)"
-                            dot={false}
-                            activeDot={{ r: 4, fill: "#27B7C8" }}
-                          />
-                        </AreaChart>
-                      </ResponsiveContainer>
+                  {/* Candlestick chart */}
+                  <div className="rounded-xl bg-[#16264A] border border-[#27B7C8]/20 p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <p className="text-xs text-[#F4F7FA]/50">Price Chart (OHLC)</p>
+                      <div className="flex gap-1">
+                        {TIMEFRAMES.map(tf => (
+                          <button
+                            key={tf.key}
+                            onClick={() => setTimeframe(tf.key)}
+                            className={`px-2.5 py-1 rounded-md text-[10px] font-mono font-semibold transition-colors ${
+                              timeframe === tf.key
+                                ? "bg-[#27B7C8] text-[#0E1B30]"
+                                : "bg-[#0E1B30] text-[#F4F7FA]/40 hover:text-[#F4F7FA]/70"
+                            }`}
+                          >
+                            {tf.label}
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                  )}
+                    {ohlcLoading ? (
+                      <div className="flex items-center justify-center h-[280px]">
+                        <Loader2 className="w-5 h-5 text-[#27B7C8] animate-spin" />
+                      </div>
+                    ) : ohlc.length > 1 ? (
+                      <CandlestickChart data={ohlc} height={280} />
+                    ) : (
+                      <div className="flex items-center justify-center h-[280px] text-[#F4F7FA]/20 text-xs">
+                        No chart data available
+                      </div>
+                    )}
+                  </div>
 
                   {/* Fundamentals + About from Pansy panel */}
                   {panel?.profile && (

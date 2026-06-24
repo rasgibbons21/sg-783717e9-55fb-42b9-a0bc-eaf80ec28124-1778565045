@@ -1,5 +1,7 @@
-import { useState } from "react";
-import { X, ArrowLeft, ArrowRight, AlertTriangle, CheckCircle2, TrendingUp, TrendingDown } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { X, ArrowLeft, ArrowRight, AlertTriangle, CheckCircle2, TrendingUp, TrendingDown, BarChart2 } from "lucide-react";
+import { CandlestickChart, type OHLCBar } from "@/components/CandlestickChart";
+import { supabase } from "@/integrations/supabase/client";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 export interface ChecklistResult {
@@ -107,6 +109,67 @@ function compileThesis(f: Form): string {
   if (f.resistance) lvl.push(`Resistance $${f.resistance}`);
   if (lvl.length) parts.push(`Key levels: ${lvl.join(", ")}`);
   return parts.join("\n");
+}
+
+// ── Mini chart panel ───────────────────────────────────────────────────────
+function MiniChart({ ticker, priceLines }: { ticker: string; priceLines?: { entry?: number; stop?: number; target?: number } }) {
+  const [bars, setBars] = useState<OHLCBar[]>([]);
+  const [open, setOpen] = useState(true);
+  const [loading, setLoading] = useState(false);
+
+  const load = useCallback(async (sym: string) => {
+    if (!sym) return;
+    setLoading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      const res = await fetch(`/api/practice/ohlc?ticker=${sym}&timeframe=daily`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const { bars: b } = await res.json() as { bars: OHLCBar[] };
+        setBars(b ?? []);
+      }
+    } catch {
+      // silent
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (ticker) load(ticker);
+  }, [ticker, load]);
+
+  return (
+    <div className="rounded-xl border border-[#27B7C8]/20 bg-[#0E1B30] overflow-hidden mb-4">
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center gap-2 px-3 py-2 text-xs text-[#27B7C8]/80 hover:text-[#27B7C8] transition-colors"
+      >
+        <BarChart2 className="w-3.5 h-3.5 flex-shrink-0" />
+        <span className="font-mono font-semibold">{ticker}</span>
+        <span className="text-[#F4F7FA]/30 ml-1">· Daily candles</span>
+        <span className="ml-auto text-[#F4F7FA]/25">{open ? "▲" : "▼"}</span>
+      </button>
+      {open && (
+        <div className="border-t border-[#27B7C8]/10">
+          {loading ? (
+            <div className="flex items-center justify-center h-[220px] text-[#27B7C8]/40 text-xs">
+              Loading chart…
+            </div>
+          ) : bars.length > 1 ? (
+            <CandlestickChart data={bars} height={220} priceLines={priceLines} />
+          ) : (
+            <div className="flex items-center justify-center h-[220px] text-[#F4F7FA]/20 text-xs">
+              No data
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
 }
 
 // ── Step components ────────────────────────────────────────────────────────
@@ -224,6 +287,7 @@ function StepPattern({ f, set }: { f: Form; set: (k: keyof Form, v: string) => v
       <PansyPrompt>
         Every good entry has a reason to be <em>here</em> specifically. What&apos;s the pattern you&apos;re trading, and what&apos;s the candle or signal that says now is the time?
       </PansyPrompt>
+      {f.ticker && <MiniChart ticker={f.ticker} />}
       <div className="space-y-4">
         <div>
           <label className="text-xs text-[#F4F7FA]/40 mb-2 block uppercase tracking-wide">Chart pattern</label>
@@ -273,6 +337,7 @@ function StepLevels({ f, set }: { f: Form; set: (k: keyof Form, v: string) => vo
       <PansyPrompt>
         Where&apos;s the floor, and where&apos;s the ceiling? Knowing your key levels is what separates a trade from a guess — and they&apos;ll anchor your risk plan in the next step.
       </PansyPrompt>
+      {f.ticker && <MiniChart ticker={f.ticker} />}
       <div className="space-y-3">
         <div>
           <label className="text-xs text-[#F4F7FA]/40 mb-1.5 block uppercase tracking-wide">Support level (price)</label>
@@ -310,11 +375,18 @@ function StepPlan({ f, set }: { f: Form; set: (k: keyof Form, v: string) => void
     ? parseFloat(f.shares) * parseFloat(f.entryPrice)
     : null;
 
+  const planLines = {
+    entry: f.entryPrice ? parseFloat(f.entryPrice) : undefined,
+    stop: f.stopPrice ? parseFloat(f.stopPrice) : undefined,
+    target: f.targetPrice ? parseFloat(f.targetPrice) : undefined,
+  };
+
   return (
     <>
       <PansyPrompt>
         Numbers time. Where are you getting in, what price proves you wrong (your invalidation level), and where are you taking profit? I&apos;ll calculate your risk/reward from your own levels.
       </PansyPrompt>
+      {f.ticker && <MiniChart ticker={f.ticker} priceLines={planLines} />}
       <div className="space-y-3">
         <div className="grid grid-cols-2 gap-3">
           <div>
