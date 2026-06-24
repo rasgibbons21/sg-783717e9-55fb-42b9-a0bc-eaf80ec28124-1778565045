@@ -1,24 +1,16 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { requireProUser, sendAuthError } from "@/lib/requireProUser";
 
-// Simple in-memory cache
+// In-memory cache keyed by symbol+timeframe
 const cache = new Map<string, { data: unknown; ts: number }>();
 const CACHE_MS = 5 * 60 * 1000;
 
-// Map our timeframe keys to Finnhub resolution strings
-const RESOLUTION: Record<string, string> = {
-  daily: "D",
-  "1hour": "60",
-  "15min": "15",
-  "5min": "5",
-};
-
-// How many calendar days of history to request per timeframe
-const LOOKBACK_DAYS: Record<string, number> = {
-  daily: 120,
-  "1hour": 10,
-  "15min": 5,
-  "5min": 3,
+// FMP endpoint names per timeframe
+const FMP_ENDPOINT: Record<string, string> = {
+  daily: "historical-price-full",
+  "1hour": "1hour",
+  "15min": "15min",
+  "5min": "5min",
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -31,11 +23,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (!ticker) return res.status(400).json({ error: "ticker required" });
 
   const sym = ticker.toUpperCase().trim();
-  const apiKey = process.env.FINNHUB_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: "API key not configured" });
-
-  const resolution = RESOLUTION[timeframe] ?? "D";
-  const days = LOOKBACK_DAYS[timeframe] ?? 120;
+  const apiKey = process.env.FMP_API_KEY;
+  if (!apiKey) return res.status(500).json({ error: "FMP_API_KEY not configured" });
 
   const cacheKey = `${sym}:${timeframe}`;
   const cached = cache.get(cacheKey);
@@ -44,43 +33,56 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const toTs = Math.floor(Date.now() / 1000);
-    const fromTs = toTs - days * 24 * 60 * 60;
-
-    const url =
-      `https://finnhub.io/api/v1/stock/candle` +
-      `?symbol=${sym}&resolution=${resolution}&from=${fromTs}&to=${toTs}&token=${apiKey}`;
-
-    const fhRes = await fetch(url);
-    if (fhRes.status === 429) return res.status(429).json({ error: "Rate limit" });
-    if (!fhRes.ok) throw new Error(`Finnhub ${fhRes.status}`);
-
-    const raw = await fhRes.json() as {
-      s: string;
-      o?: number[];
-      h?: number[];
-      l?: number[];
-      c?: number[];
-      v?: number[];
-      t?: number[];
-    };
-
-    if (raw.s !== "ok" || !raw.t?.length) {
-      // No data returned (weekend, invalid ticker, plan limit) — return empty
-      return res.status(200).json({ bars: [] });
+    let url: string;
+    if (timeframe === "daily") {
+      // Returns { symbol, historical: [{date,open,high,low,close,volume,...}] }
+      url = `https://financialmodelingprep.com/api/v3/historical-price-full/${sym}?timeseries=90&apiKey=${apiKey}`;
+    } else {
+      // Returns [{date: "2024-01-02 09:30:00", open, high, low, close, volume}]
+      const ep = FMP_ENDPOINT[timeframe] ?? "15min";
+      url = `https://financialmodelingprep.com/api/v3/historical-chart/${ep}/${sym}?apiKey=${apiKey}`;
     }
 
-    const bars = raw.t.map((ts, i) => ({
-      // Daily: use "YYYY-MM-DD" string (BusinessDay); intraday: Unix seconds (UTCTimestamp)
-      time: resolution === "D"
-        ? new Date(ts * 1000).toISOString().slice(0, 10)
-        : ts,
-      open: raw.o![i],
-      high: raw.h![i],
-      low: raw.l![i],
-      close: raw.c![i],
-      volume: raw.v![i],
-    }));
+    const fmpRes = await fetch(url);
+    if (fmpRes.status === 429) return res.status(429).json({ error: "Rate limit" });
+    if (!fmpRes.ok) throw new Error(`FMP ${fmpRes.status}`);
+
+    const raw = await fmpRes.json();
+
+    let bars: { time: string | number; open: number; high: number; low: number; close: number; volume: number }[] = [];
+
+    if (timeframe === "daily") {
+      // FMP returns newest-first; lightweight-charts needs oldest-first
+      const hist = (raw as { historical?: { date: string; open: number; high: number; low: number; close: number; volume: number }[] }).historical ?? [];
+      bars = hist
+        .slice()
+        .reverse()
+        .map(r => ({
+          time: r.date as string,
+          open: r.open,
+          high: r.high,
+          low: r.low,
+          close: r.close,
+          volume: r.volume,
+        }));
+    } else {
+      // Intraday: [{date: "2024-01-02 09:30:00", ...}], also newest-first
+      const intraday = (Array.isArray(raw) ? raw : []) as {
+        date: string; open: number; high: number; low: number; close: number; volume: number;
+      }[];
+      bars = intraday
+        .slice()
+        .reverse()
+        .map(r => ({
+          // lightweight-charts UTCTimestamp (seconds since epoch) for intraday
+          time: Math.floor(new Date(r.date).getTime() / 1000),
+          open: r.open,
+          high: r.high,
+          low: r.low,
+          close: r.close,
+          volume: r.volume,
+        }));
+    }
 
     const result = { bars };
     cache.set(cacheKey, { data: result, ts: Date.now() });
