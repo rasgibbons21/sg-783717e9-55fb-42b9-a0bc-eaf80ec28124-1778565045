@@ -12,7 +12,7 @@ import {
 } from "lightweight-charts";
 
 export interface OHLCBar {
-  time: string; // "YYYY-MM-DD"
+  time: string | number; // "YYYY-MM-DD" for daily, Unix seconds for intraday
   open: number;
   high: number;
   low: number;
@@ -72,7 +72,7 @@ export function CandlestickChart({ data, priceLines, height = 280 }: Props) {
       },
       timeScale: {
         borderColor: GRID,
-        timeVisible: false,
+        timeVisible: typeof data[0]?.time === "number",
         secondsVisible: false,
       },
       handleScroll: true,
