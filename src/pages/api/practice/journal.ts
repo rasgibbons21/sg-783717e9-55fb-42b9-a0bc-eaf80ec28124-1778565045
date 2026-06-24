@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createClient } from "@supabase/supabase-js";
 import { requireProUser, sendAuthError } from "@/lib/requireProUser";
+import { checkAndCompleteMissions } from "@/lib/progression";
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -69,6 +70,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       .single();
 
     if (error) return res.status(500).json({ error: error.message });
+
+    // Re-check missions with updated journal data (indicator/candlestick fields)
+    if (data && (update.indicator_used !== undefined || update.candlestick_confirmation !== undefined)) {
+      const tradeFact = {
+        id: data.trade_id ?? undefined,
+        direction: data.direction ?? "long",
+        entry_price: Number(data.entry_price ?? 0),
+        stop_price: data.stop_price != null ? Number(data.stop_price) : null,
+        target_price: data.target_price != null ? Number(data.target_price) : null,
+        thesis: data.thesis,
+      };
+      const journalFact = {
+        thesis: data.thesis,
+        indicator_used: data.indicator_used ?? null,
+        candlestick_confirmation: data.candlestick_confirmation ?? null,
+      };
+      checkAndCompleteMissions(userId, tradeFact, journalFact)
+        .catch(err => console.error("mission check error", err));
+    }
+
     return res.status(200).json({ entry: data });
   }
 
