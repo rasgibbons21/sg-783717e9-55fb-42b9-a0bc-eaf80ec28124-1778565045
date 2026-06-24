@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { Home, Search, Target, Briefcase, Building2, User, GraduationCap, PieChart } from "lucide-react";
@@ -6,9 +6,9 @@ import { PansyPopup } from "./PansyPopup";
 import { PansyPsychologyToast } from "./PansyPsychologyToast";
 import { SignUpBanner } from "./SignUpBanner";
 import { cn } from "@/lib/utils";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -18,24 +18,8 @@ export function Layout({ children }: LayoutProps) {
   const router = useRouter();
   const { toast } = useToast();
   const currentPath = router.pathname;
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setIsLoggedIn(!!user);
-      setIsCheckingAuth(false);
-    };
-    checkAuth();
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsLoggedIn(!!session?.user);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
+  // Single source of truth — SubscriptionContext owns auth state for the whole app
+  const { isLoggedIn, isLoading } = useSubscription();
 
   const isActivePath = (path: string) => {
     if (path === "/home") return currentPath === "/home";
@@ -76,7 +60,7 @@ export function Layout({ children }: LayoutProps) {
   return (
     <div className="min-h-screen bg-background flex flex-col pb-[80px]">
       {/* Sign-Up Banner for Logged-Out Users */}
-      {!isCheckingAuth && !isLoggedIn && <SignUpBanner />}
+      {!isLoading && !isLoggedIn && <SignUpBanner />}
 
       {/* Top Navbar */}
       <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -95,7 +79,7 @@ export function Layout({ children }: LayoutProps) {
       </header>
 
       {/* Main Content - add top padding when banner is showing */}
-      <main className={cn("flex-1 w-full", !isCheckingAuth && !isLoggedIn && "pt-[60px]")}>{children}</main>
+      <main className={cn("flex-1 w-full", !isLoading && !isLoggedIn && "pt-[60px]")}>{children}</main>
 
       {/* Pansy Popup */}
       <PansyPopup />

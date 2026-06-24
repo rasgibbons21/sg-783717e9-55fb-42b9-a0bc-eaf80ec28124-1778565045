@@ -36,7 +36,7 @@ const DEFAULT_MARKET_DATA: MarketIndex[] = [
 
 export default function Home() {
   const router = useRouter();
-  const { isPro } = useSubscription();
+  const { isPro, userName, userId: ctxUserId } = useSubscription();
   const [user, setUser] = useState<any>(null);
   const [marketData, setMarketData] = useState<MarketIndex[]>(DEFAULT_MARKET_DATA);
   const [watchlistNews, setWatchlistNews] = useState<any[]>([]);
@@ -73,11 +73,9 @@ export default function Home() {
     }, 5000);
 
     try {
-      const userProfile = await userService.getCurrentUser();
-      
       await Promise.all([
         loadMarketData(),
-        loadWatchlistNews(userProfile?.id),
+        loadWatchlistNews(ctxUserId ?? ""),
         loadBriefing(),
       ]);
       clearTimeout(timeoutId);
@@ -173,7 +171,7 @@ export default function Home() {
         {/* Greeting */}
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
-            <TimeGreeting fullName={user?.full_name} />
+            <TimeGreeting fullName={user?.full_name ?? userName} />
             <p className="text-muted-foreground mt-1">
               {isPro ? "Keep learning. Keep growing." : "Your daily market education"}
             </p>

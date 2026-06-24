@@ -1,12 +1,13 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from "react";
 import { useRouter } from "next/router";
-import { authService } from "@/services/authService";
 import { supabase } from "@/integrations/supabase/client";
 
 interface SubscriptionContextType {
   isPro: boolean;
   isLoggedIn: boolean;
   isLoading: boolean;
+  userName: string | null;
+  userId: string | null;
   refresh: () => Promise<void>;
 }
 
@@ -17,75 +18,81 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const [isPro, setIsPro] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [userName, setUserName] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
 
-  const loadSubscriptionStatus = async () => {
+  const loadAuthStatus = useCallback(async () => {
     try {
-      const session = await authService.getCurrentSession();
-      
-      if (!session) {
+      // getUser() hits the Supabase server and validates the token — not localStorage.
+      // This is the only source of truth for whether the session is actually live.
+      const { data: { user }, error } = await supabase.auth.getUser();
+
+      if (error || !user) {
         setIsLoggedIn(false);
         setIsPro(false);
-        setIsLoading(false);
+        setUserName(null);
+        setUserId(null);
         return;
       }
 
       setIsLoggedIn(true);
+      setUserId(user.id);
 
-      // Fetch fresh profile from Supabase - no cache
+      // Single profile fetch: name + Pro status in one query
       const { data: profile } = await supabase
         .from("profiles")
-        .select("is_pro, subscription_status")
-        .eq("id", session.user.id)
+        .select("is_pro, subscription_status, full_name")
+        .eq("id", user.id)
         .single();
 
-      // Compute Pro status: is_pro OR subscription_status = 'active'
       const userIsPro = profile?.is_pro === true || profile?.subscription_status === "active";
       setIsPro(userIsPro);
-    } catch (error) {
-      console.error("Error loading subscription status:", error);
+
+      const first = profile?.full_name
+        ? (profile.full_name as string).trim().split(" ")[0]
+        : null;
+      setUserName(first);
+    } catch {
       setIsLoggedIn(false);
       setIsPro(false);
+      setUserName(null);
+      setUserId(null);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const refresh = async () => {
+  const refresh = useCallback(async () => {
     setIsLoading(true);
-    await loadSubscriptionStatus();
-  };
+    await loadAuthStatus();
+  }, [loadAuthStatus]);
 
   useEffect(() => {
-    // Load on mount
-    loadSubscriptionStatus();
+    // Initial load
+    loadAuthStatus();
 
-    // Re-fetch on auth state changes
-    const { data: authListener } = supabase.auth.onAuthStateChange(() => {
-      loadSubscriptionStatus();
+    // Supabase fires this on sign-in, sign-out, token refresh — re-validate immediately
+    const { data: { subscription: authSub } } = supabase.auth.onAuthStateChange(() => {
+      loadAuthStatus();
     });
 
-    // Re-fetch on window focus
-    const handleFocus = () => {
-      loadSubscriptionStatus();
-    };
+    // Re-validate when the tab regains focus (catches session expiry while backgrounded)
+    const handleFocus = () => loadAuthStatus();
     window.addEventListener("focus", handleFocus);
 
-    // Re-fetch on route change
-    const handleRouteChange = () => {
-      loadSubscriptionStatus();
-    };
-    router.events?.on("routeChangeComplete", handleRouteChange);
+    // Re-validate after every client-side route transition
+    const handleRoute = () => loadAuthStatus();
+    router.events?.on("routeChangeComplete", handleRoute);
 
     return () => {
-      authListener?.subscription?.unsubscribe();
+      authSub.unsubscribe();
       window.removeEventListener("focus", handleFocus);
-      router.events?.off("routeChangeComplete", handleRouteChange);
+      router.events?.off("routeChangeComplete", handleRoute);
     };
-  }, [router.events]);
+  }, [loadAuthStatus, router.events]);
 
-  // Always render children - components handle their own loading states
   return (
-    <SubscriptionContext.Provider value={{ isPro, isLoggedIn, isLoading, refresh }}>
+    <SubscriptionContext.Provider value={{ isPro, isLoggedIn, isLoading, userName, userId, refresh }}>
       {children}
     </SubscriptionContext.Provider>
   );
@@ -93,8 +100,6 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
 
 export function useSubscription() {
   const context = useContext(SubscriptionContext);
-  if (context === undefined) {
-    throw new Error("useSubscription must be used within a SubscriptionProvider");
-  }
+  if (!context) throw new Error("useSubscription must be used within a SubscriptionProvider");
   return context;
 }
