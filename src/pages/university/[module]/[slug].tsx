@@ -14,7 +14,7 @@ import { getM10LessonBySlug } from "@/data/university/m10-candlestick-patterns";
 import { supabase } from "@/integrations/supabase/client";
 import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
-import { ArrowLeft, Bookmark, BookmarkCheck, CheckCircle, Clock } from "lucide-react";
+import { ArrowLeft, Bookmark, BookmarkCheck, CheckCircle, Clock, Sparkles } from "lucide-react";
 
 interface Props {
   moduleSlug: string;
@@ -174,6 +174,7 @@ export default function LessonPage({ moduleSlug, lessonSlug, requiresClientAuth 
   const [token, setToken] = useState<string | null>(null);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [progressMarked, setProgressMarked] = useState(false);
+  const [progressReward, setProgressReward] = useState<{ xp: number; mission: string | null } | null>(null);
 
   // Load lesson client-side (always from static data, no API call needed)
   const lesson =
@@ -191,14 +192,17 @@ export default function LessonPage({ moduleSlug, lessonSlug, requiresClientAuth 
     async (tok: string) => {
       if (progressMarked) return;
       setProgressMarked(true);
-      await fetch("/api/university/progress", {
+      const res = await fetch("/api/university/progress", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tok}`,
-        },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${tok}` },
         body: JSON.stringify({ moduleSlug, lessonSlug }),
       });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.xp_awarded > 0 || data.mission_unlocked) {
+          setProgressReward({ xp: data.xp_awarded ?? 0, mission: data.mission_unlocked ?? null });
+        }
+      }
     },
     [moduleSlug, lessonSlug, progressMarked]
   );
@@ -356,9 +360,27 @@ export default function LessonPage({ moduleSlug, lessonSlug, requiresClientAuth 
 
           {/* Progress indicator */}
           {progressMarked && (
-            <div className="mt-8 flex items-center gap-2 text-sm text-[#49B06E]">
-              <CheckCircle className="w-4 h-4" />
-              Lesson marked as complete
+            <div className="mt-8 space-y-2">
+              <div className="flex items-center gap-2 text-sm text-[#49B06E]">
+                <CheckCircle className="w-4 h-4" />
+                Lesson complete
+                {progressReward && progressReward.xp > 0 && (
+                  <span className="text-xs font-mono text-[#27B7C8] ml-1">+{progressReward.xp} XP</span>
+                )}
+              </div>
+              {progressReward?.mission && (
+                <div className="flex items-center gap-2 rounded-lg bg-[#27B7C8]/10 border border-[#27B7C8]/25 px-3 py-2">
+                  <Sparkles className="w-4 h-4 text-[#27B7C8] flex-shrink-0" />
+                  <div>
+                    <p className="text-xs font-semibold text-[#27B7C8]">Mission Unlocked!</p>
+                    <p className="text-xs text-[#F4F7FA]/60">
+                      Head to{" "}
+                      <Link href="/progression" className="underline text-[#27B7C8]">My Progression</Link>
+                      {" "}to see your new mission in the Practice Trader.
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

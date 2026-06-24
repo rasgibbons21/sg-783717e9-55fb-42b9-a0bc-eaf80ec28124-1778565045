@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@supabase/supabase-js";
 import { requireProUser, sendAuthError } from "@/lib/requireProUser";
+import { awardXP, checkAndCompleteMissions } from "@/lib/progression";
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -156,9 +157,34 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (insertErr) {
     console.error("journal insert error", insertErr);
-    // Return review even if journal save failed
     return res.status(200).json({ review, journal_id: null, warning: "Journal save failed" });
   }
 
-  return res.status(200).json({ review, journal_id: journal.id });
+  // Award XP for trade process quality (non-blocking)
+  const userId = auth.user!.id;
+  const hasProcess = trade.thesis?.trim() && trade.stop_price != null && trade.target_price != null;
+  const hasThesis = !!trade.thesis?.trim();
+  const gradeBonus = review.overall_grade === "A" ? 20 : review.overall_grade === "B" ? 10 : 0;
+  const tradeXP = (hasProcess ? 25 : hasThesis ? 15 : 5) + gradeBonus;
+
+  const tradeFact = {
+    id: trade.id,
+    direction: trade.direction,
+    entry_price: Number(trade.entry_price),
+    stop_price: trade.stop_price != null ? Number(trade.stop_price) : null,
+    target_price: trade.target_price != null ? Number(trade.target_price) : null,
+    thesis: trade.thesis,
+  };
+  const journalFact = {
+    thesis: trade.thesis,
+    indicator_used: null,
+    candlestick_confirmation: null,
+  };
+
+  await Promise.all([
+    awardXP(userId, tradeXP, `Trade reviewed: ${trade.ticker} (${review.overall_grade})`, trade.id),
+    checkAndCompleteMissions(userId, tradeFact, journalFact),
+  ]).catch(err => console.error("XP/mission error", err));
+
+  return res.status(200).json({ review, journal_id: journal.id, xp_awarded: tradeXP });
 }

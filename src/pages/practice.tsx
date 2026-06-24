@@ -11,7 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { marketService } from "@/services/marketService";
 import {
   TrendingUp, BookOpen, X,
-  AlertTriangle, Plus, Lock, Search, Sparkles, NotebookPen, Loader2,
+  AlertTriangle, Plus, Lock, Search, Sparkles, NotebookPen, Loader2, Trophy,
 } from "lucide-react";
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -660,6 +660,13 @@ export default function PracticePage(_props: PageProps) {
                 >
                   <NotebookPen className="w-4 h-4" />
                   Journal
+                </Link>
+                <Link
+                  href="/progression"
+                  className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#16264A] border border-[#27B7C8]/30 text-[#27B7C8] font-semibold text-sm hover:bg-[#27B7C8]/10 transition-colors"
+                >
+                  <Trophy className="w-4 h-4" />
+                  Progress
                 </Link>
               </div>
 
