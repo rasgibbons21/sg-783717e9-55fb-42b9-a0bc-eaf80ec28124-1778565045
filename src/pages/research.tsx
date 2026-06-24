@@ -11,7 +11,7 @@ import { requireProUserSSR } from "@/lib/requireProUserSSR";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { marketService } from "@/services/marketService";
 import { supabase } from "@/integrations/supabase/client";
-import { CandlestickChart, type OHLCBar } from "@/components/CandlestickChart";
+import DynamicChart, { type OHLCBar } from "@/components/DynamicChart";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 interface Quote {
@@ -394,7 +394,7 @@ export default function ResearchPage() {
                         <Loader2 className="w-5 h-5 text-[#27B7C8] animate-spin" />
                       </div>
                     ) : ohlc.length > 1 ? (
-                      <CandlestickChart data={ohlc} height={280} />
+                      <DynamicChart data={ohlc} height={280} />
                     ) : (
                       <div className="flex items-center justify-center h-[280px] text-[#F4F7FA]/20 text-xs">
                         No chart data available

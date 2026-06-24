@@ -1,9 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   TrendingUp, TrendingDown, ChevronDown, ChevronUp,
   X, AlertTriangle, Loader2,
   SplitSquareVertical, StopCircle, Target, StickyNote, Sparkles,
 } from "lucide-react";
+import DynamicChart, { type OHLCBar } from "@/components/DynamicChart";
+import { supabase } from "@/integrations/supabase/client";
 
 // ── Shared types ───────────────────────────────────────────────────────────
 export interface Trade {
@@ -291,6 +293,63 @@ function AddNoteModal({ trade, onSubmit, onClose }: {
 }
 
 // ── Pansy coaching modal ───────────────────────────────────────────────────
+// ── Live chart for open trade ──────────────────────────────────────────────
+function TradeChart({ trade }: { trade: Trade }) {
+  const [bars, setBars] = useState<OHLCBar[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      const res = await fetch(`/api/practice/ohlc?ticker=${trade.ticker}&timeframe=daily`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const { bars: b } = await res.json() as { bars: OHLCBar[] };
+        setBars(b ?? []);
+      }
+    } catch {
+      // non-fatal
+    } finally {
+      setLoading(false);
+    }
+  }, [trade.ticker]);
+
+  useEffect(() => { load(); }, [load]);
+
+  const priceLines = {
+    entry: trade.entry_price,
+    stop: trade.stop_price ?? undefined,
+    target: trade.target_price ?? undefined,
+  };
+
+  return (
+    <div className="border-b border-[#27B7C8]/10 bg-[#0E1B30]">
+      <div className="px-3 pt-2 pb-1 flex items-center justify-between">
+        <span className="text-[10px] text-[#F4F7FA]/30 uppercase tracking-wide">Daily Chart · {trade.ticker}</span>
+        <div className="flex items-center gap-3 text-[9px] text-[#F4F7FA]/30">
+          <span className="flex items-center gap-1"><span className="w-2 h-0.5 bg-[#49B06E] inline-block" />Entry</span>
+          {trade.stop_price && <span className="flex items-center gap-1"><span className="w-2 h-0.5 bg-[#ef4444] inline-block border-dashed" />Stop</span>}
+          {trade.target_price && <span className="flex items-center gap-1"><span className="w-2 h-0.5 bg-[#27B7C8] inline-block" />Target</span>}
+        </div>
+      </div>
+      {loading ? (
+        <div className="h-[220px] flex items-center justify-center">
+          <Loader2 className="w-4 h-4 text-[#27B7C8]/40 animate-spin" />
+        </div>
+      ) : bars.length > 1 ? (
+        <DynamicChart data={bars} height={220} priceLines={priceLines} />
+      ) : (
+        <div className="h-[220px] flex items-center justify-center text-[#F4F7FA]/20 text-xs">
+          Chart unavailable
+        </div>
+      )}
+    </div>
+  );
+}
+
 function PansyCoachModal({ trade, currentPrice, onClose }: {
   trade: Trade; currentPrice: number | null; onClose: () => void;
 }) {
@@ -524,6 +583,9 @@ export function ActiveTradeCard({
                 </div>
               </div>
             )}
+
+            {/* Live candlestick chart */}
+            <TradeChart trade={trade} />
 
             {/* Position size detail */}
             <div className="px-3 py-2 border-b border-[#27B7C8]/10 flex items-center justify-between text-xs text-[#F4F7FA]/40">

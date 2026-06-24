@@ -1,9 +1,17 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { requireProUser, sendAuthError } from "@/lib/requireProUser";
 
-// Simple in-memory cache
+// In-memory cache keyed by symbol+timeframe
 const cache = new Map<string, { data: unknown; ts: number }>();
 const CACHE_MS = 5 * 60 * 1000;
+
+// FMP endpoint names per timeframe
+const FMP_ENDPOINT: Record<string, string> = {
+  daily: "historical-price-full",
+  "1hour": "1hour",
+  "15min": "15min",
+  "5min": "5min",
+};
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const auth = await requireProUser(req);
@@ -16,7 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const sym = ticker.toUpperCase().trim();
   const apiKey = process.env.FMP_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: "Server configuration error" });
+  if (!apiKey) return res.status(500).json({ error: "FMP_API_KEY not configured" });
 
   const cacheKey = `${sym}:${timeframe}`;
   const cached = cache.get(cacheKey);
@@ -27,10 +35,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     let url: string;
     if (timeframe === "daily") {
+      // Returns { symbol, historical: [{date,open,high,low,close,volume,...}] }
       url = `https://financialmodelingprep.com/api/v3/historical-price-full/${sym}?timeseries=90&apiKey=${apiKey}`;
     } else {
-      // 1min, 5min, 15min, 30min, 1hour
-      url = `https://financialmodelingprep.com/api/v3/historical-chart/${timeframe}/${sym}?apiKey=${apiKey}`;
+      // Returns [{date: "2024-01-02 09:30:00", open, high, low, close, volume}]
+      const ep = FMP_ENDPOINT[timeframe] ?? "15min";
+      url = `https://financialmodelingprep.com/api/v3/historical-chart/${ep}/${sym}?apiKey=${apiKey}`;
     }
 
     const fmpRes = await fetch(url);
@@ -39,23 +49,39 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const raw = await fmpRes.json();
 
-    // Normalise both response shapes to [{time,open,high,low,close,volume}]
-    let bars: { time: string; open: number; high: number; low: number; close: number; volume: number }[] = [];
+    let bars: { time: string | number; open: number; high: number; low: number; close: number; volume: number }[] = [];
 
     if (timeframe === "daily") {
-      // { historical: [{date, open, high, low, close, volume}] }
-      const hist: { date: string; open: number; high: number; low: number; close: number; volume: number }[] =
-        (raw as { historical?: { date: string; open: number; high: number; low: number; close: number; volume: number }[] }).historical ?? [];
+      // FMP returns newest-first; lightweight-charts needs oldest-first
+      const hist = (raw as { historical?: { date: string; open: number; high: number; low: number; close: number; volume: number }[] }).historical ?? [];
       bars = hist
-        .map(r => ({ time: r.date, open: r.open, high: r.high, low: r.low, close: r.close, volume: r.volume }))
-        .reverse(); // FMP returns newest first; chart needs oldest first
+        .slice()
+        .reverse()
+        .map(r => ({
+          time: r.date as string,
+          open: r.open,
+          high: r.high,
+          low: r.low,
+          close: r.close,
+          volume: r.volume,
+        }));
     } else {
-      // [{date: "2024-01-02 09:30:00", open, high, low, close, volume}]
-      const intraday: { date: string; open: number; high: number; low: number; close: number; volume: number }[] =
-        Array.isArray(raw) ? raw : [];
+      // Intraday: [{date: "2024-01-02 09:30:00", ...}], also newest-first
+      const intraday = (Array.isArray(raw) ? raw : []) as {
+        date: string; open: number; high: number; low: number; close: number; volume: number;
+      }[];
       bars = intraday
-        .map(r => ({ time: r.date.slice(0, 10) + (r.date.length > 10 ? " " + r.date.slice(11, 16) : ""), open: r.open, high: r.high, low: r.low, close: r.close, volume: r.volume }))
-        .reverse();
+        .slice()
+        .reverse()
+        .map(r => ({
+          // lightweight-charts UTCTimestamp (seconds since epoch) for intraday
+          time: Math.floor(new Date(r.date).getTime() / 1000),
+          open: r.open,
+          high: r.high,
+          low: r.low,
+          close: r.close,
+          volume: r.volume,
+        }));
     }
 
     const result = { bars };
