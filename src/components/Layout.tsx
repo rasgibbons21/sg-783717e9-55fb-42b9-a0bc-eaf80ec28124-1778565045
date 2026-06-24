@@ -1,7 +1,7 @@
 import { ReactNode, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { Home, Search, Target, Briefcase, Building2, User, GraduationCap, PieChart } from "lucide-react";
+import { Home, Search, Building2, User, GraduationCap, TrendingUp } from "lucide-react";
 import { PansyPopup } from "./PansyPopup";
 import { PansyPsychologyToast } from "./PansyPsychologyToast";
 import { SignUpBanner } from "./SignUpBanner";
@@ -24,7 +24,7 @@ export function Layout({ children }: LayoutProps) {
   const isActivePath = (path: string) => {
     if (path === "/home") return currentPath === "/home";
     if (path === "/discover") return currentPath.startsWith("/discover") || currentPath.startsWith("/stock");
-    if (path === "/portfolio") return currentPath.startsWith("/portfolio");
+    if (path === "/practice") return currentPath.startsWith("/practice");
     if (path === "/learn") return currentPath === "/learn";
     if (path === "/brokers") return currentPath === "/brokers";
     if (path === "/profile") return currentPath.startsWith("/profile") || currentPath.startsWith("/subscription");
@@ -32,17 +32,6 @@ export function Layout({ children }: LayoutProps) {
     return false;
   };
 
-  const navItems = [
-    { href: "/home", icon: Home, label: "Home" },
-    { href: "/discover", icon: Search, label: "Discover" },
-    { href: "/learn", icon: GraduationCap, label: "Learn" },
-    { href: "/goals", icon: Target, label: "Goals" },
-    { href: "/portfolio", icon: Briefcase, label: "Portfolio" },
-    { href: "/brokers", icon: Building2, label: "Brokers" },
-    { href: "/profile", icon: User, label: "Profile" },
-  ];
-
-  const isActive = (path: string) => isActivePath(path);
 
   useEffect(() => {
     const handleRateLimit = () => {
@@ -111,12 +100,12 @@ export function Layout({ children }: LayoutProps) {
             </button>
           </Link>
 
-          <Link href="/portfolio" passHref>
+          <Link href="/practice" passHref>
             <button className={`flex flex-col items-center gap-1 px-2 py-1 rounded-lg transition-colors ${
-              isActivePath("/portfolio") ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
+              isActivePath("/practice") ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
             }`}>
-              <PieChart className="w-5 h-5" />
-              <span className="text-xs">Portfolio</span>
+              <TrendingUp className="w-5 h-5" />
+              <span className="text-xs">Practice</span>
             </button>
           </Link>
 
