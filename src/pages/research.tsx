@@ -10,8 +10,9 @@ import { Layout } from "@/components/Layout";
 import { requireProUserSSR } from "@/lib/requireProUserSSR";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { marketService } from "@/services/marketService";
-import { supabase } from "@/integrations/supabase/client";
 import DynamicChart, { type OHLCBar } from "@/components/DynamicChart";
+import { supabase } from "@/integrations/supabase/client";
+import { fetchOHLC } from "@/lib/fetchOHLC";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 interface Quote {
@@ -165,16 +166,10 @@ export default function ResearchPage() {
     if (!sym) return;
     setOhlcLoading(true);
     try {
-      const token = await getToken();
-      const res = await fetch(`/api/practice/ohlc?ticker=${sym}&timeframe=${tf}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        const { bars } = await res.json() as { bars: OHLCBar[] };
-        setOhlc(bars ?? []);
-      }
+      const bars = await fetchOHLC(sym, tf);
+      setOhlc(bars);
     } catch {
-      // non-fatal — chart just won't show
+      // non-fatal — placeholder shown
     } finally {
       setOhlcLoading(false);
     }
@@ -396,8 +391,12 @@ export default function ResearchPage() {
                     ) : ohlc.length > 1 ? (
                       <DynamicChart data={ohlc} height={280} />
                     ) : (
-                      <div className="flex items-center justify-center h-[280px] text-[#F4F7FA]/20 text-xs">
-                        No chart data available
+                      <div className="flex flex-col items-center justify-center h-[280px] gap-3 px-6 text-center">
+                        <span className="text-2xl">📊</span>
+                        <p className="text-sm font-medium text-[#F4F7FA]/50">Interactive chart loading</p>
+                        <p className="text-xs text-[#F4F7FA]/30 leading-relaxed max-w-xs">
+                          Use the price, range, and Key Stats above to read the setup while the chart loads.
+                        </p>
                       </div>
                     )}
                   </div>

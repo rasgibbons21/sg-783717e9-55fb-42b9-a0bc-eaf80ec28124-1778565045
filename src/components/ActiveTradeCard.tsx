@@ -5,7 +5,7 @@ import {
   SplitSquareVertical, StopCircle, Target, StickyNote, Sparkles,
 } from "lucide-react";
 import DynamicChart, { type OHLCBar } from "@/components/DynamicChart";
-import { supabase } from "@/integrations/supabase/client";
+import { fetchOHLC } from "@/lib/fetchOHLC";
 
 // ── Shared types ───────────────────────────────────────────────────────────
 export interface Trade {
@@ -301,15 +301,8 @@ function TradeChart({ trade }: { trade: Trade }) {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token;
-      const res = await fetch(`/api/practice/ohlc?ticker=${trade.ticker}&timeframe=daily`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        const { bars: b } = await res.json() as { bars: OHLCBar[] };
-        setBars(b ?? []);
-      }
+      const b = await fetchOHLC(trade.ticker, "daily");
+      setBars(b);
     } catch {
       // non-fatal
     } finally {
@@ -343,7 +336,7 @@ function TradeChart({ trade }: { trade: Trade }) {
         <DynamicChart data={bars} height={220} priceLines={priceLines} />
       ) : (
         <div className="h-[220px] flex items-center justify-center text-[#F4F7FA]/20 text-xs">
-          Chart unavailable
+          Use the price and stats above to monitor your position
         </div>
       )}
     </div>
