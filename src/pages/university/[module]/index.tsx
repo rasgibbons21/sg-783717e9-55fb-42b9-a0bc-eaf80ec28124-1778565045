@@ -10,6 +10,7 @@ import { M4_LESSONS } from "@/data/university/m4-trading-signals";
 import { M5_LESSONS } from "@/data/university/m5-strategies";
 import { M6_LESSONS } from "@/data/university/m6-entering";
 import { M7_LESSONS } from "@/data/university/m7-managing";
+import { M8_LESSONS } from "@/data/university/m8-exiting";
 import { M10_LESSONS } from "@/data/university/m10-candlestick-patterns";
 import { supabase } from "@/integrations/supabase/client";
 import { Layout } from "@/components/Layout";
@@ -41,6 +42,7 @@ export default function ModulePage({ moduleSlug, requiresClientAuth }: Props) {
     : moduleSlug === "m5-strategies" ? M5_LESSONS
     : moduleSlug === "m6-entering" ? M6_LESSONS
     : moduleSlug === "m7-managing" ? M7_LESSONS
+    : moduleSlug === "m8-exiting" ? M8_LESSONS
     : moduleSlug === "m10-candlestick-patterns" ? M10_LESSONS
     : [];
 
