@@ -1,54 +1,42 @@
 import type { OHLCBar } from "@/components/CandlestickChart";
 
-// Maps our UI timeframe keys to FMP endpoint names
-const FMP_ENDPOINT: Record<string, string> = {
-  daily: "historical-price-full",
-  "1hour": "1hour",
-  "15min": "15min",
-  "5min": "5min",
+const YAHOO_PARAMS: Record<string, { interval: string; range: string }> = {
+  daily:  { interval: "1d",  range: "3mo" },
+  "1hour":  { interval: "1h",  range: "5d"  },
+  "15min":  { interval: "15m", range: "5d"  },
+  "5min":   { interval: "5m",  range: "2d"  },
 };
 
-/**
- * Fetch OHLC bars from the already-deployed /api/stock-chart proxy (FMP).
- * No auth required — public market price data.
- */
 export async function fetchOHLC(ticker: string, timeframe = "daily"): Promise<OHLCBar[]> {
   const sym = ticker.toUpperCase().trim();
-  const ep = FMP_ENDPOINT[timeframe] ?? "historical-price-full";
+  const { interval, range } = YAHOO_PARAMS[timeframe] ?? YAHOO_PARAMS.daily;
 
-  let url: string;
-  if (timeframe === "daily") {
-    url = `/api/stock-chart?ticker=${sym}&endpoint=historical-price-full&timeseries=90`;
-  } else {
-    url = `/api/stock-chart?ticker=${sym}&endpoint=${ep}`;
-  }
-
-  const res = await fetch(url);
+  const res = await fetch(`/api/proxy/yahoo-chart?ticker=${sym}&interval=${interval}&range=${range}`);
   if (!res.ok) return [];
   const raw = await res.json();
 
-  if (timeframe === "daily") {
-    // { historical: [{date, open, high, low, close, volume}] } — newest-first
-    const hist: { date: string; open: number; high: number; low: number; close: number; volume: number }[] =
-      (raw as { historical?: typeof hist }).historical ?? [];
-    return hist
-      .slice()
-      .reverse()
-      .map(r => ({ time: r.date, open: r.open, high: r.high, low: r.low, close: r.close, volume: r.volume }));
-  } else {
-    // [{date: "2024-01-02 09:30:00", open, high, low, close, volume}] — newest-first
-    const intraday: { date: string; open: number; high: number; low: number; close: number; volume: number }[] =
-      Array.isArray(raw) ? raw : [];
-    return intraday
-      .slice()
-      .reverse()
-      .map(r => ({
-        time: Math.floor(new Date(r.date).getTime() / 1000), // UTCTimestamp for lightweight-charts
-        open: r.open,
-        high: r.high,
-        low: r.low,
-        close: r.close,
-        volume: r.volume,
-      }));
+  const result = raw?.chart?.result?.[0];
+  if (!result) return [];
+
+  const timestamps: number[] = result.timestamp ?? [];
+  const quote = result.indicators?.quote?.[0] ?? {};
+  const opens: (number | null)[]   = quote.open   ?? [];
+  const highs: (number | null)[]   = quote.high   ?? [];
+  const lows: (number | null)[]    = quote.low    ?? [];
+  const closes: (number | null)[]  = quote.close  ?? [];
+  const volumes: (number | null)[] = quote.volume ?? [];
+
+  const bars: OHLCBar[] = [];
+  for (let i = 0; i < timestamps.length; i++) {
+    const o = opens[i], h = highs[i], l = lows[i], c = closes[i];
+    if (o == null || h == null || l == null || c == null) continue;
+
+    const ts = timestamps[i];
+    const time: string | number = timeframe === "daily"
+      ? new Date(ts * 1000).toISOString().slice(0, 10)
+      : ts;
+
+    bars.push({ time, open: o, high: h, low: l, close: c, volume: volumes[i] ?? 0 });
   }
+  return bars;
 }
