@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { X, ArrowLeft, ArrowRight, AlertTriangle, CheckCircle2, TrendingUp, TrendingDown, BarChart2 } from "lucide-react";
 import DynamicChart, { type OHLCBar } from "@/components/DynamicChart";
-import { supabase } from "@/integrations/supabase/client";
+import { fetchOHLC } from "@/lib/fetchOHLC";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 export interface ChecklistResult {
@@ -121,15 +121,8 @@ function MiniChart({ ticker, priceLines }: { ticker: string; priceLines?: { entr
     if (!sym) return;
     setLoading(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token;
-      const res = await fetch(`/api/practice/ohlc?ticker=${sym}&timeframe=daily`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        const { bars: b } = await res.json() as { bars: OHLCBar[] };
-        setBars(b ?? []);
-      }
+      const b = await fetchOHLC(sym, "daily");
+      setBars(b);
     } catch {
       // silent
     } finally {
@@ -163,7 +156,7 @@ function MiniChart({ ticker, priceLines }: { ticker: string; priceLines?: { entr
             <DynamicChart data={bars} height={220} priceLines={priceLines} />
           ) : (
             <div className="flex items-center justify-center h-[220px] text-[#F4F7FA]/20 text-xs">
-              No data
+              Use the price and Key Stats on the Research page to read the setup
             </div>
           )}
         </div>
