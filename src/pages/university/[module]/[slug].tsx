@@ -26,10 +26,12 @@ function QuizSection({
   lesson,
   moduleSlug,
   token,
+  onPass,
 }: {
   lesson: UniversityLesson;
   moduleSlug: string;
   token: string;
+  onPass: () => void;
 }) {
   const [selected, setSelected] = useState<(number | null)[]>(
     new Array(lesson.quiz.length).fill(null)
@@ -55,6 +57,8 @@ function QuizSection({
       0
     );
 
+    const didPass = correct / lesson.quiz.length >= 0.75;
+
     setScore(correct);
     setSubmitted(true);
     setSaving(true);
@@ -75,6 +79,7 @@ function QuizSection({
         }),
       });
       setSaved(true);
+      if (didPass) onPass();
     } finally {
       setSaving(false);
     }
@@ -229,9 +234,12 @@ export default function LessonPage({ moduleSlug, lessonSlug, requiresClientAuth 
         setIsAuthorized(true);
         setIsVerifying(false);
 
-        // Load bookmarks
         const data = await check.json();
         setIsBookmarked((data.bookmarks as string[]).includes(lessonSlug));
+        const alreadyDone = (data.progress as { lesson_slug: string }[]).some(
+          (p) => p.lesson_slug === lessonSlug
+        );
+        if (alreadyDone) setProgressMarked(true);
       } else {
         const res = await fetch(`/api/university/progress?module=${moduleSlug}`, {
           headers: { Authorization: `Bearer ${tok}` },
@@ -239,11 +247,12 @@ export default function LessonPage({ moduleSlug, lessonSlug, requiresClientAuth 
         if (res.ok) {
           const data = await res.json();
           setIsBookmarked((data.bookmarks as string[]).includes(lessonSlug));
+          const alreadyDone = (data.progress as { lesson_slug: string }[]).some(
+            (p) => p.lesson_slug === lessonSlug
+          );
+          if (alreadyDone) setProgressMarked(true);
         }
       }
-
-      // Mark lesson as read (with slight delay so user actually sees the page)
-      setTimeout(() => markProgress(tok), 3000);
     };
 
     init();
@@ -355,7 +364,12 @@ export default function LessonPage({ moduleSlug, lessonSlug, requiresClientAuth 
 
           {/* Quiz */}
           {token && (
-            <QuizSection lesson={lesson} moduleSlug={moduleSlug} token={token} />
+            <QuizSection
+              lesson={lesson}
+              moduleSlug={moduleSlug}
+              token={token}
+              onPass={() => markProgress(token)}
+            />
           )}
 
           {/* Progress indicator */}
