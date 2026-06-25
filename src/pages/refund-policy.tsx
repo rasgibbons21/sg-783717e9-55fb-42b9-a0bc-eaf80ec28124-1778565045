@@ -71,23 +71,29 @@ export default function RefundPolicy() {
             {/* ── Refunds ── */}
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Refunds</h2>
 
-            <div className="mb-6 rounded-lg border-2 border-dashed border-amber-400/60 bg-amber-400/5 p-5">
-              <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-amber-500">
-                ✏️ Placeholder — Edit this section with your actual refund terms before publishing
-              </p>
-              <p className="text-sm text-foreground/70">
-                Example options (choose one or adapt):
-              </p>
-              <ul className="mt-2 space-y-1 text-sm text-foreground/70">
-                <li>• <em>&ldquo;We offer a full refund within [X] days of your initial purchase if you are not satisfied. After [X] days, no refunds are issued.&rdquo;</em></li>
-                <li>• <em>&ldquo;All sales are final. Because Bloom delivers immediate access to digital educational content, we do not offer refunds on subscription payments.&rdquo;</em></li>
-                <li>• <em>&ldquo;Annual subscribers may request a prorated refund within [X] days of their annual renewal date. Monthly subscriptions are non-refundable.&rdquo;</em></li>
-              </ul>
-            </div>
+            <p className="mb-4 text-foreground">
+              We want you to feel confident starting your journey with Bloom. If Bloom Pro isn&apos;t
+              the right fit, you may request a full refund within 7 days of your initial purchase.
+            </p>
+            <ul className="mb-6 space-y-2 text-foreground">
+              <li>
+                <strong>New subscribers:</strong> A full refund is available within 7 days of your
+                first Pro payment, no questions asked.
+              </li>
+              <li>
+                <strong>After 7 days:</strong> Subscription payments are non-refundable, but you can
+                cancel anytime to stop all future charges (see Cancellation above).
+              </li>
+              <li>
+                <strong>Renewals:</strong> Recurring renewal payments (monthly or annual) are
+                non-refundable after they process. To avoid a renewal charge, cancel before your
+                renewal date.
+              </li>
+            </ul>
 
             <p className="mb-6 text-foreground">
               Regardless of refund eligibility, you may always cancel to stop future charges.
-              If you believe you were charged in error, contact us and we will review your case promptly.
+              If you believe you were charged in error, contact us and we&apos;ll review your case promptly.
             </p>
 
             {/* ── How to Request a Refund ── */}
