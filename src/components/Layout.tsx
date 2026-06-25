@@ -175,6 +175,11 @@ export function Layout({ children }: LayoutProps) {
                     Disclaimer
                   </Link>
                 </li>
+                <li>
+                  <Link href="/refund-policy" className="text-muted-foreground hover:text-primary">
+                    Refund Policy
+                  </Link>
+                </li>
               </ul>
             </div>
             <div>
