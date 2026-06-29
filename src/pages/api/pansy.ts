@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { requireProUser, sendAuthError } from "@/lib/requireProUser";
 import { fetchStockBundle, buildDataBlock } from "@/lib/fetchStockData";
+import { PANSY_APP_AWARENESS } from "@/lib/pansyPersona";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -55,7 +56,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const bundle = await fetchStockBundle(ticker, currentPrice, currentChangePercent);
     const dataBlock = buildDataBlock(bundle);
 
-    const systemPrompt = PANSY_SYSTEM_PROMPT_TEMPLATE
+    const systemPrompt = `${PANSY_SYSTEM_PROMPT_TEMPLATE}\n\n${PANSY_APP_AWARENESS}`
       .replace(/{companyName}/g, companyName || ticker)
       .replace(/{ticker}/g, ticker)
       .replace(/{dataBlock}/g, dataBlock);
