@@ -64,6 +64,19 @@ export function Layout({ children }: LayoutProps) {
               Bloom
             </span>
           </Link>
+
+          <Link
+            href="/ask-pansy"
+            className={cn(
+              "flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium transition-colors",
+              currentPath === "/ask-pansy"
+                ? "bg-primary/15 text-primary"
+                : "text-muted-foreground hover:bg-primary/10 hover:text-primary"
+            )}
+          >
+            <span className="text-lg">🌺</span>
+            <span>Ask Pansy</span>
+          </Link>
         </div>
       </header>
 
