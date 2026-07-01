@@ -22,6 +22,14 @@ interface Props {
   requiresClientAuth?: boolean;
 }
 
+// Modules whose content is live. Single source for both the progress fetch and
+// the card grid so they can never drift apart.
+const UNLOCKED_SLUGS = [
+  "m1-chart-reading", "m2-chart-patterns", "m3-indicators", "m4-trading-signals",
+  "m5-strategies", "m6-entering", "m7-managing", "m8-exiting", "m10-candlestick-patterns",
+];
+const UNLOCKED = new Set(UNLOCKED_SLUGS);
+
 export default function UniversityIndex({ requiresClientAuth }: Props) {
   const [isVerifying, setIsVerifying] = useState(!!requiresClientAuth);
   const [isAuthorized, setIsAuthorized] = useState(!requiresClientAuth);
@@ -63,14 +71,24 @@ export default function UniversityIndex({ requiresClientAuth }: Props) {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return;
 
-    const res = await fetch("/api/university/progress?module=m1-chart-reading", {
-      headers: { Authorization: `Bearer ${session.access_token}` },
-    });
+    const headers = { Authorization: `Bearer ${session.access_token}` };
 
-    if (res.ok) {
-      const data: ProgressData = await res.json();
-      setProgressMap({ "m1-chart-reading": data.progress });
-    }
+    // Fetch progress for every unlocked module in parallel so the hub reflects
+    // real completion across all modules, not just Module 1.
+    const results = await Promise.all(
+      UNLOCKED_SLUGS.map(async (slug) => {
+        try {
+          const res = await fetch(`/api/university/progress?module=${slug}`, { headers });
+          if (!res.ok) return [slug, []] as const;
+          const data: ProgressData = await res.json();
+          return [slug, data.progress] as const;
+        } catch {
+          return [slug, []] as const;
+        }
+      })
+    );
+
+    setProgressMap(Object.fromEntries(results));
   };
 
   if (isVerifying) {
@@ -88,9 +106,11 @@ export default function UniversityIndex({ requiresClientAuth }: Props) {
 
   if (!isAuthorized) return null;
 
-  const m1Progress = progressMap["m1-chart-reading"] ?? [];
-  const m1CompletedCount = m1Progress.length;
-  const m1TotalLessons = 10;
+  // Overall progress across every unlocked module.
+  const totalLessons = UNIVERSITY_MODULES
+    .filter((m) => UNLOCKED.has(m.slug))
+    .reduce((sum, m) => sum + m.lessonCount, 0);
+  const completedLessons = Object.values(progressMap).reduce((sum, arr) => sum + arr.length, 0);
 
   return (
     <Layout>
@@ -113,17 +133,17 @@ export default function UniversityIndex({ requiresClientAuth }: Props) {
             Structured trading education built the right way — no hype, no directives, just the real patterns and frameworks that experienced traders use to make sense of price action.
           </p>
 
-          {/* M1 Progress Bar */}
-          {m1CompletedCount > 0 && (
+          {/* Overall Progress Bar */}
+          {completedLessons > 0 && (
             <div className="mt-8 max-w-sm mx-auto">
               <div className="flex justify-between text-xs text-[#F4F7FA]/50 mb-1">
-                <span>Module 1 Progress</span>
-                <span>{m1CompletedCount}/{m1TotalLessons} lessons</span>
+                <span>Your Progress</span>
+                <span>{completedLessons}/{totalLessons} lessons</span>
               </div>
               <div className="h-2 bg-white/10 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-gradient-to-r from-[#27B7C8] to-[#49B06E] rounded-full transition-all"
-                  style={{ width: `${(m1CompletedCount / m1TotalLessons) * 100}%` }}
+                  style={{ width: `${(completedLessons / totalLessons) * 100}%` }}
                 />
               </div>
             </div>
@@ -138,7 +158,6 @@ export default function UniversityIndex({ requiresClientAuth }: Props) {
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {UNIVERSITY_MODULES.map((mod) => {
-              const UNLOCKED = new Set(["m1-chart-reading", "m2-chart-patterns", "m3-indicators", "m4-trading-signals", "m5-strategies", "m6-entering", "m7-managing", "m8-exiting", "m10-candlestick-patterns"]);
               const isUnlocked = UNLOCKED.has(mod.slug);
               const progress = progressMap[mod.slug] ?? [];
               const completed = progress.length;
