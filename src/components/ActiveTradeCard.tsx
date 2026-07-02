@@ -32,7 +32,7 @@ interface Props {
   currentPrice: number | null;
   priceLoading?: boolean;
   onClose: (trade: Trade) => void;
-  onCloseHalf: (trade: Trade, exitPrice: number, reason: string) => Promise<void>;
+  onCloseHalf: (trade: Trade, reason: string) => Promise<void>;
   onMoveStop: (trade: Trade, newStop: number) => Promise<void>;
   onAdjustTarget: (trade: Trade, newTarget: number) => Promise<void>;
   onAddNote: (trade: Trade, note: string) => Promise<void>;
@@ -102,42 +102,34 @@ function inputCls(v: string) {
 }
 
 // ── Close-half modal ───────────────────────────────────────────────────────
-function CloseHalfModal({ trade, onSubmit, onClose }: {
+function CloseHalfModal({ trade, currentPrice, onSubmit, onClose }: {
   trade: Trade;
-  onSubmit: (exitPrice: number, reason: string) => Promise<void>;
+  currentPrice: number | null;
+  onSubmit: (reason: string) => Promise<void>;
   onClose: () => void;
 }) {
-  const [exitPrice, setExitPrice] = useState("");
   const [reason, setReason] = useState("");
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
 
   const half = trade.shares / 2;
-  const ep = parseFloat(exitPrice);
-  const preview = exitPrice && !isNaN(ep)
-    ? (trade.direction === "long" ? ep - trade.entry_price : trade.entry_price - ep) * half
+  const preview = currentPrice != null
+    ? (trade.direction === "long" ? currentPrice - trade.entry_price : trade.entry_price - currentPrice) * half
     : null;
 
-  const handle = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!exitPrice || isNaN(ep)) return;
+  const handle = async () => {
     setLoading(true); setErr("");
-    try { await onSubmit(ep, reason); }
+    try { await onSubmit(reason); }
     catch (ex: unknown) { setErr(ex instanceof Error ? ex.message : "Failed"); setLoading(false); }
   };
 
   return (
     <MiniModal title={`Close ½ Position — ${trade.ticker}`} onClose={onClose}>
       <p className="text-xs text-foreground/40 mb-4">
-        Closing {half.toFixed(4)} of {trade.shares} shares. The remaining {half.toFixed(4)} shares stay open.
+        Closing {half.toFixed(4)} of {trade.shares} shares at the live price. The remaining {half.toFixed(4)} shares stay open.
       </p>
       {err && <p className="mb-3 text-xs text-destructive bg-destructive/10 rounded-lg px-3 py-2">{err}</p>}
-      <form onSubmit={handle} className="space-y-3">
-        <div>
-          <label className="text-xs text-foreground/40 mb-1.5 block uppercase tracking-wide">Exit Price *</label>
-          <input type="number" step="any" min="0" className={inputCls(exitPrice)}
-            value={exitPrice} onChange={e => setExitPrice(e.target.value)} placeholder="e.g. 155.00" autoFocus />
-        </div>
+      <div className="space-y-3">
         <div>
           <label className="text-xs text-foreground/40 mb-1.5 block uppercase tracking-wide">Reason (optional)</label>
           <input className={inputCls(reason)} value={reason} onChange={e => setReason(e.target.value)}
@@ -145,14 +137,14 @@ function CloseHalfModal({ trade, onSubmit, onClose }: {
         </div>
         {preview != null && (
           <p className={`text-sm font-mono font-bold rounded-lg px-3 py-2 ${preview >= 0 ? "text-primary bg-primary/10" : "text-destructive bg-destructive/10"}`}>
-            P&L on half: {preview >= 0 ? "+" : ""}${Math.abs(preview).toFixed(2)}
+            Est. P&L on half: {preview >= 0 ? "+" : ""}${Math.abs(preview).toFixed(2)} <span className="font-sans font-normal text-foreground/40">(fills at the live price)</span>
           </p>
         )}
-        <button type="submit" disabled={loading || !exitPrice}
-          className="w-full py-3 rounded-xl bg-accent text-background font-semibold text-sm disabled:opacity-40 hover:bg-accent/90 transition-colors">
-          {loading ? "Closing half…" : "Close Half Position"}
+        <button onClick={handle} disabled={loading}
+          className="w-full py-3 rounded-xl bg-accent text-accent-foreground font-semibold text-sm disabled:opacity-40 hover:bg-accent/90 transition-colors">
+          {loading ? "Closing half…" : "Close Half at market"}
         </button>
-      </form>
+      </div>
     </MiniModal>
   );
 }
@@ -501,6 +493,17 @@ export function ActiveTradeCard({
           </div>
         )}
 
+        {/* Grandfather nudge — trades opened before stops were required */}
+        {trade.stop_price == null && (
+          <button
+            onClick={(e) => { e.stopPropagation(); setModal("stop"); }}
+            className="w-full flex items-center gap-2 px-3 py-2 bg-accent/10 border-b border-accent/20 text-left hover:bg-accent/15 transition-colors"
+          >
+            <span className="text-sm">🌸</span>
+            <span className="text-xs text-accent">This trade has no stop yet — want to set one? Every plan needs an exit.</span>
+          </button>
+        )}
+
         {/* Header row — always visible */}
         <div
           className="flex items-center gap-3 p-3 cursor-pointer select-none"
@@ -640,7 +643,8 @@ export function ActiveTradeCard({
       {modal === "close-half" && (
         <CloseHalfModal
           trade={trade}
-          onSubmit={async (ep, r) => { await onCloseHalf(trade, ep, r); setModal(null); }}
+          currentPrice={currentPrice}
+          onSubmit={async (r) => { await onCloseHalf(trade, r); setModal(null); }}
           onClose={() => setModal(null)}
         />
       )}
