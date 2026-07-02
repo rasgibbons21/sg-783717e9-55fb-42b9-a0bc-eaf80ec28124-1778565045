@@ -15,6 +15,7 @@ import { marketService } from "@/services/marketService";
 import { supabase } from "@/integrations/supabase/client";
 import { TrendingUp, TrendingDown, ChevronDown } from "lucide-react";
 import { TimeGreeting } from "@/components/TimeGreeting";
+import { GemsLeaderboard } from "@/components/GemsLeaderboard";
 
 interface MarketIndex {
   symbol: string;
@@ -195,6 +196,9 @@ export default function Home() {
             </a>
           )}
         </div>
+
+        {/* Lessons / Gems Leaderboard */}
+        <GemsLeaderboard />
 
         {/* Pansy Chat Bubble */}
         <div className="flex items-start gap-4">

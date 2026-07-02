@@ -53,8 +53,9 @@ export async function getUserGems(userId: string): Promise<GemBreakdown> {
   return { universityLessons, learnLessons, gems: computeGems(universityLessons, learnLessons) };
 }
 
-/** (b) Compute + rank gems across all users, for the leaderboard. */
-export async function getGemsLeaderboard(limit = 50): Promise<GemLeaderboardRow[]> {
+/** Compute + rank every user by gems (descending). Ranks are assigned across
+ *  the full population, so a slice keeps true ranks. */
+async function rankAllUsers(): Promise<GemLeaderboardRow[]> {
   const [uniRes, learnRes, profilesRes] = await Promise.all([
     supabaseAdmin.from("university_lesson_progress").select("user_id"),
     supabaseAdmin.from("lesson_progress").select("user_id").eq("quiz_completed", true),
@@ -90,6 +91,24 @@ export async function getGemsLeaderboard(limit = 50): Promise<GemLeaderboardRow[
     };
   });
 
-  rows.sort((a, b) => b.gems - a.gems);
-  return rows.slice(0, limit).map((r, i) => ({ ...r, rank: i + 1 }));
+  rows.sort((a, b) => b.gems - a.gems || a.challenge_name.localeCompare(b.challenge_name));
+  return rows.map((r, i) => ({ ...r, rank: i + 1 }));
+}
+
+/** (b) Compute + rank gems across all users, for the leaderboard. */
+export async function getGemsLeaderboard(limit = 50): Promise<GemLeaderboardRow[]> {
+  return (await rankAllUsers()).slice(0, limit);
+}
+
+/** (c) Viewer-aware board: the top `limit`, plus the viewer's own ranked row
+ *  (null if they have no gems yet) so they always see where they stand. */
+export async function getLeaderboardView(
+  viewerId: string,
+  limit = 10
+): Promise<{ top: GemLeaderboardRow[]; me: GemLeaderboardRow | null }> {
+  const all = await rankAllUsers();
+  return {
+    top: all.slice(0, limit),
+    me: all.find((r) => r.user_id === viewerId) ?? null,
+  };
 }
