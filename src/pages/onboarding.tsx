@@ -236,10 +236,11 @@ export default function Onboarding() {
                     </p>
                   </div>
                   <p className="leading-relaxed text-foreground">
-                    I know everything about investing and I'm going to break it
-                    all down for you in a way that actually makes sense. No
-                    confusing terms, no pressure. Just real talk about your money
-                    💛
+                    I&apos;m Pansy, your guide here — I&apos;ll break investing
+                    down in a way that actually makes sense. I won&apos;t pretend
+                    to have every answer, and I&apos;ll tell you when something&apos;s
+                    uncertain. No confusing terms, no pressure — just clear, honest
+                    help with your money 💛
                   </p>
                 </div>
               </div>
