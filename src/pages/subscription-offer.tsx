@@ -82,7 +82,7 @@ export default function SubscriptionOffer() {
             You're all set!
           </h1>
           <p className="text-xl text-muted-foreground max-w-lg mx-auto">
-            Want to unlock everything Pansy has to offer? Get unlimited daily picks and full analysis.
+            Want to unlock everything Pansy has to offer? Get unlimited daily analyses and full breakdowns.
           </p>
         </div>
 
@@ -133,7 +133,7 @@ export default function SubscriptionOffer() {
 
             <ul className="space-y-3">
               {[
-                "Unlimited daily picks from Pansy",
+                "Unlimited daily analyses from Pansy",
                 "Full analysis on every stock & ETF",
                 "Real-time news and charts",
                 "Portfolio tracker",

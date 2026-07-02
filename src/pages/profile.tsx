@@ -576,7 +576,7 @@ export default function Profile() {
                 </div>
                 <div className="grid grid-cols-2 gap-4 p-4 bg-gradient-to-br from-accent/10 to-primary/10 rounded-lg border border-accent/20">
                   <div>
-                    <p className="text-xs text-muted-foreground mb-1">Daily Picks</p>
+                    <p className="text-xs text-muted-foreground mb-1">Daily Analyses</p>
                     <p className="text-sm font-semibold text-foreground">Unlimited</p>
                   </div>
                   <div>
@@ -584,7 +584,7 @@ export default function Profile() {
                     <p className="text-sm font-semibold text-foreground">✓ Included</p>
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground mb-1">ETF Picks</p>
+                    <p className="text-xs text-muted-foreground mb-1">ETF Analyses</p>
                     <p className="text-sm font-semibold text-foreground">✓ Included</p>
                   </div>
                   <div>
@@ -608,7 +608,7 @@ export default function Profile() {
                   </div>
                   <div>
                     <p className="font-semibold text-foreground text-lg">Free Plan</p>
-                    <p className="text-sm text-muted-foreground">3 picks per week, basic features</p>
+                    <p className="text-sm text-muted-foreground">3 analyses per week, basic features</p>
                   </div>
                 </div>
                 <Link href="/subscription">

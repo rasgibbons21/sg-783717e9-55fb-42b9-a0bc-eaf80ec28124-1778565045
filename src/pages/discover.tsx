@@ -443,7 +443,7 @@ export default function Discover() {
               variant={activeFilter === "pansy-picks" ? "default" : "outline"}
               onClick={() => setActiveFilter("pansy-picks")}
             >
-              🌺 Pansy's Picks
+              🌺 Pansy's Analyses
             </Button>
           </div>
         </div>
