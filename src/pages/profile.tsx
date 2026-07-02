@@ -56,6 +56,12 @@ export default function Profile() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>("default");
 
+  // Gems (derived) + leaderboard name
+  const [gems, setGems] = useState<number | null>(null);
+  const [challengeName, setChallengeName] = useState<string>("");
+  const [savedChallengeName, setSavedChallengeName] = useState<string>("");
+  const [isSavingName, setIsSavingName] = useState(false);
+
   // Form state
   const [fullName, setFullName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
@@ -80,6 +86,18 @@ export default function Profile() {
         setFullName(user.full_name || "");
         setEmail(user.email || "");
         setUser(user);
+        const existingName = (user as any).challenge_name || "";
+        setChallengeName(existingName);
+        setSavedChallengeName(existingName);
+
+        // Derived gem total (single source: /api/gems)
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          fetch("/api/gems", { headers: { Authorization: `Bearer ${session.access_token}` } })
+            .then((r) => (r.ok ? r.json() : null))
+            .then((d) => { if (d) setGems(d.gems); })
+            .catch(() => {});
+        }
         // Set default values since these fields don't exist in profiles table
         setRiskTolerance("moderate");
         setInvestmentGoals(["growth"]);
@@ -167,6 +185,43 @@ export default function Profile() {
       });
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  // Isolated save for the leaderboard name — writes ONLY challenge_name (a real
+  // column), not the preferences fields that have no columns yet.
+  const sanitizeChallengeName = (raw: string) =>
+    // strip control chars, collapse whitespace, trim, cap at 20
+    raw.replace(/[\u0000-\u001F\u007F]/g, "").replace(/\s+/g, " ").trim().slice(0, 20);
+
+  const handleSaveChallengeName = async () => {
+    if (!user) return;
+    const clean = sanitizeChallengeName(challengeName);
+    if (clean.length < 3) {
+      toast({
+        title: "Name too short",
+        description: "Your leaderboard name needs at least 3 characters.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSavingName(true);
+    try {
+      const updated = await userService.updateUser(user.id, { challenge_name: clean } as any);
+      if (!updated) throw new Error("Failed to save");
+      setChallengeName(clean);
+      setSavedChallengeName(clean);
+      setUser(updated);
+      toast({ title: "Leaderboard name saved 🌸", description: `You'll show up as "${clean}".` });
+    } catch (error: any) {
+      toast({
+        title: "Couldn't save your name",
+        description: error.message || "Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSavingName(false);
     }
   };
 
@@ -259,6 +314,41 @@ export default function Profile() {
                   Member since {new Date(authCreatedAt).toLocaleDateString("en-US", { month: "long", year: "numeric" })}
                 </p>
               )}
+              {gems !== null && (
+                <div className="inline-flex items-center gap-1.5 mt-2 rounded-full bg-primary/10 px-3 py-1">
+                  <span className="text-base leading-none">💎</span>
+                  <span className="text-sm font-semibold text-foreground">{gems.toLocaleString()}</span>
+                  <span className="text-xs text-muted-foreground">gems</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Leaderboard name */}
+          <Separator />
+          <div className="space-y-2">
+            <Label htmlFor="challenge-name" className="text-sm font-medium text-foreground">
+              Your leaderboard name
+            </Label>
+            <p className="text-xs text-muted-foreground">
+              This is how you&apos;ll show up on the gems leaderboard — pick any name you like. Others never see your real name or email.
+            </p>
+            <div className="flex gap-2">
+              <Input
+                id="challenge-name"
+                value={challengeName}
+                onChange={(e) => setChallengeName(e.target.value)}
+                placeholder="e.g. BloomingBoss"
+                maxLength={20}
+                className="flex-1"
+              />
+              <Button
+                onClick={handleSaveChallengeName}
+                disabled={isSavingName || challengeName.trim() === savedChallengeName.trim()}
+              >
+                <Save className="w-4 h-4 mr-1.5" />
+                {isSavingName ? "Saving…" : "Save"}
+              </Button>
             </div>
           </div>
         </Card>

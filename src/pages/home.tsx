@@ -15,6 +15,7 @@ import { marketService } from "@/services/marketService";
 import { supabase } from "@/integrations/supabase/client";
 import { TrendingUp, TrendingDown, ChevronDown } from "lucide-react";
 import { TimeGreeting } from "@/components/TimeGreeting";
+import { GemsLeaderboard } from "@/components/GemsLeaderboard";
 
 interface MarketIndex {
   symbol: string;
@@ -38,6 +39,7 @@ export default function Home() {
   const router = useRouter();
   const { isPro, userName, userId: ctxUserId } = useSubscription();
   const [user, setUser] = useState<any>(null);
+  const [gems, setGems] = useState<number | null>(null);
   const [marketData, setMarketData] = useState<MarketIndex[]>(DEFAULT_MARKET_DATA);
   const [watchlistNews, setWatchlistNews] = useState<any[]>([]);
   const [isLoadingNews, setIsLoadingNews] = useState(true);
@@ -61,7 +63,13 @@ export default function Home() {
     // Load complete user profile from users table
     const userProfile = await userService.getCurrentUser();
     setUser(userProfile);
-    
+
+    // Derived gem total (single source: /api/gems)
+    fetch("/api/gems", { headers: { Authorization: `Bearer ${session.access_token}` } })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (d) setGems(d.gems); })
+      .catch(() => {});
+
     // Load data with timeout
     loadDataWithTimeout();
   };
@@ -176,7 +184,21 @@ export default function Home() {
               {isPro ? "Keep learning. Keep growing." : "Your daily market education"}
             </p>
           </div>
+          {gems !== null && (
+            <a
+              href="/profile"
+              className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 hover:bg-primary/15 transition-colors"
+              title="Gems earned from completed lessons"
+            >
+              <span className="text-lg leading-none">💎</span>
+              <span className="text-base font-bold text-foreground">{gems.toLocaleString()}</span>
+              <span className="text-xs text-muted-foreground">gems</span>
+            </a>
+          )}
         </div>
+
+        {/* Lessons / Gems Leaderboard */}
+        <GemsLeaderboard />
 
         {/* Pansy Chat Bubble */}
         <div className="flex items-start gap-4">
