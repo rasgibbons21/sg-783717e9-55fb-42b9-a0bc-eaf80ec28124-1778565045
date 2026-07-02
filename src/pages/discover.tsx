@@ -85,7 +85,7 @@ const PANSYS_DEFAULT_PICKS: Asset[] = [
     type: "stock",
     trend: "Bullish",
     riskLevel: "Aggressive",
-    pansyQuote: "Powering the AI revolution. Every tech company needs their chips.",
+    pansyQuote: "At the center of the AI boom and its chip demand — but richly valued and sharply volatile when sentiment turns.",
   },
   {
     ticker: "VOO",
@@ -96,7 +96,7 @@ const PANSYS_DEFAULT_PICKS: Asset[] = [
     type: "etf",
     trend: "Bullish",
     riskLevel: "Moderate",
-    pansyQuote: "Tracks the 500 biggest US companies. A foundational portfolio piece.",
+    pansyQuote: "A low-cost way to own 500 large US companies at once — broadly diversified, though it still falls with the whole market.",
   },
   {
     ticker: "FXAIX",
@@ -107,7 +107,7 @@ const PANSYS_DEFAULT_PICKS: Asset[] = [
     type: "mutual-fund",
     trend: "Sideways",
     riskLevel: "Conservative",
-    pansyQuote: "One of the lowest cost index funds. Perfect for set-and-forget accounts.",
+    pansyQuote: "A very low-cost S&P 500 index fund built for set-and-forget — steady, but with no protection from broad market downturns.",
   },
 ];
 
