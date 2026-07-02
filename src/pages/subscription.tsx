@@ -106,7 +106,7 @@ export default function Subscription() {
     <Layout>
       <SEO 
         title="Subscription Plans - Bloom" 
-        description="Choose between Free and Bloom Pro to unlock unlimited daily picks and full analysis"
+        description="Choose between Free and Bloom Pro to unlock unlimited daily stock analyses"
       />
       <div className="max-w-lg mx-auto p-4">
         <div className="space-y-6">
@@ -165,7 +165,7 @@ export default function Subscription() {
 
                 <ul className="space-y-2">
                   {[
-                    "3 picks per week",
+                    "3 analyses per week",
                     "Basic market summary",
                     "Broker directory",
                   ].map((feature) => (
@@ -178,7 +178,7 @@ export default function Subscription() {
                     <span className="text-sm text-muted-foreground line-through">Pansy's full analysis</span>
                   </li>
                   <li className="flex items-start gap-2 opacity-50">
-                    <span className="text-sm text-muted-foreground line-through">ETF picks</span>
+                    <span className="text-sm text-muted-foreground line-through">ETF analyses</span>
                   </li>
                 </ul>
 
@@ -221,8 +221,8 @@ export default function Subscription() {
 
                 <ul className="space-y-2">
                   {[
-                    "Unlimited daily picks",
-                    "Pansy's full analysis on every pick",
+                    "Unlimited daily analyses",
+                    "Pansy's full analysis on every stock",
                     "Stocks, ETFs, and mutual funds",
                     "Real-time news and charts",
                     "Portfolio tracker",
