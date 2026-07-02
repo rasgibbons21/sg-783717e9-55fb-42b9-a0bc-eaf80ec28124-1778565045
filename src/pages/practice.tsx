@@ -72,12 +72,12 @@ function fmtPct(n: number | null | undefined) {
 
 // ── Metric Card ────────────────────────────────────────────────────────────
 function MetricCard({ label, value, sub, positive }: { label: string; value: string; sub?: string; positive?: boolean | null }) {
-  const color = positive === true ? "text-[#49B06E]" : positive === false ? "text-[#ef4444]" : "text-[#F4F7FA]";
+  const color = positive === true ? "text-primary" : positive === false ? "text-destructive" : "text-foreground";
   return (
-    <div className="rounded-xl bg-[#16264A] border border-[#27B7C8]/20 p-4 flex flex-col gap-1">
-      <span className="text-xs text-[#F4F7FA]/50 uppercase tracking-wide">{label}</span>
+    <div className="rounded-xl bg-card border border-accent/20 p-4 flex flex-col gap-1">
+      <span className="text-xs text-foreground/50 uppercase tracking-wide">{label}</span>
       <span className={`text-xl font-bold font-mono ${color}`}>{value}</span>
-      {sub && <span className="text-xs text-[#F4F7FA]/40">{sub}</span>}
+      {sub && <span className="text-xs text-foreground/40">{sub}</span>}
     </div>
   );
 }
@@ -87,16 +87,16 @@ function MetricCard({ label, value, sub, positive }: { label: string; value: str
 function ClosedTradeRow({ trade }: { trade: Trade }) {
   const win = (trade.pnl ?? 0) >= 0;
   return (
-    <div className="flex items-center gap-3 p-3 rounded-lg bg-[#16264A] border border-[#27B7C8]/10">
-      <span className={`text-xs font-semibold w-5 ${win ? "text-[#49B06E]" : "text-[#ef4444]"}`}>{win ? "W" : "L"}</span>
-      <span className="font-mono text-sm text-[#F4F7FA] font-semibold w-14">{trade.ticker}</span>
-      <span className={`text-xs px-1.5 py-0.5 rounded ${trade.direction === "long" ? "bg-[#49B06E]/15 text-[#49B06E]" : "bg-[#ef4444]/15 text-[#ef4444]"}`}>
+    <div className="flex items-center gap-3 p-3 rounded-lg bg-card border border-accent/10">
+      <span className={`text-xs font-semibold w-5 ${win ? "text-primary" : "text-destructive"}`}>{win ? "W" : "L"}</span>
+      <span className="font-mono text-sm text-foreground font-semibold w-14">{trade.ticker}</span>
+      <span className={`text-xs px-1.5 py-0.5 rounded ${trade.direction === "long" ? "bg-primary/15 text-primary" : "bg-destructive/15 text-destructive"}`}>
         {trade.direction[0].toUpperCase()}
       </span>
-      <span className={`ml-auto text-sm font-mono font-bold ${win ? "text-[#49B06E]" : "text-[#ef4444]"}`}>
+      <span className={`ml-auto text-sm font-mono font-bold ${win ? "text-primary" : "text-destructive"}`}>
         {win ? "+" : ""}{fmt(trade.pnl)}
       </span>
-      <span className="text-xs text-[#F4F7FA]/40 w-14 text-right">{fmtPct(trade.pnl_pct)}</span>
+      <span className="text-xs text-foreground/40 w-14 text-right">{fmtPct(trade.pnl_pct)}</span>
     </div>
   );
 }
@@ -134,21 +134,21 @@ function CloseTradeModal({ trade, onSubmit, onCancel }: {
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="w-full max-w-md bg-[#0E1B30] rounded-2xl border border-[#27B7C8]/30 p-6">
+      <div className="w-full max-w-md bg-background rounded-2xl border border-accent/30 p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-serif text-lg font-bold text-[#F4F7FA]">Close {trade.ticker}</h2>
-          <button onClick={onCancel} className="text-[#F4F7FA]/40 hover:text-[#F4F7FA]"><X className="w-5 h-5" /></button>
+          <h2 className="font-serif text-lg font-bold text-foreground">Close {trade.ticker}</h2>
+          <button onClick={onCancel} className="text-foreground/40 hover:text-foreground"><X className="w-5 h-5" /></button>
         </div>
-        <p className="text-xs text-[#F4F7FA]/50 mb-4">
+        <p className="text-xs text-foreground/50 mb-4">
           {trade.direction.toUpperCase()} · {trade.shares} shares · Entry {fmt(trade.entry_price)}
         </p>
-        {err && <p className="mb-3 text-sm text-[#ef4444] bg-[#ef4444]/10 rounded-lg px-3 py-2">{err}</p>}
+        {err && <p className="mb-3 text-sm text-destructive bg-destructive/10 rounded-lg px-3 py-2">{err}</p>}
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>
-            <label className="text-xs text-[#F4F7FA]/50 mb-1 block">Exit Price *</label>
+            <label className="text-xs text-foreground/50 mb-1 block">Exit Price *</label>
             <input
               type="number" min="0.0001" step="any"
-              className="w-full bg-[#16264A] border border-[#27B7C8]/20 rounded-lg px-3 py-2 text-[#F4F7FA] text-sm focus:outline-none focus:border-[#27B7C8]"
+              className="w-full bg-card border border-accent/20 rounded-lg px-3 py-2 text-foreground text-sm focus:outline-none focus:border-accent"
               value={exitPrice}
               onChange={e => setExitPrice(e.target.value)}
               placeholder="155.00"
@@ -156,23 +156,23 @@ function CloseTradeModal({ trade, onSubmit, onCancel }: {
             />
           </div>
           <div>
-            <label className="text-xs text-[#F4F7FA]/50 mb-1 block">Exit Reason</label>
+            <label className="text-xs text-foreground/50 mb-1 block">Exit Reason</label>
             <input
-              className="w-full bg-[#16264A] border border-[#27B7C8]/20 rounded-lg px-3 py-2 text-[#F4F7FA] text-sm focus:outline-none focus:border-[#27B7C8]"
+              className="w-full bg-card border border-accent/20 rounded-lg px-3 py-2 text-foreground text-sm focus:outline-none focus:border-accent"
               value={exitReason}
               onChange={e => setExitReason(e.target.value)}
               placeholder="Hit target / stopped out / reversal..."
             />
           </div>
           {previewPnl != null && (
-            <p className={`text-sm font-mono font-bold rounded-lg px-3 py-2 ${previewPnl >= 0 ? "text-[#49B06E] bg-[#49B06E]/10" : "text-[#ef4444] bg-[#ef4444]/10"}`}>
+            <p className={`text-sm font-mono font-bold rounded-lg px-3 py-2 ${previewPnl >= 0 ? "text-primary bg-primary/10" : "text-destructive bg-destructive/10"}`}>
               P&L: {previewPnl >= 0 ? "+" : ""}{fmt(previewPnl)}
             </p>
           )}
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-xl bg-[#27B7C8] text-[#0E1B30] font-semibold text-sm disabled:opacity-50 hover:bg-[#27B7C8]/90 transition-colors"
+            className="w-full py-3 rounded-xl bg-accent text-background font-semibold text-sm disabled:opacity-50 hover:bg-accent/90 transition-colors"
           >
             {loading ? "Closing…" : "Confirm Close"}
           </button>
@@ -199,14 +199,14 @@ interface ReviewState {
 }
 
 function ScoreBar({ label, score }: { label: string; score: number }) {
-  const color = score >= 80 ? "bg-[#49B06E]" : score >= 55 ? "bg-yellow-400" : "bg-[#ef4444]";
+  const color = score >= 80 ? "bg-primary" : score >= 55 ? "bg-yellow-400" : "bg-destructive";
   return (
     <div>
       <div className="flex justify-between mb-1">
-        <span className="text-[10px] text-[#F4F7FA]/50 uppercase tracking-wide">{label}</span>
-        <span className="text-[10px] font-mono text-[#F4F7FA]/70">{score}</span>
+        <span className="text-[10px] text-foreground/50 uppercase tracking-wide">{label}</span>
+        <span className="text-[10px] font-mono text-foreground/70">{score}</span>
       </div>
-      <div className="h-1.5 rounded-full bg-[#0E1B30] overflow-hidden">
+      <div className="h-1.5 rounded-full bg-background overflow-hidden">
         <div className={`h-full rounded-full ${color} transition-all`} style={{ width: `${score}%` }} />
       </div>
     </div>
@@ -214,11 +214,11 @@ function ScoreBar({ label, score }: { label: string; score: number }) {
 }
 
 function gradeColor(g: string) {
-  if (g === "A") return "text-[#49B06E] bg-[#49B06E]/10 border-[#49B06E]/30";
-  if (g === "B") return "text-[#27B7C8] bg-[#27B7C8]/10 border-[#27B7C8]/30";
+  if (g === "A") return "text-primary bg-primary/10 border-primary/30";
+  if (g === "B") return "text-accent bg-accent/10 border-accent/30";
   if (g === "C") return "text-yellow-400 bg-yellow-400/10 border-yellow-400/30";
   if (g === "D") return "text-orange-400 bg-orange-400/10 border-orange-400/30";
-  return "text-[#ef4444] bg-[#ef4444]/10 border-[#ef4444]/30";
+  return "text-destructive bg-destructive/10 border-destructive/30";
 }
 
 function TradeReviewModal({ state, onClose }: { state: ReviewState; onClose: () => void }) {
@@ -227,34 +227,34 @@ function TradeReviewModal({ state, onClose }: { state: ReviewState; onClose: () 
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="w-full max-w-md bg-[#0E1B30] rounded-2xl border border-[#27B7C8]/30 p-5 max-h-[90vh] overflow-y-auto">
+      <div className="w-full max-w-md bg-background rounded-2xl border border-accent/30 p-5 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-[#27B7C8]" />
-            <h2 className="font-serif text-base font-bold text-[#F4F7FA]">Trade Review — {ticker}</h2>
+            <Sparkles className="w-5 h-5 text-accent" />
+            <h2 className="font-serif text-base font-bold text-foreground">Trade Review — {ticker}</h2>
           </div>
-          <button onClick={onClose} className="text-[#F4F7FA]/30 hover:text-[#F4F7FA]">
+          <button onClick={onClose} className="text-foreground/30 hover:text-foreground">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* P/L banner */}
-        <div className={`flex items-center justify-between rounded-lg px-4 py-3 mb-4 ${win ? "bg-[#49B06E]/10 border border-[#49B06E]/20" : "bg-[#ef4444]/10 border border-[#ef4444]/20"}`}>
-          <span className="text-xs text-[#F4F7FA]/50">Final P/L</span>
-          <span className={`font-mono font-bold ${win ? "text-[#49B06E]" : "text-[#ef4444]"}`}>
+        <div className={`flex items-center justify-between rounded-lg px-4 py-3 mb-4 ${win ? "bg-primary/10 border border-primary/20" : "bg-destructive/10 border border-destructive/20"}`}>
+          <span className="text-xs text-foreground/50">Final P/L</span>
+          <span className={`font-mono font-bold ${win ? "text-primary" : "text-destructive"}`}>
             {win ? "+" : ""}${Math.abs(pnl).toFixed(2)}
           </span>
         </div>
 
         {loading && (
           <div className="flex items-center gap-3 py-8 justify-center">
-            <Loader2 className="w-5 h-5 text-[#27B7C8] animate-spin" />
-            <span className="text-sm text-[#F4F7FA]/50">Pansy is reviewing your process…</span>
+            <Loader2 className="w-5 h-5 text-accent animate-spin" />
+            <span className="text-sm text-foreground/50">Pansy is reviewing your process…</span>
           </div>
         )}
 
         {!loading && error && (
-          <p className="text-xs text-[#ef4444] bg-[#ef4444]/10 rounded-lg px-3 py-3 mb-4">{error}</p>
+          <p className="text-xs text-destructive bg-destructive/10 rounded-lg px-3 py-3 mb-4">{error}</p>
         )}
 
         {!loading && review && (
@@ -276,20 +276,20 @@ function TradeReviewModal({ state, onClose }: { state: ReviewState; onClose: () 
             {/* Pansy commentary */}
             <div className="space-y-3 mb-4">
               {[
-                { label: "What went well", text: review.what_went_well, color: "text-[#49B06E]" },
-                { label: "What to improve", text: review.what_to_improve, color: "text-[#ef4444]" },
-                { label: "Did you follow your plan?", text: review.followed_plan, color: "text-[#27B7C8]" },
+                { label: "What went well", text: review.what_went_well, color: "text-primary" },
+                { label: "What to improve", text: review.what_to_improve, color: "text-destructive" },
+                { label: "Did you follow your plan?", text: review.followed_plan, color: "text-accent" },
                 { label: "Remember next time", text: review.remember_next, color: "text-yellow-400" },
               ].map(({ label, text, color }) => (
-                <div key={label} className="rounded-lg bg-[#16264A] border border-[#27B7C8]/10 px-4 py-3">
+                <div key={label} className="rounded-lg bg-card border border-accent/10 px-4 py-3">
                   <p className={`text-[10px] uppercase tracking-wide font-semibold mb-1 ${color}`}>{label}</p>
-                  <p className="text-sm text-[#F4F7FA]/80 leading-relaxed">{text}</p>
+                  <p className="text-sm text-foreground/80 leading-relaxed">{text}</p>
                 </div>
               ))}
             </div>
 
             {journal_id && (
-              <Link href="/journal" className="flex items-center gap-2 text-xs text-[#27B7C8] hover:underline mb-3">
+              <Link href="/journal" className="flex items-center gap-2 text-xs text-accent hover:underline mb-3">
                 <NotebookPen className="w-3.5 h-3.5" />
                 Open journal entry to add notes
               </Link>
@@ -299,11 +299,11 @@ function TradeReviewModal({ state, onClose }: { state: ReviewState; onClose: () 
 
         <button
           onClick={onClose}
-          className="w-full py-3 rounded-xl bg-[#16264A] border border-[#27B7C8]/20 text-[#F4F7FA]/70 font-semibold text-sm hover:bg-[#27B7C8]/10 transition-colors"
+          className="w-full py-3 rounded-xl bg-card border border-accent/20 text-foreground/70 font-semibold text-sm hover:bg-accent/10 transition-colors"
         >
           Close
         </button>
-        <p className="mt-3 text-[10px] text-[#F4F7FA]/25 text-center">
+        <p className="mt-3 text-[10px] text-foreground/25 text-center">
           Educational simulator — not a brokerage, not financial advice.
         </p>
       </div>
@@ -344,18 +344,18 @@ function computeMetrics(account: Account | null, trades: Trade[]) {
 function ProGate() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center gap-6">
-      <div className="rounded-full bg-[#27B7C8]/10 p-6 border border-[#27B7C8]/20">
-        <Lock className="w-10 h-10 text-[#27B7C8]" />
+      <div className="rounded-full bg-accent/10 p-6 border border-accent/20">
+        <Lock className="w-10 h-10 text-accent" />
       </div>
       <div>
-        <h2 className="font-serif text-2xl font-bold text-[#F4F7FA] mb-2">Bloom Practice Trader</h2>
-        <p className="text-[#F4F7FA]/60 max-w-sm">
+        <h2 className="font-serif text-2xl font-bold text-foreground mb-2">Bloom Practice Trader</h2>
+        <p className="text-foreground/60 max-w-sm">
           Practice trading with $10,000 in virtual cash — no real money, no real risk. Upgrade to Bloom Pro to unlock.
         </p>
       </div>
       <Link
         href="/subscription"
-        className="px-8 py-3 rounded-xl bg-[#49B06E] text-white font-semibold hover:bg-[#49B06E]/90 transition-colors"
+        className="px-8 py-3 rounded-xl bg-primary text-white font-semibold hover:bg-primary/90 transition-colors"
       >
         Upgrade to Pro
       </Link>
@@ -536,18 +536,18 @@ export default function PracticePage(_props: PageProps) {
         <title>Bloom Practice Trader</title>
       </Head>
       <Layout>
-        <div className="min-h-screen bg-[#0E1B30] px-4 py-6 max-w-2xl mx-auto">
+        <div className="min-h-screen bg-background px-4 py-6 max-w-2xl mx-auto">
 
           {/* Header */}
           <div className="mb-6">
             <div className="flex items-center gap-3 mb-1">
-              <TrendingUp className="w-6 h-6 text-[#27B7C8]" />
-              <h1 className="font-serif text-2xl font-bold text-[#F4F7FA]">Practice Trader</h1>
+              <TrendingUp className="w-6 h-6 text-accent" />
+              <h1 className="font-serif text-2xl font-bold text-foreground">Practice Trader</h1>
             </div>
             {/* Disclaimer — always visible */}
-            <div className="flex items-start gap-2 mt-3 rounded-lg bg-[#27B7C8]/10 border border-[#27B7C8]/20 px-3 py-2">
-              <AlertTriangle className="w-4 h-4 text-[#27B7C8] flex-shrink-0 mt-0.5" />
-              <p className="text-xs text-[#27B7C8]/90 leading-relaxed">
+            <div className="flex items-start gap-2 mt-3 rounded-lg bg-accent/10 border border-accent/20 px-3 py-2">
+              <AlertTriangle className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" />
+              <p className="text-xs text-accent/90 leading-relaxed">
                 <strong>Educational simulator — not a brokerage.</strong> All trades use virtual money only. This is not financial advice and does not constitute real trading or investment activity.
               </p>
             </div>
@@ -557,7 +557,7 @@ export default function PracticePage(_props: PageProps) {
           {(authLoading || (loading && isPro)) && (
             <div className="space-y-4">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="h-20 rounded-xl bg-[#16264A] animate-pulse" />
+                <div key={i} className="h-20 rounded-xl bg-card animate-pulse" />
               ))}
             </div>
           )}
@@ -567,7 +567,7 @@ export default function PracticePage(_props: PageProps) {
 
           {/* Error */}
           {!loading && !authLoading && isPro && error && (
-            <div className="rounded-xl bg-[#ef4444]/10 border border-[#ef4444]/20 px-4 py-3 text-sm text-[#ef4444] mb-4">
+            <div className="rounded-xl bg-destructive/10 border border-destructive/20 px-4 py-3 text-sm text-destructive mb-4">
               {error}
               <button onClick={loadData} className="ml-2 underline">Retry</button>
             </div>
@@ -617,23 +617,23 @@ export default function PracticePage(_props: PageProps) {
               </div>
 
               {/* Discipline & Progress */}
-              <div className="rounded-xl bg-[#16264A] border border-[#27B7C8]/20 p-4 mb-6">
+              <div className="rounded-xl bg-card border border-accent/20 p-4 mb-6">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <BookOpen className="w-4 h-4 text-[#27B7C8]" />
-                    <span className="text-sm font-semibold text-[#F4F7FA]">Discipline Score</span>
+                    <BookOpen className="w-4 h-4 text-accent" />
+                    <span className="text-sm font-semibold text-foreground">Discipline Score</span>
                   </div>
-                  <span className={`text-lg font-mono font-bold ${metrics.dScore >= 70 ? "text-[#49B06E]" : metrics.dScore >= 40 ? "text-yellow-400" : "text-[#ef4444]"}`}>
+                  <span className={`text-lg font-mono font-bold ${metrics.dScore >= 70 ? "text-primary" : metrics.dScore >= 40 ? "text-yellow-400" : "text-destructive"}`}>
                     {metrics.dScore}/100
                   </span>
                 </div>
-                <div className="h-2 rounded-full bg-[#0E1B30] overflow-hidden">
+                <div className="h-2 rounded-full bg-background overflow-hidden">
                   <div
-                    className={`h-full rounded-full transition-all ${metrics.dScore >= 70 ? "bg-[#49B06E]" : metrics.dScore >= 40 ? "bg-yellow-400" : "bg-[#ef4444]"}`}
+                    className={`h-full rounded-full transition-all ${metrics.dScore >= 70 ? "bg-primary" : metrics.dScore >= 40 ? "bg-yellow-400" : "bg-destructive"}`}
                     style={{ width: `${metrics.dScore}%` }}
                   />
                 </div>
-                <p className="text-xs text-[#F4F7FA]/40 mt-2">
+                <p className="text-xs text-foreground/40 mt-2">
                   Score improves when you set a thesis, stop, and target before entering. ({trades.length} trade{trades.length !== 1 ? "s" : ""} tracked)
                 </p>
               </div>
@@ -642,28 +642,28 @@ export default function PracticePage(_props: PageProps) {
               <div className="flex gap-3 mb-6">
                 <button
                   onClick={() => setShowOpenModal(true)}
-                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-[#49B06E] text-white font-semibold hover:bg-[#49B06E]/90 transition-colors"
+                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-primary text-white font-semibold hover:bg-primary/90 transition-colors"
                 >
                   <Plus className="w-4 h-4" />
                   Open Position
                 </button>
                 <Link
                   href="/research"
-                  className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#16264A] border border-[#27B7C8]/30 text-[#27B7C8] font-semibold text-sm hover:bg-[#27B7C8]/10 transition-colors"
+                  className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-card border border-accent/30 text-accent font-semibold text-sm hover:bg-accent/10 transition-colors"
                 >
                   <Search className="w-4 h-4" />
                   Research
                 </Link>
                 <Link
                   href="/journal"
-                  className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#16264A] border border-[#27B7C8]/30 text-[#27B7C8] font-semibold text-sm hover:bg-[#27B7C8]/10 transition-colors"
+                  className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-card border border-accent/30 text-accent font-semibold text-sm hover:bg-accent/10 transition-colors"
                 >
                   <NotebookPen className="w-4 h-4" />
                   Journal
                 </Link>
                 <Link
                   href="/progression"
-                  className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#16264A] border border-[#27B7C8]/30 text-[#27B7C8] font-semibold text-sm hover:bg-[#27B7C8]/10 transition-colors"
+                  className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-card border border-accent/30 text-accent font-semibold text-sm hover:bg-accent/10 transition-colors"
                 >
                   <Trophy className="w-4 h-4" />
                   Progress
@@ -674,13 +674,13 @@ export default function PracticePage(_props: PageProps) {
               <div className="flex gap-2 mb-4">
                 <button
                   onClick={() => setTab("open")}
-                  className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-colors ${tab === "open" ? "bg-[#27B7C8]/20 text-[#27B7C8]" : "text-[#F4F7FA]/40 hover:text-[#F4F7FA]"}`}
+                  className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-colors ${tab === "open" ? "bg-accent/20 text-accent" : "text-foreground/40 hover:text-foreground"}`}
                 >
                   Open ({metrics.open.length})
                 </button>
                 <button
                   onClick={() => setTab("closed")}
-                  className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-colors ${tab === "closed" ? "bg-[#27B7C8]/20 text-[#27B7C8]" : "text-[#F4F7FA]/40 hover:text-[#F4F7FA]"}`}
+                  className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-colors ${tab === "closed" ? "bg-accent/20 text-accent" : "text-foreground/40 hover:text-foreground"}`}
                 >
                   Closed ({metrics.closed.length})
                 </button>
@@ -689,7 +689,7 @@ export default function PracticePage(_props: PageProps) {
               {tab === "open" && (
                 <div className="space-y-3">
                   {metrics.open.length === 0 ? (
-                    <div className="text-center py-10 text-[#F4F7FA]/30 text-sm">
+                    <div className="text-center py-10 text-foreground/30 text-sm">
                       No open positions. Hit &ldquo;Open New Position&rdquo; to start practicing.
                     </div>
                   ) : (
@@ -713,7 +713,7 @@ export default function PracticePage(_props: PageProps) {
               {tab === "closed" && (
                 <div className="space-y-2">
                   {metrics.closed.length === 0 ? (
-                    <div className="text-center py-10 text-[#F4F7FA]/30 text-sm">
+                    <div className="text-center py-10 text-foreground/30 text-sm">
                       No closed trades yet.
                     </div>
                   ) : (
@@ -724,7 +724,7 @@ export default function PracticePage(_props: PageProps) {
 
               {/* Bottom disclaimer */}
               <div className="mt-8 text-center">
-                <p className="text-[10px] text-[#F4F7FA]/25 leading-relaxed max-w-sm mx-auto">
+                <p className="text-[10px] text-foreground/25 leading-relaxed max-w-sm mx-auto">
                   Bloom Practice Trader is an educational simulator. It does not execute real trades, connect to any broker, or involve real money. Past simulated performance does not predict real market results. Not financial advice.
                 </p>
               </div>
