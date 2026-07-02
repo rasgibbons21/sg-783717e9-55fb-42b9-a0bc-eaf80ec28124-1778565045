@@ -92,9 +92,9 @@ function formatVol(n: number) {
 function StatRow({ label, value }: { label: string; value: string | null }) {
   if (!value) return null;
   return (
-    <div className="flex justify-between items-center py-1.5 border-b border-[#27B7C8]/10 last:border-0">
-      <span className="text-xs text-[#F4F7FA]/50">{label}</span>
-      <span className="text-xs font-mono text-[#F4F7FA]">{value}</span>
+    <div className="flex justify-between items-center py-1.5 border-b border-accent/10 last:border-0">
+      <span className="text-xs text-foreground/50">{label}</span>
+      <span className="text-xs font-mono text-foreground">{value}</span>
     </div>
   );
 }
@@ -108,11 +108,11 @@ function PansyCard({
     <div className={`rounded-xl border p-4 ${color}`}>
       <div className="flex items-center gap-2 mb-3">
         {icon}
-        <span className="text-sm font-semibold text-[#F4F7FA]">{title}</span>
+        <span className="text-sm font-semibold text-foreground">{title}</span>
       </div>
       <ul className="space-y-2">
         {items.map((item, i) => (
-          <li key={i} className="flex gap-2 text-xs text-[#F4F7FA]/80 leading-relaxed">
+          <li key={i} className="flex gap-2 text-xs text-foreground/80 leading-relaxed">
             <span className="mt-0.5 flex-shrink-0 w-1.5 h-1.5 rounded-full bg-current opacity-60" />
             {item}
           </li>
@@ -126,18 +126,18 @@ function PansyCard({
 function ProGate() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center gap-6">
-      <div className="rounded-full bg-[#27B7C8]/10 p-6 border border-[#27B7C8]/20">
-        <Lock className="w-10 h-10 text-[#27B7C8]" />
+      <div className="rounded-full bg-accent/10 p-6 border border-accent/20">
+        <Lock className="w-10 h-10 text-accent" />
       </div>
       <div>
-        <h2 className="font-serif text-2xl font-bold text-[#F4F7FA] mb-2">Stock Research</h2>
-        <p className="text-[#F4F7FA]/60 max-w-sm">
+        <h2 className="font-serif text-2xl font-bold text-foreground mb-2">Stock Research</h2>
+        <p className="text-foreground/60 max-w-sm">
           Search any stock, ETF, or index — live quotes, interactive charts, news, and Pansy&apos;s educational analysis. Upgrade to unlock.
         </p>
       </div>
       <Link
         href="/subscription"
-        className="px-8 py-3 rounded-xl bg-[#49B06E] text-white font-semibold hover:bg-[#49B06E]/90 transition-colors"
+        className="px-8 py-3 rounded-xl bg-primary text-white font-semibold hover:bg-primary/90 transition-colors"
       >
         Upgrade to Pro
       </Link>
@@ -245,7 +245,7 @@ export default function ResearchPage() {
   };
 
   const isUp = (quote?.dp ?? 0) >= 0;
-  const priceColor = isUp ? "text-[#49B06E]" : "text-[#ef4444]";
+  const priceColor = isUp ? "text-primary" : "text-destructive";
   const showProGate = !authLoading && !isPro;
 
   return (
@@ -254,20 +254,20 @@ export default function ResearchPage() {
         <title>Bloom Research</title>
       </Head>
       <Layout>
-        <div className="min-h-screen bg-[#0E1B30] px-4 py-6 max-w-2xl mx-auto">
+        <div className="min-h-screen bg-background px-4 py-6 max-w-2xl mx-auto">
 
           {/* Header */}
           <div className="flex items-center gap-3 mb-1">
-            <Link href="/practice" className="text-[#F4F7FA]/40 hover:text-[#27B7C8] transition-colors">
+            <Link href="/practice" className="text-foreground/40 hover:text-accent transition-colors">
               <ArrowLeft className="w-5 h-5" />
             </Link>
-            <h1 className="font-serif text-2xl font-bold text-[#F4F7FA]">Stock Research</h1>
+            <h1 className="font-serif text-2xl font-bold text-foreground">Stock Research</h1>
           </div>
-          <p className="text-[#F4F7FA]/40 text-sm mb-6 pl-8">Educational only — not financial advice</p>
+          <p className="text-foreground/40 text-sm mb-6 pl-8">Educational only — not financial advice</p>
 
           {authLoading && (
             <div className="flex justify-center py-20">
-              <Loader2 className="w-6 h-6 text-[#27B7C8] animate-spin" />
+              <Loader2 className="w-6 h-6 text-accent animate-spin" />
             </div>
           )}
 
@@ -278,9 +278,9 @@ export default function ResearchPage() {
               {/* Search */}
               <form onSubmit={handleSubmit} className="mb-4">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#F4F7FA]/30" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/30" />
                   <input
-                    className="w-full bg-[#16264A] border border-[#27B7C8]/20 rounded-xl pl-10 pr-4 py-3 text-[#F4F7FA] font-mono uppercase placeholder:text-[#F4F7FA]/20 placeholder:normal-case focus:outline-none focus:border-[#27B7C8] text-sm"
+                    className="w-full bg-card border border-accent/20 rounded-xl pl-10 pr-4 py-3 text-foreground font-mono uppercase placeholder:text-foreground/20 placeholder:normal-case focus:outline-none focus:border-accent text-sm"
                     placeholder="Search ticker — AAPL, SPY, BTC-USD…"
                     value={search}
                     onChange={e => setSearch(e.target.value.toUpperCase())}
@@ -290,7 +290,7 @@ export default function ResearchPage() {
                   />
                   <button
                     type="submit"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1.5 rounded-lg bg-[#27B7C8] text-[#0E1B30] text-xs font-bold hover:bg-[#27B7C8]/90 transition-colors"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1.5 rounded-lg bg-accent text-background text-xs font-bold hover:bg-accent/90 transition-colors"
                   >
                     Go
                   </button>
@@ -303,7 +303,7 @@ export default function ResearchPage() {
                   <button
                     key={sym}
                     onClick={() => { setSearch(sym); loadStock(sym); }}
-                    className="text-xs px-3 py-1.5 rounded-full bg-[#16264A] border border-[#27B7C8]/15 text-[#F4F7FA]/60 hover:border-[#27B7C8]/50 hover:text-[#F4F7FA] transition-colors"
+                    className="text-xs px-3 py-1.5 rounded-full bg-card border border-accent/15 text-foreground/60 hover:border-accent/50 hover:text-foreground transition-colors"
                   >
                     {label}
                   </button>
@@ -312,7 +312,7 @@ export default function ResearchPage() {
 
               {/* Error */}
               {error && (
-                <div className="rounded-xl bg-[#ef4444]/10 border border-[#ef4444]/20 px-4 py-3 text-sm text-[#ef4444] mb-4">
+                <div className="rounded-xl bg-destructive/10 border border-destructive/20 px-4 py-3 text-sm text-destructive mb-4">
                   {error}
                 </div>
               )}
@@ -320,9 +320,9 @@ export default function ResearchPage() {
               {/* Loading skeleton */}
               {loading && (
                 <div className="space-y-4">
-                  <div className="h-24 rounded-xl bg-[#16264A] animate-pulse" />
-                  <div className="h-48 rounded-xl bg-[#16264A] animate-pulse" />
-                  <div className="h-32 rounded-xl bg-[#16264A] animate-pulse" />
+                  <div className="h-24 rounded-xl bg-card animate-pulse" />
+                  <div className="h-48 rounded-xl bg-card animate-pulse" />
+                  <div className="h-32 rounded-xl bg-card animate-pulse" />
                 </div>
               )}
 
@@ -331,10 +331,10 @@ export default function ResearchPage() {
                 <div className="space-y-5">
 
                   {/* Quote hero */}
-                  <div className="rounded-xl bg-[#16264A] border border-[#27B7C8]/20 p-5">
+                  <div className="rounded-xl bg-card border border-accent/20 p-5">
                     <div className="flex items-start justify-between mb-1">
                       <div>
-                        <span className="font-mono text-3xl font-bold text-[#F4F7FA]">
+                        <span className="font-mono text-3xl font-bold text-foreground">
                           ${quote.c.toFixed(2)}
                         </span>
                         <div className={`flex items-center gap-1 mt-1 ${priceColor}`}>
@@ -344,30 +344,30 @@ export default function ResearchPage() {
                           </span>
                         </div>
                       </div>
-                      <span className="font-mono text-lg font-bold text-[#27B7C8] bg-[#27B7C8]/10 px-3 py-1 rounded-lg">
+                      <span className="font-mono text-lg font-bold text-accent bg-accent/10 px-3 py-1 rounded-lg">
                         {ticker}
                       </span>
                     </div>
-                    <div className="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-[#27B7C8]/10 text-center">
+                    <div className="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-accent/10 text-center">
                       <div>
-                        <p className="text-[10px] text-[#F4F7FA]/40 uppercase tracking-wide">Open</p>
-                        <p className="font-mono text-sm text-[#F4F7FA]">${quote.o.toFixed(2)}</p>
+                        <p className="text-[10px] text-foreground/40 uppercase tracking-wide">Open</p>
+                        <p className="font-mono text-sm text-foreground">${quote.o.toFixed(2)}</p>
                       </div>
                       <div>
-                        <p className="text-[10px] text-[#F4F7FA]/40 uppercase tracking-wide">Range</p>
-                        <p className="font-mono text-sm text-[#F4F7FA]">${quote.l.toFixed(2)}–${quote.h.toFixed(2)}</p>
+                        <p className="text-[10px] text-foreground/40 uppercase tracking-wide">Range</p>
+                        <p className="font-mono text-sm text-foreground">${quote.l.toFixed(2)}–${quote.h.toFixed(2)}</p>
                       </div>
                       <div>
-                        <p className="text-[10px] text-[#F4F7FA]/40 uppercase tracking-wide">Volume</p>
-                        <p className="font-mono text-sm text-[#F4F7FA]">{formatVol(quote.v)}</p>
+                        <p className="text-[10px] text-foreground/40 uppercase tracking-wide">Volume</p>
+                        <p className="font-mono text-sm text-foreground">{formatVol(quote.v)}</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Candlestick chart */}
-                  <div className="rounded-xl bg-[#16264A] border border-[#27B7C8]/20 p-4">
+                  <div className="rounded-xl bg-card border border-accent/20 p-4">
                     <div className="flex items-center justify-between mb-3">
-                      <p className="text-xs text-[#F4F7FA]/50">Price Chart (OHLC)</p>
+                      <p className="text-xs text-foreground/50">Price Chart (OHLC)</p>
                       <div className="flex gap-1">
                         {TIMEFRAMES.map(tf => (
                           <button
@@ -375,8 +375,8 @@ export default function ResearchPage() {
                             onClick={() => setTimeframe(tf.key)}
                             className={`px-2.5 py-1 rounded-md text-[10px] font-mono font-semibold transition-colors ${
                               timeframe === tf.key
-                                ? "bg-[#27B7C8] text-[#0E1B30]"
-                                : "bg-[#0E1B30] text-[#F4F7FA]/40 hover:text-[#F4F7FA]/70"
+                                ? "bg-accent text-background"
+                                : "bg-background text-foreground/40 hover:text-foreground/70"
                             }`}
                           >
                             {tf.label}
@@ -386,15 +386,15 @@ export default function ResearchPage() {
                     </div>
                     {ohlcLoading ? (
                       <div className="flex items-center justify-center h-[280px]">
-                        <Loader2 className="w-5 h-5 text-[#27B7C8] animate-spin" />
+                        <Loader2 className="w-5 h-5 text-accent animate-spin" />
                       </div>
                     ) : ohlc.length > 1 ? (
                       <DynamicChart data={ohlc} height={280} />
                     ) : (
                       <div className="flex flex-col items-center justify-center h-[280px] gap-3 px-6 text-center">
                         <span className="text-2xl">📊</span>
-                        <p className="text-sm font-medium text-[#F4F7FA]/50">Interactive chart loading</p>
-                        <p className="text-xs text-[#F4F7FA]/30 leading-relaxed max-w-xs">
+                        <p className="text-sm font-medium text-foreground/50">Interactive chart loading</p>
+                        <p className="text-xs text-foreground/30 leading-relaxed max-w-xs">
                           Use the price, range, and Key Stats above to read the setup while the chart loads.
                         </p>
                       </div>
@@ -403,12 +403,12 @@ export default function ResearchPage() {
 
                   {/* Fundamentals + About from Pansy panel */}
                   {panel?.profile && (
-                    <div className="rounded-xl bg-[#16264A] border border-[#27B7C8]/20 p-4">
+                    <div className="rounded-xl bg-card border border-accent/20 p-4">
                       <div className="flex items-center gap-2 mb-3">
-                        <Info className="w-4 h-4 text-[#27B7C8]" />
-                        <span className="text-sm font-semibold text-[#F4F7FA]">Key Stats</span>
+                        <Info className="w-4 h-4 text-accent" />
+                        <span className="text-sm font-semibold text-foreground">Key Stats</span>
                         {panel.profile.sector && (
-                          <span className="ml-auto text-[10px] px-2 py-0.5 rounded-full bg-[#27B7C8]/15 text-[#27B7C8]">
+                          <span className="ml-auto text-[10px] px-2 py-0.5 rounded-full bg-accent/15 text-accent">
                             {panel.profile.sector}
                           </span>
                         )}
@@ -422,7 +422,7 @@ export default function ResearchPage() {
                       <StatRow label="Perf. YTD" value={panel.profile.perfYTD} />
                       <StatRow label="Perf. 1Y" value={panel.profile.perf1y} />
                       {panel.profile.shortDescription && (
-                        <p className="mt-3 pt-3 border-t border-[#27B7C8]/10 text-xs text-[#F4F7FA]/50 leading-relaxed">
+                        <p className="mt-3 pt-3 border-t border-accent/10 text-xs text-foreground/50 leading-relaxed">
                           {panel.profile.shortDescription}
                         </p>
                       )}
@@ -431,10 +431,10 @@ export default function ResearchPage() {
 
                   {/* News */}
                   {news.length > 0 && (
-                    <div className="rounded-xl bg-[#16264A] border border-[#27B7C8]/20 p-4">
+                    <div className="rounded-xl bg-card border border-accent/20 p-4">
                       <div className="flex items-center gap-2 mb-3">
-                        <Newspaper className="w-4 h-4 text-[#27B7C8]" />
-                        <span className="text-sm font-semibold text-[#F4F7FA]">Latest News</span>
+                        <Newspaper className="w-4 h-4 text-accent" />
+                        <span className="text-sm font-semibold text-foreground">Latest News</span>
                       </div>
                       <div className="space-y-3">
                         {news.map((item, i) => (
@@ -445,12 +445,12 @@ export default function ResearchPage() {
                             rel="noopener noreferrer"
                             className="flex items-start gap-3 group"
                           >
-                            <ChevronRight className="w-3 h-3 mt-1 flex-shrink-0 text-[#27B7C8]/40 group-hover:text-[#27B7C8] transition-colors" />
+                            <ChevronRight className="w-3 h-3 mt-1 flex-shrink-0 text-accent/40 group-hover:text-accent transition-colors" />
                             <div>
-                              <p className="text-xs text-[#F4F7FA]/80 group-hover:text-[#F4F7FA] leading-snug transition-colors line-clamp-2">
+                              <p className="text-xs text-foreground/80 group-hover:text-foreground leading-snug transition-colors line-clamp-2">
                                 {item.headline}
                               </p>
-                              <p className="text-[10px] text-[#F4F7FA]/30 mt-0.5">
+                              <p className="text-[10px] text-foreground/30 mt-0.5">
                                 {item.source} · {new Date(item.datetime * 1000).toLocaleDateString()}
                               </p>
                             </div>
@@ -464,16 +464,16 @@ export default function ResearchPage() {
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 mb-3">
                       <span className="text-lg">🌸</span>
-                      <span className="font-serif text-base font-bold text-[#F4F7FA]">Pansy&apos;s Analysis</span>
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#27B7C8]/10 text-[#27B7C8] border border-[#27B7C8]/20 ml-1">
+                      <span className="font-serif text-base font-bold text-foreground">Pansy&apos;s Analysis</span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/20 ml-1">
                         Educational only
                       </span>
                     </div>
 
                     {panelLoading && (
-                      <div className="rounded-xl bg-[#16264A] border border-[#27B7C8]/10 p-6 flex items-center gap-3">
-                        <Loader2 className="w-5 h-5 text-[#27B7C8] animate-spin flex-shrink-0" />
-                        <span className="text-sm text-[#F4F7FA]/50">Pansy is reading the tape…</span>
+                      <div className="rounded-xl bg-card border border-accent/10 p-6 flex items-center gap-3">
+                        <Loader2 className="w-5 h-5 text-accent animate-spin flex-shrink-0" />
+                        <span className="text-sm text-foreground/50">Pansy is reading the tape…</span>
                       </div>
                     )}
 
@@ -482,24 +482,24 @@ export default function ResearchPage() {
                         <PansyCard
                           title="Bull Case"
                           items={panel.bullCase}
-                          color="bg-[#49B06E]/5 border border-[#49B06E]/20"
-                          icon={<TrendingUp className="w-4 h-4 text-[#49B06E]" />}
+                          color="bg-primary/5 border border-primary/20"
+                          icon={<TrendingUp className="w-4 h-4 text-primary" />}
                         />
                         <PansyCard
                           title="Bear Case"
                           items={panel.bearCase}
-                          color="bg-[#ef4444]/5 border border-[#ef4444]/20"
-                          icon={<TrendingDown className="w-4 h-4 text-[#ef4444]" />}
+                          color="bg-destructive/5 border border-destructive/20"
+                          icon={<TrendingDown className="w-4 h-4 text-destructive" />}
                         />
                         <PansyCard
                           title="What Traders Watch"
                           items={panel.watchList}
-                          color="bg-[#27B7C8]/5 border border-[#27B7C8]/20"
-                          icon={<Search className="w-4 h-4 text-[#27B7C8]" />}
+                          color="bg-accent/5 border border-accent/20"
+                          icon={<Search className="w-4 h-4 text-accent" />}
                         />
-                        <div className="flex items-start gap-2 rounded-lg bg-[#27B7C8]/8 border border-[#27B7C8]/15 px-3 py-2 mt-1">
-                          <AlertTriangle className="w-3.5 h-3.5 text-[#27B7C8]/70 flex-shrink-0 mt-0.5" />
-                          <p className="text-[10px] text-[#F4F7FA]/40 leading-relaxed">
+                        <div className="flex items-start gap-2 rounded-lg bg-accent/8 border border-accent/15 px-3 py-2 mt-1">
+                          <AlertTriangle className="w-3.5 h-3.5 text-accent/70 flex-shrink-0 mt-0.5" />
+                          <p className="text-[10px] text-foreground/40 leading-relaxed">
                             Educational only — not financial advice. Markets carry real risk, including loss of principal, and past moves don&apos;t predict future ones. The decision&apos;s always yours.
                           </p>
                         </div>
@@ -508,14 +508,14 @@ export default function ResearchPage() {
                   </div>
 
                   {/* Practice CTA */}
-                  <div className="rounded-xl bg-[#16264A] border border-[#49B06E]/20 p-4 flex items-center justify-between mt-2">
+                  <div className="rounded-xl bg-card border border-primary/20 p-4 flex items-center justify-between mt-2">
                     <div>
-                      <p className="text-sm font-semibold text-[#F4F7FA]">Ready to practice?</p>
-                      <p className="text-xs text-[#F4F7FA]/40">Open a virtual {ticker} position</p>
+                      <p className="text-sm font-semibold text-foreground">Ready to practice?</p>
+                      <p className="text-xs text-foreground/40">Open a virtual {ticker} position</p>
                     </div>
                     <Link
                       href="/practice"
-                      className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#49B06E] text-white text-xs font-semibold hover:bg-[#49B06E]/90 transition-colors"
+                      className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-white text-xs font-semibold hover:bg-primary/90 transition-colors"
                     >
                       <TrendingUp className="w-3.5 h-3.5" />
                       Practice Trader
@@ -527,7 +527,7 @@ export default function ResearchPage() {
 
               {/* Empty state */}
               {!loading && !quote && !error && (
-                <div className="text-center py-16 text-[#F4F7FA]/20 text-sm">
+                <div className="text-center py-16 text-foreground/20 text-sm">
                   Search a ticker above to get started
                 </div>
               )}
