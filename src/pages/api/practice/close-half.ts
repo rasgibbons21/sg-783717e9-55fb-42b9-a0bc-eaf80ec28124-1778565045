@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { requireProUser } from "@/lib/requireProUser";
 import { createClient } from "@supabase/supabase-js";
+import { getServerQuote } from "@/lib/serverQuote";
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -15,8 +16,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (auth.error) return res.status(auth.error).json({ error: "Unauthorized" });
   const userId = auth.user!.id;
 
-  const { trade_id, exit_price, exit_reason } = req.body;
-  if (!trade_id || !exit_price) return res.status(400).json({ error: "trade_id and exit_price required" });
+  const { trade_id, exit_reason } = req.body;
+  if (!trade_id) return res.status(400).json({ error: "trade_id required" });
 
   const { data: trade, error: tradeErr } = await supabaseAdmin
     .from("practice_trades")
@@ -28,7 +29,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (tradeErr || !trade) return res.status(404).json({ error: "Open trade not found" });
 
-  const exitP = Number(exit_price);
+  // Fresh server-side market fill for the partial exit — consistent with close.ts.
+  const quote = await getServerQuote(trade.ticker);
+  if (!quote)
+    return res.status(502).json({ error: "Couldn't get a live price to close right now — try again in a moment." });
+  const exitP = quote.price;
   const fullShares = Number(trade.shares);
   if (fullShares < 0.0002) return res.status(400).json({ error: "Position too small to halve" });
 
@@ -90,7 +95,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (updateErr) return res.status(500).json({ error: updateErr.message });
 
-  // Return half-position exit value to account cash
+  // Release the reserved cost (entry × halfShares) + realized P&L for the half.
+  // Direction-correct: longs unchanged (= exit × halfShares); shorts were
+  // previously inverted by crediting exit × halfShares.
+  const credit = Number(trade.entry_price) * halfShares + pnl;
+
   const { data: account } = await supabaseAdmin
     .from("practice_account")
     .select("id, cash_balance")
@@ -101,7 +110,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await supabaseAdmin
       .from("practice_account")
       .update({
-        cash_balance: Number(account.cash_balance) + exitP * halfShares,
+        cash_balance: Number(account.cash_balance) + credit,
         updated_at: now,
       })
       .eq("id", account.id);

@@ -3,7 +3,7 @@ import type { GetServerSideProps } from "next";
 import Head from "next/head";
 import Link from "next/link";
 import { Layout } from "@/components/Layout";
-import { PreTradeChecklist, type ChecklistResult } from "@/components/PreTradeChecklist";
+import { OrderTicket } from "@/components/OrderTicket";
 import { ActiveTradeCard } from "@/components/ActiveTradeCard";
 import { requireProUserSSR } from "@/lib/requireProUserSSR";
 import { useSubscription } from "@/contexts/SubscriptionContext";
@@ -102,81 +102,78 @@ function ClosedTradeRow({ trade }: { trade: Trade }) {
 }
 
 // ── Close Trade Modal ──────────────────────────────────────────────────────
-function CloseTradeModal({ trade, onSubmit, onCancel }: {
+const CLOSE_REASONS = ["Hit target", "Stopped out", "Changed my mind", "Taking profit", "Cutting loss"];
+
+function CloseTradeModal({ trade, currentPrice, onSubmit, onCancel }: {
   trade: Trade;
-  onSubmit: (exitPrice: number, exitReason: string) => Promise<void>;
+  currentPrice: number | null;
+  onSubmit: (exitReason: string) => Promise<void>;
   onCancel: () => void;
 }) {
-  const [exitPrice, setExitPrice] = useState("");
   const [exitReason, setExitReason] = useState("");
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleConfirm = async () => {
     setErr("");
     setLoading(true);
     try {
-      await onSubmit(parseFloat(exitPrice), exitReason);
+      await onSubmit(exitReason);
     } catch (e: unknown) {
       setErr(e instanceof Error ? e.message : "Failed to close trade");
-    } finally {
       setLoading(false);
     }
   };
 
-  const ep = parseFloat(exitPrice);
-  const previewPnl = exitPrice && !isNaN(ep)
+  // P&L preview from the latest polled price (the actual fill is a fresh server quote).
+  const previewPnl = currentPrice != null
     ? trade.direction === "long"
-      ? (ep - trade.entry_price) * trade.shares
-      : (trade.entry_price - ep) * trade.shares
+      ? (currentPrice - trade.entry_price) * trade.shares
+      : (trade.entry_price - currentPrice) * trade.shares
     : null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-4">
       <div className="w-full max-w-md bg-background rounded-2xl border border-accent/30 p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-serif text-lg font-bold text-foreground">Close {trade.ticker}</h2>
+          <h2 className="font-serif text-lg font-bold text-foreground">Close {trade.ticker} at market</h2>
           <button onClick={onCancel} className="text-foreground/40 hover:text-foreground"><X className="w-5 h-5" /></button>
         </div>
         <p className="text-xs text-foreground/50 mb-4">
           {trade.direction.toUpperCase()} · {trade.shares} shares · Entry {fmt(trade.entry_price)}
+          {currentPrice != null && <> · Now {fmt(currentPrice)}</>}
         </p>
+
+        {previewPnl != null && (
+          <p className={`text-sm font-mono font-bold rounded-lg px-3 py-2 mb-4 ${previewPnl >= 0 ? "text-primary bg-primary/10" : "text-destructive bg-destructive/10"}`}>
+            Est. P&L: {previewPnl >= 0 ? "+" : ""}{fmt(previewPnl)} <span className="font-sans font-normal text-foreground/40">(fills at the live price)</span>
+          </p>
+        )}
+
+        <label className="text-xs text-foreground/50 mb-1.5 block">Reason (optional)</label>
+        <div className="flex flex-wrap gap-2 mb-4">
+          {CLOSE_REASONS.map(r => (
+            <button
+              key={r}
+              type="button"
+              onClick={() => setExitReason(exitReason === r ? "" : r)}
+              className={`px-3 py-1.5 rounded-full text-xs border transition-colors ${
+                exitReason === r ? "border-accent bg-accent/15 text-accent" : "border-accent/20 text-foreground/60 hover:border-accent/40"
+              }`}
+            >
+              {r}
+            </button>
+          ))}
+        </div>
+
         {err && <p className="mb-3 text-sm text-destructive bg-destructive/10 rounded-lg px-3 py-2">{err}</p>}
-        <form onSubmit={handleSubmit} className="space-y-3">
-          <div>
-            <label className="text-xs text-foreground/50 mb-1 block">Exit Price *</label>
-            <input
-              type="number" min="0.0001" step="any"
-              className="w-full bg-card border border-accent/20 rounded-lg px-3 py-2 text-foreground text-sm focus:outline-none focus:border-accent"
-              value={exitPrice}
-              onChange={e => setExitPrice(e.target.value)}
-              placeholder="155.00"
-              required
-            />
-          </div>
-          <div>
-            <label className="text-xs text-foreground/50 mb-1 block">Exit Reason</label>
-            <input
-              className="w-full bg-card border border-accent/20 rounded-lg px-3 py-2 text-foreground text-sm focus:outline-none focus:border-accent"
-              value={exitReason}
-              onChange={e => setExitReason(e.target.value)}
-              placeholder="Hit target / stopped out / reversal..."
-            />
-          </div>
-          {previewPnl != null && (
-            <p className={`text-sm font-mono font-bold rounded-lg px-3 py-2 ${previewPnl >= 0 ? "text-primary bg-primary/10" : "text-destructive bg-destructive/10"}`}>
-              P&L: {previewPnl >= 0 ? "+" : ""}{fmt(previewPnl)}
-            </p>
-          )}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 rounded-xl bg-accent text-background font-semibold text-sm disabled:opacity-50 hover:bg-accent/90 transition-colors"
-          >
-            {loading ? "Closing…" : "Confirm Close"}
-          </button>
-        </form>
+        <button
+          onClick={handleConfirm}
+          disabled={loading}
+          className="w-full py-3 rounded-xl bg-accent text-accent-foreground font-semibold text-sm disabled:opacity-50 hover:bg-accent/90 transition-colors"
+        >
+          {loading ? "Closing…" : "Close at market"}
+        </button>
       </div>
     </div>
   );
@@ -439,33 +436,20 @@ export default function PracticePage(_props: PageProps) {
     };
   }, [trades, refreshPrices]);
 
-  const handleOpenTrade = async (result: ChecklistResult) => {
-    const res = await apiFetch("/api/practice/trades", {
-      method: "POST",
-      body: JSON.stringify({
-        ticker: result.ticker,
-        direction: result.direction,
-        shares: result.shares,
-        entry_price: result.entry_price,
-        stop_price: result.stop_price,
-        target_price: result.target_price,
-        thesis: result.thesis || undefined,
-      }),
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Failed to open trade");
+  const handleTradePlaced = async () => {
     setShowOpenModal(false);
     await loadData();
   };
 
-  const handleCloseTrade = async (exitPrice: number, exitReason: string) => {
+  const handleCloseTrade = async (exitReason: string) => {
     if (!closingTrade) return;
     const tradeId = closingTrade.id;
     const ticker = closingTrade.ticker;
 
+    // Market close — server fills at a fresh quote; no client exit price.
     const res = await apiFetch("/api/practice/close", {
       method: "POST",
-      body: JSON.stringify({ trade_id: tradeId, exit_price: exitPrice, exit_reason: exitReason || undefined }),
+      body: JSON.stringify({ trade_id: tradeId, exit_reason: exitReason || undefined }),
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || "Failed to close trade");
@@ -487,10 +471,10 @@ export default function PracticePage(_props: PageProps) {
     });
   };
 
-  const handleCloseHalf = async (trade: Trade, exitPrice: number, exitReason: string) => {
+  const handleCloseHalf = async (trade: Trade, exitReason: string) => {
     const res = await apiFetch("/api/practice/close-half", {
       method: "POST",
-      body: JSON.stringify({ trade_id: trade.id, exit_price: exitPrice, exit_reason: exitReason || undefined }),
+      body: JSON.stringify({ trade_id: trade.id, exit_reason: exitReason || undefined }),
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || "Failed to close half");
@@ -585,7 +569,7 @@ export default function PracticePage(_props: PageProps) {
                   positive={metrics.totalPnl > 0 ? true : metrics.totalPnl < 0 ? false : null}
                 />
                 <MetricCard
-                  label="Cash Available"
+                  label="Buying Power"
                   value={fmt(account?.cash_balance)}
                   sub={`${metrics.open.length} open position${metrics.open.length !== 1 ? "s" : ""}`}
                 />
@@ -734,14 +718,16 @@ export default function PracticePage(_props: PageProps) {
       </Layout>
 
       {showOpenModal && (
-        <PreTradeChecklist
-          onSubmit={handleOpenTrade}
+        <OrderTicket
+          buyingPower={account?.cash_balance ?? 0}
+          onPlaced={handleTradePlaced}
           onClose={() => setShowOpenModal(false)}
         />
       )}
       {closingTrade && (
         <CloseTradeModal
           trade={closingTrade}
+          currentPrice={livePrices[closingTrade.ticker] ?? null}
           onSubmit={handleCloseTrade}
           onCancel={() => setClosingTrade(null)}
         />
