@@ -21,7 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   // Verify the trade belongs to this user and is open
   const { data: trade, error: fetchErr } = await supabaseAdmin
     .from("practice_trades")
-    .select("id, thesis, stop_price, target_price, status")
+    .select("id, thesis, stop_price, target_price, status, entry_price, shares")
     .eq("id", trade_id)
     .eq("user_id", userId)
     .eq("status", "open")
@@ -30,7 +30,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (fetchErr || !trade) return res.status(404).json({ error: "Open trade not found" });
 
   const patch: Record<string, unknown> = {};
-  if (stop_price !== undefined) patch.stop_price = stop_price === null ? null : Number(stop_price);
+  if (stop_price !== undefined) {
+    patch.stop_price = stop_price === null ? null : Number(stop_price);
+    // Keep risk_amount in sync with the new stop so risk displays stay correct.
+    patch.risk_amount =
+      stop_price === null
+        ? null
+        : Math.abs((Number(trade.entry_price) - Number(stop_price)) * Number(trade.shares));
+  }
   if (target_price !== undefined) patch.target_price = target_price === null ? null : Number(target_price);
   if (note) {
     const ts = new Date().toISOString().slice(0, 16).replace("T", " ");
