@@ -18,9 +18,8 @@ import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
 import { authService } from "@/services/authService";
 import { userService } from "@/services/userService";
-import { notificationService } from "@/services/notificationService";
 import { supabase } from "@/integrations/supabase/client";
-import { User, Mail, Calendar, Crown, Settings, LogOut, Camera, Share, CreditCard, Bell, Shield, CheckCircle2, BellRing, BellOff, Target, TrendingUp, Clock, DollarSign, Save } from "lucide-react";
+import { User, Mail, Calendar, Crown, Settings, LogOut, Camera, Share, CreditCard, Bell, Shield, CheckCircle2, BellOff, Target, TrendingUp, Clock, DollarSign, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 
@@ -112,10 +111,18 @@ export default function Profile() {
     checkNotificationStatus();
   }, []);
 
-  const checkNotificationStatus = () => {
+  const checkNotificationStatus = async () => {
     if ("Notification" in window) {
       setNotificationPermission(Notification.permission);
-      setNotificationsEnabled(Notification.permission === "granted");
+    }
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      const { data } = await supabase
+        .from("profiles")
+        .select("notifications_enabled")
+        .eq("id", session.user.id)
+        .single();
+      setNotificationsEnabled(data?.notifications_enabled ?? false);
     }
   };
 
@@ -123,24 +130,29 @@ export default function Profile() {
     if (!user) return;
 
     if (enabled) {
-      const success = await notificationService.subscribeToPush(user.id);
-      if (success) {
-        setNotificationsEnabled(true);
-        setNotificationPermission("granted");
+      if (!("Notification" in window)) {
+        toast({ title: "Not Supported", description: "Push notifications aren't supported in this browser.", variant: "destructive" });
+        return;
       }
-    } else {
-      const success = await notificationService.unsubscribeFromPush(user.id);
-      if (success) {
-        setNotificationsEnabled(false);
+      const permission = await Notification.requestPermission();
+      setNotificationPermission(permission);
+      if (permission !== "granted") {
+        toast({ title: "Permission Denied", description: "Enable notifications in your browser settings to receive alerts.", variant: "destructive" });
+        return;
       }
     }
-  };
 
-  const handleTestNotification = async () => {
-    const success = await notificationService.sendTestNotification();
-    if (!success) {
-      alert("Could not send test notification. Please enable notifications first.");
+    const { error } = await supabase
+      .from("profiles")
+      .update({ notifications_enabled: enabled })
+      .eq("id", user.id);
+
+    if (error) {
+      toast({ title: "Error", description: "Could not save notification preference.", variant: "destructive" });
+      return;
     }
+
+    setNotificationsEnabled(enabled);
   };
 
   const handleGoalToggle = (goal: string) => {
@@ -673,22 +685,16 @@ export default function Profile() {
                   id="notifications"
                   checked={notificationsEnabled}
                   onCheckedChange={handleNotificationToggle}
-                  disabled={notificationPermission === "denied"}
+                  disabled={notificationPermission === "denied" || (typeof window !== "undefined" && !("Notification" in window))}
                 />
               </div>
 
-              {notificationsEnabled && (
-                <>
-                  <Separator />
-                  <Button
-                    onClick={handleTestNotification}
-                    variant="outline"
-                    className="w-full border-border text-foreground"
-                  >
-                    <BellRing className="w-4 h-4 mr-2" />
-                    Send Test Notification
-                  </Button>
-                </>
+              {typeof window !== "undefined" && !("Notification" in window) && (
+                <div className="p-4 bg-muted/50 border border-muted-foreground/20 rounded-xl">
+                  <p className="text-sm text-muted-foreground">
+                    Push notifications are not supported in this browser.
+                  </p>
+                </div>
               )}
 
               {notificationPermission === "denied" && (
