@@ -59,7 +59,7 @@ async function rankAllUsers(): Promise<GemLeaderboardRow[]> {
   const [uniRes, learnRes, profilesRes] = await Promise.all([
     supabaseAdmin.from("university_lesson_progress").select("user_id"),
     supabaseAdmin.from("lesson_progress").select("user_id").eq("quiz_completed", true),
-    supabaseAdmin.from("profiles").select("id, challenge_name"),
+    supabaseAdmin.from("profiles").select("id, challenge_name, is_review_account"),
   ]);
 
   const uni = new Map<string, number>();
@@ -73,12 +73,15 @@ async function rankAllUsers(): Promise<GemLeaderboardRow[]> {
   }
 
   const names = new Map<string, string>();
-  for (const p of (profilesRes.data ?? []) as { id: string; challenge_name: string | null }[]) {
+  const reviewIds = new Set<string>();
+  for (const p of (profilesRes.data ?? []) as { id: string; challenge_name: string | null; is_review_account: boolean | null }[]) {
+    if (p.is_review_account) reviewIds.add(p.id);
     const name = (p.challenge_name ?? "").trim();
     if (name) names.set(p.id, name);
   }
 
   const userIds = new Set<string>([...uni.keys(), ...learn.keys()]);
+  for (const id of reviewIds) userIds.delete(id);
   const rows = [...userIds].map((user_id) => {
     const universityLessons = uni.get(user_id) ?? 0;
     const learnLessons = learn.get(user_id) ?? 0;
