@@ -19,7 +19,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { authService } from "@/services/authService";
 import { userService } from "@/services/userService";
 import { supabase } from "@/integrations/supabase/client";
-import { User, Mail, Calendar, Crown, Settings, LogOut, Camera, Share, CreditCard, Bell, Shield, CheckCircle2, BellOff, Target, TrendingUp, Clock, DollarSign, Save } from "lucide-react";
+import { User, Mail, Calendar, Crown, Settings, LogOut, Camera, Share, CreditCard, Bell, Shield, CheckCircle2, BellOff, Target, TrendingUp, Clock, DollarSign, Save, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 
@@ -746,6 +746,17 @@ export default function Profile() {
           <LogOut className="w-4 h-4 mr-2" />
           Sign Out
         </Button>
+
+        {/* Delete Account */}
+        <Link href="/delete-account" className="block">
+          <Button
+            variant="ghost"
+            className="w-full text-muted-foreground hover:text-destructive"
+          >
+            <Trash2 className="w-4 h-4 mr-2" />
+            Delete Account
+          </Button>
+        </Link>
 
         {/* Disclaimer */}
         <Card className="p-4 bg-muted/50 border-muted-foreground/20 rounded-2xl">

@@ -193,6 +193,11 @@ export function Layout({ children }: LayoutProps) {
                     Refund Policy
                   </Link>
                 </li>
+                <li>
+                  <Link href="/delete-account" className="text-muted-foreground hover:text-primary">
+                    Delete Account
+                  </Link>
+                </li>
               </ul>
             </div>
             <div>

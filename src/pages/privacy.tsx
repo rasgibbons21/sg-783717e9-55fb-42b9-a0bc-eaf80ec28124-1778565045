@@ -66,7 +66,8 @@ export default function Privacy() {
               <li>Export your data</li>
             </ul>
             <p className="mb-6 text-foreground">
-              To exercise these rights, email: <a href="mailto:info@vanguardapexholdings.com" className="text-primary hover:underline">info@vanguardapexholdings.com</a>
+              To exercise these rights, email: <a href="mailto:info@vanguardapexholdings.com" className="text-primary hover:underline">info@vanguardapexholdings.com</a>.
+              You can also <a href="/delete-account" className="text-primary hover:underline">request account deletion here</a>.
             </p>
 
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Children</h2>
