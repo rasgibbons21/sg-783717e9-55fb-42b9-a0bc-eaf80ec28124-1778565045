@@ -240,6 +240,7 @@ export type Database = {
           investment_goals: string[] | null
           is_pro: boolean | null
           is_review_account: boolean
+          notifications_enabled: boolean
           onboarding_complete: boolean
           risk_tolerance: string | null
           stripe_customer_id: string | null
@@ -260,6 +261,7 @@ export type Database = {
           investment_goals?: string[] | null
           is_pro?: boolean | null
           is_review_account?: boolean
+          notifications_enabled?: boolean
           onboarding_complete?: boolean
           risk_tolerance?: string | null
           stripe_customer_id?: string | null
@@ -280,6 +282,7 @@ export type Database = {
           investment_goals?: string[] | null
           is_pro?: boolean | null
           is_review_account?: boolean
+          notifications_enabled?: boolean
           onboarding_complete?: boolean
           risk_tolerance?: string | null
           stripe_customer_id?: string | null
