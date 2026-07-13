@@ -10,6 +10,7 @@ import {
   AlertTriangle, Loader2, X, Check, TrendingUp, TrendingDown, Lock,
 } from "lucide-react";
 import Link from "next/link";
+import { canShowExternalPayment } from "@/lib/payments";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 interface JournalEntry {
@@ -293,13 +294,21 @@ function ProGate() {
     <div className="flex flex-col items-center justify-center py-20 text-center">
       <Lock className="w-10 h-10 text-[#27B7C8]/40 mb-4" />
       <h2 className="font-serif text-xl font-bold text-[#F4F7FA] mb-2">Pro Feature</h2>
-      <p className="text-sm text-[#F4F7FA]/50 mb-6 max-w-xs">
-        The Trade Journal is available to Pro subscribers. Upgrade to track your process and build better habits.
-      </p>
-      <Link href="/subscription-offer"
-        className="px-6 py-3 rounded-xl bg-[#27B7C8] text-[#0E1B30] font-semibold text-sm hover:bg-[#27B7C8]/90 transition-colors">
-        Upgrade to Pro
-      </Link>
+      {canShowExternalPayment ? (
+        <>
+          <p className="text-sm text-[#F4F7FA]/50 mb-6 max-w-xs">
+            The Trade Journal is available to Pro subscribers. Upgrade to track your process and build better habits.
+          </p>
+          <Link href="/subscription-offer"
+            className="px-6 py-3 rounded-xl bg-[#27B7C8] text-[#0E1B30] font-semibold text-sm hover:bg-[#27B7C8]/90 transition-colors">
+            Upgrade to Pro
+          </Link>
+        </>
+      ) : (
+        <p className="text-sm text-[#F4F7FA]/50 max-w-xs">
+          This feature isn&apos;t available in this version.
+        </p>
+      )}
     </div>
   );
 }

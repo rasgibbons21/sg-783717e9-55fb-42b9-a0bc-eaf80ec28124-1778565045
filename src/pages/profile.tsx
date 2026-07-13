@@ -22,6 +22,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { User, Mail, Calendar, Crown, Settings, LogOut, Camera, Share, CreditCard, Bell, Shield, CheckCircle2, BellOff, Target, TrendingUp, Clock, DollarSign, Save, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useSubscription } from "@/contexts/SubscriptionContext";
+import { canShowExternalPayment } from "@/lib/payments";
 
 const RISK_TOLERANCE_OPTIONS = [
   { value: "Conservative", label: "Conservative", description: "Prioritize stability and capital preservation" },
@@ -604,13 +605,15 @@ export default function Profile() {
                     <p className="text-sm font-semibold text-foreground">Real-time</p>
                   </div>
                 </div>
-                <Button 
-                  variant="outline" 
-                  className="w-full border-accent text-accent hover:bg-accent/10"
-                  onClick={() => router.push("/subscription")}
-                >
-                  Manage Subscription
-                </Button>
+                {canShowExternalPayment && (
+                  <Button
+                    variant="outline"
+                    className="w-full border-accent text-accent hover:bg-accent/10"
+                    onClick={() => router.push("/subscription")}
+                  >
+                    Manage Subscription
+                  </Button>
+                )}
               </div>
             ) : (
               <div className="space-y-4">
@@ -623,11 +626,13 @@ export default function Profile() {
                     <p className="text-sm text-muted-foreground">3 analyses per week, basic features</p>
                   </div>
                 </div>
-                <Link href="/subscription">
-                  <Button className="w-full bg-gradient-to-r from-accent to-primary hover:from-accent/90 hover:to-primary/90">
-                    Upgrade to Pro
-                  </Button>
-                </Link>
+                {canShowExternalPayment && (
+                  <Link href="/subscription">
+                    <Button className="w-full bg-gradient-to-r from-accent to-primary hover:from-accent/90 hover:to-primary/90">
+                      Upgrade to Pro
+                    </Button>
+                  </Link>
+                )}
               </div>
             )}
           </CardContent>

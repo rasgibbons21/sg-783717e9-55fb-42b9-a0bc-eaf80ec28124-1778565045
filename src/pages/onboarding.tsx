@@ -15,6 +15,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { authService } from "@/services/authService";
 import { userService } from "@/services/userService";
 import { supabase } from "@/integrations/supabase/client";
+import { canShowExternalPayment } from "@/lib/payments";
 import { Loader2, Eye, EyeOff } from "lucide-react";
 
 type Step = "auth" | "check-email" | "experience" | "goals" | "risk";
@@ -178,7 +179,7 @@ export default function Onboarding() {
         return;
       }
 
-      window.location.href = "/subscription-offer";
+      window.location.href = canShowExternalPayment ? "/subscription-offer" : "/home";
     } catch (err) {
       console.error("Onboarding error:", err);
       setError("Something went wrong. Please try again.");

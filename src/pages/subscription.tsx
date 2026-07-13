@@ -7,9 +7,10 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { authService } from "@/services/authService";
 import { userService } from "@/services/userService";
-import { Check, Loader2, AlertCircle } from "lucide-react";
+import { Check, Loader2, AlertCircle, Lock } from "lucide-react";
 import { SEO } from "@/components/SEO";
 import { PRO_PLAN } from "@/config/proPlan";
+import { canShowExternalPayment } from "@/lib/payments";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -103,10 +104,29 @@ export default function Subscription() {
   const yearlyPrice = PRO_PLAN.yearlyPrice;
   const yearlyMonthly = PRO_PLAN.yearlyMonthly;
 
+  if (!canShowExternalPayment) {
+    return (
+      <Layout>
+        <SEO title="Subscription - Bloom" description="Bloom Pro subscription" />
+        <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center gap-6">
+          <div className="rounded-full bg-muted p-6">
+            <Lock className="w-10 h-10 text-muted-foreground" />
+          </div>
+          <div>
+            <h1 className="font-serif text-2xl font-bold text-foreground mb-2">Subscriptions</h1>
+            <p className="text-muted-foreground max-w-sm">
+              Subscriptions are not available in this version of the app.
+            </p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
-      <SEO 
-        title="Subscription Plans - Bloom" 
+      <SEO
+        title="Subscription Plans - Bloom"
         description="Choose between Free and Bloom Pro to unlock unlimited daily stock analyses"
       />
       <div className="max-w-lg mx-auto p-4">
