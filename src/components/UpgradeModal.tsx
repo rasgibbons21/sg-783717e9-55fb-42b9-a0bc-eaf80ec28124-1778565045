@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Check, Sparkles, X } from "lucide-react";
 import { useRouter } from "next/router";
+import { PRO_PLAN } from "@/config/proPlan";
 
 interface UpgradeModalProps {
   isOpen: boolean;
@@ -60,15 +61,15 @@ export function UpgradeModal({ isOpen, onClose, trigger = "view_limit" }: Upgrad
           <div className="grid grid-cols-2 gap-3">
             <div className="rounded-lg border border-border p-3 text-center">
               <p className="text-xs text-muted-foreground">Monthly</p>
-              <p className="font-serif text-xl font-semibold text-foreground">$7.99<span className="text-sm font-normal text-muted-foreground">/mo</span></p>
+              <p className="font-serif text-xl font-semibold text-foreground">${PRO_PLAN.monthlyPrice}<span className="text-sm font-normal text-muted-foreground">/mo</span></p>
             </div>
             <div className="relative rounded-lg border border-accent p-3 text-center bg-accent/5">
               <Badge className="absolute -top-2 right-2 bg-accent text-accent-foreground text-[10px] px-1.5 py-0.5">
                 <Sparkles className="w-3 h-3 mr-1" />
-                Save 40% · nearly 5 months free
+                {PRO_PLAN.yearlySavingsLabel}
               </Badge>
               <p className="text-xs text-muted-foreground">Yearly</p>
-              <p className="font-serif text-xl font-semibold text-foreground">$57.99<span className="text-sm font-normal text-muted-foreground">/yr</span></p>
+              <p className="font-serif text-xl font-semibold text-foreground">${PRO_PLAN.yearlyPrice}<span className="text-sm font-normal text-muted-foreground">/yr</span></p>
             </div>
           </div>
 
