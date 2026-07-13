@@ -8,6 +8,7 @@ import { authService } from "@/services/authService";
 import { userService } from "@/services/userService";
 import { Check, Loader2, Sparkles } from "lucide-react";
 import { SEO } from "@/components/SEO";
+import { PRO_PLAN } from "@/config/proPlan";
 
 export default function SubscriptionOffer() {
   const router = useRouter();
@@ -64,9 +65,9 @@ export default function SubscriptionOffer() {
     }
   };
 
-  const monthlyPrice = 7.99;
-  const yearlyPrice = 57.99;
-  const yearlyMonthly = (yearlyPrice / 12).toFixed(2);
+  const monthlyPrice = PRO_PLAN.monthlyPrice;
+  const yearlyPrice = PRO_PLAN.yearlyPrice;
+  const yearlyMonthly = PRO_PLAN.yearlyMonthly;
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">

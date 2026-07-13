@@ -16,6 +16,7 @@ import { PansyChat } from "@/components/PansyChat";
 import { TextWithPansyTooltips } from "@/components/TextWithPansyTooltips";
 import { UpgradeModal, UpgradeBanner, useViewTracker } from "@/components/UpgradeModal";
 import { LockedFeatureModal } from "@/components/LockedFeatureModal";
+import { PRO_PLAN } from "@/config/proPlan";
 import { marketService } from "@/services/marketService";
 import { TrendingUp, TrendingDown, AlertTriangle, ExternalLink, BarChart3, Activity, Target, Sparkles, Lock } from "lucide-react";
 import Link from "next/link";
@@ -402,7 +403,7 @@ export default function StockPage() {
 
         {/* Upgrade Banner for Free Users After Analysis */}
         {pansyAnalysis && !isPro && isLoggedIn && (
-          <UpgradeBanner message="Loved Pansy's take? Get unlimited analysis with Bloom Pro — $7.99/month" />
+          <UpgradeBanner message={`Loved Pansy's take? Get unlimited analysis with Bloom Pro — $${PRO_PLAN.monthlyPrice}/month`} />
         )}
 
         {/* Sign-Up CTA for Logged-Out Users */}

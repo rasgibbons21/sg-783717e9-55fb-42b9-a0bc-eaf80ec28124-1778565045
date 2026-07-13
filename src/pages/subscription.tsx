@@ -9,6 +9,7 @@ import { authService } from "@/services/authService";
 import { userService } from "@/services/userService";
 import { Check, Loader2, AlertCircle } from "lucide-react";
 import { SEO } from "@/components/SEO";
+import { PRO_PLAN } from "@/config/proPlan";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -98,9 +99,9 @@ export default function Subscription() {
     }
   };
 
-  const monthlyPrice = 7.99;
-  const yearlyPrice = 57.99;
-  const yearlyMonthly = (yearlyPrice / 12).toFixed(2);
+  const monthlyPrice = PRO_PLAN.monthlyPrice;
+  const yearlyPrice = PRO_PLAN.yearlyPrice;
+  const yearlyMonthly = PRO_PLAN.yearlyMonthly;
 
   return (
     <Layout>

@@ -1,6 +1,9 @@
 export const PRO_PLAN = {
   monthlyPrice: 7.99,
   yearlyPrice: 57.99,
+  yearlyMonthly: (57.99 / 12).toFixed(2),
+  monthlyLabel: "$7.99/mo",
+  yearlyLabel: "$57.99/yr",
   yearlySavingsLabel: "Save 40% · nearly 5 months free",
   benefits: [
     "Save your portfolio — your holdings and progress, there every time you come back.",
