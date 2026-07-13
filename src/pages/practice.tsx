@@ -9,6 +9,7 @@ import { requireProUserSSR } from "@/lib/requireProUserSSR";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { supabase } from "@/integrations/supabase/client";
 import { marketService } from "@/services/marketService";
+import { canShowExternalPayment } from "@/lib/payments";
 import {
   TrendingUp, BookOpen, X,
   AlertTriangle, Plus, Lock, Search, Sparkles, NotebookPen, Loader2, Trophy,
@@ -347,15 +348,19 @@ function ProGate() {
       <div>
         <h2 className="font-serif text-2xl font-bold text-foreground mb-2">Bloom Practice Trader</h2>
         <p className="text-foreground/60 max-w-sm">
-          Practice trading with $10,000 in virtual cash — no real money, no real risk. Upgrade to Bloom Pro to unlock.
+          {canShowExternalPayment
+            ? "Practice trading with $10,000 in virtual cash — no real money, no real risk. Upgrade to Bloom Pro to unlock."
+            : "This feature isn’t available in this version."}
         </p>
       </div>
-      <Link
-        href="/subscription"
-        className="px-8 py-3 rounded-xl bg-primary text-white font-semibold hover:bg-primary/90 transition-colors"
-      >
-        Upgrade to Pro
-      </Link>
+      {canShowExternalPayment && (
+        <Link
+          href="/subscription"
+          className="px-8 py-3 rounded-xl bg-primary text-white font-semibold hover:bg-primary/90 transition-colors"
+        >
+          Upgrade to Pro
+        </Link>
+      )}
     </div>
   );
 }

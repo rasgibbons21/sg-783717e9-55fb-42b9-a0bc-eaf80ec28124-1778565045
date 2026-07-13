@@ -9,6 +9,7 @@ import { userService } from "@/services/userService";
 import { Check, Loader2, Sparkles } from "lucide-react";
 import { SEO } from "@/components/SEO";
 import { PRO_PLAN } from "@/config/proPlan";
+import { canShowExternalPayment } from "@/lib/payments";
 
 export default function SubscriptionOffer() {
   const router = useRouter();
@@ -17,6 +18,11 @@ export default function SubscriptionOffer() {
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
+    if (!canShowExternalPayment) {
+      router.replace("/home");
+      return;
+    }
+
     const checkAuth = async () => {
       const session = await authService.getCurrentSession();
       if (!session) {

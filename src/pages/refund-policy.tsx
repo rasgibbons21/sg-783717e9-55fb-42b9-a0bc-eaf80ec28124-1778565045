@@ -1,8 +1,29 @@
 import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
 import { Card } from "@/components/ui/card";
+import { Lock } from "lucide-react";
+import { canShowExternalPayment } from "@/lib/payments";
 
 export default function RefundPolicy() {
+  if (!canShowExternalPayment) {
+    return (
+      <Layout>
+        <SEO title="Refund Policy - Bloom" description="Refund policy for Bloom" />
+        <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center gap-6">
+          <div className="rounded-full bg-muted p-6">
+            <Lock className="w-10 h-10 text-muted-foreground" />
+          </div>
+          <div>
+            <h1 className="font-serif text-2xl font-bold text-foreground mb-2">Refund Policy</h1>
+            <p className="text-muted-foreground max-w-sm">
+              Billing information is not available in this version of the app.
+            </p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <SEO

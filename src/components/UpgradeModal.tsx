@@ -3,9 +3,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Check, Sparkles, X } from "lucide-react";
+import { Check, Sparkles, X, Lock } from "lucide-react";
 import { useRouter } from "next/router";
 import { PRO_PLAN } from "@/config/proPlan";
+import { canShowExternalPayment } from "@/lib/payments";
 
 interface UpgradeModalProps {
   isOpen: boolean;
@@ -15,6 +16,34 @@ interface UpgradeModalProps {
 
 export function UpgradeModal({ isOpen, onClose, trigger = "view_limit" }: UpgradeModalProps) {
   const router = useRouter();
+
+  if (!canShowExternalPayment) {
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="max-w-md bg-background border-border">
+          <DialogHeader>
+            <div className="flex items-center justify-between">
+              <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
+                <Lock className="w-5 h-5 text-muted-foreground" />
+              </div>
+              <Button variant="ghost" size="icon" onClick={onClose}>
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+            <DialogTitle className="font-serif text-2xl text-foreground mt-4">
+              Not available in this version
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-muted-foreground">
+            This feature requires Bloom Pro. Subscriptions are not available in this version of the app.
+          </p>
+          <Button variant="outline" onClick={onClose} className="w-full">
+            Got it
+          </Button>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -103,7 +132,7 @@ export function UpgradeBanner({ message, className = "" }: { message: string; cl
   const router = useRouter();
   const [isVisible, setIsVisible] = useState(true);
 
-  if (!isVisible) return null;
+  if (!canShowExternalPayment || !isVisible) return null;
 
   return (
     <Card className={`p-4 bg-gradient-to-r from-accent/10 to-primary/10 border-accent/30 ${className}`}>
@@ -156,6 +185,8 @@ export function useViewTracker() {
   }, []);
 
   const trackView = () => {
+    if (!canShowExternalPayment) return;
+
     const newCount = viewCount + 1;
     setViewCount(newCount);
     localStorage.setItem("bloom-daily-views", newCount.toString());

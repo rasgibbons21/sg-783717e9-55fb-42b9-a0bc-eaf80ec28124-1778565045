@@ -18,6 +18,7 @@ import { Search, TrendingUp, TrendingDown } from "lucide-react";
 import { userService } from "@/services/userService";
 import { supabase } from "@/integrations/supabase/client";
 import { UpgradeBanner } from "@/components/UpgradeModal";
+import { canShowExternalPayment } from "@/lib/payments";
 
 interface Asset {
   ticker: string;
@@ -448,8 +449,8 @@ export default function Discover() {
           </div>
         </div>
 
-        {/* Upgrade Banner - Hidden for Pro users */}
-        {!isPro && (
+        {/* Upgrade Banner - Hidden for Pro users and non-Stripe builds */}
+        {!isPro && canShowExternalPayment && (
           <Card className="p-5 bg-gradient-to-br from-accent/20 to-primary/10 border-accent rounded-2xl">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-2xl shrink-0">

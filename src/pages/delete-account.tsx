@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
 import { Card } from "@/components/ui/card";
+import { canShowExternalPayment } from "@/lib/payments";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -95,7 +96,9 @@ export default function DeleteAccount() {
                         Retention notice
                       </p>
                       <p className="mt-1 text-sm text-amber-700 dark:text-amber-400">
-                        Payment and subscription records handled by Stripe may be retained as required for legal, tax, fraud prevention, and accounting purposes.
+                        {canShowExternalPayment
+                          ? "Payment and subscription records handled by Stripe may be retained as required for legal, tax, fraud prevention, and accounting purposes."
+                          : "Payment and subscription records may be retained as required for legal, tax, fraud prevention, and accounting purposes."}
                       </p>
                     </div>
                   </div>

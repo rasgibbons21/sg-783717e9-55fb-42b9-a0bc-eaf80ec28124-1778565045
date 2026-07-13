@@ -6,6 +6,7 @@ import Head from "next/head";
 import { supabase } from "@/integrations/supabase/client";
 import { SEO } from "@/components/SEO";
 import { Menu, X, ArrowRight } from "lucide-react";
+import { canShowExternalPayment } from "@/lib/payments";
 
 /* ─── Palette ─────────────────────────────────────────────────────────────── */
 const C = {
@@ -879,9 +880,11 @@ export default function LandingPage() {
                   Start Learning Free
                 </button>
               </Link>
-              <Link href="/subscription" className="text-sm font-medium" style={{ color:"rgba(244,247,250,0.55)" }}>
-                Explore Bloom Pro
-              </Link>
+              {canShowExternalPayment && (
+                <Link href="/subscription" className="text-sm font-medium" style={{ color:"rgba(244,247,250,0.55)" }}>
+                  Explore Bloom Pro
+                </Link>
+              )}
             </div>
             <div className="flex flex-wrap items-center justify-center gap-4 pt-2 text-xs" style={{ color:"rgba(244,247,250,0.45)" }}>
               <span>🔒 Secure &amp; Private</span>
@@ -918,7 +921,7 @@ export default function LandingPage() {
               <div className="space-y-2">
                 <p className="text-xs font-semibold uppercase tracking-wide" style={{ color:"rgba(244,247,250,0.35)" }}>Account</p>
                 <div className="flex flex-col gap-1.5">
-                  {[{ label:"Get started free", href:"/onboarding" }, { label:"Sign in", href:"/onboarding" }, { label:"Bloom Pro", href:"/subscription" }].map(({ label, href }) => (
+                  {[{ label:"Get started free", href:"/onboarding" }, { label:"Sign in", href:"/onboarding" }, ...(canShowExternalPayment ? [{ label:"Bloom Pro", href:"/subscription" }] : [])].map(({ label, href }) => (
                     <Link key={label} href={href} className="text-xs transition-colors hover:text-white" style={{ color:"rgba(244,247,250,0.40)" }}>{label}</Link>
                   ))}
                 </div>

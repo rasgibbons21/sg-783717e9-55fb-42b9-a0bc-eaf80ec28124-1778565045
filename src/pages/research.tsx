@@ -13,6 +13,7 @@ import { marketService } from "@/services/marketService";
 import DynamicChart, { type OHLCBar } from "@/components/DynamicChart";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchOHLC } from "@/lib/fetchOHLC";
+import { canShowExternalPayment } from "@/lib/payments";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 interface Quote {
@@ -132,15 +133,19 @@ function ProGate() {
       <div>
         <h2 className="font-serif text-2xl font-bold text-foreground mb-2">Stock Research</h2>
         <p className="text-foreground/60 max-w-sm">
-          Search any stock, ETF, or index — live quotes, interactive charts, news, and Pansy&apos;s educational analysis. Upgrade to unlock.
+          {canShowExternalPayment
+            ? "Search any stock, ETF, or index — live quotes, interactive charts, news, and Pansy's educational analysis. Upgrade to unlock."
+            : "This feature isn't available in this version."}
         </p>
       </div>
-      <Link
-        href="/subscription"
-        className="px-8 py-3 rounded-xl bg-primary text-white font-semibold hover:bg-primary/90 transition-colors"
-      >
-        Upgrade to Pro
-      </Link>
+      {canShowExternalPayment && (
+        <Link
+          href="/subscription"
+          className="px-8 py-3 rounded-xl bg-primary text-white font-semibold hover:bg-primary/90 transition-colors"
+        >
+          Upgrade to Pro
+        </Link>
+      )}
     </div>
   );
 }
