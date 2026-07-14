@@ -51,7 +51,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // 5. App Health
     const health = {
-      anthropic: !!(process.env.ANTHROPIC_API_KEY || process.env.NEXT_PUBLIC_ANTHROPIC_API_KEY),
+      anthropic: !!process.env.ANTHROPIC_API_KEY,
       apiKeys: {
         finnhub: !!process.env.FINNHUB_API_KEY,
         fmp: !!process.env.FMP_API_KEY

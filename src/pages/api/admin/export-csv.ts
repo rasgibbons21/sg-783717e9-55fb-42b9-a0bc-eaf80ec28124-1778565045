@@ -1,18 +1,23 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { supabase } from '@/integrations/supabase/client';
+import { createClient } from '@supabase/supabase-js';
+import { requireAdminUser, sendAuthError } from '@/lib/requireProUser';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { authorization } = req.headers;
-  const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'bloomadmin2026';
-  
-  if (authorization !== `Bearer ${ADMIN_PASSWORD}`) {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
-
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  const auth = await requireAdminUser(req);
+  if (auth.error) return sendAuthError(res, auth.error);
+
+  if (!supabaseServiceKey) {
+    return res.status(500).json({ error: "Server configuration error" });
+  }
+
+  const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
   const { type } = req.query;
 
   try {
@@ -20,7 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     let filename = 'export.csv';
 
     if (type === 'brokers') {
-      const { data } = await supabase
+      const { data } = await supabaseAdmin
         .from('broker_clicks')
         .select('*')
         .order('clicked_at', { ascending: false });
@@ -31,7 +36,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
       filename = 'broker-clicks.csv';
     } else if (type === 'users') {
-      const { data } = await supabase
+      const { data } = await supabaseAdmin
         .from('profiles')
         .select('*')
         .order('created_at', { ascending: false });
@@ -42,7 +47,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
       filename = 'users.csv';
     } else if (type === 'subscriptions') {
-      const { data } = await supabase
+      const { data } = await supabaseAdmin
         .from('subscriptions')
         .select('*')
         .order('created_at', { ascending: false });

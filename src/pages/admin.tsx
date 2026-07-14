@@ -1,15 +1,16 @@
 import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Users, TrendingUp, DollarSign, Activity, BarChart3, 
+import {
+  Users, TrendingUp, DollarSign, Activity, BarChart3,
   Download, Mail, Settings, Target, Eye, BookOpen, Sparkles,
-  ArrowUp, ArrowDown, ExternalLink, Lock
+  ArrowUp, ArrowDown, ExternalLink, Lock, Loader2
 } from "lucide-react";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { supabase } from "@/integrations/supabase/client";
 
 interface AnalyticsData {
   overview: {
@@ -42,41 +43,72 @@ const COLORS = {
 };
 
 export default function AdminDashboard() {
+  const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [password, setPassword] = useState("");
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [brokerData, setBrokerData] = useState<BrokerData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const savedAuth = localStorage.getItem('bloom-admin-auth');
-    if (savedAuth === 'true') {
-      setIsAuthenticated(true);
-      loadAnalytics();
-    }
+    checkAdmin();
   }, []);
 
-  const handleLogin = () => {
-    const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'bloomadmin2026';
-    if (password === ADMIN_PASSWORD) {
-      setIsAuthenticated(true);
-      localStorage.setItem('bloom-admin-auth', 'true');
-      loadAnalytics();
-    } else {
-      alert('Incorrect password');
+  const checkAdmin = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        setIsCheckingAuth(false);
+        return;
+      }
+
+      const res = await fetch("/api/admin/analytics", {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+
+      if (res.ok) {
+        setIsAuthenticated(true);
+        const data = await res.json();
+        setAnalytics(data);
+        loadBrokers(session.access_token);
+      }
+    } catch {
+      // not admin
+    } finally {
+      setIsCheckingAuth(false);
+    }
+  };
+
+  const getToken = async (): Promise<string | null> => {
+    const { data: { session } } = await supabase.auth.getSession();
+    return session?.access_token ?? null;
+  };
+
+  const loadBrokers = async (token: string) => {
+    try {
+      const res = await fetch("/api/admin/broker-clicks", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setBrokerData(data.brokers);
+      }
+    } catch {
+      // ignore
     }
   };
 
   const loadAnalytics = async () => {
     setIsLoading(true);
-    const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'bloomadmin2026';
+    const token = await getToken();
+    if (!token) return;
     try {
       const [analyticsRes, brokersRes] = await Promise.all([
         fetch('/api/admin/analytics', {
-          headers: { 'Authorization': `Bearer ${ADMIN_PASSWORD}` }
+          headers: { 'Authorization': `Bearer ${token}` }
         }),
         fetch('/api/admin/broker-clicks', {
-          headers: { 'Authorization': `Bearer ${ADMIN_PASSWORD}` }
+          headers: { 'Authorization': `Bearer ${token}` }
         })
       ]);
 
@@ -97,12 +129,13 @@ export default function AdminDashboard() {
   };
 
   const handleExport = async (type: string) => {
-    const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'bloomadmin2026';
+    const token = await getToken();
+    if (!token) return;
     try {
       const res = await fetch(`/api/admin/export-csv?type=${type}`, {
-        headers: { 'Authorization': `Bearer ${ADMIN_PASSWORD}` }
+        headers: { 'Authorization': `Bearer ${token}` }
       });
-      
+
       const blob = await res.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -115,6 +148,14 @@ export default function AdminDashboard() {
       console.error('Export failed:', error);
     }
   };
+
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return (
@@ -132,21 +173,15 @@ export default function AdminDashboard() {
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Password</label>
-              <Input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
-                placeholder="Enter admin password"
-                className="bg-muted/50"
-              />
+            <div className="flex flex-col items-center gap-3 text-center">
+              <Lock className="w-8 h-8 text-muted-foreground" />
+              <p className="text-muted-foreground">
+                Sign in with an authorized admin account to access this dashboard.
+              </p>
+              <Button onClick={() => router.push("/")} variant="outline">
+                Go to Sign In
+              </Button>
             </div>
-            <Button onClick={handleLogin} className="w-full bg-primary hover:bg-primary/90">
-              <Lock className="w-4 h-4 mr-2" />
-              Unlock Dashboard
-            </Button>
           </CardContent>
         </Card>
       </div>
@@ -343,7 +378,7 @@ export default function AdminDashboard() {
           {/* Engagement Tab */}
           <TabsContent value="engagement" className="space-y-6">
             <h2 className="text-2xl font-serif font-semibold">User Engagement Analytics</h2>
-            
+
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -357,7 +392,7 @@ export default function AdminDashboard() {
                     <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
                     <XAxis dataKey="ticker" stroke="#ffffff40" />
                     <YAxis stroke="#ffffff40" />
-                    <Tooltip 
+                    <Tooltip
                       contentStyle={{ backgroundColor: '#1a1a1f', border: '1px solid #ffffff20' }}
                       labelStyle={{ color: '#ffffff' }}
                     />
@@ -371,7 +406,7 @@ export default function AdminDashboard() {
           {/* Revenue Tab */}
           <TabsContent value="revenue" className="space-y-6">
             <h2 className="text-2xl font-serif font-semibold">Revenue Dashboard</h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Card>
                 <CardHeader className="pb-2">
@@ -410,7 +445,7 @@ export default function AdminDashboard() {
           {/* Exports Tab */}
           <TabsContent value="exports" className="space-y-6">
             <h2 className="text-2xl font-serif font-semibold">Data Exports & Reports</h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Card>
                 <CardHeader>
