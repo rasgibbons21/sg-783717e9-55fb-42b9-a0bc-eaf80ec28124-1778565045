@@ -3,6 +3,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { requireLoggedInUser, sendAuthError } from "@/lib/requireProUser";
 import { rateLimit, RATE_LIMIT_RESPONSE } from "@/lib/rateLimit";
 import { rejectOversizedBody, validateAssets } from "@/lib/validateInput";
+import { checkDirectives } from "@/lib/outputFilter";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -106,7 +107,7 @@ export default async function handler(
       }
     }
 
-    // Try to parse JSON from response
+    checkDirectives(responseText, "compare-analysis");
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
       const analysis = JSON.parse(jsonMatch[0]);

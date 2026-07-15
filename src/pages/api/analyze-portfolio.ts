@@ -3,6 +3,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { requireProUser, sendAuthError } from "@/lib/requireProUser";
 import { rateLimit, RATE_LIMIT_RESPONSE } from "@/lib/rateLimit";
 import { rejectOversizedBody, validateMessage } from "@/lib/validateInput";
+import { scrubDirectives } from "@/lib/outputFilter";
 
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 
@@ -122,7 +123,7 @@ export default async function handler(
     }
 
     return res.status(200).json({
-      fullText: analysisText,
+      fullText: scrubDirectives(analysisText),
     });
   } catch (error: unknown) {
     console.error("Error calling Anthropic API:", error);
