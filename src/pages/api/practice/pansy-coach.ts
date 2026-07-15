@@ -4,6 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 import { requireProUser, sendAuthError } from "@/lib/requireProUser";
 import { rateLimit, RATE_LIMIT_RESPONSE } from "@/lib/rateLimit";
 import { rejectOversizedBody } from "@/lib/validateInput";
+import { checkDirectives } from "@/lib/outputFilter";
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -133,6 +134,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (block.type === "text") raw += block.text;
     }
     raw = raw.replace(/```[a-z]*\n?/g, "").trim();
+    checkDirectives(raw, "pansy-coach");
 
     let parsed: { coaching: string[] };
     try {

@@ -3,6 +3,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@supabase/supabase-js";
 import { requireLoggedInUser, sendAuthError } from "@/lib/requireProUser";
 import { rateLimit, RATE_LIMIT_RESPONSE } from "@/lib/rateLimit";
+import { scrubDirectives } from "@/lib/outputFilter";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -158,7 +159,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!block || block.type !== "text" || !block.text.trim()) {
       throw new Error("Empty response from Anthropic");
     }
-    content = block.text.trim();
+    content = scrubDirectives(block.text.trim());
   } catch (err) {
     console.error("[daily-briefing] Anthropic call failed:", err);
     return res.status(503).json({ error: "Briefing generation failed" });

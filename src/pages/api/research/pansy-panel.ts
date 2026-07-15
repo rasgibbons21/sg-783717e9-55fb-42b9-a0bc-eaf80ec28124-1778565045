@@ -4,6 +4,7 @@ import { requireProUser, sendAuthError } from "@/lib/requireProUser";
 import { fetchStockBundle, buildDataBlock } from "@/lib/fetchStockData";
 import { rateLimit, RATE_LIMIT_RESPONSE } from "@/lib/rateLimit";
 import { rejectOversizedBody } from "@/lib/validateInput";
+import { checkDirectives } from "@/lib/outputFilter";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -59,8 +60,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (block.type === "text") raw += block.text;
     }
 
-    // Strip any accidental markdown fences
     raw = raw.replace(/```[a-z]*\n?/g, "").trim();
+    checkDirectives(raw, "pansy-panel");
 
     let parsed: { bullCase: string[]; bearCase: string[]; watchList: string[] };
     try {

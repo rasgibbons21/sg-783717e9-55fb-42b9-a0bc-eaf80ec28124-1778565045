@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import Anthropic from "@anthropic-ai/sdk";
 import { requireLoggedInUser, sendAuthError } from "@/lib/requireProUser";
 import { rateLimit, RATE_LIMIT_RESPONSE } from "@/lib/rateLimit";
+import { checkDirectives } from "@/lib/outputFilter";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -82,7 +83,7 @@ export default async function handler(
       }
     }
 
-    // Try to parse JSON from response
+    checkDirectives(responseText, "pansy-picks");
     const jsonMatch = responseText.match(/\[[\s\S]*\]/);
     if (jsonMatch) {
       const picks = JSON.parse(jsonMatch[0]);
