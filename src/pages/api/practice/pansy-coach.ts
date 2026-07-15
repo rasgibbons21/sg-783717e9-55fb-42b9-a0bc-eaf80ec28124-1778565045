@@ -2,6 +2,8 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@supabase/supabase-js";
 import { requireProUser, sendAuthError } from "@/lib/requireProUser";
+import { rateLimit, RATE_LIMIT_RESPONSE } from "@/lib/rateLimit";
+import { rejectOversizedBody } from "@/lib/validateInput";
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -32,6 +34,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const auth = await requireProUser(req);
   if (auth.error) return sendAuthError(res, auth.error);
+
+  if (rejectOversizedBody(req, res)) return;
+
+  const { limited } = await rateLimit(auth.user!.id, "pansy-coach", 15, 300);
+  if (limited) return res.status(429).json(RATE_LIMIT_RESPONSE);
 
   const { trade_id, current_price } = req.body;
 

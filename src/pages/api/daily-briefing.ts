@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@supabase/supabase-js";
 import { requireLoggedInUser, sendAuthError } from "@/lib/requireProUser";
+import { rateLimit, RATE_LIMIT_RESPONSE } from "@/lib/rateLimit";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -95,6 +96,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const auth = await requireLoggedInUser(req);
   if (auth.error) return sendAuthError(res, auth.error);
+
+  const { limited } = await rateLimit(auth.user!.id, "daily-briefing", 15, 300);
+  if (limited) return res.status(429).json(RATE_LIMIT_RESPONSE);
 
   const today = getTodayET();
 

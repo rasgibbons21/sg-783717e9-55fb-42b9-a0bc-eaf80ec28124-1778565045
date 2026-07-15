@@ -1,50 +1,39 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { requireLoggedInUser, sendAuthError, isRateLimited } from "@/lib/requireProUser";
+import { requireLoggedInUser, sendAuthError } from "@/lib/requireProUser";
+import { rateLimit, RATE_LIMIT_RESPONSE } from "@/lib/rateLimit";
+import { rejectOversizedBody, validateMessage, sanitizeHistory } from "@/lib/validateInput";
 import { PANSY_GENERAL_PERSONA } from "@/lib/pansyPersona";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-
-type ChatTurn = { role: "user" | "assistant"; content: string };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method Not Allowed" });
   }
 
-  // Ask Pansy is a free-tier feature — any logged-in user, not Pro-gated.
   const auth = await requireLoggedInUser(req);
   if (auth.error) return sendAuthError(res, auth.error);
   const userId = auth.user!.id;
 
-  // Light abuse guard: 30 messages per 5 minutes per user.
-  if (isRateLimited(userId, "ask-pansy", 30, 5 * 60 * 1000)) {
-    return res.status(429).json({ error: "You're chatting fast! Give me a moment and try again." });
-  }
+  if (rejectOversizedBody(req, res)) return;
+
+  const { limited } = await rateLimit(userId, "ask-pansy", 20, 300);
+  if (limited) return res.status(429).json(RATE_LIMIT_RESPONSE);
 
   try {
-    const { message, history } = req.body as { message?: string; history?: ChatTurn[] };
+    const { message, history } = req.body;
 
-    if (!message || typeof message !== "string" || !message.trim()) {
-      return res.status(400).json({ error: "message is required" });
+    const validMessage = validateMessage(message);
+    if (!validMessage || !validMessage.trim()) {
+      return res.status(400).json({ error: "message is required and must be a string" });
     }
 
-    // Keep the last 10 turns for context; ignore anything malformed.
-    const priorTurns = Array.isArray(history)
-      ? history
-          .filter(
-            (t): t is ChatTurn =>
-              !!t &&
-              (t.role === "user" || t.role === "assistant") &&
-              typeof t.content === "string" &&
-              t.content.trim().length > 0
-          )
-          .slice(-10)
-      : [];
+    const priorTurns = sanitizeHistory(history);
 
     const messages = [
       ...priorTurns.map((t) => ({ role: t.role, content: t.content })),
-      { role: "user" as const, content: message },
+      { role: "user" as const, content: validMessage },
     ];
 
     const result = await anthropic.messages.create({

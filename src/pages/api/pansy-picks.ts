@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import Anthropic from "@anthropic-ai/sdk";
-import { requireLoggedInUser, sendAuthError, isRateLimited } from "@/lib/requireProUser";
+import { requireLoggedInUser, sendAuthError } from "@/lib/requireProUser";
+import { rateLimit, RATE_LIMIT_RESPONSE } from "@/lib/rateLimit";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -50,10 +51,8 @@ export default async function handler(
   const auth = await requireLoggedInUser(req);
   if (auth.error) return sendAuthError(res, auth.error);
 
-  // 5 picks-refreshes per user per hour (it's expensive with web search)
-  if (isRateLimited(auth.user.id, "pansy-picks", 5, 60 * 60 * 1000)) {
-    return res.status(429).json({ error: "Too many requests — try again later" });
-  }
+  const { limited } = await rateLimit(auth.user!.id, "pansy-picks", 15, 300);
+  if (limited) return res.status(429).json(RATE_LIMIT_RESPONSE);
 
   try {
     const response = await anthropic.messages.create({
