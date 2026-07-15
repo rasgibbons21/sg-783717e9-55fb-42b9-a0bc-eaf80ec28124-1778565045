@@ -4,6 +4,7 @@ import { requireLoggedInUser, sendAuthError } from "@/lib/requireProUser";
 import { rateLimit, RATE_LIMIT_RESPONSE } from "@/lib/rateLimit";
 import { rejectOversizedBody, validateMessage, sanitizeHistory } from "@/lib/validateInput";
 import { PANSY_GENERAL_PERSONA } from "@/lib/pansyPersona";
+import { scrubDirectives } from "@/lib/outputFilter";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -44,7 +45,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     const reply = result.content.find((b) => b.type === "text");
-    return res.status(200).json({ reply: reply?.type === "text" ? reply.text : "" });
+    return res.status(200).json({ reply: scrubDirectives(reply?.type === "text" ? reply.text : "") });
   } catch (error: unknown) {
     console.error("Ask Pansy route error:", error);
     return res.status(500).json({ error: (error as Error).message || String(error) });

@@ -5,6 +5,7 @@ import { fetchStockBundle, buildDataBlock } from "@/lib/fetchStockData";
 import { PANSY_APP_AWARENESS } from "@/lib/pansyPersona";
 import { rateLimit, RATE_LIMIT_RESPONSE } from "@/lib/rateLimit";
 import { rejectOversizedBody } from "@/lib/validateInput";
+import { scrubDirectives } from "@/lib/outputFilter";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -111,7 +112,7 @@ Give me your honest read on ${companyName || ticker} (${ticker}) — the busines
     }
 
     return res.status(200).json({
-      fullText: analysisText,
+      fullText: scrubDirectives(analysisText),
       ticker,
       companyName: companyName || ticker,
       price: bundle.price,

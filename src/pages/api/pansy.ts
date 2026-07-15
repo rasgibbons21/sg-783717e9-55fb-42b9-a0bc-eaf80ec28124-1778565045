@@ -5,6 +5,7 @@ import { fetchStockBundle, buildDataBlock } from "@/lib/fetchStockData";
 import { PANSY_APP_AWARENESS } from "@/lib/pansyPersona";
 import { rateLimit, RATE_LIMIT_RESPONSE } from "@/lib/rateLimit";
 import { rejectOversizedBody, validateMessage } from "@/lib/validateInput";
+import { scrubDirectives } from "@/lib/outputFilter";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -84,7 +85,7 @@ ${message}`;
     });
 
     const reply = result.content.find(b => b.type === "text");
-    return res.status(200).json({ reply: reply?.type === "text" ? reply.text : "" });
+    return res.status(200).json({ reply: scrubDirectives(reply?.type === "text" ? reply.text : "") });
   } catch (error: unknown) {
     console.error("Pansy route error:", error);
     return res.status(500).json({ error: (error as Error).message || String(error) });
