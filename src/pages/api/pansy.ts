@@ -3,6 +3,8 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { requireProUser, sendAuthError } from "@/lib/requireProUser";
 import { fetchStockBundle, buildDataBlock } from "@/lib/fetchStockData";
 import { PANSY_APP_AWARENESS } from "@/lib/pansyPersona";
+import { rateLimit, RATE_LIMIT_RESPONSE } from "@/lib/rateLimit";
+import { rejectOversizedBody, validateMessage } from "@/lib/validateInput";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -43,8 +45,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const auth = await requireProUser(req);
   if (auth.error) return sendAuthError(res, auth.error);
 
+  if (rejectOversizedBody(req, res)) return;
+
+  const { limited } = await rateLimit(auth.user!.id, "pansy", 10, 300);
+  if (limited) return res.status(429).json(RATE_LIMIT_RESPONSE);
+
   try {
-    const { message, ticker, companyName, currentPrice, currentChangePercent } = req.body;
+    const { ticker, companyName, currentPrice, currentChangePercent } = req.body;
+    const message = validateMessage(req.body.message);
 
     if (!ticker || !message) {
       return res.status(400).json({ error: "ticker and message are required" });

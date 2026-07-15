@@ -1,6 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import Anthropic from "@anthropic-ai/sdk";
 import { requireProUser, sendAuthError } from "@/lib/requireProUser";
+import { rateLimit, RATE_LIMIT_RESPONSE } from "@/lib/rateLimit";
+import { rejectOversizedBody, validateMessage } from "@/lib/validateInput";
 
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 
@@ -72,10 +74,15 @@ export default async function handler(
   const auth = await requireProUser(req);
   if (auth.error) return sendAuthError(res, auth.error);
 
-  const { userMessage } = req.body;
+  if (rejectOversizedBody(req, res)) return;
+
+  const { limited } = await rateLimit(auth.user!.id, "analyze-portfolio", 10, 300);
+  if (limited) return res.status(429).json(RATE_LIMIT_RESPONSE);
+
+  const userMessage = validateMessage(req.body.userMessage);
 
   if (!userMessage) {
-    return res.status(400).json({ error: "userMessage is required" });
+    return res.status(400).json({ error: "userMessage is required and must be a string" });
   }
 
   if (!ANTHROPIC_API_KEY) {

@@ -1,6 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import Anthropic from "@anthropic-ai/sdk";
-import { requireLoggedInUser, sendAuthError, isRateLimited } from "@/lib/requireProUser";
+import { requireLoggedInUser, sendAuthError } from "@/lib/requireProUser";
+import { rateLimit, RATE_LIMIT_RESPONSE } from "@/lib/rateLimit";
+import { rejectOversizedBody, validateAssets } from "@/lib/validateInput";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -61,16 +63,17 @@ export default async function handler(
   const auth = await requireLoggedInUser(req);
   if (auth.error) return sendAuthError(res, auth.error);
 
-  // 10 comparisons per user per hour
-  if (isRateLimited(auth.user.id, "compare-analysis", 10, 60 * 60 * 1000)) {
-    return res.status(429).json({ error: "Too many requests — try again later" });
-  }
+  if (rejectOversizedBody(req, res)) return;
+
+  const { limited } = await rateLimit(auth.user!.id, "compare-analysis", 10, 300);
+  if (limited) return res.status(429).json(RATE_LIMIT_RESPONSE);
 
   try {
     const { assets } = req.body as { assets: ComparisonAsset[] };
 
-    if (!assets || assets.length < 2) {
-      return res.status(400).json({ error: "At least 2 assets required for comparison" });
+    const assetsCheck = validateAssets(assets);
+    if (!assetsCheck.valid) {
+      return res.status(400).json({ error: assetsCheck.error });
     }
 
     const assetsDescription = assets
