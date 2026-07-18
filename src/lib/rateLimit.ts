@@ -4,17 +4,18 @@ import { Redis } from "@upstash/redis";
 const redisUrl = process.env.UPSTASH_REDIS_REST_URL;
 const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
 
-if (!redisUrl || !redisToken) {
-  throw new Error(
-    "UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN must be set"
-  );
-}
+let redis: Redis | null = null;
 
-const redis = new Redis({ url: redisUrl, token: redisToken });
+if (redisUrl && redisToken) {
+  redis = new Redis({ url: redisUrl, token: redisToken });
+} else {
+  console.warn("[rateLimit] UPSTASH_REDIS_REST_URL / TOKEN not set — rate limiting disabled");
+}
 
 const limiters = new Map<string, Ratelimit>();
 
-function getLimiter(bucket: string, limit: number, windowSec: number): Ratelimit {
+function getLimiter(bucket: string, limit: number, windowSec: number): Ratelimit | null {
+  if (!redis) return null;
   const key = `${bucket}:${limit}:${windowSec}`;
   let limiter = limiters.get(key);
   if (!limiter) {
@@ -40,6 +41,7 @@ export async function rateLimit(
 
   try {
     const limiter = getLimiter(bucket, limit, windowSec);
+    if (!limiter) return { limited: false };
     const result = await limiter.limit(userId);
     return { limited: !result.success };
   } catch (err) {
