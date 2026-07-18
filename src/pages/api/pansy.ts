@@ -7,7 +7,11 @@ import { rateLimit, RATE_LIMIT_RESPONSE } from "@/lib/rateLimit";
 import { rejectOversizedBody, validateMessage } from "@/lib/validateInput";
 import { scrubDirectives } from "@/lib/outputFilter";
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const apiKey = process.env.ANTHROPIC_API_KEY;
+if (!apiKey) {
+  console.error("[pansy] ANTHROPIC_API_KEY is not set — all requests will fail");
+}
+const anthropic = new Anthropic({ apiKey });
 
 const PANSY_SYSTEM_PROMPT = `You are Pansy — a sharp, warm friend who knows markets deeply and helps people learn to think for themselves. You're not a tutor reading a textbook, and you're not a broker pushing a trade. You're the friend who's been in the markets, knows how they work and how they mess with your head, and helps someone build their own judgment instead of borrowing yours.
 
@@ -51,6 +55,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { limited } = await rateLimit(auth.user!.id, "pansy", 10, 300);
   if (limited) return res.status(429).json(RATE_LIMIT_RESPONSE);
 
+  if (!apiKey) {
+    return res.status(500).json({ error: "Server configuration error — ANTHROPIC_API_KEY not set" });
+  }
+
   try {
     const { ticker, companyName, currentPrice, currentChangePercent } = req.body;
     const message = validateMessage(req.body.message);
@@ -59,6 +67,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: "ticker and message are required" });
     }
 
+    console.log(`[pansy] Fetching data for ${ticker}`);
     const bundle = await fetchStockBundle(ticker, currentPrice, currentChangePercent);
     const dataBlock = buildDataBlock(bundle);
 
@@ -72,6 +81,7 @@ ${dataBlock}
 
 ${message}`;
 
+    console.log(`[pansy] Calling Anthropic for ${ticker}`);
     const result = await anthropic.messages.create({
       model: "claude-sonnet-4-5",
       max_tokens: 1024,
@@ -83,11 +93,17 @@ ${message}`;
         },
       ],
     });
+    console.log(`[pansy] Anthropic responded, stop_reason=${result.stop_reason}`);
 
     const reply = result.content.find(b => b.type === "text");
     return res.status(200).json({ reply: scrubDirectives(reply?.type === "text" ? reply.text : "") });
   } catch (error: unknown) {
-    console.error("Pansy route error:", error);
-    return res.status(500).json({ error: (error as Error).message || String(error) });
+    const err = error as Error & { status?: number; error?: { type?: string } };
+    console.error(`[pansy] FAILED: ${err.message}`, {
+      status: err.status,
+      type: err.error?.type,
+      stack: err.stack?.split("\n").slice(0, 3).join(" | "),
+    });
+    return res.status(500).json({ error: err.message || String(error) });
   }
 }
