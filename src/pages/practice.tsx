@@ -564,20 +564,44 @@ const MARKETS = [
 
 function getMarketInfo(tz: string, openH: number, closeH: number) {
   const now = new Date();
-  const parts = new Intl.DateTimeFormat("en-US", { timeZone: tz, hour: "numeric", minute: "numeric", hour12: false }).formatToParts(now);
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: tz, hour: "numeric", minute: "numeric", hour12: false, weekday: "short",
+  }).formatToParts(now);
   const h = parseInt(parts.find(p => p.type === "hour")?.value || "0");
   const m = parseInt(parts.find(p => p.type === "minute")?.value || "0");
+  const weekday = parts.find(p => p.type === "weekday")?.value || "";
+
   const mins = h * 60 + m;
-  const openMins = openH * 60;
-  const closeMins = closeH * 60;
-  const isOpen = mins >= openMins && mins < closeMins;
+  const openMins = Math.round(openH * 60);
+  const closeMins = Math.round(closeH * 60);
+
+  const isWeekend = weekday === "Sat" || weekday === "Sun";
+  const isOpen = !isWeekend && mins >= openMins && mins < closeMins;
+
   let remaining = "";
   if (isOpen) {
     const left = closeMins - mins;
     remaining = left >= 60 ? `${Math.floor(left / 60)}h ${left % 60}m left` : `${left}m left`;
   } else {
-    const toOpen = mins < openMins ? openMins - mins : (24 * 60 - mins + openMins);
-    remaining = toOpen >= 60 ? `${Math.floor(toOpen / 60)}h ${toOpen % 60}m to open` : `${toOpen}m to open`;
+    let daysToAdd = 0;
+    if (weekday === "Sat") daysToAdd = 2;
+    else if (weekday === "Sun") daysToAdd = 1;
+    else if (mins >= closeMins) daysToAdd = weekday === "Fri" ? 3 : 1;
+
+    let toOpen: number;
+    if (daysToAdd === 0) {
+      toOpen = openMins - mins;
+    } else {
+      toOpen = (24 * 60 - mins) + (daysToAdd - 1) * 24 * 60 + openMins;
+    }
+
+    if (toOpen >= 24 * 60) {
+      const d = Math.floor(toOpen / (24 * 60));
+      const hr = Math.floor((toOpen % (24 * 60)) / 60);
+      remaining = `${d}d ${hr}h to open`;
+    } else {
+      remaining = toOpen >= 60 ? `${Math.floor(toOpen / 60)}h ${toOpen % 60}m to open` : `${toOpen}m to open`;
+    }
   }
   return { isOpen, remaining, time: `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}` };
 }

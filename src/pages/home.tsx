@@ -13,7 +13,7 @@ import { authService } from "@/services/authService";
 import { userService } from "@/services/userService";
 import { marketService } from "@/services/marketService";
 import { supabase } from "@/integrations/supabase/client";
-import { TrendingUp, TrendingDown, ChevronDown } from "lucide-react";
+import { TrendingUp, TrendingDown, ChevronDown, Clock } from "lucide-react";
 import { TimeGreeting } from "@/components/TimeGreeting";
 import { GemsLeaderboard } from "@/components/GemsLeaderboard";
 
@@ -34,6 +34,94 @@ const DEFAULT_MARKET_DATA: MarketIndex[] = [
   { symbol: "VIXY", name: "VIX", price: 0, change: 0, changePercent: 0 },
 ];
 
+
+const HOME_MARKETS = [
+  { name: "NYSE", tz: "America/New_York", open: 9.5, close: 16 },
+  { name: "LSE", tz: "Europe/London", open: 8, close: 16.5 },
+  { name: "TSE", tz: "Asia/Tokyo", open: 9, close: 15 },
+];
+
+function getHomeMarketInfo(tz: string, openH: number, closeH: number) {
+  const now = new Date();
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: tz, hour: "numeric", minute: "numeric", hour12: false, weekday: "short",
+  }).formatToParts(now);
+  const h = parseInt(parts.find(p => p.type === "hour")?.value || "0");
+  const m = parseInt(parts.find(p => p.type === "minute")?.value || "0");
+  const weekday = parts.find(p => p.type === "weekday")?.value || "";
+
+  const mins = h * 60 + m;
+  const openMins = Math.round(openH * 60);
+  const closeMins = Math.round(closeH * 60);
+
+  const isWeekend = weekday === "Sat" || weekday === "Sun";
+  const isOpen = !isWeekend && mins >= openMins && mins < closeMins;
+
+  let countdown = "";
+  if (isOpen) {
+    const left = closeMins - mins;
+    countdown = left >= 60 ? `${Math.floor(left / 60)}h ${left % 60}m to close` : `${left}m to close`;
+  } else {
+    let daysToAdd = 0;
+    if (weekday === "Sat") daysToAdd = 2;
+    else if (weekday === "Sun") daysToAdd = 1;
+    else if (mins >= closeMins) daysToAdd = weekday === "Fri" ? 3 : 1;
+
+    let toOpen: number;
+    if (daysToAdd === 0) {
+      toOpen = openMins - mins;
+    } else {
+      toOpen = (24 * 60 - mins) + (daysToAdd - 1) * 24 * 60 + openMins;
+    }
+
+    if (toOpen >= 24 * 60) {
+      const d = Math.floor(toOpen / (24 * 60));
+      const hr = Math.floor((toOpen % (24 * 60)) / 60);
+      countdown = `${d}d ${hr}h to open`;
+    } else {
+      countdown = toOpen >= 60 ? `${Math.floor(toOpen / 60)}h ${toOpen % 60}m to open` : `${toOpen}m to open`;
+    }
+  }
+
+  const localTime = `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`;
+  return { isOpen, countdown, localTime };
+}
+
+function MarketClock() {
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setTick(t => t + 1), 60000);
+    return () => clearInterval(id);
+  }, []);
+
+  return (
+    <Card className="p-4 bg-card border-border rounded-2xl shadow-sm">
+      <div className="flex items-center gap-2 mb-3">
+        <Clock className="w-4 h-4 text-muted-foreground" />
+        <h3 className="text-sm font-semibold text-foreground">Market Hours</h3>
+      </div>
+      <div className="grid grid-cols-3 gap-3">
+        {HOME_MARKETS.map(mkt => {
+          const info = getHomeMarketInfo(mkt.tz, mkt.open, mkt.close);
+          return (
+            <div key={mkt.name} className="text-center p-3 rounded-xl bg-muted/30 border border-border">
+              <p className="text-xs font-medium text-muted-foreground mb-1">{mkt.name}</p>
+              <p className="text-sm font-mono font-semibold text-foreground">{info.localTime}</p>
+              <Badge className={`mt-1.5 text-[10px] border-0 ${
+                info.isOpen
+                  ? "bg-[#49B06E]/15 text-[#49B06E]"
+                  : "bg-muted text-muted-foreground"
+              }`}>
+                {info.isOpen ? "Open" : "Closed"}
+              </Badge>
+              <p className="text-[10px] text-muted-foreground mt-1">{info.countdown}</p>
+            </div>
+          );
+        })}
+      </div>
+    </Card>
+  );
+}
 
 export default function Home() {
   const router = useRouter();
@@ -270,6 +358,9 @@ export default function Home() {
             ))}
           </div>
         </Card>
+
+        {/* Market Hours Clock */}
+        <MarketClock />
 
         {/* Morning Coffee with Pansy */}
         {(briefingLoading || briefing) && (
