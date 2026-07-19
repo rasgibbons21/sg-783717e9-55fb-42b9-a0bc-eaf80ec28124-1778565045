@@ -4,21 +4,18 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { supabase } from "@/integrations/supabase/client";
 import { authService } from "@/services/authService";
-import { userService } from "@/services/userService";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { Layout } from "@/components/Layout";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PansyChat } from "@/components/PansyChat";
 import { TextWithPansyTooltips } from "@/components/TextWithPansyTooltips";
 import { UpgradeModal, UpgradeBanner, useViewTracker } from "@/components/UpgradeModal";
 import { LockedFeatureModal } from "@/components/LockedFeatureModal";
 import { PRO_PLAN } from "@/config/proPlan";
 import { marketService } from "@/services/marketService";
-import { TrendingUp, TrendingDown, AlertTriangle, ExternalLink, BarChart3, Activity, Target, Sparkles, Lock } from "lucide-react";
+import { ExternalLink, BarChart3, Lock, Loader2 } from "lucide-react";
 import Link from "next/link";
 
 interface StockData {
@@ -36,15 +33,8 @@ interface NewsItem {
 }
 
 interface PansyAnalysis {
-  technical: string;
-  fundamental: string;
-  bullishScenario: string;
-  bearishScenario: string;
-  behavioralTip: string;
-  scorecard: string;
-  verdict: string;
-  rating: string;
   fullText: string;
+  rating: string;
   timestamp: string;
 }
 
@@ -169,9 +159,9 @@ export default function StockPage() {
   if (isLoading) {
     return (
       <Layout>
-        <div className="container-full py-8 space-y-6 pb-24">
-          <Skeleton className="h-8 w-48" />
-          <Skeleton className="h-64 w-full" />
+        <div className="container-full py-8 pb-24 flex flex-col items-center justify-center min-h-[50vh] gap-4">
+          <Loader2 className="w-8 h-8 text-accent animate-spin" />
+          <p className="text-sm text-muted-foreground">Loading stock data...</p>
         </div>
       </Layout>
     );
@@ -285,113 +275,29 @@ export default function StockPage() {
             </div>
           </Card>
         ) : pansyAnalysis ? (
-          <Card className="p-6 bg-card border-[#27B7C8] border-2 rounded-2xl space-y-6 animate-slide-up shadow-lg shadow-[#27B7C8]/20">
+          <Card className="p-6 bg-card border-[#27B7C8] border-2 rounded-2xl space-y-5 animate-slide-up shadow-lg shadow-[#27B7C8]/20">
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-xl shrink-0 shadow-lg">
                 🌺
               </div>
-              <div className="flex-1 space-y-2">
-                <div>
-                  <p className="font-semibold text-foreground text-lg">Pansy's Analysis</p>
-                  <p className="text-sm text-muted-foreground">Bloom's Investing Expert</p>
-                </div>
+              <div className="flex-1">
+                <p className="font-semibold text-foreground text-lg">Pansy&apos;s Analysis</p>
+                <p className="text-sm text-muted-foreground">Bloom&apos;s Investing Expert</p>
               </div>
+              {pansyAnalysis.rating && (
+                <Badge className={getRatingColor(pansyAnalysis.rating)}>
+                  {pansyAnalysis.rating}
+                </Badge>
+              )}
             </div>
 
-            <Tabs defaultValue="technical" className="w-full">
-              <TabsList className="grid w-full grid-cols-3 bg-muted/50">
-                <TabsTrigger value="technical" className="data-[state=active]:bg-[#49B06E] data-[state=active]:text-white">
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  Pansy's Take
-                </TabsTrigger>
-                <TabsTrigger value="fundamental" className="data-[state=active]:bg-[#27B7C8] data-[state=active]:text-white">
-                  <Target className="w-4 h-4 mr-2" />
-                  Entry & Exit
-                </TabsTrigger>
-                <TabsTrigger value="risk" className="data-[state=active]:bg-[#ef4444] data-[state=active]:text-white">
-                  <AlertTriangle className="w-4 h-4 mr-2" />
-                  Risk & Mindset
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="technical" className="space-y-4 mt-4">
-                <Card className="p-4 border-[#49B06E]/30 bg-[#49B06E]/10">
-                  <h3 className="text-sm font-semibold text-[#49B06E] mb-2 flex items-center gap-2">
-                    <BarChart3 className="w-4 h-4" />
-                    Chart Analysis
-                  </h3>
-                  <p className="text-sm text-foreground leading-relaxed">
-                    <TextWithPansyTooltips text={pansyAnalysis.technical} />
-                  </p>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="fundamental" className="space-y-4 mt-4">
-                <Card className="p-4 border-[#27B7C8]/30 bg-[#27B7C8]/10">
-                  <h3 className="text-sm font-semibold text-[#27B7C8] mb-2 flex items-center gap-2">
-                    <Target className="w-4 h-4" />
-                    Business Analysis
-                  </h3>
-                  <p className="text-sm text-foreground leading-relaxed">
-                    <TextWithPansyTooltips text={pansyAnalysis.fundamental} />
-                  </p>
-                </Card>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Card className="p-4 border-[#49B06E]/30 bg-[#49B06E]/10">
-                    <h3 className="text-sm font-semibold text-[#49B06E] mb-2 flex items-center gap-2">
-                      <TrendingUp className="w-4 h-4" />
-                      Bullish Scenario
-                    </h3>
-                    <p className="text-sm text-foreground leading-relaxed">
-                      <TextWithPansyTooltips text={pansyAnalysis.bullishScenario} />
-                    </p>
-                  </Card>
-
-                  <Card className="p-4 border-[#ef4444]/30 bg-[#ef4444]/10">
-                    <h3 className="text-sm font-semibold text-[#ef4444] mb-2 flex items-center gap-2">
-                      <TrendingDown className="w-4 h-4" />
-                      Bearish Scenario
-                    </h3>
-                    <p className="text-sm text-foreground leading-relaxed">
-                      <TextWithPansyTooltips text={pansyAnalysis.bearishScenario} />
-                    </p>
-                  </Card>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="risk" className="space-y-4 mt-4">
-                {pansyAnalysis.scorecard && (
-                  <Card className="p-4 border-[#27B7C8]/40 bg-[#27B7C8]/10">
-                    <h4 className="text-sm font-semibold text-[#27B7C8] mb-2 flex items-center gap-2">
-                      📋 Scorecard
-                    </h4>
-                    <p className="text-sm text-foreground/90">
-                      <TextWithPansyTooltips text={pansyAnalysis.scorecard} />
-                    </p>
-                  </Card>
-                )}
-
-                <Card className="p-4 border-accent/20 bg-accent/5">
-                  <h3 className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2">
-                    💡 Behavioral Tip
-                  </h3>
-                  <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-xs shrink-0">
-                      🌺
-                    </div>
-                    <p className="text-sm text-foreground leading-relaxed italic">
-                      <TextWithPansyTooltips text={pansyAnalysis.behavioralTip} />
-                    </p>
-                  </div>
-                </Card>
-
-                <Card className="p-4 border-[#27B7C8]/50 bg-[#27B7C8]/20 shadow-lg">
-                  <h3 className="text-sm font-semibold text-[#27B7C8] mb-1">Pansy's Verdict</h3>
-                  <p className="text-lg font-bold text-foreground">{pansyAnalysis.verdict}</p>
-                </Card>
-              </TabsContent>
-            </Tabs>
+            <div className="prose prose-sm max-w-none text-foreground/90 leading-relaxed space-y-4">
+              {pansyAnalysis.fullText.split("\n\n").map((paragraph, i) => (
+                <p key={i} className="text-sm leading-relaxed">
+                  <TextWithPansyTooltips text={paragraph} />
+                </p>
+              ))}
+            </div>
 
             <div className="pt-4 border-t border-border">
               <p className="text-xs text-muted-foreground italic">
