@@ -72,12 +72,15 @@ function fmtPct(n: number | null | undefined) {
 }
 
 // ── Metric Card ────────────────────────────────────────────────────────────
-function MetricCard({ label, value, sub, positive }: { label: string; value: string; sub?: string; positive?: boolean | null }) {
+function MetricCard({ label, value, sub, positive, icon }: { label: string; value: string; sub?: string; positive?: boolean | null; icon?: React.ReactNode }) {
   const color = positive === true ? "text-primary" : positive === false ? "text-destructive" : "text-foreground";
   return (
-    <div className="rounded-xl bg-card border border-accent/20 p-4 flex flex-col gap-1">
-      <span className="text-xs text-foreground/50 uppercase tracking-wide">{label}</span>
-      <span className={`text-xl font-bold font-mono ${color}`}>{value}</span>
+    <div className="rounded-2xl bg-card border border-accent/15 p-4 flex flex-col gap-1.5 shadow-sm hover:shadow-md transition-shadow">
+      <div className="flex items-center gap-2">
+        {icon && <span className="text-accent/60">{icon}</span>}
+        <span className="text-[11px] text-foreground/50 uppercase tracking-wider font-medium">{label}</span>
+      </div>
+      <span className={`text-2xl font-bold font-mono ${color}`}>{value}</span>
       {sub && <span className="text-xs text-foreground/40">{sub}</span>}
     </div>
   );
@@ -528,26 +531,29 @@ export default function PracticePage(_props: PageProps) {
         <div className="min-h-screen bg-background px-4 py-6 max-w-2xl mx-auto">
 
           {/* Header */}
-          <div className="mb-6">
-            <div className="flex items-center gap-3 mb-1">
-              <TrendingUp className="w-6 h-6 text-accent" />
-              <h1 className="font-serif text-2xl font-bold text-foreground">Practice Trader</h1>
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center shadow-lg">
+                <TrendingUp className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h1 className="font-serif text-2xl font-bold text-foreground">Practice Trader</h1>
+                <p className="text-xs text-foreground/50">Build your skills risk-free with $10k virtual cash</p>
+              </div>
             </div>
-            {/* Disclaimer — always visible */}
-            <div className="flex items-start gap-2 mt-3 rounded-lg bg-accent/10 border border-accent/20 px-3 py-2">
-              <AlertTriangle className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" />
-              <p className="text-xs text-accent/90 leading-relaxed">
-                <strong>Educational simulator — not a brokerage.</strong> All trades use virtual money only. This is not financial advice and does not constitute real trading or investment activity.
+            <div className="flex items-start gap-2 mt-4 rounded-xl bg-accent/5 border border-accent/10 px-4 py-2.5">
+              <AlertTriangle className="w-3.5 h-3.5 text-accent/60 flex-shrink-0 mt-0.5" />
+              <p className="text-[11px] text-foreground/40 leading-relaxed">
+                Educational simulator — virtual money only. Not financial advice.
               </p>
             </div>
           </div>
 
           {/* Loading */}
           {(authLoading || (loading && isPro)) && (
-            <div className="space-y-4">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="h-20 rounded-xl bg-card animate-pulse" />
-              ))}
+            <div className="flex flex-col items-center justify-center py-16 gap-4">
+              <Loader2 className="w-8 h-8 text-accent animate-spin" />
+              <p className="text-sm text-foreground/40">Loading your portfolio...</p>
             </div>
           )}
 
@@ -565,19 +571,20 @@ export default function PracticePage(_props: PageProps) {
           {/* Dashboard */}
           {!authLoading && !loading && isPro && !error && (
             <>
-              {/* Account Summary */}
-              <div className="grid grid-cols-2 gap-3 mb-6">
-                <MetricCard
-                  label="Total Equity"
-                  value={fmt(metrics.totalEquity)}
-                  sub={`${metrics.totalPnl >= 0 ? "+" : ""}${fmt(metrics.totalPnl)} all time`}
-                  positive={metrics.totalPnl > 0 ? true : metrics.totalPnl < 0 ? false : null}
-                />
-                <MetricCard
-                  label="Buying Power"
-                  value={fmt(account?.cash_balance)}
-                  sub={`${metrics.open.length} open position${metrics.open.length !== 1 ? "s" : ""}`}
-                />
+              {/* Portfolio Overview */}
+              <div className="rounded-2xl bg-gradient-to-br from-card to-accent/5 border border-accent/15 p-5 mb-6 shadow-sm">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-xs text-foreground/50 uppercase tracking-wider font-medium">Portfolio Value</span>
+                  <span className={`text-xs font-mono px-2 py-0.5 rounded-full ${metrics.totalPnl >= 0 ? "bg-primary/10 text-primary" : "bg-destructive/10 text-destructive"}`}>
+                    {metrics.totalPnl >= 0 ? "+" : ""}{fmt(metrics.totalPnl)} all time
+                  </span>
+                </div>
+                <p className={`text-3xl font-bold font-mono mb-1 ${metrics.totalPnl > 0 ? "text-primary" : metrics.totalPnl < 0 ? "text-destructive" : "text-foreground"}`}>
+                  {fmt(metrics.totalEquity)}
+                </p>
+                <p className="text-xs text-foreground/40">
+                  {fmt(account?.cash_balance)} available · {metrics.open.length} open position{metrics.open.length !== 1 ? "s" : ""}
+                </p>
               </div>
 
               {/* Performance Metrics */}
@@ -589,97 +596,93 @@ export default function PracticePage(_props: PageProps) {
                   positive={metrics.winRate != null ? metrics.winRate >= 50 : null}
                 />
                 <MetricCard
-                  label="Avg Winner"
-                  value={fmt(metrics.avgWin)}
-                  positive={metrics.avgWin != null ? true : null}
-                />
-                <MetricCard
-                  label="Avg Loser"
-                  value={metrics.avgLoss != null ? `-${fmt(metrics.avgLoss)}` : "—"}
-                  positive={metrics.avgLoss != null ? false : null}
-                />
-                <MetricCard
-                  label="Avg Risk/Reward"
-                  value={metrics.avgRR != null ? `${metrics.avgRR.toFixed(2)}R` : "—"}
+                  label="Avg R:R"
+                  value={metrics.avgRR != null ? `${metrics.avgRR.toFixed(1)}R` : "—"}
                   positive={metrics.avgRR != null ? metrics.avgRR >= 1.5 : null}
                 />
               </div>
 
-              {/* Discipline & Progress */}
-              <div className="rounded-xl bg-card border border-accent/20 p-4 mb-6">
+              {/* Discipline Score */}
+              <div className="rounded-2xl bg-card border border-accent/15 p-5 mb-6 shadow-sm">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <BookOpen className="w-4 h-4 text-accent" />
-                    <span className="text-sm font-semibold text-foreground">Discipline Score</span>
+                    <BookOpen className="w-4 h-4 text-accent/70" />
+                    <span className="text-sm font-semibold text-foreground">Discipline</span>
                   </div>
-                  <span className={`text-lg font-mono font-bold ${metrics.dScore >= 70 ? "text-primary" : metrics.dScore >= 40 ? "text-yellow-400" : "text-destructive"}`}>
-                    {metrics.dScore}/100
+                  <span className={`text-2xl font-mono font-bold ${metrics.dScore >= 70 ? "text-primary" : metrics.dScore >= 40 ? "text-yellow-400" : "text-destructive"}`}>
+                    {metrics.dScore}
                   </span>
                 </div>
-                <div className="h-2 rounded-full bg-background overflow-hidden">
+                <div className="h-2.5 rounded-full bg-background/80 overflow-hidden">
                   <div
-                    className={`h-full rounded-full transition-all ${metrics.dScore >= 70 ? "bg-primary" : metrics.dScore >= 40 ? "bg-yellow-400" : "bg-destructive"}`}
+                    className={`h-full rounded-full transition-all duration-500 ${metrics.dScore >= 70 ? "bg-gradient-to-r from-primary/80 to-primary" : metrics.dScore >= 40 ? "bg-gradient-to-r from-yellow-400/80 to-yellow-400" : "bg-gradient-to-r from-destructive/80 to-destructive"}`}
                     style={{ width: `${metrics.dScore}%` }}
                   />
                 </div>
-                <p className="text-xs text-foreground/40 mt-2">
-                  Score improves when you set a thesis, stop, and target before entering. ({trades.length} trade{trades.length !== 1 ? "s" : ""} tracked)
+                <p className="text-[11px] text-foreground/35 mt-2.5">
+                  Set a thesis, stop, and target on each trade to grow this score
                 </p>
               </div>
 
               {/* Action Buttons */}
-              <div className="flex gap-3 mb-6">
+              <div className="mb-6">
                 <button
                   onClick={() => setShowOpenModal(true)}
-                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-primary text-white font-semibold hover:bg-primary/90 transition-colors"
+                  className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-gradient-to-r from-primary to-primary/90 text-white font-semibold shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all active:scale-[0.98]"
                 >
-                  <Plus className="w-4 h-4" />
-                  Open Position
+                  <Plus className="w-5 h-5" />
+                  Open New Position
                 </button>
-                <Link
-                  href="/research"
-                  className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-card border border-accent/30 text-accent font-semibold text-sm hover:bg-accent/10 transition-colors"
-                >
-                  <Search className="w-4 h-4" />
-                  Research
-                </Link>
-                <Link
-                  href="/journal"
-                  className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-card border border-accent/30 text-accent font-semibold text-sm hover:bg-accent/10 transition-colors"
-                >
-                  <NotebookPen className="w-4 h-4" />
-                  Journal
-                </Link>
-                <Link
-                  href="/progression"
-                  className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-card border border-accent/30 text-accent font-semibold text-sm hover:bg-accent/10 transition-colors"
-                >
-                  <Trophy className="w-4 h-4" />
-                  Progress
-                </Link>
+                <div className="grid grid-cols-3 gap-2.5 mt-3">
+                  <Link
+                    href="/research"
+                    className="flex flex-col items-center gap-1.5 px-3 py-3 rounded-xl bg-card border border-accent/15 text-foreground/60 text-xs font-medium hover:bg-accent/5 hover:text-accent hover:border-accent/30 transition-all"
+                  >
+                    <Search className="w-4 h-4" />
+                    Research
+                  </Link>
+                  <Link
+                    href="/journal"
+                    className="flex flex-col items-center gap-1.5 px-3 py-3 rounded-xl bg-card border border-accent/15 text-foreground/60 text-xs font-medium hover:bg-accent/5 hover:text-accent hover:border-accent/30 transition-all"
+                  >
+                    <NotebookPen className="w-4 h-4" />
+                    Journal
+                  </Link>
+                  <Link
+                    href="/progression"
+                    className="flex flex-col items-center gap-1.5 px-3 py-3 rounded-xl bg-card border border-accent/15 text-foreground/60 text-xs font-medium hover:bg-accent/5 hover:text-accent hover:border-accent/30 transition-all"
+                  >
+                    <Trophy className="w-4 h-4" />
+                    Progress
+                  </Link>
+                </div>
               </div>
 
               {/* Trades Tabs */}
-              <div className="flex gap-2 mb-4">
+              <div className="flex gap-1 mb-5 bg-card rounded-xl border border-accent/10 p-1">
                 <button
                   onClick={() => setTab("open")}
-                  className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-colors ${tab === "open" ? "bg-accent/20 text-accent" : "text-foreground/40 hover:text-foreground"}`}
+                  className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all ${tab === "open" ? "bg-accent/15 text-accent shadow-sm" : "text-foreground/40 hover:text-foreground/60"}`}
                 >
-                  Open ({metrics.open.length})
+                  Open{metrics.open.length > 0 && ` (${metrics.open.length})`}
                 </button>
                 <button
                   onClick={() => setTab("closed")}
-                  className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-colors ${tab === "closed" ? "bg-accent/20 text-accent" : "text-foreground/40 hover:text-foreground"}`}
+                  className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all ${tab === "closed" ? "bg-accent/15 text-accent shadow-sm" : "text-foreground/40 hover:text-foreground/60"}`}
                 >
-                  Closed ({metrics.closed.length})
+                  History{metrics.closed.length > 0 && ` (${metrics.closed.length})`}
                 </button>
               </div>
 
               {tab === "open" && (
                 <div className="space-y-3">
                   {metrics.open.length === 0 ? (
-                    <div className="text-center py-10 text-foreground/30 text-sm">
-                      No open positions. Hit &ldquo;Open New Position&rdquo; to start practicing.
+                    <div className="flex flex-col items-center py-12 text-center">
+                      <div className="w-14 h-14 rounded-full bg-accent/10 flex items-center justify-center mb-4">
+                        <Sparkles className="w-6 h-6 text-accent/50" />
+                      </div>
+                      <p className="text-sm text-foreground/50 font-medium mb-1">No open positions yet</p>
+                      <p className="text-xs text-foreground/30 max-w-[200px]">Research a stock, form a thesis, then open your first practice trade</p>
                     </div>
                   ) : (
                     metrics.open.map(t => (
@@ -702,8 +705,12 @@ export default function PracticePage(_props: PageProps) {
               {tab === "closed" && (
                 <div className="space-y-2">
                   {metrics.closed.length === 0 ? (
-                    <div className="text-center py-10 text-foreground/30 text-sm">
-                      No closed trades yet.
+                    <div className="flex flex-col items-center py-12 text-center">
+                      <div className="w-14 h-14 rounded-full bg-accent/10 flex items-center justify-center mb-4">
+                        <Trophy className="w-6 h-6 text-accent/50" />
+                      </div>
+                      <p className="text-sm text-foreground/50 font-medium mb-1">No trade history yet</p>
+                      <p className="text-xs text-foreground/30 max-w-[200px]">Your closed trades and Pansy&apos;s reviews will show up here</p>
                     </div>
                   ) : (
                     metrics.closed.map(t => <ClosedTradeRow key={t.id} trade={t} />)
