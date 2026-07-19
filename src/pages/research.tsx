@@ -322,18 +322,17 @@ export default function ResearchPage() {
                 </div>
               )}
 
-              {/* Loading skeleton */}
+              {/* Loading state */}
               {loading && (
-                <div className="space-y-4">
-                  <div className="h-24 rounded-xl bg-card animate-pulse" />
-                  <div className="h-48 rounded-xl bg-card animate-pulse" />
-                  <div className="h-32 rounded-xl bg-card animate-pulse" />
+                <div className="flex flex-col items-center justify-center py-24 animate-in fade-in duration-300">
+                  <Loader2 className="w-8 h-8 animate-spin text-accent mb-3" />
+                  <span className="text-foreground/40 text-sm">Loading your data...</span>
                 </div>
               )}
 
               {/* Stock detail */}
               {!loading && quote && (
-                <div className="space-y-5">
+                <div className="space-y-5 animate-in fade-in duration-500">
 
                   {/* Quote hero */}
                   <div className="rounded-xl bg-card border border-accent/20 p-5">
