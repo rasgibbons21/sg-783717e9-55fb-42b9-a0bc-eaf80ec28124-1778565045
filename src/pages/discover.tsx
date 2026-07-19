@@ -14,7 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { marketService } from "@/services/marketService";
-import { Search, TrendingUp, TrendingDown } from "lucide-react";
+import { Search, TrendingUp, TrendingDown, Loader2 } from "lucide-react";
 import { userService } from "@/services/userService";
 import { supabase } from "@/integrations/supabase/client";
 import { UpgradeBanner } from "@/components/UpgradeModal";
@@ -470,74 +470,42 @@ export default function Discover() {
           </Card>
         )}
 
-        {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="stocks">Stocks</TabsTrigger>
-            <TabsTrigger value="etfs">ETFs</TabsTrigger>
-            <TabsTrigger value="mutual-funds">Mutual Funds</TabsTrigger>
-          </TabsList>
+        {/* Loading state */}
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center py-32 animate-in fade-in duration-300">
+            <Loader2 className="w-8 h-8 animate-spin text-accent mb-3" />
+            <span className="text-muted-foreground text-sm">Loading market data...</span>
+          </div>
+        ) : (
+          <div className="animate-in fade-in duration-500">
+            {/* Tabs */}
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="stocks">Stocks</TabsTrigger>
+                <TabsTrigger value="etfs">ETFs</TabsTrigger>
+                <TabsTrigger value="mutual-funds">Mutual Funds</TabsTrigger>
+              </TabsList>
 
-          <TabsContent value="stocks" className="mt-6">
-            {isLoading ? (
-              <div className="space-y-3">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <Skeleton key={i} className="h-32 w-full" />
-                ))}
-              </div>
-            ) : displayAssets.length > 0 ? (
-              <div className="space-y-3">
-                {displayAssets.map((asset) => (
-                  <AssetCard key={asset.ticker} asset={asset} />
-                ))}
-              </div>
-            ) : (
-              <Card className="p-8 text-center">
-                <p className="text-muted-foreground">No stocks found</p>
-              </Card>
-            )}
-          </TabsContent>
-
-          <TabsContent value="etfs" className="mt-6">
-            {isLoading ? (
-              <div className="space-y-3">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <Skeleton key={i} className="h-32 w-full" />
-                ))}
-              </div>
-            ) : displayAssets.length > 0 ? (
-              <div className="space-y-3">
-                {displayAssets.map((asset) => (
-                  <AssetCard key={asset.ticker} asset={asset} />
-                ))}
-              </div>
-            ) : (
-              <Card className="p-8 text-center">
-                <p className="text-muted-foreground">No ETFs found</p>
-              </Card>
-            )}
-          </TabsContent>
-
-          <TabsContent value="mutual-funds" className="mt-6">
-            {isLoading ? (
-              <div className="space-y-3">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <Skeleton key={i} className="h-32 w-full" />
-                ))}
-              </div>
-            ) : displayAssets.length > 0 ? (
-              <div className="space-y-3">
-                {displayAssets.map((asset) => (
-                  <AssetCard key={asset.ticker} asset={asset} />
-                ))}
-              </div>
-            ) : (
-              <Card className="p-8 text-center">
-                <p className="text-muted-foreground">No mutual funds found</p>
-              </Card>
-            )}
-          </TabsContent>
-        </Tabs>
+              {(["stocks", "etfs", "mutual-funds"] as const).map((tab) => (
+                <TabsContent key={tab} value={tab} className="mt-6">
+                  {displayAssets.length > 0 ? (
+                    <div className="space-y-3">
+                      {displayAssets.map((asset) => (
+                        <AssetCard key={asset.ticker} asset={asset} />
+                      ))}
+                    </div>
+                  ) : (
+                    <Card className="p-8 text-center">
+                      <p className="text-muted-foreground">
+                        No {tab === "stocks" ? "stocks" : tab === "etfs" ? "ETFs" : "mutual funds"} found
+                      </p>
+                    </Card>
+                  )}
+                </TabsContent>
+              ))}
+            </Tabs>
+          </div>
+        )}
       </div>
     </Layout>
   );
