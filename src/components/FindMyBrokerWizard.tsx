@@ -36,7 +36,7 @@ export default function FindMyBrokerWizard() {
   };
 
   const getMatchedBrokers = (): BrokerConfig[] => {
-    let scored = allBrokers.map((broker) => {
+    const scored = allBrokers.map((broker) => {
       let score = 0;
 
       if (answers.experience === "Beginner" && broker.beginnerRating >= 4.7) score += 2;
