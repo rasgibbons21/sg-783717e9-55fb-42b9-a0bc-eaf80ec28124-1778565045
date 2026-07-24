@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
 import { Card } from "@/components/ui/card";
-import { getEnabledBrokers } from "@/config/brokers";
+import { CATEGORIES, getBrokersByCategory } from "@/config/brokers";
 import BrokerCard from "@/components/BrokerCard";
 import BrokerHubDisclaimer from "@/components/BrokerHubDisclaimer";
 import FindMyBrokerWizard from "@/components/FindMyBrokerWizard";
@@ -10,23 +10,21 @@ import { Compass, LayoutGrid } from "lucide-react";
 
 export default function Brokers() {
   const [showWizard, setShowWizard] = useState(false);
-  const brokers = getEnabledBrokers();
 
   return (
     <Layout>
       <SEO
-        title="Broker Hub — Bloom"
-        description="Compare regulated brokers and find the right platform for your trading journey."
+        title="Invest & Trade — Bloom"
+        description="Compare regulated brokers and platforms to find the right fit for your trading and investing journey."
       />
       <div className="container-full py-8 space-y-6 pb-24">
         {/* Header */}
         <div className="space-y-3">
           <h1 className="font-serif text-3xl md:text-4xl font-bold text-foreground">
-            Broker Hub
+            Invest &amp; Trade
           </h1>
           <p className="text-muted-foreground max-w-2xl">
-            Compare regulated brokers and find a platform that suits your trading goals.
-            Every broker listed here is vetted for regulation and reliability.
+            Compare brokers and platforms to find the right fit for your goals. Every provider listed here has a confirmed partnership with Bloom.
           </p>
         </div>
 
@@ -37,20 +35,20 @@ export default function Brokers() {
               🌺
             </div>
             <div className="space-y-2 flex-1">
-              <p className="font-semibold text-foreground">How to think about choosing a broker</p>
+              <p className="font-semibold text-foreground">How to think about choosing a platform</p>
               <p className="text-sm text-foreground leading-relaxed">
-                The right broker depends on where you are in your journey and what you need.
-                If you&apos;re just starting, look for low minimum deposits and educational
-                resources. If you&apos;re more experienced, focus on execution speed, spreads,
-                and the instruments available. Always check that a broker is properly regulated
-                before depositing funds — and never risk more than you can afford to lose.
+                The right platform depends on where you are in your journey and what you need.
+                If you&apos;re just starting, look for educational resources and demo accounts.
+                If you&apos;re more experienced, focus on execution speed, available markets, and
+                the tools that fit your strategy. Always check terms, fees, and regional availability
+                on the provider&apos;s website before opening an account.
               </p>
               <p className="text-sm font-medium text-primary">— Pansy 🌺</p>
             </div>
           </div>
         </Card>
 
-        {/* Disclaimer */}
+        {/* Disclosures */}
         <BrokerHubDisclaimer />
 
         {/* Mode toggle */}
@@ -64,7 +62,7 @@ export default function Brokers() {
             }`}
           >
             <LayoutGrid className="w-4 h-4" />
-            All Brokers
+            All Platforms
           </button>
           <button
             onClick={() => setShowWizard(true)}
@@ -75,7 +73,7 @@ export default function Brokers() {
             }`}
           >
             <Compass className="w-4 h-4" />
-            Find My Broker
+            Find My Platform
           </button>
         </div>
 
@@ -83,19 +81,28 @@ export default function Brokers() {
         {showWizard ? (
           <FindMyBrokerWizard />
         ) : (
-          <div className="grid gap-6 md:grid-cols-2">
-            {brokers.map((broker) => (
-              <BrokerCard key={broker.id} broker={broker} />
-            ))}
+          <div className="space-y-10">
+            {CATEGORIES.map((category) => {
+              const items = getBrokersByCategory(category);
+              if (items.length === 0) return null;
+              return (
+                <section key={category} className="space-y-4">
+                  <h2 className="font-serif text-2xl font-bold text-foreground">{category}</h2>
+                  <div className="grid gap-6 md:grid-cols-2">
+                    {items.map((broker) => (
+                      <BrokerCard key={broker.id} broker={broker} />
+                    ))}
+                  </div>
+                </section>
+              );
+            })}
           </div>
         )}
 
         {/* Bottom disclaimer */}
         <Card className="p-4 bg-muted/50 border-border rounded-2xl">
           <p className="text-xs text-center text-muted-foreground leading-relaxed">
-            Trading forex and CFDs carries significant risk — you can lose more than your
-            initial deposit. The brokers listed are for informational purposes only. Always
-            do your own research and consider consulting a licensed financial advisor.
+            Check availability and terms on each provider&apos;s website. Bloom does not guarantee eligibility, rewards, or account approval. This page is for informational purposes only and is not financial advice.
           </p>
         </Card>
       </div>

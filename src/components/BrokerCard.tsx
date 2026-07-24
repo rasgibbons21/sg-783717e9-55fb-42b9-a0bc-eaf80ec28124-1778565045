@@ -1,24 +1,27 @@
 import { useState } from "react";
-import { ExternalLink, Copy, Check, Shield, Gift } from "lucide-react";
+import { ExternalLink, Copy, Check, Shield, Wrench, ChevronDown, Info } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import type { BrokerConfig } from "@/config/brokers";
+import BrokerDetailModal from "./BrokerDetailModal";
 
 interface BrokerCardProps {
   broker: BrokerConfig;
 }
 
 export default function BrokerCard({ broker }: BrokerCardProps) {
-  const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  const [copiedCode, setCopiedCode] = useState(false);
+  const [showSecondary, setShowSecondary] = useState(false);
+  const [showDetail, setShowDetail] = useState(false);
 
-  const copyToClipboard = (code: string, type: string) => {
-    navigator.clipboard.writeText(code);
-    setCopiedCode(type);
-    setTimeout(() => setCopiedCode(null), 2000);
+  const copyCode = () => {
+    if (!broker.partnerCode) return;
+    navigator.clipboard.writeText(broker.partnerCode);
+    setCopiedCode(true);
+    setTimeout(() => setCopiedCode(false), 2000);
   };
 
-  const trackAndOpen = (url: string) => {
-    window.open(url, "_blank", "noopener,noreferrer");
+  const trackClick = () => {
     try {
       supabase.auth.getSession().then(({ data: { session } }) => {
         supabase.from("broker_clicks").insert({
@@ -29,188 +32,182 @@ export default function BrokerCard({ broker }: BrokerCardProps) {
     } catch {}
   };
 
-  const primaryLink = broker.affiliateLinks.openAccount
-    || broker.affiliateLinks.homepage
-    || broker.website;
-
-  const demoLink = broker.affiliateLinks.demoAccount
-    || broker.affiliateLinks.openAccount
-    || broker.website;
-
   return (
-    <div className="group relative h-full overflow-hidden rounded-2xl border border-border/50 bg-card/80 backdrop-blur-xl transition-all duration-300 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/10">
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+    <>
+      <div className="group relative h-full overflow-hidden rounded-2xl border border-border/50 bg-card/80 backdrop-blur-xl transition-all duration-300 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/10">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
-      <div className="relative z-10 p-6 flex flex-col h-full">
-        {/* Header */}
-        <div className="mb-4 flex items-start justify-between">
-          <div className="flex-1">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={broker.logo}
-              alt={broker.name}
-              className="h-10 w-auto object-contain"
-              onError={(e) => {
-                e.currentTarget.style.display = "none";
-                const fallback = document.createElement("span");
-                fallback.className = "text-2xl font-bold text-foreground/60";
-                fallback.textContent = broker.name[0];
-                e.currentTarget.parentElement?.appendChild(fallback);
-              }}
-            />
-            <h3 className="mt-3 text-xl font-bold text-foreground">{broker.name}</h3>
-            <div className="mt-2 flex items-center gap-2">
-              <div className="flex gap-1">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className={`h-1.5 w-1.5 rounded-full ${
-                      i < Math.floor(broker.beginnerRating)
-                        ? "bg-primary"
-                        : "bg-muted-foreground/20"
-                    }`}
-                  />
-                ))}
-              </div>
-              <span className="text-xs text-muted-foreground">
-                Beginner: {broker.beginnerRating}/5
-              </span>
+        <div className="relative z-10 p-6 flex flex-col h-full">
+          {/* Header */}
+          <div className="mb-4 flex items-start justify-between">
+            <div className="flex-1">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={broker.logo}
+                alt={broker.name}
+                className="h-10 w-auto object-contain"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                  const fb = document.createElement("span");
+                  fb.className = "text-2xl font-bold text-foreground/60";
+                  fb.textContent = broker.name[0];
+                  e.currentTarget.parentElement?.appendChild(fb);
+                }}
+              />
+              <h3 className="mt-3 text-xl font-bold text-foreground">{broker.name}</h3>
             </div>
-          </div>
-          {broker.regulated ? (
-            <Badge variant="outline" className="text-[10px] bg-[#49B06E]/10 text-[#49B06E] border-[#49B06E]/20 gap-1 shrink-0">
-              <Shield className="w-3 h-3" /> Regulated
-            </Badge>
-          ) : (
-            <Badge variant="outline" className="text-[10px] bg-[#27B7C8]/10 text-[#27B7C8] border-[#27B7C8]/20 shrink-0">
-              Tool
-            </Badge>
-          )}
-        </div>
-
-        {/* Description */}
-        <p className="text-sm text-muted-foreground leading-relaxed">
-          {broker.description}
-        </p>
-
-        {/* Sign-up Bonus */}
-        {broker.signUpBonus && (
-          <div className="mt-4 rounded-xl bg-[#49B06E]/8 border border-[#49B06E]/20 p-3">
-            <div className="flex items-start gap-2">
-              <Gift className="w-4 h-4 text-[#49B06E] shrink-0 mt-0.5" />
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-[#49B06E] mb-1">
-                  Why join through Bloom
-                </p>
-                <p className="text-xs text-foreground/80 leading-relaxed">
-                  {broker.signUpBonus}
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Markets */}
-        <div className="mt-4 space-y-1.5">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
-            Available Markets
-          </p>
-          <div className="flex flex-wrap gap-1.5">
-            {broker.markets.slice(0, 4).map((market) => (
-              <span
-                key={market}
-                className="rounded-full bg-muted/50 border border-border/50 px-2.5 py-0.5 text-[11px] text-muted-foreground"
-              >
-                {market}
-              </span>
-            ))}
-            {broker.markets.length > 4 && (
-              <span className="rounded-full bg-muted/50 border border-border/50 px-2.5 py-0.5 text-[11px] text-muted-foreground/60">
-                +{broker.markets.length - 4} more
-              </span>
+            {broker.type === "broker" ? (
+              <Badge variant="outline" className="text-[10px] bg-[#49B06E]/10 text-[#49B06E] border-[#49B06E]/20 gap-1 shrink-0">
+                <Shield className="w-3 h-3" /> Broker
+              </Badge>
+            ) : (
+              <Badge variant="outline" className="text-[10px] bg-[#27B7C8]/10 text-[#27B7C8] border-[#27B7C8]/20 gap-1 shrink-0">
+                <Wrench className="w-3 h-3" /> Platform
+              </Badge>
             )}
           </div>
-        </div>
 
-        {/* Best For */}
-        <div className="mt-4 space-y-1.5">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
-            Best For
+          {/* Description */}
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            {broker.shortDescription}
           </p>
-          <div className="flex flex-wrap gap-1.5">
-            {broker.bestFor.slice(0, 3).map((cat) => (
-              <span
-                key={cat}
-                className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-medium text-primary"
-              >
-                {cat}
-              </span>
-            ))}
-          </div>
-        </div>
 
-        {/* Key Info */}
-        <div className="mt-4 grid grid-cols-2 gap-3">
-          <div className="rounded-lg bg-muted/30 border border-border/30 p-3">
-            <p className="text-[10px] text-muted-foreground/60 uppercase tracking-wider">Min Deposit</p>
-            <p className="mt-0.5 font-semibold text-foreground text-sm">{broker.minimumDeposit}</p>
-          </div>
-          <div className="rounded-lg bg-muted/30 border border-border/30 p-3">
-            <p className="text-[10px] text-muted-foreground/60 uppercase tracking-wider">Platforms</p>
-            <p className="mt-0.5 font-semibold text-foreground text-sm">{broker.platforms.length}+</p>
-          </div>
-        </div>
+          {/* Promotion */}
+          {broker.promotionText && (
+            <div className="mt-3 rounded-xl bg-primary/5 border border-primary/20 px-3 py-2">
+              <p className="text-xs text-primary leading-relaxed">{broker.promotionText}</p>
+            </div>
+          )}
 
-        {/* Referral Code */}
-        {broker.referralCode && (
+          {/* Markets */}
           <div className="mt-4 space-y-1.5">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
-              Referral Code
-            </p>
-            <div className="flex items-center justify-between rounded-lg bg-muted/30 border border-border/30 p-3">
-              <code className="text-sm font-mono text-primary">{broker.referralCode}</code>
-              <button
-                onClick={() => copyToClipboard(broker.referralCode!, "referral")}
-                className="transition-colors hover:text-primary"
-              >
-                {copiedCode === "referral" ? (
-                  <Check className="h-4 w-4 text-[#49B06E]" />
-                ) : (
-                  <Copy className="h-4 w-4 text-muted-foreground" />
-                )}
-              </button>
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">Markets</p>
+            <div className="flex flex-wrap gap-1.5">
+              {broker.markets.slice(0, 4).map((m) => (
+                <span key={m} className="rounded-full bg-muted/50 border border-border/50 px-2.5 py-0.5 text-[11px] text-muted-foreground">
+                  {m}
+                </span>
+              ))}
+              {broker.markets.length > 4 && (
+                <span className="rounded-full bg-muted/50 border border-border/50 px-2.5 py-0.5 text-[11px] text-muted-foreground/60">
+                  +{broker.markets.length - 4} more
+                </span>
+              )}
             </div>
           </div>
-        )}
 
-        {/* Action Buttons */}
-        <div className="mt-auto pt-6 space-y-2">
-          {broker.demoAccountAvailable && (
-            <button
-              onClick={() => trackAndOpen(demoLink)}
-              className="w-full rounded-xl border border-primary/30 bg-primary/5 px-4 py-2.5 text-sm font-semibold text-primary transition-all hover:bg-primary/10 hover:border-primary/50"
-            >
-              Try Demo Account
-            </button>
+          {/* Best For */}
+          <div className="mt-3 space-y-1.5">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">Best For</p>
+            <div className="flex flex-wrap gap-1.5">
+              {broker.bestFor.slice(0, 3).map((b) => (
+                <span key={b} className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-medium text-primary">
+                  {b}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Platforms */}
+          {broker.platforms && (
+            <div className="mt-3 space-y-1.5">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">Platforms</p>
+              <div className="flex flex-wrap gap-1.5">
+                {broker.platforms.map((p) => (
+                  <span key={p} className="rounded-full bg-muted/30 border border-border/30 px-2.5 py-0.5 text-[11px] text-muted-foreground">
+                    {p}
+                  </span>
+                ))}
+              </div>
+            </div>
           )}
-          <button
-            onClick={() => trackAndOpen(primaryLink)}
-            className="w-full rounded-xl bg-primary hover:bg-primary/90 px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:shadow-lg hover:shadow-primary/20 flex items-center justify-center gap-2"
-          >
-            {broker.regulated ? "Open Account" : "Visit Platform"}
-            <ExternalLink className="h-4 w-4" />
-          </button>
-          {broker.educationLink && (
-            <button
-              onClick={() => trackAndOpen(broker.educationLink!)}
-              className="w-full rounded-xl border border-border/50 bg-muted/20 px-4 py-2.5 text-sm font-semibold text-muted-foreground transition-all hover:bg-muted/40 hover:text-foreground flex items-center justify-center gap-2"
+
+          {/* Demo badge */}
+          {broker.demoAvailable && (
+            <div className="mt-3">
+              <Badge variant="outline" className="text-[10px] bg-[#27B7C8]/10 text-[#27B7C8] border-[#27B7C8]/20">
+                Demo Account Available
+              </Badge>
+            </div>
+          )}
+
+          {/* Partner Code */}
+          {broker.partnerCode && (
+            <div className="mt-4 space-y-1.5">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">Partner Code</p>
+              <div className="flex items-center justify-between rounded-lg bg-muted/30 border border-border/30 p-3">
+                <code className="text-sm font-mono text-primary">{broker.partnerCode}</code>
+                <button onClick={copyCode} className="transition-colors hover:text-primary" aria-label="Copy code">
+                  {copiedCode ? (
+                    <Check className="h-4 w-4 text-[#49B06E]" />
+                  ) : (
+                    <Copy className="h-4 w-4 text-muted-foreground" />
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Actions */}
+          <div className="mt-auto pt-6 space-y-2">
+            {/* Primary CTA */}
+            <a
+              href={broker.primaryUrl}
+              target="_blank"
+              rel="noopener noreferrer sponsored"
+              onClick={trackClick}
+              className="w-full rounded-xl bg-primary hover:bg-primary/90 px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:shadow-lg hover:shadow-primary/20 flex items-center justify-center gap-2"
             >
-              View Resources
+              {broker.primaryButtonLabel}
               <ExternalLink className="h-4 w-4" />
+            </a>
+
+            {/* Secondary actions (XM has multiple) */}
+            {broker.secondaryActions.length > 0 && (
+              <>
+                <button
+                  onClick={() => setShowSecondary(!showSecondary)}
+                  className="w-full rounded-xl border border-border/50 bg-muted/20 px-4 py-2 text-xs font-semibold text-muted-foreground transition-all hover:bg-muted/40 hover:text-foreground flex items-center justify-center gap-1"
+                >
+                  More Options
+                  <ChevronDown className={`h-3 w-3 transition-transform ${showSecondary ? "rotate-180" : ""}`} />
+                </button>
+                {showSecondary && (
+                  <div className="space-y-1.5">
+                    {broker.secondaryActions.map((action) => (
+                      <a
+                        key={action.label}
+                        href={action.url}
+                        target="_blank"
+                        rel="noopener noreferrer sponsored"
+                        onClick={trackClick}
+                        className="w-full rounded-lg border border-border/30 bg-muted/10 px-4 py-2 text-xs font-medium text-muted-foreground transition-all hover:bg-muted/30 hover:text-foreground flex items-center justify-center gap-2"
+                      >
+                        {action.label}
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* View Details */}
+            <button
+              onClick={() => setShowDetail(true)}
+              className="w-full rounded-xl border border-border/50 bg-muted/20 px-4 py-2 text-xs font-semibold text-muted-foreground transition-all hover:bg-muted/40 hover:text-foreground flex items-center justify-center gap-1.5"
+            >
+              <Info className="h-3.5 w-3.5" />
+              View Details
             </button>
-          )}
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* Detail Modal */}
+      {showDetail && (
+        <BrokerDetailModal broker={broker} onClose={() => setShowDetail(false)} onTrackClick={trackClick} />
+      )}
+    </>
   );
 }
