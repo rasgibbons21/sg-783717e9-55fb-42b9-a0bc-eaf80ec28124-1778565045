@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ExternalLink, Copy, Check, Shield } from "lucide-react";
+import { ExternalLink, Copy, Check, Shield, Gift } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import type { BrokerConfig } from "@/config/brokers";
@@ -17,15 +17,16 @@ export default function BrokerCard({ broker }: BrokerCardProps) {
     setTimeout(() => setCopiedCode(null), 2000);
   };
 
-  const trackAndOpen = async (url: string) => {
+  const trackAndOpen = (url: string) => {
+    window.open(url, "_blank", "noopener,noreferrer");
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      await supabase.from("broker_clicks").insert({
-        broker_name: broker.name,
-        user_id: session?.user?.id ?? null,
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        supabase.from("broker_clicks").insert({
+          broker_name: broker.name,
+          user_id: session?.user?.id ?? null,
+        });
       });
     } catch {}
-    window.open(url, "_blank", "noopener,noreferrer");
   };
 
   const primaryLink = broker.affiliateLinks.openAccount
@@ -91,6 +92,23 @@ export default function BrokerCard({ broker }: BrokerCardProps) {
         <p className="text-sm text-muted-foreground leading-relaxed">
           {broker.description}
         </p>
+
+        {/* Sign-up Bonus */}
+        {broker.signUpBonus && (
+          <div className="mt-4 rounded-xl bg-[#49B06E]/8 border border-[#49B06E]/20 p-3">
+            <div className="flex items-start gap-2">
+              <Gift className="w-4 h-4 text-[#49B06E] shrink-0 mt-0.5" />
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-[#49B06E] mb-1">
+                  Why join through Bloom
+                </p>
+                <p className="text-xs text-foreground/80 leading-relaxed">
+                  {broker.signUpBonus}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Markets */}
         <div className="mt-4 space-y-1.5">
@@ -184,7 +202,7 @@ export default function BrokerCard({ broker }: BrokerCardProps) {
           </button>
           {broker.educationLink && (
             <button
-              onClick={() => window.open(broker.educationLink!, "_blank", "noopener,noreferrer")}
+              onClick={() => trackAndOpen(broker.educationLink!)}
               className="w-full rounded-xl border border-border/50 bg-muted/20 px-4 py-2.5 text-sm font-semibold text-muted-foreground transition-all hover:bg-muted/40 hover:text-foreground flex items-center justify-center gap-2"
             >
               View Resources
