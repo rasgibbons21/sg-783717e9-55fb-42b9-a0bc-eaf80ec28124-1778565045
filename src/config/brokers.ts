@@ -1,3 +1,10 @@
+// ─── Broker comparison data model ───
+// All facts must be verified. Use null for unverified fields.
+// relationshipType: "affiliate" = monetised link, "informational" = no partnership.
+// Admin: update verifiedAt when you re-check a broker's details.
+
+export type RelationshipType = "affiliate" | "informational";
+
 export interface SecondaryAction {
   label: string;
   url: string;
@@ -6,195 +13,496 @@ export interface SecondaryAction {
 export interface BrokerConfig {
   id: string;
   name: string;
-  category: "Stocks & ETFs" | "Forex & CFDs" | "Charting & Research";
-  type: "broker" | "platform";
-  logo: string;
-  shortDescription: string;
-  markets: string[];
-  platforms: string[] | null;
-  bestFor: string[];
-  demoAvailable: boolean | null;
-  minimumDeposit: string | null;
-  regulation: string | null;
-  primaryUrl: string;
-  primaryButtonLabel: string;
+  slug: string;
+  logoPath: string;
+
+  // Relationship
+  relationshipType: RelationshipType;
+  affiliateUrl: string;
+  disclosureRequired: boolean;
   secondaryActions: SecondaryAction[];
   partnerCode: string | null;
   promotionText: string | null;
-  enabled: boolean;
+
+  // Classification
+  type: "broker" | "platform";
+  category: "Stocks & ETFs" | "Forex & CFDs" | "Charting & Research";
+
+  // Comparison fields
+  bestFor: string[];
+  beginnerFriendly: boolean;
+  regions: string[]; // e.g. ["US","EU","APAC","LATAM","MENA","Africa","Global"]
+  supportedAssets: {
+    stocks: boolean | null;
+    etfs: boolean | null;
+    fractionalShares: boolean | null;
+    options: boolean | null;
+    mutualFunds: boolean | null;
+    forex: boolean | null;
+    cfds: boolean | null;
+    crypto: boolean | null;
+    commodities: boolean | null;
+    futures: boolean | null;
+    bonds: boolean | null;
+  };
+  paperTrading: boolean | null;
+  retirementAccounts: boolean | null;
+  minimumDeposit: string | null;
+  feeSummary: string | null;
+  educationLevel: "strong" | "moderate" | "basic" | null;
+  supportChannels: string[];
+
+  // Qualitative (verified text)
+  shortDescription: string;
+  overview: string | null;
+  strengths: string[];
+  limitations: string[];
+  platforms: string[] | null;
+  markets: string[];
+
+  // Admin
+  verifiedAt: string | null;   // ISO date
+  sourceNotes: string | null;
+  active: boolean;
   displayOrder: number;
 }
 
+// ─── Broker data ───
+// Only brokers with confirmed affiliate URLs approved for this repository.
+// No unapproved brokers. No invented facts.
+
 export const brokers: BrokerConfig[] = [
-  // ── Stocks & ETFs ──
   {
     id: "webull",
     name: "Webull",
-    category: "Stocks & ETFs",
-    type: "broker",
-    logo: "/logos/webull-logo.svg",
-    shortDescription: "Commission-free trading platform for stocks, ETFs, and options with advanced charting.",
-    markets: ["Stocks", "ETFs", "Options", "Crypto"],
-    platforms: ["Desktop App", "Mobile App", "Web Platform"],
-    bestFor: ["Stocks", "ETFs", "Options", "Beginners"],
-    demoAvailable: null,
-    minimumDeposit: null,
-    regulation: null,
-    primaryUrl: "https://www.webull.com/s/3KhusTF68dPXmGVxdq",
-    primaryButtonLabel: "View Promotion",
+    slug: "webull",
+    logoPath: "/logos/webull-logo.svg",
+    relationshipType: "affiliate",
+    affiliateUrl: "https://www.webull.com/s/3KhusTF68dPXmGVxdq",
+    disclosureRequired: true,
     secondaryActions: [],
     partnerCode: null,
     promotionText: "Eligible users may receive promotional fractional shares.",
-    enabled: true,
+    type: "broker",
+    category: "Stocks & ETFs",
+    bestFor: ["Stocks", "ETFs", "Options", "Beginners"],
+    beginnerFriendly: true,
+    regions: ["US"],
+    supportedAssets: {
+      stocks: true,
+      etfs: true,
+      fractionalShares: null,
+      options: true,
+      mutualFunds: null,
+      forex: null,
+      cfds: null,
+      crypto: true,
+      commodities: null,
+      futures: null,
+      bonds: null,
+    },
+    paperTrading: true,
+    retirementAccounts: null,
+    minimumDeposit: null,
+    feeSummary: null,
+    educationLevel: null,
+    supportChannels: [],
+    shortDescription:
+      "Commission-free trading platform for stocks, ETFs, and options with advanced charting.",
+    overview: null,
+    strengths: [
+      "Commission-free stock and ETF trades",
+      "Advanced charting tools",
+      "Paper trading available",
+    ],
+    limitations: [
+      "Primarily available in the United States",
+    ],
+    platforms: ["Desktop App", "Mobile App", "Web Platform"],
+    markets: ["Stocks", "ETFs", "Options", "Crypto"],
+    verifiedAt: null,
+    sourceNotes: null,
+    active: true,
     displayOrder: 1,
   },
 
-  // ── Forex & CFDs ──
   {
     id: "deriv",
     name: "Deriv",
-    category: "Forex & CFDs",
-    type: "broker",
-    logo: "/logos/deriv-logo.svg",
-    shortDescription: "Trade forex, commodities, and synthetic indices with flexible leverage.",
-    markets: ["Forex", "Commodities", "Synthetics", "Crypto", "Indices"],
-    platforms: ["DTrader", "DBot", "MT5", "Mobile App"],
-    bestFor: ["Beginners", "Forex", "Synthetic Trading"],
-    demoAvailable: true,
-    minimumDeposit: null,
-    regulation: null,
-    primaryUrl: "https://deriv.com",
-    primaryButtonLabel: "Open Account",
+    slug: "deriv",
+    logoPath: "/logos/deriv-logo.svg",
+    relationshipType: "affiliate",
+    affiliateUrl: "https://deriv.com",
+    disclosureRequired: true,
     secondaryActions: [],
     partnerCode: "NPQCUG86TJTE",
     promotionText: null,
-    enabled: true,
+    type: "broker",
+    category: "Forex & CFDs",
+    bestFor: ["Beginners", "Forex", "Synthetic Trading"],
+    beginnerFriendly: true,
+    regions: ["Global"],
+    supportedAssets: {
+      stocks: null,
+      etfs: null,
+      fractionalShares: null,
+      options: null,
+      mutualFunds: null,
+      forex: true,
+      cfds: null,
+      crypto: true,
+      commodities: true,
+      futures: null,
+      bonds: null,
+    },
+    paperTrading: true,
+    retirementAccounts: null,
+    minimumDeposit: null,
+    feeSummary: null,
+    educationLevel: "moderate",
+    supportChannels: [],
+    shortDescription:
+      "Trade forex, commodities, and synthetic indices with flexible leverage.",
+    overview: null,
+    strengths: [
+      "Demo account available",
+      "Synthetic indices unique to Deriv",
+      "Available in many countries",
+    ],
+    limitations: [
+      "Not available in the United States",
+    ],
+    platforms: ["DTrader", "DBot", "MT5", "Mobile App"],
+    markets: ["Forex", "Commodities", "Synthetics", "Crypto", "Indices"],
+    verifiedAt: null,
+    sourceNotes: null,
+    active: true,
     displayOrder: 2,
   },
+
   {
     id: "xm",
     name: "XM",
-    category: "Forex & CFDs",
-    type: "broker",
-    logo: "/logos/xm-logo.svg",
-    shortDescription: "Global forex and CFD broker with educational resources for all experience levels.",
-    markets: ["Forex", "CFDs", "Commodities", "Indices", "Stocks"],
-    platforms: ["MT4", "MT5", "Mobile App", "Web Platform"],
-    bestFor: ["Forex Trading", "CFDs", "Education"],
-    demoAvailable: true,
-    minimumDeposit: null,
-    regulation: null,
-    primaryUrl: "https://clicks.pipaffiliates.com/c?c=1269286&l=en&p=3022",
-    primaryButtonLabel: "Open Real Account",
+    slug: "xm",
+    logoPath: "/logos/xm-logo.svg",
+    relationshipType: "affiliate",
+    affiliateUrl: "https://clicks.pipaffiliates.com/c?c=1269286&l=en&p=3022",
+    disclosureRequired: true,
     secondaryActions: [
-      { label: "Visit XM", url: "https://clicks.pipaffiliates.com/c?c=1269286&l=en&p=0" },
-      { label: "Download Mobile App", url: "https://clicks.pipaffiliates.com/c?c=1269286&l=en&p=5" },
+      {
+        label: "Visit XM",
+        url: "https://clicks.pipaffiliates.com/c?c=1269286&l=en&p=0",
+      },
+      {
+        label: "Download Mobile App",
+        url: "https://clicks.pipaffiliates.com/c?c=1269286&l=en&p=5",
+      },
     ],
     partnerCode: null,
     promotionText: null,
-    enabled: true,
+    type: "broker",
+    category: "Forex & CFDs",
+    bestFor: ["Forex Trading", "CFDs", "Education"],
+    beginnerFriendly: true,
+    regions: ["Global"],
+    supportedAssets: {
+      stocks: true,
+      etfs: null,
+      fractionalShares: null,
+      options: null,
+      mutualFunds: null,
+      forex: true,
+      cfds: true,
+      crypto: null,
+      commodities: true,
+      futures: null,
+      bonds: null,
+    },
+    paperTrading: true,
+    retirementAccounts: null,
+    minimumDeposit: null,
+    feeSummary: null,
+    educationLevel: "strong",
+    supportChannels: [],
+    shortDescription:
+      "Global forex and CFD broker with educational resources for all experience levels.",
+    overview: null,
+    strengths: [
+      "Extensive educational resources",
+      "Demo account available",
+      "Multi-platform support (MT4, MT5)",
+    ],
+    limitations: [
+      "Not available in the United States",
+    ],
+    platforms: ["MT4", "MT5", "Mobile App", "Web Platform"],
+    markets: ["Forex", "CFDs", "Commodities", "Indices", "Stocks"],
+    verifiedAt: null,
+    sourceNotes: null,
+    active: true,
     displayOrder: 3,
   },
+
   {
     id: "exness",
     name: "Exness",
-    category: "Forex & CFDs",
-    type: "broker",
-    logo: "/logos/exness-logo.svg",
-    shortDescription: "Forex and CFD broker with fast execution and comprehensive trading tools.",
-    markets: ["Forex", "Metals", "Energy", "Indices", "Crypto"],
-    platforms: ["MT4", "MT5", "Mobile App", "Web Platform"],
-    bestFor: ["Forex Trading", "Active Traders"],
-    demoAvailable: true,
-    minimumDeposit: null,
-    regulation: null,
-    primaryUrl: "https://one.exnessonelink.com/a/t13zv0dpdi",
-    primaryButtonLabel: "Open Account",
+    slug: "exness",
+    logoPath: "/logos/exness-logo.svg",
+    relationshipType: "affiliate",
+    affiliateUrl: "https://one.exnessonelink.com/a/t13zv0dpdi",
+    disclosureRequired: true,
     secondaryActions: [],
     partnerCode: null,
     promotionText: null,
-    enabled: true,
+    type: "broker",
+    category: "Forex & CFDs",
+    bestFor: ["Forex Trading", "Active Traders"],
+    beginnerFriendly: false,
+    regions: ["Global"],
+    supportedAssets: {
+      stocks: null,
+      etfs: null,
+      fractionalShares: null,
+      options: null,
+      mutualFunds: null,
+      forex: true,
+      cfds: null,
+      crypto: true,
+      commodities: null,
+      futures: null,
+      bonds: null,
+    },
+    paperTrading: true,
+    retirementAccounts: null,
+    minimumDeposit: null,
+    feeSummary: null,
+    educationLevel: null,
+    supportChannels: [],
+    shortDescription:
+      "Forex and CFD broker with fast execution and comprehensive trading tools.",
+    overview: null,
+    strengths: [
+      "Demo account available",
+      "Fast execution speeds",
+    ],
+    limitations: [
+      "Not available in the United States",
+    ],
+    platforms: ["MT4", "MT5", "Mobile App", "Web Platform"],
+    markets: ["Forex", "Metals", "Energy", "Indices", "Crypto"],
+    verifiedAt: null,
+    sourceNotes: null,
+    active: true,
     displayOrder: 4,
   },
+
   {
     id: "vantage",
     name: "Vantage",
-    category: "Forex & CFDs",
-    type: "broker",
-    logo: "/logos/vantage-logo.svg",
-    shortDescription: "Forex and CFD trading platform with tight spreads and professional tools.",
-    markets: ["Forex", "CFDs", "Stocks", "Indices", "Commodities"],
-    platforms: ["MT4", "MT5", "cTrader", "Mobile App"],
-    bestFor: ["Active Trading", "Forex", "CFDs"],
-    demoAvailable: true,
-    minimumDeposit: null,
-    regulation: null,
-    primaryUrl: "https://www.vantagemarkets.com/open-live-account?cpaAffid=MjAzMTQwMDM",
-    primaryButtonLabel: "Open Live Account",
+    slug: "vantage",
+    logoPath: "/logos/vantage-logo.svg",
+    relationshipType: "affiliate",
+    affiliateUrl:
+      "https://www.vantagemarkets.com/open-live-account?cpaAffid=MjAzMTQwMDM",
+    disclosureRequired: true,
     secondaryActions: [],
     partnerCode: "CPA00ixMG",
     promotionText: null,
-    enabled: true,
+    type: "broker",
+    category: "Forex & CFDs",
+    bestFor: ["Active Trading", "Forex", "CFDs"],
+    beginnerFriendly: false,
+    regions: ["Global"],
+    supportedAssets: {
+      stocks: true,
+      etfs: null,
+      fractionalShares: null,
+      options: null,
+      mutualFunds: null,
+      forex: true,
+      cfds: true,
+      crypto: null,
+      commodities: true,
+      futures: null,
+      bonds: null,
+    },
+    paperTrading: true,
+    retirementAccounts: null,
+    minimumDeposit: null,
+    feeSummary: null,
+    educationLevel: null,
+    supportChannels: [],
+    shortDescription:
+      "Forex and CFD trading platform with tight spreads and professional tools.",
+    overview: null,
+    strengths: [
+      "Multiple platform support including cTrader",
+      "Demo account available",
+    ],
+    limitations: [
+      "Not available in the United States",
+    ],
+    platforms: ["MT4", "MT5", "cTrader", "Mobile App"],
+    markets: ["Forex", "CFDs", "Stocks", "Indices", "Commodities"],
+    verifiedAt: null,
+    sourceNotes: null,
+    active: true,
     displayOrder: 5,
   },
+
   {
     id: "avatrade",
     name: "AvaTrade",
-    category: "Forex & CFDs",
-    type: "broker",
-    logo: "/logos/avatrade-logo.svg",
-    shortDescription: "Multi-asset broker offering forex, CFDs, options, futures, and more.",
-    markets: ["Forex", "CFDs", "Stocks", "Commodities", "Indices", "Crypto", "Options"],
-    platforms: null,
-    bestFor: ["Multi-Asset Trading", "Forex", "CFDs"],
-    demoAvailable: null,
-    minimumDeposit: null,
-    regulation: null,
-    primaryUrl: "https://www.avatrade.com?tag=222519",
-    primaryButtonLabel: "Open Account",
+    slug: "avatrade",
+    logoPath: "/logos/avatrade-logo.svg",
+    relationshipType: "affiliate",
+    affiliateUrl: "https://www.avatrade.com?tag=222519",
+    disclosureRequired: true,
     secondaryActions: [],
     partnerCode: null,
     promotionText: null,
-    enabled: true,
+    type: "broker",
+    category: "Forex & CFDs",
+    bestFor: ["Multi-Asset Trading", "Forex", "CFDs"],
+    beginnerFriendly: false,
+    regions: ["Global"],
+    supportedAssets: {
+      stocks: true,
+      etfs: null,
+      fractionalShares: null,
+      options: true,
+      mutualFunds: null,
+      forex: true,
+      cfds: true,
+      crypto: true,
+      commodities: true,
+      futures: null,
+      bonds: null,
+    },
+    paperTrading: null,
+    retirementAccounts: null,
+    minimumDeposit: null,
+    feeSummary: null,
+    educationLevel: null,
+    supportChannels: [],
+    shortDescription:
+      "Multi-asset broker offering forex, CFDs, options, futures, and more.",
+    overview: null,
+    strengths: [
+      "Wide range of asset classes",
+      "Available in many countries",
+    ],
+    limitations: [
+      "Check availability and terms on the provider's website",
+    ],
+    platforms: null,
+    markets: [
+      "Forex",
+      "CFDs",
+      "Stocks",
+      "Commodities",
+      "Indices",
+      "Crypto",
+      "Options",
+    ],
+    verifiedAt: null,
+    sourceNotes: null,
+    active: true,
     displayOrder: 6,
   },
 
-  // ── Charting & Research ──
   {
     id: "tradingview",
     name: "TradingView",
-    category: "Charting & Research",
-    type: "platform",
-    logo: "/logos/tradingview-logo.svg",
-    shortDescription: "Advanced charting, indicators, screeners, alerts, and market research tools.",
-    markets: ["Stocks", "Forex", "Crypto", "Indices", "Commodities", "Bonds"],
-    platforms: ["Web Platform", "Desktop App", "Mobile App"],
-    bestFor: ["Charting", "Technical Analysis", "Market Research"],
-    demoAvailable: null,
-    minimumDeposit: null,
-    regulation: null,
-    primaryUrl: "https://www.tradingview.com/?aff_id=169003",
-    primaryButtonLabel: "Open TradingView",
+    slug: "tradingview",
+    logoPath: "/logos/tradingview-logo.svg",
+    relationshipType: "affiliate",
+    affiliateUrl: "https://www.tradingview.com/?aff_id=169003",
+    disclosureRequired: true,
     secondaryActions: [],
     partnerCode: null,
     promotionText: null,
-    enabled: true,
+    type: "platform",
+    category: "Charting & Research",
+    bestFor: ["Charting", "Technical Analysis", "Market Research"],
+    beginnerFriendly: true,
+    regions: ["Global"],
+    supportedAssets: {
+      stocks: true,
+      etfs: true,
+      fractionalShares: null,
+      options: null,
+      mutualFunds: null,
+      forex: true,
+      cfds: null,
+      crypto: true,
+      commodities: true,
+      futures: null,
+      bonds: true,
+    },
+    paperTrading: true,
+    retirementAccounts: null,
+    minimumDeposit: null,
+    feeSummary: null,
+    educationLevel: "strong",
+    supportChannels: [],
+    shortDescription:
+      "Advanced charting, indicators, screeners, alerts, and market research tools.",
+    overview: null,
+    strengths: [
+      "Industry-leading charting tools",
+      "Paper trading built in",
+      "Large community and idea sharing",
+    ],
+    limitations: [
+      "Charting and research tool, not a full brokerage",
+    ],
+    platforms: ["Web Platform", "Desktop App", "Mobile App"],
+    markets: [
+      "Stocks",
+      "Forex",
+      "Crypto",
+      "Indices",
+      "Commodities",
+      "Bonds",
+    ],
+    verifiedAt: null,
+    sourceNotes: null,
+    active: true,
     displayOrder: 7,
   },
 ];
 
-export const CATEGORIES = ["Stocks & ETFs", "Forex & CFDs", "Charting & Research"] as const;
+// ─── Helpers ───
 
-export const getEnabledBrokers = () => {
-  return brokers
-    .filter((b) => b.enabled)
-    .sort((a, b) => a.displayOrder - b.displayOrder);
-};
+export const CATEGORIES = [
+  "Stocks & ETFs",
+  "Forex & CFDs",
+  "Charting & Research",
+] as const;
 
-export const getBrokersByCategory = (category: string) => {
-  return getEnabledBrokers().filter((b) => b.category === category);
-};
+export const getEnabledBrokers = () =>
+  brokers.filter((b) => b.active).sort((a, b) => a.displayOrder - b.displayOrder);
 
-export const getBrokerById = (id: string) => {
-  return brokers.find((b) => b.id === id);
-};
+export const getBrokersByCategory = (category: string) =>
+  getEnabledBrokers().filter((b) => b.category === category);
+
+export const getBrokerById = (id: string) =>
+  brokers.find((b) => b.id === id);
+
+export const REGION_OPTIONS = [
+  { value: "US", label: "United States" },
+  { value: "EU", label: "Europe" },
+  { value: "APAC", label: "Asia-Pacific" },
+  { value: "LATAM", label: "Latin America" },
+  { value: "MENA", label: "Middle East & North Africa" },
+  { value: "Africa", label: "Africa" },
+  { value: "Global", label: "Other / Not sure" },
+] as const;
+
+export function getBrokersForRegion(regionCode: string) {
+  return getEnabledBrokers().filter(
+    (b) =>
+      b.regions.includes("Global") || b.regions.includes(regionCode)
+  );
+}

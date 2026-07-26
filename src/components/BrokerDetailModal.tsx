@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { X, ExternalLink, AlertTriangle, Shield, Wrench } from "lucide-react";
+import { X, ExternalLink, AlertTriangle, Shield, Wrench, Check } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { BrokerConfig } from "@/config/brokers";
 
@@ -27,18 +27,34 @@ export default function BrokerDetailModal({ broker, onClose, onTrackClick }: Pro
     </div>
   );
 
+  const assetLabels: { key: keyof BrokerConfig["supportedAssets"]; label: string }[] = [
+    { key: "stocks", label: "Stocks" },
+    { key: "etfs", label: "ETFs" },
+    { key: "forex", label: "Forex" },
+    { key: "cfds", label: "CFDs" },
+    { key: "crypto", label: "Crypto" },
+    { key: "options", label: "Options" },
+    { key: "commodities", label: "Commodities" },
+    { key: "futures", label: "Futures" },
+    { key: "bonds", label: "Bonds" },
+    { key: "fractionalShares", label: "Fractional Shares" },
+    { key: "mutualFunds", label: "Mutual Funds" },
+  ];
+
+  const supportedAssets = assetLabels.filter((a) => broker.supportedAssets[a.key] === true);
+
   return (
     <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center" onClick={onClose}>
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
       <div
-        className="relative z-10 w-full sm:max-w-lg max-h-[85vh] overflow-y-auto rounded-t-2xl sm:rounded-2xl bg-card border border-border shadow-2xl"
+        className="relative z-10 w-full sm:max-w-lg max-h-[90vh] overflow-y-auto rounded-t-2xl sm:rounded-2xl bg-card border border-border shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="sticky top-0 z-10 bg-card border-b border-border px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={broker.logo} alt={broker.name} className="h-8 w-auto object-contain"
+            <img src={broker.logoPath} alt={broker.name} className="h-8 w-auto object-contain"
               onError={(e) => { e.currentTarget.style.display = "none"; }} />
             <div>
               <h2 className="text-lg font-bold text-foreground">{broker.name}</h2>
@@ -51,8 +67,8 @@ export default function BrokerDetailModal({ broker, onClose, onTrackClick }: Pro
         </div>
 
         <div className="px-6 py-5 space-y-5">
-          {/* Type badge */}
-          <div className="flex items-center gap-2">
+          {/* Badges */}
+          <div className="flex flex-wrap items-center gap-2">
             {broker.type === "broker" ? (
               <Badge variant="outline" className="text-[10px] bg-[#49B06E]/10 text-[#49B06E] border-[#49B06E]/20 gap-1">
                 <Shield className="w-3 h-3" /> Broker
@@ -62,16 +78,23 @@ export default function BrokerDetailModal({ broker, onClose, onTrackClick }: Pro
                 <Wrench className="w-3 h-3" /> Platform
               </Badge>
             )}
-            {broker.demoAvailable && (
+            {broker.paperTrading && (
               <Badge variant="outline" className="text-[10px] bg-[#27B7C8]/10 text-[#27B7C8] border-[#27B7C8]/20">
                 Demo Available
+              </Badge>
+            )}
+            {broker.beginnerFriendly && (
+              <Badge variant="outline" className="text-[10px] bg-[#49B06E]/10 text-[#49B06E] border-[#49B06E]/20">
+                Beginner Friendly
               </Badge>
             )}
           </div>
 
           {/* Overview */}
           <Section title="Overview">
-            <p className="text-sm text-foreground/80 leading-relaxed">{broker.shortDescription}</p>
+            <p className="text-sm text-foreground/80 leading-relaxed">
+              {broker.overview || broker.shortDescription}
+            </p>
           </Section>
 
           {/* Promotion */}
@@ -79,6 +102,46 @@ export default function BrokerDetailModal({ broker, onClose, onTrackClick }: Pro
             <div className="rounded-xl bg-primary/5 border border-primary/20 px-4 py-3">
               <p className="text-xs text-primary leading-relaxed">{broker.promotionText}</p>
             </div>
+          )}
+
+          {/* Strengths */}
+          {broker.strengths.length > 0 && (
+            <Section title="Strengths">
+              <ul className="space-y-1.5">
+                {broker.strengths.map((s) => (
+                  <li key={s} className="flex items-start gap-2 text-sm text-foreground/80">
+                    <Check className="w-4 h-4 text-[#49B06E] mt-0.5 shrink-0" />
+                    {s}
+                  </li>
+                ))}
+              </ul>
+            </Section>
+          )}
+
+          {/* Limitations */}
+          {broker.limitations.length > 0 && (
+            <Section title="Things to Consider">
+              <ul className="space-y-1.5">
+                {broker.limitations.map((l) => (
+                  <li key={l} className="text-sm text-muted-foreground leading-relaxed">
+                    • {l}
+                  </li>
+                ))}
+              </ul>
+            </Section>
+          )}
+
+          {/* Supported assets */}
+          {supportedAssets.length > 0 && (
+            <Section title="Supported Assets">
+              <div className="flex flex-wrap gap-1.5">
+                {supportedAssets.map((a) => (
+                  <span key={a.key} className="rounded-full bg-muted/50 border border-border/50 px-2.5 py-0.5 text-[11px] text-muted-foreground">
+                    {a.label}
+                  </span>
+                ))}
+              </div>
+            </Section>
           )}
 
           {/* Markets */}
@@ -116,8 +179,19 @@ export default function BrokerDetailModal({ broker, onClose, onTrackClick }: Pro
             </div>
           </Section>
 
-          {/* Key Info */}
-          {(broker.minimumDeposit || broker.regulation) && (
+          {/* Regions */}
+          <Section title="Availability">
+            <div className="flex flex-wrap gap-1.5">
+              {broker.regions.map((r) => (
+                <span key={r} className="rounded-full bg-muted/30 border border-border/30 px-2.5 py-0.5 text-[11px] text-muted-foreground">
+                  {r}
+                </span>
+              ))}
+            </div>
+          </Section>
+
+          {/* Key Info grid */}
+          {(broker.minimumDeposit || broker.feeSummary) && (
             <div className="grid grid-cols-2 gap-3">
               {broker.minimumDeposit && (
                 <div className="rounded-lg bg-muted/30 border border-border/30 p-3">
@@ -125,10 +199,10 @@ export default function BrokerDetailModal({ broker, onClose, onTrackClick }: Pro
                   <p className="mt-0.5 font-semibold text-foreground text-sm">{broker.minimumDeposit}</p>
                 </div>
               )}
-              {broker.regulation && (
+              {broker.feeSummary && (
                 <div className="rounded-lg bg-muted/30 border border-border/30 p-3">
-                  <p className="text-[10px] text-muted-foreground/60 uppercase tracking-wider">Regulation</p>
-                  <p className="mt-0.5 font-semibold text-foreground text-sm">{broker.regulation}</p>
+                  <p className="text-[10px] text-muted-foreground/60 uppercase tracking-wider">Fees</p>
+                  <p className="mt-0.5 font-semibold text-foreground text-sm">{broker.feeSummary}</p>
                 </div>
               )}
             </div>
@@ -136,7 +210,7 @@ export default function BrokerDetailModal({ broker, onClose, onTrackClick }: Pro
 
           {/* Important Considerations */}
           <Section title="Important Considerations">
-            <div className="rounded-xl bg-muted/20 border border-border/30 p-3 space-y-2">
+            <div className="rounded-xl bg-muted/20 border border-border/30 p-3">
               <p className="text-xs text-muted-foreground leading-relaxed">
                 Check availability and terms on the provider&apos;s website. Regional restrictions, deposit requirements, fees, and platform features may vary.
               </p>
@@ -160,13 +234,13 @@ export default function BrokerDetailModal({ broker, onClose, onTrackClick }: Pro
 
           {/* CTA */}
           <a
-            href={broker.primaryUrl}
+            href={broker.affiliateUrl}
             target="_blank"
             rel="noopener noreferrer sponsored"
             onClick={onTrackClick}
             className="w-full rounded-xl bg-primary hover:bg-primary/90 px-4 py-3 text-sm font-semibold text-primary-foreground transition-all hover:shadow-lg hover:shadow-primary/20 flex items-center justify-center gap-2"
           >
-            {broker.primaryButtonLabel}
+            Visit {broker.name}
             <ExternalLink className="h-4 w-4" />
           </a>
 

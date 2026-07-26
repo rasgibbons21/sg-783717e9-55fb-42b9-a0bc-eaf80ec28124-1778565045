@@ -71,6 +71,35 @@ export type Database = {
           },
         ]
       }
+      saved_brokers: {
+        Row: {
+          id: string
+          user_id: string
+          broker_id: string
+          saved_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          broker_id: string
+          saved_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          broker_id?: string
+          saved_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_brokers_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       email_logs: {
         Row: {
           created_at: string | null

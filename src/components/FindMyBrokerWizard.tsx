@@ -1,22 +1,33 @@
 import { useState } from "react";
-import { getEnabledBrokers, type BrokerConfig } from "@/config/brokers";
+import { getEnabledBrokers, REGION_OPTIONS, type BrokerConfig } from "@/config/brokers";
 import BrokerCard from "./BrokerCard";
 import { ChevronRight, ChevronLeft, RotateCcw, AlertTriangle } from "lucide-react";
 
-type Step = "region" | "experience" | "interests" | "style" | "demo" | "amount" | "results";
+type Step = "region" | "experience" | "interests" | "results";
 
 interface Answers {
   region: string;
   experience: string;
   interests: string[];
-  style: string;
-  demo: string;
-  amount: string;
 }
 
-const STEPS: Step[] = ["region", "experience", "interests", "style", "demo", "amount", "results"];
+const STEPS: Step[] = ["region", "experience", "interests", "results"];
 
-export default function FindMyBrokerWizard() {
+interface Props {
+  onViewDetail?: (broker: BrokerConfig) => void;
+  onCompare?: (broker: BrokerConfig) => void;
+  compareIds?: Set<string>;
+  savedIds?: Set<string>;
+  onToggleSave?: (id: string) => void;
+}
+
+export default function FindMyBrokerWizard({
+  onViewDetail,
+  onCompare,
+  compareIds,
+  savedIds,
+  onToggleSave,
+}: Props) {
   const [step, setStep] = useState<Step>("region");
   const [answers, setAnswers] = useState<Partial<Answers>>({});
   const allBrokers = getEnabledBrokers();
@@ -38,21 +49,37 @@ export default function FindMyBrokerWizard() {
   const getMatched = (): BrokerConfig[] => {
     const scored = allBrokers.map((broker) => {
       let score = 0;
-      if (answers.experience === "Beginner" && broker.bestFor.some((b) => b.toLowerCase().includes("beginner"))) score += 2;
-      if (answers.experience === "Advanced" && broker.platforms && broker.platforms.length >= 4) score += 2;
+
+      // Region match
+      if (answers.region) {
+        if (broker.regions.includes("Global") || broker.regions.includes(answers.region)) {
+          score += 3;
+        } else {
+          score -= 5;
+        }
+      }
+
+      // Experience
+      if (answers.experience === "Beginner" && broker.beginnerFriendly) score += 3;
+      if (answers.experience === "Beginner" && broker.educationLevel === "strong") score += 1;
+      if (answers.experience === "Advanced" && !broker.beginnerFriendly) score += 2;
+      if (answers.experience === "Advanced" && broker.platforms && broker.platforms.length >= 4) score += 1;
+
+      // Interest matching
       if (answers.interests) {
         score += answers.interests.filter((i) =>
           broker.markets.some((m) => m.toLowerCase().includes(i.toLowerCase()))
           || broker.bestFor.some((b) => b.toLowerCase().includes(i.toLowerCase()))
-        ).length;
+        ).length * 2;
       }
-      if (answers.demo === "Yes" && broker.demoAvailable) score += 2;
-      if (answers.style === "Active Trader" && broker.bestFor.some((b) => b.toLowerCase().includes("active"))) score += 1;
-      if (answers.style === "Long-term Investor" && broker.category === "Stocks & ETFs") score += 2;
+
+      // Demo preference for beginners
+      if (answers.experience === "Beginner" && broker.paperTrading) score += 1;
+
       return { broker, score };
     });
     scored.sort((a, b) => b.score - a.score);
-    return scored.map((s) => s.broker);
+    return scored.filter((s) => s.score > 0).map((s) => s.broker);
   };
 
   if (step === "results") {
@@ -77,11 +104,25 @@ export default function FindMyBrokerWizard() {
           </div>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
-          {matched.map((broker) => (
-            <BrokerCard key={broker.id} broker={broker} />
-          ))}
-        </div>
+        {matched.length > 0 ? (
+          <div className="grid gap-6 md:grid-cols-2">
+            {matched.map((broker) => (
+              <BrokerCard
+                key={broker.id}
+                broker={broker}
+                isSaved={savedIds?.has(broker.id)}
+                onToggleSave={onToggleSave}
+                onCompare={onCompare}
+                isInCompare={compareIds?.has(broker.id)}
+                onViewDetail={onViewDetail}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-8">
+            <p className="text-muted-foreground">No exact matches found. Try broadening your selections.</p>
+          </div>
+        )}
 
         <button
           onClick={reset}
@@ -94,19 +135,23 @@ export default function FindMyBrokerWizard() {
     );
   }
 
-  const OptionBtn = ({ label, onClick }: { label: string; onClick: () => void }) => (
+  const GridBtn = ({ label, onClick, selected }: { label: string; onClick: () => void; selected?: boolean }) => (
     <button
       onClick={onClick}
-      className="w-full rounded-xl border border-border/50 bg-muted/20 px-5 py-3.5 text-left text-sm font-semibold text-foreground transition-all hover:border-primary/50 hover:bg-primary/5"
+      className={`rounded-xl border px-4 py-3.5 text-center text-sm font-semibold transition-all ${
+        selected
+          ? "border-primary bg-primary/15 text-primary"
+          : "border-border/50 bg-muted/20 text-foreground hover:border-primary/50 hover:bg-primary/5"
+      }`}
     >
       {label}
     </button>
   );
 
-  const GridBtn = ({ label, onClick }: { label: string; onClick: () => void }) => (
+  const OptionBtn = ({ label, onClick }: { label: string; onClick: () => void }) => (
     <button
       onClick={onClick}
-      className="rounded-xl border border-border/50 bg-muted/20 px-4 py-3.5 text-center text-sm font-semibold text-foreground transition-all hover:border-primary/50 hover:bg-primary/5"
+      className="w-full rounded-xl border border-border/50 bg-muted/20 px-5 py-3.5 text-left text-sm font-semibold text-foreground transition-all hover:border-primary/50 hover:bg-primary/5"
     >
       {label}
     </button>
@@ -127,8 +172,8 @@ export default function FindMyBrokerWizard() {
             <h2 className="text-xl md:text-2xl font-bold text-foreground">Where are you located?</h2>
             <p className="text-sm text-muted-foreground">Availability varies by region.</p>
             <div className="grid gap-2.5 sm:grid-cols-2">
-              {["Europe", "Asia", "Americas", "Africa", "Oceania", "Other"].map((r) => (
-                <GridBtn key={r} label={r} onClick={() => pick("region", r)} />
+              {REGION_OPTIONS.map((r) => (
+                <GridBtn key={r.value} label={r.label} onClick={() => pick("region", r.value)} />
               ))}
             </div>
           </div>
@@ -139,7 +184,7 @@ export default function FindMyBrokerWizard() {
             <h2 className="text-xl md:text-2xl font-bold text-foreground">What&apos;s your experience level?</h2>
             <p className="text-sm text-muted-foreground">This helps us show platforms suited to your level.</p>
             <div className="space-y-2.5">
-              {["Beginner", "Intermediate", "Advanced", "Professional"].map((l) => (
+              {["Beginner", "Intermediate", "Advanced"].map((l) => (
                 <OptionBtn key={l} label={l} onClick={() => pick("experience", l)} />
               ))}
             </div>
@@ -152,17 +197,12 @@ export default function FindMyBrokerWizard() {
             <p className="text-sm text-muted-foreground">Select all that apply.</p>
             <div className="grid gap-2.5 sm:grid-cols-2">
               {["Stocks", "ETFs", "Forex", "CFDs", "Options", "Futures", "Crypto", "Charting"].map((i) => (
-                <button
+                <GridBtn
                   key={i}
+                  label={i}
+                  selected={answers.interests?.includes(i)}
                   onClick={() => toggle(i)}
-                  className={`rounded-xl border px-4 py-3 text-center text-sm font-semibold transition-all ${
-                    answers.interests?.includes(i)
-                      ? "border-primary bg-primary/15 text-primary"
-                      : "border-border/50 bg-muted/20 text-foreground hover:border-primary/50 hover:bg-primary/5"
-                  }`}
-                >
-                  {i}
-                </button>
+                />
               ))}
             </div>
             <button
@@ -170,43 +210,8 @@ export default function FindMyBrokerWizard() {
               disabled={!answers.interests?.length}
               className="mt-2 w-full rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
-              Continue <ChevronRight className="h-4 w-4" />
+              See Results <ChevronRight className="h-4 w-4" />
             </button>
-          </div>
-        )}
-
-        {step === "style" && (
-          <div className="space-y-4">
-            <h2 className="text-xl md:text-2xl font-bold text-foreground">What&apos;s your trading style?</h2>
-            <div className="space-y-2.5">
-              {["Long-term Investor", "Swing Trader", "Day Trader", "Active Trader", "Not Sure Yet"].map((s) => (
-                <OptionBtn key={s} label={s} onClick={() => pick("style", s)} />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {step === "demo" && (
-          <div className="space-y-4">
-            <h2 className="text-xl md:text-2xl font-bold text-foreground">Do you need a demo account?</h2>
-            <p className="text-sm text-muted-foreground">Practice with virtual funds before trading live.</p>
-            <div className="space-y-2.5">
-              {["Yes", "No", "Not Sure"].map((d) => (
-                <OptionBtn key={d} label={d} onClick={() => pick("demo", d)} />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {step === "amount" && (
-          <div className="space-y-4">
-            <h2 className="text-xl md:text-2xl font-bold text-foreground">Approximate starting amount?</h2>
-            <p className="text-sm text-muted-foreground">This helps filter by deposit requirements.</p>
-            <div className="grid gap-2.5 sm:grid-cols-2">
-              {["Under $100", "$100 - $1,000", "$1,000 - $10,000", "$10,000+"].map((a) => (
-                <GridBtn key={a} label={a} onClick={() => pick("amount", a)} />
-              ))}
-            </div>
           </div>
         )}
       </div>
