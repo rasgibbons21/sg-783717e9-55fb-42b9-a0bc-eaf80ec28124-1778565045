@@ -9,15 +9,20 @@ import { userService } from "@/services/userService";
 import { Check, Loader2, Sparkles } from "lucide-react";
 import { SEO } from "@/components/SEO";
 import { PRO_PLAN } from "@/config/proPlan";
-import { canShowExternalPayment } from "@/lib/payments";
+import { usePaymentProvider } from "@/lib/payments";
 
 export default function SubscriptionOffer() {
   const router = useRouter();
+  const { canShowExternalPayment, canShowInAppPayment } = usePaymentProvider();
   const [isYearly, setIsYearly] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
+    if (canShowInAppPayment) {
+      router.replace("/subscription");
+      return;
+    }
     if (!canShowExternalPayment) {
       router.replace("/home");
       return;
@@ -36,7 +41,7 @@ export default function SubscriptionOffer() {
       }
     };
     checkAuth();
-  }, [router]);
+  }, [router, canShowExternalPayment, canShowInAppPayment]);
 
   const handleSubscribe = async () => {
     setIsProcessing(true);

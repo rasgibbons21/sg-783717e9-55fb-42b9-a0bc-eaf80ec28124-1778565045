@@ -10,12 +10,14 @@ import { userService } from "@/services/userService";
 import { Check, Loader2, AlertCircle, Lock } from "lucide-react";
 import { SEO } from "@/components/SEO";
 import { PRO_PLAN } from "@/config/proPlan";
-import { canShowExternalPayment } from "@/lib/payments";
+import { usePaymentProvider } from "@/lib/payments";
+import GooglePlaySubscription from "@/components/GooglePlaySubscription";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 export default function Subscription() {
   const router = useRouter();
+  const { canShowExternalPayment, canShowInAppPayment } = usePaymentProvider();
   const [isYearly, setIsYearly] = useState(false);
   const [currentPlan, setCurrentPlan] = useState<"free" | "pro">("free");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -103,6 +105,15 @@ export default function Subscription() {
   const monthlyPrice = PRO_PLAN.monthlyPrice;
   const yearlyPrice = PRO_PLAN.yearlyPrice;
   const yearlyMonthly = PRO_PLAN.yearlyMonthly;
+
+  if (canShowInAppPayment) {
+    return (
+      <Layout>
+        <SEO title="Bloom Premium" description="Subscribe to Bloom Premium via Google Play" />
+        <GooglePlaySubscription />
+      </Layout>
+    );
+  }
 
   if (!canShowExternalPayment) {
     return (

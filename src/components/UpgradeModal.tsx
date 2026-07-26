@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Check, Sparkles, X, Lock } from "lucide-react";
 import { useRouter } from "next/router";
 import { PRO_PLAN } from "@/config/proPlan";
-import { canShowExternalPayment } from "@/lib/payments";
+import { usePaymentProvider } from "@/lib/payments";
 
 interface UpgradeModalProps {
   isOpen: boolean;
@@ -16,6 +16,43 @@ interface UpgradeModalProps {
 
 export function UpgradeModal({ isOpen, onClose, trigger = "view_limit" }: UpgradeModalProps) {
   const router = useRouter();
+  const { canShowExternalPayment, canShowInAppPayment } = usePaymentProvider();
+
+  if (canShowInAppPayment) {
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="max-w-md bg-background border-accent">
+          <DialogHeader>
+            <div className="flex items-center justify-between">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-2xl">
+                🌺
+              </div>
+              <Button variant="ghost" size="icon" onClick={onClose}>
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+            <DialogTitle className="font-serif text-2xl text-foreground mt-4">
+              Unlock Bloom Pro
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-muted-foreground">
+            Get unlimited analyses, full lessons, and more with Bloom Pro.
+          </p>
+          <div className="flex gap-3">
+            <Button variant="outline" onClick={onClose} className="flex-1">
+              Maybe later
+            </Button>
+            <Button
+              className="flex-1 bg-accent hover:bg-accent/90 text-accent-foreground"
+              onClick={() => router.push("/subscription")}
+            >
+              View Plans
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   if (!canShowExternalPayment) {
     return (
@@ -130,9 +167,10 @@ export function UpgradeModal({ isOpen, onClose, trigger = "view_limit" }: Upgrad
 
 export function UpgradeBanner({ message, className = "" }: { message: string; className?: string }) {
   const router = useRouter();
+  const { canShowExternalPayment, canShowInAppPayment } = usePaymentProvider();
   const [isVisible, setIsVisible] = useState(true);
 
-  if (!canShowExternalPayment || !isVisible) return null;
+  if ((!canShowExternalPayment && !canShowInAppPayment) || !isVisible) return null;
 
   return (
     <Card className={`p-4 bg-gradient-to-r from-accent/10 to-primary/10 border-accent/30 ${className}`}>
@@ -184,8 +222,10 @@ export function useViewTracker() {
     }
   }, []);
 
+  const { canShowExternalPayment: canShowStripe, canShowInAppPayment: canShowGP } = usePaymentProvider();
+
   const trackView = () => {
-    if (!canShowExternalPayment) return;
+    if (!canShowStripe && !canShowGP) return;
 
     const newCount = viewCount + 1;
     setViewCount(newCount);

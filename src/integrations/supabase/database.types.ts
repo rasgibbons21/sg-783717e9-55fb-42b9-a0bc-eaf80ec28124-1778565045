@@ -234,12 +234,18 @@ export type Database = {
           current_age: number | null
           current_period_end: string | null
           email: string | null
+          entitlement_source: string | null
           experience_level: string | null
           full_name: string | null
+          google_play_acknowledged: boolean | null
+          google_play_base_plan_id: string | null
+          google_play_product_id: string | null
+          google_play_purchase_token: string | null
           id: string
           investment_goals: string[] | null
           is_pro: boolean | null
           is_review_account: boolean
+          last_verification_time: string | null
           notifications_enabled: boolean
           onboarding_complete: boolean
           risk_tolerance: string | null
@@ -255,12 +261,18 @@ export type Database = {
           current_age?: number | null
           current_period_end?: string | null
           email?: string | null
+          entitlement_source?: string | null
           experience_level?: string | null
           full_name?: string | null
+          google_play_acknowledged?: boolean | null
+          google_play_base_plan_id?: string | null
+          google_play_product_id?: string | null
+          google_play_purchase_token?: string | null
           id: string
           investment_goals?: string[] | null
           is_pro?: boolean | null
           is_review_account?: boolean
+          last_verification_time?: string | null
           notifications_enabled?: boolean
           onboarding_complete?: boolean
           risk_tolerance?: string | null
@@ -276,12 +288,18 @@ export type Database = {
           current_age?: number | null
           current_period_end?: string | null
           email?: string | null
+          entitlement_source?: string | null
           experience_level?: string | null
           full_name?: string | null
+          google_play_acknowledged?: boolean | null
+          google_play_base_plan_id?: string | null
+          google_play_product_id?: string | null
+          google_play_purchase_token?: string | null
           id?: string
           investment_goals?: string[] | null
           is_pro?: boolean | null
           is_review_account?: boolean
+          last_verification_time?: string | null
           notifications_enabled?: boolean
           onboarding_complete?: boolean
           risk_tolerance?: string | null
