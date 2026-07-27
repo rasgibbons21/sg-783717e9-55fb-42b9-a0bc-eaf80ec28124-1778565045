@@ -1,5 +1,5 @@
 {
-  "packageId": "app.shebloomswealth",
+  "packageId": "app.shebloomswealth.mobile",
   "host": "shebloomswealth.app",
   "name": "She Blooms Wealth",
   "launcherName": "Bloom",
@@ -30,13 +30,13 @@
     }
   ],
   "signing": {
-    "keystore": "./android.keystore",
-    "keystorePassword": "REPLACE_ME",
-    "alias": "bloom",
-    "aliasPassword": "REPLACE_ME"
+    "keystore": "./signing.keystore",
+    "keystorePassword": "KxOqlCPuZUce",
+    "alias": "my-key-alias",
+    "aliasPassword": "KxOqlCPuZUce"
   },
   "appVersionCode": 2,
-  "appVersionName": "1.1.0",
+  "appVersionName": "1.0.1",
   "signingMode": "releaseKey",
   "isChromeOSOnly": false,
   "fallbackType": "customtabs",

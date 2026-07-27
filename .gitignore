@@ -37,3 +37,8 @@ next-env.d.ts
 
 # firebase
 firebase-service-account.json
+
+# android signing
+signing.keystore
+*.keystore
+android/local.properties
