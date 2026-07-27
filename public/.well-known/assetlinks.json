@@ -3,9 +3,9 @@
     "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "android_app",
-      "package_name": "app.shebloomswealth",
+      "package_name": "app.shebloomswealth.mobile",
       "sha256_cert_fingerprints": [
-        "REPLACE_WITH_SHA256_FINGERPRINT"
+        "C5:56:12:9B:CE:19:29:BC:6C:CD:95:9C:82:2D:E6:FD:C3:93:03:D9:45:5B:4B:1C:CC:B3:BB:E2:A2:07:88:A5"
       ]
     }
   }
