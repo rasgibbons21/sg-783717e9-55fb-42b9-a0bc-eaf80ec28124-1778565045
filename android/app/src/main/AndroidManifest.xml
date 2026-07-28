@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <application
         android:name="app.shebloomswealth.mobile.Application"
@@ -84,6 +85,11 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </service>
+
+        <provider
+            android:name="com.google.androidbrowserhelper.trusted.TwaProviderPicker$$UpdateProvider"
+            android:authorities="${applicationId}.UpdateProvider"
+            tools:node="remove" />
 
     </application>
 
