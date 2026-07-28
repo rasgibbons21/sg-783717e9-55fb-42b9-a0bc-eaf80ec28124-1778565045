@@ -85,16 +85,6 @@
             </intent-filter>
         </service>
 
-        <provider
-            android:name="com.google.androidbrowserhelper.trusted.TwaProviderPicker$$UpdateProvider"
-            android:authorities="${applicationId}.UpdateProvider"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.support.customtabs.trusted.PREINITIALIZE" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </provider>
-
     </application>
 
     <queries>
