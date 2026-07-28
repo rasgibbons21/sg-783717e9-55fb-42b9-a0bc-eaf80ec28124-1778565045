@@ -10,8 +10,8 @@ android {
         applicationId "app.shebloomswealth.mobile"
         minSdk 21
         targetSdk 35
-        versionCode 3
-        versionName "1.0.2"
+        versionCode 5
+        versionName "1.0.4"
 
         manifestPlaceholders = [
             hostName        : "shebloomswealth.app",
@@ -58,4 +58,5 @@ configurations.all {
 dependencies {
     implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.5.0'
     implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'com.android.billingclient:billing:7.1.1'
 }
