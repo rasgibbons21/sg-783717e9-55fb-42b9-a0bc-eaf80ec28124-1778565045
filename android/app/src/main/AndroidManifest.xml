@@ -89,7 +89,7 @@
         <provider
             android:name="com.google.androidbrowserhelper.trusted.TwaProviderPicker$$UpdateProvider"
             android:authorities="${applicationId}.UpdateProvider"
-            tools:node="remove" />
+            android:exported="false" />
 
     </application>
 
