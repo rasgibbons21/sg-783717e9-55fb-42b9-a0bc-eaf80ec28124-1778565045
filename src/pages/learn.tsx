@@ -16,9 +16,10 @@ import { PositionSizeCalculator } from "@/components/PositionSizeCalculator";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { authService } from "@/services/authService";
 import { supabase } from "@/integrations/supabase/client";
-import { Search, ArrowLeft, Clock, CheckCircle2, Circle, ChevronRight, Bookmark, BookmarkCheck, Award, Lock, Building2, BookOpen } from "lucide-react";
+import { Search, ArrowLeft, Clock, CheckCircle2, Circle, ChevronRight, Bookmark, BookmarkCheck, Award, Lock, Building2, BookOpen, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { UpgradeModal } from "@/components/UpgradeModal";
+import { BloomGarden } from "@/components/BloomGarden";
 
 type Category = "All" | "Stocks" | "ETFs" | "Mutual Funds" | "Dividends" | "Bonds" | "Retirement" | "Trading Psychology" | "Income Streams";
 
@@ -2957,19 +2958,46 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
                 </Button>
               ) : (
                 <div className="space-y-4">
-                  <div className="p-4 bg-primary/10 border border-primary/30 rounded-lg text-center">
-                    <Award className="w-8 h-8 text-primary mx-auto mb-2" />
-                    <p className="text-lg font-semibold text-primary mb-1">
-                      You scored {quizScore} out of 3!
-                    </p>
-                    <p className="text-sm text-foreground">
-                      {quizScore === 3
-                        ? "Perfect score girl! You absolutely crushed this lesson 🎉"
-                        : quizScore === 2
-                        ? "Nice work! You got most of it down 💪"
-                        : "That's okay! Go back and review the lesson anytime 💛"}
-                    </p>
+                  <div className="p-6 bg-gradient-to-br from-primary/10 via-accent/5 to-[#EC4899]/10 border border-primary/20 rounded-2xl text-center space-y-3">
+                    <div className="text-5xl" style={{ animation: "gardenBloom 0.6s ease-out" }}>
+                      {quizScore === 3 ? "🌸" : quizScore === 2 ? "🌺" : "🌱"}
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold text-foreground mb-1">
+                        {quizScore === 3 ? "Perfect! You earned a bloom!" : quizScore === 2 ? "Great work! Flower earned!" : "Keep growing!"}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {quizScore}/3 correct — {quizScore === 3
+                          ? "This bloom is now in your garden 🌸"
+                          : quizScore === 2
+                          ? "A new flower joins your garden 💪"
+                          : "Review and try again to earn a bloom 💛"}
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground">
+                      <Sparkles className="w-3.5 h-3.5 text-[#EC4899]" />
+                      <span>{completedLessons.length} flowers in your garden</span>
+                    </div>
                   </div>
+
+                  {(() => {
+                    const currentIdx = lessons.findIndex(l => l.id === selectedLesson);
+                    const nextLesson = currentIdx >= 0 && currentIdx < lessons.length - 1 ? lessons[currentIdx + 1] : null;
+                    return nextLesson ? (
+                      <Button
+                        onClick={() => {
+                          setSelectedLesson(nextLesson.id);
+                          setHasScrolledToBottom(false);
+                          resetQuiz();
+                          window.scrollTo(0, 0);
+                        }}
+                        className="w-full bg-primary hover:bg-primary/90 h-12 text-base font-semibold"
+                      >
+                        Next Lesson: {nextLesson.title} <ChevronRight className="w-5 h-5 ml-1" />
+                      </Button>
+                    ) : null;
+                  })()}
+
                   <Button
                     onClick={resetQuiz}
                     variant="outline"
@@ -2977,6 +3005,12 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
                   >
                     Retake Quiz
                   </Button>
+                  <style jsx global>{`
+                    @keyframes gardenBloom {
+                      from { opacity: 0; transform: scale(0.3) rotate(-20deg); }
+                      to { opacity: 1; transform: scale(1) rotate(0deg); }
+                    }
+                  `}</style>
                 </div>
               )}
             </Card>
@@ -3065,6 +3099,12 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
               {completedLessons.length} of {lessons.length} lessons completed
             </p>
           </Card>
+
+          <BloomGarden
+            completedLessons={completedLessons}
+            totalLessons={lessons.length}
+            lessonNames={lessons.map(l => ({ id: l.id, title: l.title, category: l.category }))}
+          />
 
           <div className="grid grid-cols-2 gap-3">
             <Link href="/university" className="flex items-center gap-3 p-4 rounded-2xl bg-card border border-border hover:border-accent/40 transition-colors">
