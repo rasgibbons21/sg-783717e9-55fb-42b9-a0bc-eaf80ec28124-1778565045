@@ -17,15 +17,21 @@
   "maskableIconUrl": "https://shebloomswealth.app/icon-512.png",
   "shortcuts": [
     {
-      "name": "Learn",
+      "name": "Bloom Basics",
       "shortName": "Learn",
       "url": "/learn",
       "iconUrl": "https://shebloomswealth.app/icon-192.png"
     },
     {
-      "name": "Practice",
+      "name": "Practice Trader",
       "shortName": "Practice",
       "url": "/practice",
+      "iconUrl": "https://shebloomswealth.app/icon-192.png"
+    },
+    {
+      "name": "Ask Pansy",
+      "shortName": "Pansy",
+      "url": "/ask-pansy",
       "iconUrl": "https://shebloomswealth.app/icon-192.png"
     }
   ],
@@ -35,8 +41,8 @@
     "alias": "my-key-alias",
     "aliasPassword": "KxOqlCPuZUce"
   },
-  "appVersionCode": 2,
-  "appVersionName": "1.0.1",
+  "appVersionCode": 3,
+  "appVersionName": "1.1.0",
   "signingMode": "releaseKey",
   "isChromeOSOnly": false,
   "fallbackType": "customtabs",
@@ -46,7 +52,7 @@
     {
       "relation": ["delegate_permission/common.handle_all_urls"],
       "name": "Production",
-      "value": "REPLACE_WITH_SHA256_FINGERPRINT"
+      "value": "C5:56:12:9B:CE:19:29:BC:6C:CD:95:9C:82:2D:E6:FD:C3:93:03:D9:45:5B:4B:1C:CC:B3:BB:E2:A2:07:88:A5"
     }
   ],
   "additionalTrustedOrigins": [],
