@@ -40,8 +40,26 @@ export default function Onboarding() {
   const [resetEmailSent, setResetEmailSent] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  
+
   const submitLock = useRef(false);
+
+  useEffect(() => {
+    (async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("onboarding_complete")
+        .eq("id", session.user.id)
+        .single();
+      if (profile?.onboarding_complete) {
+        router.push("/home");
+      } else {
+        setStep("experience");
+      }
+    })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleAuth = async () => {
     if (submitLock.current) {

@@ -147,7 +147,17 @@ export default function Home() {
       router.push("/");
       return;
     }
-    
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("onboarding_complete")
+      .eq("id", session.user.id)
+      .single();
+    if (profile && !profile.onboarding_complete) {
+      router.push("/onboarding");
+      return;
+    }
+
     // Load complete user profile from users table
     const userProfile = await userService.getCurrentUser();
     setUser(userProfile);
