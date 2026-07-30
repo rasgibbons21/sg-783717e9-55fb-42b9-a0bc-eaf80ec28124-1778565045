@@ -227,22 +227,28 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Confidence tip */}
+            {/* Confidence tip — milestone-aware */}
             <div className="bg-card border border-border rounded-2xl p-4">
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-xl bg-[#49B06E]/10 flex items-center justify-center shrink-0 text-lg">
                   💡
                 </div>
                 <div className="flex-1">
-                  <p className="font-semibold text-sm text-foreground mb-1">Confidence Tip</p>
+                  <p className="font-semibold text-sm text-foreground mb-1">Pansy&apos;s Note</p>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    {completedCount === 0
+                    {streak >= 7
+                      ? `${streak} days straight! You're more consistent than most professional traders. That discipline will serve you well.`
+                      : streak >= 3
+                      ? `${streak}-day streak going! Consistency is the real secret to building wealth — and you've got it.`
+                      : completedCount === 0
                       ? "You don't need to know everything to start. The best investors began exactly where you are now."
                       : completedCount < 5
-                      ? "You've already started — that puts you ahead of most people. Keep showing up."
-                      : completedCount < 15
-                      ? "You're building real knowledge. Every lesson compounds, just like your future investments."
-                      : "You've come so far. Your confidence isn't luck — it's earned through learning."}
+                      ? `${completedCount} lesson${completedCount > 1 ? "s" : ""} done! You've already started — that puts you ahead of most people.`
+                      : completedCount < 12
+                      ? `${completedCount} lessons and growing! You're in the Sprout stage now — real knowledge is taking root.`
+                      : completedCount < 22
+                      ? "You're in the Grow stage. Every lesson compounds, just like your future investments will."
+                      : "Full Bloom! Your confidence isn't luck — it's earned through every single lesson."}
                   </p>
                 </div>
               </div>
