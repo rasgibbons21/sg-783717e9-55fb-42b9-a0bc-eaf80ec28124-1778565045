@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { X, RefreshCw, ChevronDown, ChevronUp, Sparkles } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Props {
   buyingPower: number;
@@ -115,9 +116,12 @@ export function OrderTicket({ buyingPower, onClose, onPlaced }: Props) {
     setPlacing(true);
     setErr("");
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) { setErr("Session expired — please sign in again."); setPlacing(false); return; }
       const res = await fetch("/api/practice/trades", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({
           ticker: ticker.toUpperCase().trim(),
           direction,
