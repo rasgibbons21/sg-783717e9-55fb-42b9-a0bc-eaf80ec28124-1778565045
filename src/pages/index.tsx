@@ -517,8 +517,8 @@ export default function LandingPage() {
             {[
               { icon:"🔒", title:"Secure & Private",       body:"Your data is safe." },
               { icon:"📚", title:"Educational Platform",   body:"Not financial advice." },
-              { icon:"🌸", title:"Trusted by Women",       body:"Like you." },
-              { icon:"⭐", title:"4.9 / 5 Rating",         body:"From 10,000+ learners." },
+              { icon:"🌸", title:"Built for Women",         body:"Like you." },
+              { icon:"🌱", title:"Start Free Today",       body:"No credit card needed." },
             ].map((t, i) => (
               <div key={i} style={{ display:"flex", alignItems:"center", gap:8 }}>
                 {i > 0 && <div className="hidden sm:block" style={{ width:1, height:22, background:"rgba(255,255,255,0.08)", marginRight:8 }} />}
@@ -891,7 +891,7 @@ export default function LandingPage() {
               <span>·</span>
               <span>📚 Educational Platform — Not Financial Advice</span>
               <span>·</span>
-              <span>🌸 Trusted by Women</span>
+              <span>🌸 Built for Women</span>
             </div>
             <p className="text-sm italic pt-4" style={{ color:"rgba(244,247,250,0.40)" }}>
               &ldquo;Knowledge is the seed. Confidence is the bloom. Wealth is the harvest.&rdquo; — Pansy
