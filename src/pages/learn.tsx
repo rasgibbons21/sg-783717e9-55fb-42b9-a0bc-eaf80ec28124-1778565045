@@ -16,7 +16,8 @@ import { PositionSizeCalculator } from "@/components/PositionSizeCalculator";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { authService } from "@/services/authService";
 import { supabase } from "@/integrations/supabase/client";
-import { Search, ArrowLeft, Clock, CheckCircle2, Circle, ChevronRight, Bookmark, BookmarkCheck, Award, Lock } from "lucide-react";
+import { Search, ArrowLeft, Clock, CheckCircle2, Circle, ChevronRight, Bookmark, BookmarkCheck, Award, Lock, Building2, BookOpen } from "lucide-react";
+import Link from "next/link";
 import { UpgradeModal } from "@/components/UpgradeModal";
 
 type Category = "All" | "Stocks" | "ETFs" | "Mutual Funds" | "Dividends" | "Bonds" | "Retirement" | "Trading Psychology" | "Income Streams";
@@ -3064,6 +3065,23 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
               {completedLessons.length} of {lessons.length} lessons completed
             </p>
           </Card>
+
+          <div className="grid grid-cols-2 gap-3">
+            <Link href="/university" className="flex items-center gap-3 p-4 rounded-2xl bg-card border border-border hover:border-accent/40 transition-colors">
+              <BookOpen className="w-5 h-5 text-accent shrink-0" />
+              <div>
+                <p className="text-sm font-semibold text-foreground">Bloom University</p>
+                <p className="text-xs text-muted-foreground">Structured modules</p>
+              </div>
+            </Link>
+            <Link href="/brokers" className="flex items-center gap-3 p-4 rounded-2xl bg-card border border-border hover:border-accent/40 transition-colors">
+              <Building2 className="w-5 h-5 text-accent shrink-0" />
+              <div>
+                <p className="text-sm font-semibold text-foreground">Find a Broker</p>
+                <p className="text-xs text-muted-foreground">Compare platforms</p>
+              </div>
+            </Link>
+          </div>
 
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
