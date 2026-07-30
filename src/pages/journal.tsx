@@ -460,14 +460,27 @@ export default function JournalPage(_props: PageProps) {
               )}
 
               {entries.length === 0 ? (
-                <div className="text-center py-16 text-[#F4F7FA]/30 text-sm">
-                  {ticker || grade !== "all" || direction !== "all" || range !== "all"
-                    ? "No entries match your filters."
-                    : "No journal entries yet. Close a trade to generate your first review."}
-                  {entries.length === 0 && !ticker && grade === "all" && (
-                    <div className="mt-4">
-                      <Link href="/practice" className="text-[#27B7C8] hover:underline text-xs">Go to Practice Trader →</Link>
-                    </div>
+                <div className="flex flex-col items-center py-16 text-center">
+                  {ticker || grade !== "all" || direction !== "all" || range !== "all" ? (
+                    <>
+                      <Search className="w-10 h-10 text-[#F4F7FA]/15 mb-4" />
+                      <p className="text-sm text-[#F4F7FA]/40">No entries match your filters.</p>
+                    </>
+                  ) : (
+                    <>
+                      <div className="w-14 h-14 rounded-full bg-[#27B7C8]/10 flex items-center justify-center mb-4">
+                        <NotebookPen className="w-6 h-6 text-[#27B7C8]/60" />
+                      </div>
+                      <p className="text-sm font-medium text-[#F4F7FA]/50 mb-1">No journal entries yet</p>
+                      <p className="text-xs text-[#F4F7FA]/30 max-w-[260px] mb-5">
+                        Close a practice trade and Pansy will generate your first review automatically.
+                      </p>
+                      <Link href="/practice"
+                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold bg-[#27B7C8]/15 text-[#27B7C8] border border-[#27B7C8]/25 hover:bg-[#27B7C8]/25 transition-colors">
+                        <TrendingUp className="w-3.5 h-3.5" />
+                        Go to Practice Trader
+                      </Link>
+                    </>
                   )}
                 </div>
               ) : (
