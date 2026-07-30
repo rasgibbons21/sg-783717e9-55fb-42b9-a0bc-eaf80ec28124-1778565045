@@ -316,6 +316,56 @@ export function OrderTicket({ buyingPower, onClose, onPlaced }: Props) {
                 )}
               </div>
 
+              {/* Pansy trade coaching */}
+              {(() => {
+                const tips: { text: string; severity: "warn" | "tip" | "good" }[] = [];
+
+                const bpPct = price > 0 && sh > 0 ? (cost / buyingPower) * 100 : 0;
+                if (bpPct > 50) tips.push({ text: `You're putting ${Math.round(bpPct)}% of your buying power into one trade. Consider sizing down — most pros risk 1-5% per trade.`, severity: "warn" });
+                else if (bpPct > 25) tips.push({ text: `${Math.round(bpPct)}% of buying power on one trade is aggressive. Make sure you're comfortable with the risk.`, severity: "tip" });
+
+                if (sh > 0 && stopN <= 0) tips.push({ text: "No stop loss = no exit plan. Every trade needs a level where your thesis is wrong.", severity: "warn" });
+                if (stopN > 0 && !stopSideOk) tips.push({ text: `Your stop is on the wrong side of entry. ${direction === "long" ? "For a long, stop goes below entry." : "For a short, stop goes above entry."}`, severity: "warn" });
+                if (stopN > 0 && stopSideOk && price > 0) {
+                  const stopPct = Math.abs(price - stopN) / price * 100;
+                  if (stopPct > 20) tips.push({ text: `Your stop is ${stopPct.toFixed(1)}% away — that's a wide stop. Are you sure you want that much risk per share?`, severity: "tip" });
+                  else if (stopPct < 1) tips.push({ text: `Stop is only ${stopPct.toFixed(1)}% away — very tight. You might get stopped out by normal price movement.`, severity: "tip" });
+                }
+
+                if (rr != null && rr < 1) tips.push({ text: `R/R is 1:${rr.toFixed(1)} — you're risking more than you could gain. Aim for at least 1:1.5.`, severity: "warn" });
+                else if (rr != null && rr >= 1 && rr < 1.5) tips.push({ text: `R/R is 1:${rr.toFixed(1)} — not bad, but 1:2 or better gives you room to be wrong and still profit overall.`, severity: "tip" });
+                else if (rr != null && rr >= 2) tips.push({ text: `R/R of 1:${rr.toFixed(1)} — solid setup! Even if you're wrong half the time, the math works in your favor.`, severity: "good" });
+
+                if (sh > 0 && !showThesis) tips.push({ text: "Write a thesis! Trades without a plan are just gambling. What has to be true for this to work?", severity: "tip" });
+
+                if (dollarRisk != null && dollarRisk > buyingPower * 0.05) tips.push({ text: `You're risking $${dollarRisk.toFixed(2)} (${((dollarRisk / buyingPower) * 100).toFixed(1)}% of your account). Most pros keep risk under 2% per trade.`, severity: "warn" });
+
+                if (tips.length === 0) return null;
+
+                return (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-sm">🌺</span>
+                      <span className="text-[10px] font-semibold text-accent/70 uppercase tracking-wider">Pansy&apos;s Notes</span>
+                    </div>
+                    {tips.map((tip, i) => (
+                      <div
+                        key={i}
+                        className="flex items-start gap-2 rounded-lg px-3 py-2 text-xs leading-relaxed"
+                        style={{
+                          background: tip.severity === "warn" ? "rgba(239,68,68,0.08)" : tip.severity === "good" ? "rgba(132,204,22,0.08)" : "rgba(39,183,200,0.08)",
+                          border: `1px solid ${tip.severity === "warn" ? "rgba(239,68,68,0.15)" : tip.severity === "good" ? "rgba(132,204,22,0.15)" : "rgba(39,183,200,0.15)"}`,
+                          color: tip.severity === "warn" ? "#fca5a5" : tip.severity === "good" ? "#bef264" : "rgba(255,255,255,0.6)",
+                        }}
+                      >
+                        <span className="shrink-0 mt-0.5">{tip.severity === "warn" ? "⚠️" : tip.severity === "good" ? "✅" : "💡"}</span>
+                        <span>{tip.text}</span>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
+
               {err && <p className="text-sm text-destructive bg-destructive/10 rounded-lg px-3 py-2">{err}</p>}
             </>
           )}
