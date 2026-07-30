@@ -4,19 +4,14 @@
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { Layout } from "@/components/Layout";
-import { SEO } from "@/components/SEO";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { authService } from "@/services/authService";
 import { userService } from "@/services/userService";
 import { supabase } from "@/integrations/supabase/client";
 import { canShowExternalPayment } from "@/lib/payments";
-import { Loader2, Eye, EyeOff } from "lucide-react";
+import { Loader2, Eye, EyeOff, ChevronRight, Sparkles, Shield, Target, Flame, TrendingUp, Landmark, Wallet, ArrowLeft } from "lucide-react";
 
 type Step = "auth" | "check-email" | "experience" | "goals" | "risk";
 type AuthMode = "signup" | "login" | "forgot";
@@ -40,6 +35,7 @@ export default function Onboarding() {
   const [resetEmailSent, setResetEmailSent] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [animateIn, setAnimateIn] = useState(false);
 
   const submitLock = useRef(false);
 
@@ -61,18 +57,23 @@ export default function Onboarding() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    setAnimateIn(false);
+    const t = requestAnimationFrame(() => setAnimateIn(true));
+    return () => cancelAnimationFrame(t);
+  }, [step]);
+
+  const goToStep = (next: Step) => {
+    setStep(next);
+  };
+
   const handleAuth = async () => {
-    if (submitLock.current) {
-      console.log("🔒 Auth submission blocked: already processing");
-      return;
-    }
-    
+    if (submitLock.current) return;
     submitLock.current = true;
     setError("");
     setIsSubmitting(true);
 
     try {
-      // Basic validation
       if (!email || !email.includes("@")) {
         setError("Please enter a valid email address");
         submitLock.current = false;
@@ -82,21 +83,18 @@ export default function Onboarding() {
 
       if (authMode === "forgot") {
         const { error: resetError } = await authService.resetPassword(email);
-        
         if (resetError) {
           setError(resetError.message);
           submitLock.current = false;
           setIsSubmitting(false);
           return;
         }
-
         setResetEmailSent(true);
         submitLock.current = false;
         setIsSubmitting(false);
         return;
       }
 
-      // At this point, authMode is either "signup" or "login" (forgot was handled above)
       if (password.length < 6) {
         setError("Password must be at least 6 characters long");
         submitLock.current = false;
@@ -111,23 +109,19 @@ export default function Onboarding() {
           setIsSubmitting(false);
           return;
         }
-
         if (!termsAccepted) {
           setError("Please accept the Terms of Service and Privacy Policy to continue");
           submitLock.current = false;
           setIsSubmitting(false);
           return;
         }
-
         const { user, error: signupError } = await authService.signUp(email, password, fullName);
-        
         if (signupError) {
           setError(signupError.message);
           submitLock.current = false;
           setIsSubmitting(false);
           return;
         }
-
         if (user) {
           await userService.updateUser(user.id, { full_name: fullName });
           setSignupSuccess(true);
@@ -137,16 +131,13 @@ export default function Onboarding() {
         }
       } else {
         const { user, error: loginError } = await authService.signIn(email, password);
-        
         if (loginError) {
           setError(loginError.message);
           submitLock.current = false;
           setIsSubmitting(false);
           return;
         }
-
         if (user) {
-          // Do not release lock here, let it transition to /home
           router.push("/home");
         }
       }
@@ -175,14 +166,12 @@ export default function Onboarding() {
 
   const handleCompleteOnboarding = async () => {
     setIsSubmitting(true);
-
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         setError("Session expired — please sign in again.");
         return;
       }
-
       const { error: saveError } = await supabase.from("profiles").upsert({
         id: user.id,
         experience_level: experience,
@@ -190,13 +179,11 @@ export default function Onboarding() {
         risk_tolerance: risk,
         onboarding_complete: true,
       });
-
       if (saveError) {
         console.error("Failed to save onboarding profile:", saveError);
         setError("We couldn't save your answers. Please try again.");
         return;
       }
-
       window.location.href = canShowExternalPayment ? "/subscription-offer" : "/home";
     } catch (err) {
       console.error("Onboarding error:", err);
@@ -206,554 +193,672 @@ export default function Onboarding() {
     }
   };
 
+  const onboardingSteps = ["experience", "goals", "risk"] as const;
+  const currentStepIndex = onboardingSteps.indexOf(step as any);
+  const isOnboardingStep = currentStepIndex >= 0;
+
+  const glassCard = "relative backdrop-blur-xl border border-white/[0.08] rounded-3xl overflow-hidden";
+  const glassCardBg = "bg-white/[0.04]";
+  const glowBorder = "shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05),0_0_20px_rgba(39,183,200,0.08)]";
+
   if (signupSuccess) {
     return (
-      <div style={{textAlign:'center', padding:40}}>
-        <div style={{fontSize:60}}>🌸</div>
-        <h2>Check your email!</h2>
-        <p>We sent a confirmation link to <strong>{email}</strong></p>
-        <p>Click the link to activate your account.</p>
-        <p style={{color:'#666', fontSize:12}}>Don't forget to check your spam folder 🌸</p>
-      </div>
+      <>
+        <style jsx global>{`
+          @keyframes float1 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(30px,-40px) scale(1.1); } }
+          @keyframes float2 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-40px,30px) scale(1.15); } }
+          @keyframes fadeSlideUp { from { opacity:0; transform: translateY(24px); } to { opacity:1; transform: translateY(0); } }
+          @keyframes pulse-glow { 0%,100% { box-shadow: 0 0 20px rgba(39,183,200,0.15); } 50% { box-shadow: 0 0 40px rgba(39,183,200,0.3); } }
+        `}</style>
+        <div className="fixed inset-0 overflow-hidden" style={{ background: "linear-gradient(135deg, #0E1B30 0%, #0a1525 40%, #0d1f35 70%, #0E1B30 100%)" }}>
+          <div className="absolute w-[500px] h-[500px] rounded-full opacity-30 blur-[120px]" style={{ background: "radial-gradient(circle, #27B7C8 0%, transparent 70%)", top: "-10%", right: "-10%", animation: "float1 15s ease-in-out infinite" }} />
+          <div className="absolute w-[400px] h-[400px] rounded-full opacity-20 blur-[100px]" style={{ background: "radial-gradient(circle, #49B06E 0%, transparent 70%)", bottom: "10%", left: "-5%", animation: "float2 18s ease-in-out infinite" }} />
+          <div className="flex items-center justify-center min-h-screen p-6">
+            <div className="text-center space-y-6" style={{ animation: "fadeSlideUp 0.8s ease-out" }}>
+              <div className="w-24 h-24 mx-auto rounded-full flex items-center justify-center text-5xl" style={{ background: "linear-gradient(135deg, rgba(39,183,200,0.2), rgba(73,176,110,0.2))", animation: "pulse-glow 3s ease-in-out infinite" }}>
+                🌸
+              </div>
+              <h2 className="font-serif text-4xl font-bold text-[#F4F7FA]">Check your email!</h2>
+              <p className="text-[#F4F7FA]/60 text-lg max-w-sm mx-auto">
+                We sent a confirmation link to <strong className="text-[#27B7C8]">{email}</strong>. Click to activate your account.
+              </p>
+              <p className="text-[#F4F7FA]/40 text-sm">Don&apos;t forget to check your spam folder 🌸</p>
+            </div>
+          </div>
+        </div>
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        {step === "auth" && (
-          <div className="space-y-6">
-            <div className="text-center space-y-4">
-              <img
-                src="/bloom-logo.png"
-                alt="Bloom Logo"
-                className="w-24 h-24 mx-auto rounded-full object-cover"
-              />
-              
-              <h1 className="font-serif text-5xl font-bold text-foreground">
-                Bloom
-              </h1>
-              
-              <p className="text-xl text-muted-foreground font-medium">
-                Invest in yourself first 🌸
-              </p>
-            </div>
+    <>
+      <style jsx global>{`
+        @keyframes float1 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(30px,-40px) scale(1.1); } }
+        @keyframes float2 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-40px,30px) scale(1.15); } }
+        @keyframes float3 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(20px,40px) scale(1.05); } }
+        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+        @keyframes fadeSlideUp { from { opacity:0; transform: translateY(24px); } to { opacity:1; transform: translateY(0); } }
+        @keyframes scaleIn { from { opacity:0; transform: scale(0.92); } to { opacity:1; transform: scale(1); } }
+        @keyframes pulse-glow { 0%,100% { box-shadow: 0 0 20px rgba(39,183,200,0.15); } 50% { box-shadow: 0 0 40px rgba(39,183,200,0.3); } }
+        @keyframes cardEntrance { from { opacity:0; transform: translateY(30px) scale(0.95); } to { opacity:1; transform: translateY(0) scale(1); } }
+        @keyframes selectPop { 0% { transform: scale(1); } 50% { transform: scale(1.03); } 100% { transform: scale(1); } }
 
-            {/* Pansy's Intro Card */}
-            <Card className="border-accent bg-gradient-to-br from-accent/20 to-background p-8">
-              <div className="flex items-start gap-4">
-                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-accent to-primary text-3xl shadow-lg">
-                  🌺
-                </div>
-                <div className="flex-1 space-y-4">
-                  <div>
-                    <h3 className="mb-1 font-serif text-xl font-semibold text-primary">
-                      Hi! I'm Pansy
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      Bloom's Investing Expert
-                    </p>
-                  </div>
-                  <p className="leading-relaxed text-foreground">
-                    I&apos;m Pansy, your guide here — I&apos;ll break investing
-                    down in a way that actually makes sense. I won&apos;t pretend
-                    to have every answer, and I&apos;ll tell you when something&apos;s
-                    uncertain. No confusing terms, no pressure — just clear, honest
-                    help with your money 💛
-                  </p>
-                </div>
-              </div>
-            </Card>
+        .glass-input {
+          background: rgba(255,255,255,0.04) !important;
+          border-color: rgba(255,255,255,0.08) !important;
+          color: #F4F7FA !important;
+          border-radius: 16px !important;
+          backdrop-filter: blur(10px);
+          transition: all 0.3s ease;
+        }
+        .glass-input:focus {
+          border-color: rgba(39,183,200,0.4) !important;
+          box-shadow: 0 0 0 3px rgba(39,183,200,0.1), 0 0 20px rgba(39,183,200,0.1) !important;
+          background: rgba(255,255,255,0.06) !important;
+        }
+        .glass-input::placeholder { color: rgba(244,247,250,0.3) !important; }
 
-            {/* Terms & Privacy Checkbox */}
-            <Card className="p-6">
-              <div className="flex items-start gap-3">
-                <Checkbox
-                  id="terms"
-                  checked={termsAccepted}
-                  onCheckedChange={(checked) => setTermsAccepted(checked as boolean)}
-                  className="mt-1"
-                />
-                <Label htmlFor="terms" className="cursor-pointer text-sm leading-relaxed text-foreground">
-                  I agree to the{" "}
-                  <Link href="/terms" target="_blank" className="text-primary underline hover:text-primary/80">
-                    Terms of Service
-                  </Link>{" "}
-                  and{" "}
-                  <Link href="/privacy" target="_blank" className="text-primary underline hover:text-primary/80">
-                    Privacy Policy
-                  </Link>
-                </Label>
-              </div>
-            </Card>
+        .glass-btn {
+          position: relative;
+          overflow: hidden;
+          background: linear-gradient(135deg, #49B06E, #27B7C8);
+          border: none;
+          border-radius: 16px;
+          color: #0E1B30;
+          font-weight: 700;
+          padding: 14px 24px;
+          font-size: 16px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          width: 100%;
+        }
+        .glass-btn::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%);
+          background-size: 200% 100%;
+          animation: shimmer 3s ease-in-out infinite;
+        }
+        .glass-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 30px rgba(39,183,200,0.3); }
+        .glass-btn:active { transform: translateY(0); }
+        .glass-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
 
-            <Card className="p-6 bg-card border-border rounded-2xl">
-              <div className="space-y-4">
-                {authMode !== "forgot" && (
-                  <div className="flex gap-2 p-1 bg-muted rounded-xl">
-                    <Button
-                      type="button"
-                      variant={authMode === "signup" ? "default" : "ghost"}
-                      className="flex-1 rounded-lg"
-                      onClick={() => {
-                        setAuthMode("signup");
-                        setResetEmailSent(false);
-                        setError("");
-                      }}
-                    >
-                      Sign Up
-                    </Button>
-                    <Button
-                      type="button"
-                      variant={authMode === "login" ? "default" : "ghost"}
-                      className="flex-1 rounded-lg"
-                      onClick={() => {
-                        setAuthMode("login");
-                        setResetEmailSent(false);
-                        setError("");
-                      }}
-                    >
-                      Log In
-                    </Button>
-                  </div>
-                )}
+        .step-animate { animation: fadeSlideUp 0.6s ease-out both; }
 
-                {authMode === "forgot" && !resetEmailSent && (
-                  <div className="space-y-2">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      className="mb-2"
-                      onClick={() => {
-                        setAuthMode("login");
-                        setResetEmailSent(false);
-                        setError("");
-                      }}
-                    >
-                      ← Back to Log In
-                    </Button>
-                    <h3 className="font-serif text-xl font-bold text-foreground">
-                      Reset Your Password
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      Enter your email and we'll send you instructions to reset your password.
-                    </p>
-                  </div>
-                )}
+        .option-card {
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          cursor: pointer;
+        }
+        .option-card:hover { transform: translateY(-2px); }
+        .option-card.selected { animation: selectPop 0.35s ease-out; }
+      `}</style>
 
-                {authMode === "forgot" && resetEmailSent ? (
-                  <div className="space-y-4 py-4">
-                    <div className="w-16 h-16 rounded-full bg-accent/20 mx-auto flex items-center justify-center">
-                      <span className="text-3xl">📧</span>
-                    </div>
-                    <div className="text-center space-y-2">
-                      <h3 className="font-serif text-xl font-bold text-foreground">
-                        Check Your Email
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        We've sent password reset instructions to <strong>{email}</strong>. 
-                        Check your inbox (and spam folder just in case) 💛
-                      </p>
-                    </div>
-                    <Button
-                      type="button"
-                      onClick={() => {
-                        setAuthMode("login");
-                        setResetEmailSent(false);
-                        setEmail("");
-                      }}
-                      className="w-full rounded-xl"
-                    >
-                      Back to Log In
-                    </Button>
-                  </div>
-                ) : (
-                  <>
-                    {authMode === "signup" && (
-                      <div className="space-y-2">
-                        <Label htmlFor="fullName" className="text-foreground">Full Name</Label>
-                        <Input
-                          id="fullName"
-                          type="text"
-                          placeholder="Jane Doe"
-                          value={fullName}
-                          onChange={(e) => setFullName(e.target.value)}
-                          disabled={isSubmitting}
-                          className="bg-popover border-border rounded-xl"
+      <div className="fixed inset-0 overflow-hidden" style={{ background: "linear-gradient(135deg, #0E1B30 0%, #0a1525 40%, #0d1f35 70%, #0E1B30 100%)" }}>
+        {/* Animated floating orbs */}
+        <div className="absolute w-[500px] h-[500px] rounded-full opacity-30 blur-[120px]" style={{ background: "radial-gradient(circle, #27B7C8 0%, transparent 70%)", top: "-10%", right: "-10%", animation: "float1 15s ease-in-out infinite" }} />
+        <div className="absolute w-[400px] h-[400px] rounded-full opacity-20 blur-[100px]" style={{ background: "radial-gradient(circle, #49B06E 0%, transparent 70%)", bottom: "10%", left: "-5%", animation: "float2 18s ease-in-out infinite" }} />
+        <div className="absolute w-[350px] h-[350px] rounded-full opacity-15 blur-[100px]" style={{ background: "radial-gradient(circle, #8B5CF6 0%, transparent 70%)", top: "40%", left: "60%", animation: "float3 20s ease-in-out infinite" }} />
+
+        <div className="relative z-10 flex flex-col min-h-screen overflow-y-auto">
+          {/* Progress bar for onboarding steps */}
+          {isOnboardingStep && (
+            <div className="sticky top-0 z-20 px-6 pt-4 pb-2">
+              <div className="max-w-md mx-auto">
+                <div className="flex items-center justify-between mb-3">
+                  <button
+                    onClick={() => {
+                      if (step === "goals") goToStep("experience");
+                      else if (step === "risk") goToStep("goals");
+                    }}
+                    className={`flex items-center gap-1 text-sm text-[#F4F7FA]/50 hover:text-[#F4F7FA]/80 transition-colors ${step === "experience" ? "invisible" : ""}`}
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    Back
+                  </button>
+                  <div className="flex items-center gap-2">
+                    {onboardingSteps.map((s, i) => (
+                      <div key={s} className="flex items-center gap-2">
+                        <div
+                          className="w-2.5 h-2.5 rounded-full transition-all duration-500"
+                          style={{
+                            background: i <= currentStepIndex
+                              ? "linear-gradient(135deg, #49B06E, #27B7C8)"
+                              : "rgba(255,255,255,0.15)",
+                            boxShadow: i <= currentStepIndex ? "0 0 8px rgba(39,183,200,0.4)" : "none",
+                            transform: i === currentStepIndex ? "scale(1.3)" : "scale(1)",
+                          }}
                         />
-                      </div>
-                    )}
-
-                    <div className="space-y-2">
-                      <Label htmlFor="email" className="text-foreground">Email</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="jane@example.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        disabled={isSubmitting}
-                        className="bg-popover border-border rounded-xl"
-                      />
-                    </div>
-
-                    {authMode !== "forgot" && (
-                      <div className="space-y-2">
-                        <Label htmlFor="password" className="text-foreground">Password</Label>
-                        <div className="flex items-stretch">
-                          <Input
-                            id="password"
-                            type={showPassword ? "text" : "password"}
-                            placeholder="••••••••"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                            className="pl-10 pr-10"
+                        {i < onboardingSteps.length - 1 && (
+                          <div
+                            className="w-8 h-0.5 rounded-full transition-all duration-500"
+                            style={{ background: i < currentStepIndex ? "linear-gradient(90deg, #49B06E, #27B7C8)" : "rgba(255,255,255,0.08)" }}
                           />
-                          <button
-                            type="button"
-                            onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                          >
-                            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                          </button>
-                        </div>
-                        {authMode === "login" && (
-                          <div className="text-right">
-                            <Link href="/forgot-password" className="text-sm text-accent hover:text-accent/80 font-medium">
-                              Forgot password?
-                            </Link>
-                          </div>
                         )}
                       </div>
-                    )}
+                    ))}
+                  </div>
+                  <span className="text-xs text-[#F4F7FA]/30 font-medium">{currentStepIndex + 1}/3</span>
+                </div>
+                {/* Glass progress bar */}
+                <div className="h-1 rounded-full overflow-hidden backdrop-blur-xl border border-white/[0.08]" style={{ background: "rgba(255,255,255,0.04)" }}>
+                  <div
+                    className="h-full rounded-full transition-all duration-700 ease-out"
+                    style={{
+                      width: `${((currentStepIndex + 1) / onboardingSteps.length) * 100}%`,
+                      background: "linear-gradient(90deg, #49B06E, #27B7C8)",
+                      boxShadow: "0 0 12px rgba(39,183,200,0.4)",
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
 
-                    {error && (
-                      <Card className="p-4 bg-destructive/10 border-destructive rounded-xl">
-                        <p className="text-sm text-destructive font-medium">{error}</p>
-                      </Card>
-                    )}
+          <div className="flex-1 flex items-center justify-center p-6">
+            <div className="w-full max-w-md">
+              {/* ═══════════ AUTH STEP ═══════════ */}
+              {step === "auth" && (
+                <div className={`space-y-6 ${animateIn ? "step-animate" : "opacity-0"}`}>
+                  {/* Logo & tagline */}
+                  <div className="text-center space-y-4">
+                    <div className="relative inline-block">
+                      <img
+                        src="/bloom-logo.png"
+                        alt="Bloom Logo"
+                        className="w-20 h-20 mx-auto rounded-2xl object-cover"
+                        style={{ boxShadow: "0 0 40px rgba(39,183,200,0.2)" }}
+                      />
+                      <div className="absolute -inset-2 rounded-2xl opacity-50" style={{ background: "linear-gradient(135deg, rgba(39,183,200,0.15), rgba(73,176,110,0.15))", filter: "blur(10px)", zIndex: -1 }} />
+                    </div>
+                    <h1 className="font-serif text-5xl font-bold text-[#F4F7FA]">Bloom</h1>
+                    <p className="text-lg text-[#F4F7FA]/50 font-medium">Invest in yourself first 🌸</p>
+                  </div>
 
-                    <Button
-                      type="button"
-                      onClick={handleAuth}
-                      disabled={
-                        isSubmitting || 
-                        !email || 
-                        (authMode !== "forgot" && !password) || 
-                        (authMode === "signup" && !fullName) ||
-                        (authMode === "signup" && !termsAccepted)
-                      }
-                      className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-12 rounded-xl"
-                    >
-                      {isSubmitting ? (
-                        <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Processing...</>
-                      ) : authMode === "signup" ? (
-                        "Create Account"
-                      ) : authMode === "login" ? (
-                        "Log In"
+                  {/* Pansy glass card */}
+                  <div className={`${glassCard} ${glassCardBg} ${glowBorder} p-6`}>
+                    <div className="absolute inset-0 rounded-3xl" style={{ background: "linear-gradient(135deg, rgba(39,183,200,0.06) 0%, transparent 50%, rgba(73,176,110,0.04) 100%)" }} />
+                    <div className="relative flex items-start gap-4">
+                      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-2xl" style={{ background: "linear-gradient(135deg, rgba(39,183,200,0.2), rgba(73,176,110,0.2))", boxShadow: "0 0 20px rgba(39,183,200,0.15)" }}>
+                        🌺
+                      </div>
+                      <div className="flex-1 space-y-2">
+                        <div>
+                          <h3 className="font-serif text-lg font-semibold text-[#27B7C8]">Hi! I&apos;m Pansy</h3>
+                          <p className="text-xs text-[#F4F7FA]/40">Bloom&apos;s Investing Expert</p>
+                        </div>
+                        <p className="text-sm leading-relaxed text-[#F4F7FA]/70">
+                          I&apos;ll break investing down in a way that actually makes sense. No confusing terms, no pressure — just clear, honest help with your money 💛
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Terms glass card */}
+                  <div className={`${glassCard} ${glassCardBg} p-4`}>
+                    <div className="flex items-start gap-3">
+                      <Checkbox
+                        id="terms"
+                        checked={termsAccepted}
+                        onCheckedChange={(checked) => setTermsAccepted(checked as boolean)}
+                        className="mt-0.5 border-white/20 data-[state=checked]:bg-[#27B7C8] data-[state=checked]:border-[#27B7C8]"
+                      />
+                      <Label htmlFor="terms" className="cursor-pointer text-sm leading-relaxed text-[#F4F7FA]/60">
+                        I agree to the{" "}
+                        <Link href="/terms" target="_blank" className="text-[#27B7C8] underline hover:text-[#27B7C8]/80">Terms of Service</Link>{" "}
+                        and{" "}
+                        <Link href="/privacy" target="_blank" className="text-[#27B7C8] underline hover:text-[#27B7C8]/80">Privacy Policy</Link>
+                      </Label>
+                    </div>
+                  </div>
+
+                  {/* Auth form glass card */}
+                  <div className={`${glassCard} ${glassCardBg} ${glowBorder} p-6`}>
+                    <div className="space-y-4">
+                      {authMode !== "forgot" && (
+                        <div className="flex gap-1.5 p-1 rounded-2xl" style={{ background: "rgba(255,255,255,0.04)" }}>
+                          <button
+                            type="button"
+                            onClick={() => { setAuthMode("signup"); setResetEmailSent(false); setError(""); }}
+                            className="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300"
+                            style={{
+                              background: authMode === "signup" ? "linear-gradient(135deg, #49B06E, #27B7C8)" : "transparent",
+                              color: authMode === "signup" ? "#0E1B30" : "rgba(244,247,250,0.5)",
+                              boxShadow: authMode === "signup" ? "0 4px 15px rgba(39,183,200,0.25)" : "none",
+                            }}
+                          >
+                            Sign Up
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => { setAuthMode("login"); setResetEmailSent(false); setError(""); }}
+                            className="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300"
+                            style={{
+                              background: authMode === "login" ? "linear-gradient(135deg, #49B06E, #27B7C8)" : "transparent",
+                              color: authMode === "login" ? "#0E1B30" : "rgba(244,247,250,0.5)",
+                              boxShadow: authMode === "login" ? "0 4px 15px rgba(39,183,200,0.25)" : "none",
+                            }}
+                          >
+                            Log In
+                          </button>
+                        </div>
+                      )}
+
+                      {authMode === "forgot" && !resetEmailSent && (
+                        <div className="space-y-2">
+                          <button
+                            type="button"
+                            onClick={() => { setAuthMode("login"); setResetEmailSent(false); setError(""); }}
+                            className="flex items-center gap-1 text-sm text-[#F4F7FA]/50 hover:text-[#F4F7FA]/80 transition-colors"
+                          >
+                            <ArrowLeft className="w-4 h-4" /> Back to Log In
+                          </button>
+                          <h3 className="font-serif text-xl font-bold text-[#F4F7FA]">Reset Your Password</h3>
+                          <p className="text-sm text-[#F4F7FA]/40">Enter your email and we&apos;ll send you reset instructions.</p>
+                        </div>
+                      )}
+
+                      {authMode === "forgot" && resetEmailSent ? (
+                        <div className="space-y-4 py-4 text-center">
+                          <div className="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center text-3xl" style={{ background: "rgba(39,183,200,0.15)", animation: "pulse-glow 3s ease-in-out infinite" }}>
+                            📧
+                          </div>
+                          <h3 className="font-serif text-xl font-bold text-[#F4F7FA]">Check Your Email</h3>
+                          <p className="text-sm text-[#F4F7FA]/50">
+                            Reset instructions sent to <strong className="text-[#27B7C8]">{email}</strong>. Check your inbox 💛
+                          </p>
+                          <button type="button" onClick={() => { setAuthMode("login"); setResetEmailSent(false); setEmail(""); }} className="glass-btn">
+                            Back to Log In
+                          </button>
+                        </div>
                       ) : (
-                        "Send Reset Instructions"
-                      )}
-                    </Button>
-                  </>
-                )}
-              </div>
-            </Card>
-          </div>
-        )}
+                        <>
+                          {authMode === "signup" && (
+                            <div className="space-y-1.5">
+                              <Label htmlFor="fullName" className="text-xs font-medium text-[#F4F7FA]/40 uppercase tracking-wider">Full Name</Label>
+                              <Input
+                                id="fullName"
+                                type="text"
+                                placeholder="Jane Doe"
+                                value={fullName}
+                                onChange={(e) => setFullName(e.target.value)}
+                                disabled={isSubmitting}
+                                className="glass-input h-12"
+                              />
+                            </div>
+                          )}
 
-        {step === "check-email" && (
-          <div className="space-y-6">
-            <div className="text-center space-y-4">
-              <div className="w-20 h-20 bg-accent/20 rounded-full flex items-center justify-center mx-auto text-4xl">
-                🌸
-              </div>
-              
-              <h2 className="font-serif text-4xl font-bold text-foreground">
-                Check your email!
-              </h2>
-              
-              <p className="text-muted-foreground text-lg">
-                We sent a confirmation link to <strong>{email}</strong>.
-                <br/>Click the link in your email to activate your account.
-              </p>
-            </div>
+                          <div className="space-y-1.5">
+                            <Label htmlFor="email" className="text-xs font-medium text-[#F4F7FA]/40 uppercase tracking-wider">Email</Label>
+                            <Input
+                              id="email"
+                              type="email"
+                              placeholder="jane@example.com"
+                              value={email}
+                              onChange={(e) => setEmail(e.target.value)}
+                              disabled={isSubmitting}
+                              className="glass-input h-12"
+                            />
+                          </div>
 
-            <Card className="p-6 bg-card border-border rounded-2xl space-y-4 text-center">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={async () => {
-                  setIsSubmitting(true);
-                  try {
-                    await supabase.auth.resend({
-                      type: 'signup',
-                      email: email,
-                      options: {
-                        emailRedirectTo: 'https://shebloomswealth.app/auth/callback'
-                      }
-                    });
-                    alert("Email resent! Check your inbox.");
-                  } catch (e) {
-                    console.error("Resend error:", e);
-                  } finally {
-                    setIsSubmitting(false);
-                  }
-                }}
-                disabled={isSubmitting}
-                className="w-full h-12 rounded-xl border-primary text-primary hover:bg-primary/10"
-              >
-                {isSubmitting ? "Sending..." : "Resend email"}
-              </Button>
-              <p className="text-sm text-muted-foreground italic">
-                Don't forget to check your spam folder 🌸
-              </p>
-            </Card>
-          </div>
-        )}
+                          {authMode !== "forgot" && (
+                            <div className="space-y-1.5">
+                              <Label htmlFor="password" className="text-xs font-medium text-[#F4F7FA]/40 uppercase tracking-wider">Password</Label>
+                              <div className="relative">
+                                <Input
+                                  id="password"
+                                  type={showPassword ? "text" : "password"}
+                                  placeholder="••••••••"
+                                  value={password}
+                                  onChange={(e) => setPassword(e.target.value)}
+                                  required
+                                  className="glass-input h-12 pr-12"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => setShowPassword(!showPassword)}
+                                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[#F4F7FA]/30 hover:text-[#F4F7FA]/60 transition-colors"
+                                >
+                                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                </button>
+                              </div>
+                              {authMode === "login" && (
+                                <div className="text-right">
+                                  <button
+                                    type="button"
+                                    onClick={() => { setAuthMode("forgot"); setError(""); }}
+                                    className="text-sm text-[#27B7C8]/70 hover:text-[#27B7C8] font-medium transition-colors"
+                                  >
+                                    Forgot password?
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          )}
 
-        {step === "experience" && (
-          <div className="space-y-6">
-            <div className="text-center space-y-2">
-              <h2 className="font-serif text-4xl font-bold text-foreground">
-                How much do you know about investing?
-              </h2>
-              <p className="text-muted-foreground text-lg">
-                No judgment — just helps me personalize your experience
-              </p>
-            </div>
+                          {error && (
+                            <div className={`${glassCard} p-3`} style={{ background: "rgba(239,68,68,0.08)", borderColor: "rgba(239,68,68,0.2)" }}>
+                              <p className="text-sm text-red-400 font-medium">{error}</p>
+                            </div>
+                          )}
 
-            <div className="space-y-3">
-              {[
-                { value: "beginner" as ExperienceLevel, label: "Beginner", desc: "Just getting started", icon: "🌱" },
-                { value: "intermediate" as ExperienceLevel, label: "Intermediate", desc: "Some experience", icon: "🌿" },
-                { value: "advanced" as ExperienceLevel, label: "Advanced", desc: "Pretty comfortable", icon: "🌳" },
-              ].map((option) => (
-                <Card
-                  key={option.value}
-                  className={`p-5 cursor-pointer transition-all rounded-2xl ${
-                    experience === option.value
-                      ? "border-primary border-2 bg-primary/5"
-                      : "border-border hover:border-primary/50 bg-card"
-                  }`}
-                  onClick={() => setExperience(option.value)}
-                >
-                  <div className="flex items-center gap-4">
-                    <span className="text-3xl">{option.icon}</span>
-                    <div className="flex-1">
-                      <p className="font-semibold text-lg text-foreground">{option.label}</p>
-                      <p className="text-sm text-muted-foreground">{option.desc}</p>
-                    </div>
-                    <div
-                      className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                        experience === option.value
-                          ? "border-primary bg-primary"
-                          : "border-border"
-                      }`}
-                    >
-                      {experience === option.value && (
-                        <div className="w-3 h-3 rounded-full bg-[#F4F7FA]" />
+                          <button
+                            type="button"
+                            onClick={handleAuth}
+                            disabled={
+                              isSubmitting ||
+                              !email ||
+                              (authMode !== "forgot" && !password) ||
+                              (authMode === "signup" && !fullName) ||
+                              (authMode === "signup" && !termsAccepted)
+                            }
+                            className="glass-btn flex items-center justify-center gap-2"
+                          >
+                            {isSubmitting ? (
+                              <><Loader2 className="w-5 h-5 animate-spin" /> Processing...</>
+                            ) : authMode === "signup" ? (
+                              <>Create Account <ChevronRight className="w-5 h-5" /></>
+                            ) : authMode === "login" ? (
+                              <>Log In <ChevronRight className="w-5 h-5" /></>
+                            ) : (
+                              "Send Reset Instructions"
+                            )}
+                          </button>
+                        </>
                       )}
                     </div>
                   </div>
-                </Card>
-              ))}
-            </div>
-
-            <Button
-              type="button"
-              onClick={() => setStep("goals")}
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-12 rounded-xl"
-            >
-              Continue
-            </Button>
-
-            <button
-              type="button"
-              onClick={handleSkip}
-              className="w-full text-center text-sm text-muted-foreground hover:text-foreground mt-2 py-2"
-            >
-              Skip for now →
-            </button>
-
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={handleSkip}
-              className="w-full text-muted-foreground hover:text-foreground"
-            >
-              Skip for now
-            </Button>
-          </div>
-        )}
-
-        {step === "goals" && (
-          <div className="space-y-6">
-            <div className="text-center space-y-2">
-              <h2 className="font-serif text-4xl font-bold text-foreground">
-                What's your main goal?
-              </h2>
-              <p className="text-muted-foreground text-lg">
-                You can always change this later
-              </p>
-            </div>
-
-            <div className="space-y-3">
-              {[
-                { value: "grow_wealth" as InvestmentGoal, label: "Grow My Wealth", icon: "📈" },
-                { value: "retirement" as InvestmentGoal, label: "Save for Retirement", icon: "🏝️" },
-                { value: "passive_income" as InvestmentGoal, label: "Generate Passive Income", icon: "💰" },
-                { value: "emergency_fund" as InvestmentGoal, label: "Build an Emergency Fund", icon: "🛡️" },
-              ].map((option) => (
-                <Card
-                  key={option.value}
-                  className={`p-5 cursor-pointer transition-all rounded-2xl ${
-                    goals.includes(option.value)
-                      ? "border-primary border-2 bg-primary/5"
-                      : "border-border hover:border-primary/50 bg-card"
-                  }`}
-                  onClick={() => {
-                    setGoals(prev => 
-                      prev.includes(option.value) 
-                        ? prev.filter(g => g !== option.value)
-                        : [...prev, option.value]
-                    );
-                  }}
-                >
-                  <div className="flex items-center gap-4">
-                    <span className="text-3xl">{option.icon}</span>
-                    <p className="font-semibold text-lg text-foreground flex-1">{option.label}</p>
-                    <div
-                      className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                        goals.includes(option.value)
-                          ? "border-primary bg-primary"
-                          : "border-border"
-                      }`}
-                    >
-                      {goals.includes(option.value) && (
-                        <div className="w-3 h-3 rounded-full bg-[#F4F7FA]" />
-                      )}
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-
-            <Button
-              type="button"
-              onClick={() => setStep("risk")}
-              disabled={goals.length === 0}
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-12 rounded-xl"
-            >
-              Continue
-            </Button>
-
-            <button
-              type="button"
-              onClick={handleSkip}
-              className="w-full text-center text-sm text-muted-foreground hover:text-foreground mt-2 py-2"
-            >
-              Skip for now →
-            </button>
-
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={handleSkip}
-              className="w-full text-muted-foreground hover:text-foreground"
-            >
-              Skip for now
-            </Button>
-          </div>
-        )}
-
-        {step === "risk" && (
-          <div className="space-y-6">
-            <div className="text-center space-y-2">
-              <h2 className="font-serif text-4xl font-bold text-foreground">
-                How do you feel about risk?
-              </h2>
-              <p className="text-muted-foreground text-lg">
-                There's no right answer — just what feels right for you
-              </p>
-            </div>
-
-            <div className="space-y-3">
-              {[
-                { value: "conservative" as RiskTolerance, label: "Conservative", desc: "Steady and safe, I want to protect what I have", icon: "🌱" },
-                { value: "moderate" as RiskTolerance, label: "Moderate", desc: "I want growth but not too much drama", icon: "🌿" },
-                { value: "aggressive" as RiskTolerance, label: "Aggressive", desc: "Let's grow this money, I can handle the ride", icon: "🌸" },
-              ].map((option) => (
-                <Card
-                  key={option.value}
-                  className={`p-5 cursor-pointer transition-all rounded-2xl ${
-                    risk === option.value
-                      ? "border-primary border-2 bg-primary/5"
-                      : "border-border hover:border-primary/50 bg-card"
-                  }`}
-                  onClick={() => setRisk(option.value)}
-                >
-                  <div className="flex items-start gap-4">
-                    <span className="text-3xl">{option.icon}</span>
-                    <div className="flex-1">
-                      <p className="font-semibold text-lg text-foreground mb-1">{option.label}</p>
-                      <p className="text-sm text-muted-foreground">{option.desc}</p>
-                    </div>
-                    <div
-                      className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                        risk === option.value
-                          ? "border-primary bg-primary"
-                          : "border-border"
-                      }`}
-                    >
-                      {risk === option.value && (
-                        <div className="w-3 h-3 rounded-full bg-[#F4F7FA]" />
-                      )}
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-
-            {error && (
-              <Card className="p-4 border-[#ef4444] bg-[#ef4444]/5 rounded-2xl">
-                <p className="text-sm text-[#ef4444]">{error}</p>
-              </Card>
-            )}
-
-            <Button
-              type="button"
-              onClick={handleCompleteOnboarding}
-              disabled={isSubmitting}
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-12 rounded-xl"
-            >
-              {isSubmitting ? (
-                <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Setting up your account...</>
-              ) : (
-                "Complete Setup"
+                </div>
               )}
-            </Button>
 
-            <button
-              type="button"
-              onClick={handleSkip}
-              className="w-full text-center text-sm text-muted-foreground hover:text-foreground mt-2 py-2"
-            >
-              Skip for now →
-            </button>
+              {/* ═══════════ CHECK EMAIL STEP ═══════════ */}
+              {step === "check-email" && (
+                <div className={`space-y-6 ${animateIn ? "step-animate" : "opacity-0"}`}>
+                  <div className="text-center space-y-4">
+                    <div className="w-20 h-20 mx-auto rounded-2xl flex items-center justify-center text-4xl" style={{ background: "rgba(39,183,200,0.15)", animation: "pulse-glow 3s ease-in-out infinite" }}>
+                      🌸
+                    </div>
+                    <h2 className="font-serif text-4xl font-bold text-[#F4F7FA]">Check your email!</h2>
+                    <p className="text-[#F4F7FA]/50 text-lg">
+                      We sent a confirmation link to <strong className="text-[#27B7C8]">{email}</strong>.
+                      <br />Click the link to activate your account.
+                    </p>
+                  </div>
+                  <div className={`${glassCard} ${glassCardBg} ${glowBorder} p-6 space-y-4 text-center`}>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        setIsSubmitting(true);
+                        try {
+                          await supabase.auth.resend({ type: "signup", email, options: { emailRedirectTo: "https://shebloomswealth.app/auth/callback" } });
+                          alert("Email resent! Check your inbox.");
+                        } catch (e) { console.error("Resend error:", e); }
+                        finally { setIsSubmitting(false); }
+                      }}
+                      disabled={isSubmitting}
+                      className="glass-btn"
+                    >
+                      {isSubmitting ? "Sending..." : "Resend email"}
+                    </button>
+                    <p className="text-sm text-[#F4F7FA]/30 italic">Don&apos;t forget to check your spam folder 🌸</p>
+                  </div>
+                </div>
+              )}
 
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={handleSkip}
-              className="w-full text-muted-foreground hover:text-foreground"
-            >
-              Skip for now
-            </Button>
+              {/* ═══════════ EXPERIENCE STEP ═══════════ */}
+              {step === "experience" && (
+                <div className={`space-y-6 ${animateIn ? "step-animate" : "opacity-0"}`}>
+                  <div className="text-center space-y-3">
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold text-[#27B7C8]" style={{ background: "rgba(39,183,200,0.1)", border: "1px solid rgba(39,183,200,0.15)" }}>
+                      <Sparkles className="w-3.5 h-3.5" /> Let&apos;s personalize
+                    </div>
+                    <h2 className="font-serif text-3xl font-bold text-[#F4F7FA]">
+                      How much do you know<br />about investing?
+                    </h2>
+                    <p className="text-[#F4F7FA]/40 text-base">No judgment — helps me personalize your experience</p>
+                  </div>
+
+                  {/* Bento grid — beginner is featured (full-width) */}
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      { value: "beginner" as ExperienceLevel, label: "Beginner", desc: "Just getting started — I'll guide you every step", icon: "🌱", span: true },
+                      { value: "intermediate" as ExperienceLevel, label: "Intermediate", desc: "Some experience", icon: "🌿", span: false },
+                      { value: "advanced" as ExperienceLevel, label: "Advanced", desc: "Pretty comfortable", icon: "🌳", span: false },
+                    ].map((option, i) => {
+                      const isSelected = experience === option.value;
+                      return (
+                        <div
+                          key={option.value}
+                          onClick={() => setExperience(option.value)}
+                          className={`option-card ${glassCard} ${isSelected ? "selected" : ""} ${option.span ? "col-span-2" : ""}`}
+                          style={{
+                            background: isSelected
+                              ? "linear-gradient(135deg, rgba(39,183,200,0.12), rgba(73,176,110,0.08))"
+                              : "rgba(255,255,255,0.03)",
+                            borderColor: isSelected ? "rgba(39,183,200,0.35)" : "rgba(255,255,255,0.06)",
+                            boxShadow: isSelected ? "0 0 25px rgba(39,183,200,0.12), inset 0 1px 0 rgba(255,255,255,0.06)" : "inset 0 1px 0 rgba(255,255,255,0.03)",
+                            padding: option.span ? "24px" : "20px",
+                            animation: animateIn ? `cardEntrance 0.5s ease-out ${i * 0.1}s both` : "none",
+                          }}
+                        >
+                          <div className={`flex items-center gap-4 ${option.span ? "" : "flex-col text-center"}`}>
+                            <span className={option.span ? "text-4xl" : "text-3xl"}>{option.icon}</span>
+                            <div className={option.span ? "flex-1" : ""}>
+                              <p className={`font-semibold text-[#F4F7FA] ${option.span ? "text-lg" : "text-base"}`}>{option.label}</p>
+                              <p className={`text-[#F4F7FA]/40 ${option.span ? "text-sm" : "text-xs"} mt-0.5`}>{option.desc}</p>
+                            </div>
+                            <div
+                              className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-300 shrink-0"
+                              style={{
+                                background: isSelected ? "linear-gradient(135deg, #49B06E, #27B7C8)" : "rgba(255,255,255,0.06)",
+                                border: isSelected ? "none" : "2px solid rgba(255,255,255,0.12)",
+                                boxShadow: isSelected ? "0 0 12px rgba(39,183,200,0.4)" : "none",
+                              }}
+                            >
+                              {isSelected && <div className="w-2.5 h-2.5 rounded-full bg-[#0E1B30]" />}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <button type="button" onClick={() => goToStep("goals")} className="glass-btn flex items-center justify-center gap-2">
+                    Continue <ChevronRight className="w-5 h-5" />
+                  </button>
+
+                  <button type="button" onClick={handleSkip} className="w-full text-center text-sm text-[#F4F7FA]/30 hover:text-[#F4F7FA]/60 transition-colors py-2">
+                    Skip for now →
+                  </button>
+                </div>
+              )}
+
+              {/* ═══════════ GOALS STEP ═══════════ */}
+              {step === "goals" && (
+                <div className={`space-y-6 ${animateIn ? "step-animate" : "opacity-0"}`}>
+                  <div className="text-center space-y-3">
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold text-[#49B06E]" style={{ background: "rgba(73,176,110,0.1)", border: "1px solid rgba(73,176,110,0.15)" }}>
+                      <Target className="w-3.5 h-3.5" /> Choose your goals
+                    </div>
+                    <h2 className="font-serif text-3xl font-bold text-[#F4F7FA]">
+                      What&apos;s your main goal?
+                    </h2>
+                    <p className="text-[#F4F7FA]/40 text-base">Select all that apply — you can change this later</p>
+                  </div>
+
+                  {/* 2x2 Bento grid */}
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      { value: "grow_wealth" as InvestmentGoal, label: "Grow Wealth", icon: <TrendingUp className="w-7 h-7" />, color: "#49B06E" },
+                      { value: "retirement" as InvestmentGoal, label: "Retirement", icon: <Landmark className="w-7 h-7" />, color: "#27B7C8" },
+                      { value: "passive_income" as InvestmentGoal, label: "Passive Income", icon: <Wallet className="w-7 h-7" />, color: "#8B5CF6" },
+                      { value: "emergency_fund" as InvestmentGoal, label: "Emergency Fund", icon: <Shield className="w-7 h-7" />, color: "#F59E0B" },
+                    ].map((option, i) => {
+                      const isSelected = goals.includes(option.value);
+                      return (
+                        <div
+                          key={option.value}
+                          onClick={() => {
+                            setGoals(prev =>
+                              prev.includes(option.value)
+                                ? prev.filter(g => g !== option.value)
+                                : [...prev, option.value]
+                            );
+                          }}
+                          className={`option-card ${glassCard} ${isSelected ? "selected" : ""}`}
+                          style={{
+                            background: isSelected
+                              ? `linear-gradient(135deg, ${option.color}15, ${option.color}08)`
+                              : "rgba(255,255,255,0.03)",
+                            borderColor: isSelected ? `${option.color}50` : "rgba(255,255,255,0.06)",
+                            boxShadow: isSelected ? `0 0 25px ${option.color}18, inset 0 1px 0 rgba(255,255,255,0.06)` : "inset 0 1px 0 rgba(255,255,255,0.03)",
+                            padding: "20px",
+                            animation: animateIn ? `cardEntrance 0.5s ease-out ${i * 0.08}s both` : "none",
+                          }}
+                        >
+                          <div className="flex flex-col items-center text-center gap-3">
+                            <div
+                              className="w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300"
+                              style={{
+                                background: isSelected ? `${option.color}20` : "rgba(255,255,255,0.04)",
+                                color: isSelected ? option.color : "rgba(244,247,250,0.4)",
+                                boxShadow: isSelected ? `0 0 15px ${option.color}20` : "none",
+                              }}
+                            >
+                              {option.icon}
+                            </div>
+                            <p className="font-semibold text-sm text-[#F4F7FA]">{option.label}</p>
+                            <div
+                              className="w-5 h-5 rounded-full flex items-center justify-center transition-all duration-300"
+                              style={{
+                                background: isSelected ? `linear-gradient(135deg, ${option.color}, ${option.color}cc)` : "rgba(255,255,255,0.06)",
+                                border: isSelected ? "none" : "2px solid rgba(255,255,255,0.12)",
+                                boxShadow: isSelected ? `0 0 8px ${option.color}40` : "none",
+                              }}
+                            >
+                              {isSelected && (
+                                <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                                  <path d="M1 4L3.5 6.5L9 1" stroke="#0E1B30" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => goToStep("risk")}
+                    disabled={goals.length === 0}
+                    className="glass-btn flex items-center justify-center gap-2"
+                  >
+                    Continue <ChevronRight className="w-5 h-5" />
+                  </button>
+
+                  <button type="button" onClick={handleSkip} className="w-full text-center text-sm text-[#F4F7FA]/30 hover:text-[#F4F7FA]/60 transition-colors py-2">
+                    Skip for now →
+                  </button>
+                </div>
+              )}
+
+              {/* ═══════════ RISK STEP ═══════════ */}
+              {step === "risk" && (
+                <div className={`space-y-6 ${animateIn ? "step-animate" : "opacity-0"}`}>
+                  <div className="text-center space-y-3">
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold text-[#F59E0B]" style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.15)" }}>
+                      <Flame className="w-3.5 h-3.5" /> Almost done
+                    </div>
+                    <h2 className="font-serif text-3xl font-bold text-[#F4F7FA]">
+                      How do you feel<br />about risk?
+                    </h2>
+                    <p className="text-[#F4F7FA]/40 text-base">No right answer — just what feels right for you</p>
+                  </div>
+
+                  <div className="space-y-3">
+                    {[
+                      { value: "conservative" as RiskTolerance, label: "Conservative", desc: "Steady and safe — protect what I have", icon: "🛡️", color: "#49B06E" },
+                      { value: "moderate" as RiskTolerance, label: "Moderate", desc: "Growth without too much drama", icon: "⚖️", color: "#27B7C8" },
+                      { value: "aggressive" as RiskTolerance, label: "Aggressive", desc: "Let's grow this — I can handle the ride", icon: "🚀", color: "#F59E0B" },
+                    ].map((option, i) => {
+                      const isSelected = risk === option.value;
+                      return (
+                        <div
+                          key={option.value}
+                          onClick={() => setRisk(option.value)}
+                          className={`option-card ${glassCard} ${isSelected ? "selected" : ""}`}
+                          style={{
+                            background: isSelected
+                              ? `linear-gradient(135deg, ${option.color}12, ${option.color}06)`
+                              : "rgba(255,255,255,0.03)",
+                            borderColor: isSelected ? `${option.color}40` : "rgba(255,255,255,0.06)",
+                            boxShadow: isSelected ? `0 0 25px ${option.color}15, inset 0 1px 0 rgba(255,255,255,0.06)` : "inset 0 1px 0 rgba(255,255,255,0.03)",
+                            padding: "20px",
+                            animation: animateIn ? `cardEntrance 0.5s ease-out ${i * 0.1}s both` : "none",
+                          }}
+                        >
+                          <div className="flex items-center gap-4">
+                            <span className="text-3xl">{option.icon}</span>
+                            <div className="flex-1">
+                              <p className="font-semibold text-lg text-[#F4F7FA]">{option.label}</p>
+                              <p className="text-sm text-[#F4F7FA]/40 mt-0.5">{option.desc}</p>
+                            </div>
+                            <div
+                              className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-300 shrink-0"
+                              style={{
+                                background: isSelected ? `linear-gradient(135deg, ${option.color}, ${option.color}cc)` : "rgba(255,255,255,0.06)",
+                                border: isSelected ? "none" : "2px solid rgba(255,255,255,0.12)",
+                                boxShadow: isSelected ? `0 0 12px ${option.color}40` : "none",
+                              }}
+                            >
+                              {isSelected && <div className="w-2.5 h-2.5 rounded-full bg-[#0E1B30]" />}
+                            </div>
+                          </div>
+                          {/* Risk meter bar */}
+                          <div className="mt-3 h-1 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.04)" }}>
+                            <div
+                              className="h-full rounded-full transition-all duration-500"
+                              style={{
+                                width: option.value === "conservative" ? "33%" : option.value === "moderate" ? "66%" : "100%",
+                                background: `linear-gradient(90deg, ${option.color}80, ${option.color})`,
+                                opacity: isSelected ? 1 : 0.3,
+                              }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {error && (
+                    <div className={`${glassCard} p-3`} style={{ background: "rgba(239,68,68,0.08)", borderColor: "rgba(239,68,68,0.2)" }}>
+                      <p className="text-sm text-red-400 font-medium">{error}</p>
+                    </div>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={handleCompleteOnboarding}
+                    disabled={isSubmitting}
+                    className="glass-btn flex items-center justify-center gap-2"
+                  >
+                    {isSubmitting ? (
+                      <><Loader2 className="w-5 h-5 animate-spin" /> Setting up your account...</>
+                    ) : (
+                      <>Complete Setup <Sparkles className="w-5 h-5" /></>
+                    )}
+                  </button>
+
+                  <button type="button" onClick={handleSkip} className="w-full text-center text-sm text-[#F4F7FA]/30 hover:text-[#F4F7FA]/60 transition-colors py-2">
+                    Skip for now →
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
-        )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
