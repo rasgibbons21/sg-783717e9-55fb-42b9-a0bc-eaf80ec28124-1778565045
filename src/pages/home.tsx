@@ -15,6 +15,7 @@ import {
   ChevronRight, Flame, Target, Sparkles, Play,
 } from "lucide-react";
 import { TimeGreeting } from "@/components/TimeGreeting";
+import { GemsLeaderboard } from "@/components/GemsLeaderboard";
 
 export default function Home() {
   const router = useRouter();
@@ -293,6 +294,9 @@ export default function Home() {
             ))}
           </div>
         </div>
+
+        {/* ══════ LEADERBOARD ══════ */}
+        <GemsLeaderboard />
 
         {/* ══════ QUICK ACTIONS ══════ */}
         <div className="space-y-3">
