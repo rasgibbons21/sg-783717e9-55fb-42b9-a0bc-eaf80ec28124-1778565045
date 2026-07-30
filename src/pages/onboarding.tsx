@@ -10,7 +10,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { authService } from "@/services/authService";
 import { userService } from "@/services/userService";
 import { supabase } from "@/integrations/supabase/client";
-import { canShowExternalPayment } from "@/lib/payments";
 import { Loader2, Eye, EyeOff, ChevronRight, Sparkles, Shield, Target, Flame, TrendingUp, Landmark, Wallet, ArrowLeft } from "lucide-react";
 
 type Step = "auth" | "check-email" | "experience" | "goals" | "risk";
@@ -184,7 +183,7 @@ export default function Onboarding() {
         setError("We couldn't save your answers. Please try again.");
         return;
       }
-      window.location.href = canShowExternalPayment ? "/subscription-offer" : "/home";
+      window.location.href = "/subscription-offer";
     } catch (err) {
       console.error("Onboarding error:", err);
       setError("Something went wrong. Please try again.");
