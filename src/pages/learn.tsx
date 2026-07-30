@@ -11,8 +11,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { RiskRewardCalculator } from "@/components/RiskRewardCalculator";
-import { PositionSizeCalculator } from "@/components/PositionSizeCalculator";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { authService } from "@/services/authService";
 import { supabase } from "@/integrations/supabase/client";
@@ -3141,18 +3139,17 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
   return (
     <Layout>
       <SEO
-        title="Bloom University - Learn Investing"
+        title="Bloom Basics - Learn Investing"
         description="Everything about investing explained by Pansy in girlfriend language"
       />
       <div className="min-h-screen bg-background pb-20">
         <div className="max-w-4xl mx-auto p-6 space-y-6">
           <div className="text-center space-y-2">
             <h1 className="text-3xl font-bold text-foreground">
-              Bloom University 🎓
+              Bloom Basics 🌱
             </h1>
             <p className="text-muted-foreground">
-              Everything about investing explained by Pansy in girlfriend
-              language
+              Your foundation — investing explained by Pansy in girlfriend language
             </p>
           </div>
 
@@ -3226,7 +3223,7 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
               <BookOpen className="w-5 h-5 text-accent shrink-0" />
               <div>
                 <p className="text-sm font-semibold text-foreground">Bloom University</p>
-                <p className="text-xs text-muted-foreground">Structured modules</p>
+                <p className="text-xs text-muted-foreground">Advanced modules</p>
               </div>
             </Link>
             <Link href="/brokers" className="flex items-center gap-3 p-4 rounded-2xl bg-card border border-border hover:border-accent/40 transition-colors">
@@ -3271,16 +3268,6 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
                 {category}
               </Badge>
             ))}
-          </div>
-
-          {/* Risk to Reward Calculator */}
-          <div className="mb-8">
-            <RiskRewardCalculator />
-          </div>
-
-          {/* Position Size Calculator */}
-          <div className="mb-8">
-            <PositionSizeCalculator />
           </div>
 
           {/* Lessons Grid */}

@@ -7,6 +7,8 @@ import Link from "next/link";
 import { Layout } from "@/components/Layout";
 import { OrderTicket } from "@/components/OrderTicket";
 import { ActiveTradeCard } from "@/components/ActiveTradeCard";
+import { RiskRewardCalculator } from "@/components/RiskRewardCalculator";
+import { PositionSizeCalculator } from "@/components/PositionSizeCalculator";
 import { requireProUserSSR } from "@/lib/requireProUserSSR";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -1191,6 +1193,14 @@ export default function PracticePage(_props: PageProps) {
                       )}
                     </div>
                   )}
+                </div>
+              )}
+
+              {/* ── Trading Tools ─────────────────────────────────────── */}
+              {!authLoading && !loading && isPro && !error && view === "trades" && (
+                <div className="max-w-2xl mt-8 space-y-6">
+                  <RiskRewardCalculator />
+                  <PositionSizeCalculator />
                 </div>
               )}
 
