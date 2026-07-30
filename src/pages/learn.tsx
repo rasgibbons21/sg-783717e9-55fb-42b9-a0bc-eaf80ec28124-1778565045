@@ -16,7 +16,7 @@ import { PositionSizeCalculator } from "@/components/PositionSizeCalculator";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { authService } from "@/services/authService";
 import { supabase } from "@/integrations/supabase/client";
-import { Search, ArrowLeft, Clock, CheckCircle2, Circle, ChevronRight, Bookmark, BookmarkCheck, Award, Lock, Building2, BookOpen, Sparkles } from "lucide-react";
+import { Search, ArrowLeft, Clock, CheckCircle2, Circle, ChevronRight, Bookmark, BookmarkCheck, Award, Lock, Building2, BookOpen, Sparkles, Route, Star } from "lucide-react";
 import Link from "next/link";
 import { UpgradeModal } from "@/components/UpgradeModal";
 import { BloomGarden } from "@/components/BloomGarden";
@@ -54,6 +54,7 @@ export default function Learn() {
   const [activeCategory, setActiveCategory] = useState<Category>("All");
   const [completedLessons, setCompletedLessons] = useState<string[]>([]);
   const [bookmarkedLessons, setBookmarkedLessons] = useState<string[]>([]);
+  const [userProfile, setUserProfile] = useState<{ experience_level: string | null; investment_goals: string[] | null; risk_tolerance: string | null } | null>(null);
   const [selectedLesson, setSelectedLesson] = useState<string | null>(null);
   const [quizAnswers, setQuizAnswers] = useState<(number | null)[]>([null, null, null]);
   const [quizSubmitted, setQuizSubmitted] = useState(false);
@@ -2626,7 +2627,7 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
 
       const { data: profileData } = await supabase
         .from("profiles")
-        .select("bookmarked_lessons")
+        .select("bookmarked_lessons, experience_level, investment_goals, risk_tolerance")
         .eq("id", userId)
         .single();
 
@@ -2634,8 +2635,15 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
         setCompletedLessons(progressData.map((p) => p.lesson_id));
       }
 
-      if (profileData?.bookmarked_lessons) {
-        setBookmarkedLessons(profileData.bookmarked_lessons);
+      if (profileData) {
+        if (profileData.bookmarked_lessons) {
+          setBookmarkedLessons(profileData.bookmarked_lessons);
+        }
+        setUserProfile({
+          experience_level: profileData.experience_level,
+          investment_goals: profileData.investment_goals as string[] | null,
+          risk_tolerance: profileData.risk_tolerance,
+        });
       }
     } catch (error) {
       console.error("Error loading progress:", error);
@@ -2751,6 +2759,54 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
   const completionPercentage = Math.round(
     (completedLessons.length / lessons.length) * 100
   );
+
+  const TOPIC_TO_CATEGORIES: Record<string, string[]> = {
+    stocks_etfs: ["Stocks", "ETFs"],
+    budgeting: ["Trading Psychology"],
+    retirement: ["Retirement"],
+    crypto: ["Stocks"],
+    real_estate: ["Income Streams"],
+    trading: ["Trading Psychology", "Stocks"],
+  };
+
+  const GOAL_TO_CATEGORIES: Record<string, string[]> = {
+    grow_wealth: ["Stocks", "ETFs"],
+    retirement: ["Retirement", "ETFs"],
+    passive_income: ["Dividends", "Income Streams"],
+    emergency_fund: ["Trading Psychology", "Bonds"],
+    financial_confidence: ["Stocks", "ETFs", "Mutual Funds"],
+    college_fund: ["Retirement", "ETFs"],
+  };
+
+  const getPersonalizedLessons = () => {
+    if (!userProfile) return [];
+
+    const topicCategories = new Set<string>();
+    (userProfile.investment_goals || []).forEach(t => {
+      (TOPIC_TO_CATEGORIES[t] || []).forEach(c => topicCategories.add(c));
+    });
+
+    const goalCategories = new Set<string>();
+    (GOAL_TO_CATEGORIES[userProfile.risk_tolerance || ""] || []).forEach(c => goalCategories.add(c));
+
+    const isBeginnerish = !userProfile.experience_level || userProfile.experience_level === "beginner";
+
+    const uncompleted = lessons.filter(l => !completedLessons.includes(l.id));
+
+    const scored = uncompleted.map(lesson => {
+      let score = 0;
+      if (topicCategories.has(lesson.category)) score += 3;
+      if (goalCategories.has(lesson.category)) score += 2;
+      if (isBeginnerish && lesson.difficulty === "Beginner") score += 1;
+      if (!isBeginnerish && lesson.difficulty === "Intermediate") score += 1;
+      return { lesson, score };
+    });
+
+    scored.sort((a, b) => b.score - a.score);
+    return scored.slice(0, 5).map(s => s.lesson);
+  };
+
+  const roadmapLessons = getPersonalizedLessons();
 
   if (selectedLesson) {
     const lesson = lessons.find((l) => l.id === selectedLesson);
@@ -3105,6 +3161,50 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
             totalLessons={lessons.length}
             lessonNames={lessons.map(l => ({ id: l.id, title: l.title, category: l.category }))}
           />
+
+          {roadmapLessons.length > 0 && (
+            <div className="bg-card border border-border rounded-2xl p-5 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Route className="w-5 h-5 text-[#27B7C8]" />
+                  <h3 className="font-serif text-lg font-bold text-foreground">Your Roadmap</h3>
+                </div>
+                <span className="text-xs text-muted-foreground font-medium">Based on your goals</span>
+              </div>
+              <div className="space-y-0">
+                {roadmapLessons.map((lesson, i) => {
+                  const isLast = i === roadmapLessons.length - 1;
+                  return (
+                    <div key={lesson.id} className="flex gap-3 cursor-pointer group" onClick={() => setSelectedLesson(lesson.id)}>
+                      <div className="flex flex-col items-center">
+                        <div
+                          className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-colors group-hover:scale-110"
+                          style={{
+                            background: i === 0 ? "linear-gradient(135deg, #27B7C8, #49B06E)" : "rgba(39,183,200,0.12)",
+                            color: i === 0 ? "white" : "#27B7C8",
+                            border: i === 0 ? "none" : "1px solid rgba(39,183,200,0.25)",
+                          }}
+                        >
+                          {i === 0 ? <Star className="w-4 h-4" /> : i + 1}
+                        </div>
+                        {!isLast && (
+                          <div className="w-px h-full min-h-[24px] bg-border" />
+                        )}
+                      </div>
+                      <div className={`flex-1 ${isLast ? "pb-0" : "pb-4"}`}>
+                        <p className="text-sm font-semibold text-foreground group-hover:text-[#27B7C8] transition-colors leading-tight">{lesson.title}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Badge className="bg-accent/20 text-accent border-accent/30 text-[10px] px-1.5 py-0">{lesson.category}</Badge>
+                          <span className="text-[10px] text-muted-foreground">{lesson.readTime} min</span>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-muted-foreground mt-1 shrink-0 group-hover:text-[#27B7C8] group-hover:translate-x-0.5 transition-all" />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           <div className="grid grid-cols-2 gap-3">
             <Link href="/university" className="flex items-center gap-3 p-4 rounded-2xl bg-card border border-border hover:border-accent/40 transition-colors">
