@@ -1,6 +1,11 @@
-import { useState, useEffect, useCallback } from "react";
-import { X, RefreshCw, ChevronDown, ChevronUp, Sparkles } from "lucide-react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { X, RefreshCw, ChevronDown, ChevronUp, Sparkles, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+
+interface SearchResult {
+  symbol: string;
+  name: string;
+}
 
 interface Props {
   buyingPower: number;
@@ -33,6 +38,48 @@ export function OrderTicket({ buyingPower, onClose, onPlaced }: Props) {
 
   const [placing, setPlacing] = useState(false);
   const [err, setErr] = useState("");
+
+  // ── Symbol search / autocomplete ────────────────────────────────────────
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [showResults, setShowResults] = useState(false);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const tickerRef = useRef<HTMLInputElement>(null);
+
+  const searchSymbol = useCallback(async (q: string) => {
+    if (q.length < 2) { setSearchResults([]); return; }
+    setSearchLoading(true);
+    try {
+      const res = await fetch(`/api/proxy/symbol-search?q=${encodeURIComponent(q)}`);
+      const data = await res.json();
+      setSearchResults(data.results || []);
+      setShowResults(true);
+    } catch {
+      setSearchResults([]);
+    } finally {
+      setSearchLoading(false);
+    }
+  }, []);
+
+  const handleTickerChange = (val: string) => {
+    setTicker(val.toUpperCase());
+    setQuote(null);
+    setStopTouched(false);
+    if (searchTimeout.current) clearTimeout(searchTimeout.current);
+    if (val.length >= 2) {
+      searchTimeout.current = setTimeout(() => searchSymbol(val), 300);
+    } else {
+      setSearchResults([]);
+      setShowResults(false);
+    }
+  };
+
+  const selectSymbol = (result: SearchResult) => {
+    setTicker(result.symbol);
+    setSearchResults([]);
+    setShowResults(false);
+    fetchQuote(result.symbol);
+  };
 
   // ── Live quote ──────────────────────────────────────────────────────────
   const fetchQuote = useCallback(async (sym: string) => {
@@ -169,15 +216,41 @@ export function OrderTicket({ buyingPower, onClose, onPlaced }: Props) {
         <div className="p-5 space-y-4">
           {/* Ticker + direction */}
           <div className="flex gap-2">
-            <input
-              value={ticker}
-              onChange={(e) => { setTicker(e.target.value.toUpperCase()); setQuote(null); setStopTouched(false); }}
-              onBlur={() => ticker && fetchQuote(ticker)}
-              onKeyDown={(e) => { if (e.key === "Enter") fetchQuote(ticker); }}
-              placeholder="Ticker (e.g. AAPL)"
-              autoFocus
-              className="flex-1 bg-card border border-accent/20 rounded-lg px-3 py-2.5 text-foreground text-sm uppercase focus:outline-none focus:border-accent"
-            />
+            <div className="flex-1 relative">
+              <div className="relative">
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-foreground/30" />
+                <input
+                  ref={tickerRef}
+                  value={ticker}
+                  onChange={(e) => handleTickerChange(e.target.value)}
+                  onBlur={() => { setTimeout(() => setShowResults(false), 200); if (ticker && !showResults) fetchQuote(ticker); }}
+                  onKeyDown={(e) => { if (e.key === "Enter") { setShowResults(false); fetchQuote(ticker); } }}
+                  onFocus={() => { if (searchResults.length > 0) setShowResults(true); }}
+                  placeholder="Search company or ticker"
+                  autoFocus
+                  className="w-full bg-card border border-accent/20 rounded-lg pl-8 pr-3 py-2.5 text-foreground text-sm uppercase focus:outline-none focus:border-accent"
+                />
+                {searchLoading && (
+                  <div className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 border-2 border-accent/30 border-t-accent rounded-full animate-spin" />
+                )}
+              </div>
+              {showResults && searchResults.length > 0 && (
+                <div className="absolute z-10 left-0 right-0 mt-1 bg-card border border-accent/20 rounded-lg overflow-hidden shadow-xl max-h-52 overflow-y-auto">
+                  {searchResults.map((r) => (
+                    <button
+                      key={r.symbol}
+                      type="button"
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => selectSymbol(r)}
+                      className="w-full flex items-center gap-3 px-3 py-2.5 text-left hover:bg-accent/10 transition-colors border-b border-accent/5 last:border-0"
+                    >
+                      <span className="font-mono font-bold text-sm text-accent w-14 shrink-0">{r.symbol}</span>
+                      <span className="text-xs text-foreground/60 truncate">{r.name}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
             <div className="flex rounded-lg overflow-hidden border border-accent/20">
               {(["long", "short"] as Dir[]).map((d) => (
                 <button
