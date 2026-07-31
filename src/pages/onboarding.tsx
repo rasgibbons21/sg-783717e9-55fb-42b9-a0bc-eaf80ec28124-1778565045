@@ -250,10 +250,10 @@ export default function Onboarding() {
     <>
       <OnboardingStyles />
 
-      <div className="fixed inset-0 overflow-hidden" style={{ background: "linear-gradient(135deg, #0E1B30 0%, #0a1525 40%, #0d1f35 70%, #0E1B30 100%)" }}>
+      <div className="fixed inset-0 overflow-y-auto" style={{ background: "linear-gradient(135deg, #0E1B30 0%, #0a1525 40%, #0d1f35 70%, #0E1B30 100%)" }}>
         <FloatingOrbs />
 
-        <div className="relative z-10 flex flex-col min-h-screen overflow-y-auto">
+        <div className="relative z-10 flex flex-col min-h-screen">
           {/* Progress bar for quiz steps */}
           {isQuizStep && (
             <div className="sticky top-0 z-20 px-6 pt-4 pb-2">
@@ -302,7 +302,7 @@ export default function Onboarding() {
             </div>
           )}
 
-          <div className="flex-1 flex items-center justify-center p-6">
+          <div className="flex-1 flex items-center justify-center p-6 pb-16">
             <div className="w-full max-w-md">
 
               {/* ═══════════ WELCOME ═══════════ */}
@@ -759,7 +759,7 @@ export default function Onboarding() {
 
                   <button
                     type="button"
-                    onClick={() => { window.location.href = "/subscription-offer"; }}
+                    onClick={() => { window.location.href = "/home"; }}
                     className="glass-btn flex items-center justify-center gap-2 text-lg"
                   >
                     Start Learning <ChevronRight className="w-5 h-5" />

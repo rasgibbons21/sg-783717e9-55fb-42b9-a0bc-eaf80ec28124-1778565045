@@ -20,29 +20,29 @@
       "name": "Bloom Basics",
       "shortName": "Learn",
       "url": "/learn",
-      "iconUrl": "https://shebloomswealth.app/icon-192.png"
+      "chosenIconUrl": "https://shebloomswealth.app/icon-192.png"
     },
     {
       "name": "Practice Trader",
       "shortName": "Practice",
       "url": "/practice",
-      "iconUrl": "https://shebloomswealth.app/icon-192.png"
+      "chosenIconUrl": "https://shebloomswealth.app/icon-192.png"
     },
     {
       "name": "Ask Pansy",
       "shortName": "Pansy",
       "url": "/ask-pansy",
-      "iconUrl": "https://shebloomswealth.app/icon-192.png"
+      "chosenIconUrl": "https://shebloomswealth.app/icon-192.png"
     }
   ],
-  "signing": {
-    "keystore": "./signing.keystore",
-    "keystorePassword": "KxOqlCPuZUce",
-    "alias": "my-key-alias",
-    "aliasPassword": "KxOqlCPuZUce"
+  "signingKey": {
+    "path": "./signing.keystore",
+    "alias": "my-key-alias"
   },
-  "appVersionCode": 3,
+  "splashScreenFadeOutDuration": 300,
+  "appVersionCode": 12,
   "appVersionName": "1.1.0",
+  "appVersion": "1.1.0",
   "signingMode": "releaseKey",
   "isChromeOSOnly": false,
   "fallbackType": "customtabs",

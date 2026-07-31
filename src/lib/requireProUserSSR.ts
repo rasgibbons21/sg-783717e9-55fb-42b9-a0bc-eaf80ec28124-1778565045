@@ -71,14 +71,6 @@ export async function requireProUserSSR(
   const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
   if (error || !user) return { status: "unauthenticated" };
 
-  const { data: profile } = await supabaseAdmin
-    .from("profiles")
-    .select("is_pro, subscription_status")
-    .eq("id", user.id)
-    .single();
-
-  const isPro =
-    profile?.is_pro === true || profile?.subscription_status === "active";
-
-  return isPro ? { status: "ok", userId: user.id } : { status: "not-pro" };
+  // All content is free — skip Pro check, just require valid login
+  return { status: "ok", userId: user.id };
 }

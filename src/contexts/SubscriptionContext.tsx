@@ -45,8 +45,8 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
         .eq("id", user.id)
         .single();
 
-      const userIsPro = profile?.is_pro === true || profile?.subscription_status === "active";
-      setIsPro(userIsPro);
+      // All content is free — every logged-in user gets full access
+      setIsPro(true);
 
       const first = profile?.full_name
         ? (profile.full_name as string).trim().split(" ")[0]

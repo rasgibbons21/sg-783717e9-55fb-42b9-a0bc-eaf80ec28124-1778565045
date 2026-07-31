@@ -32,15 +32,7 @@ export async function requireProUser(req: NextApiRequest): Promise<AuthResult> {
   const { data: { user }, error: userErr } = await supabaseAdmin.auth.getUser(token);
   if (userErr || !user) return { error: 401, user: null };
 
-  const { data: profile } = await supabaseAdmin
-    .from("profiles")
-    .select("is_pro, subscription_status")
-    .eq("id", user.id)
-    .single();
-
-  const isPro = profile?.is_pro === true || profile?.subscription_status === "active";
-  if (!isPro) return { error: 403, user: null };
-
+  // All content is free — skip Pro check, just require valid login
   return { user, error: null };
 }
 
