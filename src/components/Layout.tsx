@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Home, Search, User, GraduationCap, TrendingUp } from "lucide-react";
 import { PansyMilestones } from "./PansyMilestones";
 import { PansyPsychologyToast } from "./PansyPsychologyToast";
+import { PansyAssistant } from "./PansyAssistant";
 import { SignUpBanner } from "./SignUpBanner";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
@@ -80,6 +81,9 @@ export function Layout({ children }: LayoutProps) {
 
       {/* Main Content - add top padding when banner is showing */}
       <main className={cn("flex-1 w-full", !isLoading && !isLoggedIn && "pt-[60px]")}>{children}</main>
+
+      {/* Pansy Floating Assistant */}
+      <PansyAssistant />
 
       {/* Pansy Milestone Messages */}
       <PansyMilestones />
