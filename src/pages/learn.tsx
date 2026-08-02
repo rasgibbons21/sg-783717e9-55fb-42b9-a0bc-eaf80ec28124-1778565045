@@ -18,6 +18,7 @@ import { Search, ArrowLeft, Clock, CheckCircle2, Circle, ChevronRight, Bookmark,
 import Link from "next/link";
 import { UpgradeModal } from "@/components/UpgradeModal";
 import { BloomGarden } from "@/components/BloomGarden";
+import { PansyContextCard } from "@/components/PansyContextCard";
 
 type Category = "All" | "Stocks" | "ETFs" | "Mutual Funds" | "Dividends" | "Bonds" | "Retirement" | "Trading Psychology" | "Income Streams";
 
@@ -2806,20 +2807,48 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
 
   const roadmapLessons = getPersonalizedLessons();
 
-  const getPansyNudge = () => {
-    if (completedLessons.length === 0) return null;
+  const getPansyGuidance = (): { message: string; tip?: string; variant: "default" | "celebration" | "tip" | "coach"; action?: { label: string; href: string } } | null => {
     const completedCategories = new Set(
       lessons.filter(l => completedLessons.includes(l.id)).map(l => l.category)
     );
     const allCategories = [...new Set(lessons.map(l => l.category))];
     const unexplored = allCategories.filter(c => !completedCategories.has(c));
-    if (unexplored.length === 0) return "You've explored every category! Try revisiting quizzes to strengthen your knowledge.";
-    if (completedLessons.length >= 3 && unexplored.length > 0) {
-      return `You've been doing great! Have you checked out ${unexplored[0]} yet? It pairs well with what you've learned.`;
+
+    if (completedLessons.length === 0) {
+      return {
+        message: "Start with \"What is a Stock\" — it takes 3 minutes and sets the foundation for everything else.",
+        variant: "coach",
+      };
+    }
+    if (completedLessons.length === 1) {
+      return {
+        message: "First lesson done! You just took the hardest step. The next one builds directly on what you learned.",
+        variant: "celebration",
+      };
+    }
+    if (completedLessons.length >= 3 && completedLessons.length < 8 && unexplored.length > 0) {
+      return {
+        message: `You've been doing great! Have you checked out ${unexplored[0]} yet? It pairs well with what you've learned.`,
+        tip: "Exploring different categories gives you a wider perspective on how markets work.",
+        variant: "tip",
+      };
+    }
+    if (unexplored.length === 0) {
+      return {
+        message: "You've explored every category! Try revisiting quizzes to strengthen your knowledge, or head to Practice.",
+        variant: "celebration",
+        action: { label: "Practice Trading", href: "/practice" },
+      };
+    }
+    if (completedLessons.length >= 8) {
+      return {
+        message: `${completedLessons.length} lessons completed — you're building real knowledge. ${unexplored.length} categor${unexplored.length === 1 ? "y" : "ies"} left to explore.`,
+        variant: "default",
+      };
     }
     return null;
   };
-  const pansyNudge = getPansyNudge();
+  const pansyGuidance = getPansyGuidance();
 
   if (selectedLesson) {
     const lesson = lessons.find((l) => l.id === selectedLesson);
@@ -3235,11 +3264,13 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
             </Link>
           </div>
 
-          {pansyNudge && (
-            <div className="flex items-start gap-3 p-4 rounded-2xl bg-gradient-to-r from-[#27B7C8]/8 to-[#49B06E]/8 border border-[#27B7C8]/15">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#27B7C8] to-[#49B06E] flex items-center justify-center text-sm shrink-0">🌺</div>
-              <p className="text-sm text-muted-foreground leading-relaxed pt-1">{pansyNudge}</p>
-            </div>
+          {pansyGuidance && (
+            <PansyContextCard
+              message={pansyGuidance.message}
+              tip={pansyGuidance.tip}
+              variant={pansyGuidance.variant}
+              action={pansyGuidance.action}
+            />
           )}
 
           <div className="relative">

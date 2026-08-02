@@ -5,6 +5,7 @@ import { Home, Search, User, GraduationCap, TrendingUp } from "lucide-react";
 import { PansyMilestones } from "./PansyMilestones";
 import { PansyPsychologyToast } from "./PansyPsychologyToast";
 import { PansyAssistant } from "./PansyAssistant";
+import { PansyEncouragement } from "./PansyEncouragement";
 import { SignUpBanner } from "./SignUpBanner";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
@@ -84,6 +85,9 @@ export function Layout({ children }: LayoutProps) {
 
       {/* Pansy Floating Assistant */}
       <PansyAssistant />
+
+      {/* Pansy Returning-User Encouragement */}
+      <PansyEncouragement />
 
       {/* Pansy Milestone Messages */}
       <PansyMilestones />

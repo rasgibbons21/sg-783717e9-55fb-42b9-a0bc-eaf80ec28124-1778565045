@@ -19,6 +19,7 @@ import { userService } from "@/services/userService";
 import { supabase } from "@/integrations/supabase/client";
 import { UpgradeBanner } from "@/components/UpgradeModal";
 import { canShowExternalPayment } from "@/lib/payments";
+import { PansyContextCard } from "@/components/PansyContextCard";
 
 interface Asset {
   ticker: string;
@@ -410,6 +411,13 @@ export default function Discover() {
           <h1 className="font-serif text-3xl md:text-4xl font-bold text-foreground">
             Discover
           </h1>
+
+          <PansyContextCard
+            message="This is your research playground! Browse real market data, explore Pansy's Picks for curated ideas, or search for any company you're curious about."
+            tip="Tip: Try the 'Pansy's Picks' filter to see investments I've hand-picked with beginner-friendly analysis."
+            variant="tip"
+            compact
+          />
 
           {/* Search */}
           <div className="relative">

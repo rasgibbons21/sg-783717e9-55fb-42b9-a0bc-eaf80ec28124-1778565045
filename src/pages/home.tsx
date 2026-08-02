@@ -12,10 +12,12 @@ import { userService } from "@/services/userService";
 import { supabase } from "@/integrations/supabase/client";
 import {
   BookOpen, TrendingUp, MessageCircle, NotebookPen,
-  ChevronRight, Flame, Target, Sparkles, Play,
+  ChevronRight, Flame, Target, Sparkles, Play, ArrowRight,
 } from "lucide-react";
+import { motion } from "framer-motion";
 import { TimeGreeting } from "@/components/TimeGreeting";
 import { GemsLeaderboard } from "@/components/GemsLeaderboard";
+import { PansyContextCard } from "@/components/PansyContextCard";
 
 export default function Home() {
   const router = useRouter();
@@ -117,6 +119,45 @@ export default function Home() {
     { name: "Bloom", emoji: "🌸" },
   ];
 
+  const getJourneyCoachMessage = (): { message: string; action: { label: string; href: string } } => {
+    if (completedCount === 0) {
+      return {
+        message: "Your first step: learn what a stock actually is. It takes 3 minutes and changes how you see the market.",
+        action: { label: "Start First Lesson", href: "/learn" },
+      };
+    }
+    if (completedCount < 5) {
+      return {
+        message: `${completedCount} lessons done — you're in the Seed stage. Keep going to reach Sprout. Each lesson builds on the last.`,
+        action: { label: "Next Lesson", href: "/learn" },
+      };
+    }
+    if (completedCount < 12 && streak === 0) {
+      return {
+        message: "You haven't studied today yet. Even 5 minutes keeps the momentum going. Your Sprout stage garden needs water!",
+        action: { label: "Continue Learning", href: "/learn" },
+      };
+    }
+    if (completedCount < 12) {
+      return {
+        message: "You're in the Sprout stage now. Try the Practice Trader to apply what you've learned — no real money involved.",
+        action: { label: "Try Practice Trading", href: "/practice" },
+      };
+    }
+    if (completedCount < 22) {
+      return {
+        message: "Growing strong! You know enough to start exploring real stocks. Head to Discover and research some companies.",
+        action: { label: "Discover Stocks", href: "/discover" },
+      };
+    }
+    return {
+      message: "Full Bloom! You've built a strong foundation. Consider finding a broker to start your real investing journey.",
+      action: { label: "Find a Broker", href: "/brokers" },
+    };
+  };
+
+  const coach = getJourneyCoachMessage();
+
   return (
     <Layout>
       <SEO title="Home — Bloom" description="Your personalized learning dashboard" />
@@ -132,27 +173,25 @@ export default function Home() {
 
           {/* Stats row */}
           <div className="grid grid-cols-3 gap-3">
-            <div className="bg-card border border-border rounded-2xl p-3 text-center">
-              <div className="flex items-center justify-center gap-1.5 mb-1">
-                <Flame className="w-4 h-4 text-orange-400" />
-                <span className="text-xl font-bold text-foreground">{streak}</span>
-              </div>
-              <p className="text-xs text-muted-foreground">day streak</p>
-            </div>
-            <div className="bg-card border border-border rounded-2xl p-3 text-center">
-              <div className="flex items-center justify-center gap-1.5 mb-1">
-                <Target className="w-4 h-4 text-[#27B7C8]" />
-                <span className="text-xl font-bold text-foreground">{progressPercent}%</span>
-              </div>
-              <p className="text-xs text-muted-foreground">journey</p>
-            </div>
-            <div className="bg-card border border-border rounded-2xl p-3 text-center">
-              <div className="flex items-center justify-center gap-1.5 mb-1">
-                <Sparkles className="w-4 h-4 text-[#49B06E]" />
-                <span className="text-xl font-bold text-foreground">{confidenceScore}</span>
-              </div>
-              <p className="text-xs text-muted-foreground">confidence</p>
-            </div>
+            {[
+              { icon: <Flame className="w-4 h-4 text-orange-400" />, value: streak, label: "day streak" },
+              { icon: <Target className="w-4 h-4 text-[#27B7C8]" />, value: `${progressPercent}%`, label: "journey" },
+              { icon: <Sparkles className="w-4 h-4 text-[#49B06E]" />, value: confidenceScore, label: "confidence" },
+            ].map((stat, i) => (
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 + i * 0.1, duration: 0.4 }}
+                className="bg-card border border-border rounded-2xl p-3 text-center"
+              >
+                <div className="flex items-center justify-center gap-1.5 mb-1">
+                  {stat.icon}
+                  <span className="text-xl font-bold text-foreground">{stat.value}</span>
+                </div>
+                <p className="text-xs text-muted-foreground">{stat.label}</p>
+              </motion.div>
+            ))}
           </div>
         </div>
 
@@ -256,6 +295,13 @@ export default function Home() {
             </div>
           </div>
         </div>
+
+        {/* ══════ PANSY'S NEXT STEP ══════ */}
+        <PansyContextCard
+          message={coach.message}
+          action={coach.action}
+          variant="coach"
+        />
 
         {/* ══════ YOUR LEARNING PATH ══════ */}
         <div className="bg-card border border-border rounded-2xl p-5">
