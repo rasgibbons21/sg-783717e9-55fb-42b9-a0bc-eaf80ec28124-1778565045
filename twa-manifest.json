@@ -40,9 +40,9 @@
     "alias": "my-key-alias"
   },
   "splashScreenFadeOutDuration": 300,
-  "appVersionCode": 12,
-  "appVersionName": "1.1.0",
-  "appVersion": "1.1.0",
+  "appVersionCode": 13,
+  "appVersionName": "1.2.0",
+  "appVersion": "1.2.0",
   "signingMode": "releaseKey",
   "isChromeOSOnly": false,
   "fallbackType": "customtabs",
@@ -58,7 +58,7 @@
   "additionalTrustedOrigins": [],
   "retainedBundles": [],
   "playBilling": {
-    "enabled": true
+    "enabled": false
   },
   "alphaDependencies": {
     "enabled": false
@@ -68,7 +68,7 @@
       "enabled": false
     },
     "playBilling": {
-      "enabled": true
+      "enabled": false
     }
   },
   "generatorApp": "bubblewrap-cli"
