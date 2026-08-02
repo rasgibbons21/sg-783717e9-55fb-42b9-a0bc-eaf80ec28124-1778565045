@@ -1,70 +1,45 @@
-# Bloom iOS App Store Build Guide
+# Bloom App Store Build Guide
 
-## Prerequisites (Mac required)
+## No Mac? Use Codemagic (Recommended)
 
-- macOS with Xcode 15+ installed
-- Apple Developer account ($99/year) — https://developer.apple.com
-- CocoaPods: `sudo gem install cocoapods`
-- Node.js 18+
+Codemagic provides cloud Mac build machines — no Mac needed.
 
-## Setup Steps
+### Step 1: Apple Developer Account
 
-### 1. Generate the iOS project
+Sign up at https://developer.apple.com ($99/year). This is required for any iOS app.
 
-On the Mac, clone the repo and run:
+### Step 2: Codemagic Setup
 
-```bash
-npm install
-npx cap add ios
-```
+1. Sign up at https://codemagic.io (free tier: 500 build mins/month)
+2. Connect your GitLab repo (`cinder-vault-enterprises-llc-group/sbw-production`)
+3. Codemagic will auto-detect the `codemagic.yaml` in the repo
 
-This creates the `ios/` directory with a full Xcode project.
+### Step 3: Add Credentials in Codemagic
 
-### 2. Open in Xcode
+In Codemagic dashboard → Settings → Environment variables, create a group called `apple_credentials`:
 
-```bash
-npx cap open ios
-```
+- **APP_STORE_CONNECT_KEY_IDENTIFIER** — from App Store Connect → Users → Keys
+- **APP_STORE_CONNECT_ISSUER_ID** — same page
+- **APP_STORE_CONNECT_PRIVATE_KEY** — download the .p8 key file, paste contents
+- **CERTIFICATE_PRIVATE_KEY** — generate via Codemagic's code signing docs
 
-### 3. Configure signing
+For Android, create a group called `android_credentials`:
+- **GCLOUD_SERVICE_ACCOUNT_CREDENTIALS** — Google Play service account JSON
+- **CM_KEYSTORE** — base64-encoded signing.keystore
+- **CM_KEYSTORE_PASSWORD** — keystore password
+- **CM_KEY_ALIAS** — `my-key-alias`
+- **CM_KEY_PASSWORD** — key password
 
-In Xcode:
-1. Select the **App** target
-2. Go to **Signing & Capabilities**
-3. Set **Team** to your Apple Developer account
-4. Set **Bundle Identifier** to `app.shebloomswealth.ios`
-5. Xcode will auto-create the provisioning profile
+### Step 4: Build
 
-### 4. App icons
+Click "Start new build" in Codemagic. It will:
+1. Spin up a Mac with Xcode
+2. Install dependencies
+3. Generate the iOS project via Capacitor
+4. Build and sign the app
+5. Upload to TestFlight automatically
 
-Place the app icon (1024x1024 PNG, no alpha) in:
-`ios/App/App/Assets.xcassets/AppIcon.appiconset/`
-
-Use the existing `store_icon.png` or generate the set with:
-https://www.appicon.co/
-
-### 5. Splash screen
-
-The Capacitor splash screen plugin is installed. Add a splash image:
-- `ios/App/App/Assets.xcassets/Splash.imageset/splash.png`
-- Or configure a storyboard launch screen in Xcode
-
-### 6. Build and test
-
-```bash
-npx cap sync ios
-```
-
-Then in Xcode: **Product → Run** (on simulator or device).
-
-### 7. Archive for App Store
-
-1. In Xcode: **Product → Archive**
-2. Once archived, click **Distribute App**
-3. Choose **App Store Connect**
-4. Upload
-
-### 8. App Store Connect
+### Step 5: App Store Connect
 
 At https://appstoreconnect.apple.com:
 1. Create a new app with bundle ID `app.shebloomswealth.ios`
