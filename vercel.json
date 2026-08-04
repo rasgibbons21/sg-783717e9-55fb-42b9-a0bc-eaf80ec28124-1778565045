@@ -2,8 +2,9 @@
   "framework": "nextjs",
   "redirects": [
     {
-      "source": "/old-path",
-      "destination": "/new-path",
+      "source": "/:path(.*)",
+      "has": [{ "type": "host", "value": "www.shebloomswealth.app" }],
+      "destination": "https://shebloomswealth.app/:path",
       "permanent": true
     }
   ],
