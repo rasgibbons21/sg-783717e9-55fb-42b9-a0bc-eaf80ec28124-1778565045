@@ -203,6 +203,13 @@ export const authService = {
           full_name: fullName,
           created_at: new Date().toISOString()
         });
+
+        // Fire welcome email (best-effort, don't block signup)
+        fetch("/api/auth/send-welcome", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: data.user.email || email, name: fullName }),
+        }).catch(() => {});
       }
 
       const authUser = data.user ? {
