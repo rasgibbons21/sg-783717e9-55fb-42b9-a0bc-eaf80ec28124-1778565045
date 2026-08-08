@@ -42,3 +42,4 @@ firebase-service-account.json
 signing.keystore
 *.keystore
 android/local.properties
+.env*

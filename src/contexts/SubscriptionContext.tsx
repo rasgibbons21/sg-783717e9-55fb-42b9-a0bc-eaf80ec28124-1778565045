@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface SubscriptionContextType {
   isPro: boolean;
+  isTrial: boolean;
+  trialDaysLeft: number;
   isLoggedIn: boolean;
   isLoading: boolean;
   userName: string | null;
@@ -16,6 +18,8 @@ const SubscriptionContext = createContext<SubscriptionContextType | undefined>(u
 export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const [isPro, setIsPro] = useState(false);
+  const [isTrial, setIsTrial] = useState(false);
+  const [trialDaysLeft, setTrialDaysLeft] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [userName, setUserName] = useState<string | null>(null);
@@ -30,6 +34,8 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
       if (error || !user) {
         setIsLoggedIn(false);
         setIsPro(false);
+        setIsTrial(false);
+        setTrialDaysLeft(0);
         setUserName(null);
         setUserId(null);
         return;
@@ -38,15 +44,21 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
       setIsLoggedIn(true);
       setUserId(user.id);
 
-      // Single profile fetch: name + Pro status in one query
       const { data: profile } = await supabase
         .from("profiles")
-        .select("is_pro, subscription_status, full_name")
+        .select("is_pro, subscription_status, full_name, trial_ends_at")
         .eq("id", user.id)
         .single();
 
-      // All content is free — every logged-in user gets full access
-      setIsPro(true);
+      const hasActiveSubscription = profile?.subscription_status === "active";
+      const trialEnd = profile?.trial_ends_at ? new Date(profile.trial_ends_at as string) : null;
+      const now = new Date();
+      const onTrial = trialEnd !== null && trialEnd > now && !hasActiveSubscription;
+      const daysLeft = trialEnd ? Math.max(0, Math.ceil((trialEnd.getTime() - now.getTime()) / 86400000)) : 0;
+
+      setIsPro(hasActiveSubscription || onTrial || (profile?.is_pro === true && !trialEnd));
+      setIsTrial(onTrial);
+      setTrialDaysLeft(daysLeft);
 
       const first = profile?.full_name
         ? (profile.full_name as string).trim().split(" ")[0]
@@ -55,6 +67,8 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     } catch {
       setIsLoggedIn(false);
       setIsPro(false);
+      setIsTrial(false);
+      setTrialDaysLeft(0);
       setUserName(null);
       setUserId(null);
     } finally {
@@ -106,7 +120,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   }, [loadAuthStatus, router.events]);
 
   return (
-    <SubscriptionContext.Provider value={{ isPro, isLoggedIn, isLoading, userName, userId, refresh }}>
+    <SubscriptionContext.Provider value={{ isPro, isTrial, trialDaysLeft, isLoggedIn, isLoading, userName, userId, refresh }}>
       {children}
     </SubscriptionContext.Provider>
   );

@@ -71,17 +71,17 @@ interface LeaderboardRow {
 
 // ── Theme Colors ──────────────────────────────────────────────────────────
 const C = {
-  bg: "#0a1e1e",
-  sidebar: "#0d2a2a",
-  card: "#0d2626",
-  cardBorder: "#1a4040",
-  accent: "#84cc16",
-  accentDim: "rgba(132,204,22,0.15)",
-  text: "#ffffff",
-  textDim: "rgba(255,255,255,0.5)",
-  textMuted: "rgba(255,255,255,0.3)",
-  red: "#ef4444",
-  green: "#84cc16",
+  bg: "#0E1B30",
+  sidebar: "#0A1525",
+  card: "#162540",
+  cardBorder: "rgba(39, 183, 200, 0.15)",
+  accent: "#27B7C8",
+  accentDim: "rgba(39, 183, 200, 0.12)",
+  text: "#F4F7FA",
+  textDim: "rgba(244, 247, 250, 0.6)",
+  textMuted: "rgba(244, 247, 250, 0.35)",
+  red: "#E5484D",
+  green: "#49B06E",
 };
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -169,7 +169,7 @@ function CloseTradeModal({ trade, currentPrice, onSubmit, onCancel }: {
         {previewPnl != null && (
           <p className="text-sm font-mono font-bold rounded-lg px-3 py-2 mb-4" style={{
             color: previewPnl >= 0 ? C.green : C.red,
-            background: previewPnl >= 0 ? "rgba(132,204,22,0.1)" : "rgba(239,68,68,0.1)",
+            background: previewPnl >= 0 ? "rgba(39,183,200,0.1)" : "rgba(239,68,68,0.1)",
           }}>
             Est. P&L: {previewPnl >= 0 ? "+" : ""}{fmt(previewPnl)}
           </p>
@@ -191,7 +191,7 @@ function CloseTradeModal({ trade, currentPrice, onSubmit, onCancel }: {
         {err && <p className="mb-3 text-sm rounded-lg px-3 py-2" style={{ color: C.red, background: "rgba(239,68,68,0.1)" }}>{err}</p>}
         <button onClick={handleConfirm} disabled={loading}
           className="w-full py-3 rounded-xl font-semibold text-sm disabled:opacity-50 transition-colors"
-          style={{ background: C.accent, color: "#0a1e1e" }}>
+          style={{ background: C.accent, color: C.bg }}>
           {loading ? "Closing…" : "Close at market"}
         </button>
       </div>
@@ -227,7 +227,7 @@ function DashScoreBar({ label, score }: { label: string; score: number }) {
 }
 
 function gradeColor(g: string) {
-  if (g === "A") return { color: C.green, bg: "rgba(132,204,22,0.1)", border: "rgba(132,204,22,0.3)" };
+  if (g === "A") return { color: C.green, bg: "rgba(39,183,200,0.1)", border: "rgba(39,183,200,0.3)" };
   if (g === "B") return { color: "#22d3ee", bg: "rgba(34,211,238,0.1)", border: "rgba(34,211,238,0.3)" };
   if (g === "C") return { color: "#facc15", bg: "rgba(250,204,21,0.1)", border: "rgba(250,204,21,0.3)" };
   if (g === "D") return { color: "#fb923c", bg: "rgba(251,146,60,0.1)", border: "rgba(251,146,60,0.3)" };
@@ -249,8 +249,8 @@ function TradeReviewModal({ state, onClose }: { state: ReviewState; onClose: () 
           <button onClick={onClose} style={{ color: C.textMuted }}><X className="w-5 h-5" /></button>
         </div>
         <div className="flex items-center justify-between rounded-lg px-4 py-3 mb-4" style={{
-          background: win ? "rgba(132,204,22,0.1)" : "rgba(239,68,68,0.1)",
-          border: `1px solid ${win ? "rgba(132,204,22,0.2)" : "rgba(239,68,68,0.2)"}`,
+          background: win ? "rgba(39,183,200,0.1)" : "rgba(239,68,68,0.1)",
+          border: `1px solid ${win ? "rgba(39,183,200,0.2)" : "rgba(239,68,68,0.2)"}`,
         }}>
           <span className="text-xs" style={{ color: C.textDim }}>Final P/L</span>
           <span className="font-mono font-bold" style={{ color: win ? C.green : C.red }}>
@@ -558,7 +558,7 @@ function PositionCalculator() {
           </div>
         )}
         <button onClick={calculate} className="w-full py-2.5 rounded-xl text-xs font-semibold transition-all hover:brightness-110 active:scale-[0.98]"
-          style={{ background: C.accent, color: "#0a1e1e" }}>
+          style={{ background: C.accent, color: C.bg }}>
           Calculate
         </button>
       </div>
@@ -738,7 +738,7 @@ function Sidebar({ view, setView, open, onClose }: {
 
         {/* Promo card */}
         <div className="px-3 pb-4">
-          <div className="rounded-xl p-4" style={{ background: `linear-gradient(135deg, rgba(132,204,22,0.15), rgba(132,204,22,0.05))`, border: `1px solid rgba(132,204,22,0.2)` }}>
+          <div className="rounded-xl p-4" style={{ background: `linear-gradient(135deg, rgba(39,183,200,0.15), rgba(39,183,200,0.05))`, border: `1px solid rgba(39,183,200,0.2)` }}>
             <div className="flex items-center gap-2 mb-2">
               <Sparkles className="w-4 h-4" style={{ color: C.accent }} />
               <p className="text-xs font-semibold" style={{ color: C.accent }}>Learn more</p>
@@ -748,7 +748,7 @@ function Sidebar({ view, setView, open, onClose }: {
             </p>
             <Link href="/learn" onClick={onClose}
               className="block text-center text-[10px] font-semibold py-1.5 rounded-lg transition-all hover:brightness-110"
-              style={{ background: C.accent, color: "#0a1e1e" }}>
+              style={{ background: C.accent, color: C.bg }}>
               Start Learning
             </Link>
           </div>
@@ -767,7 +767,7 @@ function ClosedTradeRow({ trade }: { trade: Trade }) {
       <span className="text-xs font-semibold w-5" style={{ color: win ? C.green : C.red }}>{win ? "W" : "L"}</span>
       <span className="font-mono text-sm font-semibold w-14" style={{ color: C.text }}>{trade.ticker}</span>
       <span className="text-[10px] px-1.5 py-0.5 rounded" style={{
-        background: trade.direction === "long" ? "rgba(132,204,22,0.15)" : "rgba(239,68,68,0.15)",
+        background: trade.direction === "long" ? "rgba(39,183,200,0.15)" : "rgba(239,68,68,0.15)",
         color: trade.direction === "long" ? C.green : C.red,
       }}>
         {trade.direction[0].toUpperCase()}
@@ -784,23 +784,19 @@ function ClosedTradeRow({ trade }: { trade: Trade }) {
 function ProGate() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center gap-6">
-      <div className="rounded-full p-6" style={{ background: C.accentDim, border: `1px solid rgba(132,204,22,0.2)` }}>
+      <div className="rounded-full p-6" style={{ background: C.accentDim, border: `1px solid rgba(39,183,200,0.2)` }}>
         <Lock className="w-10 h-10" style={{ color: C.accent }} />
       </div>
       <div>
         <h2 className="text-2xl font-bold mb-2" style={{ color: C.text }}>Bloom Practice Trader</h2>
         <p className="max-w-sm" style={{ color: C.textDim }}>
-          {canShowExternalPayment
-            ? "Practice trading with $10,000 in virtual cash — no real money, no real risk. Upgrade to Bloom Pro to unlock."
-            : "This feature isn't available in this version."}
+          Practice trading with $10,000 in virtual cash — no real money, no real risk. Your free trial has ended — subscribe to keep trading.
         </p>
       </div>
-      {canShowExternalPayment && (
-        <Link href="/subscription" className="px-8 py-3 rounded-xl font-semibold transition-all hover:brightness-110"
-          style={{ background: C.accent, color: "#0a1e1e" }}>
-          Upgrade to Pro
-        </Link>
-      )}
+      <Link href="/subscription" className="px-8 py-3 rounded-xl font-semibold transition-all hover:brightness-110"
+        style={{ background: C.accent, color: C.bg }}>
+        Subscribe Now
+      </Link>
     </div>
   );
 }
@@ -809,7 +805,7 @@ function ProGate() {
 // ── MAIN PAGE ─────────────────────────────────────────────────────────────
 // ══════════════════════════════════════════════════════════════════════════
 export default function PracticePage(_props: PageProps) {
-  const { isPro, isLoading: authLoading } = useSubscription();
+  const { isPro, isTrial, trialDaysLeft, isLoading: authLoading } = useSubscription();
 
   // ── Data state ──────────────────────────────────────────────────────────
   const [account, setAccount] = useState<Account | null>(null);
@@ -898,9 +894,9 @@ export default function PracticePage(_props: PageProps) {
   }, []);
 
   useEffect(() => {
-    if (!authLoading && isPro) { loadData(); loadMarketQuotes(); }
+    if (!authLoading && isPro) { loadData(); loadMarketQuotes(); loadLeaderboard(); }
     else if (!authLoading && !isPro) setLoading(false);
-  }, [authLoading, isPro, loadData, loadMarketQuotes]);
+  }, [authLoading, isPro, loadData, loadMarketQuotes, loadLeaderboard]);
 
   useEffect(() => {
     if (view === "leaderboard" && isPro) loadLeaderboard();
@@ -1005,7 +1001,7 @@ export default function PracticePage(_props: PageProps) {
                   </span>
                   <span className="text-xs font-mono px-1.5 py-0.5 rounded" style={{
                     color: metrics.totalPnlPct >= 0 ? C.green : C.red,
-                    background: metrics.totalPnlPct >= 0 ? "rgba(132,204,22,0.1)" : "rgba(239,68,68,0.1)",
+                    background: metrics.totalPnlPct >= 0 ? "rgba(39,183,200,0.1)" : "rgba(239,68,68,0.1)",
                   }}>
                     {metrics.totalPnlPct >= 0 ? "+" : ""}{metrics.totalPnlPct.toFixed(2)}%
                   </span>
@@ -1025,7 +1021,7 @@ export default function PracticePage(_props: PageProps) {
             <div className="flex items-center gap-2 flex-shrink-0 ml-auto">
               <button onClick={() => { setView("trades"); setShowOpenModal(true); }}
                 className="hidden sm:flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold transition-all hover:brightness-110 active:scale-[0.98]"
-                style={{ background: C.accent, color: "#0a1e1e" }}>
+                style={{ background: C.accent, color: C.bg }}>
                 <Plus className="w-3.5 h-3.5" />
                 New Trade
               </button>
@@ -1059,6 +1055,26 @@ export default function PracticePage(_props: PageProps) {
                 }}>
                   {error}
                   <button onClick={loadData} className="ml-2 underline">Retry</button>
+                </div>
+              )}
+
+              {/* ── Trial Banner ──────────────────────────────────── */}
+              {isTrial && (
+                <div className="rounded-xl px-4 py-3 mb-4 flex items-center justify-between" style={{
+                  background: "linear-gradient(135deg, rgba(39,183,200,0.15), rgba(73,176,110,0.1))",
+                  border: "1px solid rgba(39,183,200,0.3)",
+                }}>
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4" style={{ color: C.accent }} />
+                    <span className="text-sm" style={{ color: C.text }}>
+                      <span className="font-semibold">{trialDaysLeft} day{trialDaysLeft !== 1 ? "s" : ""}</span>
+                      <span style={{ color: C.textDim }}> left in your free trial</span>
+                    </span>
+                  </div>
+                  <Link href="/subscription" className="text-xs font-semibold px-3 py-1.5 rounded-lg transition-all hover:brightness-110"
+                    style={{ background: C.accent, color: C.bg }}>
+                    Subscribe
+                  </Link>
                 </div>
               )}
 
@@ -1140,6 +1156,54 @@ export default function PracticePage(_props: PageProps) {
 
                   {/* ── Right Column ────────────────────────────────── */}
                   <div className="space-y-5">
+                    {/* Leaderboard Preview */}
+                    <div className="rounded-2xl p-4" style={{ background: C.card, border: `1px solid ${C.cardBorder}` }}>
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <Trophy className="w-4 h-4" style={{ color: "#facc15" }} />
+                          <span className="text-xs font-semibold" style={{ color: C.text }}>Top Traders</span>
+                        </div>
+                        <button onClick={() => { setView("leaderboard"); loadLeaderboard(); }}
+                          className="text-[10px] font-medium px-2 py-0.5 rounded-lg transition-colors hover:brightness-110"
+                          style={{ color: C.accent, background: C.accentDim }}>
+                          View All
+                        </button>
+                      </div>
+                      {lbTop.length === 0 ? (
+                        <p className="text-xs py-4 text-center" style={{ color: C.textMuted }}>
+                          Close trades to climb the leaderboard
+                        </p>
+                      ) : (
+                        <div className="space-y-1.5">
+                          {lbTop.slice(0, 3).map((row) => {
+                            const medal = row.rank === 1 ? "🥇" : row.rank === 2 ? "🥈" : "🥉";
+                            const isMe = lbMe?.user_id === row.user_id;
+                            return (
+                              <div key={row.user_id} className="flex items-center gap-2 px-2 py-1.5 rounded-lg"
+                                style={{ background: isMe ? C.accentDim : "transparent" }}>
+                                <span className="text-sm">{medal}</span>
+                                <span className="text-xs flex-1 truncate" style={{ color: isMe ? C.accent : C.textDim }}>
+                                  {row.display_name}
+                                </span>
+                                <span className="text-xs font-mono font-bold" style={{ color: row.total_pnl >= 0 ? C.green : C.red }}>
+                                  {row.total_pnl >= 0 ? "+" : ""}{fmt(row.total_pnl)}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                      {lbMe && !lbTop.slice(0, 3).find(r => r.user_id === lbMe.user_id) && (
+                        <div className="mt-2 pt-2 flex items-center gap-2 px-2 py-1.5 rounded-lg"
+                          style={{ borderTop: `1px solid ${C.cardBorder}`, background: C.accentDim }}>
+                          <span className="text-[10px] font-bold" style={{ color: C.textMuted }}>#{lbMe.rank}</span>
+                          <span className="text-xs flex-1 truncate" style={{ color: C.accent }}>{lbMe.display_name}</span>
+                          <span className="text-xs font-mono font-bold" style={{ color: lbMe.total_pnl >= 0 ? C.green : C.red }}>
+                            {lbMe.total_pnl >= 0 ? "+" : ""}{fmt(lbMe.total_pnl)}
+                          </span>
+                        </div>
+                      )}
+                    </div>
                     <PositionCalculator />
                     <MarketHoursPanel />
                   </div>
@@ -1154,7 +1218,7 @@ export default function PracticePage(_props: PageProps) {
                   {/* Open Position CTA */}
                   <button onClick={() => setShowOpenModal(true)}
                     className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-semibold mb-6 transition-all hover:brightness-110 active:scale-[0.98]"
-                    style={{ background: C.accent, color: "#0a1e1e" }}>
+                    style={{ background: C.accent, color: C.bg }}>
                     <Plus className="w-5 h-5" />
                     Open New Position
                   </button>
@@ -1263,8 +1327,8 @@ export default function PracticePage(_props: PageProps) {
                           <div key={row.user_id}
                             className="flex items-center gap-3 p-3.5 rounded-xl transition-colors"
                             style={{
-                              background: isMe ? "rgba(132,204,22,0.08)" : "rgba(255,255,255,0.02)",
-                              border: `1px solid ${isMe ? "rgba(132,204,22,0.3)" : C.cardBorder}`,
+                              background: isMe ? "rgba(39,183,200,0.08)" : "rgba(255,255,255,0.02)",
+                              border: `1px solid ${isMe ? "rgba(39,183,200,0.3)" : C.cardBorder}`,
                             }}>
                             <span className="w-8 text-center text-sm font-bold" style={{ color: C.textDim }}>
                               {medal ?? `#${row.rank}`}
@@ -1292,7 +1356,7 @@ export default function PracticePage(_props: PageProps) {
                             <div className="flex-1 border-t" style={{ borderColor: C.cardBorder }} />
                           </div>
                           <div className="flex items-center gap-3 p-3.5 rounded-xl"
-                            style={{ background: "rgba(132,204,22,0.08)", border: `1px solid rgba(132,204,22,0.3)` }}>
+                            style={{ background: "rgba(39,183,200,0.08)", border: `1px solid rgba(39,183,200,0.3)` }}>
                             <span className="w-8 text-center text-sm font-bold" style={{ color: C.textDim }}>
                               #{lbMe.rank}
                             </span>
@@ -1332,7 +1396,7 @@ export default function PracticePage(_props: PageProps) {
               {/* ── Mobile FAB ──────────────────────────────────────── */}
               <button onClick={() => { setView("trades"); setShowOpenModal(true); }}
                 className="fixed bottom-24 right-5 z-30 w-14 h-14 rounded-full flex items-center justify-center shadow-xl sm:hidden transition-all hover:scale-105 active:scale-95"
-                style={{ background: C.accent, color: "#0a1e1e", boxShadow: `0 4px 20px rgba(132,204,22,0.3)` }}>
+                style={{ background: C.accent, color: "#0a1e1e", boxShadow: `0 4px 20px rgba(39,183,200,0.3)` }}>
                 <Plus className="w-6 h-6" />
               </button>
 
