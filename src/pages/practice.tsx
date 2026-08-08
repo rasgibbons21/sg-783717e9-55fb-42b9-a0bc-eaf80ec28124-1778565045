@@ -60,6 +60,15 @@ interface MarketQuote {
   change: number;
 }
 
+interface LeaderboardRow {
+  user_id: string;
+  display_name: string;
+  total_pnl: number;
+  total_trades: number;
+  win_rate: number;
+  rank: number;
+}
+
 // ── Theme Colors ──────────────────────────────────────────────────────────
 const C = {
   bg: "#0a1e1e",
@@ -655,13 +664,14 @@ function MarketHoursPanel() {
 }
 
 // ── Sidebar ───────────────────────────────────────────────────────────────
-type View = "dashboard" | "trades" | "discover" | "journal" | "progress";
+type View = "dashboard" | "trades" | "discover" | "journal" | "progress" | "leaderboard";
 
 const SIDEBAR_ITEMS: { id: View | "link"; icon: any; label: string; href?: string }[] = [
   { id: "dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { id: "trades", icon: TrendingUp, label: "Trades" },
   { id: "link", icon: Search, label: "Discover", href: "/discover" },
   { id: "link", icon: Wallet, label: "Assets", href: "/research" },
+  { id: "leaderboard", icon: Trophy, label: "Leaderboard" },
   { id: "journal", icon: NotebookPen, label: "Journal", href: "/journal" },
   { id: "link", icon: Calendar, label: "Calendar", href: "/learn" },
   { id: "link", icon: Settings, label: "Settings", href: "/profile" },
@@ -818,6 +828,9 @@ export default function PracticePage(_props: PageProps) {
   const [view, setView] = useState<View>("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [marketQuotes, setMarketQuotes] = useState<MarketQuote[]>([]);
+  const [lbTop, setLbTop] = useState<LeaderboardRow[]>([]);
+  const [lbMe, setLbMe] = useState<LeaderboardRow | null>(null);
+  const [lbLoading, setLbLoading] = useState(false);
 
   // ── Load account + trades ───────────────────────────────────────────────
   const loadData = useCallback(async () => {
@@ -872,10 +885,26 @@ export default function PracticePage(_props: PageProps) {
     } catch { /* non-fatal */ }
   }, []);
 
+  const loadLeaderboard = useCallback(async () => {
+    setLbLoading(true);
+    try {
+      const res = await apiFetch("/api/practice/leaderboard");
+      if (res.ok) {
+        const data = await res.json();
+        setLbTop(data.top ?? []);
+        setLbMe(data.me ?? null);
+      }
+    } catch { /* non-fatal */ } finally { setLbLoading(false); }
+  }, []);
+
   useEffect(() => {
     if (!authLoading && isPro) { loadData(); loadMarketQuotes(); }
     else if (!authLoading && !isPro) setLoading(false);
   }, [authLoading, isPro, loadData, loadMarketQuotes]);
+
+  useEffect(() => {
+    if (view === "leaderboard" && isPro) loadLeaderboard();
+  }, [view, isPro, loadLeaderboard]);
 
   useEffect(() => {
     const open = trades.filter(t => t.status === "open");
@@ -1193,6 +1222,102 @@ export default function PracticePage(_props: PageProps) {
                       )}
                     </div>
                   )}
+                </div>
+              )}
+
+              {/* ════════════════════════════════════════════════════ */}
+              {/* LEADERBOARD VIEW                                     */}
+              {/* ════════════════════════════════════════════════════ */}
+              {!authLoading && isPro && !error && view === "leaderboard" && (
+                <div className="max-w-2xl">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: C.accentDim }}>
+                      <Trophy className="w-5 h-5" style={{ color: C.accent }} />
+                    </div>
+                    <div>
+                      <h2 className="text-lg font-bold" style={{ color: C.text }}>Trading Leaderboard</h2>
+                      <p className="text-xs" style={{ color: C.textDim }}>Ranked by total P&L from closed trades</p>
+                    </div>
+                  </div>
+
+                  {lbLoading ? (
+                    <div className="flex justify-center py-16">
+                      <Loader2 className="w-6 h-6 animate-spin" style={{ color: C.accent }} />
+                    </div>
+                  ) : lbTop.length === 0 ? (
+                    <div className="flex flex-col items-center py-16 text-center">
+                      <div className="w-14 h-14 rounded-full flex items-center justify-center mb-4" style={{ background: C.accentDim }}>
+                        <Trophy className="w-6 h-6" style={{ color: C.accent }} />
+                      </div>
+                      <p className="text-sm font-medium mb-1" style={{ color: C.textDim }}>No traders yet</p>
+                      <p className="text-xs max-w-[220px]" style={{ color: C.textMuted }}>
+                        Close your first trade to appear on the leaderboard
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {lbTop.map((row) => {
+                        const isMe = lbMe?.user_id === row.user_id;
+                        const medal = row.rank === 1 ? "🥇" : row.rank === 2 ? "🥈" : row.rank === 3 ? "🥉" : null;
+                        return (
+                          <div key={row.user_id}
+                            className="flex items-center gap-3 p-3.5 rounded-xl transition-colors"
+                            style={{
+                              background: isMe ? "rgba(132,204,22,0.08)" : "rgba(255,255,255,0.02)",
+                              border: `1px solid ${isMe ? "rgba(132,204,22,0.3)" : C.cardBorder}`,
+                            }}>
+                            <span className="w-8 text-center text-sm font-bold" style={{ color: C.textDim }}>
+                              {medal ?? `#${row.rank}`}
+                            </span>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold truncate" style={{ color: isMe ? C.accent : C.text }}>
+                                {row.display_name}{isMe && " (you)"}
+                              </p>
+                              <p className="text-[10px]" style={{ color: C.textMuted }}>
+                                {row.total_trades} trades · {row.win_rate}% win rate
+                              </p>
+                            </div>
+                            <span className="text-sm font-mono font-bold" style={{ color: row.total_pnl >= 0 ? C.green : C.red }}>
+                              {row.total_pnl >= 0 ? "+" : ""}{fmt(row.total_pnl)}
+                            </span>
+                          </div>
+                        );
+                      })}
+
+                      {lbMe && !lbTop.find(r => r.user_id === lbMe.user_id) && (
+                        <>
+                          <div className="flex items-center gap-2 py-2">
+                            <div className="flex-1 border-t" style={{ borderColor: C.cardBorder }} />
+                            <span className="text-[10px]" style={{ color: C.textMuted }}>Your rank</span>
+                            <div className="flex-1 border-t" style={{ borderColor: C.cardBorder }} />
+                          </div>
+                          <div className="flex items-center gap-3 p-3.5 rounded-xl"
+                            style={{ background: "rgba(132,204,22,0.08)", border: `1px solid rgba(132,204,22,0.3)` }}>
+                            <span className="w-8 text-center text-sm font-bold" style={{ color: C.textDim }}>
+                              #{lbMe.rank}
+                            </span>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold truncate" style={{ color: C.accent }}>
+                                {lbMe.display_name} (you)
+                              </p>
+                              <p className="text-[10px]" style={{ color: C.textMuted }}>
+                                {lbMe.total_trades} trades · {lbMe.win_rate}% win rate
+                              </p>
+                            </div>
+                            <span className="text-sm font-mono font-bold" style={{ color: lbMe.total_pnl >= 0 ? C.green : C.red }}>
+                              {lbMe.total_pnl >= 0 ? "+" : ""}{fmt(lbMe.total_pnl)}
+                            </span>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  )}
+
+                  <button onClick={loadLeaderboard}
+                    className="mt-4 w-full py-2.5 rounded-xl text-xs font-medium transition-colors"
+                    style={{ color: C.textDim, background: "rgba(255,255,255,0.03)", border: `1px solid ${C.cardBorder}` }}>
+                    Refresh
+                  </button>
                 </div>
               )}
 
