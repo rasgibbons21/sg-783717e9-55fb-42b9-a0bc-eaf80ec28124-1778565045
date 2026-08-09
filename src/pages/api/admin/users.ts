@@ -24,19 +24,36 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const { data: publicUsers } = await supabaseAdmin
       .from("profiles")
-      .select("id, full_name, risk_tolerance, experience_level, onboarding_complete, created_at, is_pro, subscription_status");
+      .select("id, full_name, risk_tolerance, experience_level, onboarding_complete, created_at, is_pro, subscription_status, trial_ends_at, challenge_name");
 
     const users = authData.users.map(au => {
       const pub = (publicUsers ?? []).find(u => u.id === au.id);
+      const trialEnd = pub?.trial_ends_at ? new Date(pub.trial_ends_at) : null;
+      const now = new Date();
+      const hasSubscription = pub?.subscription_status === "active";
+      const onTrial = trialEnd !== null && trialEnd > now && !hasSubscription;
+      const manualPro = pub?.is_pro === true && !trialEnd;
+
+      let proStatus = "free";
+      if (hasSubscription) proStatus = "subscribed";
+      else if (onTrial) proStatus = `trial (${Math.ceil((trialEnd!.getTime() - now.getTime()) / 86400000)}d left)`;
+      else if (manualPro) proStatus = "manual pro";
+      else if (trialEnd && trialEnd <= now) proStatus = "trial expired";
+
       return {
         id: au.id,
         email: au.email || "",
         full_name: pub?.full_name || au.user_metadata?.full_name || "",
+        challenge_name: pub?.challenge_name || "",
         risk_tolerance: pub?.risk_tolerance || "",
         onboarding_complete: !!pub?.onboarding_complete,
         created_at: au.created_at || pub?.created_at || new Date().toISOString(),
         last_sign_in: au.last_sign_in_at || null,
-        email_confirmed: !!au.email_confirmed_at
+        email_confirmed: !!au.email_confirmed_at,
+        is_pro: !!pub?.is_pro,
+        subscription_status: pub?.subscription_status || null,
+        trial_ends_at: pub?.trial_ends_at || null,
+        pro_status: proStatus,
       };
     }).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 

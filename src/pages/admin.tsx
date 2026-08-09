@@ -48,6 +48,8 @@ export default function AdminDashboard() {
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [brokerData, setBrokerData] = useState<BrokerData[]>([]);
+  const [userList, setUserList] = useState<any[]>([]);
+  const [usersLoading, setUsersLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -71,6 +73,7 @@ export default function AdminDashboard() {
         const data = await res.json();
         setAnalytics(data);
         loadBrokers(session.access_token);
+        loadUsers(session.access_token);
       }
     } catch {
       // not admin
@@ -95,6 +98,23 @@ export default function AdminDashboard() {
       }
     } catch {
       // ignore
+    }
+  };
+
+  const loadUsers = async (token: string) => {
+    setUsersLoading(true);
+    try {
+      const res = await fetch("/api/admin/users", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setUserList(data.users ?? []);
+      }
+    } catch {
+      // ignore
+    } finally {
+      setUsersLoading(false);
     }
   };
 
@@ -218,13 +238,71 @@ export default function AdminDashboard() {
 
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid grid-cols-5 w-full max-w-4xl">
+          <TabsList className="grid grid-cols-6 w-full max-w-4xl">
             <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="brokers">Brokers</TabsTrigger>
             <TabsTrigger value="engagement">Engagement</TabsTrigger>
             <TabsTrigger value="revenue">Revenue</TabsTrigger>
             <TabsTrigger value="exports">Exports</TabsTrigger>
           </TabsList>
+
+          {/* Users Tab */}
+          <TabsContent value="users" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Users className="w-5 h-5" /> All Users ({userList.length})
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {usersLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-border">
+                          <th className="text-left py-2 px-2 text-muted-foreground font-medium">Name</th>
+                          <th className="text-left py-2 px-2 text-muted-foreground font-medium">Email</th>
+                          <th className="text-left py-2 px-2 text-muted-foreground font-medium">Status</th>
+                          <th className="text-left py-2 px-2 text-muted-foreground font-medium">Signed Up</th>
+                          <th className="text-left py-2 px-2 text-muted-foreground font-medium">Last Sign In</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {userList.map((u: any) => (
+                          <tr key={u.id} className="border-b border-border/50 hover:bg-muted/30">
+                            <td className="py-2 px-2 text-foreground">{u.full_name || "—"}</td>
+                            <td className="py-2 px-2 text-foreground">{u.email}</td>
+                            <td className="py-2 px-2">
+                              <Badge className={
+                                u.pro_status === "subscribed" ? "bg-accent text-accent-foreground" :
+                                u.pro_status?.startsWith("trial") ? "bg-amber-500/20 text-amber-400 border border-amber-500/30" :
+                                u.pro_status === "manual pro" ? "bg-purple-500/20 text-purple-400 border border-purple-500/30" :
+                                u.pro_status === "trial expired" ? "bg-red-500/20 text-red-400 border border-red-500/30" :
+                                "bg-muted text-muted-foreground"
+                              }>
+                                {u.pro_status}
+                              </Badge>
+                            </td>
+                            <td className="py-2 px-2 text-muted-foreground">
+                              {new Date(u.created_at).toLocaleDateString()}
+                            </td>
+                            <td className="py-2 px-2 text-muted-foreground">
+                              {u.last_sign_in ? new Date(u.last_sign_in).toLocaleDateString() : "Never"}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
