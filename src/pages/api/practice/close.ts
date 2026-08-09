@@ -63,6 +63,34 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (updateErr) return res.status(500).json({ error: updateErr.message });
 
+  // Auto-journal the closed trade (basic entry — user can enrich via review later)
+  const durationMs = new Date(updated.exit_at).getTime() - new Date(trade.created_at).getTime();
+  const durationMinutes = Math.max(1, Math.round(durationMs / 60000));
+
+  await supabaseAdmin
+    .from("practice_journal")
+    .upsert({
+      user_id: userId,
+      trade_id: trade.id,
+      ticker: trade.ticker,
+      direction: trade.direction,
+      entry_price: trade.entry_price,
+      exit_price: exitP,
+      stop_price: trade.stop_price,
+      target_price: trade.target_price,
+      shares: trade.shares,
+      pnl,
+      pnl_pct,
+      risk_amount: trade.risk_amount,
+      duration_minutes: durationMinutes,
+      thesis: trade.thesis,
+      exit_reason: exit_reason || null,
+      closed_at: updated.exit_at,
+    }, { onConflict: "trade_id" })
+    .then(({ error: jErr }) => {
+      if (jErr) console.error("Auto-journal insert error:", jErr);
+    });
+
   // Release the reserved cost (entry × shares) + realized P&L back to buying power.
   // This is direction-correct: for a long it equals exit×shares (unchanged), and
   // for a short it credits the true result (the old exit×shares INVERTED shorts).

@@ -58,7 +58,7 @@ export default function Onboarding() {
         .eq("id", session.user.id)
         .single();
       if (profile?.onboarding_complete) {
-        router.push("/journal");
+        router.push("/home");
       } else {
         setStep("q-topics");
       }
@@ -142,7 +142,7 @@ export default function Onboarding() {
           setIsSubmitting(false);
           return;
         }
-        if (user) router.push("/journal");
+        if (user) router.push("/home");
       }
     } catch (err: any) {
       console.error("Auth error:", err);
@@ -157,7 +157,7 @@ export default function Onboarding() {
     if (!user) { setError("Session expired — please sign in again."); return; }
     const { error } = await supabase.from("profiles").upsert({ id: user.id, onboarding_complete: true });
     if (error) { setError("Something went wrong. Please try again."); return; }
-    window.location.href = "/journal";
+    window.location.href = "/home";
   };
 
   const handleCompleteOnboarding = async () => {
@@ -759,7 +759,7 @@ export default function Onboarding() {
 
                   <button
                     type="button"
-                    onClick={() => { window.location.href = "/journal"; }}
+                    onClick={() => { window.location.href = "/home"; }}
                     className="glass-btn flex items-center justify-center gap-2 text-lg"
                   >
                     Start Learning <ChevronRight className="w-5 h-5" />
