@@ -261,7 +261,7 @@ export default function LandingPage() {
       if (session) {
         // Any logged-in user belongs in the dashboard, not the marketing page.
         // home.tsx handles onboarding state from there.
-        router.push("/home");
+        router.push("/journal");
         return;
       }
       setIsCheckingAuth(false);

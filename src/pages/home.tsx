@@ -12,7 +12,7 @@ import { userService } from "@/services/userService";
 import { supabase } from "@/integrations/supabase/client";
 import {
   BookOpen, TrendingUp, MessageCircle, NotebookPen,
-  ChevronRight, Flame, Target, Sparkles, Play, ArrowRight,
+  ChevronRight, Flame, Target, Sparkles, Play, ArrowRight, Trophy,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { TimeGreeting } from "@/components/TimeGreeting";
@@ -27,6 +27,8 @@ export default function Home() {
   const [streak, setStreak] = useState(0);
   const [briefing, setBriefing] = useState<string | null>(null);
   const [briefingLoading, setBriefingLoading] = useState(true);
+  const [traderLb, setTraderLb] = useState<{ display_name: string; total_pnl: number; win_rate: number; rank: number }[]>([]);
+  const [traderMe, setTraderMe] = useState<{ display_name: string; total_pnl: number; win_rate: number; rank: number } | null>(null);
 
   useEffect(() => {
     checkAuth();
@@ -55,6 +57,7 @@ export default function Home() {
 
     loadProgress(session.user.id);
     loadBriefing(session.access_token);
+    loadTraderLeaderboard(session.access_token);
   };
 
   const loadProgress = async (userId: string) => {
@@ -104,6 +107,20 @@ export default function Home() {
       // silent
     } finally {
       setBriefingLoading(false);
+    }
+  };
+
+  const loadTraderLeaderboard = async (token: string) => {
+    try {
+      const res = await fetch("/api/practice/leaderboard", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      setTraderLb(data.top ?? []);
+      setTraderMe(data.me ?? null);
+    } catch {
+      // silent
     }
   };
 
@@ -341,7 +358,55 @@ export default function Home() {
           </div>
         </div>
 
-        {/* ══════ LEADERBOARD ══════ */}
+        {/* ══════ TRADER LEADERBOARD ══════ */}
+        {traderLb.length > 0 && (
+          <Link href="/practice" className="block">
+            <div className="bg-card border border-border rounded-2xl p-5 space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="font-serif text-lg font-bold text-foreground flex items-center gap-2">
+                  <Trophy className="w-5 h-5 text-[#27B7C8]" /> Top Traders
+                </h3>
+                <span className="text-xs text-[#27B7C8] font-medium flex items-center gap-1">
+                  View All <ChevronRight className="w-3.5 h-3.5" />
+                </span>
+              </div>
+              <div className="space-y-2">
+                {traderLb.slice(0, 5).map((row) => {
+                  const medals: Record<number, string> = { 1: "\u{1F947}", 2: "\u{1F948}", 3: "\u{1F949}" };
+                  const isPositive = row.total_pnl >= 0;
+                  return (
+                    <div key={row.rank} className="flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-muted/50">
+                      <span className="w-7 text-center text-sm font-semibold text-muted-foreground">
+                        {medals[row.rank] ?? row.rank}
+                      </span>
+                      <span className="flex-1 text-sm font-medium text-foreground truncate">
+                        {row.display_name}
+                      </span>
+                      <span className={`text-sm font-bold ${isPositive ? "text-[#49B06E]" : "text-red-400"}`}>
+                        {isPositive ? "+" : ""}${row.total_pnl.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
+                      <span className="text-xs text-muted-foreground w-12 text-right">{row.win_rate}%</span>
+                    </div>
+                  );
+                })}
+              </div>
+              {traderMe && traderMe.rank > 5 && (
+                <div className="border-t border-border pt-3">
+                  <div className="flex items-center gap-3 rounded-xl px-3 py-2.5 bg-[#27B7C8]/10 border border-[#27B7C8]/20">
+                    <span className="w-7 text-center text-sm font-semibold text-[#27B7C8]">{traderMe.rank}</span>
+                    <span className="flex-1 text-sm font-medium text-foreground truncate">You</span>
+                    <span className={`text-sm font-bold ${traderMe.total_pnl >= 0 ? "text-[#49B06E]" : "text-red-400"}`}>
+                      {traderMe.total_pnl >= 0 ? "+" : ""}${traderMe.total_pnl.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                    <span className="text-xs text-muted-foreground w-12 text-right">{traderMe.win_rate}%</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </Link>
+        )}
+
+        {/* ══════ GEMS LEADERBOARD ══════ */}
         <GemsLeaderboard />
 
         {/* ══════ QUICK ACTIONS ══════ */}
