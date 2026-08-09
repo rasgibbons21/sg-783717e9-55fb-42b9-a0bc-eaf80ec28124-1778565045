@@ -1,0 +1,4 @@
+ALTER TABLE profiles
+ADD COLUMN IF NOT EXISTS verification_code TEXT,
+ADD COLUMN IF NOT EXISTS verification_sent_at TIMESTAMPTZ,
+ADD COLUMN IF NOT EXISTS email_verified BOOLEAN DEFAULT false;

@@ -284,6 +284,9 @@ export type Database = {
           trial_ends_at: string | null
           challenge_name: string | null
           updated_at: string | null
+          verification_code: string | null
+          verification_sent_at: string | null
+          email_verified: boolean | null
         }
         Insert: {
           avatar_url?: string | null
@@ -313,6 +316,9 @@ export type Database = {
           trial_ends_at?: string | null
           challenge_name?: string | null
           updated_at?: string | null
+          verification_code?: string | null
+          verification_sent_at?: string | null
+          email_verified?: boolean | null
         }
         Update: {
           avatar_url?: string | null
@@ -342,6 +348,9 @@ export type Database = {
           trial_ends_at?: string | null
           challenge_name?: string | null
           updated_at?: string | null
+          verification_code?: string | null
+          verification_sent_at?: string | null
+          email_verified?: boolean | null
         }
         Relationships: []
       }
