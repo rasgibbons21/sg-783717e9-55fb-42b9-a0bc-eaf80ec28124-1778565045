@@ -21,7 +21,7 @@ import { PansyContextCard } from "@/components/PansyContextCard";
 
 export default function Home() {
   const router = useRouter();
-  const { isPro, userName } = useSubscription();
+  const { isPro, isTrial, trialDaysLeft, userName } = useSubscription();
   const [user, setUser] = useState<any>(null);
   const [completedCount, setCompletedCount] = useState(0);
   const [streak, setStreak] = useState(0);
@@ -187,6 +187,27 @@ export default function Home() {
             <TimeGreeting fullName={user?.full_name ?? userName} />
             <p className="text-muted-foreground mt-1">Your next small step is ready.</p>
           </div>
+
+          {/* Trial banner */}
+          {isTrial && (
+            <Link href="/subscription" className="block">
+              <div className="rounded-xl px-4 py-3 flex items-center justify-between" style={{
+                background: "linear-gradient(135deg, rgba(39,183,200,0.15), rgba(73,176,110,0.1))",
+                border: "1px solid rgba(39,183,200,0.3)",
+              }}>
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-[#27B7C8]" />
+                  <span className="text-sm text-foreground">
+                    <span className="font-semibold">{trialDaysLeft} day{trialDaysLeft !== 1 ? "s" : ""}</span>
+                    <span className="text-muted-foreground"> left in your free trial</span>
+                  </span>
+                </div>
+                <span className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-[#27B7C8] text-[#0E1B30]">
+                  Subscribe
+                </span>
+              </div>
+            </Link>
+          )}
 
           {/* Stats row */}
           <div className="grid grid-cols-3 gap-3">

@@ -48,7 +48,7 @@ const TIME_HORIZON_OPTIONS = [
 export default function Profile() {
   const router = useRouter();
   const { toast } = useToast();
-  const { isPro, isLoading: subscriptionLoading } = useSubscription();
+  const { isPro, isTrial, trialDaysLeft, isLoading: subscriptionLoading } = useSubscription();
   const [user, setUser] = useState<any>(null);
   const [authCreatedAt, setAuthCreatedAt] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -317,7 +317,7 @@ export default function Profile() {
                 </h2>
                 {isPro && (
                   <Badge className="bg-accent text-accent-foreground">
-                    Pro
+                    {isTrial ? `Trial — ${trialDaysLeft}d left` : "Pro"}
                   </Badge>
                 )}
               </div>
