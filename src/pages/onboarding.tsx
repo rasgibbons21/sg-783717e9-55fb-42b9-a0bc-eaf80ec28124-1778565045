@@ -43,6 +43,7 @@ export default function Onboarding() {
   const [verificationCode, setVerificationCode] = useState("");
   const [verificationError, setVerificationError] = useState("");
   const [verificationSending, setVerificationSending] = useState(false);
+  const [referralCode, setReferralCode] = useState("");
 
   const [topics, setTopics] = useState<LearningTopic[]>([]);
   const [stockExp, setStockExp] = useState<StockExperience | null>(null);
@@ -50,6 +51,13 @@ export default function Onboarding() {
   const [dailyTime, setDailyTime] = useState<DailyTime | null>(null);
 
   const submitLock = useRef(false);
+
+  useEffect(() => {
+    const ref = router.query.ref;
+    if (typeof ref === "string" && ref.trim()) {
+      setReferralCode(ref.trim().toUpperCase());
+    }
+  }, [router.query.ref]);
 
   useEffect(() => {
     (async () => {
@@ -225,6 +233,16 @@ export default function Onboarding() {
       });
       const d = await res.json();
       if (!res.ok) { setVerificationError(d.error || "Verification failed"); return; }
+      // Apply referral code if one was provided
+      if (referralCode.trim()) {
+        try {
+          await fetch("/api/referral/apply", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
+            body: JSON.stringify({ code: referralCode.trim() }),
+          });
+        } catch {}
+      }
       setSignupSuccess(false);
       setStep("q-topics");
     } catch { setVerificationError("Network error — please try again."); }
@@ -280,6 +298,11 @@ export default function Onboarding() {
               <p className="text-[#F4F7FA]/60 text-lg">
                 We sent a 6-digit code to <strong className="text-[#27B7C8]">{email}</strong>
               </p>
+              {referralCode && (
+                <div className="px-4 py-3 rounded-xl text-sm text-[#49B06E] font-medium" style={{ background: "rgba(73,176,110,0.1)", border: "1px solid rgba(73,176,110,0.2)" }}>
+                  Referral code applied — you&apos;ll both get 7 bonus Pro days!
+                </div>
+              )}
               <div className="space-y-4">
                 <input
                   type="text"
@@ -520,6 +543,12 @@ export default function Onboarding() {
                                   <button type="button" onClick={() => { setAuthMode("forgot"); setError(""); }} className="text-sm text-[#27B7C8]/70 hover:text-[#27B7C8] font-medium transition-colors">Forgot password?</button>
                                 </div>
                               )}
+                            </div>
+                          )}
+                          {authMode === "signup" && (
+                            <div className="space-y-1.5">
+                              <Label htmlFor="referral" className="text-xs font-medium text-[#F4F7FA]/40 uppercase tracking-wider">Referral Code <span className="normal-case text-[#F4F7FA]/25">(optional)</span></Label>
+                              <Input id="referral" type="text" placeholder="BLOOM-XXXXXX" value={referralCode} onChange={(e) => setReferralCode(e.target.value.toUpperCase())} disabled={isSubmitting} className="glass-input h-12 tracking-wider" />
                             </div>
                           )}
                           {error && (

@@ -19,7 +19,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { authService } from "@/services/authService";
 import { userService } from "@/services/userService";
 import { supabase } from "@/integrations/supabase/client";
-import { User, Mail, Calendar, Crown, Settings, LogOut, Camera, Share, CreditCard, Bell, Shield, CheckCircle2, BellOff, Target, TrendingUp, Clock, DollarSign, Save, Trash2 } from "lucide-react";
+import { User, Mail, Calendar, Crown, Settings, LogOut, Camera, Share, CreditCard, Bell, Shield, CheckCircle2, BellOff, Target, TrendingUp, Clock, DollarSign, Save, Trash2, Gift, Copy, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { canShowExternalPayment } from "@/lib/payments";
@@ -61,6 +61,11 @@ export default function Profile() {
   const [challengeName, setChallengeName] = useState<string>("");
   const [savedChallengeName, setSavedChallengeName] = useState<string>("");
   const [isSavingName, setIsSavingName] = useState(false);
+
+  // Referral state
+  const [referralCode, setReferralCode] = useState<string | null>(null);
+  const [referralStats, setReferralStats] = useState<{ totalReferrals: number; rewardDays: number }>({ totalReferrals: 0, rewardDays: 0 });
+  const [referralLoading, setReferralLoading] = useState(false);
 
   // Form state
   const [fullName, setFullName] = useState<string>("");
@@ -105,6 +110,19 @@ export default function Profile() {
         setMonthlyContribution("500");
         setCurrentAge("30");
         setRetirementAge("65");
+
+        // Load referral stats
+        if (session) {
+          fetch("/api/referral/stats", { headers: { Authorization: `Bearer ${session.access_token}` } })
+            .then((r) => (r.ok ? r.json() : null))
+            .then((d) => {
+              if (d) {
+                setReferralCode(d.code);
+                setReferralStats({ totalReferrals: d.totalReferrals, rewardDays: d.rewardDays });
+              }
+            })
+            .catch(() => {});
+        }
       }
       setIsLoading(false);
     };
@@ -243,11 +261,41 @@ export default function Profile() {
     router.push("/");
   };
 
-  const handleShare = async () => {
-    const shareUrl = "https://shebloomswealth.app";
-    const shareText = "Check out Bloom — investing made simple.";
+  const generateReferralCode = async () => {
+    setReferralLoading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+      const res = await fetch("/api/referral/generate", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      if (res.ok) {
+        const d = await res.json();
+        setReferralCode(d.code);
+      }
+    } catch {}
+    finally { setReferralLoading(false); }
+  };
 
-    // Try native share first (mobile/supported browsers)
+  const copyReferralLink = async () => {
+    const link = `https://shebloomswealth.app/onboarding?ref=${referralCode}`;
+    try {
+      await navigator.clipboard.writeText(link);
+      toast({ title: "Referral link copied!", description: "Share it with friends to earn 7 bonus trial days each." });
+    } catch {
+      toast({ title: "Could not copy", description: "Please try again.", variant: "destructive" });
+    }
+  };
+
+  const handleShare = async () => {
+    const shareUrl = referralCode
+      ? `https://shebloomswealth.app/onboarding?ref=${referralCode}`
+      : "https://shebloomswealth.app";
+    const shareText = referralCode
+      ? "Join me on Bloom and we both get 7 extra days of Pro! Investing made simple."
+      : "Check out Bloom — investing made simple.";
+
     if (navigator.share) {
       try {
         await navigator.share({
@@ -256,11 +304,9 @@ export default function Profile() {
           url: shareUrl,
         });
       } catch (error: any) {
-        // User cancelled or error occurred - silently fail
         console.log("Share cancelled or failed:", error);
       }
     } else {
-      // Fallback to clipboard copy (desktop browsers)
       try {
         await navigator.clipboard.writeText(shareUrl);
         toast({
@@ -638,22 +684,58 @@ export default function Profile() {
           </CardContent>
         </Card>
 
-        {/* Share Bloom */}
+        {/* Referral & Share */}
         <Card className="border-accent bg-gradient-to-br from-accent/10 to-primary/10">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Share className="h-5 w-5" />
-              Share Bloom
+              <Gift className="h-5 w-5" />
+              Refer Friends, Earn Rewards
             </CardTitle>
             <CardDescription>
-              Know someone who'd love Bloom? Share it with them!
+              Share your referral link — you both get 7 extra days of Pro!
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
+            {referralCode ? (
+              <>
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 bg-background/60 border border-border rounded-lg px-4 py-3 font-mono text-sm text-foreground tracking-wider text-center">
+                    {referralCode}
+                  </div>
+                  <Button variant="outline" size="icon" onClick={copyReferralLink} title="Copy referral link">
+                    <Copy className="w-4 h-4" />
+                  </Button>
+                </div>
+                {referralStats.totalReferrals > 0 && (
+                  <div className="flex items-center gap-4 p-3 bg-background/40 rounded-lg border border-border">
+                    <div className="flex items-center gap-2">
+                      <Users className="w-4 h-4 text-accent" />
+                      <span className="text-sm text-foreground font-semibold">{referralStats.totalReferrals}</span>
+                      <span className="text-xs text-muted-foreground">referred</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Crown className="w-4 h-4 text-accent" />
+                      <span className="text-sm text-foreground font-semibold">+{referralStats.rewardDays}d</span>
+                      <span className="text-xs text-muted-foreground">earned</span>
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : (
+              <Button
+                onClick={generateReferralCode}
+                disabled={referralLoading}
+                variant="outline"
+                className="w-full border-accent text-accent hover:bg-accent/10"
+              >
+                {referralLoading ? "Generating..." : "Get Your Referral Code"}
+              </Button>
+            )}
             <Button
               onClick={handleShare}
               className="w-full bg-gradient-to-r from-accent to-primary hover:from-accent/90 hover:to-primary/90"
             >
+              <Share className="w-4 h-4 mr-2" />
               Share Bloom
             </Button>
           </CardContent>

@@ -287,6 +287,9 @@ export type Database = {
           verification_code: string | null
           verification_sent_at: string | null
           email_verified: boolean | null
+          referral_code: string | null
+          referred_by: string | null
+          referral_reward_days: number | null
         }
         Insert: {
           avatar_url?: string | null
@@ -319,6 +322,9 @@ export type Database = {
           verification_code?: string | null
           verification_sent_at?: string | null
           email_verified?: boolean | null
+          referral_code?: string | null
+          referred_by?: string | null
+          referral_reward_days?: number | null
         }
         Update: {
           avatar_url?: string | null
@@ -351,6 +357,36 @@ export type Database = {
           verification_code?: string | null
           verification_sent_at?: string | null
           email_verified?: boolean | null
+          referral_code?: string | null
+          referred_by?: string | null
+          referral_reward_days?: number | null
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          id: string
+          referrer_id: string
+          referred_id: string
+          referral_code: string
+          reward_applied: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          referrer_id: string
+          referred_id: string
+          referral_code: string
+          reward_applied?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          referrer_id?: string
+          referred_id?: string
+          referral_code?: string
+          reward_applied?: boolean
+          created_at?: string
         }
         Relationships: []
       }
