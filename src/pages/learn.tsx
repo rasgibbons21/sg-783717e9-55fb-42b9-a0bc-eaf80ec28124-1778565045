@@ -3195,6 +3195,15 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
             <p className="text-xs text-muted-foreground mt-2">
               {completedLessons.length} of {lessons.length} lessons completed
             </p>
+            {completedLessons.length >= 5 && (
+              <button
+                onClick={() => router.push("/certificate?type=basics")}
+                className="mt-3 w-full py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:scale-[1.02]"
+                style={{ background: "linear-gradient(135deg, #C9A84C, #D4AF37)" }}
+              >
+                🌸 {completedLessons.length >= lessons.length ? "Download Your Certificate" : "Preview Your Certificate"}
+              </button>
+            )}
           </Card>
 
           <BloomGarden

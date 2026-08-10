@@ -146,6 +146,15 @@ export default function UniversityIndex({ requiresClientAuth }: Props) {
                   style={{ width: `${(completedLessons / totalLessons) * 100}%` }}
                 />
               </div>
+              {completedLessons >= totalLessons && (
+                <Link
+                  href="/certificate?type=university-all"
+                  className="mt-3 block py-2.5 rounded-xl text-sm font-semibold text-white text-center transition-all hover:scale-[1.02]"
+                  style={{ background: "linear-gradient(135deg, #C9A84C, #D4AF37)" }}
+                >
+                  🏅 Download Your Advanced Certificate
+                </Link>
+              )}
             </div>
           )}
         </div>

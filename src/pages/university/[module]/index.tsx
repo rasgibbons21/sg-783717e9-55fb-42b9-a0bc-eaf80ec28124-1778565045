@@ -127,6 +127,15 @@ export default function ModulePage({ moduleSlug, requiresClientAuth }: Props) {
                   style={{ width: `${pct}%` }}
                 />
               </div>
+              {completedCount >= lessons.length && (
+                <Link
+                  href={`/certificate?type=university&module=${moduleSlug}`}
+                  className="mt-3 block w-full py-2.5 rounded-xl text-sm font-semibold text-white text-center transition-all hover:scale-[1.02]"
+                  style={{ background: "linear-gradient(135deg, #C9A84C, #D4AF37)" }}
+                >
+                  🏅 Download Your Certificate
+                </Link>
+              )}
             </div>
           </div>
         </div>
