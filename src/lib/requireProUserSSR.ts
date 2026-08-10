@@ -30,7 +30,7 @@ const supabaseAdmin = createClient(
   { auth: { autoRefreshToken: false, persistSession: false } }
 );
 
-const SUPABASE_COOKIE = "sb-rcwluhzzitrzlfrtqjkf-auth-token";
+const SUPABASE_COOKIE = "sb-sbzwaiyxmnnzcenhgunr-auth-token";
 
 function parseSupabaseCookie(cookieStr: string | undefined): string | null {
   if (!cookieStr) return null;
