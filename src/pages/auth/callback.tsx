@@ -7,11 +7,17 @@ export default function AuthCallback() {
   
   useEffect(() => {
     const handleCallback = async () => {
+      const params = new URLSearchParams(window.location.search);
+      const isRecovery = params.get("type") === "recovery";
+
       // First check if we already have a valid session
       const { data: { session } } = await supabase.auth.getSession();
-      
+
       if (session) {
-        // Already have a session — check onboarding status
+        if (isRecovery) {
+          router.push("/reset-password");
+          return;
+        }
         const { data: profile } = await supabase
           .from("profiles")
           .select("onboarding_complete")
@@ -21,12 +27,16 @@ export default function AuthCallback() {
         router.push(profile?.onboarding_complete ? "/home" : "/onboarding");
         return;
       }
-      
+
       // Handle the code from email confirmation
-      const code = new URLSearchParams(window.location.search).get("code");
+      const code = params.get("code");
       if (code) {
         const { data, error } = await supabase.auth.exchangeCodeForSession(code);
         if (!error && data.session) {
+          if (isRecovery) {
+            router.push("/reset-password");
+            return;
+          }
           const { data: profile } = await supabase
             .from("profiles")
             .select("onboarding_complete")
@@ -41,7 +51,7 @@ export default function AuthCallback() {
         router.push("/");
       }
     };
-    
+
     handleCallback();
   }, [router]);
 
