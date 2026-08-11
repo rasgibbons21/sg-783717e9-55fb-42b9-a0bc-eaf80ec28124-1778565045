@@ -14,7 +14,8 @@ import { Progress } from "@/components/ui/progress";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { authService } from "@/services/authService";
 import { supabase } from "@/integrations/supabase/client";
-import { Search, ArrowLeft, Clock, CheckCircle2, Circle, ChevronRight, Bookmark, BookmarkCheck, Award, Lock, Building2, BookOpen, Sparkles, Route, Star } from "lucide-react";
+import { Search, ArrowLeft, Clock, CheckCircle2, Circle, ChevronRight, Bookmark, BookmarkCheck, Award, Lock, Building2, BookOpen, Sparkles, Route, Star, PartyPopper } from "lucide-react";
+import confetti from "canvas-confetti";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { UpgradeModal } from "@/components/UpgradeModal";
@@ -63,6 +64,7 @@ export default function Learn() {
   const [quizScore, setQuizScore] = useState(0);
   const contentRef = useRef<HTMLDivElement>(null);
   const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
+  const [confettiFired, setConfettiFired] = useState(false);
 
   const lessons: Lesson[] = [
     {
@@ -2666,7 +2668,15 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
         });
 
       if (!error) {
-        setCompletedLessons([...completedLessons, lessonId]);
+        const updated = [...completedLessons, lessonId];
+        setCompletedLessons(updated);
+        if (updated.length === lessons.length && !confettiFired) {
+          setConfettiFired(true);
+          haptic(50);
+          confetti({ particleCount: 200, spread: 90, origin: { y: 0.6 }, colors: ["#27B7C8", "#49B06E", "#FFD700", "#F4F7FA"] });
+          setTimeout(() => confetti({ particleCount: 100, spread: 120, origin: { y: 0.4, x: 0.3 } }), 300);
+          setTimeout(() => confetti({ particleCount: 100, spread: 120, origin: { y: 0.4, x: 0.7 } }), 600);
+        }
       }
     } catch (error) {
       console.error("Error completing lesson:", error);
@@ -2703,7 +2713,15 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
         });
 
       if (!error && !completedLessons.includes(selectedLesson)) {
-        setCompletedLessons([...completedLessons, selectedLesson]);
+        const updated = [...completedLessons, selectedLesson];
+        setCompletedLessons(updated);
+        if (updated.length === lessons.length && !confettiFired) {
+          setConfettiFired(true);
+          haptic(50);
+          confetti({ particleCount: 200, spread: 90, origin: { y: 0.6 }, colors: ["#27B7C8", "#49B06E", "#FFD700", "#F4F7FA"] });
+          setTimeout(() => confetti({ particleCount: 100, spread: 120, origin: { y: 0.4, x: 0.3 } }), 300);
+          setTimeout(() => confetti({ particleCount: 100, spread: 120, origin: { y: 0.4, x: 0.7 } }), 600);
+        }
       }
     } catch (error) {
       console.error("Error submitting quiz:", error);
@@ -3198,6 +3216,26 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
             <p className="text-xs text-muted-foreground mt-2">
               {completedLessons.length} of {lessons.length} lessons completed
             </p>
+            {completionPercentage === 100 && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="mt-3 p-3 rounded-xl bg-[#49B06E]/15 border border-[#49B06E]/30 text-center"
+              >
+                <p className="text-sm font-bold text-[#49B06E]">You completed every lesson! 🎉🌸</p>
+                <p className="text-xs text-[#49B06E]/70 mt-0.5">You&apos;re officially Bloom Basics certified</p>
+              </motion.div>
+            )}
+            {completionPercentage >= 75 && completionPercentage < 100 && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-3 p-3 rounded-xl bg-[#27B7C8]/10 border border-[#27B7C8]/20 text-center"
+              >
+                <p className="text-sm font-semibold text-[#27B7C8]">Almost there! Only {lessons.length - completedLessons.length} lesson{lessons.length - completedLessons.length === 1 ? "" : "s"} left 🔥</p>
+                <p className="text-xs text-[#27B7C8]/60 mt-0.5">Finish them all to earn your certificate + confetti</p>
+              </motion.div>
+            )}
             {completedLessons.length >= 5 && (
               <button
                 onClick={() => router.push("/certificate?type=basics")}
