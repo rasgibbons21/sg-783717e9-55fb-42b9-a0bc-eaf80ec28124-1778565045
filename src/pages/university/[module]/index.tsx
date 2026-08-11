@@ -127,7 +127,7 @@ export default function ModulePage({ moduleSlug, requiresClientAuth }: Props) {
                   style={{ width: `${pct}%` }}
                 />
               </div>
-              {completedCount >= lessons.length && (
+              {completedCount >= lessons.length ? (
                 <Link
                   href={`/certificate?type=university&module=${moduleSlug}`}
                   className="mt-3 block w-full py-2.5 rounded-xl text-sm font-semibold text-white text-center transition-all hover:scale-[1.02]"
@@ -135,7 +135,14 @@ export default function ModulePage({ moduleSlug, requiresClientAuth }: Props) {
                 >
                   🏅 Download Your Certificate
                 </Link>
-              )}
+              ) : completedCount >= 2 ? (
+                <Link
+                  href={`/certificate?type=university&module=${moduleSlug}`}
+                  className="mt-3 block w-full py-2.5 rounded-xl text-sm font-medium text-[#C9A84C] border border-[#C9A84C]/20 text-center transition-all hover:bg-[#C9A84C]/5"
+                >
+                  🔒 Preview Your Certificate
+                </Link>
+              ) : null}
             </div>
           </div>
         </div>

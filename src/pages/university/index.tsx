@@ -146,7 +146,7 @@ export default function UniversityIndex({ requiresClientAuth }: Props) {
                   style={{ width: `${(completedLessons / totalLessons) * 100}%` }}
                 />
               </div>
-              {completedLessons >= totalLessons && (
+              {completedLessons >= totalLessons ? (
                 <Link
                   href="/certificate?type=university-all"
                   className="mt-3 block py-2.5 rounded-xl text-sm font-semibold text-white text-center transition-all hover:scale-[1.02]"
@@ -154,7 +154,14 @@ export default function UniversityIndex({ requiresClientAuth }: Props) {
                 >
                   🏅 Download Your Advanced Certificate
                 </Link>
-              )}
+              ) : completedLessons >= 5 ? (
+                <Link
+                  href="/certificate?type=university-all"
+                  className="mt-3 block py-2.5 rounded-xl text-sm font-medium text-[#C9A84C] border border-[#C9A84C]/20 text-center transition-all hover:bg-[#C9A84C]/5"
+                >
+                  🔒 Preview Your Advanced Certificate
+                </Link>
+              ) : null}
             </div>
           )}
         </div>

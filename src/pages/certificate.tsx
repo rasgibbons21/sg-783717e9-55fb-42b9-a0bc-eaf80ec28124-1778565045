@@ -100,38 +100,9 @@ export default function CertificatePage() {
     );
   }
 
-  if (!cert?.eligible) {
-    const remaining = (cert?.totalRequired || 0) - (cert?.completedCount || 0);
-    return (
-      <div className="fixed inset-0 flex items-center justify-center p-6" style={{ background: "#0E1B30" }}>
-        <div className="text-center max-w-md space-y-5">
-          <div className="w-20 h-20 mx-auto rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
-            <Lock className="w-8 h-8 text-[#F4F7FA]/30" />
-          </div>
-          <h2 className="text-xl font-serif font-bold text-[#F4F7FA]">Certificate Locked</h2>
-          <p className="text-sm text-[#F4F7FA]/50 leading-relaxed">
-            Complete all lessons to earn your certificate of completion.
-          </p>
-          {cert && cert.totalRequired && (
-            <div className="space-y-2">
-              <div className="h-2 bg-white/10 rounded-full overflow-hidden max-w-xs mx-auto">
-                <div
-                  className="h-full bg-gradient-to-r from-[#27B7C8] to-[#49B06E] rounded-full transition-all"
-                  style={{ width: `${Math.min(100, (cert.completedCount / cert.totalRequired) * 100)}%` }}
-                />
-              </div>
-              <p className="text-xs text-[#F4F7FA]/30">
-                {cert.completedCount} of {cert.totalRequired} lessons completed — {remaining} remaining
-              </p>
-            </div>
-          )}
-          <button onClick={() => router.back()} className="text-[#27B7C8] text-sm hover:underline">
-            Go back and keep learning
-          </button>
-        </div>
-      </div>
-    );
-  }
+  const notEligible = cert && !cert.eligible;
+  const remaining = (cert?.totalRequired || 0) - (cert?.completedCount || 0);
+  const pct = cert?.totalRequired ? Math.min(100, Math.round((cert.completedCount / cert.totalRequired) * 100)) : 0;
 
   return (
     <>
@@ -142,31 +113,75 @@ export default function CertificatePage() {
             <ArrowLeft className="w-4 h-4" /> Back
           </button>
 
-          {/* Certificate */}
-          <div ref={certRef}>
-            {isUniversity ? (
-              <UniversityCert name={cert.userName} date={formatDate(cert.completedAt)} certId={cert.certId} title={certTitle} moduleName={mod?.title} />
-            ) : (
-              <BasicsCert name={cert.userName} date={formatDate(cert.completedAt)} certId={cert.certId} />
+          {/* Certificate with locked overlay when not eligible */}
+          <div className="relative">
+            <div
+              ref={notEligible ? undefined : certRef}
+              style={notEligible ? { filter: "blur(4px) grayscale(0.3)", pointerEvents: "none", userSelect: "none" } : undefined}
+            >
+              {isUniversity ? (
+                <UniversityCert name={cert!.userName} date={formatDate(cert!.completedAt)} certId={cert!.certId} title={certTitle} moduleName={mod?.title} />
+              ) : (
+                <BasicsCert name={cert!.userName} date={formatDate(cert!.completedAt)} certId={cert!.certId} />
+              )}
+            </div>
+
+            {/* Locked overlay */}
+            {notEligible && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-center bg-[#0E1B30]/90 backdrop-blur-sm rounded-2xl border border-[#C9A84C]/20 px-8 py-8 max-w-sm mx-4 shadow-2xl">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#C9A84C]/10 border-2 border-[#C9A84C]/30 flex items-center justify-center">
+                    <Lock className="w-7 h-7 text-[#C9A84C]" />
+                  </div>
+                  <h3 className="text-lg font-serif font-bold text-[#F4F7FA] mb-2">
+                    Almost Yours
+                  </h3>
+                  <p className="text-sm text-[#F4F7FA]/50 mb-4 leading-relaxed">
+                    Complete all lessons to unlock your certificate and download it.
+                  </p>
+                  {cert!.totalRequired && (
+                    <div className="space-y-2 mb-5">
+                      <div className="h-2.5 bg-white/10 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-[#C9A84C] to-[#D4AF37] rounded-full transition-all"
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                      <p className="text-xs text-[#C9A84C]/70 font-medium">
+                        {cert!.completedCount} of {cert!.totalRequired} lessons · {remaining} to go
+                      </p>
+                    </div>
+                  )}
+                  <button
+                    onClick={() => router.back()}
+                    className="px-6 py-2.5 rounded-xl text-sm font-semibold text-[#0E1B30] transition-all hover:scale-105"
+                    style={{ background: "linear-gradient(135deg, #C9A84C, #D4AF37)" }}
+                  >
+                    Keep Learning
+                  </button>
+                </div>
+              </div>
             )}
           </div>
 
-          {/* Action buttons */}
-          <div className="flex gap-3 justify-center">
-            <button
-              onClick={handleDownload}
-              className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-white transition-all hover:scale-105"
-              style={{ background: "linear-gradient(135deg, #C9A84C, #D4AF37)" }}
-            >
-              <Download className="w-5 h-5" /> Download Certificate
-            </button>
-            <button
-              onClick={handleShare}
-              className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-[#C9A84C] border border-[#C9A84C]/30 hover:bg-[#C9A84C]/10 transition-all"
-            >
-              <Share2 className="w-5 h-5" /> Share
-            </button>
-          </div>
+          {/* Action buttons — only when eligible */}
+          {!notEligible && (
+            <div className="flex gap-3 justify-center">
+              <button
+                onClick={handleDownload}
+                className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-white transition-all hover:scale-105"
+                style={{ background: "linear-gradient(135deg, #C9A84C, #D4AF37)" }}
+              >
+                <Download className="w-5 h-5" /> Download Certificate
+              </button>
+              <button
+                onClick={handleShare}
+                className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-[#C9A84C] border border-[#C9A84C]/30 hover:bg-[#C9A84C]/10 transition-all"
+              >
+                <Share2 className="w-5 h-5" /> Share
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </>

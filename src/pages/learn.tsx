@@ -3236,7 +3236,7 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
                 <p className="text-xs text-[#27B7C8]/60 mt-0.5">Finish them all to earn your certificate + confetti</p>
               </motion.div>
             )}
-            {completedLessons.length >= lessons.length && (
+            {completedLessons.length >= lessons.length ? (
               <button
                 onClick={() => router.push("/certificate?type=basics")}
                 className="mt-3 w-full py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:scale-[1.02]"
@@ -3244,7 +3244,14 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
               >
                 🌸 Download Your Certificate
               </button>
-            )}
+            ) : completedLessons.length >= 3 ? (
+              <button
+                onClick={() => router.push("/certificate?type=basics")}
+                className="mt-3 w-full py-2.5 rounded-xl text-sm font-medium text-[#C9A84C] border border-[#C9A84C]/20 transition-all hover:bg-[#C9A84C]/5"
+              >
+                🔒 Preview Your Certificate
+              </button>
+            ) : null}
           </Card>
 
           <BloomGarden
