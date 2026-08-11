@@ -215,16 +215,19 @@ export default function Home() {
           {/* Stats row */}
           <div className="grid grid-cols-3 gap-3">
             {[
-              { icon: <Flame className="w-4 h-4 text-orange-400" />, value: streak, label: "day streak" },
-              { icon: <Target className="w-4 h-4 text-[#27B7C8]" />, value: `${progressPercent}%`, label: "journey" },
-              { icon: <Sparkles className="w-4 h-4 text-[#49B06E]" />, value: confidenceScore, label: "confidence" },
+              { icon: <Flame className="w-4 h-4 text-orange-400" />, value: streak, label: "day streak", glow: "rgba(251,146,60,0.15)" },
+              { icon: <Target className="w-4 h-4 text-[#27B7C8]" />, value: `${progressPercent}%`, label: "journey", glow: "rgba(39,183,200,0.15)" },
+              { icon: <Sparkles className="w-4 h-4 text-[#49B06E]" />, value: confidenceScore, label: "confidence", glow: "rgba(73,176,110,0.15)" },
             ].map((stat, i) => (
               <motion.div
                 key={stat.label}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 + i * 0.1, duration: 0.4 }}
-                className="bg-card border border-border rounded-2xl p-3 text-center"
+                initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ delay: 0.15 + i * 0.12, type: "spring", stiffness: 300, damping: 20 }}
+                whileTap={{ scale: 0.92 }}
+                whileHover={{ scale: 1.05, boxShadow: `0 8px 24px ${stat.glow}` }}
+                className="bg-card border border-border rounded-2xl p-3 text-center cursor-pointer"
+                style={{ boxShadow: `0 2px 12px ${stat.glow}` }}
               >
                 <div className="flex items-center justify-center gap-1.5 mb-1">
                   {stat.icon}
@@ -239,11 +242,14 @@ export default function Home() {
         {/* ══════ CONTINUE YOUR JOURNEY ══════ */}
         <Link href="/learn" className="block">
           <motion.div
-            whileTap={{ scale: 0.97 }}
-            whileHover={{ scale: 1.01 }}
-            transition={cardSpring}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, type: "spring", stiffness: 250, damping: 20 }}
+            whileTap={{ scale: 0.96 }}
+            whileHover={{ scale: 1.02, boxShadow: "0 12px 40px rgba(39,183,200,0.2)" }}
             onClick={() => haptic(12)}
-            className="relative overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-[#27B7C8]/10 via-card to-[#49B06E]/10">
+            className="relative overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-[#27B7C8]/10 via-card to-[#49B06E]/10"
+            style={{ boxShadow: "0 4px 20px rgba(39,183,200,0.1)" }}>
             <div className="absolute inset-0 opacity-20" style={{ background: "radial-gradient(circle at 80% 20%, rgba(39,183,200,0.3), transparent 60%)" }} />
             <div className="relative p-6 space-y-4">
               <div className="flex items-start justify-between">
@@ -465,17 +471,23 @@ export default function Home() {
             ].map((action, i) => (
               <Link key={action.href} href={action.href}>
                 <motion.div
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 + i * 0.08, ...cardSpring }}
-                  whileTap={{ scale: 0.9 }}
-                  whileHover={{ scale: 1.05 }}
+                  initial={{ opacity: 0, scale: 0.7, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ delay: 0.4 + i * 0.1, type: "spring", stiffness: 300, damping: 18 }}
+                  whileTap={{ scale: 0.85 }}
+                  whileHover={{ scale: 1.1, boxShadow: `0 8px 24px ${action.color}25` }}
                   onClick={() => haptic()}
-                  className="flex flex-col items-center gap-2 p-3 bg-card border border-border rounded-2xl hover:border-accent/30 transition-colors"
+                  className="flex flex-col items-center gap-2 p-3 bg-card border border-border rounded-2xl transition-colors"
+                  style={{ boxShadow: `0 2px 8px ${action.color}10` }}
                 >
-                  <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: `${action.color}15`, color: action.color }}>
+                  <motion.div
+                    className="w-12 h-12 rounded-xl flex items-center justify-center"
+                    style={{ background: `${action.color}15`, color: action.color }}
+                    whileHover={{ rotate: [0, -8, 8, 0] }}
+                    transition={{ duration: 0.4 }}
+                  >
                     {action.icon}
-                  </div>
+                  </motion.div>
                   <span className="text-xs font-medium text-foreground">{action.label}</span>
                 </motion.div>
               </Link>

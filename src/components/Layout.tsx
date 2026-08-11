@@ -115,17 +115,27 @@ export function Layout({ children }: LayoutProps) {
             return (
               <Link key={href} href={href} passHref>
                 <motion.button
-                  whileTap={{ scale: 0.85 }}
-                  transition={{ type: "spring", stiffness: 500, damping: 25 }}
+                  whileTap={{ scale: 0.75, y: 2 }}
+                  transition={{ type: "spring", stiffness: 500, damping: 20 }}
                   onClick={() => haptic()}
-                  className={`flex flex-col items-center gap-1 px-2 py-1 rounded-lg transition-colors w-full ${
-                    active ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
+                  className={`flex flex-col items-center gap-1 px-2 py-1 rounded-lg w-full relative ${
+                    active ? "text-primary" : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  <motion.div animate={active ? { scale: [1, 1.2, 1] } : {}} transition={{ duration: 0.3 }}>
-                    <Icon className="w-5 h-5" />
+                  {active && (
+                    <motion.div
+                      layoutId="nav-indicator"
+                      className="absolute -top-1 w-6 h-1 rounded-full bg-primary"
+                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                    />
+                  )}
+                  <motion.div
+                    animate={active ? { scale: [1, 1.3, 1], y: [0, -3, 0] } : {}}
+                    transition={{ duration: 0.4, ease: "easeOut" }}
+                  >
+                    <Icon className={`w-5 h-5 ${active ? "drop-shadow-[0_0_6px_rgba(39,183,200,0.5)]" : ""}`} />
                   </motion.div>
-                  <span className="text-xs">{label}</span>
+                  <span className={`text-xs ${active ? "font-semibold" : ""}`}>{label}</span>
                 </motion.button>
               </Link>
             );

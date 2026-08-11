@@ -497,9 +497,9 @@ export default function Discover() {
                       {displayAssets.map((asset, i) => (
                         <motion.div
                           key={asset.ticker}
-                          initial={{ opacity: 0, y: 12 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: Math.min(i * 0.04, 0.4), type: "spring", stiffness: 400, damping: 30 }}
+                          initial={{ opacity: 0, x: -30, scale: 0.95 }}
+                          animate={{ opacity: 1, x: 0, scale: 1 }}
+                          transition={{ delay: Math.min(i * 0.06, 0.5), type: "spring", stiffness: 300, damping: 22 }}
                         >
                           <AssetCard asset={asset} />
                         </motion.div>
@@ -523,8 +523,14 @@ export default function Discover() {
 }
 
 function AssetCard({ asset }: { asset: Asset }) {
+  const isPositive = asset.changePercent >= 0;
   return (
-    <motion.div whileTap={{ scale: 0.98 }} transition={{ type: "spring", stiffness: 400, damping: 25 }}>
+    <motion.div
+      whileTap={{ scale: 0.97 }}
+      whileHover={{ scale: 1.01, boxShadow: isPositive ? "0 6px 24px rgba(73,176,110,0.12)" : "0 6px 24px rgba(239,68,68,0.12)" }}
+      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+      onClick={() => haptic()}
+    >
     <Card className="p-4 hover:bg-muted/50 transition-colors border-border rounded-xl">
       <div className="flex items-start justify-between mb-3">
         <Link href={`/stock/${asset.ticker}`} className="flex-1">

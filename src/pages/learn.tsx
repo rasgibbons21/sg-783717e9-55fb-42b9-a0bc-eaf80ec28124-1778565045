@@ -3329,10 +3329,11 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
                 return (
                   <motion.div
                     key={lesson.id}
-                    initial={{ opacity: 0, y: 14 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: Math.min(idx * 0.05, 0.5), type: "spring", stiffness: 400, damping: 30 }}
-                    whileTap={{ scale: 0.97 }}
+                    initial={{ opacity: 0, y: 25, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ delay: Math.min(idx * 0.07, 0.6), type: "spring", stiffness: 280, damping: 20 }}
+                    whileTap={{ scale: 0.95 }}
+                    whileHover={{ scale: 1.02, boxShadow: "0 8px 30px rgba(39,183,200,0.12)" }}
                   >
                   <Card
                     className={`p-4 bg-card border-border rounded-xl hover:border-accent/50 transition-all cursor-pointer group ${isGated ? "opacity-50" : ""}`}
