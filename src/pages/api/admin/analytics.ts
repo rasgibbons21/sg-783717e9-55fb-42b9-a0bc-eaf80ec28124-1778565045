@@ -25,77 +25,60 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       .select('*', { count: 'exact', head: true });
 
     const now = new Date();
-    const todayStart = new Date(now.setHours(0, 0, 0, 0)).toISOString();
-    const weekStart = new Date(now.setDate(now.getDate() - 7)).toISOString();
-    const monthStart = new Date(now.setDate(1)).toISOString();
-    const yearStart = new Date(now.setMonth(0, 1)).toISOString();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+    const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+    const yearStart = new Date(now.getFullYear(), 0, 1).toISOString();
 
-    const { count: signupsToday } = await supabaseAdmin
-      .from('profiles')
-      .select('*', { count: 'exact', head: true })
-      .gte('created_at', todayStart);
+    const [todayRes, weekRes, monthRes, yearRes, proRes] = await Promise.all([
+      supabaseAdmin.from('profiles').select('*', { count: 'exact', head: true }).gte('created_at', todayStart),
+      supabaseAdmin.from('profiles').select('*', { count: 'exact', head: true }).gte('created_at', weekAgo),
+      supabaseAdmin.from('profiles').select('*', { count: 'exact', head: true }).gte('created_at', monthStart),
+      supabaseAdmin.from('profiles').select('*', { count: 'exact', head: true }).gte('created_at', yearStart),
+      supabaseAdmin.from('profiles').select('*', { count: 'exact', head: true }).eq('is_pro', true),
+    ]);
 
-    const { count: signupsWeek } = await supabaseAdmin
-      .from('profiles')
-      .select('*', { count: 'exact', head: true })
-      .gte('created_at', weekStart);
-
-    const { count: signupsMonth } = await supabaseAdmin
-      .from('profiles')
-      .select('*', { count: 'exact', head: true })
-      .gte('created_at', monthStart);
-
-    const { count: signupsYear } = await supabaseAdmin
-      .from('profiles')
-      .select('*', { count: 'exact', head: true })
-      .gte('created_at', yearStart);
-
-    const { data: subscriptions } = await supabaseAdmin
-      .from('subscriptions')
-      .select('*')
-      .eq('status', 'active');
-
-    const proUsers = subscriptions?.length || 0;
+    const proUsers = proRes.count || 0;
     const freeUsers = (totalUsers || 0) - proUsers;
 
-    const monthlyRevenue = subscriptions?.reduce((sum, sub) => {
-      if (sub.plan === 'monthly') return sum + 7.99;
-      if (sub.plan === 'yearly') return sum + (57.99 / 12);
-      return sum;
-    }, 0) || 0;
-
+    // Broker clicks (safe — table exists from migration)
     const { data: brokerClicks } = await supabaseAdmin
       .from('broker_clicks')
       .select('*');
 
     const brokerStats: Record<string, number> = {};
-    brokerClicks?.forEach(click => {
+    (brokerClicks ?? []).forEach(click => {
       brokerStats[click.broker_name] = (brokerStats[click.broker_name] || 0) + 1;
     });
 
-    const { data: watchlistData } = await supabaseAdmin
-      .from('watchlist')
-      .select('ticker');
+    // Watchlist — may not exist, handle gracefully
+    let topStocks: [string, number][] = [];
+    try {
+      const { data: watchlistData } = await supabaseAdmin
+        .from('watchlist')
+        .select('ticker');
 
-    const stockViews: Record<string, number> = {};
-    watchlistData?.forEach(item => {
-      stockViews[item.ticker] = (stockViews[item.ticker] || 0) + 1;
-    });
-
-    const topStocks = Object.entries(stockViews)
-      .sort(([, a], [, b]) => b - a)
-      .slice(0, 10);
+      if (watchlistData) {
+        const stockViews: Record<string, number> = {};
+        watchlistData.forEach((item: any) => {
+          stockViews[item.ticker] = (stockViews[item.ticker] || 0) + 1;
+        });
+        topStocks = Object.entries(stockViews)
+          .sort(([, a], [, b]) => b - a)
+          .slice(0, 10);
+      }
+    } catch {}
 
     res.status(200).json({
       overview: {
         totalUsers: totalUsers || 0,
-        signupsToday: signupsToday || 0,
-        signupsWeek: signupsWeek || 0,
-        signupsMonth: signupsMonth || 0,
-        signupsYear: signupsYear || 0,
+        signupsToday: todayRes.count || 0,
+        signupsWeek: weekRes.count || 0,
+        signupsMonth: monthRes.count || 0,
+        signupsYear: yearRes.count || 0,
         proUsers,
         freeUsers,
-        mrr: monthlyRevenue.toFixed(2),
+        mrr: "0.00",
       },
       brokers: brokerStats,
       stocks: topStocks,

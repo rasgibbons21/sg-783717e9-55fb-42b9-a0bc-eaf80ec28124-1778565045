@@ -128,12 +128,12 @@ export function Layout({ children }: LayoutProps) {
             </button>
           </Link>
 
-          <Link href="/practice" passHref>
+          <Link href="/paper-trader-v2" passHref>
             <button className={`flex flex-col items-center gap-1 px-2 py-1 rounded-lg transition-colors ${
-              isActivePath("/practice") ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
+              isActivePath("/paper-trader-v2") ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
             }`}>
               <TrendingUp className="w-5 h-5" />
-              <span className="text-xs">Practice</span>
+              <span className="text-xs">Trade</span>
             </button>
           </Link>
 

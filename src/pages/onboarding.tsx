@@ -37,6 +37,9 @@ export default function Onboarding() {
   const [signupSuccess, setSignupSuccess] = useState(false);
   const [error, setError] = useState("");
   const [resetEmailSent, setResetEmailSent] = useState(false);
+  const [resetCode, setResetCode] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [resetStep, setResetStep] = useState<"email" | "code">("email");
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [animateIn, setAnimateIn] = useState(false);
@@ -103,9 +106,30 @@ export default function Onboarding() {
       }
 
       if (authMode === "forgot") {
-        const { error: resetError } = await authService.resetPassword(email);
-        if (resetError) { setError(resetError.message); }
-        else { setResetEmailSent(true); }
+        if (resetStep === "email") {
+          try {
+            const resp = await fetch("/api/auth/send-reset-code", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email }),
+            });
+            const data = await resp.json();
+            if (!resp.ok) { setError(data.error || "Failed to send code"); }
+            else { setResetStep("code"); setError(""); }
+          } catch { setError("Something went wrong. Please try again."); }
+        } else {
+          if (newPassword.length < 6) { setError("Password must be at least 6 characters"); submitLock.current = false; setIsSubmitting(false); return; }
+          try {
+            const resp = await fetch("/api/auth/verify-reset-code", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email, code: resetCode, newPassword }),
+            });
+            const data = await resp.json();
+            if (!resp.ok) { setError(data.error || "Failed to reset password"); }
+            else { setResetEmailSent(true); setError(""); }
+          } catch { setError("Something went wrong. Please try again."); }
+        }
         submitLock.current = false;
         setIsSubmitting(false);
         return;
@@ -503,19 +527,21 @@ export default function Onboarding() {
 
                       {authMode === "forgot" && !resetEmailSent && (
                         <div className="space-y-2">
-                          <button type="button" onClick={() => { setAuthMode("login"); setResetEmailSent(false); setError(""); }} className="flex items-center gap-1 text-sm text-[#F4F7FA]/50 hover:text-[#F4F7FA]/80 transition-colors">
+                          <button type="button" onClick={() => { setAuthMode("login"); setResetEmailSent(false); setResetStep("email"); setResetCode(""); setNewPassword(""); setError(""); }} className="flex items-center gap-1 text-sm text-[#F4F7FA]/50 hover:text-[#F4F7FA]/80 transition-colors">
                             <ArrowLeft className="w-4 h-4" /> Back to Log In
                           </button>
-                          <p className="text-sm text-[#F4F7FA]/40">Enter your email and we&apos;ll send reset instructions.</p>
+                          <p className="text-sm text-[#F4F7FA]/40">
+                            {resetStep === "email" ? "Enter your email and we'll send a reset code." : "Enter the 6-digit code and your new password."}
+                          </p>
                         </div>
                       )}
 
                       {authMode === "forgot" && resetEmailSent ? (
                         <div className="space-y-4 py-4 text-center">
-                          <div className="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center text-3xl" style={{ background: "rgba(39,183,200,0.15)", animation: "pulse-glow 3s ease-in-out infinite" }}>📧</div>
-                          <h3 className="font-serif text-xl font-bold text-[#F4F7FA]">Check Your Email</h3>
-                          <p className="text-sm text-[#F4F7FA]/50">Reset instructions sent to <strong className="text-[#27B7C8]">{email}</strong> 💛</p>
-                          <button type="button" onClick={() => { setAuthMode("login"); setResetEmailSent(false); setEmail(""); }} className="glass-btn">Back to Log In</button>
+                          <div className="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center text-3xl" style={{ background: "rgba(73,176,110,0.15)", animation: "pulse-glow 3s ease-in-out infinite" }}>✅</div>
+                          <h3 className="font-serif text-xl font-bold text-[#F4F7FA]">Password Reset!</h3>
+                          <p className="text-sm text-[#F4F7FA]/50">Your password has been updated. You can now log in.</p>
+                          <button type="button" onClick={() => { setAuthMode("login"); setResetEmailSent(false); setResetStep("email"); setResetCode(""); setNewPassword(""); setEmail(""); setError(""); }} className="glass-btn">Log In</button>
                         </div>
                       ) : (
                         <>
@@ -540,10 +566,27 @@ export default function Onboarding() {
                               </div>
                               {authMode === "login" && (
                                 <div className="text-right">
-                                  <button type="button" onClick={() => { setAuthMode("forgot"); setError(""); }} className="text-sm text-[#27B7C8]/70 hover:text-[#27B7C8] font-medium transition-colors">Forgot password?</button>
+                                  <button type="button" onClick={() => { setAuthMode("forgot"); setResetStep("email"); setError(""); }} className="text-sm text-[#27B7C8]/70 hover:text-[#27B7C8] font-medium transition-colors">Forgot password?</button>
                                 </div>
                               )}
                             </div>
+                          )}
+                          {authMode === "forgot" && resetStep === "code" && (
+                            <>
+                              <div className="space-y-1.5">
+                                <Label htmlFor="resetCode" className="text-xs font-medium text-[#F4F7FA]/40 uppercase tracking-wider">6-Digit Code</Label>
+                                <Input id="resetCode" type="text" inputMode="numeric" placeholder="000000" maxLength={6} value={resetCode} onChange={(e) => setResetCode(e.target.value.replace(/\D/g, ""))} className="glass-input h-12 text-center text-2xl tracking-[0.5em] font-bold" />
+                              </div>
+                              <div className="space-y-1.5">
+                                <Label htmlFor="newPassword" className="text-xs font-medium text-[#F4F7FA]/40 uppercase tracking-wider">New Password</Label>
+                                <div className="relative">
+                                  <Input id="newPassword" type={showPassword ? "text" : "password"} placeholder="••••••••" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="glass-input h-12 pr-12" />
+                                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#F4F7FA]/30 hover:text-[#F4F7FA]/60 transition-colors">
+                                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                  </button>
+                                </div>
+                              </div>
+                            </>
                           )}
                           {authMode === "signup" && (
                             <div className="space-y-1.5">
@@ -559,10 +602,10 @@ export default function Onboarding() {
                           <button
                             type="button"
                             onClick={handleAuth}
-                            disabled={isSubmitting || !email || (authMode !== "forgot" && !password) || (authMode === "signup" && !fullName) || (authMode === "signup" && !termsAccepted)}
+                            disabled={isSubmitting || !email || (authMode !== "forgot" && !password) || (authMode === "signup" && !fullName) || (authMode === "signup" && !termsAccepted) || (authMode === "forgot" && resetStep === "code" && (!resetCode || resetCode.length < 6 || !newPassword))}
                             className="glass-btn flex items-center justify-center gap-2"
                           >
-                            {isSubmitting ? <><Loader2 className="w-5 h-5 animate-spin" /> Processing...</> : authMode === "signup" ? <>Create Account <ChevronRight className="w-5 h-5" /></> : authMode === "login" ? <>Log In <ChevronRight className="w-5 h-5" /></> : "Send Reset Instructions"}
+                            {isSubmitting ? <><Loader2 className="w-5 h-5 animate-spin" /> Processing...</> : authMode === "signup" ? <>Create Account <ChevronRight className="w-5 h-5" /></> : authMode === "login" ? <>Log In <ChevronRight className="w-5 h-5" /></> : resetStep === "email" ? "Send Reset Code" : "Reset Password"}
                           </button>
                         </>
                       )}
