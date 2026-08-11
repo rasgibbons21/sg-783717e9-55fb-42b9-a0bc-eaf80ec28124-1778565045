@@ -6,7 +6,7 @@ import { UNIVERSITY_MODULES } from "@/data/university/modules";
 import { supabase } from "@/integrations/supabase/client";
 import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
-import { GraduationCap, BookOpen, Lock, CheckCircle, Clock } from "lucide-react";
+import { GraduationCap, BookOpen, Lock, CheckCircle, Clock, FlaskConical } from "lucide-react";
 
 interface LessonProgress {
   lesson_slug: string;
@@ -163,6 +163,28 @@ export default function UniversityIndex({ requiresClientAuth }: Props) {
       {/* Modules Grid */}
       <div className="bg-[#0E1B30] min-h-screen">
         <div className="max-w-5xl mx-auto px-4 py-12">
+          {/* Strategy Lab banner */}
+          <Link href="/university/strategy-lab">
+            <div className="mb-10 rounded-2xl border border-[#27B7C8]/30 bg-gradient-to-r from-[#162540] to-[#0E1B30] p-6 hover:border-[#27B7C8]/60 transition-all cursor-pointer group">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-[#27B7C8]/10 rounded-xl flex items-center justify-center group-hover:bg-[#27B7C8]/20 transition-colors">
+                  <FlaskConical className="w-6 h-6 text-[#27B7C8]" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-[#F4F7FA] group-hover:text-[#27B7C8] transition-colors">
+                    Strategy Lab
+                  </h3>
+                  <p className="text-xs text-[#F4F7FA]/50">
+                    30+ strategies with interactive charts, simulations, and exercises across day trading, swing trading, long-term investing, and indicators.
+                  </p>
+                </div>
+                <div className="text-[#27B7C8]/40 group-hover:text-[#27B7C8] transition-colors">
+                  →
+                </div>
+              </div>
+            </div>
+          </Link>
+
           <h2 className="text-xl font-semibold text-[#F4F7FA] mb-8">All Modules</h2>
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
