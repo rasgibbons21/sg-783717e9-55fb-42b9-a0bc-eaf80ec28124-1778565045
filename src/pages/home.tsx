@@ -14,10 +14,13 @@ import {
   BookOpen, TrendingUp, MessageCircle, NotebookPen,
   ChevronRight, Flame, Target, Sparkles, Play, ArrowRight, Trophy,
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { TimeGreeting } from "@/components/TimeGreeting";
 import { GemsLeaderboard } from "@/components/GemsLeaderboard";
 import { PansyContextCard } from "@/components/PansyContextCard";
+
+const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
+const cardSpring = { type: "spring" as const, stiffness: 400, damping: 25 };
 
 export default function Home() {
   const router = useRouter();
@@ -235,7 +238,12 @@ export default function Home() {
 
         {/* ══════ CONTINUE YOUR JOURNEY ══════ */}
         <Link href="/learn" className="block">
-          <div className="relative overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-[#27B7C8]/10 via-card to-[#49B06E]/10">
+          <motion.div
+            whileTap={{ scale: 0.97 }}
+            whileHover={{ scale: 1.01 }}
+            transition={cardSpring}
+            onClick={() => haptic(12)}
+            className="relative overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-[#27B7C8]/10 via-card to-[#49B06E]/10">
             <div className="absolute inset-0 opacity-20" style={{ background: "radial-gradient(circle at 80% 20%, rgba(39,183,200,0.3), transparent 60%)" }} />
             <div className="relative p-6 space-y-4">
               <div className="flex items-start justify-between">
@@ -273,7 +281,7 @@ export default function Home() {
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
         </Link>
 
         {/* ══════ TODAY WITH PANSY ══════ */}
@@ -284,7 +292,11 @@ export default function Home() {
 
           <div className="grid grid-cols-1 gap-3">
             {/* Morning Coffee */}
-            <div className="bg-card border border-border rounded-2xl p-4">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.15, ...cardSpring }}
+              className="bg-card border border-border rounded-2xl p-4">
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center shrink-0 text-lg">
                   ☕
@@ -303,10 +315,14 @@ export default function Home() {
                   )}
                 </div>
               </div>
-            </div>
+            </motion.div>
 
             {/* Confidence tip — milestone-aware */}
-            <div className="bg-card border border-border rounded-2xl p-4">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.25, ...cardSpring }}
+              className="bg-card border border-border rounded-2xl p-4">
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-xl bg-[#49B06E]/10 flex items-center justify-center shrink-0 text-lg">
                   💡
@@ -330,7 +346,7 @@ export default function Home() {
                   </p>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
 
@@ -342,7 +358,11 @@ export default function Home() {
         />
 
         {/* ══════ YOUR LEARNING PATH ══════ */}
-        <div className="bg-card border border-border rounded-2xl p-5">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, ...cardSpring }}
+          className="bg-card border border-border rounded-2xl p-5">
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">Your Learning Path</p>
           <div className="flex items-center justify-between">
             {stages.map((stage, i) => (
@@ -377,7 +397,7 @@ export default function Home() {
               </div>
             ))}
           </div>
-        </div>
+        </motion.div>
 
         {/* ══════ LEADERBOARDS — SIDE BY SIDE ══════ */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -439,15 +459,25 @@ export default function Home() {
           <div className="grid grid-cols-4 gap-3">
             {[
               { href: "/learn", label: "Learn", icon: <BookOpen className="w-6 h-6" />, color: "#27B7C8" },
-              { href: "/practice", label: "Practice", icon: <TrendingUp className="w-6 h-6" />, color: "#49B06E" },
+              { href: "/paper-trader-v2", label: "Trade", icon: <TrendingUp className="w-6 h-6" />, color: "#49B06E" },
               { href: "/ask-pansy", label: "Pansy", icon: <MessageCircle className="w-6 h-6" />, color: "#8B5CF6" },
               { href: "/journal", label: "Journal", icon: <NotebookPen className="w-6 h-6" />, color: "#F59E0B" },
-            ].map((action) => (
-              <Link key={action.href} href={action.href} className="flex flex-col items-center gap-2 p-3 bg-card border border-border rounded-2xl hover:border-accent/30 transition-colors">
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: `${action.color}15`, color: action.color }}>
-                  {action.icon}
-                </div>
-                <span className="text-xs font-medium text-foreground">{action.label}</span>
+            ].map((action, i) => (
+              <Link key={action.href} href={action.href}>
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 + i * 0.08, ...cardSpring }}
+                  whileTap={{ scale: 0.9 }}
+                  whileHover={{ scale: 1.05 }}
+                  onClick={() => haptic()}
+                  className="flex flex-col items-center gap-2 p-3 bg-card border border-border rounded-2xl hover:border-accent/30 transition-colors"
+                >
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: `${action.color}15`, color: action.color }}>
+                    {action.icon}
+                  </div>
+                  <span className="text-xs font-medium text-foreground">{action.label}</span>
+                </motion.div>
               </Link>
             ))}
           </div>

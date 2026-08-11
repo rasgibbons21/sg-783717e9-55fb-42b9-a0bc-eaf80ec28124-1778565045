@@ -20,9 +20,13 @@ import { authService } from "@/services/authService";
 import { userService } from "@/services/userService";
 import { supabase } from "@/integrations/supabase/client";
 import { User, Mail, Calendar, Crown, Settings, LogOut, Camera, Share, CreditCard, Bell, Shield, CheckCircle2, BellOff, Target, TrendingUp, Clock, DollarSign, Save, Trash2, Gift, Copy, Users } from "lucide-react";
+import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { canShowExternalPayment } from "@/lib/payments";
+
+const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
+const stagger = (i: number) => ({ initial: { opacity: 0, y: 14 }, animate: { opacity: 1, y: 0 }, transition: { delay: i * 0.08, type: "spring" as const, stiffness: 400, damping: 30 } });
 
 const RISK_TOLERANCE_OPTIONS = [
   { value: "Conservative", label: "Conservative", description: "Prioritize stability and capital preservation" },
@@ -351,6 +355,7 @@ export default function Profile() {
         </div>
 
         {/* User Info Card */}
+        <motion.div {...stagger(0)}>
         <Card className="p-6 bg-card border-border rounded-2xl space-y-4">
           <div className="flex items-start gap-4">
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
@@ -411,8 +416,10 @@ export default function Profile() {
             </div>
           </div>
         </Card>
+        </motion.div>
 
         {/* Investment Preferences */}
+        <motion.div {...stagger(1)}>
         <Card className="p-6 bg-card border-border rounded-2xl space-y-6">
           <div className="flex items-start gap-4">
             <Target className="w-6 h-6 text-foreground mt-1" />
@@ -582,8 +589,10 @@ export default function Profile() {
             </div>
           </div>
         </Card>
+        </motion.div>
 
         {/* Pansy's Personalization Tip */}
+        <motion.div {...stagger(2)}>
         <Card className="p-6 bg-accent/5 border-accent/20 rounded-2xl">
           <div className="flex items-start gap-4">
             <img
@@ -603,8 +612,10 @@ export default function Profile() {
             </div>
           </div>
         </Card>
+        </motion.div>
 
         {/* Subscription Section */}
+        <motion.div {...stagger(3)}>
         <Card className="border-border">
           <CardHeader>
             <CardTitle className="text-xl text-foreground">Subscription</CardTitle>
@@ -683,8 +694,10 @@ export default function Profile() {
             )}
           </CardContent>
         </Card>
+        </motion.div>
 
         {/* Referral & Share */}
+        <motion.div {...stagger(4)} whileTap={{ scale: 0.99 }}>
         <Card className="border-accent bg-gradient-to-br from-accent/10 to-primary/10">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -740,8 +753,10 @@ export default function Profile() {
             </Button>
           </CardContent>
         </Card>
+        </motion.div>
 
         {/* Notification Settings */}
+        <motion.div {...stagger(5)}>
         <Card className="p-6 bg-card border-border rounded-2xl">
           <div className="flex items-start gap-4">
             <Bell className="w-6 h-6 text-foreground mt-1" />
@@ -802,6 +817,7 @@ export default function Profile() {
             </div>
           </div>
         </Card>
+        </motion.div>
 
         {/* Pansy's Privacy Tip */}
         <Card className="p-6 bg-accent/5 border-accent/20 rounded-2xl">
@@ -825,14 +841,16 @@ export default function Profile() {
         </Card>
 
         {/* Sign Out */}
-        <Button
-          onClick={handleSignOut}
-          variant="outline"
-          className="w-full border-destructive/20 text-destructive hover:bg-destructive/10"
-        >
-          <LogOut className="w-4 h-4 mr-2" />
-          Sign Out
-        </Button>
+        <motion.div whileTap={{ scale: 0.96 }} transition={{ type: "spring", stiffness: 400, damping: 25 }}>
+          <Button
+            onClick={() => { haptic(15); handleSignOut(); }}
+            variant="outline"
+            className="w-full border-destructive/20 text-destructive hover:bg-destructive/10"
+          >
+            <LogOut className="w-4 h-4 mr-2" />
+            Sign Out
+          </Button>
+        </motion.div>
 
         {/* Delete Account */}
         <Link href="/delete-account" className="block">

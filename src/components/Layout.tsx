@@ -1,7 +1,8 @@
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { Home, Search, User, GraduationCap, TrendingUp } from "lucide-react";
+import { motion } from "framer-motion";
 import { PansyMilestones } from "./PansyMilestones";
 import { PansyPsychologyToast } from "./PansyPsychologyToast";
 import { PansyAssistant } from "./PansyAssistant";
@@ -11,6 +12,8 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 import { useSubscription } from "@/contexts/SubscriptionContext";
+
+const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -101,50 +104,32 @@ export function Layout({ children }: LayoutProps) {
       {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-40 safe-area-bottom">
         <div className="grid grid-cols-5 gap-1 px-2 py-2 max-w-md mx-auto">
-          <Link href="/home" passHref>
-            <button className={`flex flex-col items-center gap-1 px-2 py-1 rounded-lg transition-colors ${
-              isActivePath("/home") ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
-            }`}>
-              <Home className="w-5 h-5" />
-              <span className="text-xs">Home</span>
-            </button>
-          </Link>
-
-          <Link href="/discover" passHref>
-            <button className={`flex flex-col items-center gap-1 px-2 py-1 rounded-lg transition-colors ${
-              isActivePath("/discover") ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
-            }`}>
-              <Search className="w-5 h-5" />
-              <span className="text-xs">Discover</span>
-            </button>
-          </Link>
-
-          <Link href="/learn" passHref>
-            <button className={`flex flex-col items-center gap-1 px-2 py-1 rounded-lg transition-colors ${
-              isActivePath("/learn") ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
-            }`}>
-              <GraduationCap className="w-5 h-5" />
-              <span className="text-xs">Learn</span>
-            </button>
-          </Link>
-
-          <Link href="/paper-trader-v2" passHref>
-            <button className={`flex flex-col items-center gap-1 px-2 py-1 rounded-lg transition-colors ${
-              isActivePath("/paper-trader-v2") ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
-            }`}>
-              <TrendingUp className="w-5 h-5" />
-              <span className="text-xs">Trade</span>
-            </button>
-          </Link>
-
-          <Link href="/profile" passHref>
-            <button className={`flex flex-col items-center gap-1 px-2 py-1 rounded-lg transition-colors ${
-              isActivePath("/profile") ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
-            }`}>
-              <User className="w-5 h-5" />
-              <span className="text-xs">Profile</span>
-            </button>
-          </Link>
+          {[
+            { href: "/home", icon: Home, label: "Home" },
+            { href: "/discover", icon: Search, label: "Discover" },
+            { href: "/learn", icon: GraduationCap, label: "Learn" },
+            { href: "/paper-trader-v2", icon: TrendingUp, label: "Trade" },
+            { href: "/profile", icon: User, label: "Profile" },
+          ].map(({ href, icon: Icon, label }) => {
+            const active = isActivePath(href);
+            return (
+              <Link key={href} href={href} passHref>
+                <motion.button
+                  whileTap={{ scale: 0.85 }}
+                  transition={{ type: "spring", stiffness: 500, damping: 25 }}
+                  onClick={() => haptic()}
+                  className={`flex flex-col items-center gap-1 px-2 py-1 rounded-lg transition-colors w-full ${
+                    active ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <motion.div animate={active ? { scale: [1, 1.2, 1] } : {}} transition={{ duration: 0.3 }}>
+                    <Icon className="w-5 h-5" />
+                  </motion.div>
+                  <span className="text-xs">{label}</span>
+                </motion.button>
+              </Link>
+            );
+          })}
         </div>
       </nav>
 

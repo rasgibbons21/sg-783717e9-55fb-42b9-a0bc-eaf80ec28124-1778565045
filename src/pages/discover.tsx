@@ -15,11 +15,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { marketService } from "@/services/marketService";
 import { Search, TrendingUp, TrendingDown, Loader2 } from "lucide-react";
+import { motion } from "framer-motion";
 import { userService } from "@/services/userService";
 import { supabase } from "@/integrations/supabase/client";
 import { UpgradeBanner } from "@/components/UpgradeModal";
 import { canShowExternalPayment } from "@/lib/payments";
 import { PansyContextCard } from "@/components/PansyContextCard";
+
+const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
 
 interface Asset {
   ticker: string;
@@ -432,28 +435,21 @@ export default function Discover() {
 
           {/* Filter Buttons */}
           <div className="flex gap-2 overflow-x-auto pb-2">
-            <Button
-              size="sm"
-              variant={activeFilter === "top-performers" ? "default" : "outline"}
-              onClick={() => setActiveFilter("top-performers")}
-            >
-              <TrendingUp className="w-4 h-4 mr-2" />
-              Top Performers
-            </Button>
-            <Button
-              size="sm"
-              variant={activeFilter === "most-watched" ? "default" : "outline"}
-              onClick={() => setActiveFilter("most-watched")}
-            >
-              Most Watched
-            </Button>
-            <Button
-              size="sm"
-              variant={activeFilter === "pansy-picks" ? "default" : "outline"}
-              onClick={() => setActiveFilter("pansy-picks")}
-            >
-              🌺 Pansy's Analyses
-            </Button>
+            {[
+              { key: "top-performers", label: "Top Performers", icon: <TrendingUp className="w-4 h-4 mr-2" /> },
+              { key: "most-watched", label: "Most Watched", icon: null },
+              { key: "pansy-picks", label: "🌺 Pansy's Analyses", icon: null },
+            ].map((f) => (
+              <motion.div key={f.key} whileTap={{ scale: 0.92 }} transition={{ type: "spring", stiffness: 500, damping: 25 }}>
+                <Button
+                  size="sm"
+                  variant={activeFilter === f.key ? "default" : "outline"}
+                  onClick={() => { setActiveFilter(f.key); haptic(); }}
+                >
+                  {f.icon}{f.label}
+                </Button>
+              </motion.div>
+            ))}
           </div>
         </div>
 
@@ -498,8 +494,15 @@ export default function Discover() {
                 <TabsContent key={tab} value={tab} className="mt-6">
                   {displayAssets.length > 0 ? (
                     <div className="space-y-3">
-                      {displayAssets.map((asset) => (
-                        <AssetCard key={asset.ticker} asset={asset} />
+                      {displayAssets.map((asset, i) => (
+                        <motion.div
+                          key={asset.ticker}
+                          initial={{ opacity: 0, y: 12 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: Math.min(i * 0.04, 0.4), type: "spring", stiffness: 400, damping: 30 }}
+                        >
+                          <AssetCard asset={asset} />
+                        </motion.div>
                       ))}
                     </div>
                   ) : (
@@ -521,6 +524,7 @@ export default function Discover() {
 
 function AssetCard({ asset }: { asset: Asset }) {
   return (
+    <motion.div whileTap={{ scale: 0.98 }} transition={{ type: "spring", stiffness: 400, damping: 25 }}>
     <Card className="p-4 hover:bg-muted/50 transition-colors border-border rounded-xl">
       <div className="flex items-start justify-between mb-3">
         <Link href={`/stock/${asset.ticker}`} className="flex-1">
@@ -606,6 +610,7 @@ function AssetCard({ asset }: { asset: Asset }) {
         </Link>
       </div>
     </Card>
+    </motion.div>
   );
 }
 

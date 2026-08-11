@@ -15,10 +15,13 @@ import { useSubscription } from "@/contexts/SubscriptionContext";
 import { authService } from "@/services/authService";
 import { supabase } from "@/integrations/supabase/client";
 import { Search, ArrowLeft, Clock, CheckCircle2, Circle, ChevronRight, Bookmark, BookmarkCheck, Award, Lock, Building2, BookOpen, Sparkles, Route, Star } from "lucide-react";
+import { motion } from "framer-motion";
 import Link from "next/link";
 import { UpgradeModal } from "@/components/UpgradeModal";
 import { BloomGarden } from "@/components/BloomGarden";
 import { PansyContextCard } from "@/components/PansyContextCard";
+
+const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
 
 type Category = "All" | "Stocks" | "ETFs" | "Mutual Funds" | "Dividends" | "Bonds" | "Retirement" | "Trading Psychology" | "Income Streams";
 
@@ -3257,20 +3260,26 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
           )}
 
           <div className="grid grid-cols-2 gap-3">
-            <Link href="/university" className="flex items-center gap-3 p-4 rounded-2xl bg-card border border-border hover:border-accent/40 transition-colors">
-              <BookOpen className="w-5 h-5 text-accent shrink-0" />
-              <div>
-                <p className="text-sm font-semibold text-foreground">Bloom University</p>
-                <p className="text-xs text-muted-foreground">Advanced modules</p>
-              </div>
-            </Link>
-            <Link href="/brokers" className="flex items-center gap-3 p-4 rounded-2xl bg-card border border-border hover:border-accent/40 transition-colors">
-              <Building2 className="w-5 h-5 text-accent shrink-0" />
-              <div>
-                <p className="text-sm font-semibold text-foreground">Find a Broker</p>
-                <p className="text-xs text-muted-foreground">Compare platforms</p>
-              </div>
-            </Link>
+            {[
+              { href: "/university", icon: <BookOpen className="w-5 h-5 text-accent shrink-0" />, title: "Bloom University", sub: "Advanced modules" },
+              { href: "/brokers", icon: <Building2 className="w-5 h-5 text-accent shrink-0" />, title: "Find a Broker", sub: "Compare platforms" },
+            ].map((item, i) => (
+              <Link key={item.href} href={item.href}>
+                <motion.div
+                  whileTap={{ scale: 0.93 }}
+                  whileHover={{ scale: 1.03 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                  onClick={() => haptic()}
+                  className="flex items-center gap-3 p-4 rounded-2xl bg-card border border-border hover:border-accent/40 transition-colors"
+                >
+                  {item.icon}
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">{item.title}</p>
+                    <p className="text-xs text-muted-foreground">{item.sub}</p>
+                  </div>
+                </motion.div>
+              </Link>
+            ))}
           </div>
 
           {pansyGuidance && (
@@ -3313,15 +3322,22 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
           {/* Lessons Grid */}
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {filteredLessons.length > 0 ? (
-              filteredLessons.map((lesson) => {
+              filteredLessons.map((lesson, idx) => {
                 const isCompleted = completedLessons.includes(lesson.id);
                 const isBookmarked = bookmarkedLessons.includes(lesson.id);
                 const isGated = lesson.isPro === true && !isPro;
                 return (
-                  <Card
+                  <motion.div
                     key={lesson.id}
+                    initial={{ opacity: 0, y: 14 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: Math.min(idx * 0.05, 0.5), type: "spring", stiffness: 400, damping: 30 }}
+                    whileTap={{ scale: 0.97 }}
+                  >
+                  <Card
                     className={`p-4 bg-card border-border rounded-xl hover:border-accent/50 transition-all cursor-pointer group ${isGated ? "opacity-50" : ""}`}
                     onClick={() => {
+                      haptic();
                       if (isGated) {
                         setShowLearnUpgradeModal(true);
                       } else {
@@ -3396,6 +3412,7 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
                       </div>
                     </div>
                   </Card>
+                  </motion.div>
                 );
               })
             ) : (
