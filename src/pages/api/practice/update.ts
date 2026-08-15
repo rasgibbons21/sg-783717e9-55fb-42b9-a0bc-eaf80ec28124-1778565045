@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { requireProUser } from "@/lib/requireProUser";
+import { requireLoggedInUser, sendAuthError } from "@/lib/requireProUser";
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseAdmin = createClient(
@@ -11,8 +11,8 @@ const supabaseAdmin = createClient(
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") return res.status(405).end();
 
-  const auth = await requireProUser(req);
-  if (auth.error) return res.status(auth.error).json({ error: "Unauthorized" });
+  const auth = await requireLoggedInUser(req);
+  if (auth.error) return sendAuthError(res, auth.error);
   const userId = auth.user!.id;
 
   const { trade_id, stop_price, target_price, note } = req.body;

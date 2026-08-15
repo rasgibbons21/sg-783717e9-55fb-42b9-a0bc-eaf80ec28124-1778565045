@@ -6,6 +6,7 @@ import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from
 import confetti from "canvas-confetti";
 import { supabase } from "@/integrations/supabase/client";
 import { useSubscription } from "@/contexts/SubscriptionContext";
+import { AdMobBanner } from "@/components/AdMobBanner";
 import Link from "next/link";
 import {
   TrendingUp, TrendingDown, Trophy, Flame, X, ChevronRight,
@@ -117,7 +118,8 @@ function CountUp({ value, prefix = "$" }: { value: number; prefix?: string }) {
 }
 
 export default function PaperTraderV2() {
-  const { isPro, isTrial, trialDaysLeft } = useSubscription();
+  const { isPro, isTrial, trialDaysLeft, userId: subUserId } = useSubscription();
+  const showAds = !isPro;
   const [account, setAccount] = useState<Account | null>(null);
   const [trades, setTrades] = useState<Trade[]>([]);
   const [leaderboard, setLeaderboard] = useState<LeaderboardRow[]>([]);
@@ -376,6 +378,13 @@ export default function PaperTraderV2() {
             )}
           </motion.div>
 
+          {/* Ad: Top */}
+          {showAds && (
+            <div className="px-4 mb-2">
+              <AdMobBanner adUnitId="1111111111" format="banner" />
+            </div>
+          )}
+
           {/* Trade Entry Form */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -488,6 +497,13 @@ export default function PaperTraderV2() {
                 <ChevronRight className="w-5 h-5" style={{ color: C.textMuted }} />
               </TapButton>
             </motion.div>
+          )}
+
+          {/* Ad: Middle */}
+          {showAds && (
+            <div className="px-4 mb-4">
+              <AdMobBanner adUnitId="2222222222" format="rectangle" />
+            </div>
           )}
 
           {/* Open Positions */}
@@ -638,6 +654,36 @@ export default function PaperTraderV2() {
                 ))}
               </div>
             </motion.div>
+          )}
+
+          {/* Ad: Bottom */}
+          {showAds && (
+            <div className="px-4 mb-4">
+              <AdMobBanner adUnitId="3333333333" format="banner" />
+            </div>
+          )}
+
+          {/* Pro Upsell for free users */}
+          {showAds && (
+            <div className="px-4 mb-4">
+              <div className="rounded-2xl p-4" style={{
+                background: `linear-gradient(135deg, ${C.tealDim}, ${C.emeraldDim})`,
+                border: `1px solid rgba(39, 183, 200, 0.25)`,
+              }}>
+                <div className="flex items-center gap-2 mb-2">
+                  <Crown className="w-4 h-4" style={{ color: C.teal }} />
+                  <span className="text-sm font-bold" style={{ color: C.textPrimary }}>Unlock Pro</span>
+                </div>
+                <p className="text-xs mb-3" style={{ color: C.textSecondary }}>
+                  Remove ads, access advanced lessons & strategies, and get the full Bloom experience.
+                </p>
+                <Link href="/subscription"
+                  className="inline-block px-5 py-2 rounded-xl text-xs font-semibold transition-all hover:brightness-110"
+                  style={{ background: `linear-gradient(135deg, ${C.emerald}, ${C.teal})`, color: "#fff" }}>
+                  $7.99/mo — Subscribe
+                </Link>
+              </div>
+            </div>
           )}
 
           {/* Disclaimer */}

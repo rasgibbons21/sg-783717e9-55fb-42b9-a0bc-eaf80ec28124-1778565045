@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { requireProUser, sendAuthError } from "@/lib/requireProUser";
+import { requireLoggedInUser, sendAuthError } from "@/lib/requireProUser";
 
 // In-memory cache keyed by symbol+timeframe
 const cache = new Map<string, { data: unknown; ts: number }>();
@@ -14,7 +14,7 @@ const FMP_ENDPOINT: Record<string, string> = {
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const auth = await requireProUser(req);
+  const auth = await requireLoggedInUser(req);
   if (auth.error) return sendAuthError(res, auth.error);
 
   if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });

@@ -14,6 +14,7 @@ import { useSubscription } from "@/contexts/SubscriptionContext";
 import { supabase } from "@/integrations/supabase/client";
 import { marketService } from "@/services/marketService";
 import { canShowExternalPayment } from "@/lib/payments";
+import { AdMobBanner } from "@/components/AdMobBanner";
 import {
   TrendingUp, BookOpen, X, AlertTriangle, Plus, Lock, Search,
   Sparkles, NotebookPen, Loader2, Trophy, BarChart3, Globe,
@@ -780,22 +781,23 @@ function ClosedTradeRow({ trade }: { trade: Trade }) {
   );
 }
 
-// ── Gate: non-Pro ─────────────────────────────────────────────────────────
-function ProGate() {
+// ── Pro Upsell Banner (replaces hard gate — free users can still trade) ──
+function ProUpsellBanner() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center gap-6">
-      <div className="rounded-full p-6" style={{ background: C.accentDim, border: `1px solid rgba(39,183,200,0.2)` }}>
-        <Lock className="w-10 h-10" style={{ color: C.accent }} />
+    <div className="rounded-xl px-4 py-3 mb-4 flex items-center justify-between" style={{
+      background: "linear-gradient(135deg, rgba(39,183,200,0.15), rgba(73,176,110,0.1))",
+      border: "1px solid rgba(39,183,200,0.25)",
+    }}>
+      <div className="flex items-center gap-2">
+        <Lock className="w-4 h-4" style={{ color: C.accent }} />
+        <span className="text-sm" style={{ color: C.text }}>
+          <span className="font-semibold">Go Pro</span>
+          <span style={{ color: C.textDim }}> — remove ads, unlock advanced lessons</span>
+        </span>
       </div>
-      <div>
-        <h2 className="text-2xl font-bold mb-2" style={{ color: C.text }}>Bloom Practice Trader</h2>
-        <p className="max-w-sm" style={{ color: C.textDim }}>
-          Practice trading with $10,000 in virtual cash — no real money, no real risk. Your free trial has ended — subscribe to keep trading.
-        </p>
-      </div>
-      <Link href="/subscription" className="px-8 py-3 rounded-xl font-semibold transition-all hover:brightness-110"
+      <Link href="/subscription" className="text-xs font-semibold px-3 py-1.5 rounded-lg transition-all hover:brightness-110 flex-shrink-0"
         style={{ background: C.accent, color: C.bg }}>
-        Subscribe Now
+        $7.99/mo
       </Link>
     </div>
   );
@@ -805,7 +807,8 @@ function ProGate() {
 // ── MAIN PAGE ─────────────────────────────────────────────────────────────
 // ══════════════════════════════════════════════════════════════════════════
 export default function PracticePage(_props: PageProps) {
-  const { isPro, isTrial, trialDaysLeft, isLoading: authLoading } = useSubscription();
+  const { isPro, isTrial, trialDaysLeft, isLoading: authLoading, isLoggedIn } = useSubscription();
+  const showAds = !isPro;
 
   // ── Data state ──────────────────────────────────────────────────────────
   const [account, setAccount] = useState<Account | null>(null);
@@ -894,13 +897,13 @@ export default function PracticePage(_props: PageProps) {
   }, []);
 
   useEffect(() => {
-    if (!authLoading && isPro) { loadData(); loadMarketQuotes(); loadLeaderboard(); }
-    else if (!authLoading && !isPro) setLoading(false);
-  }, [authLoading, isPro, loadData, loadMarketQuotes, loadLeaderboard]);
+    if (!authLoading && isLoggedIn) { loadData(); loadMarketQuotes(); loadLeaderboard(); }
+    else if (!authLoading && !isLoggedIn) setLoading(false);
+  }, [authLoading, isLoggedIn, loadData, loadMarketQuotes, loadLeaderboard]);
 
   useEffect(() => {
-    if (view === "leaderboard" && isPro) loadLeaderboard();
-  }, [view, isPro, loadLeaderboard]);
+    if (view === "leaderboard" && isLoggedIn) loadLeaderboard();
+  }, [view, isLoggedIn, loadLeaderboard]);
 
   useEffect(() => {
     const open = trades.filter(t => t.status === "open");
@@ -970,7 +973,7 @@ export default function PracticePage(_props: PageProps) {
     setTrades(prev => prev.map(t => t.id === trade.id ? data.trade : t));
   };
 
-  const showProGate = !authLoading && !isPro;
+  const showProUpsell = !authLoading && !isPro && isLoggedIn;
   const metrics = computeMetrics(account, trades);
 
   // ════════════════════════════════════════════════════════════════════════
@@ -1038,7 +1041,7 @@ export default function PracticePage(_props: PageProps) {
             <main className="flex-1 min-w-0 p-4 lg:p-6 pb-24">
 
               {/* Loading */}
-              {(authLoading || (loading && isPro)) && (
+              {(authLoading || (loading && isLoggedIn)) && (
                 <div className="flex flex-col items-center justify-center py-20 gap-4">
                   <Loader2 className="w-8 h-8 animate-spin" style={{ color: C.accent }} />
                   <p className="text-sm" style={{ color: C.textDim }}>Loading your portfolio...</p>
@@ -1046,10 +1049,16 @@ export default function PracticePage(_props: PageProps) {
               )}
 
               {/* Not Pro */}
-              {showProGate && <ProGate />}
+              {/* Pro Upsell + Ad for free users */}
+              {showProUpsell && <ProUpsellBanner />}
+              {showAds && (
+                <div className="mb-4">
+                  <AdMobBanner adUnitId="1111111111" format="banner" />
+                </div>
+              )}
 
               {/* Error */}
-              {!loading && !authLoading && isPro && error && (
+              {!loading && !authLoading && isLoggedIn && error && (
                 <div className="rounded-xl px-4 py-3 text-sm mb-4" style={{
                   color: C.red, background: "rgba(239,68,68,0.1)", border: `1px solid rgba(239,68,68,0.2)`,
                 }}>
@@ -1081,7 +1090,7 @@ export default function PracticePage(_props: PageProps) {
               {/* ════════════════════════════════════════════════════ */}
               {/* DASHBOARD VIEW                                      */}
               {/* ════════════════════════════════════════════════════ */}
-              {!authLoading && !loading && isPro && !error && view === "dashboard" && (
+              {!authLoading && !loading && isLoggedIn && !error && view === "dashboard" && (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
                   {/* ── Left Column ─────────────────────────────────── */}
@@ -1213,7 +1222,7 @@ export default function PracticePage(_props: PageProps) {
               {/* ════════════════════════════════════════════════════ */}
               {/* TRADES VIEW                                         */}
               {/* ════════════════════════════════════════════════════ */}
-              {!authLoading && !loading && isPro && !error && view === "trades" && (
+              {!authLoading && !loading && isLoggedIn && !error && view === "trades" && (
                 <div className="max-w-2xl">
                   {/* Open Position CTA */}
                   <button onClick={() => setShowOpenModal(true)}
@@ -1292,7 +1301,7 @@ export default function PracticePage(_props: PageProps) {
               {/* ════════════════════════════════════════════════════ */}
               {/* LEADERBOARD VIEW                                     */}
               {/* ════════════════════════════════════════════════════ */}
-              {!authLoading && isPro && !error && view === "leaderboard" && (
+              {!authLoading && isLoggedIn && !error && view === "leaderboard" && (
                 <div className="max-w-2xl">
                   <div className="flex items-center gap-3 mb-6">
                     <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: C.accentDim }}>
@@ -1386,7 +1395,7 @@ export default function PracticePage(_props: PageProps) {
               )}
 
               {/* ── Trading Tools ─────────────────────────────────────── */}
-              {!authLoading && !loading && isPro && !error && view === "trades" && (
+              {!authLoading && !loading && isLoggedIn && !error && view === "trades" && (
                 <div className="max-w-2xl mt-8 space-y-6">
                   <RiskRewardCalculator />
                   <PositionSizeCalculator />
@@ -1401,7 +1410,7 @@ export default function PracticePage(_props: PageProps) {
               </button>
 
               {/* Footer disclaimer */}
-              {!authLoading && !loading && isPro && !error && (
+              {!authLoading && !loading && isLoggedIn && !error && (
                 <div className="mt-10 text-center">
                   <p className="text-[10px] leading-relaxed max-w-md mx-auto" style={{ color: C.textMuted }}>
                     Bloom Practice Trader is an educational simulator. It does not execute real trades, connect to any broker, or involve real money. Past simulated performance does not predict real market results. Not financial advice.

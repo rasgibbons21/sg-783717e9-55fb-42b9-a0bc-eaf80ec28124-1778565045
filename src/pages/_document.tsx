@@ -20,10 +20,10 @@ export default function Document() {
         <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192" />
         <link rel="icon" href="/icon-512.png" type="image/png" sizes="512x512" />
 
-        {/* Google AdSense */}
+        {/* Google AdSense / AdMob */}
         <script
           async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6927440703853992"
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-app-pub-1507435968246952"
           crossOrigin="anonymous"
         />
       </Head>
