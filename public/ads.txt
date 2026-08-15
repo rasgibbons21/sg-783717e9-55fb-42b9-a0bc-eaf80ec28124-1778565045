@@ -1,1 +1,1 @@
-NEXT_PUBLIC_ADMOB_APP_ID=ca-app-pub-1507435968246952~4484456284  public\ads.txtcd C:\Users\Roy\shebloomswealthecho google.com, pub-1507435968246952, DIRECT, f08c47fec0942fa0 
+google.com, pub-1507435968246952, DIRECT, f08c47fec0942fa0
