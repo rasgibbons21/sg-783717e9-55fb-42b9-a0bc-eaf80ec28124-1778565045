@@ -301,7 +301,7 @@ export default function LandingPage() {
 
       <SEO
         title="She Blooms Wealth — Free Financial Education for Women"
-        description="Learn everything about money — investing, budgeting, side hustles, real estate, retirement — completely free. 36 lessons, paper trading simulator, and AI guide Pansy. Built for women. No jargon."
+        description="Learn everything about money — investing, budgeting, side hustles, real estate, retirement — completely free. 150+ lessons, paper trading simulator, and your friendly guide Pansy. Earn a certificate. Built for women. No jargon."
       />
 
       <div style={{ fontFamily: "'DM Sans', sans-serif", background: C.deep, color: C.ivory, minHeight: "100vh", paddingTop: 36 }}>
@@ -433,8 +433,8 @@ export default function LandingPage() {
               </p>
 
               <p style={{ fontSize:"clamp(0.88rem, 1.6vw, 0.95rem)", lineHeight:1.65, color:"rgba(244,247,250,0.55)", maxWidth:460, marginBottom:"1.8rem", animation:"fade-up 0.55s ease-out 0.34s both" }}>
-                Your AI guide Pansy walks you through bite-size lessons, gives you a paper trading simulator to practice risk-free,
-                and helps you build the confidence to take control of your financial future. Built for women. No jargon. No judgment.
+                Your friendly guide Pansy walks you through 150+ lessons and strategies — from beginner to advanced — gives you a paper trading simulator to practice risk-free,
+                and awards you a certificate when you complete the program. Built for women. No jargon. No judgment.
               </p>
 
               {/* Buttons */}
@@ -511,12 +511,12 @@ export default function LandingPage() {
             </h2>
             <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(220px, 1fr))", gap:16 }}>
               {[
-                { icon:"📖", title:"36 Bite-Size Lessons", desc:"Stocks, ETFs, dividends, real estate, side hustles, retirement, budgeting, and trading psychology. 3-5 min each." },
-                { icon:"📊", title:"Paper Trading Simulator", desc:"Practice buying and selling stocks with $10,000 fake money. Real market prices, zero risk. Learn strategies before you risk a cent." },
-                { icon:"🌺", title:"AI Guide — Pansy", desc:"Your personal financial coach who explains everything in plain language. Ask anything, get honest answers. No jargon, no judgment." },
-                { icon:"💡", title:"Strategy Lab", desc:"32 real trading and investing strategies explained step by step. Entry rules, stop losses, when to use them, when NOT to." },
-                { icon:"💰", title:"Side Hustle Playbook", desc:"Start making money with $0. Real estate cash flow, digital products, freelancing, and building income streams from scratch." },
-                { icon:"🏆", title:"Track Your Growth", desc:"Daily streaks, achievement badges, XP levels, leaderboards. See your confidence score grow as you learn more." },
+                { icon:"📖", title:"150+ Lessons & Strategies", desc:"Beginner to advanced. Stocks, ETFs, options, dividends, real estate, budgeting, retirement, trading psychology — plus a full university with 9 deep-dive modules." },
+                { icon:"📊", title:"Paper Trading Simulator", desc:"Practice buying and selling stocks with $10,000 fake money. Real market prices, zero risk. Test 32 strategies before you risk a cent." },
+                { icon:"🌺", title:"Your Friendly Guide — Pansy", desc:"Your personal financial coach who explains everything in plain language. Ask anything, get honest answers. No jargon, no judgment." },
+                { icon:"💡", title:"32 Pro Strategies", desc:"Day trading, swing trading, long-term investing, indicators — each one broken down with entry rules, stop losses, and when to use them." },
+                { icon:"💰", title:"16 Side Hustle Lessons", desc:"Start making money with $0. Real estate cash flow, digital products, freelancing, and building income streams from scratch. No startup capital needed." },
+                { icon:"🎓", title:"Earn Your Certificate", desc:"Complete the program and earn a real certificate of completion. Track your progress with daily streaks, achievement badges, XP levels, and leaderboards." },
               ].map((item) => (
                 <div key={item.title} style={{ ...glass, borderRadius:14, padding:"1.25rem", boxShadow:"0 4px 24px rgba(0,0,0,0.24)" }}>
                   <span style={{ fontSize:24, display:"block", marginBottom:10 }}>{item.icon}</span>
@@ -637,7 +637,7 @@ export default function LandingPage() {
               <div className="relative w-full max-w-xs">
                 <div className="absolute inset-0 rounded-3xl blur-2xl opacity-20"
                   style={{ background:`radial-gradient(circle at 50% 60%, ${C.green}, transparent 70%)` }} />
-                <Image src="/pansy-coffee.png" alt="Pansy, your AI investing education guide" width={360} height={420}
+                <Image src="/pansy-coffee.png" alt="Pansy, your friendly financial education guide" width={360} height={420}
                   className="relative rounded-3xl object-cover w-full" />
               </div>
             </div>
@@ -647,7 +647,7 @@ export default function LandingPage() {
                 🌺 Your guide to financial independence
               </div>
               <h2 className="text-3xl md:text-4xl font-bold leading-tight" style={{ color:C.ivory }}>
-                Meet Pansy — your <span style={gradientText}>AI money mentor</span>
+                Meet Pansy — your <span style={gradientText}>friendly money mentor</span>
               </h2>
               <p className="text-base leading-relaxed" style={{ color:"rgba(244,247,250,0.72)" }}>
                 Most financial education is written by men, for men, in language designed to make you feel stupid.
@@ -655,13 +655,13 @@ export default function LandingPage() {
               </p>
               <ul className="space-y-3">
                 {[
-                  "Understand stocks, ETFs, dividends, and how markets work",
-                  "Learn to budget, save, and build an emergency fund",
-                  "Start a side hustle with literally $0 in your pocket",
-                  "Understand real estate investing and cash flow",
-                  "Practice trading risk-free before you spend a cent",
-                  "Build wealth the smart way — one habit at a time",
-                  "Master your money mindset and investing psychology",
+                  "36 core lessons — stocks, ETFs, dividends, budgeting, retirement",
+                  "16 side hustle lessons — start earning with $0 in your pocket",
+                  "32 trading & investing strategies with real entry/exit rules",
+                  "9-module university — deep dives into real estate, options, psychology",
+                  "Paper trading simulator — practice with $10K fake money, zero risk",
+                  "Earn a certificate of completion to prove your knowledge",
+                  "Daily streaks, badges, XP levels, and a community leaderboard",
                 ].map(item => (
                   <li key={item} className="flex items-start gap-3 text-sm" style={{ color:"rgba(244,247,250,0.80)" }}>
                     <span className="mt-0.5 shrink-0" style={{ color:C.green }}>✓</span>
@@ -684,11 +684,11 @@ export default function LandingPage() {
           <div className="max-w-3xl mx-auto px-4 py-16 md:px-12 md:py-24 text-center space-y-8">
             <p className="text-4xl">🌺</p>
             <h2 className="text-3xl md:text-4xl font-bold leading-tight" style={{ color:C.ivory }}>
-              36 lessons. Zero cost. Zero risk.<br />
+              150+ lessons. 32 strategies. A certificate at the end.<br />
               <span style={gradientText}>Your financial independence starts today.</span>
             </h2>
             <p className="text-base max-w-lg mx-auto" style={{ color:"rgba(244,247,250,0.60)" }}>
-              Join thousands of women learning to invest, build income, and take control of their money — completely free.
+              Join thousands of women learning to invest, build side hustles, and take control of their money — beginner to advanced, completely free.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
               <Link href="/onboarding" className="w-full sm:w-auto">
