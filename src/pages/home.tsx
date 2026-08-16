@@ -482,8 +482,8 @@ export default function Home() {
             {[
               { href: "/learn", label: "Learn", icon: <BookOpen className="w-6 h-6" />, color: "#27B7C8" },
               { href: "/paper-trader-v2", label: "Trade", icon: <TrendingUp className="w-6 h-6" />, color: "#49B06E" },
+              { href: "/budget-tracker", label: "Budget", icon: <Target className="w-6 h-6" />, color: "#F59E0B" },
               { href: "/ask-pansy", label: "Pansy", icon: <MessageCircle className="w-6 h-6" />, color: "#8B5CF6" },
-              { href: "/journal", label: "Journal", icon: <NotebookPen className="w-6 h-6" />, color: "#F59E0B" },
             ].map((action, i) => (
               <Link key={action.href} href={action.href}>
                 <motion.div
