@@ -101,11 +101,36 @@ export default function About() {
               </h2>
             </div>
             <p style={{ fontSize:"1rem", lineHeight:1.72, color:"rgba(244,247,250,0.68)" }}>
-              Pansy is Bloom&apos;s AI education guide. She walks you through market concepts, breaks down what&apos;s happening in plain English, and answers your questions without judgment. She&apos;s not a financial advisor — she&apos;s a teacher, and a good one.
+              Pansy is your friendly financial education guide. She walks you through market concepts, breaks down what&apos;s happening in plain English, and answers your questions without judgment. She&apos;s not a financial advisor — she&apos;s a teacher, and a good one.
             </p>
             <p style={{ fontSize:"0.85rem", color:"rgba(244,247,250,0.38)", marginTop:"0.75rem", fontStyle:"italic" }}>
               Pansy does not provide financial advice. All content is educational. She never recommends buying or selling any security.
             </p>
+          </div>
+
+          {/* What's inside */}
+          <div style={{ background:`rgba(22,38,74,0.5)`, border:`1px solid rgba(255,255,255,0.07)`, borderRadius:18, padding:"2rem 2.25rem", marginBottom:"2rem" }}>
+            <h2 style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:"1.75rem", fontWeight:700, color:C.ivory, marginBottom:"1.25rem" }}>
+              What&apos;s inside Bloom
+            </h2>
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(200px, 1fr))", gap:14 }}>
+              {[
+                { emoji:"📖", label:"36 Core Lessons", desc:"Beginner to intermediate — stocks, ETFs, dividends, budgeting, retirement" },
+                { emoji:"💰", label:"16 Side Hustle Lessons", desc:"Start earning with $0 — real estate, freelancing, digital products" },
+                { emoji:"💡", label:"32 Pro Strategies", desc:"Day trading, swing trading, long-term, indicators — with entry/exit rules" },
+                { emoji:"🎓", label:"9-Module University", desc:"89 deep-dive lessons on advanced topics, real estate, options, psychology" },
+                { emoji:"📊", label:"Paper Trading Simulator", desc:"Practice with $10K fake money, real prices, zero risk" },
+                { emoji:"🏦", label:"Budget Tracker", desc:"Track where your money goes. Pansy walks you through every step" },
+                { emoji:"🏆", label:"Achievements & Streaks", desc:"Daily challenges, XP levels, badges, leaderboards" },
+                { emoji:"📜", label:"Certificate", desc:"Complete the program and earn a real certificate of completion" },
+              ].map(item => (
+                <div key={item.label} style={{ padding:"1rem", borderRadius:12, border:"1px solid rgba(255,255,255,0.06)", background:"rgba(14,27,48,0.4)" }}>
+                  <span style={{ fontSize:20, display:"block", marginBottom:8 }}>{item.emoji}</span>
+                  <p style={{ fontSize:14, fontWeight:700, color:C.ivory, marginBottom:4 }}>{item.label}</p>
+                  <p style={{ fontSize:12, lineHeight:1.55, color:"rgba(244,247,250,0.50)", margin:0 }}>{item.desc}</p>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Company */}

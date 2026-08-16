@@ -514,7 +514,7 @@ export default function LandingPage() {
                 { icon:"📖", title:"150+ Lessons & Strategies", desc:"Beginner to advanced. Stocks, ETFs, options, dividends, real estate, budgeting, retirement, trading psychology — plus a full university with 9 deep-dive modules." },
                 { icon:"📊", title:"Paper Trading Simulator", desc:"Practice buying and selling stocks with $10,000 fake money. Real market prices, zero risk. Test 32 strategies before you risk a cent." },
                 { icon:"🌺", title:"Your Friendly Guide — Pansy", desc:"Your personal financial coach who explains everything in plain language. Ask anything, get honest answers. No jargon, no judgment." },
-                { icon:"💡", title:"32 Pro Strategies", desc:"Day trading, swing trading, long-term investing, indicators — each one broken down with entry rules, stop losses, and when to use them." },
+                { icon:"🏦", title:"Budget Tracker", desc:"See where your money actually goes. Track expenses by category, get Pansy's tips, and build the habits that lead to wealth." },
                 { icon:"💰", title:"16 Side Hustle Lessons", desc:"Start making money with $0. Real estate cash flow, digital products, freelancing, and building income streams from scratch. No startup capital needed." },
                 { icon:"🎓", title:"Earn Your Certificate", desc:"Complete the program and earn a real certificate of completion. Track your progress with daily streaks, achievement badges, XP levels, and leaderboards." },
               ].map((item) => (
