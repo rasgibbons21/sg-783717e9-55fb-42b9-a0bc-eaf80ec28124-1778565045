@@ -300,8 +300,8 @@ export default function LandingPage() {
       <style>{KEYFRAMES}</style>
 
       <SEO
-        title="She Blooms Wealth — Investing Education for Women"
-        description="Learn how money really works. Pansy, your AI education guide, helps women build investing confidence one lesson at a time."
+        title="She Blooms Wealth — Free Financial Education for Women"
+        description="Learn everything about money — investing, budgeting, side hustles, real estate, retirement — completely free. 36 lessons, paper trading simulator, and AI guide Pansy. Built for women. No jargon."
       />
 
       <div style={{ fontFamily: "'DM Sans', sans-serif", background: C.deep, color: C.ivory, minHeight: "100vh", paddingTop: 36 }}>
@@ -411,39 +411,30 @@ export default function LandingPage() {
             {/* ── LEFT COLUMN ─────────────────────────────────────────────── */}
             <div style={{ flex:"0 0 54%" }}>
 
-              {/* Greeting */}
-              <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:"1.5rem", animation:"fade-up 0.55s ease-out 0.1s both" }}>
-                <span style={{ fontSize:17 }}>
-                  {hour < 12 ? "☀️" : hour < 17 ? "🌤️" : "🌙"}
-                </span>
-                <span style={{ fontSize:13.5, fontWeight:500, color:"rgba(244,247,250,0.58)" }}>
-                  {greet}{userName ? `, ${userName}` : ""}
-                </span>
-                <Image src="/bloom-logo.png" alt="" width={16} height={16} style={{ borderRadius:"50%", opacity:0.55, background:"white" }} />
+              {/* Free badge */}
+              <div style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"6px 14px", borderRadius:20, marginBottom:"1.25rem", animation:"fade-up 0.55s ease-out 0.1s both", background:"rgba(73, 176, 110, 0.12)", border:"1px solid rgba(73, 176, 110, 0.25)" }}>
+                <span style={{ fontSize:13 }}>🌱</span>
+                <span style={{ fontSize:12, fontWeight:700, color:C.green, letterSpacing:"0.04em" }}>100% Free to Start — No Credit Card</span>
               </div>
 
               {/* Headline */}
-              <div style={{ marginBottom:"1.5rem", animation:"fade-up 0.55s ease-out 0.2s both" }}>
-                <h1 style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:"clamp(2.5rem, 5.2vw, 4rem)", fontWeight:700, lineHeight:1.1, letterSpacing:"-0.01em", color:C.ivory, margin:0 }}>
-                  Understand today.
+              <div style={{ marginBottom:"1.25rem", animation:"fade-up 0.55s ease-out 0.2s both" }}>
+                <h1 style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:"clamp(2.3rem, 5vw, 3.6rem)", fontWeight:700, lineHeight:1.12, letterSpacing:"-0.01em", color:C.ivory, margin:0 }}>
+                  Learn to build wealth
                   <br />
-                  Invest tomorrow.
-                  <br />
-                  <span style={{ fontFamily:"'Dancing Script', cursive", fontWeight:700, fontSize:"clamp(2.7rem, 5.6vw, 4.3rem)", position:"relative", display:"inline-block", ...gradientText }}>
-                    Bloom forever.
-                    <svg style={{ position:"absolute", bottom:-8, left:2, overflow:"visible" }} width="230" height="12">
-                      <path d="M 0 6 Q 57 1, 115 6 Q 173 11, 230 6"
-                        stroke={C.teal} strokeWidth="1.6" fill="none" strokeLinecap="round" opacity="0.65"
-                        style={{ strokeDasharray:320, animation:"underline-draw 1.4s cubic-bezier(0.4,0,0.2,1) 0.9s both" }} />
-                    </svg>
-                  </span>
+                  <span style={{ ...gradientText }}>from scratch.</span>
                 </h1>
               </div>
 
-              {/* Sub-copy */}
-              <p style={{ fontSize:"clamp(1rem, 1.9vw, 1.12rem)", lineHeight:1.68, color:"rgba(244,247,250,0.62)", maxWidth:470, marginBottom:"2.2rem", animation:"fade-up 0.55s ease-out 0.32s both" }}>
-                Bloom teaches women how money really works, so you can grow wealth with confidence.
-                One lesson. One step. One bloom at a time.
+              {/* Sub-copy — clear value prop */}
+              <p style={{ fontSize:"clamp(1rem, 1.9vw, 1.12rem)", lineHeight:1.72, color:"rgba(244,247,250,0.72)", maxWidth:480, marginBottom:"1rem", animation:"fade-up 0.55s ease-out 0.28s both" }}>
+                Bloom is a <strong style={{ color:C.ivory }}>free financial education app</strong> that teaches you <em>everything</em> — not just investing.
+                Budgeting, side hustles, real estate, retirement, trading psychology, and how money actually works.
+              </p>
+
+              <p style={{ fontSize:"clamp(0.88rem, 1.6vw, 0.95rem)", lineHeight:1.65, color:"rgba(244,247,250,0.55)", maxWidth:460, marginBottom:"1.8rem", animation:"fade-up 0.55s ease-out 0.34s both" }}>
+                Your AI guide Pansy walks you through bite-size lessons, gives you a paper trading simulator to practice risk-free,
+                and helps you build the confidence to take control of your financial future. Built for women. No jargon. No judgment.
               </p>
 
               {/* Buttons */}
@@ -511,24 +502,31 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ── TRUST BAR ───────────────────────────────────────────────────── */}
-        <div style={{ ...glass, borderTop:"1px solid rgba(255,255,255,0.06)", borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
-          <div style={{ maxWidth:1200, margin:"0 auto", padding:"1rem 1.5rem", display:"flex", flexWrap:"wrap", alignItems:"center", justifyContent:"center", gap:"1.5rem" }}>
-            {[
-              { icon:"🔒", title:"Secure & Private",       body:"Your data is safe." },
-              { icon:"📚", title:"Educational Platform",   body:"Not financial advice." },
-              { icon:"🌸", title:"Built for Women",         body:"Like you." },
-              { icon:"🌱", title:"Start Free Today",       body:"No credit card needed." },
-            ].map((t, i) => (
-              <div key={i} style={{ display:"flex", alignItems:"center", gap:8 }}>
-                {i > 0 && <div className="hidden sm:block" style={{ width:1, height:22, background:"rgba(255,255,255,0.08)", marginRight:8 }} />}
-                <span style={{ fontSize:15 }}>{t.icon}</span>
-                <span style={{ fontSize:12, fontWeight:600, color:C.ivory }}>{t.title}</span>
-                <span style={{ fontSize:12, color:"rgba(244,247,250,0.42)" }}>— {t.body}</span>
-              </div>
-            ))}
+        {/* ── WHAT YOU GET ─────────────────────────────────────────────────── */}
+        <section style={{ background:"rgba(22,38,74,0.45)", borderTop:"1px solid rgba(255,255,255,0.06)", borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
+          <div style={{ maxWidth:1200, margin:"0 auto", padding:"3rem 1.5rem" }}>
+            <p style={{ textAlign:"center", fontSize:11, fontWeight:700, letterSpacing:"0.14em", textTransform:"uppercase", color:C.teal, marginBottom:10 }}>Everything You Need — All Free</p>
+            <h2 style={{ textAlign:"center", fontFamily:"'Cormorant Garamond', serif", fontSize:"clamp(1.6rem, 3.5vw, 2.2rem)", fontWeight:700, color:C.ivory, marginBottom:"2rem" }}>
+              Financial literacy is more than just stocks
+            </h2>
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(220px, 1fr))", gap:16 }}>
+              {[
+                { icon:"📖", title:"36 Bite-Size Lessons", desc:"Stocks, ETFs, dividends, real estate, side hustles, retirement, budgeting, and trading psychology. 3-5 min each." },
+                { icon:"📊", title:"Paper Trading Simulator", desc:"Practice buying and selling stocks with $10,000 fake money. Real market prices, zero risk. Learn strategies before you risk a cent." },
+                { icon:"🌺", title:"AI Guide — Pansy", desc:"Your personal financial coach who explains everything in plain language. Ask anything, get honest answers. No jargon, no judgment." },
+                { icon:"💡", title:"Strategy Lab", desc:"32 real trading and investing strategies explained step by step. Entry rules, stop losses, when to use them, when NOT to." },
+                { icon:"💰", title:"Side Hustle Playbook", desc:"Start making money with $0. Real estate cash flow, digital products, freelancing, and building income streams from scratch." },
+                { icon:"🏆", title:"Track Your Growth", desc:"Daily streaks, achievement badges, XP levels, leaderboards. See your confidence score grow as you learn more." },
+              ].map((item) => (
+                <div key={item.title} style={{ ...glass, borderRadius:14, padding:"1.25rem", boxShadow:"0 4px 24px rgba(0,0,0,0.24)" }}>
+                  <span style={{ fontSize:24, display:"block", marginBottom:10 }}>{item.icon}</span>
+                  <p style={{ fontSize:14, fontWeight:700, color:C.ivory, marginBottom:6 }}>{item.title}</p>
+                  <p style={{ fontSize:12, lineHeight:1.6, color:"rgba(244,247,250,0.55)", margin:0 }}>{item.desc}</p>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        </section>
 
         {/* ── DASHBOARD CARDS ─────────────────────────────────────────────── */}
         <section style={{ maxWidth:1200, margin:"0 auto", padding:"3.5rem 1.5rem 1rem" }}>
@@ -646,22 +644,24 @@ export default function LandingPage() {
             <div className="flex-1 space-y-6">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold tracking-wide uppercase"
                 style={{ background:`${C.green}18`, color:C.green, border:`1px solid ${C.green}30` }}>
-                🌺 Meet your guide
+                🌺 Your guide to financial independence
               </div>
               <h2 className="text-3xl md:text-4xl font-bold leading-tight" style={{ color:C.ivory }}>
-                Meet Pansy
+                Meet Pansy — your <span style={gradientText}>AI money mentor</span>
               </h2>
-              <p className="text-lg leading-relaxed" style={{ color:"rgba(244,247,250,0.72)" }}>
-                I won&apos;t just hand you answers — I&apos;ll show you how to think for yourself.
+              <p className="text-base leading-relaxed" style={{ color:"rgba(244,247,250,0.72)" }}>
+                Most financial education is written by men, for men, in language designed to make you feel stupid.
+                Pansy is different. She explains how money <em>actually</em> works — clearly, honestly, and without talking down to you.
               </p>
               <ul className="space-y-3">
                 {[
-                  "Understand stocks, ETFs, and how markets actually work",
-                  "Read charts with confidence, not confusion",
-                  "Understand what moves a stock and why",
-                  "Manage risk the way experienced investors do",
-                  "Build wealth the smart way, one habit at a time",
-                  "Master your investing mindset and emotions",
+                  "Understand stocks, ETFs, dividends, and how markets work",
+                  "Learn to budget, save, and build an emergency fund",
+                  "Start a side hustle with literally $0 in your pocket",
+                  "Understand real estate investing and cash flow",
+                  "Practice trading risk-free before you spend a cent",
+                  "Build wealth the smart way — one habit at a time",
+                  "Master your money mindset and investing psychology",
                 ].map(item => (
                   <li key={item} className="flex items-start gap-3 text-sm" style={{ color:"rgba(244,247,250,0.80)" }}>
                     <span className="mt-0.5 shrink-0" style={{ color:C.green }}>✓</span>
@@ -670,7 +670,7 @@ export default function LandingPage() {
                 ))}
               </ul>
               <p className="text-base font-medium pt-2" style={{ color:C.teal }}>
-                You don&apos;t have to do this alone. I&apos;ve got you.
+                Financial independence isn&apos;t a privilege — it&apos;s a skill. And we&apos;re going to teach you.
               </p>
               <p className="text-xs" style={{ color:"rgba(244,247,250,0.35)" }}>
                 Educational only. Not financial advice. Pansy never tells you what to buy or sell.
@@ -684,9 +684,12 @@ export default function LandingPage() {
           <div className="max-w-3xl mx-auto px-4 py-16 md:px-12 md:py-24 text-center space-y-8">
             <p className="text-4xl">🌺</p>
             <h2 className="text-3xl md:text-4xl font-bold leading-tight" style={{ color:C.ivory }}>
-              The best time to learn was years ago.<br />
-              <span style={gradientText}>The second-best time is today.</span>
+              36 lessons. Zero cost. Zero risk.<br />
+              <span style={gradientText}>Your financial independence starts today.</span>
             </h2>
+            <p className="text-base max-w-lg mx-auto" style={{ color:"rgba(244,247,250,0.60)" }}>
+              Join thousands of women learning to invest, build income, and take control of their money — completely free.
+            </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
               <Link href="/onboarding" className="w-full sm:w-auto">
                 <button className="w-full sm:w-auto px-8 py-4 rounded-xl text-base font-semibold shadow-xl"
