@@ -27,37 +27,22 @@ export default function Subscription() {
   useEffect(() => {
     const checkAuth = async () => {
       const session = await authService.getCurrentSession();
-      if (!session) {
-        router.push("/");
-        return;
-      }
-
-      const userData = await userService.getCurrentUser();
-      if (userData) {
-        setUser(userData);
+      if (session) {
+        const userData = await userService.getCurrentUser();
+        if (userData) {
+          setUser(userData);
+        }
       }
     };
-    
+
     checkAuth();
-    
-    // Check for URL errors (e.g. from canceled checkout)
+
     if (router.query.canceled) {
       setErrorMsg("Checkout was canceled. You have not been charged.");
     } else if (router.query.error) {
       setErrorMsg("There was an issue processing your subscription. Please try again.");
     }
   }, [router]);
-
-  useEffect(() => {
-    const checkCurrentPlan = async () => {
-      const user = await userService.getCurrentUser();
-      if (user) {
-        // Default to free since plan_type doesn't exist in profiles
-        setCurrentPlan("free");
-      }
-    };
-    checkCurrentPlan();
-  }, []);
 
   const handleSubscribe = async () => {
     setIsProcessing(true);
@@ -147,7 +132,7 @@ export default function Subscription() {
               Choose Your Plan
             </h1>
             <p className="text-muted-foreground">
-              Get unlimited access to Pansy's investing insights
+              Unlock 150+ lessons, 32 strategies, and earn your certificate
             </p>
           </div>
           
@@ -197,9 +182,10 @@ export default function Subscription() {
 
                 <ul className="space-y-2">
                   {[
-                    "3 analyses per week",
-                    "Basic market summary",
-                    "Broker directory",
+                    "36 core lessons (beginner & intermediate)",
+                    "Paper trading simulator with $10K",
+                    "Daily challenges & streak tracking",
+                    "Market insights & daily bloom",
                   ].map((feature) => (
                     <li key={feature} className="flex items-start gap-2">
                       <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
@@ -207,10 +193,13 @@ export default function Subscription() {
                     </li>
                   ))}
                   <li className="flex items-start gap-2 opacity-50">
-                    <span className="text-sm text-muted-foreground line-through">Pansy's full analysis</span>
+                    <span className="text-sm text-muted-foreground line-through">16 income stream lessons</span>
                   </li>
                   <li className="flex items-start gap-2 opacity-50">
-                    <span className="text-sm text-muted-foreground line-through">ETF analyses</span>
+                    <span className="text-sm text-muted-foreground line-through">32 pro strategies</span>
+                  </li>
+                  <li className="flex items-start gap-2 opacity-50">
+                    <span className="text-sm text-muted-foreground line-through">9-module university (89 lessons)</span>
                   </li>
                 </ul>
 
@@ -253,12 +242,14 @@ export default function Subscription() {
 
                 <ul className="space-y-2">
                   {[
-                    "Unlimited daily analyses",
-                    "Pansy's full analysis on every stock",
-                    "Stocks, ETFs, and mutual funds",
-                    "Real-time news and charts",
-                    "Portfolio tracker",
-                    "Curated broker education",
+                    "Everything in Free, plus:",
+                    "16 income stream & side hustle lessons",
+                    "32 pro trading & investing strategies",
+                    "9-module university — 89 deep-dive lessons",
+                    "Unlimited stock & ETF analysis",
+                    "Certificate of completion",
+                    "Save your portfolio & progress forever",
+                    "Pansy unlimited — ask anything, anytime",
                   ].map((feature) => (
                     <li key={feature} className="flex items-start gap-2">
                       <Check className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
@@ -269,20 +260,29 @@ export default function Subscription() {
 
                 {currentPlan === "free" && (
                   <div className="space-y-3 pt-4">
-                    <Button 
-                      className="w-full bg-accent hover:bg-accent/90 text-accent-foreground" 
-                      onClick={handleSubscribe}
-                      disabled={isProcessing || !user}
-                    >
-                      {isProcessing ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Redirecting to Stripe...
-                        </>
-                      ) : (
-                        "Upgrade to Bloom Pro"
-                      )}
-                    </Button>
+                    {user ? (
+                      <Button
+                        className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
+                        onClick={handleSubscribe}
+                        disabled={isProcessing}
+                      >
+                        {isProcessing ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Redirecting to Stripe...
+                          </>
+                        ) : (
+                          "Upgrade to Bloom Pro"
+                        )}
+                      </Button>
+                    ) : (
+                      <Button
+                        className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
+                        onClick={() => router.push("/onboarding")}
+                      >
+                        Sign Up Free, Then Upgrade
+                      </Button>
+                    )}
                     <p className="text-xs text-center text-muted-foreground">
                       Secure checkout powered by Stripe
                     </p>
