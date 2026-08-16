@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { createClient } from "@supabase/supabase-js";
 import { requireLoggedInUser, sendAuthError } from "@/lib/requireProUser";
 import { awardXP } from "@/lib/progression";
+import { checkMiscAchievement } from "@/lib/achievementChecker";
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -207,6 +208,8 @@ async function handleComplete(req: NextApiRequest, res: NextApiResponse) {
     },
     { onConflict: "user_id,activity_date,activity_type,reference_id" }
   );
+
+  await checkMiscAchievement(userId, "first-challenge");
 
   return res.json({
     success: true,

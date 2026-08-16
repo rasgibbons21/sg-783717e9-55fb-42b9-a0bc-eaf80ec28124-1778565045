@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { requireLoggedInUser, sendAuthError } from "@/lib/requireProUser";
 import { createClient } from "@supabase/supabase-js";
 import { getServerQuote } from "@/lib/serverQuote";
+import { checkTradeAchievements } from "@/lib/achievementChecker";
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -119,6 +120,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         updated_at: new Date().toISOString(),
       })
       .eq("id", account.id);
+  }
+
+  // Check trade achievements in the background
+  const { data: allClosed } = await supabaseAdmin
+    .from("practice_trades")
+    .select("pnl, thesis")
+    .eq("user_id", userId)
+    .eq("status", "closed");
+
+  if (allClosed) {
+    let winStreak = 0;
+    const sortedTrades = allClosed;
+    for (let i = sortedTrades.length - 1; i >= 0; i--) {
+      if (Number(sortedTrades[i].pnl) > 0) winStreak++;
+      else break;
+    }
+
+    await checkTradeAchievements(userId, {
+      totalClosed: allClosed.length,
+      winStreak,
+      hasProfitableTrade: pnl > 0,
+      hasThesis: !!trade.thesis,
+      thesisTradeCount: allClosed.filter(t => !!t.thesis).length,
+      hasGoodRR: pnl_pct >= 2,
+    });
   }
 
   return res.status(200).json({ trade: updated, pnl, exit_price: exitP });

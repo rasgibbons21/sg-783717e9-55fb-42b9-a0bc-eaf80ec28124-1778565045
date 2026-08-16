@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { createClient } from "@supabase/supabase-js";
 import { requireLoggedInUser, sendAuthError } from "@/lib/requireProUser";
 import { awardXP } from "@/lib/progression";
+import { checkStreakAchievements } from "@/lib/achievementChecker";
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -134,11 +135,14 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     await awardXP(userId, xpBonus, `${hitMilestone}-day streak milestone`);
   }
 
+  const newBadges = await checkStreakAchievements(userId, currentStreak);
+
   return res.json({
     currentStreak,
     longestStreak,
     totalActiveDays,
     streakExtended: true,
     milestone: hitMilestone ?? null,
+    newBadges,
   });
 }

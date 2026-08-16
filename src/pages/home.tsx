@@ -20,6 +20,8 @@ import { GemsLeaderboard } from "@/components/GemsLeaderboard";
 import { PansyContextCard } from "@/components/PansyContextCard";
 import { StreakCalendar } from "@/components/StreakCalendar";
 import { DailyChallenge } from "@/components/DailyChallenge";
+import { TrophyCase } from "@/components/TrophyCase";
+import { PushNotificationPrompt } from "@/components/PushNotificationPrompt";
 
 const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
 const cardSpring = { type: "spring" as const, stiffness: 400, damping: 25 };
@@ -410,8 +412,14 @@ export default function Home() {
           </div>
         </motion.div>
 
+        {/* ══════ PUSH NOTIFICATION PROMPT ══════ */}
+        <PushNotificationPrompt />
+
         {/* ══════ STREAK CALENDAR ══════ */}
         <StreakCalendar />
+
+        {/* ══════ TROPHY CASE ══════ */}
+        <TrophyCase />
 
         {/* ══════ LEADERBOARDS — SIDE BY SIDE ══════ */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

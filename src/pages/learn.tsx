@@ -2677,6 +2677,13 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
           setTimeout(() => confetti({ particleCount: 100, spread: 120, origin: { y: 0.4, x: 0.3 } }), 300);
           setTimeout(() => confetti({ particleCount: 100, spread: 120, origin: { y: 0.4, x: 0.7 } }), 600);
         }
+        const session = await authService.getCurrentSession();
+        if (session) {
+          fetch("/api/check-achievements", {
+            method: "POST",
+            headers: { Authorization: `Bearer ${session.access_token}` },
+          }).catch(() => {});
+        }
       }
     } catch (error) {
       console.error("Error completing lesson:", error);

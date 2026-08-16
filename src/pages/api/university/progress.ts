@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { requireProUser, sendAuthError } from "@/lib/requireProUser";
 import { awardXP, unlockMission, missionUnlockedByLesson } from "@/lib/progression";
 import { UNIVERSITY_MODULES } from "@/data/university/modules";
+import { checkLessonAchievements } from "@/lib/achievementChecker";
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -96,6 +97,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         xpAwarded += 50;
       }
     }
+
+    const { data: totalProgress } = await supabaseAdmin
+      .from("university_lesson_progress")
+      .select("lesson_slug")
+      .eq("user_id", userId);
+    await checkLessonAchievements(userId, totalProgress?.length ?? 0);
 
     return res.status(200).json({ ok: true, xp_awarded: xpAwarded, mission_unlocked: missionKey ?? null });
   }
