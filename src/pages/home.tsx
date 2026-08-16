@@ -131,7 +131,7 @@ export default function Home() {
     }
   };
 
-  const totalLessons = 30;
+  const totalLessons = 36;
   const progressPercent = Math.min(Math.round((completedCount / totalLessons) * 100), 100);
   const confidenceScore = Math.min(Math.round((completedCount / totalLessons) * 100), 100);
 

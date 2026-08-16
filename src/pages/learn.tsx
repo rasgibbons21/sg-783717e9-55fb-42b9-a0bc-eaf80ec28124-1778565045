@@ -24,7 +24,7 @@ import { PansyContextCard } from "@/components/PansyContextCard";
 
 const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
 
-type Category = "All" | "Stocks" | "ETFs" | "Mutual Funds" | "Dividends" | "Bonds" | "Retirement" | "Trading Psychology" | "Income Streams";
+type Category = "All" | "Stocks" | "ETFs" | "Mutual Funds" | "Dividends" | "Retirement" | "Trading Psychology" | "Income Streams";
 
 interface QuizQuestion {
   question: string;
@@ -2584,6 +2584,132 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
         }
       ]
     },
+    {
+      id: "income-start-from-zero",
+      title: "Side Hustle — Start From $0",
+      category: "Income Streams",
+      readTime: 5,
+      difficulty: "Beginner",
+      summary: "How to start making money with literally nothing in your pocket",
+      isPro: false,
+      content: `Let's be real — most side hustle advice assumes you already have money to invest. Buy equipment. Pay for courses. Run ads. But what if you have $0 right now? Here's how to start from absolutely nothing 💪
+
+**The truth about starting from zero:**
+
+You don't need money. You need time, a phone, and internet access. That's it. Everything else is an excuse the internet sells you so you'll buy their course.
+
+**Phase 1: Make your first $100 (Week 1-2)**
+
+Start with what you already have and what you already know. Don't overcomplicate this.
+
+**Sell what you own:**
+- Clean out your closet. List on Poshmark, Mercari, Facebook Marketplace
+- Old electronics, books, kitchen gadgets — everything has resale value
+- You'll probably find $100-500 worth of stuff you forgot about
+
+**Sell your time locally:**
+- Dog walking ($15-25/walk — sign up on Rover or Wag, free to join)
+- Babysitting ($15-20/hour — use Care.com or local Facebook groups)
+- Cleaning houses ($25-40/hour — post on Nextdoor, free)
+- Yard work, errands, moving help — TaskRabbit is free to join
+
+This isn't glamorous. It's real. And it works this week, not next month.
+
+**Phase 2: Sell skills you already have (Week 2-4)**
+
+Think about what you're naturally good at or what people already ask you for help with:
+
+- **Good at writing?** Freelance on Upwork (free to join). Blog posts pay $50-200 each
+- **Good with social media?** Manage accounts for local businesses. $300-500/month per client
+- **Organized?** Virtual assistant work. $15-25/hour on Belay or Upwork
+- **Good at explaining things?** Tutor on Wyzant or Varsity Tutors. $20-40/hour
+- **Crafty?** Sell on Etsy. Listing fee is $0.20 per item — basically free
+- **Can type fast?** Transcription on Rev or TranscribeMe. Entry level, no experience needed
+- **Bilingual?** Translation work pays $0.10-0.30 per word
+- **Good at design?** Canva templates sell on Etsy for $5-20 each. Make once, sell forever
+
+**Phase 3: Stack and specialize (Month 2-3)**
+
+Once money starts coming in, double down on what's working:
+
+1. **Pick your best earner** — the one that makes the most per hour
+2. **Get your first 3 reviews** — do the work cheaply or free if needed to build credibility
+3. **Raise your price 20%** — if nobody leaves, raise it again
+4. **Document your process** — write down exactly how you do it step by step
+
+**The $0 toolkit:**
+
+Everything you need is free:
+- **Canva** (free plan) — for marketing materials and digital products
+- **Google Docs/Sheets** — for tracking clients and finances
+- **Instagram/TikTok** — for marketing (free, just takes consistency)
+- **Cash App/Venmo/Zelle** — for getting paid (free)
+- **Gmail** — for professional email (free)
+- **Wave** — for invoicing (free forever)
+
+**What NOT to do when starting from $0:**
+
+❌ Don't buy a course. YouTube has everything for free
+❌ Don't pay for a website yet. Instagram bio + DMs is your storefront
+❌ Don't wait until you "feel ready." Start messy, improve as you go
+❌ Don't compare yourself to people who started with money. Different starting line, same finish line
+❌ Don't quit your day job yet. Stack income, don't swap it
+
+**Real timeline from $0:**
+
+- **Week 1:** Sell stuff you own. Make $50-200
+- **Week 2-3:** Pick a skill, get first paying client. Make $100-300
+- **Month 2:** Get 2-3 regular clients. Making $500-1,000/month
+- **Month 3-4:** Raise prices, get referrals. Making $1,000-2,000/month
+- **Month 6:** Steady $1,500-3,000/month side income
+
+Is this guaranteed? No. Is it realistic if you put in the work? Absolutely. Thousands of women have done exactly this.
+
+**The mindset shift:**
+
+Stop thinking "I need money to make money." You need effort. You need consistency. You need to be willing to do unglamorous work for a few months while you build. The money comes after the work, not before it.
+
+You have a phone. You have skills. You have time outside your 9-5. That's your startup capital sis 🌸
+
+Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
+      keyTakeaway: "You don't need money to start — you need time, a phone, and internet. Sell what you own, sell your skills, then stack and specialize. Free tools exist for everything.",
+      relatedTopics: ["income-skills-to-income", "income-side-hustle-map", "income-digital-products"],
+      quiz: [
+        {
+          question: "What do you need to start a side hustle from $0?",
+          options: [
+            "A course, equipment, and a website",
+            "Time, a phone, and internet access",
+            "At least $500 in savings",
+            "A business degree"
+          ],
+          correctAnswer: 1,
+          explanation: "That's it! Time, a phone, and internet. Everything else is extra. Don't let the excuse of 'no money' stop you 💪"
+        },
+        {
+          question: "What's the fastest way to make your first $100?",
+          options: [
+            "Buy a course on how to make money",
+            "Wait for the perfect business idea",
+            "Sell stuff you already own and offer local services",
+            "Take out a business loan"
+          ],
+          correctAnswer: 2,
+          explanation: "Yes! Sell things from your closet and offer services like dog walking, cleaning, babysitting. Real money this week, not next month 🏡"
+        },
+        {
+          question: "What should you NOT do when starting from $0?",
+          options: [
+            "Start messy and improve as you go",
+            "Buy courses and a fancy website before making any money",
+            "Use free tools like Canva and Google Docs",
+            "Pick your best earner and double down"
+          ],
+          correctAnswer: 1,
+          explanation: "Right! Don't spend money you don't have on courses and websites. YouTube is free, Instagram is your storefront. Start with what you have 🌸"
+        }
+      ]
+    },
   ];
 
   useEffect(() => {
@@ -2778,9 +2904,9 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
     "ETFs",
     "Mutual Funds",
     "Dividends",
-    "Bonds",
     "Retirement",
     "Trading Psychology",
+    "Income Streams",
   ];
 
   const completionPercentage = Math.round(
