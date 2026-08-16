@@ -18,6 +18,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { TimeGreeting } from "@/components/TimeGreeting";
 import { GemsLeaderboard } from "@/components/GemsLeaderboard";
 import { PansyContextCard } from "@/components/PansyContextCard";
+import { StreakCalendar } from "@/components/StreakCalendar";
+import { DailyChallenge } from "@/components/DailyChallenge";
 
 const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
 const cardSpring = { type: "spring" as const, stiffness: 400, damping: 25 };
@@ -296,6 +298,9 @@ export default function Home() {
             Today with Pansy <span className="text-lg">🌺</span>
           </h3>
 
+          {/* Daily Challenge */}
+          <DailyChallenge />
+
           <div className="grid grid-cols-1 gap-3">
             {/* Morning Coffee */}
             <motion.div
@@ -404,6 +409,9 @@ export default function Home() {
             ))}
           </div>
         </motion.div>
+
+        {/* ══════ STREAK CALENDAR ══════ */}
+        <StreakCalendar />
 
         {/* ══════ LEADERBOARDS — SIDE BY SIDE ══════ */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
