@@ -4,6 +4,9 @@ import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { supabase } from "@/integrations/supabase/client";
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const db = supabase as any;
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Trash2, TrendingDown, DollarSign, PieChart, Sparkles } from "lucide-react";
 import confetti from "canvas-confetti";
@@ -71,7 +74,7 @@ export default function BudgetTracker() {
 
   const fetchEntries = useCallback(async () => {
     if (!userId) return;
-    const { data } = await supabase
+    const { data } = await db
       .from("budget_entries")
       .select("*")
       .eq("user_id", userId)
@@ -103,7 +106,7 @@ export default function BudgetTracker() {
     setSaving(true);
     haptic(12);
 
-    const { error } = await supabase.from("budget_entries").insert({
+    const { error } = await db.from("budget_entries").insert({
       user_id: userId,
       category,
       amount: parsed,
@@ -127,7 +130,7 @@ export default function BudgetTracker() {
 
   const handleDelete = async (id: string) => {
     haptic(6);
-    await supabase.from("budget_entries").delete().eq("id", id).eq("user_id", userId);
+    await db.from("budget_entries").delete().eq("id", id).eq("user_id", userId);
     setEntries(prev => prev.filter(e => e.id !== id));
   };
 
