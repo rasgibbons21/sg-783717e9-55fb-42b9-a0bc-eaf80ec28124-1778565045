@@ -34,7 +34,6 @@ export default function Onboarding() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [signupSuccess, setSignupSuccess] = useState(false);
   const [error, setError] = useState("");
   const [resetEmailSent, setResetEmailSent] = useState(false);
   const [resetCode, setResetCode] = useState("");
@@ -43,9 +42,6 @@ export default function Onboarding() {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [animateIn, setAnimateIn] = useState(false);
-  const [verificationCode, setVerificationCode] = useState("");
-  const [verificationError, setVerificationError] = useState("");
-  const [verificationSending, setVerificationSending] = useState(false);
   const [referralCode, setReferralCode] = useState("");
 
   const [topics, setTopics] = useState<LearningTopic[]>([]);
@@ -174,10 +170,22 @@ export default function Onboarding() {
         }
         if (user) {
           await userService.updateUser(user.id, { full_name: fullName });
-          setSignupSuccess(true);
+          // Ensure we have a session — sign in if autoconfirm didn't grant one
+          let { data: { session } } = await supabase.auth.getSession();
+          if (!session) {
+            await authService.signIn(email, password);
+            ({ data: { session } } = await supabase.auth.getSession());
+          }
+          if (referralCode.trim() && session) {
+            fetch("/api/referral/apply", {
+              method: "POST",
+              headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
+              body: JSON.stringify({ code: referralCode.trim() }),
+            }).catch(() => {});
+          }
           submitLock.current = false;
           setIsSubmitting(false);
-          setTimeout(() => sendVerificationCode(), 500);
+          goToStep("q-struggle");
           return;
         }
       } else {
@@ -235,54 +243,6 @@ export default function Onboarding() {
     }
   };
 
-  const sendVerificationCode = async () => {
-    setVerificationSending(true);
-    setVerificationError("");
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) { setVerificationError("Session expired — please sign in again."); return; }
-      const res = await fetch("/api/auth/send-verification", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
-      });
-      if (!res.ok) {
-        const d = await res.json();
-        setVerificationError(d.error || "Failed to send code");
-      }
-    } catch { setVerificationError("Network error — please try again."); }
-    finally { setVerificationSending(false); }
-  };
-
-  const verifyCode = async () => {
-    if (!verificationCode.trim()) { setVerificationError("Please enter the code"); return; }
-    setVerificationSending(true);
-    setVerificationError("");
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) { setVerificationError("Session expired — please sign in again."); return; }
-      const res = await fetch("/api/auth/verify-code", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
-        body: JSON.stringify({ code: verificationCode.trim() }),
-      });
-      const d = await res.json();
-      if (!res.ok) { setVerificationError(d.error || "Verification failed"); return; }
-      // Apply referral code if one was provided
-      if (referralCode.trim()) {
-        try {
-          await fetch("/api/referral/apply", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
-            body: JSON.stringify({ code: referralCode.trim() }),
-          });
-        } catch {}
-      }
-      setSignupSuccess(false);
-      setStep("q-struggle");
-    } catch { setVerificationError("Network error — please try again."); }
-    finally { setVerificationSending(false); }
-  };
-
   const glassCard = "relative backdrop-blur-xl border border-white/[0.08] rounded-3xl overflow-hidden";
   const glassCardBg = "bg-white/[0.04]";
   const glowBorder = "shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05),0_0_20px_rgba(39,183,200,0.08)]";
@@ -316,64 +276,6 @@ export default function Onboarding() {
       )}
     </div>
   );
-
-  if (signupSuccess) {
-    return (
-      <>
-        <OnboardingStyles />
-        <div className="fixed inset-0 overflow-hidden" style={{ background: "linear-gradient(135deg, #0E1B30 0%, #0a1525 40%, #0d1f35 70%, #0E1B30 100%)" }}>
-          <FloatingOrbs />
-          <div className="flex items-center justify-center min-h-screen p-6">
-            <div className="text-center space-y-6 max-w-sm mx-auto" style={{ animation: "fadeSlideUp 0.8s ease-out" }}>
-              <div className="w-24 h-24 mx-auto rounded-full flex items-center justify-center text-5xl" style={{ background: "linear-gradient(135deg, rgba(39,183,200,0.2), rgba(73,176,110,0.2))", animation: "pulse-glow 3s ease-in-out infinite" }}>
-                🌸
-              </div>
-              <h2 className="font-serif text-4xl font-bold text-[#F4F7FA]">Verify your email</h2>
-              <p className="text-[#F4F7FA]/60 text-lg">
-                We sent a 6-digit code to <strong className="text-[#27B7C8]">{email}</strong>
-              </p>
-              {referralCode && (
-                <div className="px-4 py-3 rounded-xl text-sm text-[#49B06E] font-medium" style={{ background: "rgba(73,176,110,0.1)", border: "1px solid rgba(73,176,110,0.2)" }}>
-                  Referral code applied — you&apos;ll both get 7 bonus Pro days!
-                </div>
-              )}
-              <div className="space-y-4">
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={6}
-                  placeholder="Enter 6-digit code"
-                  value={verificationCode}
-                  onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, ""))}
-                  className="w-full text-center text-3xl font-bold tracking-[0.5em] py-4 rounded-2xl border border-white/10 bg-white/5 text-[#F4F7FA] placeholder:text-[#F4F7FA]/20 focus:outline-none focus:border-[#27B7C8]/50 focus:ring-2 focus:ring-[#27B7C8]/20"
-                  autoFocus
-                />
-                {verificationError && (
-                  <p className="text-red-400 text-sm">{verificationError}</p>
-                )}
-                <button
-                  onClick={verifyCode}
-                  disabled={verificationSending || verificationCode.length < 6}
-                  className="w-full py-4 rounded-2xl font-semibold text-white text-lg transition-all disabled:opacity-40"
-                  style={{ background: "linear-gradient(135deg, #27B7C8, #49B06E)" }}
-                >
-                  {verificationSending ? "Verifying..." : "Verify & Continue"}
-                </button>
-                <button
-                  onClick={sendVerificationCode}
-                  disabled={verificationSending}
-                  className="text-[#27B7C8] text-sm hover:underline disabled:opacity-40"
-                >
-                  Resend code
-                </button>
-              </div>
-              <p className="text-[#F4F7FA]/40 text-sm">Check your spam folder if you don&apos;t see it</p>
-            </div>
-          </div>
-        </div>
-      </>
-    );
-  }
 
   return (
     <>

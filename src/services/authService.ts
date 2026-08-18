@@ -195,6 +195,11 @@ export const authService = {
         return { user: null, error: formatAuthError(error) };
       }
 
+      // Supabase returns a user with empty identities when email already exists
+      if (data.user && (!data.user.identities || data.user.identities.length === 0)) {
+        return { user: null, error: { message: "An account with this email already exists. Try logging in instead." } };
+      }
+
       // Create profile row in profiles table after successful auth signup
       if (data.user) {
         await supabase.from('profiles').insert({
