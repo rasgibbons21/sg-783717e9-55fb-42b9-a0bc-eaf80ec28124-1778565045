@@ -867,7 +867,7 @@ export default function Profile() {
         <Card className="p-4 bg-muted/50 border-muted-foreground/20 rounded-2xl">
           <p className="text-xs text-muted-foreground text-center leading-relaxed">
             This is educational content only and does not constitute financial advice. Bloom is not liable for any investment decisions or losses.<br/>
-            Contact us at support@bloom.app
+            Contact us at cindervaultenterprisesllc@gmail.com
           </p>
         </Card>
       </div>

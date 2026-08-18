@@ -46,7 +46,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const webpush = await import("web-push");
-  webpush.setVapidDetails("mailto:rasgibbons@gmail.com", vapidPublic, vapidPrivate);
+  webpush.setVapidDetails("mailto:cindervaultenterprisesllc@gmail.com", vapidPublic, vapidPrivate);
 
   const streakMap = new Map(atRiskUsers.map(u => [u.user_id, u.current_streak]));
   let sent = 0;

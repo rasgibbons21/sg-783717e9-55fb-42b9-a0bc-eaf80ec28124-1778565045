@@ -74,7 +74,7 @@ export default function Disclaimer() {
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Contact</h2>
             <p className="text-foreground">
               For questions about this disclaimer, contact:<br />
-              <a href="mailto:info@vanguardapexholdings.com" className="text-primary hover:underline">info@vanguardapexholdings.com</a><br />
+              <a href="mailto:cindervaultenterprisesllc@gmail.com" className="text-primary hover:underline">cindervaultenterprisesllc@gmail.com</a><br />
               Cinder Vault Enterprises LLC<br />
               <a href="https://shebloomswealth.app" className="text-primary hover:underline">shebloomswealth.app</a>
             </p>

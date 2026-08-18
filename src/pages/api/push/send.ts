@@ -24,7 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(500).json({ error: "VAPID keys not configured" });
   }
 
-  webpush.setVapidDetails("mailto:rasgibbons@gmail.com", vapidPublic, vapidPrivate);
+  webpush.setVapidDetails("mailto:cindervaultenterprisesllc@gmail.com", vapidPublic, vapidPrivate);
 
   const query = supabaseAdmin.from("push_subscriptions").select("*");
   if (userId) query.eq("user_id", userId);

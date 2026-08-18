@@ -32,8 +32,8 @@ export default function Contact() {
               <Mail className="w-5 h-5 text-accent mt-0.5" shrink-0 />
               <div>
                 <p className="font-medium text-foreground">General Inquiries</p>
-                <a href="mailto:info@vanguardapexholdings.com" className="text-primary hover:underline">
-                  info@vanguardapexholdings.com
+                <a href="mailto:cindervaultenterprisesllc@gmail.com" className="text-primary hover:underline">
+                  cindervaultenterprisesllc@gmail.com
                 </a>
               </div>
             </div>
@@ -42,8 +42,8 @@ export default function Contact() {
               <Mail className="w-5 h-5 text-accent mt-0.5" shrink-0 />
               <div>
                 <p className="font-medium text-foreground">Support</p>
-                <a href="mailto:admin@vanguardapexholdings.com" className="text-primary hover:underline">
-                  admin@vanguardapexholdings.com
+                <a href="mailto:cindervaultenterprisesllc@gmail.com" className="text-primary hover:underline">
+                  cindervaultenterprisesllc@gmail.com
                 </a>
               </div>
             </div>

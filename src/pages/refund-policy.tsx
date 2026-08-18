@@ -77,8 +77,8 @@ export default function RefundPolicy() {
               </li>
               <li>
                 <strong>By email:</strong> Email us at{" "}
-                <a href="mailto:support@shebloomswealth.app" className="text-primary hover:underline">
-                  support@shebloomswealth.app
+                <a href="mailto:cindervaultenterprisesllc@gmail.com" className="text-primary hover:underline">
+                  cindervaultenterprisesllc@gmail.com
                 </a>{" "}
                 with your account email and we will cancel on your behalf within 1 business day.
               </li>
@@ -121,8 +121,8 @@ export default function RefundPolicy() {
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">How to Request a Refund</h2>
             <p className="mb-4 text-foreground">
               To request a refund, email us at{" "}
-              <a href="mailto:support@shebloomswealth.app" className="text-primary hover:underline">
-                support@shebloomswealth.app
+              <a href="mailto:cindervaultenterprisesllc@gmail.com" className="text-primary hover:underline">
+                cindervaultenterprisesllc@gmail.com
               </a>{" "}
               with the following information:
             </p>
@@ -160,8 +160,8 @@ export default function RefundPolicy() {
             <ul className="space-y-2 text-foreground">
               <li>
                 Email:{" "}
-                <a href="mailto:support@shebloomswealth.app" className="text-primary hover:underline">
-                  support@shebloomswealth.app
+                <a href="mailto:cindervaultenterprisesllc@gmail.com" className="text-primary hover:underline">
+                  cindervaultenterprisesllc@gmail.com
                 </a>
               </li>
               <li>Company: Cinder Vault Enterprises LLC</li>

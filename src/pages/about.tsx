@@ -142,7 +142,7 @@ export default function About() {
               Bloom is a product of Cinder Vault Enterprises LLC. We are a financial education company, not a broker, investment adviser, or financial planner. We hold no licences to provide investment advice and we do not do so.
             </p>
             <p style={{ fontSize:"1rem", lineHeight:1.72, color:"rgba(244,247,250,0.68)", marginTop:"1rem" }}>
-              Questions? Reach us at <a href="mailto:support@vanguardapexholdings.com" style={{ color:C.teal, textDecoration:"none" }}>support@vanguardapexholdings.com</a> or visit our <Link href="/contact" style={{ color:C.teal, textDecoration:"none" }}>contact page</Link>.
+              Questions? Reach us at <a href="mailto:cindervaultenterprisesllc@gmail.com" style={{ color:C.teal, textDecoration:"none" }}>cindervaultenterprisesllc@gmail.com</a> or visit our <Link href="/contact" style={{ color:C.teal, textDecoration:"none" }}>contact page</Link>.
             </p>
           </div>
 

@@ -106,8 +106,8 @@ export default function DeleteAccount() {
 
                 <p className="text-sm text-muted-foreground">
                   Deletion requests are processed within <strong>30 days</strong>. If you change your mind, contact us at{" "}
-                  <a href="mailto:admin@vanguardapexholdings.com" className="text-primary hover:underline">
-                    admin@vanguardapexholdings.com
+                  <a href="mailto:cindervaultenterprisesllc@gmail.com" className="text-primary hover:underline">
+                    cindervaultenterprisesllc@gmail.com
                   </a>{" "}
                   before processing is complete.
                 </p>

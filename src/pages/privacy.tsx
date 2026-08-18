@@ -66,7 +66,7 @@ export default function Privacy() {
               <li>Export your data</li>
             </ul>
             <p className="mb-6 text-foreground">
-              To exercise these rights, email: <a href="mailto:info@vanguardapexholdings.com" className="text-primary hover:underline">info@vanguardapexholdings.com</a>.
+              To exercise these rights, email: <a href="mailto:cindervaultenterprisesllc@gmail.com" className="text-primary hover:underline">cindervaultenterprisesllc@gmail.com</a>.
               You can also <a href="/delete-account" className="text-primary hover:underline">request account deletion here</a>.
             </p>
 
@@ -83,7 +83,7 @@ export default function Privacy() {
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Contact</h2>
             <p className="text-foreground">
               Cinder Vault Enterprises LLC<br />
-              <a href="mailto:info@vanguardapexholdings.com" className="text-primary hover:underline">info@vanguardapexholdings.com</a><br />
+              <a href="mailto:cindervaultenterprisesllc@gmail.com" className="text-primary hover:underline">cindervaultenterprisesllc@gmail.com</a><br />
               <a href="https://shebloomswealth.app" className="text-primary hover:underline">shebloomswealth.app</a>
             </p>
           </div>

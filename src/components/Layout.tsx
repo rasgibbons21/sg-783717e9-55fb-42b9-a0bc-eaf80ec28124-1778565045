@@ -192,8 +192,8 @@ export function Layout({ children }: LayoutProps) {
                   </Link>
                 </li>
                 <li>
-                  <a href="mailto:admin@vanguardapexholdings.com" className="text-muted-foreground hover:text-primary">
-                    support@vanguardapexholdings.com
+                  <a href="mailto:cindervaultenterprisesllc@gmail.com" className="text-muted-foreground hover:text-primary">
+                    cindervaultenterprisesllc@gmail.com
                   </a>
                 </li>
               </ul>
