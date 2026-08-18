@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any;
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Trash2, TrendingDown, DollarSign, PieChart, Sparkles, AlertTriangle, CheckCircle, ArrowRight } from "lucide-react";
+import { Plus, Trash2, TrendingDown, DollarSign, PieChart, Sparkles, AlertTriangle, CheckCircle, ArrowRight, Target } from "lucide-react";
 import confetti from "canvas-confetti";
 import { AdMobBanner } from "@/components/AdMobBanner";
 
@@ -118,6 +118,90 @@ function monthLabel(date: Date) {
   return date.toLocaleString("default", { month: "long", year: "numeric" });
 }
 
+function DonutChart({ data, total, size = 200 }: { data: { label: string; value: number; color: string; emoji: string }[]; total: number; size?: number }) {
+  const cx = size / 2;
+  const cy = size / 2;
+  const outerR = size / 2 - 4;
+  const innerR = outerR * 0.62;
+  const gapAngle = 0.02;
+
+  if (data.length === 0 || total === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center" style={{ width: size, height: size }}>
+        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+          <circle cx={cx} cy={cy} r={outerR} fill="none" stroke="currentColor" strokeWidth={outerR - innerR} className="text-muted/30" strokeDasharray="4 4" />
+        </svg>
+        <p className="text-xs text-muted-foreground mt-2">Add expenses to see your chart</p>
+      </div>
+    );
+  }
+
+  const arcs: { path: string; color: string; label: string; emoji: string; pct: number }[] = [];
+  let startAngle = -Math.PI / 2;
+
+  data.forEach(d => {
+    const pct = d.value / total;
+    const sweep = pct * Math.PI * 2 - gapAngle;
+    if (sweep <= 0) return;
+    const endAngle = startAngle + sweep;
+
+    const x1o = cx + outerR * Math.cos(startAngle);
+    const y1o = cy + outerR * Math.sin(startAngle);
+    const x2o = cx + outerR * Math.cos(endAngle);
+    const y2o = cy + outerR * Math.sin(endAngle);
+    const x1i = cx + innerR * Math.cos(endAngle);
+    const y1i = cy + innerR * Math.sin(endAngle);
+    const x2i = cx + innerR * Math.cos(startAngle);
+    const y2i = cy + innerR * Math.sin(startAngle);
+    const largeArc = sweep > Math.PI ? 1 : 0;
+
+    const path = `M ${x1o} ${y1o} A ${outerR} ${outerR} 0 ${largeArc} 1 ${x2o} ${y2o} L ${x1i} ${y1i} A ${innerR} ${innerR} 0 ${largeArc} 0 ${x2i} ${y2i} Z`;
+    arcs.push({ path, color: d.color, label: d.label, emoji: d.emoji, pct: pct * 100 });
+
+    startAngle = endAngle + gapAngle;
+  });
+
+  return (
+    <div className="relative" style={{ width: size, height: size }}>
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        {arcs.map((arc, i) => (
+          <motion.path
+            key={i}
+            d={arc.path}
+            fill={arc.color}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: i * 0.08, duration: 0.4, ease: "easeOut" }}
+            style={{ transformOrigin: `${cx}px ${cy}px` }}
+          />
+        ))}
+        <circle cx={cx} cy={cy} r={innerR - 1} className="fill-card" />
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <span className="text-2xl font-bold text-foreground">${total.toLocaleString("en-US", { maximumFractionDigits: 0 })}</span>
+        <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Total Spent</span>
+      </div>
+    </div>
+  );
+}
+
+function DonutLegend({ data, total }: { data: { label: string; value: number; color: string; emoji: string }[]; total: number }) {
+  return (
+    <div className="grid grid-cols-2 gap-x-4 gap-y-2 mt-4">
+      {data.map(d => {
+        const pct = total > 0 ? ((d.value / total) * 100).toFixed(0) : "0";
+        return (
+          <div key={d.label} className="flex items-center gap-2 min-w-0">
+            <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: d.color }} />
+            <span className="text-xs text-muted-foreground truncate">{d.emoji} {d.label}</span>
+            <span className="text-xs font-semibold text-foreground ml-auto shrink-0">{pct}%</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function BudgetTracker() {
   const router = useRouter();
   const { userId, isLoggedIn } = useSubscription();
@@ -132,6 +216,9 @@ export default function BudgetTracker() {
   const [saving, setSaving] = useState(false);
 
   const [tip] = useState(() => PANSY_TIPS[Math.floor(Math.random() * PANSY_TIPS.length)]);
+  const [monthlyBudget, setMonthlyBudget] = useState<number | null>(null);
+  const [showBudgetInput, setShowBudgetInput] = useState(false);
+  const [budgetDraft, setBudgetDraft] = useState("");
 
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
@@ -152,6 +239,11 @@ export default function BudgetTracker() {
     if (!isLoggedIn && !loading) { router.push("/onboarding"); return; }
     fetchEntries();
   }, [isLoggedIn, loading, router, fetchEntries]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("sbw_monthly_budget");
+    if (saved) setMonthlyBudget(parseFloat(saved));
+  }, []);
 
   const totalSpent = entries.reduce((s, e) => s + e.amount, 0);
 
@@ -224,27 +316,113 @@ export default function BudgetTracker() {
           </div>
         </motion.div>
 
-        {/* ── MONTH TOTAL ────────────────────────────────────── */}
+        {/* ── MONTH TOTAL + BUDGET RING ────────────────────── */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.1 }}
-          className="bg-card border border-border rounded-2xl p-6 text-center"
+          className="bg-card border border-border rounded-2xl p-6"
         >
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-            {monthLabel(now)}
-          </p>
-          <div className="flex items-center justify-center gap-2">
-            <DollarSign className="w-7 h-7 text-primary" />
-            <span className="text-4xl font-bold text-foreground">
-              {totalSpent.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </span>
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-sm font-bold text-foreground">{monthLabel(now)}</p>
+            <button
+              onClick={() => { setShowBudgetInput(o => !o); haptic(); }}
+              className="flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors"
+            >
+              <Target className="w-3.5 h-3.5" />
+              {monthlyBudget ? `$${monthlyBudget.toLocaleString()} goal` : "Set budget"}
+            </button>
           </div>
-          <p className="text-xs text-muted-foreground mt-2">
-            {entries.length === 0
-              ? "Track your first expense below"
-              : `${entries.length} expense${entries.length === 1 ? "" : "s"} tracked`}
-          </p>
+
+          <AnimatePresence>
+            {showBudgetInput && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="overflow-hidden mb-4"
+              >
+                <div className="flex gap-2 pb-2">
+                  <div className="relative flex-1">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
+                    <input
+                      type="number"
+                      inputMode="decimal"
+                      placeholder="2,000"
+                      value={budgetDraft}
+                      onChange={e => setBudgetDraft(e.target.value)}
+                      className="w-full pl-7 pr-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:border-primary"
+                    />
+                  </div>
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      const v = parseFloat(budgetDraft);
+                      if (!isNaN(v) && v > 0) {
+                        setMonthlyBudget(v);
+                        localStorage.setItem("sbw_monthly_budget", String(v));
+                        setShowBudgetInput(false);
+                        setBudgetDraft("");
+                        haptic(12);
+                      }
+                    }}
+                    className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold"
+                  >
+                    Set
+                  </motion.button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {monthlyBudget && totalSpent > 0 ? (
+            <div className="space-y-3">
+              <div className="flex items-end justify-between">
+                <div>
+                  <span className="text-3xl font-bold text-foreground">${totalSpent.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                  <span className="text-sm text-muted-foreground ml-1">/ ${monthlyBudget.toLocaleString()}</span>
+                </div>
+                <span className={`text-sm font-bold ${totalSpent <= monthlyBudget ? "text-[#49B06E]" : "text-[#E05A6A]"}`}>
+                  {totalSpent <= monthlyBudget
+                    ? `$${(monthlyBudget - totalSpent).toLocaleString("en-US", { maximumFractionDigits: 0 })} left`
+                    : `$${(totalSpent - monthlyBudget).toLocaleString("en-US", { maximumFractionDigits: 0 })} over`}
+                </span>
+              </div>
+              <div className="w-full bg-muted rounded-full h-3 overflow-hidden">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${Math.min((totalSpent / monthlyBudget) * 100, 100)}%` }}
+                  transition={{ duration: 0.8, ease: "easeOut" }}
+                  className="h-full rounded-full"
+                  style={{
+                    background: totalSpent <= monthlyBudget * 0.75
+                      ? "linear-gradient(90deg, #49B06E, #27B7C8)"
+                      : totalSpent <= monthlyBudget
+                      ? "linear-gradient(90deg, #F59E0B, #F97316)"
+                      : "linear-gradient(90deg, #E05A6A, #EF4444)",
+                  }}
+                />
+              </div>
+              <div className="flex justify-between text-[10px] text-muted-foreground">
+                <span>{((totalSpent / monthlyBudget) * 100).toFixed(0)}% used</span>
+                <span>{entries.length} expense{entries.length === 1 ? "" : "s"}</span>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-2">
+              <div className="flex items-center justify-center gap-2">
+                <DollarSign className="w-7 h-7 text-primary" />
+                <span className="text-4xl font-bold text-foreground">
+                  {totalSpent.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                {entries.length === 0
+                  ? "Track your first expense below"
+                  : `${entries.length} expense${entries.length === 1 ? "" : "s"} tracked`}
+              </p>
+            </div>
+          )}
         </motion.div>
 
         {/* ── ADD EXPENSE BUTTON / FORM ──────────────────────── */}
@@ -343,48 +521,89 @@ export default function BudgetTracker() {
           )}
         </AnimatePresence>
 
-        {/* ── CATEGORY BREAKDOWN ─────────────────────────────── */}
+        {/* ── SPENDING CHART ──────────────────────────────────── */}
         {sortedCategories.length > 0 && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="bg-card border border-border rounded-2xl p-5 space-y-4"
+            className="bg-card border border-border rounded-2xl p-5"
           >
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 mb-4">
               <PieChart className="w-4 h-4 text-primary" />
-              <h3 className="text-sm font-bold text-foreground">Where your money went</h3>
+              <h3 className="text-sm font-bold text-foreground">Spending Breakdown</h3>
             </div>
 
-            <div className="space-y-3">
-              {sortedCategories.map(([cat, total]) => {
-                const info = getCatInfo(cat);
-                const pct = totalSpent > 0 ? (total / totalSpent) * 100 : 0;
-                return (
-                  <div key={cat}>
-                    <div className="flex items-center justify-between text-sm mb-1.5">
-                      <div className="flex items-center gap-2">
-                        <span>{info.emoji}</span>
-                        <span className="font-medium text-foreground">{cat}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-muted-foreground text-xs">{pct.toFixed(0)}%</span>
-                        <span className="font-semibold text-foreground">${total.toFixed(2)}</span>
-                      </div>
-                    </div>
-                    <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${pct}%` }}
-                        transition={{ duration: 0.6, ease: "easeOut" }}
-                        className="h-full rounded-full"
-                        style={{ backgroundColor: info.color }}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
+            <div className="flex justify-center">
+              <DonutChart
+                data={sortedCategories.map(([cat, val]) => {
+                  const info = getCatInfo(cat);
+                  return { label: cat, value: val, color: info.color, emoji: info.emoji };
+                })}
+                total={totalSpent}
+              />
             </div>
+
+            <DonutLegend
+              data={sortedCategories.map(([cat, val]) => {
+                const info = getCatInfo(cat);
+                return { label: cat, value: val, color: info.color, emoji: info.emoji };
+              })}
+              total={totalSpent}
+            />
+          </motion.div>
+        )}
+
+        {/* ── CATEGORY BARS ────────────────────────────────────── */}
+        {sortedCategories.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.25 }}
+            className="bg-card border border-border rounded-2xl p-5 space-y-1"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-bold text-foreground">By Category</h3>
+              <span className="text-xs text-muted-foreground">{sortedCategories.length} categories</span>
+            </div>
+
+            {sortedCategories.map(([cat, catTotal], i) => {
+              const info = getCatInfo(cat);
+              const pct = totalSpent > 0 ? (catTotal / totalSpent) * 100 : 0;
+              const maxVal = sortedCategories[0][1];
+              const barWidth = maxVal > 0 ? (catTotal / maxVal) * 100 : 0;
+              return (
+                <motion.div
+                  key={cat}
+                  initial={{ opacity: 0, x: -16 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.05 * i }}
+                  className="py-2.5 border-b border-border/50 last:border-0"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg flex items-center justify-center text-sm" style={{ backgroundColor: info.color + "18" }}>
+                        {info.emoji}
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-foreground leading-tight">{cat}</p>
+                        <p className="text-[10px] text-muted-foreground">{pct.toFixed(1)}% of total</p>
+                      </div>
+                    </div>
+                    <span className="text-sm font-bold text-foreground">${catTotal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                  </div>
+                  <div className="w-full bg-muted/50 rounded-full h-2 overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${barWidth}%` }}
+                      transition={{ duration: 0.6, delay: 0.05 * i, ease: "easeOut" }}
+                      className="h-full rounded-full"
+                      style={{ backgroundColor: info.color }}
+                    />
+                  </div>
+                </motion.div>
+              );
+            })}
           </motion.div>
         )}
 
