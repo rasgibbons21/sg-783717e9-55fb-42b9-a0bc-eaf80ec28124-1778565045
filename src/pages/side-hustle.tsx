@@ -157,6 +157,40 @@ function getLexiTip(hustleType: HustleType, stepNum: number): string {
   return tips[stepNum - 1];
 }
 
+// ─── Phases ────────────────────────────────────────────────────────────────
+const PHASES = [
+  { name: "Foundation", steps: [1, 2, 3], desc: "Set up your base" },
+  { name: "Build", steps: [4, 5, 6], desc: "Create your brand" },
+  { name: "Launch", steps: [7, 8, 9], desc: "Go live & sell" },
+  { name: "Scale", steps: [10, 11, 12], desc: "Grow your business" },
+];
+
+function HustleRing({ percent, size = 100, color = C.accent, label }: { percent: number; size?: number; color?: string; label?: string }) {
+  const stroke = 7;
+  const r = (size - stroke) / 2;
+  const circ = 2 * Math.PI * r;
+  const offset = circ - (percent / 100) * circ;
+  return (
+    <div className="flex flex-col items-center gap-1.5">
+      <div className="relative" style={{ width: size, height: size }}>
+        <svg width={size} height={size} style={{ transform: "rotate(-90deg)" }}>
+          <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={stroke} />
+          <circle
+            cx={size / 2} cy={size / 2} r={r} fill="none"
+            stroke={color} strokeWidth={stroke} strokeLinecap="round"
+            strokeDasharray={circ} strokeDashoffset={offset}
+            style={{ transition: "stroke-dashoffset 1s ease-out" }}
+          />
+        </svg>
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <span className="text-lg font-bold" style={{ color: C.text }}>{percent}%</span>
+        </div>
+      </div>
+      {label && <p className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: C.textMuted }}>{label}</p>}
+    </div>
+  );
+}
+
 // ─── Hustle Data ────────────────────────────────────────────────────────────
 
 const HUSTLES: HustleInfo[] = [
@@ -604,9 +638,22 @@ export default function SideHustlePage() {
   const [loading, setLoading] = useState(true);
   const [celebrating, setCelebrating] = useState(false);
   const [journeyComplete, setJourneyComplete] = useState(false);
+  const [allProgress, setAllProgress] = useState<Record<string, number[]>>({});
   const stepRefs = useRef<Record<number, HTMLDivElement | null>>({});
 
   const hustle = HUSTLES.find((h) => h.type === selectedHustle);
+
+  useEffect(() => {
+    if (!userId) return;
+    (async () => {
+      const { data } = await db.from("side_hustle_progress").select("hustle_type,completed_steps").eq("user_id", userId);
+      if (data) {
+        const map: Record<string, number[]> = {};
+        data.forEach((row: any) => { map[row.hustle_type] = row.completed_steps || []; });
+        setAllProgress(map);
+      }
+    })();
+  }, [userId, selectedHustle]);
 
   const loadProgress = useCallback(async (type: HustleType) => {
     if (!userId) return;
@@ -633,31 +680,21 @@ export default function SideHustlePage() {
     }, { onConflict: "user_id,hustle_type" });
   }, [userId]);
 
-  useEffect(() => {
-    setLoading(false);
-  }, []);
+  useEffect(() => { setLoading(false); }, []);
 
   useEffect(() => {
-    if (selectedHustle && userId) {
-      loadProgress(selectedHustle);
-    }
+    if (selectedHustle && userId) loadProgress(selectedHustle);
   }, [selectedHustle, userId, loadProgress]);
 
-  const selectHustle = (type: HustleType) => {
-    setSelectedHustle(type);
-    haptic(12);
-  };
+  const selectHustle = (type: HustleType) => { setSelectedHustle(type); haptic(12); };
 
   const completeStep = async (stepNum: number) => {
     if (!selectedHustle || completedSteps.includes(stepNum)) return;
     haptic(20);
-
     const newCompleted = [...completedSteps, stepNum].sort((a, b) => a - b);
     setCompletedSteps(newCompleted);
     setCelebrating(true);
-
     confetti({ particleCount: 80, spread: 70, origin: { y: 0.7 }, colors: [hustle?.color || "#49B06E", "#27B7C8", "#F4F7FA"] });
-
     const isComplete = newCompleted.length === 12;
     if (isComplete) {
       setJourneyComplete(true);
@@ -670,29 +707,33 @@ export default function SideHustlePage() {
         stepRefs.current[stepNum + 1]?.scrollIntoView({ behavior: "smooth", block: "center" });
       }, 300);
     }
-
     await saveProgress(selectedHustle, newCompleted, isComplete);
+    setAllProgress(prev => ({ ...prev, [selectedHustle]: newCompleted }));
     setTimeout(() => setCelebrating(false), 1500);
   };
 
   const encouragement = [
-    { who: "🌺", msg: "You're doing amazing!" },
+    { who: "\u{1F33A}", msg: "You're doing amazing!" },
     { who: "⚡", msg: "That's the hustle spirit! Keep it moving!" },
-    { who: "🌺", msg: "One step closer to your dream!" },
+    { who: "\u{1F33A}", msg: "One step closer to your dream!" },
     { who: "⚡", msg: "You just leveled up. Next step, let's GO!" },
-    { who: "🌺", msg: "This is YOUR time!" },
+    { who: "\u{1F33A}", msg: "This is YOUR time!" },
     { who: "⚡", msg: "Most people quit by now. Not you though." },
-    { who: "🌺", msg: "Proud of you, queen!" },
+    { who: "\u{1F33A}", msg: "Proud of you, queen!" },
     { who: "⚡", msg: "The money's getting closer. I can feel it!" },
-    { who: "🌺", msg: "Every step counts. Keep going!" },
+    { who: "\u{1F33A}", msg: "Every step counts. Keep going!" },
     { who: "⚡", msg: "You're built for this. No question." },
   ];
+
+  const totalSteps = Object.values(allProgress).reduce((sum, steps) => sum + steps.length, 0);
+  const totalPercent = Math.round((totalSteps / 72) * 100);
+  const hustlesStarted = Object.values(allProgress).filter(s => s.length > 0).length;
 
   return (
     <>
       <Head>
         <title>Side Hustle Journey | She Blooms Wealth</title>
-        <meta name="description" content="Follow Lexi's 12-step guided journey to start your side hustle — dropshipping, TikTok Shop, UGC, digital products, freelancing, or content creation." />
+        <meta name="description" content="Follow Lexi's 12-step guided journey to start your side hustle." />
       </Head>
       <Layout>
         <div className="min-h-screen" style={{ background: C.bg }}>
@@ -706,62 +747,95 @@ export default function SideHustlePage() {
 
             {/* ═══ HUSTLE PICKER ═══ */}
             {!selectedHustle && (
-              <div className="space-y-6" style={{ animation: "fadeIn 0.5s ease-out" }}>
-                {/* Pansy handoff + Lexi intro */}
-                <div className="space-y-3">
-                  <div className="flex items-start gap-3 p-4 rounded-2xl" style={{ background: "rgba(39,183,200,0.06)", border: "1px solid rgba(39,183,200,0.12)" }}>
-                    <span className="text-xl shrink-0">🌺</span>
-                    <div>
-                      <p className="font-serif text-sm font-semibold" style={{ color: C.accent }}>Pansy says</p>
-                      <p className="text-sm leading-relaxed mt-1" style={{ color: C.textDim }}>
-                        I&apos;m handing you off to someone special for this part. Meet Lexi — she&apos;s built side hustles from scratch and she&apos;s got the real playbook. I&apos;ll still be here when you need me!
-                      </p>
-                    </div>
+              <div className="space-y-5" style={{ animation: "fadeIn 0.5s ease-out" }}>
+                {/* Header */}
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-11 h-11 rounded-2xl flex items-center justify-center text-xl"
+                    style={{ background: "rgba(245,158,11,0.12)", border: "1px solid rgba(245,158,11,0.2)" }}
+                  >
+                    {"⚡"}
                   </div>
-                  <div className="flex items-start gap-3 p-4 rounded-2xl" style={{ background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.15)" }}>
-                    <span className="text-xl shrink-0">⚡</span>
-                    <div>
-                      <p className="text-sm font-bold" style={{ color: "#F59E0B" }}>Hey, I&apos;m Lexi!</p>
-                      <p className="text-sm leading-relaxed mt-1" style={{ color: C.textDim }}>
-                        I&apos;m the one who&apos;s actually done all this — built stores, gone live, pitched brands, the whole thing. No theory, no fluff. Just what works.
-                        Pick a hustle below and I&apos;ll walk you through every step. Let&apos;s get this money! 💛
-                      </p>
-                    </div>
+                  <div>
+                    <h1 className="text-xl font-bold" style={{ color: C.text }}>Lexi&apos;s Hustle Lab</h1>
+                    <p className="text-xs" style={{ color: C.textMuted }}>12 steps per hustle. Real results.</p>
                   </div>
                 </div>
 
-                <div>
-                  <h1 className="text-2xl font-bold mb-1" style={{ color: C.text }}>Start Your Side Hustle</h1>
-                  <p className="text-sm" style={{ color: C.textMuted }}>12 steps. Real results. Pick your path.</p>
+                {/* Overall progress card */}
+                <div className="p-5 rounded-2xl" style={{ background: C.card, border: `1px solid ${C.cardBorder}` }}>
+                  <div className="flex items-center gap-5">
+                    <HustleRing percent={totalPercent} size={88} color="#F59E0B" />
+                    <div className="flex-1 space-y-3">
+                      <div>
+                        <p className="text-sm font-semibold" style={{ color: C.text }}>Overall Progress</p>
+                        <p className="text-xs mt-0.5" style={{ color: C.textMuted }}>{hustlesStarted}/6 hustles started</p>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-[10px]" style={{ color: C.textMuted }}>
+                          <span>Total steps</span>
+                          <span>{totalSteps}/72</span>
+                        </div>
+                        <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
+                          <div className="h-full rounded-full" style={{
+                            width: `${totalPercent}%`,
+                            background: "linear-gradient(90deg, #F59E0B, #27B7C8)",
+                            transition: "width 0.7s ease-out",
+                          }} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Hustle grid */}
-                <div className="grid grid-cols-1 gap-3">
-                  {HUSTLES.map((h, i) => (
-                    <button
-                      key={h.type}
-                      onClick={() => selectHustle(h.type)}
-                      className="flex items-center gap-4 p-4 rounded-2xl text-left transition-all hover:scale-[1.01] active:scale-[0.99]"
-                      style={{
-                        background: C.card,
-                        border: `1px solid ${C.cardBorder}`,
-                        animation: `slideUp 0.4s ease-out ${i * 0.08}s both`,
-                      }}
-                    >
-                      <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shrink-0" style={{ background: `${h.color}15` }}>
-                        {h.emoji}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-bold text-base" style={{ color: C.text }}>{h.title}</p>
-                        <p className="text-xs mt-0.5" style={{ color: C.textMuted }}>{h.subtitle}</p>
-                        <div className="flex items-center gap-1.5 mt-1.5">
-                          <Star className="w-3 h-3" style={{ color: h.color }} />
-                          <span className="text-[11px] font-semibold" style={{ color: h.color }}>{h.earnings}</span>
-                        </div>
-                      </div>
-                      <ChevronRight className="w-5 h-5 shrink-0" style={{ color: C.textMuted }} />
-                    </button>
-                  ))}
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: C.textMuted }}>Choose Your Hustle</p>
+                  <div className="grid grid-cols-1 gap-3">
+                    {HUSTLES.map((h, i) => {
+                      const prog = allProgress[h.type]?.length || 0;
+                      const pct = Math.round((prog / 12) * 100);
+                      return (
+                        <button
+                          key={h.type}
+                          onClick={() => selectHustle(h.type)}
+                          className="flex items-center gap-4 p-4 rounded-2xl text-left transition-all hover:scale-[1.01] active:scale-[0.99]"
+                          style={{
+                            background: prog > 0 ? `${h.color}06` : C.card,
+                            border: `1px solid ${prog > 0 ? `${h.color}20` : C.cardBorder}`,
+                            animation: `slideUp 0.4s ease-out ${i * 0.08}s both`,
+                          }}
+                        >
+                          <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-xl shrink-0" style={{ background: `${h.color}15` }}>
+                            {h.emoji}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between">
+                              <p className="font-bold text-sm" style={{ color: C.text }}>{h.title}</p>
+                              {prog > 0 && (
+                                <span className="text-[10px] font-bold" style={{ color: h.color }}>{prog}/12</span>
+                              )}
+                            </div>
+                            <p className="text-[11px] mt-0.5" style={{ color: C.textMuted }}>{h.subtitle}</p>
+                            <div className="flex items-center gap-1 mt-1.5">
+                              <Star className="w-3 h-3" style={{ color: h.color }} />
+                              <span className="text-[10px] font-semibold" style={{ color: h.color }}>{h.earnings}</span>
+                            </div>
+                            {prog > 0 && (
+                              <div className="mt-2 h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
+                                <div className="h-full rounded-full" style={{
+                                  width: `${pct}%`,
+                                  background: `linear-gradient(90deg, ${h.color}, ${C.accent})`,
+                                  transition: "width 0.5s ease-out",
+                                }} />
+                              </div>
+                            )}
+                          </div>
+                          <ChevronRight className="w-5 h-5 shrink-0" style={{ color: C.textMuted }} />
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             )}
@@ -769,208 +843,202 @@ export default function SideHustlePage() {
             {/* ═══ JOURNEY VIEW ═══ */}
             {selectedHustle && hustle && (
               <div className="space-y-5" style={{ animation: "fadeIn 0.4s ease-out" }}>
-                {/* Header */}
+                {/* Header with progress ring */}
                 <div>
-                  <button onClick={() => { setSelectedHustle(null); setCompletedSteps([]); setJourneyComplete(false); }} className="flex items-center gap-1 text-xs mb-3 transition-colors hover:brightness-125" style={{ color: C.accent }}>
+                  <button
+                    onClick={() => { setSelectedHustle(null); setCompletedSteps([]); setJourneyComplete(false); }}
+                    className="flex items-center gap-1 text-xs mb-3 transition-colors hover:brightness-125"
+                    style={{ color: C.accent }}
+                  >
                     <ArrowLeft className="w-3.5 h-3.5" /> All Hustles
                   </button>
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-xl" style={{ background: `${hustle.color}15` }}>
-                      {hustle.emoji}
+                  <div className="p-5 rounded-2xl" style={{ background: C.card, border: `1px solid ${C.cardBorder}` }}>
+                    <div className="flex items-center gap-4">
+                      <HustleRing percent={Math.round((completedSteps.length / 12) * 100)} size={80} color={hustle.color} />
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xl">{hustle.emoji}</span>
+                          <h1 className="text-lg font-bold" style={{ color: C.text }}>{hustle.title}</h1>
+                        </div>
+                        <p className="text-xs mt-1" style={{ color: C.textMuted }}>{completedSteps.length}/12 steps complete</p>
+                        <div className="flex items-center gap-1 mt-1.5">
+                          <Star className="w-3 h-3" style={{ color: hustle.color }} />
+                          <span className="text-[10px] font-semibold" style={{ color: hustle.color }}>{hustle.earnings}</span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex-1">
-                      <h1 className="text-xl font-bold" style={{ color: C.text }}>{hustle.title}</h1>
-                      <p className="text-xs" style={{ color: C.textMuted }}>{completedSteps.length}/12 steps complete</p>
-                    </div>
-                  </div>
-                  {/* Progress bar */}
-                  <div className="mt-3 h-2 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
-                    <div
-                      className="h-full rounded-full transition-all duration-700 ease-out"
-                      style={{
-                        width: `${(completedSteps.length / 12) * 100}%`,
-                        background: `linear-gradient(90deg, ${hustle.color}, ${C.accent})`,
-                        boxShadow: `0 0 12px ${hustle.color}40`,
-                      }}
-                    />
                   </div>
                 </div>
 
-                {/* Lexi intro */}
-                <div className="flex items-start gap-3 p-4 rounded-2xl" style={{ background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.15)" }}>
-                  <span className="text-lg">⚡</span>
-                  <div>
-                    <p className="text-xs font-bold" style={{ color: "#F59E0B" }}>Lexi</p>
-                    <p className="text-sm leading-relaxed mt-1" style={{ color: C.textDim }}>{hustle.pansyIntro}</p>
-                  </div>
+                {/* Lexi one-liner */}
+                <div className="flex items-center gap-2.5 px-4 py-3 rounded-xl" style={{ background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.12)" }}>
+                  <span className="text-sm shrink-0">{"⚡"}</span>
+                  <p className="text-xs leading-relaxed" style={{ color: C.textDim }}>
+                    <span className="font-bold" style={{ color: "#F59E0B" }}>Lexi: </span>{hustle.pansyIntro}
+                  </p>
                 </div>
 
                 {/* Journey complete banner */}
                 {journeyComplete && (
                   <div className="p-5 rounded-2xl text-center space-y-3" style={{ background: `linear-gradient(135deg, ${hustle.color}15, ${C.accent}10)`, border: `1px solid ${hustle.color}30` }}>
-                    <div className="text-4xl mb-2">🎉</div>
+                    <div className="text-4xl mb-2">{"\u{1F389}"}</div>
                     <h2 className="font-bold text-lg mb-1" style={{ color: C.text }}>You Did It!</h2>
-                    <p className="text-sm" style={{ color: C.textDim }}>
-                      All 12 steps complete — you&apos;re officially in business!
-                    </p>
+                    <p className="text-sm" style={{ color: C.textDim }}>All 12 steps complete — you&apos;re officially in business!</p>
                     <div className="flex flex-col gap-2 pt-2">
                       <p className="text-xs" style={{ color: "#F59E0B" }}>
-                        ⚡ <strong>Lexi:</strong> Most people just TALK about starting a business. You actually DID it. All 12 steps. That&apos;s rare. I&apos;m impressed.
+                        {"⚡"} <strong>Lexi:</strong> Most people just TALK about starting a business. You actually DID it. That&apos;s rare. I&apos;m impressed.
                       </p>
                       <p className="text-xs italic" style={{ color: C.accent }}>
-                        🌺 <strong>Pansy:</strong> From zero to a real business owner. We always knew you had it in you. So proud! 💛
+                        {"\u{1F33A}"} <strong>Pansy:</strong> From zero to a real business owner. So proud! {"\u{1F49B}"}
                       </p>
                     </div>
                   </div>
                 )}
 
-                {/* Steps timeline */}
-                <div className="space-y-3">
-                  {hustle.steps.map((s) => {
-                    const isCompleted = completedSteps.includes(s.step);
-                    const isExpanded = expandedStep === s.step;
-                    const isLocked = !isCompleted && s.step > 1 && !completedSteps.includes(s.step - 1) && s.step !== 1;
-                    const canComplete = !isCompleted && !isLocked;
-
+                {/* Phase-grouped steps */}
+                <div className="space-y-5">
+                  {PHASES.map((phase, pi) => {
+                    const phaseCompleted = phase.steps.filter(s => completedSteps.includes(s)).length;
+                    const phaseDone = phaseCompleted === phase.steps.length;
                     return (
-                      <div
-                        key={s.step}
-                        ref={(el) => { stepRefs.current[s.step] = el; }}
-                        className="rounded-2xl overflow-hidden transition-all"
-                        style={{
-                          background: isCompleted ? `${hustle.color}08` : isExpanded ? "rgba(255,255,255,0.04)" : C.card,
-                          border: `1px solid ${isCompleted ? `${hustle.color}25` : isExpanded ? "rgba(39,183,200,0.2)" : C.cardBorder}`,
-                          opacity: isLocked ? 0.5 : 1,
-                        }}
-                      >
-                        {/* Step header */}
-                        <button
-                          onClick={() => !isLocked && setExpandedStep(isExpanded ? -1 : s.step)}
-                          disabled={isLocked}
-                          className="w-full flex items-center gap-3 p-4 text-left"
-                        >
-                          {/* Step indicator */}
-                          <div
-                            className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-sm font-bold transition-all"
-                            style={{
-                              background: isCompleted ? hustle.color : isExpanded ? `${hustle.color}20` : "rgba(255,255,255,0.06)",
-                              color: isCompleted ? C.bg : isExpanded ? hustle.color : C.textMuted,
-                            }}
-                          >
-                            {isCompleted ? <Check className="w-4 h-4" /> : isLocked ? <Lock className="w-3.5 h-3.5" /> : s.step}
+                      <div key={phase.name} style={{ animation: `slideUp 0.4s ease-out ${pi * 0.1}s both` }}>
+                        {/* Phase header */}
+                        <div className="flex items-center justify-between mb-2 px-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold uppercase tracking-wider" style={{ color: phaseDone ? hustle.color : C.textMuted }}>
+                              {phase.name}
+                            </span>
+                            <span className="text-[10px]" style={{ color: C.textMuted }}>{phase.desc}</span>
                           </div>
+                          <span className="text-[10px] font-bold" style={{ color: phaseDone ? hustle.color : C.textMuted }}>
+                            {phaseCompleted}/{phase.steps.length}
+                          </span>
+                        </div>
 
-                          <div className="flex-1 min-w-0">
-                            <p className="font-semibold text-sm truncate" style={{ color: isCompleted ? hustle.color : C.text }}>
-                              {s.title}
-                            </p>
-                            {!isExpanded && (
-                              <p className="text-xs mt-0.5 truncate" style={{ color: C.textMuted }}>{s.summary}</p>
-                            )}
-                          </div>
+                        {/* Phase progress bar */}
+                        <div className="h-1 rounded-full overflow-hidden mb-3 mx-1" style={{ background: "rgba(255,255,255,0.04)" }}>
+                          <div className="h-full rounded-full" style={{
+                            width: `${(phaseCompleted / phase.steps.length) * 100}%`,
+                            background: `linear-gradient(90deg, ${hustle.color}, ${C.accent})`,
+                            transition: "width 0.5s ease-out",
+                          }} />
+                        </div>
 
-                          {!isLocked && (
-                            <ChevronDown
-                              className="w-4 h-4 shrink-0 transition-transform"
-                              style={{ color: C.textMuted, transform: isExpanded ? "rotate(180deg)" : "rotate(0)" }}
-                            />
-                          )}
-                        </button>
+                        {/* Steps in this phase */}
+                        <div className="space-y-2">
+                          {phase.steps.map(stepNum => {
+                            const s = hustle.steps.find(st => st.step === stepNum)!;
+                            const isCompleted = completedSteps.includes(s.step);
+                            const isExpanded = expandedStep === s.step;
+                            const isLocked = !isCompleted && s.step > 1 && !completedSteps.includes(s.step - 1);
+                            const canComplete = !isCompleted && !isLocked;
 
-                        {/* Expanded content */}
-                        {isExpanded && !isLocked && (
-                          <div className="px-4 pb-4 space-y-4" style={{ animation: "fadeIn 0.3s ease-out" }}>
-                            <div className="flex items-center gap-3 text-xs" style={{ color: C.textMuted }}>
-                              <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {s.time}</span>
-                              <span>Step {s.step} of 12</span>
-                            </div>
-
-                            {/* Content */}
-                            <div className="text-sm leading-relaxed whitespace-pre-line" style={{ color: C.textDim }}>
-                              {s.content}
-                            </div>
-
-                            {/* Action items */}
-                            <div className="p-3 rounded-xl" style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${C.cardBorder}` }}>
-                              <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: hustle.color }}>
-                                Action Items
-                              </p>
-                              <div className="space-y-2">
-                                {s.actions.map((action, i) => (
-                                  <div key={i} className="flex items-start gap-2">
-                                    <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 text-xs font-bold" style={{ background: `${hustle.color}15`, color: hustle.color }}>
-                                      {i + 1}
-                                    </div>
-                                    <p className="text-xs leading-relaxed" style={{ color: C.textDim }}>{action}</p>
-                                  </div>
-                                ))}
-                              </div>
-                              {s.links && s.links.length > 0 && (
-                                <div className="flex flex-wrap gap-2 mt-3 pt-3" style={{ borderTop: `1px solid ${C.cardBorder}` }}>
-                                  {s.links.map((link, li) => (
-                                    <a
-                                      key={li}
-                                      href={link.url}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      onClick={() => haptic(8)}
-                                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all hover:brightness-125 active:scale-[0.97]"
-                                      style={{
-                                        background: `${hustle.color}12`,
-                                        color: hustle.color,
-                                        border: `1px solid ${hustle.color}25`,
-                                      }}
-                                    >
-                                      <ExternalLink className="w-3 h-3" />
-                                      {link.label}
-                                    </a>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-
-                            {/* Lexi + Pansy tips */}
-                            <div className="space-y-2">
-                              {getLexiTip(selectedHustle!, s.step) && (
-                                <div className="flex items-start gap-2 p-3 rounded-xl" style={{ background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.1)" }}>
-                                  <span className="text-sm shrink-0">⚡</span>
-                                  <div>
-                                    <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "#F59E0B" }}>Lexi</span>
-                                    <p className="text-xs leading-relaxed mt-0.5" style={{ color: C.textDim }}>{getLexiTip(selectedHustle!, s.step)}</p>
-                                  </div>
-                                </div>
-                              )}
-                              <div className="flex items-start gap-2 p-3 rounded-xl" style={{ background: "rgba(39,183,200,0.06)" }}>
-                                <span className="text-sm shrink-0">🌺</span>
-                                <div>
-                                  <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: C.accent }}>Pansy</span>
-                                  <p className="text-xs leading-relaxed italic mt-0.5" style={{ color: C.accent }}>{s.pansyTip}</p>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Complete button */}
-                            {canComplete && (
-                              <button
-                                onClick={() => completeStep(s.step)}
-                                className="w-full py-3 rounded-xl font-bold text-sm transition-all hover:brightness-110 active:scale-[0.98]"
+                            return (
+                              <div
+                                key={s.step}
+                                ref={(el) => { stepRefs.current[s.step] = el; }}
+                                className="rounded-2xl overflow-hidden transition-all"
                                 style={{
-                                  background: `linear-gradient(135deg, ${hustle.color}, ${C.accent})`,
-                                  color: C.bg,
+                                  background: isCompleted ? `${hustle.color}08` : isExpanded ? "rgba(255,255,255,0.04)" : C.card,
+                                  border: `1px solid ${isCompleted ? `${hustle.color}25` : isExpanded ? "rgba(39,183,200,0.2)" : C.cardBorder}`,
+                                  opacity: isLocked ? 0.5 : 1,
                                 }}
                               >
-                                {s.step === 12 ? "Complete Journey!" : "I Did This — Next Step"} <ChevronRight className="w-4 h-4 inline" />
-                              </button>
-                            )}
+                                <button
+                                  onClick={() => !isLocked && setExpandedStep(isExpanded ? -1 : s.step)}
+                                  disabled={isLocked}
+                                  className="w-full flex items-center gap-3 p-4 text-left"
+                                >
+                                  <div
+                                    className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-xs font-bold transition-all"
+                                    style={{
+                                      background: isCompleted ? hustle.color : isExpanded ? `${hustle.color}20` : "rgba(255,255,255,0.06)",
+                                      color: isCompleted ? C.bg : isExpanded ? hustle.color : C.textMuted,
+                                    }}
+                                  >
+                                    {isCompleted ? <Check className="w-3.5 h-3.5" /> : isLocked ? <Lock className="w-3 h-3" /> : s.step}
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="font-semibold text-sm truncate" style={{ color: isCompleted ? hustle.color : C.text }}>{s.title}</p>
+                                    {!isExpanded && <p className="text-xs mt-0.5 truncate" style={{ color: C.textMuted }}>{s.summary}</p>}
+                                  </div>
+                                  {!isLocked && (
+                                    <ChevronDown className="w-4 h-4 shrink-0 transition-transform" style={{ color: C.textMuted, transform: isExpanded ? "rotate(180deg)" : "rotate(0)" }} />
+                                  )}
+                                </button>
 
-                            {isCompleted && (
-                              <div className="flex items-center justify-center gap-2 py-2">
-                                <Check className="w-4 h-4" style={{ color: hustle.color }} />
-                                <span className="text-xs font-semibold" style={{ color: hustle.color }}>Completed</span>
+                                {isExpanded && !isLocked && (
+                                  <div className="px-4 pb-4 space-y-4" style={{ animation: "fadeIn 0.3s ease-out" }}>
+                                    <div className="flex items-center gap-3 text-xs" style={{ color: C.textMuted }}>
+                                      <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {s.time}</span>
+                                      <span>Step {s.step} of 12</span>
+                                    </div>
+                                    <div className="text-sm leading-relaxed whitespace-pre-line" style={{ color: C.textDim }}>{s.content}</div>
+
+                                    {/* Action items */}
+                                    <div className="p-3 rounded-xl" style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${C.cardBorder}` }}>
+                                      <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: hustle.color }}>Action Items</p>
+                                      <div className="space-y-2">
+                                        {s.actions.map((action, ai) => (
+                                          <div key={ai} className="flex items-start gap-2">
+                                            <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 text-xs font-bold" style={{ background: `${hustle.color}15`, color: hustle.color }}>{ai + 1}</div>
+                                            <p className="text-xs leading-relaxed" style={{ color: C.textDim }}>{action}</p>
+                                          </div>
+                                        ))}
+                                      </div>
+                                      {s.links && s.links.length > 0 && (
+                                        <div className="flex flex-wrap gap-2 mt-3 pt-3" style={{ borderTop: `1px solid ${C.cardBorder}` }}>
+                                          {s.links.map((link, li) => (
+                                            <a key={li} href={link.url} target="_blank" rel="noopener noreferrer" onClick={() => haptic(8)}
+                                              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all hover:brightness-125 active:scale-[0.97]"
+                                              style={{ background: `${hustle.color}12`, color: hustle.color, border: `1px solid ${hustle.color}25` }}>
+                                              <ExternalLink className="w-3 h-3" />{link.label}
+                                            </a>
+                                          ))}
+                                        </div>
+                                      )}
+                                    </div>
+
+                                    {/* Tips */}
+                                    <div className="space-y-2">
+                                      {getLexiTip(selectedHustle!, s.step) && (
+                                        <div className="flex items-start gap-2 p-3 rounded-xl" style={{ background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.1)" }}>
+                                          <span className="text-sm shrink-0">{"⚡"}</span>
+                                          <div>
+                                            <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "#F59E0B" }}>Lexi</span>
+                                            <p className="text-xs leading-relaxed mt-0.5" style={{ color: C.textDim }}>{getLexiTip(selectedHustle!, s.step)}</p>
+                                          </div>
+                                        </div>
+                                      )}
+                                      <div className="flex items-start gap-2 p-3 rounded-xl" style={{ background: "rgba(39,183,200,0.06)" }}>
+                                        <span className="text-sm shrink-0">{"\u{1F33A}"}</span>
+                                        <div>
+                                          <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: C.accent }}>Pansy</span>
+                                          <p className="text-xs leading-relaxed italic mt-0.5" style={{ color: C.accent }}>{s.pansyTip}</p>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    {canComplete && (
+                                      <button onClick={() => completeStep(s.step)}
+                                        className="w-full py-3 rounded-xl font-bold text-sm transition-all hover:brightness-110 active:scale-[0.98]"
+                                        style={{ background: `linear-gradient(135deg, ${hustle.color}, ${C.accent})`, color: C.bg }}>
+                                        {s.step === 12 ? "Complete Journey!" : "I Did This — Next Step"} <ChevronRight className="w-4 h-4 inline" />
+                                      </button>
+                                    )}
+
+                                    {isCompleted && (
+                                      <div className="flex items-center justify-center gap-2 py-2">
+                                        <Check className="w-4 h-4" style={{ color: hustle.color }} />
+                                        <span className="text-xs font-semibold" style={{ color: hustle.color }}>Completed</span>
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
                               </div>
-                            )}
-                          </div>
-                        )}
+                            );
+                          })}
+                        </div>
                       </div>
                     );
                   })}

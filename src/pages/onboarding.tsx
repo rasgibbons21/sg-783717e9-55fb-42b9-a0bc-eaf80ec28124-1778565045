@@ -16,7 +16,7 @@ import {
   Brain, PiggyBank, Clock, GraduationCap, Rocket, Check,
 } from "lucide-react";
 
-type Step = "welcome" | "auth" | "check-email" | "q-situation" | "q-struggle" | "q-topics" | "q-time" | "ready";
+type Step = "welcome" | "auth" | "check-email" | "q-struggle" | "q-situation" | "q-topics" | "q-time" | "building" | "ready";
 type AuthMode = "signup" | "login" | "forgot";
 
 type LearningTopic = "stocks_etfs" | "budgeting" | "retirement" | "crypto" | "real_estate" | "side_hustle";
@@ -24,7 +24,7 @@ type FinancialSituation = "under_100" | "100_to_1000" | "1000_to_5000" | "over_5
 type MoneyStruggle = "spending" | "saving" | "earning" | "investing" | "debt";
 type DailyTime = "5min" | "10min" | "20min" | "no_limit";
 
-const quizSteps = ["q-situation", "q-struggle", "q-topics", "q-time"] as const;
+const quizSteps = ["q-struggle", "q-situation", "q-topics", "q-time"] as const;
 
 export default function Onboarding() {
   const router = useRouter();
@@ -52,6 +52,7 @@ export default function Onboarding() {
   const [financialSituation, setFinancialSituation] = useState<FinancialSituation | null>(null);
   const [moneyStruggle, setMoneyStruggle] = useState<MoneyStruggle | null>(null);
   const [dailyTime, setDailyTime] = useState<DailyTime | null>(null);
+  const [buildingProgress, setBuildingProgress] = useState(0);
 
   const submitLock = useRef(false);
 
@@ -74,7 +75,7 @@ export default function Onboarding() {
       if (profile?.onboarding_complete) {
         router.push("/home");
       } else {
-        setStep("q-situation");
+        setStep("q-struggle");
       }
     })();
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -84,6 +85,15 @@ export default function Onboarding() {
     setAnimateIn(false);
     const t = requestAnimationFrame(() => setAnimateIn(true));
     return () => cancelAnimationFrame(t);
+  }, [step]);
+
+  useEffect(() => {
+    if (step !== "building") { setBuildingProgress(0); return; }
+    const timers = [600, 1200, 1800, 2400].map((ms, i) =>
+      setTimeout(() => setBuildingProgress(i + 1), ms)
+    );
+    const nav = setTimeout(() => setStep("ready"), 3200);
+    return () => { timers.forEach(clearTimeout); clearTimeout(nav); };
   }, [step]);
 
   const goToStep = (next: Step) => setStep(next);
@@ -216,7 +226,7 @@ export default function Onboarding() {
         setError("We couldn't save your answers. Please try again.");
         return;
       }
-      goToStep("ready");
+      goToStep("building");
     } catch (err) {
       console.error("Onboarding error:", err);
       setError("Something went wrong. Please try again.");
@@ -268,7 +278,7 @@ export default function Onboarding() {
         } catch {}
       }
       setSignupSuccess(false);
-      setStep("q-situation");
+      setStep("q-struggle");
     } catch { setVerificationError("Network error — please try again."); }
     finally { setVerificationSending(false); }
   };
@@ -380,11 +390,10 @@ export default function Onboarding() {
                 <div className="flex items-center justify-between mb-3">
                   <button
                     onClick={() => {
-                      if (step === "q-topics") return;
                       const prev = quizSteps[quizIndex - 1];
                       if (prev) goToStep(prev);
                     }}
-                    className={`flex items-center gap-1 text-sm text-[#F4F7FA]/50 hover:text-[#F4F7FA]/80 transition-colors ${step === "q-situation" ? "invisible" : ""}`}
+                    className={`flex items-center gap-1 text-sm text-[#F4F7FA]/50 hover:text-[#F4F7FA]/80 transition-colors ${step === "q-struggle" ? "invisible" : ""}`}
                   >
                     <ArrowLeft className="w-4 h-4" /> Back
                   </button>
@@ -426,39 +435,65 @@ export default function Onboarding() {
 
               {/* ═══════════ WELCOME ═══════════ */}
               {step === "welcome" && (
-                <div className={`space-y-8 ${animateIn ? "step-animate" : "opacity-0"}`}>
-                  <div className="text-center space-y-6">
+                <div className={`space-y-7 ${animateIn ? "step-animate" : "opacity-0"}`}>
+                  {/* Logo + pain-point hook */}
+                  <div className="text-center space-y-5">
                     <div className="relative inline-block">
-                      <img src="/bloom-logo.png" alt="Bloom" className="w-24 h-24 mx-auto rounded-3xl object-cover" style={{ boxShadow: "0 0 50px rgba(39,183,200,0.25)" }} />
+                      <img src="/bloom-logo.png" alt="Bloom" className="w-20 h-20 mx-auto rounded-3xl object-cover" style={{ boxShadow: "0 0 50px rgba(39,183,200,0.25)" }} />
                       <div className="absolute -inset-3 rounded-3xl opacity-50" style={{ background: "linear-gradient(135deg, rgba(39,183,200,0.15), rgba(73,176,110,0.15))", filter: "blur(12px)", zIndex: -1 }} />
                     </div>
-                    <div className="space-y-3">
-                      <h1 className="font-serif text-5xl font-bold text-[#F4F7FA]">Bloom</h1>
-                      <p className="text-xl text-[#F4F7FA]/60 font-medium leading-relaxed max-w-xs mx-auto">
-                        Build confidence with money and markets — one simple lesson at a time.
-                      </p>
-                    </div>
+                    <h1 className="font-serif text-4xl font-bold text-[#F4F7FA] leading-tight">Does this sound<br />like you?</h1>
                   </div>
 
-                  {/* Pansy glass card */}
-                  <div className={`${glassCard} ${glassCardBg} ${glowBorder} p-6`}>
+                  {/* Pain points — the user's inner voice */}
+                  <div className="space-y-3">
+                    {[
+                      { text: "“Where does all my money even go?”", delay: "0.15s" },
+                      { text: "“I know I should invest but… where do I start?”", delay: "0.3s" },
+                      { text: "“Am I the only one who feels this behind?”", delay: "0.45s" },
+                    ].map((pain, i) => (
+                      <div
+                        key={i}
+                        className={`${glassCard} ${glassCardBg} px-5 py-4`}
+                        style={{ animation: animateIn ? `cardEntrance 0.5s ease-out ${pain.delay} both` : "none" }}
+                      >
+                        <p className="text-[#F4F7FA]/70 text-base italic">{pain.text}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Shame reframe + social proof */}
+                  <div className="text-center space-y-2" style={{ animation: animateIn ? "fadeSlideUp 0.6s ease-out 0.6s both" : "none" }}>
+                    <p className="text-xl font-serif font-bold text-[#F4F7FA]">You&apos;re not broken.</p>
+                    <p className="text-lg text-[#27B7C8] font-medium">You just weren&apos;t taught this.</p>
+                    <p className="text-sm text-[#F4F7FA]/40 mt-1">78% of women say the same thing.</p>
+                  </div>
+
+                  {/* Pansy intro — shorter, trust-focused */}
+                  <div className={`${glassCard} ${glassCardBg} ${glowBorder} p-5`} style={{ animation: animateIn ? "fadeSlideUp 0.6s ease-out 0.75s both" : "none" }}>
                     <div className="absolute inset-0 rounded-3xl" style={{ background: "linear-gradient(135deg, rgba(39,183,200,0.06) 0%, transparent 50%, rgba(73,176,110,0.04) 100%)" }} />
                     <div className="relative flex items-start gap-4">
-                      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-2xl" style={{ background: "linear-gradient(135deg, rgba(39,183,200,0.2), rgba(73,176,110,0.2))", boxShadow: "0 0 20px rgba(39,183,200,0.15)" }}>
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-xl" style={{ background: "linear-gradient(135deg, rgba(39,183,200,0.2), rgba(73,176,110,0.2))", boxShadow: "0 0 20px rgba(39,183,200,0.15)" }}>
                         🌺
                       </div>
-                      <div className="flex-1 space-y-2">
-                        <h3 className="font-serif text-lg font-semibold text-[#27B7C8]">Meet Pansy</h3>
-                        <p className="text-sm leading-relaxed text-[#F4F7FA]/60">
-                          Your guide to investing — no jargon, no pressure. Just clear, honest help with your money 💛
+                      <div className="flex-1 space-y-1">
+                        <h3 className="font-serif text-base font-semibold text-[#27B7C8]">Meet Pansy, your guide</h3>
+                        <p className="text-sm leading-relaxed text-[#F4F7FA]/50">
+                          I built Bloom for women exactly like you. No jargon, no judgment — just clear steps to take control of your money.
                         </p>
                       </div>
                     </div>
                   </div>
 
+                  {/* Social proof */}
+                  <p className="text-center text-sm text-[#F4F7FA]/30" style={{ animation: animateIn ? "fadeSlideUp 0.5s ease-out 0.9s both" : "none" }}>
+                    Join 10,000+ women already on their journey
+                  </p>
+
+                  {/* CTAs */}
                   <div className="space-y-3">
                     <button type="button" onClick={() => goToStep("auth")} className="glass-btn flex items-center justify-center gap-2 text-lg">
-                      Start My Journey <Rocket className="w-5 h-5" />
+                      Let&apos;s Fix This <ChevronRight className="w-5 h-5" />
                     </button>
                     <button
                       type="button"
@@ -466,7 +501,7 @@ export default function Onboarding() {
                       className="w-full py-3 rounded-2xl text-[#F4F7FA]/50 hover:text-[#F4F7FA]/80 text-base font-medium transition-colors"
                       style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
                     >
-                      Sign In
+                      I already have an account
                     </button>
                   </div>
                 </div>
@@ -612,6 +647,17 @@ export default function Onboarding() {
                     </div>
                   </div>
 
+                  {/* Trust signals */}
+                  {authMode === "signup" && (
+                    <div className="flex items-center justify-center gap-4 text-[#F4F7FA]/25 text-xs">
+                      <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> Encrypted</span>
+                      <span>·</span>
+                      <span>No spam, ever</span>
+                      <span>·</span>
+                      <span>Free to start</span>
+                    </div>
+                  )}
+
                   <button type="button" onClick={() => goToStep("welcome")} className="w-full text-center text-sm text-[#F4F7FA]/30 hover:text-[#F4F7FA]/60 transition-colors py-2">
                     <ArrowLeft className="w-3.5 h-3.5 inline mr-1" /> Back
                   </button>
@@ -625,8 +671,8 @@ export default function Onboarding() {
                     <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold text-[#27B7C8]" style={{ background: "rgba(39,183,200,0.1)", border: "1px solid rgba(39,183,200,0.15)" }}>
                       <Sparkles className="w-3.5 h-3.5" /> Let&apos;s personalize
                     </div>
-                    <h2 className="font-serif text-3xl font-bold text-[#F4F7FA]">What do you want<br />to learn?</h2>
-                    <p className="text-[#F4F7FA]/40 text-base">Pick all that interest you</p>
+                    <h2 className="font-serif text-3xl font-bold text-[#F4F7FA]">What would change<br />your life to learn?</h2>
+                    <p className="text-[#F4F7FA]/40 text-base">Pick all that interest you — we&apos;ll prioritize these</p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
@@ -678,8 +724,8 @@ export default function Onboarding() {
                     <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold text-[#49B06E]" style={{ background: "rgba(73,176,110,0.1)", border: "1px solid rgba(73,176,110,0.15)" }}>
                       <Wallet className="w-3.5 h-3.5" /> Let&apos;s get real
                     </div>
-                    <h2 className="font-serif text-3xl font-bold text-[#F4F7FA]">Where are you with<br />money right now?</h2>
-                    <p className="text-[#F4F7FA]/40 text-base">No judgment — just so Pansy knows how to help</p>
+                    <h2 className="font-serif text-3xl font-bold text-[#F4F7FA]">Where are you<br />starting from?</h2>
+                    <p className="text-[#F4F7FA]/40 text-base">No judgment — everyone starts somewhere different</p>
                   </div>
 
                   <div className="space-y-3">
@@ -716,7 +762,7 @@ export default function Onboarding() {
                     })}
                   </div>
 
-                  <button type="button" onClick={() => goToStep("q-struggle")} disabled={!financialSituation} className="glass-btn flex items-center justify-center gap-2">
+                  <button type="button" onClick={() => goToStep("q-topics")} disabled={!financialSituation} className="glass-btn flex items-center justify-center gap-2">
                     Continue <ChevronRight className="w-5 h-5" />
                   </button>
                   <button type="button" onClick={handleSkip} className="w-full text-center text-sm text-[#F4F7FA]/30 hover:text-[#F4F7FA]/60 transition-colors py-2">Skip for now →</button>
@@ -728,10 +774,10 @@ export default function Onboarding() {
                 <div className={`space-y-6 ${animateIn ? "step-animate" : "opacity-0"}`}>
                   <div className="text-center space-y-3">
                     <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold text-[#8B5CF6]" style={{ background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.15)" }}>
-                      <Target className="w-3.5 h-3.5" /> Be honest
+                      <Shield className="w-3.5 h-3.5" /> You&apos;re safe here
                     </div>
-                    <h2 className="font-serif text-3xl font-bold text-[#F4F7FA]">What&apos;s your biggest<br />money challenge?</h2>
-                    <p className="text-[#F4F7FA]/40 text-base">Pansy&apos;s not here to judge — she&apos;s here to help</p>
+                    <h2 className="font-serif text-3xl font-bold text-[#F4F7FA]">What keeps you up<br />at night about money?</h2>
+                    <p className="text-[#F4F7FA]/40 text-base">Most women feel this — naming it is the first step</p>
                   </div>
 
                   <div className="space-y-3">
@@ -771,7 +817,7 @@ export default function Onboarding() {
                     })}
                   </div>
 
-                  <button type="button" onClick={() => goToStep("q-topics")} disabled={!moneyStruggle} className="glass-btn flex items-center justify-center gap-2">
+                  <button type="button" onClick={() => goToStep("q-situation")} disabled={!moneyStruggle} className="glass-btn flex items-center justify-center gap-2">
                     Continue <ChevronRight className="w-5 h-5" />
                   </button>
                   <button type="button" onClick={handleSkip} className="w-full text-center text-sm text-[#F4F7FA]/30 hover:text-[#F4F7FA]/60 transition-colors py-2">Skip for now →</button>
@@ -836,6 +882,55 @@ export default function Onboarding() {
                 </div>
               )}
 
+              {/* ═══════════ BUILDING YOUR PLAN ═══════════ */}
+              {step === "building" && (
+                <div className={`space-y-8 ${animateIn ? "step-animate" : "opacity-0"}`}>
+                  <div className="text-center space-y-4">
+                    <div className="w-20 h-20 mx-auto rounded-full flex items-center justify-center text-4xl" style={{ background: "linear-gradient(135deg, rgba(39,183,200,0.2), rgba(73,176,110,0.2))", animation: "pulse-glow 3s ease-in-out infinite" }}>
+                      🌸
+                    </div>
+                    <h2 className="font-serif text-3xl font-bold text-[#F4F7FA]">Creating your<br />Bloom plan...</h2>
+                    <p className="text-[#F4F7FA]/40">Personalizing your wealth journey</p>
+                  </div>
+
+                  <div className={`${glassCard} ${glassCardBg} ${glowBorder} p-6`}>
+                    <div className="space-y-5">
+                      {[
+                        "Analyzing your financial profile",
+                        "Identifying your key challenges",
+                        "Matching you with the right content",
+                        "Building your personalized roadmap",
+                      ].map((label, i) => (
+                        <div key={i} className="flex items-center gap-3" style={{ opacity: buildingProgress > i ? 1 : 0.3, transition: "all 0.5s ease" }}>
+                          <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0" style={{
+                            background: buildingProgress > i ? "linear-gradient(135deg, #49B06E, #27B7C8)" : "rgba(255,255,255,0.06)",
+                            transition: "all 0.5s ease",
+                          }}>
+                            {buildingProgress > i ? <Check className="w-3.5 h-3.5 text-[#0E1B30]" /> : <div className="w-2 h-2 rounded-full bg-white/20" />}
+                          </div>
+                          <span className="text-sm font-medium" style={{ color: buildingProgress > i ? "#F4F7FA" : "rgba(244,247,250,0.3)" }}>{label}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
+                    <div className="h-full rounded-full" style={{
+                      width: `${(buildingProgress / 4) * 100}%`,
+                      background: "linear-gradient(90deg, #49B06E, #27B7C8)",
+                      transition: "width 0.7s ease-out",
+                      boxShadow: "0 0 12px rgba(39,183,200,0.4)",
+                    }} />
+                  </div>
+
+                  <div className="text-center pt-2">
+                    <p className="text-sm text-[#F4F7FA]/30 italic">
+                      &quot;Women with a financial plan save 3x more than those without one.&quot;
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {/* ═══════════ READY SCREEN ═══════════ */}
               {step === "ready" && (() => {
                 const path: "side_hustle" | "budgeting" | "investing" =
@@ -843,10 +938,16 @@ export default function Onboarding() {
                   : (moneyStruggle === "spending" || moneyStruggle === "debt") ? "budgeting"
                   : "investing";
 
+                const identityLabel = {
+                  side_hustle: "The Rising Hustler",
+                  budgeting: "The Money Master",
+                  investing: "The Wealth Builder",
+                };
+
                 const pathConfig = {
                   side_hustle: {
                     emoji: "🚀",
-                    title: "Let’s get that\nmoney flowing!",
+                    title: "Your plan is ready!",
                     message: "Girl, before we talk investing, let’s build your income first. I’ve got step-by-step guides for dropshipping, TikTok Shop, UGC, and more. Pick one, follow the steps, and watch your money grow.",
                     cta: "Start My Side Hustle",
                     route: "/side-hustle",
@@ -856,7 +957,7 @@ export default function Onboarding() {
                   },
                   budgeting: {
                     emoji: "💰",
-                    title: "Let’s take control\nof your money!",
+                    title: "Your plan is ready!",
                     message: "No judgment, love — most people don’t know where their money goes. I set up a Budget Tracker where you can see every dollar. Once you know the truth, you can change it.",
                     cta: "Start Tracking My Money",
                     route: "/budget-tracker",
@@ -866,7 +967,7 @@ export default function Onboarding() {
                   },
                   investing: {
                     emoji: "📈",
-                    title: "Let’s grow\nyour wealth!",
+                    title: "Your plan is ready!",
                     message: "You’ve got savings ready to work for you — let’s learn how. I’ll walk you through investing in plain language, no confusing jargon. Your money deserves to bloom.",
                     cta: "Start Learning to Invest",
                     route: "/home",
@@ -880,14 +981,18 @@ export default function Onboarding() {
 
                 return (
                 <div className={`space-y-6 ${animateIn ? "step-animate" : "opacity-0"}`}>
+                  {/* Identity label */}
                   <div className="text-center space-y-4">
-                    <div className="w-20 h-20 mx-auto rounded-full flex items-center justify-center text-4xl" style={{ background: "linear-gradient(135deg, rgba(39,183,200,0.2), rgba(73,176,110,0.2))", animation: "pulse-glow 3s ease-in-out infinite" }}>
-                      🌸
+                    <div className="w-20 h-20 mx-auto rounded-full flex items-center justify-center text-4xl" style={{ background: `linear-gradient(135deg, ${cfg.color}30, ${cfg.color}15)`, animation: "pulse-glow 3s ease-in-out infinite" }}>
+                      {cfg.emoji}
                     </div>
-                    <h2 className="font-serif text-3xl font-bold text-[#F4F7FA] whitespace-pre-line">{cfg.title}</h2>
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider" style={{ background: `${cfg.color}15`, border: `1px solid ${cfg.color}30`, color: cfg.color }}>
+                      <Sparkles className="w-3.5 h-3.5" /> {identityLabel[path]}
+                    </div>
+                    <h2 className="font-serif text-3xl font-bold text-[#F4F7FA]">{cfg.title}</h2>
                   </div>
 
-                  {/* Pansy's personalized message */}
+                  {/* Pansy’s personalized message */}
                   <div className={`${glassCard} ${glassCardBg} ${glowBorder} p-5`}>
                     <div className="absolute inset-0 rounded-3xl" style={{ background: "linear-gradient(135deg, rgba(39,183,200,0.06) 0%, transparent 50%, rgba(73,176,110,0.04) 100%)" }} />
                     <div className="relative flex items-start gap-3">
@@ -940,6 +1045,11 @@ export default function Onboarding() {
                       ))}
                     </div>
                   </div>
+
+                  {/* Social proof */}
+                  <p className="text-center text-xs text-[#F4F7FA]/30">
+                    10,000+ women started their journey with Bloom
+                  </p>
 
                   <button
                     type="button"
