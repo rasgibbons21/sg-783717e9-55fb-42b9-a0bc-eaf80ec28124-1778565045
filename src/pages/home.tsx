@@ -11,10 +11,10 @@ import { authService } from "@/services/authService";
 import { userService } from "@/services/userService";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  BookOpen, TrendingUp, MessageCircle, NotebookPen,
-  ChevronRight, Flame, Target, Sparkles, Play, ArrowRight, Trophy,
+  BookOpen, TrendingUp, MessageCircle,
+  ChevronRight, Flame, Target, Sparkles, Play, Rocket, Wallet, BarChart3, Trophy,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { TimeGreeting } from "@/components/TimeGreeting";
 import { GemsLeaderboard } from "@/components/GemsLeaderboard";
 import { PansyContextCard } from "@/components/PansyContextCard";
@@ -26,6 +26,43 @@ import { AdMobBanner } from "@/components/AdMobBanner";
 
 const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
 const cardSpring = { type: "spring" as const, stiffness: 400, damping: 25 };
+const db = supabase as any;
+
+const PATHS = [
+  {
+    key: "hustle",
+    title: "Side Hustle",
+    subtitle: "Build income from scratch",
+    emoji: "🚀",
+    icon: Rocket,
+    color: "#49B06E",
+    href: "/side-hustle",
+    desc: "Meet Lexi, your hustle coach. Pick a hustle — dropshipping, TikTok Shop, UGC, digital products, freelancing, or content creation — and follow 12 guided steps.",
+    pansySays: "I'm handing you to Lexi for this one — she's built businesses from scratch and knows what actually works.",
+  },
+  {
+    key: "budget",
+    title: "Budgeting",
+    subtitle: "Take control of your money",
+    emoji: "💰",
+    icon: Wallet,
+    color: "#F59E0B",
+    href: "/budget-tracker",
+    desc: "Track every dollar, see where your money goes, and build the spending habits that create wealth. Pansy analyzes your patterns and shows you what to fix.",
+    pansySays: "You can't grow what you can't see. Let's get honest about where your money goes.",
+  },
+  {
+    key: "invest",
+    title: "Investing",
+    subtitle: "Grow your wealth",
+    emoji: "📈",
+    icon: BarChart3,
+    color: "#27B7C8",
+    href: "/learn",
+    desc: "150+ lessons from beginner to advanced — stocks, ETFs, dividends, retirement, real estate, options. Plus a paper trading simulator to practice risk-free.",
+    pansySays: "Every lesson compounds, just like your future investments will.",
+  },
+];
 
 export default function Home() {
   const router = useRouter();
@@ -35,6 +72,8 @@ export default function Home() {
   const [streak, setStreak] = useState(0);
   const [briefing, setBriefing] = useState<string | null>(null);
   const [briefingLoading, setBriefingLoading] = useState(true);
+  const [hustleProgress, setHustleProgress] = useState(0);
+  const [showPansyStory, setShowPansyStory] = useState(false);
   const [traderLb, setTraderLb] = useState<{ display_name: string; total_pnl: number; win_rate: number; rank: number }[]>([]);
   const [traderMe, setTraderMe] = useState<{ display_name: string; total_pnl: number; win_rate: number; rank: number } | null>(null);
 
@@ -66,6 +105,7 @@ export default function Home() {
     loadProgress(session.user.id);
     loadBriefing(session.access_token);
     loadTraderLeaderboard(session.access_token);
+    loadHustleProgress(session.user.id);
   };
 
   const loadProgress = async (userId: string) => {
@@ -132,6 +172,18 @@ export default function Home() {
     }
   };
 
+  const loadHustleProgress = async (userId: string) => {
+    try {
+      const { data } = await db.from("side_hustle_progress").select("completed_steps").eq("user_id", userId);
+      if (data && data.length > 0) {
+        const maxSteps = Math.max(...data.map((d: any) => (d.completed_steps || []).length));
+        setHustleProgress(maxSteps);
+      }
+    } catch {
+      // silent
+    }
+  };
+
   const totalLessons = 36;
   const progressPercent = Math.min(Math.round((completedCount / totalLessons) * 100), 100);
   const confidenceScore = Math.min(Math.round((completedCount / totalLessons) * 100), 100);
@@ -145,27 +197,27 @@ export default function Home() {
   ];
 
   const getJourneyCoachMessage = (): { message: string; action: { label: string; href: string } } => {
+    if (hustleProgress > 0 && hustleProgress < 12) {
+      return {
+        message: `You're ${hustleProgress} steps into your side hustle journey. Keep going — step ${hustleProgress + 1} is waiting!`,
+        action: { label: "Continue Hustle", href: "/side-hustle" },
+      };
+    }
     if (completedCount === 0) {
       return {
-        message: "Your first step: learn what a stock actually is. It takes 3 minutes and changes how you see the market.",
-        action: { label: "Start First Lesson", href: "/learn" },
+        message: "Pick a path below that fits where you are right now. No wrong answer — you can explore all three!",
+        action: { label: "Start Learning", href: "/learn" },
       };
     }
     if (completedCount < 5) {
       return {
-        message: `${completedCount} lessons done — you're in the Seed stage. Keep going to reach Sprout. Each lesson builds on the last.`,
+        message: `${completedCount} lessons done — you're building your foundation. Each one makes the next one easier.`,
         action: { label: "Next Lesson", href: "/learn" },
-      };
-    }
-    if (completedCount < 12 && streak === 0) {
-      return {
-        message: "You haven't studied today yet. Even 5 minutes keeps the momentum going. Your Sprout stage garden needs water!",
-        action: { label: "Continue Learning", href: "/learn" },
       };
     }
     if (completedCount < 12) {
       return {
-        message: "You're in the Sprout stage now. Try the Practice Trader to apply what you've learned — no real money involved.",
+        message: "You're in the Sprout stage. Try the Practice Trader to apply what you've learned — no real money involved.",
         action: { label: "Try Practice Trading", href: "/practice" },
       };
     }
@@ -196,7 +248,6 @@ export default function Home() {
             <p className="text-muted-foreground mt-1">Your next small step is ready.</p>
           </div>
 
-          {/* Trial banner */}
           {isTrial && (
             <Link href="/subscription" className="block">
               <div className="rounded-xl px-4 py-3 flex items-center justify-between" style={{
@@ -217,7 +268,6 @@ export default function Home() {
             </Link>
           )}
 
-          {/* Stats row */}
           <div className="grid grid-cols-3 gap-3">
             {[
               { icon: <Flame className="w-4 h-4 text-orange-400" />, value: streak, label: "day streak", glow: "rgba(251,146,60,0.15)" },
@@ -244,56 +294,115 @@ export default function Home() {
           </div>
         </div>
 
-        {/* ══════ CONTINUE YOUR JOURNEY ══════ */}
-        <Link href="/learn" className="block">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, type: "spring", stiffness: 250, damping: 20 }}
-            whileTap={{ scale: 0.96 }}
-            whileHover={{ scale: 1.02, boxShadow: "0 12px 40px rgba(39,183,200,0.2)" }}
-            onClick={() => haptic(12)}
-            className="relative overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-[#27B7C8]/10 via-card to-[#49B06E]/10"
-            style={{ boxShadow: "0 4px 20px rgba(39,183,200,0.1)" }}>
-            <div className="absolute inset-0 opacity-20" style={{ background: "radial-gradient(circle at 80% 20%, rgba(39,183,200,0.3), transparent 60%)" }} />
-            <div className="relative p-6 space-y-4">
-              <div className="flex items-start justify-between">
-                <div className="space-y-1">
-                  <p className="text-xs font-semibold text-[#27B7C8] uppercase tracking-wider">Continue Your Journey</p>
-                  <h2 className="font-serif text-2xl font-bold text-foreground">
-                    {completedCount === 0 ? "What is a Stock?" : completedCount < 5 ? "Building Your Foundation" : completedCount < 12 ? "Growing Your Knowledge" : "Advanced Strategies"}
-                  </h2>
-                  <p className="text-sm text-muted-foreground">
-                    {completedCount === 0
-                      ? "Start your investing journey with the basics"
-                      : `${completedCount} lessons completed`}
-                  </p>
-                </div>
-                <div className="w-14 h-14 rounded-2xl bg-[#27B7C8]/15 flex items-center justify-center shrink-0">
-                  <Play className="w-7 h-7 text-[#27B7C8] ml-0.5" />
-                </div>
+        {/* ══════ PANSY'S STORY ══════ */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, ...cardSpring }}
+          className="relative overflow-hidden rounded-3xl border border-border"
+          style={{
+            background: "linear-gradient(135deg, rgba(39,183,200,0.08), rgba(73,176,110,0.05), rgba(14,27,48,0.95))",
+            boxShadow: "0 4px 24px rgba(39,183,200,0.08)",
+          }}
+        >
+          <div className="absolute top-0 right-0 w-40 h-40 opacity-10" style={{ background: "radial-gradient(circle, #27B7C8, transparent 70%)" }} />
+          <div className="relative p-5 space-y-3">
+            <div className="flex items-start gap-3">
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shrink-0"
+                style={{ background: "linear-gradient(135deg, rgba(39,183,200,0.15), rgba(73,176,110,0.15))", border: "1px solid rgba(39,183,200,0.2)" }}>
+                🌺
               </div>
-              {/* Progress bar */}
-              <div className="space-y-2">
-                <div className="h-2 rounded-full overflow-hidden bg-muted/40">
-                  <div
-                    className="h-full rounded-full transition-all duration-700"
-                    style={{
-                      width: `${Math.max(progressPercent, 3)}%`,
-                      background: "linear-gradient(90deg, #49B06E, #27B7C8)",
-                    }}
-                  />
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-muted-foreground">{completedCount}/{totalLessons} lessons</span>
-                  <span className="text-xs font-medium text-[#27B7C8] flex items-center gap-1">
-                    Continue Lesson <ChevronRight className="w-3.5 h-3.5" />
-                  </span>
-                </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-serif text-lg font-bold text-foreground">Meet Pansy</p>
+                <p className="text-sm text-muted-foreground leading-relaxed mt-1">
+                  I grew up watching the women around me work harder than anyone — and still struggle with money. Not because they weren&apos;t smart, but because nobody ever taught them how it works.
+                </p>
               </div>
             </div>
-          </motion.div>
-        </Link>
+
+            {showPansyStory && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                transition={{ duration: 0.3 }}
+                className="space-y-3 pl-[68px]"
+              >
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  So I made it my mission: teach women about money in a way that actually makes sense. No jargon, no judgment, no talking down to you. Just honest guidance from someone who&apos;s been where you are.
+                </p>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  I&apos;m not here to tell you what to buy or sell. I&apos;m here to help you <span className="text-[#27B7C8] font-semibold">understand your options</span>, whether that&apos;s starting a side hustle, getting your budget under control, or learning to invest. Your money, your terms.
+                </p>
+                <p className="text-sm font-medium text-[#49B06E]">
+                  Pick a path below. I&apos;ll walk you through every step. 💛
+                </p>
+              </motion.div>
+            )}
+
+            <button
+              onClick={() => { setShowPansyStory(!showPansyStory); haptic(); }}
+              className="text-xs font-semibold flex items-center gap-1 ml-[68px] transition-colors"
+              style={{ color: "#27B7C8", background: "none", border: "none", cursor: "pointer", padding: 0 }}
+            >
+              {showPansyStory ? "Show less" : "Read my story"}{" "}
+              <ChevronRight className="w-3 h-3" style={{ transform: showPansyStory ? "rotate(90deg)" : "rotate(0)", transition: "transform 0.2s" }} />
+            </button>
+          </div>
+        </motion.div>
+
+        {/* ══════ THREE JOURNEY PATHS ══════ */}
+        <div className="space-y-3">
+          <h3 className="font-serif text-lg font-bold text-foreground">How Can Pansy Help You?</h3>
+          <p className="text-xs text-muted-foreground">Pick the path that fits where you are right now. You can explore all three.</p>
+
+          <div className="space-y-3">
+            {PATHS.map((path, i) => {
+              const Icon = path.icon;
+              return (
+                <Link key={path.key} href={path.href}>
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.3 + i * 0.1, ...cardSpring }}
+                    whileTap={{ scale: 0.97 }}
+                    whileHover={{ scale: 1.01, boxShadow: `0 8px 28px ${path.color}20` }}
+                    onClick={() => haptic(12)}
+                    className="bg-card border border-border rounded-2xl p-4 mb-3 block"
+                    style={{ borderLeft: `3px solid ${path.color}` }}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 text-xl"
+                        style={{ background: `${path.color}12` }}>
+                        {path.emoji}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="font-bold text-sm text-foreground">{path.title}</p>
+                            <p className="text-xs text-muted-foreground">{path.subtitle}</p>
+                          </div>
+                          <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+                        </div>
+                        <p className="text-xs text-muted-foreground leading-relaxed mt-2">{path.desc}</p>
+                        <div className="flex items-start gap-1.5 mt-2 pt-2 border-t border-border">
+                          <span className="text-xs shrink-0">🌺</span>
+                          <p className="text-xs italic" style={{ color: path.color }}>{path.pansySays}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ══════ PANSY'S NEXT STEP ══════ */}
+        <PansyContextCard
+          message={coach.message}
+          action={coach.action}
+          variant="coach"
+        />
 
         {/* ══════ TODAY WITH PANSY ══════ */}
         <div className="space-y-3">
@@ -301,11 +410,9 @@ export default function Home() {
             Today with Pansy <span className="text-lg">🌺</span>
           </h3>
 
-          {/* Daily Challenge */}
           <DailyChallenge />
 
           <div className="grid grid-cols-1 gap-3">
-            {/* Morning Coffee */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -331,7 +438,6 @@ export default function Home() {
               </div>
             </motion.div>
 
-            {/* Confidence tip — milestone-aware */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -364,12 +470,48 @@ export default function Home() {
           </div>
         </div>
 
-        {/* ══════ PANSY'S NEXT STEP ══════ */}
-        <PansyContextCard
-          message={coach.message}
-          action={coach.action}
-          variant="coach"
-        />
+        {/* ══════ CONTINUE YOUR JOURNEY ══════ */}
+        {completedCount > 0 && (
+          <Link href="/learn" className="block">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, type: "spring", stiffness: 250, damping: 20 }}
+              whileTap={{ scale: 0.96 }}
+              whileHover={{ scale: 1.02, boxShadow: "0 12px 40px rgba(39,183,200,0.2)" }}
+              onClick={() => haptic(12)}
+              className="relative overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-[#27B7C8]/10 via-card to-[#49B06E]/10"
+              style={{ boxShadow: "0 4px 20px rgba(39,183,200,0.1)" }}>
+              <div className="absolute inset-0 opacity-20" style={{ background: "radial-gradient(circle at 80% 20%, rgba(39,183,200,0.3), transparent 60%)" }} />
+              <div className="relative p-5 space-y-3">
+                <div className="flex items-start justify-between">
+                  <div className="space-y-1">
+                    <p className="text-xs font-semibold text-[#27B7C8] uppercase tracking-wider">Continue Learning</p>
+                    <h2 className="font-serif text-xl font-bold text-foreground">
+                      {completedCount < 5 ? "Building Your Foundation" : completedCount < 12 ? "Growing Your Knowledge" : completedCount < 22 ? "Advanced Concepts" : "Master Level"}
+                    </h2>
+                    <p className="text-sm text-muted-foreground">{completedCount} lessons completed</p>
+                  </div>
+                  <div className="w-12 h-12 rounded-2xl bg-[#27B7C8]/15 flex items-center justify-center shrink-0">
+                    <Play className="w-6 h-6 text-[#27B7C8] ml-0.5" />
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <div className="h-2 rounded-full overflow-hidden bg-muted/40">
+                    <div className="h-full rounded-full transition-all duration-700"
+                      style={{ width: `${Math.max(progressPercent, 3)}%`, background: "linear-gradient(90deg, #49B06E, #27B7C8)" }} />
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-muted-foreground">{completedCount}/{totalLessons} lessons</span>
+                    <span className="text-xs font-medium text-[#27B7C8] flex items-center gap-1">
+                      Continue <ChevronRight className="w-3.5 h-3.5" />
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </Link>
+        )}
 
         {/* ══════ YOUR LEARNING PATH ══════ */}
         <motion.div
@@ -413,21 +555,16 @@ export default function Home() {
           </div>
         </motion.div>
 
-        {/* ══════ PUSH NOTIFICATION PROMPT ══════ */}
         <PushNotificationPrompt />
 
-        {/* ══════ STREAK CALENDAR ══════ */}
         <StreakCalendar />
 
-        {/* ══════ TROPHY CASE ══════ */}
         <TrophyCase />
 
-        {/* ══════ LEADERBOARDS — SIDE BY SIDE ══════ */}
+        {/* ══════ LEADERBOARDS ══════ */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Lessons / Gems Leaderboard */}
           <GemsLeaderboard />
 
-          {/* Trader P&L Leaderboard */}
           <Link href="/practice" className="block">
             <div className="bg-card border border-border rounded-2xl p-5 space-y-4 h-full">
               <div className="flex items-center justify-between">
@@ -476,9 +613,6 @@ export default function Home() {
           </Link>
         </div>
 
-        {/* ══════ AD ══════ */}
-        <AdMobBanner format="banner" />
-
         {/* ══════ QUICK ACTIONS ══════ */}
         <div className="space-y-3">
           <h3 className="font-serif text-lg font-bold text-foreground">Quick Actions</h3>
@@ -515,7 +649,8 @@ export default function Home() {
           </div>
         </div>
 
-        {/* ══════ DISCLAIMER ══════ */}
+        <AdMobBanner format="banner" />
+
         <div className="p-4 bg-muted/50 border border-border rounded-xl">
           <p className="text-xs text-center text-muted-foreground leading-relaxed">
             This is educational content only and does not constitute financial advice. Bloom is not liable for any investment decisions or losses.

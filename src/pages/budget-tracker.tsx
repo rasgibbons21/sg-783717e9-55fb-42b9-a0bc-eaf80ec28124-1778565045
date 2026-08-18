@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any;
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Trash2, TrendingDown, DollarSign, PieChart, Sparkles } from "lucide-react";
+import { Plus, Trash2, TrendingDown, DollarSign, PieChart, Sparkles, AlertTriangle, CheckCircle, ArrowRight } from "lucide-react";
 import confetti from "canvas-confetti";
 import { AdMobBanner } from "@/components/AdMobBanner";
 
@@ -49,6 +49,69 @@ const PANSY_TIPS = [
 
 function getCatInfo(name: string) {
   return CATEGORIES.find(c => c.name === name) ?? { name, emoji: "📝", color: "#6B7280" };
+}
+
+type InsightSeverity = "warning" | "positive" | "info";
+interface SpendingInsight {
+  severity: InsightSeverity;
+  title: string;
+  message: string;
+  emoji: string;
+}
+
+function analyzeSpending(totals: Record<string, number>, total: number, entryCount: number): SpendingInsight[] {
+  if (entryCount < 3 || total < 10) return [];
+  const insights: SpendingInsight[] = [];
+  const pct = (cat: string) => total > 0 ? ((totals[cat] || 0) / total) * 100 : 0;
+
+  const housingPct = pct("Rent/Housing");
+  if (housingPct > 40) {
+    insights.push({ severity: "warning", emoji: "🏠", title: "Housing is eating your income", message: `${housingPct.toFixed(0)}% of your spending is on housing. The guideline is under 30%. If you're above 40%, it's squeezing everything else — savings, investing, even breathing room. Can you negotiate rent, get a roommate, or explore other options?` });
+  } else if (housingPct > 0 && housingPct <= 30) {
+    insights.push({ severity: "positive", emoji: "🏠", title: "Housing costs look healthy", message: `${housingPct.toFixed(0)}% on housing — that's within the recommended 30%. You've got room to breathe and invest.` });
+  }
+
+  const foodPct = pct("Food");
+  if (foodPct > 25) {
+    insights.push({ severity: "warning", emoji: "🍕", title: "Food spending is high", message: `${foodPct.toFixed(0)}% of your money is going to food. That's usually a sign of frequent dining out or delivery. Try meal prepping 2-3 days a week — most people save $200-400/month just from that switch.` });
+  }
+
+  const entertainmentPct = pct("Entertainment");
+  const shoppingPct = pct("Shopping");
+  const wantsPct = entertainmentPct + shoppingPct;
+  if (wantsPct > 35) {
+    insights.push({ severity: "warning", emoji: "🛍️", title: "Wants are outpacing needs", message: `Shopping + entertainment is ${wantsPct.toFixed(0)}% of your spending. I'm not saying cut the fun — but can you do 80% of the fun for 50% of the cost? Free events, library, park dates, thrift shopping. Your future self will thank you.` });
+  }
+
+  const subsPct = pct("Subscriptions");
+  if (subsPct > 8) {
+    insights.push({ severity: "warning", emoji: "📦", title: "Subscription creep alert", message: `${subsPct.toFixed(0)}% on subscriptions — that adds up to $${(totals["Subscriptions"] || 0).toFixed(0)}/month. Go through every subscription right now. If you haven't used it in 2 weeks, cancel it. You can always re-subscribe later.` });
+  }
+
+  const savingsPct = pct("Savings");
+  if (savingsPct === 0 && total > 100) {
+    insights.push({ severity: "warning", emoji: "🐷", title: "No savings tracked this month", message: "I don't see any money going to savings. Even $20/month is a start. The habit matters more than the amount. Set up an automatic transfer — even $5/week — so it happens before you can spend it." });
+  } else if (savingsPct >= 20) {
+    insights.push({ severity: "positive", emoji: "🐷", title: "Savings game is strong!", message: `${savingsPct.toFixed(0)}% going to savings — that's at or above the recommended 20%. You're building a foundation. Keep it up and think about where to put that money to work (HYSA, index funds).` });
+  } else if (savingsPct > 0 && savingsPct < 10) {
+    insights.push({ severity: "info", emoji: "🐷", title: "Savings could use a boost", message: `${savingsPct.toFixed(0)}% to savings is a start, but aim for 20%. Look at your top 2 spending categories above — even a small cut there can double your savings rate.` });
+  }
+
+  const debtPct = pct("Debt Payments");
+  if (debtPct > 20) {
+    insights.push({ severity: "warning", emoji: "💳", title: "Debt is taking a big cut", message: `${debtPct.toFixed(0)}% of your money goes to debt. That's real weight. Focus on the highest-interest debt first (avalanche method), or the smallest balance first for quick wins (snowball method). Either way — you're paying attention, and that's step one.` });
+  }
+
+  const catCount = Object.keys(totals).length;
+  if (catCount <= 2 && entryCount >= 5) {
+    insights.push({ severity: "info", emoji: "📊", title: "Track more categories", message: `You've got ${entryCount} expenses but only in ${catCount} category${catCount === 1 ? "" : "ies"}. Try logging everything for a week — coffee, gas, subscriptions, snacks. The full picture is where the real insights come from.` });
+  }
+
+  if (insights.length === 0 && total > 0) {
+    insights.push({ severity: "positive", emoji: "✨", title: "Looking balanced overall", message: "Your spending looks reasonably balanced across categories. Keep tracking consistently — patterns become clearer over time, and that's when you can really optimize." });
+  }
+
+  return insights;
 }
 
 function monthLabel(date: Date) {
@@ -98,6 +161,8 @@ export default function BudgetTracker() {
   }, {});
 
   const sortedCategories = Object.entries(categoryTotals).sort(([, a], [, b]) => b - a);
+  const insights = analyzeSpending(categoryTotals, totalSpent, entries.length);
+  const [showInsights, setShowInsights] = useState(false);
 
   const handleAdd = async () => {
     if (!userId || !category || !amount || saving) return;
@@ -320,6 +385,101 @@ export default function BudgetTracker() {
                 );
               })}
             </div>
+          </motion.div>
+        )}
+
+        {/* ── PANSY'S SPENDING INSIGHTS ─────────────────────── */}
+        {insights.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+            className="bg-card border border-border rounded-2xl overflow-hidden"
+          >
+            <motion.button
+              whileTap={{ scale: 0.98 }}
+              onClick={() => { setShowInsights(o => !o); haptic(); }}
+              className="w-full flex items-center justify-between p-5"
+              style={{ background: "none", border: "none", cursor: "pointer" }}
+            >
+              <div className="flex items-center gap-2">
+                <span className="text-lg">🌺</span>
+                <div className="text-left">
+                  <p className="text-sm font-bold text-foreground">Pansy&apos;s Spending Insights</p>
+                  <p className="text-xs text-muted-foreground">
+                    {insights.filter(i => i.severity === "warning").length > 0
+                      ? `${insights.filter(i => i.severity === "warning").length} thing${insights.filter(i => i.severity === "warning").length > 1 ? "s" : ""} to look at`
+                      : "Looking good overall"}
+                  </p>
+                </div>
+              </div>
+              <ArrowRight
+                className="w-4 h-4 text-muted-foreground transition-transform"
+                style={{ transform: showInsights ? "rotate(90deg)" : "rotate(0deg)" }}
+              />
+            </motion.button>
+
+            <AnimatePresence>
+              {showInsights && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="overflow-hidden"
+                >
+                  <div className="px-5 pb-5 space-y-3 border-t border-border pt-4">
+                    {insights.map((insight, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, x: -12 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: i * 0.08 }}
+                        className="rounded-xl p-4"
+                        style={{
+                          background: insight.severity === "warning"
+                            ? "rgba(245,158,11,0.08)"
+                            : insight.severity === "positive"
+                            ? "rgba(73,176,110,0.08)"
+                            : "rgba(39,183,200,0.08)",
+                          border: `1px solid ${
+                            insight.severity === "warning"
+                              ? "rgba(245,158,11,0.2)"
+                              : insight.severity === "positive"
+                              ? "rgba(73,176,110,0.2)"
+                              : "rgba(39,183,200,0.2)"
+                          }`,
+                        }}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="shrink-0 mt-0.5">
+                            {insight.severity === "warning" ? (
+                              <AlertTriangle className="w-4 h-4 text-amber-400" />
+                            ) : insight.severity === "positive" ? (
+                              <CheckCircle className="w-4 h-4 text-[#49B06E]" />
+                            ) : (
+                              <Sparkles className="w-4 h-4 text-[#27B7C8]" />
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-sm font-bold text-foreground flex items-center gap-1.5">
+                              <span>{insight.emoji}</span> {insight.title}
+                            </p>
+                            <p className="text-xs text-muted-foreground leading-relaxed mt-1">
+                              {insight.message}
+                            </p>
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+
+                    <p className="text-[10px] text-muted-foreground/60 text-center pt-1">
+                      Based on this month&apos;s data. Not financial advice — just Pansy keeping it real.
+                    </p>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         )}
 

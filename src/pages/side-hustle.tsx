@@ -37,6 +37,7 @@ interface HustleStep {
   content: string;
   actions: string[];
   pansyTip: string;
+  lexiTip?: string;
   time: string;
 }
 
@@ -49,6 +50,104 @@ interface HustleInfo {
   earnings: string;
   pansyIntro: string;
   steps: HustleStep[];
+}
+
+// ─── Lexi — The Hustle Coach ────────────────────────────────────────────────
+// Lexi is the side hustle specialist. While Pansy is the warm, encouraging mentor,
+// Lexi is the no-BS hustler friend who's been in the trenches. She gives the
+// real talk — what actually works, common scams to avoid, and the mindset it takes.
+
+const LEXI_TIPS: Record<string, string[]> = {
+  dropshipping: [
+    "Real talk — 90% of dropshipping stores fail because they pick a niche they don't care about. Pick something you'd actually scroll through at 2am.",
+    "Spy on your competitors. Go to their stores, add stuff to cart, see their upsells. They already did the testing — learn from their playbook.",
+    "Shopify's Dawn theme is free and clean. Don't spend $200 on a premium theme when your store has zero products yet. Invest AFTER you validate.",
+    "Write descriptions like you're texting your bestie about something fire you just found. If it sounds like a robot wrote it, it won't sell.",
+    "Charge $4.99 for 'express processing' on top of free shipping. It costs you nothing and 20% of customers will pay it. Free money.",
+    "Before you spend money on ads, make sure your brand looks legit. Nobody buys from a store with a pixelated logo and broken links.",
+    "Your first 100 followers won't come from posting and praying. They come from engaging in OTHER people's comments first.",
+    "Start with $5/day ads. I don't care what the gurus say about 'going big.' Test small, find what works, THEN scale.",
+    "Your first sale might be your mom. That still counts. Screenshot it and keep going.",
+    "When you fulfill orders, check the tracking. Nothing kills a store faster than a customer waiting 45 days for a $20 item.",
+    "Kill your darlings. If a product has 500 views and 0 sales, it's not the right product. Test something new.",
+    "The jump from $0 to $100/day is the hardest. After that, scaling is just doing more of what already works.",
+  ],
+  tiktok_shop: [
+    "Your TikTok name matters more than you think. If someone can't find you by typing your name, you're invisible.",
+    "Before selling anything, buy from TikTok Shop. The checkout experience teaches you what you want YOUR customers to feel.",
+    "Apply for TikTok Shop on a weekday morning — approval seems faster. While you wait, batch-film content so you're ready to go.",
+    "Always. Order. Samples. I've seen sellers list a product that looked amazing in supplier photos and was actual garbage in person.",
+    "Natural lighting > ring light > no light. Film near a window between 10am-2pm and your product will look 10x better.",
+    "Your first video will probably flop. Your fifth one might too. But video #11 might get 100K views. You can't skip to video #11 without posting 1-10.",
+    "The algorithm rewards you for posting within your first hour of going live. People watching = the algorithm pushing your live higher.",
+    "Go live even if only 3 people are watching. Those 3 people might buy. And the algorithm is watching too.",
+    "Content batching is the cheat code. One afternoon of filming = a full week of content. Block it off like a meeting.",
+    "Reply to EVERY customer message like they're your VIP. One bad review on TikTok Shop tanks your rankings for weeks.",
+    "Affiliates are how you go from hustling to building. Let other creators sell for you while you sleep.",
+    "You started with a phone and an idea. Now you have a business. Don't forget to separate your business money from personal — get a separate bank account.",
+  ],
+  ugc: [
+    "You don't need followers to make money as a UGC creator. Brands pay for CONTENT, not clout. Read that again.",
+    "Your portfolio IS your resume. If you only take one step today, film one sample video with a product you already own.",
+    "Sign up for everything — Collabstr, Billo, JoinBrands, the Insense app. Cast a wide net. Your first client will come from the platform you least expect.",
+    "Natural lighting near a window. Phone propped up or on a $10 tripod. Clean background. That's literally all you need. Stop using 'no equipment' as an excuse.",
+    "CapCut is free and it's what the pros use. Learn it. Love it. It'll make you money.",
+    "Your first 3 samples need to look GOOD, not perfect. Good enough to prove you know what you're doing. You'll level up with every real client.",
+    "Send 10 pitches a day. Minimum. Most won't reply. Some will say no. One will say yes. That's all you need to start.",
+    "Personalize every pitch or don't bother. 'Hi I love your brand' with nothing specific = instant delete.",
+    "Never. Work. For. Free. Exposure doesn't pay rent. If a brand can afford a product to send you, they can afford to pay you.",
+    "Over-deliver on your first 5 clients. Ask for testimonials. These 5 testimonials will get you your next 50 clients.",
+    "Retainers turn UGC from a hustle into a career. After 2-3 great deliveries, pitch monthly packages. Recurring revenue is the dream.",
+    "You're not 'just' a UGC creator — you're a content production company of one. Price accordingly.",
+  ],
+  digital_products: [
+    "Stop waiting for the perfect product idea. Your most-asked question from friends is your first product. Package that knowledge.",
+    "Check the 3-star reviews on competitor products. That's where customers tell you exactly what's missing. Build THAT.",
+    "Your first product will take 10 hours. Your tenth will take 2. The learning curve is steep but short.",
+    "Canva + Google Sheets + your brain = unlimited products. You don't need fancy tools.",
+    "Mockups sell products. The exact same template with professional mockups outsells one with plain screenshots by 3-5x. Invest in this step.",
+    "Your Etsy title is your SEO. Pack it with keywords people actually search. Not 'Cute Budget Planner' — 'Monthly Budget Planner Printable Finance Tracker Spreadsheet Template.'",
+    "Price yours $2-3 above the cheapest competitor. Cheap = perceived as low quality. Your product is quality.",
+    "Ask 3 friends to test your product before launch. They'll catch typos, broken links, and confusion you're too close to see.",
+    "Pinterest is literally free traffic forever. A pin you post today can bring sales 2 years from now. Start pinning.",
+    "The review you get from your first buyer is worth more than any ad. Follow up and ask nicely.",
+    "Every new product in your shop increases the chance someone finds you through search. Aim for 10-20 products in 3 months.",
+    "You just built a passive income machine. Every product you add is another stream of revenue that works while you sleep. That's the real flex.",
+  ],
+  freelancing: [
+    "Your 'basic' skills are worth $25-75/hour to someone who doesn't have them. Stop undervaluing yourself.",
+    "Packages beat hourly rates every time. Clients hate watching a clock. Give them a clear scope and price.",
+    "Your Fiverr headline: sell the OUTCOME, not the service. Not 'I write blog posts' — 'I write blog posts that rank on Google.'",
+    "No clients yet? Create sample work for brands you admire. That's your portfolio. It doesn't need to be 'real' client work.",
+    "Keep proposals under 150 words. Nobody reads a novel. Hook them in 2 sentences, show one relevant sample, done.",
+    "Apply to 10 jobs a day for 2 weeks. That's 100 applications. You'll land 3-5 clients. That's your start.",
+    "Under-promise the timeline, over-deliver the quality. 'I'll have this by Friday' then deliver Wednesday = instant hero status.",
+    "Ask for reviews immediately after delivery, while the dopamine is high. Wait a week and they forget.",
+    "After 5 good reviews, raise your rates 25%. No explanation needed. Your work speaks for itself now.",
+    "The retainer pitch after a great project: 'Want me to keep this going monthly? Here's a package that saves you the hassle of finding someone new every time.'",
+    "Templates and systems are how you double your hourly rate without working more hours. Build them obsessively.",
+    "You went from 'I don't know if anyone would pay me' to running a real freelance business. Plot twist: they're paying you because you're GOOD at this.",
+  ],
+  content_creator: [
+    "Pick ONE platform and go all in for 90 days. 'I'm on everything' = 'I'm nowhere.' Focus wins.",
+    "Your niche doesn't have to be unique. YOUR take on it does. A million people teach budgeting — none of them are you.",
+    "Your first 20 posts will suck. Post them anyway. You can't edit your way to good content — you have to earn it through reps.",
+    "Batch content creation: film 7 videos on Sunday, edit Monday, schedule for the week. That's how creators stay sane AND consistent.",
+    "The algorithm isn't random — it rewards watch time. If people watch your full video, it gets pushed. Hook them in 2 seconds or they're gone.",
+    "Set up affiliate links on day 1. Even with 100 followers, if one person buys through your link, that's money in your pocket.",
+    "30 days of daily posting will teach you more about content than any $997 course. Just start posting.",
+    "Collaborate with creators your size. You're not competing — you're co-growing. DM 3 people in your niche today.",
+    "Affiliate income is the most underrated revenue stream. You're already recommending products to friends for free. Get paid for it.",
+    "You don't need 100K followers for a sponsorship. Micro-influencers (1K-10K) are in demand because their audiences actually trust them.",
+    "Your audience is telling you what product to create. Read your comments and DMs — they're literally handing you business ideas.",
+    "An email list is the one thing no algorithm can take from you. Build it from day 1.",
+  ],
+};
+
+function getLexiTip(hustleType: HustleType, stepNum: number): string {
+  const tips = LEXI_TIPS[hustleType];
+  if (!tips || stepNum < 1 || stepNum > tips.length) return "";
+  return tips[stepNum - 1];
 }
 
 // ─── Hustle Data ────────────────────────────────────────────────────────────
@@ -565,24 +664,24 @@ export default function SideHustlePage() {
     setTimeout(() => setCelebrating(false), 1500);
   };
 
-  const pansyEncouragement = [
-    "You're doing amazing!",
-    "One step closer to your dream!",
-    "Look at you go!",
-    "Keep that momentum going!",
-    "This is YOUR time!",
-    "Proud of you, queen!",
-    "You're building something real!",
-    "The hardest part was starting — you already did that!",
-    "Every step counts. Keep going!",
-    "You've got this, and I've got you!",
+  const encouragement = [
+    { who: "🌺", msg: "You're doing amazing!" },
+    { who: "⚡", msg: "That's the hustle spirit! Keep it moving!" },
+    { who: "🌺", msg: "One step closer to your dream!" },
+    { who: "⚡", msg: "You just leveled up. Next step, let's GO!" },
+    { who: "🌺", msg: "This is YOUR time!" },
+    { who: "⚡", msg: "Most people quit by now. Not you though." },
+    { who: "🌺", msg: "Proud of you, queen!" },
+    { who: "⚡", msg: "The money's getting closer. I can feel it!" },
+    { who: "🌺", msg: "Every step counts. Keep going!" },
+    { who: "⚡", msg: "You're built for this. No question." },
   ];
 
   return (
     <>
       <Head>
         <title>Side Hustle Journey | She Blooms Wealth</title>
-        <meta name="description" content="Follow Pansy's 12-step guided journey to start your side hustle — dropshipping, TikTok Shop, UGC, digital products, freelancing, or content creation." />
+        <meta name="description" content="Follow Lexi's 12-step guided journey to start your side hustle — dropshipping, TikTok Shop, UGC, digital products, freelancing, or content creation." />
       </Head>
       <Layout>
         <div className="min-h-screen" style={{ background: C.bg }}>
@@ -597,16 +696,26 @@ export default function SideHustlePage() {
             {/* ═══ HUSTLE PICKER ═══ */}
             {!selectedHustle && (
               <div className="space-y-6" style={{ animation: "fadeIn 0.5s ease-out" }}>
-                {/* Pansy header */}
-                <div className="flex items-start gap-3 p-4 rounded-2xl" style={{ background: "rgba(39,183,200,0.06)", border: "1px solid rgba(39,183,200,0.12)" }}>
-                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-xl shrink-0" style={{ background: "linear-gradient(135deg, rgba(39,183,200,0.2), rgba(73,176,110,0.2))" }}>
-                    🌺
+                {/* Pansy handoff + Lexi intro */}
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3 p-4 rounded-2xl" style={{ background: "rgba(39,183,200,0.06)", border: "1px solid rgba(39,183,200,0.12)" }}>
+                    <span className="text-xl shrink-0">🌺</span>
+                    <div>
+                      <p className="font-serif text-sm font-semibold" style={{ color: C.accent }}>Pansy says</p>
+                      <p className="text-sm leading-relaxed mt-1" style={{ color: C.textDim }}>
+                        I&apos;m handing you off to someone special for this part. Meet Lexi — she&apos;s built side hustles from scratch and she&apos;s got the real playbook. I&apos;ll still be here when you need me!
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-serif text-sm font-semibold" style={{ color: C.accent }}>Pansy says</p>
-                    <p className="text-sm leading-relaxed mt-1" style={{ color: C.textDim }}>
-                      Pick a hustle that excites you. Each one has 12 clear steps — follow them, and you&apos;ll have a real business. No fluff, no theory. Just do the steps!
-                    </p>
+                  <div className="flex items-start gap-3 p-4 rounded-2xl" style={{ background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.15)" }}>
+                    <span className="text-xl shrink-0">⚡</span>
+                    <div>
+                      <p className="text-sm font-bold" style={{ color: "#F59E0B" }}>Hey, I&apos;m Lexi!</p>
+                      <p className="text-sm leading-relaxed mt-1" style={{ color: C.textDim }}>
+                        I&apos;m the one who&apos;s actually done all this — built stores, gone live, pitched brands, the whole thing. No theory, no fluff. Just what works.
+                        Pick a hustle below and I&apos;ll walk you through every step. Let&apos;s get this money! 💛
+                      </p>
+                    </div>
                   </div>
                 </div>
 
@@ -676,20 +785,31 @@ export default function SideHustlePage() {
                   </div>
                 </div>
 
-                {/* Pansy intro */}
-                <div className="flex items-start gap-3 p-4 rounded-2xl" style={{ background: "rgba(39,183,200,0.06)", border: "1px solid rgba(39,183,200,0.12)" }}>
-                  <span className="text-lg">🌺</span>
-                  <p className="text-sm leading-relaxed" style={{ color: C.textDim }}>{hustle.pansyIntro}</p>
+                {/* Lexi intro */}
+                <div className="flex items-start gap-3 p-4 rounded-2xl" style={{ background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.15)" }}>
+                  <span className="text-lg">⚡</span>
+                  <div>
+                    <p className="text-xs font-bold" style={{ color: "#F59E0B" }}>Lexi</p>
+                    <p className="text-sm leading-relaxed mt-1" style={{ color: C.textDim }}>{hustle.pansyIntro}</p>
+                  </div>
                 </div>
 
                 {/* Journey complete banner */}
                 {journeyComplete && (
-                  <div className="p-5 rounded-2xl text-center" style={{ background: `linear-gradient(135deg, ${hustle.color}15, ${C.accent}10)`, border: `1px solid ${hustle.color}30` }}>
+                  <div className="p-5 rounded-2xl text-center space-y-3" style={{ background: `linear-gradient(135deg, ${hustle.color}15, ${C.accent}10)`, border: `1px solid ${hustle.color}30` }}>
                     <div className="text-4xl mb-2">🎉</div>
                     <h2 className="font-bold text-lg mb-1" style={{ color: C.text }}>You Did It!</h2>
                     <p className="text-sm" style={{ color: C.textDim }}>
-                      All 12 steps complete — you&apos;re officially in business! Pansy is SO proud of you.
+                      All 12 steps complete — you&apos;re officially in business!
                     </p>
+                    <div className="flex flex-col gap-2 pt-2">
+                      <p className="text-xs" style={{ color: "#F59E0B" }}>
+                        ⚡ <strong>Lexi:</strong> Most people just TALK about starting a business. You actually DID it. All 12 steps. That&apos;s rare. I&apos;m impressed.
+                      </p>
+                      <p className="text-xs italic" style={{ color: C.accent }}>
+                        🌺 <strong>Pansy:</strong> From zero to a real business owner. We always knew you had it in you. So proud! 💛
+                      </p>
+                    </div>
                   </div>
                 )}
 
@@ -776,10 +896,24 @@ export default function SideHustlePage() {
                               </div>
                             </div>
 
-                            {/* Pansy tip */}
-                            <div className="flex items-start gap-2 p-3 rounded-xl" style={{ background: "rgba(39,183,200,0.06)" }}>
-                              <span className="text-sm shrink-0">🌺</span>
-                              <p className="text-xs leading-relaxed italic" style={{ color: C.accent }}>{s.pansyTip}</p>
+                            {/* Lexi + Pansy tips */}
+                            <div className="space-y-2">
+                              {getLexiTip(selectedHustle!, s.step) && (
+                                <div className="flex items-start gap-2 p-3 rounded-xl" style={{ background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.1)" }}>
+                                  <span className="text-sm shrink-0">⚡</span>
+                                  <div>
+                                    <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "#F59E0B" }}>Lexi</span>
+                                    <p className="text-xs leading-relaxed mt-0.5" style={{ color: C.textDim }}>{getLexiTip(selectedHustle!, s.step)}</p>
+                                  </div>
+                                </div>
+                              )}
+                              <div className="flex items-start gap-2 p-3 rounded-xl" style={{ background: "rgba(39,183,200,0.06)" }}>
+                                <span className="text-sm shrink-0">🌺</span>
+                                <div>
+                                  <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: C.accent }}>Pansy</span>
+                                  <p className="text-xs leading-relaxed italic mt-0.5" style={{ color: C.accent }}>{s.pansyTip}</p>
+                                </div>
+                              </div>
                             </div>
 
                             {/* Complete button */}
@@ -813,7 +947,8 @@ export default function SideHustlePage() {
                 {celebrating && !journeyComplete && (
                   <div className="fixed bottom-24 left-1/2 -translate-x-1/2 px-6 py-3 rounded-2xl z-50" style={{ background: `linear-gradient(135deg, ${hustle.color}, ${C.accent})`, boxShadow: `0 8px 30px ${hustle.color}40`, animation: "popIn 0.4s ease-out" }}>
                     <p className="text-sm font-bold text-center" style={{ color: C.bg }}>
-                      🌺 {pansyEncouragement[completedSteps.length % pansyEncouragement.length]}
+                      {encouragement[completedSteps.length % encouragement.length].who}{" "}
+                      {encouragement[completedSteps.length % encouragement.length].msg}
                     </p>
                   </div>
                 )}

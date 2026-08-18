@@ -515,7 +515,7 @@ export default function LandingPage() {
                 { icon:"📊", title:"Paper Trading Simulator", desc:"Practice buying and selling stocks with $10,000 fake money. Real market prices, zero risk. Test 32 strategies before you risk a cent." },
                 { icon:"🌺", title:"Your Friendly Guide — Pansy", desc:"Your personal financial coach who explains everything in plain language. Ask anything, get honest answers. No jargon, no judgment." },
                 { icon:"🏦", title:"Budget Tracker", desc:"See where your money actually goes. Track expenses by category, get Pansy's tips, and build the habits that lead to wealth." },
-                { icon:"💰", title:"16 Side Hustle Lessons", desc:"Start making money with $0. Real estate cash flow, digital products, freelancing, and building income streams from scratch. No startup capital needed." },
+                { icon:"💰", title:"12-Step Side Hustle Journeys", desc:"Pick a hustle — dropshipping, TikTok Shop, UGC, digital products, freelancing, or content creation — and follow 12 guided steps to launch your business from $0." },
                 { icon:"🎓", title:"Earn Your Certificate", desc:"Complete the program and earn a real certificate of completion. Track your progress with daily streaks, achievement badges, XP levels, and leaderboards." },
               ].map((item) => (
                 <div key={item.title} style={{ ...glass, borderRadius:14, padding:"1.25rem", boxShadow:"0 4px 24px rgba(0,0,0,0.24)" }}>
@@ -656,7 +656,7 @@ export default function LandingPage() {
               <ul className="space-y-3">
                 {[
                   "36 core lessons — stocks, ETFs, dividends, budgeting, retirement",
-                  "16 side hustle lessons — start earning with $0 in your pocket",
+                  "6 side hustle journeys — 12 guided steps each to launch a real business",
                   "32 trading & investing strategies with real entry/exit rules",
                   "9-module university — deep dives into real estate, options, psychology",
                   "Paper trading simulator — practice with $10K fake money, zero risk",
