@@ -18,6 +18,7 @@ const db = supabase as any;
 const AFF = {
   printful: "https://www.printful.com/a/YOUR_ID",
   hostinger: "https://www.hostinger.com?REFERRALCODE=K6ZBREAKTHFA",
+  tiktok: "https://getstartedtiktok.partnerlinks.io/272zlcx1b9wq",
 };
 
 const C = {
@@ -294,6 +295,7 @@ const HUSTLES: HustleInfo[] = [
         summary: "Switch to a business account and optimize your profile for selling.",
         content: "Download TikTok (if you haven't already) and create an account. Go to Settings → Manage Account → Switch to Business Account. Pick a category that matches what you'll sell.\n\nYour bio is your storefront. Include: what you sell, why you're different, and a call to action. Example: \"Viral beauty finds that actually work ✨ Shop below 👇\" Keep it short, clear, and add relevant emojis.\n\nUse a clean profile picture — your logo or a bright, clear photo of you if you plan to be on camera. First impressions matter, and your profile is your first impression.",
         actions: ["Create a TikTok account and switch to Business", "Write a bio that tells people exactly what you sell", "Add a professional profile picture"],
+        links: [{ label: "Get Started with TikTok →", url: AFF.tiktok }],
         pansyTip: "Your TikTok name should be easy to spell and remember. If people can't find you by searching, you're losing customers!",
         time: "20 min",
       },
@@ -312,6 +314,7 @@ const HUSTLES: HustleInfo[] = [
         summary: "Register as a seller on TikTok Shop and set up your store.",
         content: "Go to seller-us.tiktok.com (or your country's version) and apply to become a TikTok Shop seller. You'll need: a government ID, a phone number, and a business address (your home address works).\n\nApproval usually takes 1-3 business days. While you wait, keep studying successful sellers in your niche. Look at how they organize their shop, what their bestsellers are, and how they price things.\n\nOnce approved, set up your shop: add your logo, write a shop description, and configure your shipping templates. TikTok handles payment processing, so you don't need to worry about that.",
         actions: ["Apply at seller-us.tiktok.com with your ID and info", "While waiting for approval, study 5 successful TikTok shops in your niche", "Once approved, customize your shop profile and settings"],
+        links: [{ label: "Start Your TikTok Shop →", url: AFF.tiktok }],
         pansyTip: "Don't stress about the application — it's straightforward. Most people get approved within 48 hours!",
         time: "30 min + wait",
       },
