@@ -2,7 +2,8 @@ import { ReactNode, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { Home, Search, User, GraduationCap, TrendingUp, ChevronLeft } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { pageVariants, pageTransition } from "@/lib/motion";
 import { PansyMilestones } from "./PansyMilestones";
 import { PansyPsychologyToast } from "./PansyPsychologyToast";
 import { PansyAssistant } from "./PansyAssistant";
@@ -101,7 +102,19 @@ export function Layout({ children }: LayoutProps) {
       </header>
 
       {/* Main Content - add top padding when banner is showing */}
-      <main className={cn("flex-1 w-full", !isLoading && !isLoggedIn && "pt-[60px]")}>{children}</main>
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.main
+          key={currentPath}
+          variants={pageVariants}
+          initial="initial"
+          animate="enter"
+          exit="exit"
+          transition={pageTransition}
+          className={cn("flex-1 w-full", !isLoading && !isLoggedIn && "pt-[60px]")}
+        >
+          {children}
+        </motion.main>
+      </AnimatePresence>
 
       {/* Pansy Floating Assistant */}
       <PansyAssistant />

@@ -561,7 +561,9 @@ export default function BudgetTracker() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              whileTap={{ scale: 0.95 }}
+              whileTap={{ scale: 0.95, y: 1 }}
+              whileHover={{ scale: 1.02, boxShadow: "0 8px 28px rgba(39,183,200,0.3)" }}
+              transition={{ type: "spring", stiffness: 400, damping: 22 }}
               onClick={() => { setShowForm(true); haptic(); }}
               className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-lg shadow-primary/20"
             >

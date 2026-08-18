@@ -15,6 +15,7 @@ import {
   ChevronRight, Flame, Sparkles, Play, Target, Trophy,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { fadeUp, staggerContainer, staggerChild, cardHover } from "@/lib/motion";
 import { TimeGreeting } from "@/components/TimeGreeting";
 import { GemsLeaderboard } from "@/components/GemsLeaderboard";
 import { PansyContextCard } from "@/components/PansyContextCard";
@@ -24,6 +25,7 @@ import { TrophyCase } from "@/components/TrophyCase";
 import { PushNotificationPrompt } from "@/components/PushNotificationPrompt";
 import { AdMobBanner } from "@/components/AdMobBanner";
 
+import { haptic as hx } from "@/lib/motion";
 const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
 const cardSpring = { type: "spring" as const, stiffness: 400, damping: 25 };
 const db = supabase as any;
@@ -480,8 +482,17 @@ export default function Home() {
             <p className="text-sm text-muted-foreground leading-relaxed">{coach.message}</p>
             <Link href={coach.action.href}>
               <motion.button
-                whileTap={{ scale: 0.96 }}
-                onClick={() => haptic(12)}
+                whileTap={{ scale: 0.94, y: 1 }}
+                whileHover={{
+                  scale: 1.02,
+                  boxShadow: recommendedPath === "hustle"
+                    ? "0 6px 24px rgba(73,176,110,0.35)"
+                    : recommendedPath === "budget"
+                    ? "0 6px 24px rgba(245,158,11,0.35)"
+                    : "0 6px 24px rgba(39,183,200,0.35)",
+                }}
+                transition={{ type: "spring", stiffness: 400, damping: 22 }}
+                onClick={() => hx.bloom()}
                 className="w-full py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 mt-2"
                 style={{
                   background: recommendedPath === "hustle"
@@ -576,7 +587,14 @@ export default function Home() {
         />
 
         {/* ══════ TODAY ══════ */}
-        <div className="space-y-3">
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ type: "spring", stiffness: 300, damping: 28 }}
+          className="space-y-3"
+        >
           <h3 className="font-serif text-base font-bold text-foreground">Today</h3>
 
           <DailyChallenge />
@@ -606,7 +624,7 @@ export default function Home() {
               </div>
             </div>
           </motion.div>
-        </div>
+        </motion.div>
 
         <PushNotificationPrompt />
 
@@ -615,7 +633,14 @@ export default function Home() {
         <TrophyCase />
 
         {/* ══════ LEADERBOARDS ══════ */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.15 }}
+          transition={{ type: "spring", stiffness: 300, damping: 28 }}
+          className="grid grid-cols-1 md:grid-cols-2 gap-4"
+        >
           <GemsLeaderboard />
 
           <Link href="/practice" className="block">
@@ -664,10 +689,16 @@ export default function Home() {
               )}
             </div>
           </Link>
-        </div>
+        </motion.div>
 
         {/* ══════ QUICK ACTIONS ══════ */}
-        <div className="space-y-3">
+        <motion.div
+          variants={staggerContainer(0.08)}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+          className="space-y-3"
+        >
           <h3 className="font-serif text-base font-bold text-foreground">Quick Actions</h3>
           <div className="grid grid-cols-4 gap-3">
             {[
@@ -675,15 +706,13 @@ export default function Home() {
               { href: "/paper-trader-v2", label: "Trade", icon: <TrendingUp className="w-6 h-6" />, color: "#49B06E" },
               { href: "/budget-tracker", label: "Budget", icon: <Target className="w-6 h-6" />, color: "#F59E0B" },
               { href: "/ask-pansy", label: "Pansy", icon: <MessageCircle className="w-6 h-6" />, color: "#8B5CF6" },
-            ].map((action, i) => (
+            ].map((action) => (
               <Link key={action.href} href={action.href}>
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.7, y: 20 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  transition={{ delay: 0.4 + i * 0.1, type: "spring", stiffness: 300, damping: 18 }}
+                  variants={staggerChild}
                   whileTap={{ scale: 0.85 }}
                   whileHover={{ scale: 1.1, boxShadow: `0 8px 24px ${action.color}25` }}
-                  onClick={() => haptic()}
+                  onClick={() => hx.tap()}
                   className="flex flex-col items-center gap-2 p-3 bg-card border border-border rounded-2xl transition-colors"
                   style={{ boxShadow: `0 2px 8px ${action.color}10` }}
                 >
@@ -700,7 +729,7 @@ export default function Home() {
               </Link>
             ))}
           </div>
-        </div>
+        </motion.div>
 
         <AdMobBanner format="banner" />
 
