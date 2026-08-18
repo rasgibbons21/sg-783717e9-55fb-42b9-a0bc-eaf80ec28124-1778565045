@@ -68,10 +68,10 @@ export function Layout({ children }: LayoutProps) {
               <motion.button
                 whileTap={{ scale: 0.85 }}
                 onClick={() => { haptic(); router.back(); }}
-                className="flex items-center justify-center w-9 h-9 -ml-2 rounded-full text-foreground/50 hover:text-foreground hover:bg-accent/10 transition-colors"
+                className="flex items-center justify-center w-9 h-9 -ml-2 rounded-full bg-accent/10 text-accent hover:bg-accent/20 transition-colors"
                 aria-label="Go back"
               >
-                <ChevronLeft className="w-5 h-5" />
+                <ChevronLeft className="w-5 h-5 stroke-[2.5]" />
               </motion.button>
             )}
             <Link href="/home" className="flex items-center gap-3">

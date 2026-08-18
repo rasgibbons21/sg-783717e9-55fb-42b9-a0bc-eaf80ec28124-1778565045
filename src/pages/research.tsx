@@ -319,7 +319,7 @@ export default function ResearchPage() {
           {!authLoading && isPro && (
             <>
               {/* Search */}
-              <form onSubmit={handleSubmit} className="mb-4">
+              <form onSubmit={handleSubmit} className="relative mb-4">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/30" />
                   <input
@@ -344,7 +344,7 @@ export default function ResearchPage() {
                   </button>
                 </div>
                 {showSym && symResults.length > 0 && (
-                  <div className="absolute z-20 left-4 right-4 mt-1 bg-card border border-accent/20 rounded-xl overflow-hidden shadow-xl max-h-56 overflow-y-auto">
+                  <div className="absolute z-20 left-0 right-0 mt-1 bg-card border border-accent/20 rounded-xl overflow-hidden shadow-xl max-h-56 overflow-y-auto">
                     {symResults.map((r) => (
                       <button
                         key={r.symbol}

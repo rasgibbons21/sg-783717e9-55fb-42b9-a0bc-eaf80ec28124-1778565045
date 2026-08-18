@@ -2424,19 +2424,18 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
         >
           <div className="max-w-3xl mx-auto p-6 space-y-6">
             <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="sm"
+              <button
                 onClick={() => {
+                  haptic();
                   setSelectedLesson(null);
                   setHasScrolledToBottom(false);
                   resetQuiz();
                 }}
-                className="text-muted-foreground hover:text-foreground"
+                className="flex items-center gap-2 px-4 py-2 rounded-full bg-accent/15 text-accent font-semibold text-sm hover:bg-accent/25 active:scale-95 transition-all"
               >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to lessons
-              </Button>
+                <ArrowLeft className="w-4 h-4" />
+                Back to Lessons
+              </button>
             </div>
 
             <Card className="p-6 bg-card border-border rounded-2xl space-y-4">
