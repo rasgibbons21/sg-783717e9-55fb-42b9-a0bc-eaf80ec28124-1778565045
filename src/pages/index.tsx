@@ -630,10 +630,27 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ── 2. MEET PANSY ───────────────────────────────────────────────── */}
+        {/* ── 2. PANSY'S STORY ─────────────────────────────────────────── */}
         <section className="max-w-6xl mx-auto px-4 py-14 md:px-12 md:py-20">
-          <div className="flex flex-col md:flex-row items-start gap-10 md:gap-14">
-            <div className="flex-1 flex justify-center">
+
+          {/* Story header */}
+          <div className="text-center mb-12 md:mb-16">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold tracking-wide uppercase mb-5"
+              style={{ background:`${C.green}18`, color:C.green, border:`1px solid ${C.green}30` }}>
+              🌺 Before she was your guide
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold leading-tight mb-4" style={{ fontFamily:"'Cormorant Garamond', serif", color:C.ivory }}>
+              Pansy&apos;s story is probably <span style={gradientText}>your story too</span>
+            </h2>
+            <p className="text-base max-w-xl mx-auto" style={{ color:"rgba(244,247,250,0.55)" }}>
+              She didn&apos;t come from money. She built it — one decision at a time.
+            </p>
+          </div>
+
+          <div className="flex flex-col md:flex-row items-center gap-10 md:gap-14">
+
+            {/* Pansy image */}
+            <div className="flex-shrink-0 flex justify-center md:w-2/5">
               <div className="relative w-full max-w-xs">
                 <div className="absolute inset-0 rounded-3xl blur-2xl opacity-20"
                   style={{ background:`radial-gradient(circle at 50% 60%, ${C.green}, transparent 70%)` }} />
@@ -641,41 +658,94 @@ export default function LandingPage() {
                   className="relative rounded-3xl object-cover w-full" />
               </div>
             </div>
-            <div className="flex-1 space-y-6">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold tracking-wide uppercase"
-                style={{ background:`${C.green}18`, color:C.green, border:`1px solid ${C.green}30` }}>
-                🌺 Your guide to financial independence
-              </div>
-              <h2 className="text-3xl md:text-4xl font-bold leading-tight" style={{ color:C.ivory }}>
-                Meet Pansy — your <span style={gradientText}>friendly money mentor</span>
-              </h2>
-              <p className="text-base leading-relaxed" style={{ color:"rgba(244,247,250,0.72)" }}>
-                Most financial education is written by men, for men, in language designed to make you feel stupid.
-                Pansy is different. She explains how money <em>actually</em> works — clearly, honestly, and without talking down to you.
-              </p>
-              <ul className="space-y-3">
-                {[
-                  "36 core lessons — stocks, ETFs, dividends, budgeting, retirement",
-                  "6 side hustle journeys — 12 guided steps each to launch a real business",
-                  "32 trading & investing strategies with real entry/exit rules",
-                  "9-module university — deep dives into real estate, options, psychology",
-                  "Paper trading simulator — practice with $10K fake money, zero risk",
-                  "Earn a certificate of completion to prove your knowledge",
-                  "Daily streaks, badges, XP levels, and a community leaderboard",
-                ].map(item => (
-                  <li key={item} className="flex items-start gap-3 text-sm" style={{ color:"rgba(244,247,250,0.80)" }}>
-                    <span className="mt-0.5 shrink-0" style={{ color:C.green }}>✓</span>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <p className="text-base font-medium pt-2" style={{ color:C.teal }}>
-                Financial independence isn&apos;t a privilege — it&apos;s a skill. And we&apos;re going to teach you.
-              </p>
-              <p className="text-xs" style={{ color:"rgba(244,247,250,0.35)" }}>
-                Educational only. Not financial advice. Pansy never tells you what to buy or sell.
-              </p>
+
+            {/* Story timeline */}
+            <div className="flex-1 space-y-0">
+              {[
+                {
+                  emoji: "😔",
+                  title: "Single mom. Two kids. Barely making it.",
+                  text: "Pansy was working a job that didn't pay enough. Underemployed, underpaid, exhausted. She thought about getting a second job — but daycare would eat every dollar she earned. The math never worked.",
+                },
+                {
+                  emoji: "💡",
+                  title: "One night, she Googled \"how to make money from home.\"",
+                  text: "While the kids were sleeping, she started learning. Side hustles. Dropshipping. Digital products. Things she could build from her phone after bedtime. No boss. No babysitter. No permission needed.",
+                },
+                {
+                  emoji: "📒",
+                  title: "First, she learned where her money was going.",
+                  text: "Before she could grow money, she had to stop losing it. She tracked every dollar. Cut what didn't matter. Found $300 a month she didn't know she had. Budgeting wasn't boring — it was freedom.",
+                },
+                {
+                  emoji: "📈",
+                  title: "The side hustle money started coming in.",
+                  text: "It wasn't a flood — it was a trickle. Then a stream. She didn't spend it. She learned about investing. Stocks, ETFs, dividends. She put that extra income to work while she slept.",
+                },
+                {
+                  emoji: "🔥",
+                  title: "She fired her boss.",
+                  text: "It didn't happen overnight. But one morning she did the math and realized her investments and her side hustle income covered her bills. She walked in, gave her notice, and never looked back.",
+                },
+                {
+                  emoji: "🌸",
+                  title: "Now she's actually living.",
+                  text: "Picking her kids up from school. Making Tuesday pancakes. Taking trips that used to be \"someday\" trips. Creating memories instead of missing them. Not rich — free.",
+                },
+              ].map((step, i, arr) => (
+                <div key={i} className="flex gap-4">
+                  {/* Timeline line */}
+                  <div className="flex flex-col items-center shrink-0">
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg shrink-0"
+                      style={{ background: i === arr.length - 1 ? `linear-gradient(135deg, ${C.teal}, ${C.green})` : "rgba(255,255,255,0.06)", border: i === arr.length - 1 ? "none" : "1px solid rgba(255,255,255,0.08)" }}>
+                      {step.emoji}
+                    </div>
+                    {i < arr.length - 1 && (
+                      <div className="w-px flex-1 min-h-[24px]" style={{ background:`linear-gradient(to bottom, rgba(39,183,200,0.3), rgba(39,183,200,0.05))` }} />
+                    )}
+                  </div>
+                  {/* Content */}
+                  <div className="pb-8">
+                    <p className="text-sm font-bold mb-1.5" style={{ color:C.ivory }}>{step.title}</p>
+                    <p className="text-sm leading-relaxed" style={{ color:"rgba(244,247,250,0.58)" }}>{step.text}</p>
+                  </div>
+                </div>
+              ))}
             </div>
+          </div>
+
+          {/* Emotional bridge + what you get */}
+          <div className="mt-10 md:mt-14 text-center space-y-6">
+            <div style={{ ...glass, borderRadius:16, padding:"1.5rem 1.75rem", maxWidth:640, margin:"0 auto", boxShadow:`0 4px 28px rgba(0,0,0,0.28)` }}>
+              <p className="text-base leading-relaxed italic" style={{ color:"rgba(244,247,250,0.82)" }}>
+                &ldquo;That&apos;s the dream, right? Not a mansion or a yacht. Just <strong style={{ color:C.ivory }}>time</strong>.
+                Time with your kids. Time for yourself. Time to live while you&apos;re alive.
+                I built Bloom so you don&apos;t have to figure it out alone like I did.&rdquo;
+              </p>
+              <p className="text-sm font-semibold mt-3" style={{ color:C.teal }}>— Pansy</p>
+            </div>
+
+            <p className="text-sm font-semibold pt-4" style={{ color:"rgba(244,247,250,0.50)" }}>
+              EVERYTHING PANSY LEARNED IS NOW INSIDE BLOOM — FOR FREE
+            </p>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto pt-2">
+              {[
+                { num: "150+", label: "Lessons & Strategies" },
+                { num: "6", label: "Side Hustle Journeys" },
+                { num: "$10K", label: "Paper Trading Sim" },
+                { num: "1", label: "Certificate of Completion" },
+              ].map(stat => (
+                <div key={stat.label} style={{ ...glass, borderRadius:12, padding:"1rem 0.75rem" }}>
+                  <p className="text-xl font-bold" style={gradientText}>{stat.num}</p>
+                  <p className="text-xs mt-1" style={{ color:"rgba(244,247,250,0.50)" }}>{stat.label}</p>
+                </div>
+              ))}
+            </div>
+
+            <p className="text-xs pt-2" style={{ color:"rgba(244,247,250,0.30)" }}>
+              Educational only. Not financial advice. Pansy never tells you what to buy or sell.
+            </p>
           </div>
         </section>
 
