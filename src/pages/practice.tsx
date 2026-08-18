@@ -1053,7 +1053,7 @@ export default function PracticePage(_props: PageProps) {
               {showProUpsell && <ProUpsellBanner />}
               {showAds && (
                 <div className="mb-4">
-                  <AdMobBanner adUnitId="1111111111" format="banner" />
+                  <AdMobBanner format="banner" />
                 </div>
               )}
 

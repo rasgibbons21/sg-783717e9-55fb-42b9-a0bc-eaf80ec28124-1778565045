@@ -103,7 +103,7 @@ export default function LeaderboardPage() {
 
             {showAds && (
               <div className="mb-4">
-                <AdMobBanner adUnitId="1111111111" format="banner" />
+                <AdMobBanner format="banner" />
               </div>
             )}
 
@@ -237,7 +237,7 @@ export default function LeaderboardPage() {
 
             {showAds && (
               <div className="mt-6">
-                <AdMobBanner adUnitId="2222222222" format="rectangle" />
+                <AdMobBanner format="rectangle" />
               </div>
             )}
 

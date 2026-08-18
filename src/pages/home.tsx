@@ -22,6 +22,7 @@ import { StreakCalendar } from "@/components/StreakCalendar";
 import { DailyChallenge } from "@/components/DailyChallenge";
 import { TrophyCase } from "@/components/TrophyCase";
 import { PushNotificationPrompt } from "@/components/PushNotificationPrompt";
+import { AdMobBanner } from "@/components/AdMobBanner";
 
 const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
 const cardSpring = { type: "spring" as const, stiffness: 400, damping: 25 };
@@ -474,6 +475,9 @@ export default function Home() {
             </div>
           </Link>
         </div>
+
+        {/* ══════ AD ══════ */}
+        <AdMobBanner format="banner" />
 
         {/* ══════ QUICK ACTIONS ══════ */}
         <div className="space-y-3">

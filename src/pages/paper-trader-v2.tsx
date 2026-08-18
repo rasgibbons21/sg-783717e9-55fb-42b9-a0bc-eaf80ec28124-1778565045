@@ -432,7 +432,7 @@ export default function PaperTraderV2() {
           {/* Ad: Top */}
           {showAds && (
             <div className="px-4 mb-3">
-              <AdMobBanner adUnitId="1111111111" format="banner" />
+              <AdMobBanner format="banner" />
             </div>
           )}
 
@@ -957,7 +957,7 @@ export default function PaperTraderV2() {
           {/* Ad: Bottom */}
           {showAds && (
             <div className="px-4 mt-4 mb-3">
-              <AdMobBanner adUnitId="2222222222" format="rectangle" />
+              <AdMobBanner format="rectangle" />
             </div>
           )}
 

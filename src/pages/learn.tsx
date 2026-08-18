@@ -18,6 +18,7 @@ import { Search, ArrowLeft, Clock, CheckCircle2, Circle, ChevronRight, Bookmark,
 import confetti from "canvas-confetti";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { AdMobBanner } from "@/components/AdMobBanner";
 import { UpgradeModal } from "@/components/UpgradeModal";
 import { BloomGarden } from "@/components/BloomGarden";
 import { PansyContextCard } from "@/components/PansyContextCard";
@@ -3335,6 +3336,8 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
               Your foundation — investing explained by Pansy in girlfriend language
             </p>
           </div>
+
+          <AdMobBanner format="banner" />
 
           <Card className="p-6 bg-card border-accent/20 rounded-2xl">
             <div className="flex items-center justify-between mb-2">

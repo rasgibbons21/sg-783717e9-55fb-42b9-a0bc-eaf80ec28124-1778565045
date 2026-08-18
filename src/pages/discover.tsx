@@ -18,6 +18,7 @@ import { Search, TrendingUp, TrendingDown, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { userService } from "@/services/userService";
 import { supabase } from "@/integrations/supabase/client";
+import { AdMobBanner } from "@/components/AdMobBanner";
 import { UpgradeBanner } from "@/components/UpgradeModal";
 import { canShowExternalPayment } from "@/lib/payments";
 import { PansyContextCard } from "@/components/PansyContextCard";
@@ -369,6 +370,7 @@ export default function Discover() {
         description="Explore stocks, ETFs, and mutual funds with Pansy's expert analysis"
       />
       <div className="container-full py-8 space-y-6 pb-24">
+        <AdMobBanner format="banner" />
         {/* Market Summary Bar */}
         <Card className="p-4 bg-card border-border rounded-2xl">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

@@ -10,6 +10,7 @@ const db = supabase as any;
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Trash2, TrendingDown, DollarSign, PieChart, Sparkles } from "lucide-react";
 import confetti from "canvas-confetti";
+import { AdMobBanner } from "@/components/AdMobBanner";
 
 const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
 
@@ -321,6 +322,9 @@ export default function BudgetTracker() {
             </div>
           </motion.div>
         )}
+
+        {/* ── AD ──────────────────────────────────────────────── */}
+        <AdMobBanner format="rectangle" />
 
         {/* ── PANSY TIP ──────────────────────────────────────── */}
         <motion.div
