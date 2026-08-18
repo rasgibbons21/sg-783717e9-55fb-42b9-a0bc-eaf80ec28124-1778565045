@@ -743,6 +743,13 @@ export default function LandingPage() {
                   ))}
                 </div>
               </div>
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-wide" style={{ color:"rgba(244,247,250,0.35)" }}>Contact</p>
+                <div className="flex flex-col gap-1.5">
+                  <Link href="/contact" className="text-xs transition-colors hover:text-white" style={{ color:"rgba(244,247,250,0.40)" }}>Contact Us</Link>
+                  <a href="mailto:cindervaultenterprisesllc@gmail.com" className="text-xs transition-colors hover:text-white" style={{ color:"rgba(244,247,250,0.40)" }}>cindervaultenterprisesllc@gmail.com</a>
+                </div>
+              </div>
             </div>
             <div style={{ borderTop:"1px solid rgba(255,255,255,0.06)" }} className="pt-6 space-y-2">
               <p className="text-xs" style={{ color:"rgba(244,247,250,0.28)" }}>

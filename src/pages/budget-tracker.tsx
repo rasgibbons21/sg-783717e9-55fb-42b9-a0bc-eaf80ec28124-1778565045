@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any;
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Trash2, TrendingDown, DollarSign, PieChart, Sparkles, AlertTriangle, CheckCircle, ArrowRight, Target } from "lucide-react";
+import { Plus, Trash2, TrendingDown, TrendingUp as TrendUp, DollarSign, PieChart, Sparkles, AlertTriangle, CheckCircle, ArrowRight, Target, Wallet } from "lucide-react";
 import confetti from "canvas-confetti";
 import { AdMobBanner } from "@/components/AdMobBanner";
 
@@ -59,14 +59,36 @@ interface SpendingInsight {
   emoji: string;
 }
 
-function analyzeSpending(totals: Record<string, number>, total: number, entryCount: number): SpendingInsight[] {
+function analyzeSpending(totals: Record<string, number>, total: number, entryCount: number, income?: number | null): SpendingInsight[] {
   if (entryCount < 3 || total < 10) return [];
   const insights: SpendingInsight[] = [];
   const pct = (cat: string) => total > 0 ? ((totals[cat] || 0) / total) * 100 : 0;
+  const incPct = (cat: string) => income && income > 0 ? ((totals[cat] || 0) / income) * 100 : 0;
 
+  if (income && income > 0) {
+    const spendRatio = (total / income) * 100;
+    const disposable = income - total;
+    if (spendRatio > 95) {
+      insights.push({ severity: "warning", emoji: "🚨", title: "Almost no money left this month", message: `You've spent ${spendRatio.toFixed(0)}% of your $${income.toLocaleString()} income. That leaves only $${Math.max(0, disposable).toFixed(0)} for savings and emergencies. Let's find your biggest cost and see if we can trim it.` });
+    } else if (spendRatio > 80) {
+      insights.push({ severity: "info", emoji: "📊", title: `$${disposable.toFixed(0)} left to work with`, message: `You've used ${spendRatio.toFixed(0)}% of your income. Aim to keep spending under 80% so you can save at least 20% ($${(income * 0.2).toFixed(0)}/month). Even small cuts compound.` });
+    } else if (spendRatio <= 60 && total > 100) {
+      insights.push({ severity: "positive", emoji: "💪", title: `$${disposable.toFixed(0)} in disposable income!`, message: `Only ${spendRatio.toFixed(0)}% of your income is going to expenses. That surplus is powerful — consider putting it into a high-yield savings account or index fund.` });
+    }
+  }
+
+  const housingVal = totals["Rent/Housing"] || 0;
+  const housingInc = income && income > 0 ? incPct("Rent/Housing") : 0;
   const housingPct = pct("Rent/Housing");
-  if (housingPct > 40) {
-    insights.push({ severity: "warning", emoji: "🏠", title: "Housing is eating your income", message: `${housingPct.toFixed(0)}% of your spending is on housing. The guideline is under 30%. If you're above 40%, it's squeezing everything else — savings, investing, even breathing room. Can you negotiate rent, get a roommate, or explore other options?` });
+
+  if (income && income > 0 && housingVal > 0) {
+    if (housingInc > 30) {
+      insights.push({ severity: "warning", emoji: "🏠", title: "Housing takes too much of your income", message: `${housingInc.toFixed(0)}% of your income goes to housing. The 30% rule says this should be lower. Above that, savings and fun money get squeezed hard.` });
+    } else if (housingInc <= 30) {
+      insights.push({ severity: "positive", emoji: "🏠", title: "Housing costs look healthy", message: `${housingInc.toFixed(0)}% of your income on housing — that's within the 30% guideline. You've got room to breathe.` });
+    }
+  } else if (housingPct > 40) {
+    insights.push({ severity: "warning", emoji: "🏠", title: "Housing is eating your budget", message: `${housingPct.toFixed(0)}% of your spending is on housing. The guideline is under 30%. Add your income above so Pansy can give you a clearer picture.` });
   } else if (housingPct > 0 && housingPct <= 30) {
     insights.push({ severity: "positive", emoji: "🏠", title: "Housing costs look healthy", message: `${housingPct.toFixed(0)}% on housing — that's within the recommended 30%. You've got room to breathe and invest.` });
   }
@@ -219,6 +241,9 @@ export default function BudgetTracker() {
   const [monthlyBudget, setMonthlyBudget] = useState<number | null>(null);
   const [showBudgetInput, setShowBudgetInput] = useState(false);
   const [budgetDraft, setBudgetDraft] = useState("");
+  const [monthlyIncome, setMonthlyIncome] = useState<number | null>(null);
+  const [showIncomeInput, setShowIncomeInput] = useState(false);
+  const [incomeDraft, setIncomeDraft] = useState("");
 
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
@@ -243,6 +268,8 @@ export default function BudgetTracker() {
   useEffect(() => {
     const saved = localStorage.getItem("sbw_monthly_budget");
     if (saved) setMonthlyBudget(parseFloat(saved));
+    const savedIncome = localStorage.getItem("sbw_monthly_income");
+    if (savedIncome) setMonthlyIncome(parseFloat(savedIncome));
   }, []);
 
   const totalSpent = entries.reduce((s, e) => s + e.amount, 0);
@@ -253,7 +280,7 @@ export default function BudgetTracker() {
   }, {});
 
   const sortedCategories = Object.entries(categoryTotals).sort(([, a], [, b]) => b - a);
-  const insights = analyzeSpending(categoryTotals, totalSpent, entries.length);
+  const insights = analyzeSpending(categoryTotals, totalSpent, entries.length, monthlyIncome);
   const [showInsights, setShowInsights] = useState(false);
 
   const handleAdd = async () => {
@@ -325,14 +352,65 @@ export default function BudgetTracker() {
         >
           <div className="flex items-center justify-between mb-4">
             <p className="text-sm font-bold text-foreground">{monthLabel(now)}</p>
-            <button
-              onClick={() => { setShowBudgetInput(o => !o); haptic(); }}
-              className="flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors"
-            >
-              <Target className="w-3.5 h-3.5" />
-              {monthlyBudget ? `$${monthlyBudget.toLocaleString()} goal` : "Set budget"}
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => { setShowIncomeInput(o => !o); setShowBudgetInput(false); haptic(); }}
+                className="flex items-center gap-1.5 text-xs font-medium text-accent hover:text-accent/80 transition-colors"
+              >
+                <Wallet className="w-3.5 h-3.5" />
+                {monthlyIncome ? `$${monthlyIncome.toLocaleString()}` : "Set income"}
+              </button>
+              <button
+                onClick={() => { setShowBudgetInput(o => !o); setShowIncomeInput(false); haptic(); }}
+                className="flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors"
+              >
+                <Target className="w-3.5 h-3.5" />
+                {monthlyBudget ? `$${monthlyBudget.toLocaleString()} goal` : "Set budget"}
+              </button>
+            </div>
           </div>
+
+          <AnimatePresence>
+            {showIncomeInput && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="overflow-hidden mb-4"
+              >
+                <label className="block text-xs font-semibold text-muted-foreground mb-1.5">Monthly take-home pay</label>
+                <div className="flex gap-2 pb-2">
+                  <div className="relative flex-1">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
+                    <input
+                      type="number"
+                      inputMode="decimal"
+                      placeholder="3,500"
+                      value={incomeDraft}
+                      onChange={e => setIncomeDraft(e.target.value)}
+                      className="w-full pl-7 pr-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:border-primary"
+                    />
+                  </div>
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      const v = parseFloat(incomeDraft);
+                      if (!isNaN(v) && v > 0) {
+                        setMonthlyIncome(v);
+                        localStorage.setItem("sbw_monthly_income", String(v));
+                        setShowIncomeInput(false);
+                        setIncomeDraft("");
+                        haptic(12);
+                      }
+                    }}
+                    className="px-4 py-2 rounded-lg bg-accent text-accent-foreground text-sm font-semibold"
+                  >
+                    Set
+                  </motion.button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <AnimatePresence>
             {showBudgetInput && (
@@ -342,6 +420,7 @@ export default function BudgetTracker() {
                 exit={{ height: 0, opacity: 0 }}
                 className="overflow-hidden mb-4"
               >
+                <label className="block text-xs font-semibold text-muted-foreground mb-1.5">Monthly spending budget</label>
                 <div className="flex gap-2 pb-2">
                   <div className="relative flex-1">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
@@ -424,6 +503,55 @@ export default function BudgetTracker() {
             </div>
           )}
         </motion.div>
+
+        {/* ── INCOME vs SPENDING ─────────────────────────────── */}
+        {monthlyIncome && monthlyIncome > 0 && totalSpent > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="bg-card border border-border rounded-2xl p-5"
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <TrendUp className="w-4 h-4 text-accent" />
+              <h3 className="text-sm font-bold text-foreground">Income vs Spending</h3>
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Income</span>
+                <span className="font-bold text-[#49B06E]">${monthlyIncome.toLocaleString("en-US", { maximumFractionDigits: 0 })}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Spent so far</span>
+                <span className="font-bold text-foreground">${totalSpent.toLocaleString("en-US", { maximumFractionDigits: 0 })}</span>
+              </div>
+              <div className="w-full bg-muted rounded-full h-3 overflow-hidden relative">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${Math.min((totalSpent / monthlyIncome) * 100, 100)}%` }}
+                  transition={{ duration: 0.8, ease: "easeOut" }}
+                  className="h-full rounded-full"
+                  style={{
+                    background: totalSpent <= monthlyIncome * 0.6
+                      ? "linear-gradient(90deg, #49B06E, #27B7C8)"
+                      : totalSpent <= monthlyIncome * 0.8
+                      ? "linear-gradient(90deg, #F59E0B, #F97316)"
+                      : "linear-gradient(90deg, #E05A6A, #EF4444)",
+                  }}
+                />
+              </div>
+              <div className="flex items-center justify-between pt-1">
+                <span className="text-xs text-muted-foreground">{((totalSpent / monthlyIncome) * 100).toFixed(0)}% of income used</span>
+                <span className={`text-sm font-bold ${totalSpent <= monthlyIncome ? "text-[#49B06E]" : "text-[#E05A6A]"}`}>
+                  {totalSpent <= monthlyIncome
+                    ? `$${(monthlyIncome - totalSpent).toLocaleString("en-US", { maximumFractionDigits: 0 })} left`
+                    : `$${(totalSpent - monthlyIncome).toLocaleString("en-US", { maximumFractionDigits: 0 })} over`}
+                </span>
+              </div>
+            </div>
+          </motion.div>
+        )}
 
         {/* ── ADD EXPENSE BUTTON / FORM ──────────────────────── */}
         <AnimatePresence mode="wait">
