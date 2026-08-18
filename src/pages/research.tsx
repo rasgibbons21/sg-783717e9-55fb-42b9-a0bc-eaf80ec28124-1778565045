@@ -151,6 +151,8 @@ function ProGate() {
 }
 
 // ── Main Page ──────────────────────────────────────────────────────────────
+interface SymbolResult { symbol: string; name: string; }
+
 export default function ResearchPage() {
   const { isPro, isLoading: authLoading } = useSubscription();
 
@@ -166,6 +168,42 @@ export default function ResearchPage() {
   const [panelLoading, setPanelLoading] = useState(false);
   const [error, setError] = useState("");
   const abortRef = useRef<AbortController | null>(null);
+
+  const [symResults, setSymResults] = useState<SymbolResult[]>([]);
+  const [showSym, setShowSym] = useState(false);
+  const [symLoading, setSymLoading] = useState(false);
+  const symTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const searchSymbol = useCallback(async (q: string) => {
+    if (q.length < 2) { setSymResults([]); return; }
+    setSymLoading(true);
+    try {
+      const res = await fetch(`/api/proxy/symbol-search?q=${encodeURIComponent(q)}`);
+      const data = await res.json();
+      setSymResults(data.results || []);
+      setShowSym(true);
+    } catch { setSymResults([]); }
+    finally { setSymLoading(false); }
+  }, []);
+
+  const handleSearchChange = (val: string) => {
+    const upper = val.toUpperCase();
+    setSearch(upper);
+    if (symTimer.current) clearTimeout(symTimer.current);
+    if (val.length >= 2) {
+      symTimer.current = setTimeout(() => searchSymbol(val), 300);
+    } else {
+      setSymResults([]);
+      setShowSym(false);
+    }
+  };
+
+  const pickSymbol = (r: SymbolResult) => {
+    setSearch(r.symbol);
+    setSymResults([]);
+    setShowSym(false);
+    loadStock(r.symbol);
+  };
 
   const fetchOhlc = useCallback(async (sym: string, tf: Timeframe) => {
     if (!sym) return;
@@ -285,14 +323,19 @@ export default function ResearchPage() {
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/30" />
                   <input
-                    className="w-full bg-card border border-accent/20 rounded-xl pl-10 pr-4 py-3 text-foreground font-mono uppercase placeholder:text-foreground/20 placeholder:normal-case focus:outline-none focus:border-accent text-sm"
-                    placeholder="Search ticker — AAPL, SPY, BTC-USD…"
+                    className="w-full bg-card border border-accent/20 rounded-xl pl-10 pr-16 py-3 text-foreground font-mono uppercase placeholder:text-foreground/20 placeholder:normal-case focus:outline-none focus:border-accent text-sm"
+                    placeholder="Search company or ticker…"
                     value={search}
-                    onChange={e => setSearch(e.target.value.toUpperCase())}
+                    onChange={e => handleSearchChange(e.target.value)}
+                    onBlur={() => setTimeout(() => setShowSym(false), 200)}
+                    onFocus={() => { if (symResults.length > 0) setShowSym(true); }}
                     autoCapitalize="characters"
                     autoCorrect="off"
                     spellCheck={false}
                   />
+                  {symLoading && (
+                    <div className="absolute right-14 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-accent/30 border-t-accent rounded-full animate-spin" />
+                  )}
                   <button
                     type="submit"
                     className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1.5 rounded-lg bg-accent text-background text-xs font-bold hover:bg-accent/90 transition-colors"
@@ -300,6 +343,22 @@ export default function ResearchPage() {
                     Go
                   </button>
                 </div>
+                {showSym && symResults.length > 0 && (
+                  <div className="absolute z-20 left-4 right-4 mt-1 bg-card border border-accent/20 rounded-xl overflow-hidden shadow-xl max-h-56 overflow-y-auto">
+                    {symResults.map((r) => (
+                      <button
+                        key={r.symbol}
+                        type="button"
+                        onMouseDown={e => e.preventDefault()}
+                        onClick={() => pickSymbol(r)}
+                        className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-accent/10 transition-colors border-b border-accent/5 last:border-0"
+                      >
+                        <span className="font-mono font-bold text-sm text-accent w-16 shrink-0">{r.symbol}</span>
+                        <span className="text-xs text-foreground/60 truncate">{r.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </form>
 
               {/* Quick picks */}

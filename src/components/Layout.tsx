@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { Home, Search, User, GraduationCap, TrendingUp } from "lucide-react";
+import { Home, Search, User, GraduationCap, TrendingUp, ChevronLeft } from "lucide-react";
 import { motion } from "framer-motion";
 import { PansyMilestones } from "./PansyMilestones";
 import { PansyPsychologyToast } from "./PansyPsychologyToast";
@@ -35,6 +35,11 @@ export function Layout({ children }: LayoutProps) {
     return false;
   };
 
+  const mainPaths = ["/home", "/discover", "/learn", "/paper-trader-v2", "/profile", "/", "/onboarding", "/ask-pansy"];
+  const isInnerPage = !mainPaths.some(p =>
+    p === "/" ? currentPath === "/" : currentPath === p || currentPath.startsWith(p + "/")
+  );
+
 
   useEffect(() => {
     const handleRateLimit = () => {
@@ -57,16 +62,28 @@ export function Layout({ children }: LayoutProps) {
       {/* Top Navbar */}
       <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container-full flex h-16 items-center justify-between">
-          <Link href="/home" className="flex items-center gap-3">
-            <img
-              src="/icon-192.png"
-              alt="Bloom"
-              className="h-8 w-auto rounded-md"
-            />
-            <span className="font-serif text-xl font-bold text-foreground">
-              Bloom
-            </span>
-          </Link>
+          <div className="flex items-center gap-1">
+            {isInnerPage && (
+              <motion.button
+                whileTap={{ scale: 0.85 }}
+                onClick={() => { haptic(); router.back(); }}
+                className="flex items-center justify-center w-9 h-9 -ml-2 rounded-full text-foreground/50 hover:text-foreground hover:bg-accent/10 transition-colors"
+                aria-label="Go back"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </motion.button>
+            )}
+            <Link href="/home" className="flex items-center gap-3">
+              <img
+                src="/icon-192.png"
+                alt="Bloom"
+                className="h-8 w-auto rounded-md"
+              />
+              <span className="font-serif text-xl font-bold text-foreground">
+                Bloom
+              </span>
+            </Link>
+          </div>
 
           <Link
             href="/ask-pansy"
