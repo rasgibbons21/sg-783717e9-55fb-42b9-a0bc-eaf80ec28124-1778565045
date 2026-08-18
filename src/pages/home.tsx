@@ -12,7 +12,7 @@ import { userService } from "@/services/userService";
 import { supabase } from "@/integrations/supabase/client";
 import {
   BookOpen, TrendingUp, MessageCircle,
-  ChevronRight, Flame, Target, Sparkles, Play, Rocket, Wallet, BarChart3, Trophy,
+  ChevronRight, Flame, Sparkles, Play, Target, Trophy,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { TimeGreeting } from "@/components/TimeGreeting";
@@ -28,41 +28,75 @@ const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
 const cardSpring = { type: "spring" as const, stiffness: 400, damping: 25 };
 const db = supabase as any;
 
-const PATHS = [
-  {
-    key: "hustle",
-    title: "Side Hustle",
-    subtitle: "Build income from scratch",
-    emoji: "🚀",
-    icon: Rocket,
-    color: "#49B06E",
-    href: "/side-hustle",
-    desc: "Meet Lexi, your hustle coach. Pick a hustle — dropshipping, TikTok Shop, UGC, digital products, freelancing, or content creation — and follow 12 guided steps.",
-    pansySays: "I'm handing you to Lexi for this one — she's built businesses from scratch and knows what actually works.",
-  },
-  {
-    key: "budget",
-    title: "Budgeting",
-    subtitle: "Take control of your money",
-    emoji: "💰",
-    icon: Wallet,
-    color: "#F59E0B",
-    href: "/budget-tracker",
-    desc: "Track every dollar, see where your money goes, and build the spending habits that create wealth. Pansy analyzes your patterns and shows you what to fix.",
-    pansySays: "You can't grow what you can't see. Let's get honest about where your money goes.",
-  },
-  {
-    key: "invest",
-    title: "Investing",
-    subtitle: "Grow your wealth",
-    emoji: "📈",
-    icon: BarChart3,
-    color: "#27B7C8",
-    href: "/learn",
-    desc: "150+ lessons from beginner to advanced — stocks, ETFs, dividends, retirement, real estate, options. Plus a paper trading simulator to practice risk-free.",
-    pansySays: "Every lesson compounds, just like your future investments will.",
-  },
-];
+function ProgressRing({ percent, size = 120, stroke = 8, color = "#27B7C8", label, sublabel }: {
+  percent: number; size?: number; stroke?: number; color?: string; label: string; sublabel: string;
+}) {
+  const r = (size - stroke) / 2;
+  const circ = 2 * Math.PI * r;
+  const offset = circ - (percent / 100) * circ;
+  return (
+    <div className="flex flex-col items-center gap-2">
+      <div className="relative" style={{ width: size, height: size }}>
+        <svg width={size} height={size} className="-rotate-90">
+          <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="hsl(var(--border))" strokeWidth={stroke} />
+          <motion.circle
+            cx={size / 2} cy={size / 2} r={r} fill="none"
+            stroke={color} strokeWidth={stroke} strokeLinecap="round"
+            strokeDasharray={circ}
+            initial={{ strokeDashoffset: circ }}
+            animate={{ strokeDashoffset: offset }}
+            transition={{ duration: 1, ease: "easeOut" }}
+          />
+        </svg>
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <span className="text-2xl font-bold text-foreground">{percent}%</span>
+        </div>
+      </div>
+      <div className="text-center">
+        <p className="text-xs font-semibold text-foreground">{label}</p>
+        <p className="text-[10px] text-muted-foreground">{sublabel}</p>
+      </div>
+    </div>
+  );
+}
+
+function MiniDonut({ segments, size = 56 }: { segments: { pct: number; color: string }[]; size?: number }) {
+  const cx = size / 2;
+  const cy = size / 2;
+  const outerR = size / 2 - 2;
+  const innerR = outerR * 0.6;
+  const gap = 0.03;
+
+  if (segments.length === 0) {
+    return (
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        <circle cx={cx} cy={cy} r={(outerR + innerR) / 2} fill="none" stroke="hsl(var(--border))" strokeWidth={outerR - innerR} strokeDasharray="3 3" />
+      </svg>
+    );
+  }
+
+  let startAngle = -Math.PI / 2;
+  const arcs: { path: string; color: string }[] = [];
+  segments.forEach(seg => {
+    const sweep = (seg.pct / 100) * Math.PI * 2 - gap;
+    if (sweep <= 0) return;
+    const endAngle = startAngle + sweep;
+    const x1o = cx + outerR * Math.cos(startAngle), y1o = cy + outerR * Math.sin(startAngle);
+    const x2o = cx + outerR * Math.cos(endAngle), y2o = cy + outerR * Math.sin(endAngle);
+    const x1i = cx + innerR * Math.cos(endAngle), y1i = cy + innerR * Math.sin(endAngle);
+    const x2i = cx + innerR * Math.cos(startAngle), y2i = cy + innerR * Math.sin(startAngle);
+    const la = sweep > Math.PI ? 1 : 0;
+    arcs.push({ path: `M ${x1o} ${y1o} A ${outerR} ${outerR} 0 ${la} 1 ${x2o} ${y2o} L ${x1i} ${y1i} A ${innerR} ${innerR} 0 ${la} 0 ${x2i} ${y2i} Z`, color: seg.color });
+    startAngle = endAngle + gap;
+  });
+
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      {arcs.map((a, i) => <path key={i} d={a.path} fill={a.color} />)}
+      <circle cx={cx} cy={cy} r={innerR - 1} className="fill-card" />
+    </svg>
+  );
+}
 
 export default function Home() {
   const router = useRouter();
@@ -73,10 +107,10 @@ export default function Home() {
   const [briefing, setBriefing] = useState<string | null>(null);
   const [briefingLoading, setBriefingLoading] = useState(true);
   const [hustleProgress, setHustleProgress] = useState(0);
-  const [showPansyStory, setShowPansyStory] = useState(false);
   const [recommendedPath, setRecommendedPath] = useState<"hustle" | "budget" | "invest">("invest");
   const [traderLb, setTraderLb] = useState<{ display_name: string; total_pnl: number; win_rate: number; rank: number }[]>([]);
   const [traderMe, setTraderMe] = useState<{ display_name: string; total_pnl: number; win_rate: number; rank: number } | null>(null);
+  const [budgetCount, setBudgetCount] = useState(0);
 
   useEffect(() => {
     checkAuth();
@@ -119,6 +153,7 @@ export default function Home() {
     loadBriefing(session.access_token);
     loadTraderLeaderboard(session.access_token);
     loadHustleProgress(session.user.id);
+    loadBudgetCount(session.user.id);
   };
 
   const loadProgress = async (userId: string) => {
@@ -197,16 +232,26 @@ export default function Home() {
     }
   };
 
+  const loadBudgetCount = async (userId: string) => {
+    try {
+      const now = new Date();
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+      const { data } = await db.from("budget_entries").select("id").eq("user_id", userId).gte("date", monthStart);
+      if (data) setBudgetCount(data.length);
+    } catch {
+      // silent
+    }
+  };
+
   const totalLessons = 36;
   const progressPercent = Math.min(Math.round((completedCount / totalLessons) * 100), 100);
-  const confidenceScore = Math.min(Math.round((completedCount / totalLessons) * 100), 100);
 
   const journeyStage = completedCount < 5 ? 0 : completedCount < 12 ? 1 : completedCount < 22 ? 2 : 3;
   const stages = [
-    { name: "Seed", emoji: "🌱" },
-    { name: "Sprout", emoji: "🌿" },
-    { name: "Grow", emoji: "🌳" },
-    { name: "Bloom", emoji: "🌸" },
+    { name: "Foundation", count: 5 },
+    { name: "Build", count: 7 },
+    { name: "Launch", count: 10 },
+    { name: "Grow", count: 14 },
   ];
 
   const getJourneyCoachMessage = (): { message: string; action: { label: string; href: string } } => {
@@ -242,13 +287,13 @@ export default function Home() {
     }
     if (completedCount < 12) {
       return {
-        message: "You're in the Sprout stage. Try the Practice Trader to apply what you've learned — no real money involved.",
+        message: "You're in the Build phase. Try the Practice Trader to apply what you've learned — no real money involved.",
         action: { label: "Try Practice Trading", href: "/practice" },
       };
     }
     if (completedCount < 22) {
       return {
-        message: "Growing strong! You know enough to start exploring real stocks. Head to Discover and research some companies.",
+        message: "Launch phase! You know enough to start exploring real stocks. Head to Discover and research some companies.",
         action: { label: "Discover Stocks", href: "/discover" },
       };
     }
@@ -260,349 +305,308 @@ export default function Home() {
 
   const coach = getJourneyCoachMessage();
 
+  const hustlePct = Math.round((hustleProgress / 12) * 100);
+  const budgetActive = budgetCount > 0;
+
+  const overallPct = recommendedPath === "hustle"
+    ? hustlePct
+    : recommendedPath === "budget"
+    ? (budgetActive ? Math.min(budgetCount * 10, 100) : 0)
+    : progressPercent;
+
+  const donutSegments = [
+    { pct: progressPercent > 0 ? Math.max(progressPercent, 5) : 0, color: "#27B7C8" },
+    { pct: hustlePct > 0 ? Math.max(hustlePct, 5) : 0, color: "#49B06E" },
+    { pct: budgetActive ? 15 : 0, color: "#F59E0B" },
+  ].filter(s => s.pct > 0);
+
+  const remainingPct = 100 - donutSegments.reduce((s, d) => s + d.pct, 0);
+  if (remainingPct > 0) donutSegments.push({ pct: remainingPct, color: "hsl(var(--border))" });
+
   return (
     <Layout>
       <SEO title="Home — Bloom" description="Your personalized learning dashboard" />
 
-      <div className="w-full mx-auto space-y-6 pb-24 px-[5%] pt-6">
+      <div className="w-full mx-auto space-y-5 pb-24 px-[5%] pt-6">
 
-        {/* ══════ GREETING + STATS ══════ */}
-        <div className="space-y-4">
-          <div>
-            <TimeGreeting fullName={user?.full_name ?? userName} />
-            <p className="text-muted-foreground mt-1">Your next small step is ready.</p>
-          </div>
-
-          {isTrial && (
-            <Link href="/subscription" className="block">
-              <div className="rounded-xl px-4 py-3 flex items-center justify-between" style={{
-                background: "linear-gradient(135deg, rgba(39,183,200,0.15), rgba(73,176,110,0.1))",
-                border: "1px solid rgba(39,183,200,0.3)",
-              }}>
-                <div className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-[#27B7C8]" />
-                  <span className="text-sm text-foreground">
-                    <span className="font-semibold">{trialDaysLeft} day{trialDaysLeft !== 1 ? "s" : ""}</span>
-                    <span className="text-muted-foreground"> left in your free trial</span>
-                  </span>
-                </div>
-                <span className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-[#27B7C8] text-[#0E1B30]">
-                  Subscribe
-                </span>
-              </div>
-            </Link>
-          )}
-
-          <div className="grid grid-cols-3 gap-3">
-            {[
-              { icon: <Flame className="w-4 h-4 text-orange-400" />, value: streak, label: "day streak", glow: "rgba(251,146,60,0.15)" },
-              { icon: <Target className="w-4 h-4 text-[#27B7C8]" />, value: `${progressPercent}%`, label: "journey", glow: "rgba(39,183,200,0.15)" },
-              { icon: <Sparkles className="w-4 h-4 text-[#49B06E]" />, value: confidenceScore, label: "confidence", glow: "rgba(73,176,110,0.15)" },
-            ].map((stat, i) => (
-              <motion.div
-                key={stat.label}
-                initial={{ opacity: 0, scale: 0.8, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                transition={{ delay: 0.15 + i * 0.12, type: "spring", stiffness: 300, damping: 20 }}
-                whileTap={{ scale: 0.92 }}
-                whileHover={{ scale: 1.05, boxShadow: `0 8px 24px ${stat.glow}` }}
-                className="bg-card border border-border rounded-2xl p-3 text-center cursor-pointer"
-                style={{ boxShadow: `0 2px 12px ${stat.glow}` }}
-              >
-                <div className="flex items-center justify-center gap-1.5 mb-1">
-                  {stat.icon}
-                  <span className="text-xl font-bold text-foreground">{stat.value}</span>
-                </div>
-                <p className="text-xs text-muted-foreground">{stat.label}</p>
-              </motion.div>
-            ))}
-          </div>
+        {/* ══════ GREETING ══════ */}
+        <div>
+          <TimeGreeting fullName={user?.full_name ?? userName} />
+          <p className="text-muted-foreground mt-1 text-sm">Your next step is ready.</p>
         </div>
 
-        {/* ══════ PANSY'S STORY ══════ */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, ...cardSpring }}
-          className="relative overflow-hidden rounded-3xl border border-border"
-          style={{
-            background: "linear-gradient(135deg, rgba(39,183,200,0.08), rgba(73,176,110,0.05), rgba(14,27,48,0.95))",
-            boxShadow: "0 4px 24px rgba(39,183,200,0.08)",
-          }}
-        >
-          <div className="absolute top-0 right-0 w-40 h-40 opacity-10" style={{ background: "radial-gradient(circle, #27B7C8, transparent 70%)" }} />
-          <div className="relative p-5 space-y-3">
-            <div className="flex items-start gap-3">
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shrink-0"
-                style={{ background: "linear-gradient(135deg, rgba(39,183,200,0.15), rgba(73,176,110,0.15))", border: "1px solid rgba(39,183,200,0.2)" }}>
-                🌺
+        {isTrial && (
+          <Link href="/subscription" className="block">
+            <div className="rounded-xl px-4 py-3 flex items-center justify-between" style={{
+              background: "linear-gradient(135deg, rgba(39,183,200,0.15), rgba(73,176,110,0.1))",
+              border: "1px solid rgba(39,183,200,0.3)",
+            }}>
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-[#27B7C8]" />
+                <span className="text-sm text-foreground">
+                  <span className="font-semibold">{trialDaysLeft} day{trialDaysLeft !== 1 ? "s" : ""}</span>
+                  <span className="text-muted-foreground"> left in your free trial</span>
+                </span>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-serif text-lg font-bold text-foreground">Meet Pansy</p>
-                <p className="text-sm text-muted-foreground leading-relaxed mt-1">
-                  {recommendedPath === "hustle"
-                    ? "I know what it's like to need money NOW. Before we talk investing, let's get income flowing first. I'm handing you to Lexi — she's built businesses from scratch."
-                    : recommendedPath === "budget"
-                    ? "I know money feels chaotic right now. Let's start by seeing where it all goes — no judgment. Once you can see it clearly, we can fix it together."
-                    : "I grew up watching the women around me work harder than anyone — and still struggle with money. Not because they weren't smart, but because nobody ever taught them how it works."}
-                </p>
+              <span className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-[#27B7C8] text-[#0E1B30]">
+                Subscribe
+              </span>
+            </div>
+          </Link>
+        )}
+
+        {/* ══════ OVERALL PROGRESS + STATS ══════ */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1, ...cardSpring }}
+          className="bg-card border border-border rounded-2xl p-5"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-bold text-foreground">Overall Progress</h3>
+            <div className="flex items-center gap-1.5">
+              <Flame className="w-4 h-4 text-orange-400" />
+              <span className="text-sm font-bold text-foreground">{streak}</span>
+              <span className="text-xs text-muted-foreground">day streak</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-6">
+            <ProgressRing
+              percent={overallPct}
+              size={110}
+              stroke={8}
+              color={recommendedPath === "hustle" ? "#49B06E" : recommendedPath === "budget" ? "#F59E0B" : "#27B7C8"}
+              label={overallPct === 0 ? "Get started" : overallPct === 100 ? "Complete!" : "In progress"}
+              sublabel={recommendedPath === "hustle" ? `${hustleProgress}/12 steps` : recommendedPath === "budget" ? `${budgetCount} tracked` : `${completedCount}/${totalLessons} lessons`}
+            />
+
+            <div className="flex-1 space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="w-2.5 h-2.5 rounded-full bg-[#27B7C8]" />
+                <span className="text-xs text-muted-foreground flex-1">Lessons</span>
+                <span className="text-xs font-semibold text-foreground">{completedCount}/{totalLessons}</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-2.5 h-2.5 rounded-full bg-[#49B06E]" />
+                <span className="text-xs text-muted-foreground flex-1">Side Hustle</span>
+                <span className="text-xs font-semibold text-foreground">{hustleProgress}/12</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]" />
+                <span className="text-xs text-muted-foreground flex-1">Budget</span>
+                <span className="text-xs font-semibold text-foreground">{budgetCount > 0 ? "Active" : "—"}</span>
               </div>
             </div>
-
-            {showPansyStory && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                transition={{ duration: 0.3 }}
-                className="space-y-3 pl-[68px]"
-              >
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  So I made it my mission: teach women about money in a way that actually makes sense. No jargon, no judgment, no talking down to you. Just honest guidance from someone who&apos;s been where you are.
-                </p>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  I&apos;m not here to tell you what to buy or sell. I&apos;m here to help you <span className="text-[#27B7C8] font-semibold">understand your options</span>, whether that&apos;s starting a side hustle, getting your budget under control, or learning to invest. Your money, your terms.
-                </p>
-                <p className="text-sm font-medium text-[#49B06E]">
-                  Pick a path below. I&apos;ll walk you through every step. 💛
-                </p>
-              </motion.div>
-            )}
-
-            <button
-              onClick={() => { setShowPansyStory(!showPansyStory); haptic(); }}
-              className="text-xs font-semibold flex items-center gap-1 ml-[68px] transition-colors"
-              style={{ color: "#27B7C8", background: "none", border: "none", cursor: "pointer", padding: 0 }}
-            >
-              {showPansyStory ? "Show less" : "Read my story"}{" "}
-              <ChevronRight className="w-3 h-3" style={{ transform: showPansyStory ? "rotate(90deg)" : "rotate(0)", transition: "transform 0.2s" }} />
-            </button>
           </div>
         </motion.div>
 
-        {/* ══════ THREE JOURNEY PATHS ══════ */}
-        <div className="space-y-3">
-          <h3 className="font-serif text-lg font-bold text-foreground">How Can Pansy Help You?</h3>
-          <p className="text-xs text-muted-foreground">Based on your answers, we recommend starting here. You can explore all three.</p>
-
+        {/* ══════ PHASE BREAKDOWN ══════ */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15, ...cardSpring }}
+          className="bg-card border border-border rounded-2xl p-5"
+        >
+          <h3 className="text-sm font-bold text-foreground mb-4">Phase Breakdown</h3>
           <div className="space-y-3">
-            {[...PATHS].sort((a, b) => {
-              if (a.key === recommendedPath) return -1;
-              if (b.key === recommendedPath) return 1;
-              return 0;
-            }).map((path, i) => {
-              const isRecommended = path.key === recommendedPath;
+            {stages.map((stage, i) => {
+              const stageStart = i === 0 ? 0 : stages.slice(0, i).reduce((s, st) => s + st.count, 0);
+              const stageEnd = stageStart + stage.count;
+              const done = Math.max(0, Math.min(completedCount - stageStart, stage.count));
+              const active = i === journeyStage;
+              const completed = i < journeyStage;
               return (
-                <Link key={path.key} href={path.href}>
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.3 + i * 0.1, ...cardSpring }}
-                    whileTap={{ scale: 0.97 }}
-                    whileHover={{ scale: 1.01, boxShadow: `0 8px 28px ${path.color}20` }}
-                    onClick={() => haptic(12)}
-                    className="rounded-2xl p-4 mb-3 block relative overflow-hidden"
-                    style={{
-                      background: isRecommended
-                        ? `linear-gradient(135deg, ${path.color}08, ${path.color}04)`
-                        : undefined,
-                      border: isRecommended
-                        ? `2px solid ${path.color}40`
-                        : "1px solid hsl(var(--border))",
-                      borderLeft: `3px solid ${path.color}`,
-                    }}
-                  >
-                    {isRecommended && (
-                      <div className="absolute top-3 right-3">
-                        <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md"
-                          style={{ background: `${path.color}15`, color: path.color, border: `1px solid ${path.color}25` }}>
-                          Recommended
-                        </span>
-                      </div>
-                    )}
-                    <div className="flex items-start gap-3">
-                      <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 text-xl"
-                        style={{ background: `${path.color}12` }}>
-                        {path.emoji}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="font-bold text-sm text-foreground">{path.title}</p>
-                            <p className="text-xs text-muted-foreground">{path.subtitle}</p>
-                          </div>
-                          <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
-                        </div>
-                        <p className="text-xs text-muted-foreground leading-relaxed mt-2">{path.desc}</p>
-                        <div className="flex items-start gap-1.5 mt-2 pt-2 border-t border-border">
-                          <span className="text-xs shrink-0">🌺</span>
-                          <p className="text-xs italic" style={{ color: path.color }}>{path.pansySays}</p>
-                        </div>
-                      </div>
+                <div key={stage.name} className="flex items-center gap-3">
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 ${
+                    completed ? "bg-[#49B06E]/15 text-[#49B06E]"
+                    : active ? "bg-[#27B7C8]/15 text-[#27B7C8]"
+                    : "bg-muted/50 text-muted-foreground"
+                  }`}>
+                    {completed ? "✓" : i + 1}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className={`text-sm font-medium ${active ? "text-foreground" : completed ? "text-[#49B06E]" : "text-muted-foreground"}`}>
+                        {stage.name}
+                      </span>
+                      <span className="text-xs text-muted-foreground">{done}/{stage.count}</span>
                     </div>
-                  </motion.div>
-                </Link>
+                    <div className="w-full bg-muted/40 rounded-full h-1.5 overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${(done / stage.count) * 100}%` }}
+                        transition={{ duration: 0.6, delay: 0.1 * i }}
+                        className="h-full rounded-full"
+                        style={{
+                          background: completed
+                            ? "#49B06E"
+                            : active
+                            ? "linear-gradient(90deg, #27B7C8, #49B06E)"
+                            : "hsl(var(--border))",
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
               );
             })}
           </div>
-        </div>
+        </motion.div>
 
-        {/* ══════ PANSY'S NEXT STEP ══════ */}
+        {/* ══════ CURRENT MISSION ══════ */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, ...cardSpring }}
+          className="rounded-2xl border border-border overflow-hidden"
+          style={{ background: "linear-gradient(135deg, rgba(39,183,200,0.06), rgba(73,176,110,0.04))" }}
+        >
+          <div className="p-5 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">🌺</span>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Current Mission</p>
+              </div>
+              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md"
+                style={{
+                  background: recommendedPath === "hustle" ? "rgba(73,176,110,0.12)" : recommendedPath === "budget" ? "rgba(245,158,11,0.12)" : "rgba(39,183,200,0.12)",
+                  color: recommendedPath === "hustle" ? "#49B06E" : recommendedPath === "budget" ? "#F59E0B" : "#27B7C8",
+                  border: `1px solid ${recommendedPath === "hustle" ? "rgba(73,176,110,0.2)" : recommendedPath === "budget" ? "rgba(245,158,11,0.2)" : "rgba(39,183,200,0.2)"}`,
+                }}>
+                {recommendedPath === "hustle" ? "Side Hustle" : recommendedPath === "budget" ? "Budgeting" : "Investing"}
+              </span>
+            </div>
+            <p className="text-sm text-muted-foreground leading-relaxed">{coach.message}</p>
+            <Link href={coach.action.href}>
+              <motion.button
+                whileTap={{ scale: 0.96 }}
+                onClick={() => haptic(12)}
+                className="w-full py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 mt-2"
+                style={{
+                  background: recommendedPath === "hustle"
+                    ? "linear-gradient(135deg, #49B06E, #27B7C8)"
+                    : recommendedPath === "budget"
+                    ? "linear-gradient(135deg, #F59E0B, #F97316)"
+                    : "linear-gradient(135deg, #27B7C8, #49B06E)",
+                  color: "#0E1B30",
+                }}
+              >
+                {coach.action.label} <ChevronRight className="w-4 h-4" />
+              </motion.button>
+            </Link>
+          </div>
+        </motion.div>
+
+        {/* ══════ ACTIVITY OVERVIEW ══════ */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25, ...cardSpring }}
+          className="bg-card border border-border rounded-2xl p-5"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-bold text-foreground">Recent Activity</h3>
+            <MiniDonut segments={donutSegments.filter(s => s.color !== "hsl(var(--border))")} size={40} />
+          </div>
+
+          <div className="space-y-3">
+            {completedCount > 0 && (
+              <Link href="/learn" className="block">
+                <motion.div whileTap={{ scale: 0.98 }} className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 transition-colors">
+                  <div className="w-10 h-10 rounded-xl bg-[#27B7C8]/10 flex items-center justify-center shrink-0">
+                    <BookOpen className="w-5 h-5 text-[#27B7C8]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-foreground">Continue Learning</p>
+                    <p className="text-xs text-muted-foreground">{completedCount} lessons completed</p>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <div className="w-16 bg-muted/40 rounded-full h-1.5 overflow-hidden">
+                      <div className="h-full rounded-full bg-[#27B7C8]" style={{ width: `${progressPercent}%` }} />
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                  </div>
+                </motion.div>
+              </Link>
+            )}
+
+            {hustleProgress > 0 && (
+              <Link href="/side-hustle" className="block">
+                <motion.div whileTap={{ scale: 0.98 }} className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 transition-colors">
+                  <div className="w-10 h-10 rounded-xl bg-[#49B06E]/10 flex items-center justify-center shrink-0 text-lg">
+                    ⚡
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-foreground">Side Hustle Journey</p>
+                    <p className="text-xs text-muted-foreground">Step {hustleProgress} of 12</p>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <div className="w-16 bg-muted/40 rounded-full h-1.5 overflow-hidden">
+                      <div className="h-full rounded-full bg-[#49B06E]" style={{ width: `${hustlePct}%` }} />
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                  </div>
+                </motion.div>
+              </Link>
+            )}
+
+            {budgetActive && (
+              <Link href="/budget-tracker" className="block">
+                <motion.div whileTap={{ scale: 0.98 }} className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 transition-colors">
+                  <div className="w-10 h-10 rounded-xl bg-[#F59E0B]/10 flex items-center justify-center shrink-0">
+                    <Target className="w-5 h-5 text-[#F59E0B]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-foreground">Budget Tracker</p>
+                    <p className="text-xs text-muted-foreground">{budgetCount} expenses this month</p>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+                </motion.div>
+              </Link>
+            )}
+          </div>
+        </motion.div>
+
+        {/* ══════ PANSY'S NOTE ══════ */}
         <PansyContextCard
           message={coach.message}
           action={coach.action}
           variant="coach"
         />
 
-        {/* ══════ TODAY WITH PANSY ══════ */}
+        {/* ══════ TODAY ══════ */}
         <div className="space-y-3">
-          <h3 className="font-serif text-lg font-bold text-foreground flex items-center gap-2">
-            Today with Pansy <span className="text-lg">🌺</span>
-          </h3>
+          <h3 className="font-serif text-base font-bold text-foreground">Today</h3>
 
           <DailyChallenge />
 
-          <div className="grid grid-cols-1 gap-3">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.15, ...cardSpring }}
-              className="bg-card border border-border rounded-2xl p-4">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center shrink-0 text-lg">
-                  ☕
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm text-foreground mb-1">Morning Coffee</p>
-                  {briefingLoading ? (
-                    <div className="space-y-1.5">
-                      <Skeleton className="h-3 w-full" />
-                      <Skeleton className="h-3 w-4/5" />
-                    </div>
-                  ) : briefing ? (
-                    <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">{briefing}</p>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">Today&apos;s market context is brewing...</p>
-                  )}
-                </div>
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.15, ...cardSpring }}
+            className="bg-card border border-border rounded-2xl p-4"
+          >
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center shrink-0 text-lg">
+                ☕
               </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.25, ...cardSpring }}
-              className="bg-card border border-border rounded-2xl p-4">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#49B06E]/10 flex items-center justify-center shrink-0 text-lg">
-                  💡
-                </div>
-                <div className="flex-1">
-                  <p className="font-semibold text-sm text-foreground mb-1">Pansy&apos;s Note</p>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    {streak >= 7
-                      ? `${streak} days straight! You're more consistent than most professional traders. That discipline will serve you well.`
-                      : streak >= 3
-                      ? `${streak}-day streak going! Consistency is the real secret to building wealth — and you've got it.`
-                      : completedCount === 0
-                      ? "You don't need to know everything to start. The best investors began exactly where you are now."
-                      : completedCount < 5
-                      ? `${completedCount} lesson${completedCount > 1 ? "s" : ""} done! You've already started — that puts you ahead of most people.`
-                      : completedCount < 12
-                      ? `${completedCount} lessons and growing! You're in the Sprout stage now — real knowledge is taking root.`
-                      : completedCount < 22
-                      ? "You're in the Grow stage. Every lesson compounds, just like your future investments will."
-                      : "Full Bloom! Your confidence isn't luck — it's earned through every single lesson."}
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-
-        {/* ══════ CONTINUE YOUR JOURNEY ══════ */}
-        {completedCount > 0 && (
-          <Link href="/learn" className="block">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, type: "spring", stiffness: 250, damping: 20 }}
-              whileTap={{ scale: 0.96 }}
-              whileHover={{ scale: 1.02, boxShadow: "0 12px 40px rgba(39,183,200,0.2)" }}
-              onClick={() => haptic(12)}
-              className="relative overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-[#27B7C8]/10 via-card to-[#49B06E]/10"
-              style={{ boxShadow: "0 4px 20px rgba(39,183,200,0.1)" }}>
-              <div className="absolute inset-0 opacity-20" style={{ background: "radial-gradient(circle at 80% 20%, rgba(39,183,200,0.3), transparent 60%)" }} />
-              <div className="relative p-5 space-y-3">
-                <div className="flex items-start justify-between">
-                  <div className="space-y-1">
-                    <p className="text-xs font-semibold text-[#27B7C8] uppercase tracking-wider">Continue Learning</p>
-                    <h2 className="font-serif text-xl font-bold text-foreground">
-                      {completedCount < 5 ? "Building Your Foundation" : completedCount < 12 ? "Growing Your Knowledge" : completedCount < 22 ? "Advanced Concepts" : "Master Level"}
-                    </h2>
-                    <p className="text-sm text-muted-foreground">{completedCount} lessons completed</p>
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-sm text-foreground mb-1">Morning Coffee</p>
+                {briefingLoading ? (
+                  <div className="space-y-1.5">
+                    <Skeleton className="h-3 w-full" />
+                    <Skeleton className="h-3 w-4/5" />
                   </div>
-                  <div className="w-12 h-12 rounded-2xl bg-[#27B7C8]/15 flex items-center justify-center shrink-0">
-                    <Play className="w-6 h-6 text-[#27B7C8] ml-0.5" />
-                  </div>
-                </div>
-                <div className="space-y-1.5">
-                  <div className="h-2 rounded-full overflow-hidden bg-muted/40">
-                    <div className="h-full rounded-full transition-all duration-700"
-                      style={{ width: `${Math.max(progressPercent, 3)}%`, background: "linear-gradient(90deg, #49B06E, #27B7C8)" }} />
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-muted-foreground">{completedCount}/{totalLessons} lessons</span>
-                    <span className="text-xs font-medium text-[#27B7C8] flex items-center gap-1">
-                      Continue <ChevronRight className="w-3.5 h-3.5" />
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </Link>
-        )}
-
-        {/* ══════ YOUR LEARNING PATH ══════ */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, ...cardSpring }}
-          className="bg-card border border-border rounded-2xl p-5">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">Your Learning Path</p>
-          <div className="flex items-center justify-between">
-            {stages.map((stage, i) => (
-              <div key={stage.name} className="flex items-center">
-                <div className="flex flex-col items-center gap-1.5">
-                  <div
-                    className="w-12 h-12 rounded-full flex items-center justify-center text-xl transition-all"
-                    style={{
-                      background: i <= journeyStage
-                        ? "linear-gradient(135deg, rgba(39,183,200,0.15), rgba(73,176,110,0.15))"
-                        : "rgba(255,255,255,0.03)",
-                      border: i === journeyStage
-                        ? "2px solid rgba(39,183,200,0.4)"
-                        : i < journeyStage
-                        ? "2px solid rgba(73,176,110,0.3)"
-                        : "1px solid hsl(var(--border))",
-                      boxShadow: i === journeyStage ? "0 0 12px rgba(39,183,200,0.2)" : "none",
-                    }}
-                  >
-                    {stage.emoji}
-                  </div>
-                  <span className={`text-xs font-medium ${i === journeyStage ? "text-[#27B7C8]" : i < journeyStage ? "text-[#49B06E]" : "text-muted-foreground"}`}>
-                    {stage.name}
-                  </span>
-                </div>
-                {i < stages.length - 1 && (
-                  <div
-                    className="w-6 h-px mx-1 mt-[-18px]"
-                    style={{ background: i < journeyStage ? "linear-gradient(90deg, #49B06E, #27B7C8)" : "hsl(var(--border))" }}
-                  />
+                ) : briefing ? (
+                  <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">{briefing}</p>
+                ) : (
+                  <p className="text-sm text-muted-foreground">Today&apos;s market context is brewing...</p>
                 )}
               </div>
-            ))}
-          </div>
-        </motion.div>
+            </div>
+          </motion.div>
+        </div>
 
         <PushNotificationPrompt />
 
@@ -664,7 +668,7 @@ export default function Home() {
 
         {/* ══════ QUICK ACTIONS ══════ */}
         <div className="space-y-3">
-          <h3 className="font-serif text-lg font-bold text-foreground">Quick Actions</h3>
+          <h3 className="font-serif text-base font-bold text-foreground">Quick Actions</h3>
           <div className="grid grid-cols-4 gap-3">
             {[
               { href: "/learn", label: "Learn", icon: <BookOpen className="w-6 h-6" />, color: "#27B7C8" },
