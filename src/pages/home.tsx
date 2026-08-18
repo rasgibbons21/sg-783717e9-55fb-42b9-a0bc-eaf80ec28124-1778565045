@@ -74,6 +74,7 @@ export default function Home() {
   const [briefingLoading, setBriefingLoading] = useState(true);
   const [hustleProgress, setHustleProgress] = useState(0);
   const [showPansyStory, setShowPansyStory] = useState(false);
+  const [recommendedPath, setRecommendedPath] = useState<"hustle" | "budget" | "invest">("invest");
   const [traderLb, setTraderLb] = useState<{ display_name: string; total_pnl: number; win_rate: number; rank: number }[]>([]);
   const [traderMe, setTraderMe] = useState<{ display_name: string; total_pnl: number; win_rate: number; rank: number } | null>(null);
 
@@ -91,12 +92,24 @@ export default function Home() {
 
     const { data: profile } = await supabase
       .from("profiles")
-      .select("onboarding_complete")
+      .select("onboarding_complete, experience_level, risk_tolerance")
       .eq("id", session.user.id)
       .single();
     if (profile && !profile.onboarding_complete) {
       router.push("/onboarding");
       return;
+    }
+
+    if (profile) {
+      const struggle = profile.risk_tolerance as string | null;
+      const level = profile.experience_level as string | null;
+      if (level === "beginner" || struggle === "earning") {
+        setRecommendedPath("hustle");
+      } else if (struggle === "spending" || struggle === "debt") {
+        setRecommendedPath("budget");
+      } else {
+        setRecommendedPath("invest");
+      }
     }
 
     const userProfile = await userService.getCurrentUser();
@@ -203,9 +216,21 @@ export default function Home() {
         action: { label: "Continue Hustle", href: "/side-hustle" },
       };
     }
-    if (completedCount === 0) {
+    if (completedCount === 0 && hustleProgress === 0) {
+      if (recommendedPath === "hustle") {
+        return {
+          message: "Based on your answers, let's start by building some income. Lexi's got your 12-step plan ready — pick a hustle and go!",
+          action: { label: "Start Side Hustle", href: "/side-hustle" },
+        };
+      }
+      if (recommendedPath === "budget") {
+        return {
+          message: "Let's start by getting honest about where your money goes. Track your first expense — it takes 30 seconds.",
+          action: { label: "Open Budget Tracker", href: "/budget-tracker" },
+        };
+      }
       return {
-        message: "Pick a path below that fits where you are right now. No wrong answer — you can explore all three!",
+        message: "You're ready to learn how money works. Start with your first lesson — I'll walk you through everything.",
         action: { label: "Start Learning", href: "/learn" },
       };
     }
@@ -315,7 +340,11 @@ export default function Home() {
               <div className="flex-1 min-w-0">
                 <p className="font-serif text-lg font-bold text-foreground">Meet Pansy</p>
                 <p className="text-sm text-muted-foreground leading-relaxed mt-1">
-                  I grew up watching the women around me work harder than anyone — and still struggle with money. Not because they weren&apos;t smart, but because nobody ever taught them how it works.
+                  {recommendedPath === "hustle"
+                    ? "I know what it's like to need money NOW. Before we talk investing, let's get income flowing first. I'm handing you to Lexi — she's built businesses from scratch."
+                    : recommendedPath === "budget"
+                    ? "I know money feels chaotic right now. Let's start by seeing where it all goes — no judgment. Once you can see it clearly, we can fix it together."
+                    : "I grew up watching the women around me work harder than anyone — and still struggle with money. Not because they weren't smart, but because nobody ever taught them how it works."}
                 </p>
               </div>
             </div>
@@ -353,11 +382,15 @@ export default function Home() {
         {/* ══════ THREE JOURNEY PATHS ══════ */}
         <div className="space-y-3">
           <h3 className="font-serif text-lg font-bold text-foreground">How Can Pansy Help You?</h3>
-          <p className="text-xs text-muted-foreground">Pick the path that fits where you are right now. You can explore all three.</p>
+          <p className="text-xs text-muted-foreground">Based on your answers, we recommend starting here. You can explore all three.</p>
 
           <div className="space-y-3">
-            {PATHS.map((path, i) => {
-              const Icon = path.icon;
+            {[...PATHS].sort((a, b) => {
+              if (a.key === recommendedPath) return -1;
+              if (b.key === recommendedPath) return 1;
+              return 0;
+            }).map((path, i) => {
+              const isRecommended = path.key === recommendedPath;
               return (
                 <Link key={path.key} href={path.href}>
                   <motion.div
@@ -367,9 +400,25 @@ export default function Home() {
                     whileTap={{ scale: 0.97 }}
                     whileHover={{ scale: 1.01, boxShadow: `0 8px 28px ${path.color}20` }}
                     onClick={() => haptic(12)}
-                    className="bg-card border border-border rounded-2xl p-4 mb-3 block"
-                    style={{ borderLeft: `3px solid ${path.color}` }}
+                    className="rounded-2xl p-4 mb-3 block relative overflow-hidden"
+                    style={{
+                      background: isRecommended
+                        ? `linear-gradient(135deg, ${path.color}08, ${path.color}04)`
+                        : undefined,
+                      border: isRecommended
+                        ? `2px solid ${path.color}40`
+                        : "1px solid hsl(var(--border))",
+                      borderLeft: `3px solid ${path.color}`,
+                    }}
                   >
+                    {isRecommended && (
+                      <div className="absolute top-3 right-3">
+                        <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md"
+                          style={{ background: `${path.color}15`, color: path.color, border: `1px solid ${path.color}25` }}>
+                          Recommended
+                        </span>
+                      </div>
+                    )}
                     <div className="flex items-start gap-3">
                       <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 text-xl"
                         style={{ background: `${path.color}12` }}>
