@@ -4,14 +4,14 @@ plugins {
 
 android {
     namespace 'app.shebloomswealth.mobile'
-    compileSdk 36
+    compileSdk 35
 
     defaultConfig {
         applicationId "app.shebloomswealth.mobile"
-        minSdk 21
-        targetSdk 36
-        versionCode 13
-        versionName "1.0.12"
+        minSdk 22
+        targetSdk 35
+        versionCode 19
+        versionName "1.0.18"
 
         manifestPlaceholders = [
             hostName        : "shebloomswealth.app",
@@ -57,5 +57,4 @@ configurations.all {
 dependencies {
     implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.5.0'
     implementation 'androidx.appcompat:appcompat:1.7.0'
-    implementation 'com.android.billingclient:billing:8.0.0'
 }
