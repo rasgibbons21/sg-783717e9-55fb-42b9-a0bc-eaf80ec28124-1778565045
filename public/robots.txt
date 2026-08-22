@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /_next/
+
+Sitemap: https://shebloomswealth.app/sitemap.xml
+
+User-agent: AdsBot-Google
+Allow: /
