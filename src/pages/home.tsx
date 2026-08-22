@@ -327,7 +327,7 @@ export default function Home() {
 
   return (
     <Layout>
-      <SEO title="Home — Bloom" description="Your personalized learning dashboard" />
+      <SEO title="Dashboard — Bloom | Your Investing Learning Hub" description="Your personalized financial education dashboard. Track streaks, complete daily challenges, earn XP and badges, view your portfolio, and climb the leaderboard. Bloom makes learning about money feel like a game." />
 
       <div className="w-full mx-auto space-y-5 pb-24 px-[5%] pt-6">
 

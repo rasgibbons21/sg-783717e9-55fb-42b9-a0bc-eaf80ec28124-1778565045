@@ -115,8 +115,8 @@ export default function UniversityIndex({ requiresClientAuth }: Props) {
   return (
     <Layout>
       <SEO
-        title="Bloom University — Pro Trading Education"
-        description="Bloom University: structured, compliance-safe trading education for serious investors. Pro members only."
+        title="Bloom University — Chart Reading, Indicators & Trading Education"
+        description="Master chart reading, candlestick patterns, RSI, MACD, Bollinger Bands, moving averages, and trading signals. 9 structured modules covering chart patterns, indicators, entry/exit strategies, and position management. Advanced investing education for women."
       />
 
       {/* Hero */}

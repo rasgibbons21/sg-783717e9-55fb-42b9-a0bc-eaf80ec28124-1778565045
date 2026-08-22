@@ -366,8 +366,8 @@ export default function Discover() {
   return (
     <Layout>
       <SEO
-        title="Discover Investments | Bloom"
-        description="Explore stocks, ETFs, and mutual funds with Pansy's expert analysis"
+        title="Discover Stocks, ETFs & Mutual Funds — Bloom"
+        description="Browse and research stocks, ETFs, and mutual funds. Get real-time prices, interactive charts, and plain-language analysis from Pansy. Compare companies side by side. Free stock research for women investors."
       />
       <div className="container-full py-8 space-y-6 pb-24">
         <AdMobBanner format="banner" />

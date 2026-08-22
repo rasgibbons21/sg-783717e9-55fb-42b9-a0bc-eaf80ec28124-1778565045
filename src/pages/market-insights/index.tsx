@@ -64,8 +64,8 @@ export default function MarketInsightsIndex() {
       </Head>
 
       <SEO
-        title="Market Insights — She Blooms Wealth"
-        description="Learn how to read what markets are doing — sectors, earnings, macro forces, and investor psychology, in plain English."
+        title="Market Insights — Stock Market Analysis in Plain English | Bloom"
+        description="Understand what the stock market is doing — sectors, earnings, macro trends, and investor psychology explained in plain English. Free market analysis and insights for women investors learning to read the market."
       />
 
       <div style={{ fontFamily: "'DM Sans', sans-serif", background: C.deep, color: C.ivory, minHeight: "100vh", display: "flex", flexDirection: "column" }}>

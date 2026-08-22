@@ -2719,8 +2719,8 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
   return (
     <Layout>
       <SEO
-        title="Bloom Basics - Learn Investing"
-        description="Everything about investing explained by Pansy in girlfriend language"
+        title="Learn Investing — 150+ Free Lessons for Women | Bloom"
+        description="Free investing lessons covering stocks, ETFs, mutual funds, dividends, retirement, trading psychology, side hustles, and passive income. Each lesson includes a quiz. Earn XP and a certificate of completion. No jargon — Pansy explains it all in plain language."
       />
       <div className="min-h-screen bg-background pb-20">
         <div className="max-w-4xl mx-auto p-6 space-y-6">

@@ -32,7 +32,23 @@ export default function About() {
         <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet" />
       </Head>
 
-      <SEO title="About — She Blooms Wealth" description="Bloom is a financial education platform built to help women understand money, markets, and investing with confidence." />
+      <SEO
+        title="About She Blooms Wealth — Financial Education for Women"
+        description="Bloom is a free financial education app built for women. Learn investing, budgeting, side hustles, and trading strategies with Pansy, your AI guide. 150+ lessons, paper trading, broker comparison, 6 side hustle journeys, and a certificate. By Cinder Vault Enterprises LLC."
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: [
+            { "@type": "Question", name: "What is Bloom by She Blooms Wealth?", acceptedAnswer: { "@type": "Answer", text: "Bloom is a free financial education app built specifically for women. It teaches investing, budgeting, and side hustles through 150+ plain-language lessons with an AI guide named Pansy." } },
+            { "@type": "Question", name: "Is Bloom free?", acceptedAnswer: { "@type": "Answer", text: "Yes! Bloom offers a free tier with access to all 36 core lessons, paper trading simulator, and budget tracker. Bloom Pro ($7.99/month or $49.99/year) unlocks advanced features like Bloom University, Strategy Lab, and ad-free experience." } },
+            { "@type": "Question", name: "What side hustles does Bloom teach?", acceptedAnswer: { "@type": "Answer", text: "Bloom offers 6 guided side hustle journeys: Dropshipping, TikTok Shop, Content Creation, Digital Products, Freelancing, and UGC (User Generated Content). Each journey has 12 steps from zero to earning." } },
+            { "@type": "Question", name: "What is paper trading in Bloom?", acceptedAnswer: { "@type": "Answer", text: "Paper trading lets you practice buying and selling real stocks with $10,000 in virtual money. You get real-time prices, interactive charts, a trade journal, and P&L tracking — all with zero financial risk." } },
+            { "@type": "Question", name: "Who is Pansy?", acceptedAnswer: { "@type": "Answer", text: "Pansy is Bloom's friendly AI guide. She was a single mom who taught herself budgeting, side hustles, and investing — and eventually fired her boss. Everything she learned is inside Bloom. She explains complex financial topics in plain language, like a smart friend who happens to know about money." } },
+            { "@type": "Question", name: "What trading strategies does Bloom teach?", acceptedAnswer: { "@type": "Answer", text: "Bloom's Strategy Lab teaches 32 strategies across day trading, swing trading, long-term investing, and indicator workshops. Topics include scalping, momentum trading, breakout strategies, DCA, dividend growth, value investing, RSI, MACD, and Bollinger Bands." } },
+            { "@type": "Question", name: "Does Bloom help me find a broker?", acceptedAnswer: { "@type": "Answer", text: "Yes! Bloom's Broker Hub includes a Find My Broker quiz that matches you with the right brokerage based on your needs, plus a broker comparison table with pros, cons, and fees for each platform." } },
+          ],
+        }}
+      />
 
       <div style={{ fontFamily:"'DM Sans', sans-serif", background:C.deep, color:C.ivory, minHeight:"100vh", display:"flex", flexDirection:"column" }}>
 

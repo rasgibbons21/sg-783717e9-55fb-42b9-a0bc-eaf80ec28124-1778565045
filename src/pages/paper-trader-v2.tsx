@@ -305,8 +305,8 @@ export default function PaperTraderV2() {
   return (
     <>
       <Head>
-        <title>Paper Trader | Bloom</title>
-        <meta name="description" content="Practice trading with zero risk. Build your skills, track your streak, climb the leaderboard." />
+        <title>Paper Trading Simulator — Practice Stock Trading Free | Bloom</title>
+        <meta name="description" content="Practice buying and selling real stocks with $10,000 in virtual money. Real-time prices, interactive candlestick charts, trade journal, and P&amp;L tracking. Zero risk stock trading simulator for women learning to invest." />
       </Head>
       <Layout>
         <div className="min-h-screen pb-24" style={{ background: C.navy }}>

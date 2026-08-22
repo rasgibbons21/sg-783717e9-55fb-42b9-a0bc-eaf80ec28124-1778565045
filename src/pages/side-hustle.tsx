@@ -735,8 +735,8 @@ export default function SideHustlePage() {
   return (
     <>
       <Head>
-        <title>Side Hustle Journey | She Blooms Wealth</title>
-        <meta name="description" content="Follow Lexi's 12-step guided journey to start your side hustle." />
+        <title>Side Hustle Journeys — Start a Business From $0 | Bloom</title>
+        <meta name="description" content="6 guided side hustle journeys: dropshipping, TikTok Shop, content creation, digital products, freelancing, and UGC. 12 steps each, from zero to earning. Start a side business from your phone with Lexi's step-by-step coaching. For women who need income that works around their kids." />
       </Head>
       <Layout>
         <div className="min-h-screen" style={{ background: C.bg }}>

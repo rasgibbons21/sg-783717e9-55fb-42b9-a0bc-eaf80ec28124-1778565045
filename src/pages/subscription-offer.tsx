@@ -82,7 +82,7 @@ export default function SubscriptionOffer() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <SEO title="Unlock Everything - Bloom" description="Get unlimited access to Pansy's investing insights" />
+      <SEO title="Bloom Pro — Unlock All Lessons & Features" description="Get Bloom Pro for $7.99/month or $49.99/year. Unlock Bloom University, Strategy Lab with 32 trading strategies, ad-free experience, and unlimited access to all features. 3-day free trial." />
       
       <div className="max-w-2xl w-full space-y-8">
         {/* Hero Section */}

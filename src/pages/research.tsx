@@ -294,7 +294,8 @@ export default function ResearchPage() {
   return (
     <>
       <Head>
-        <title>Bloom Research</title>
+        <title>Stock Research — Deep Dive Into Any Ticker | Bloom</title>
+        <meta name="description" content="Research any stock with real-time price data, interactive charts, and Pansy's plain-language analysis. Compare companies, discover trends, and build conviction before you invest. Free stock research tool for women." />
       </Head>
       <Layout>
         <div className="min-h-screen bg-background px-4 py-6 max-w-2xl mx-auto">

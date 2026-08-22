@@ -301,7 +301,44 @@ export default function LandingPage() {
 
       <SEO
         title="She Blooms Wealth — Free Financial Education for Women"
-        description="Learn everything about money — investing, budgeting, side hustles, real estate, retirement — completely free. 150+ lessons, paper trading simulator, and your friendly guide Pansy. Earn a certificate. Built for women. No jargon."
+        description="Learn investing, budgeting, side hustles, and trading strategies with Pansy, your friendly AI guide. 150+ plain-language lessons, paper trading simulator, budget tracker, broker comparison, 6 side hustle journeys, 32 trading strategies, and a certificate of completion. Built for women. No jargon."
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "Organization",
+              "@id": "https://shebloomswealth.app/#organization",
+              name: "She Blooms Wealth",
+              url: "https://shebloomswealth.app",
+              logo: "https://shebloomswealth.app/bloom-logo.png",
+              description: "Financial education platform built for women — teaching investing, budgeting, and side hustles in plain language.",
+              foundingDate: "2026",
+              founder: { "@type": "Organization", name: "Cinder Vault Enterprises LLC" },
+            },
+            {
+              "@type": "SoftwareApplication",
+              "@id": "https://shebloomswealth.app/#app",
+              name: "Bloom",
+              applicationCategory: "FinanceApplication",
+              operatingSystem: "Android, Web",
+              offers: [
+                { "@type": "Offer", price: "0", priceCurrency: "USD", description: "Free tier with lessons, paper trading, and budget tracker" },
+                { "@type": "Offer", price: "7.99", priceCurrency: "USD", billingIncrement: "P1M", description: "Bloom Pro monthly" },
+                { "@type": "Offer", price: "49.99", priceCurrency: "USD", billingIncrement: "P1Y", description: "Bloom Pro yearly" },
+              ],
+              description: "Free financial education app for women. 150+ lessons on investing, budgeting, and side hustles. Paper trading simulator with $10K virtual money. AI guide Pansy explains everything in plain language.",
+              url: "https://shebloomswealth.app",
+              publisher: { "@id": "https://shebloomswealth.app/#organization" },
+            },
+            {
+              "@type": "WebSite",
+              "@id": "https://shebloomswealth.app/#website",
+              url: "https://shebloomswealth.app",
+              name: "She Blooms Wealth",
+              publisher: { "@id": "https://shebloomswealth.app/#organization" },
+            },
+          ],
+        }}
       />
 
       <div style={{ fontFamily: "'DM Sans', sans-serif", background: C.deep, color: C.ivory, minHeight: "100vh", paddingTop: 36 }}>

@@ -137,8 +137,8 @@ export default function Brokers() {
   return (
     <Layout>
       <SEO
-        title="Find Your Right Broker — Bloom"
-        description="Compare regulated brokers and platforms to find the right fit for your trading and investing journey."
+        title="Best Brokers for Beginners — Compare Brokerages | Bloom"
+        description="Compare the best online brokers and trading platforms for beginner investors. Take the Find My Broker quiz to match with the right brokerage. See pros, cons, fees, and features side by side. Designed for women starting their investing journey."
       />
       <div className="container-full py-8 space-y-6 pb-24">
         {/* ─── Section 1: Header ─── */}

@@ -93,7 +93,7 @@ export default function AskPansyPage() {
 
   return (
     <Layout>
-      <SEO title="Ask Pansy - Bloom" description="Ask Pansy anything — your warm AI guide for investing, money, and beyond." />
+      <SEO title="Ask Pansy — Free AI Financial Guide for Women | Bloom" description="Ask Pansy anything about investing, budgeting, stocks, side hustles, or personal finance. She explains complex money topics in plain language — like a smart friend who happens to know about money." />
 
       <div className="mx-auto flex h-[calc(100vh-8rem)] max-w-3xl flex-col px-4 py-6">
         {/* Header */}
