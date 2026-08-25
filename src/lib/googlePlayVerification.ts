@@ -2,7 +2,7 @@ import { androidpublisher_v3, auth as googleAuth } from "@googleapis/androidpubl
 import { createClient } from "@supabase/supabase-js";
 
 const PACKAGE_NAME =
-  process.env.GOOGLE_PLAY_PACKAGE_NAME || "app.shebloomswealth";
+  process.env.GOOGLE_PLAY_PACKAGE_NAME || "app.shebloomswealth.mobile";
 
 interface VerificationResult {
   valid: boolean;

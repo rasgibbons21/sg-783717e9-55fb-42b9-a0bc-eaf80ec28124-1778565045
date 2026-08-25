@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 const PLAY_BILLING_METHOD = "https://play.google.com/billing";
 const PRODUCT_ID = "bloom_premium";
 const MANAGE_SUBSCRIPTIONS_URL =
-  "https://play.google.com/store/account/subscriptions?package=app.shebloomswealth";
+  "https://play.google.com/store/account/subscriptions?package=app.shebloomswealth.mobile";
 
 type BillingState =
   | "idle"
