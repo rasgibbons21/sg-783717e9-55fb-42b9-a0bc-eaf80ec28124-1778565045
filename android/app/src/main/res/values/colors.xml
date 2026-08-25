@@ -5,4 +5,8 @@
     <color name="navigationColor">#0E1B30</color>
     <color name="navigationColorDark">#0E1B30</color>
     <color name="backgroundColor">#0E1B30</color>
+    <color name="navy">#0E1B30</color>
+    <color name="teal">#27B7C8</color>
+    <color name="emerald">#49B06E</color>
+    <color name="ivory">#F4F7FA</color>
 </resources>
