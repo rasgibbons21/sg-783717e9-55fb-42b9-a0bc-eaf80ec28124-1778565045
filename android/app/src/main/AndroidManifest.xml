@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="com.android.vending.BILLING" />
+
     <application
         android:name="app.shebloomswealth.mobile.Application"
         android:label="She Blooms Wealth"
@@ -118,8 +120,12 @@
     </application>
 
     <queries>
+        <package android:name="com.android.vending" />
         <intent>
             <action android:name="android.support.customtabs.action.CustomTabsService" />
+        </intent>
+        <intent>
+            <action android:name="com.android.vending.billing.InAppBillingService.BIND" />
         </intent>
     </queries>
 
