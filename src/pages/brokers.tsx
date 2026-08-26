@@ -13,6 +13,7 @@ import BrokerDetailModal from "@/components/BrokerDetailModal";
 import BrokerComparisonTable from "@/components/BrokerComparisonTable";
 import BrokerHubDisclaimer from "@/components/BrokerHubDisclaimer";
 import BrokerEducationCards from "@/components/BrokerEducationCards";
+import OpenBrokerageGuide from "@/components/OpenBrokerageGuide";
 import FindMyBrokerWizard from "@/components/FindMyBrokerWizard";
 import { useSavedBrokers } from "@/hooks/useSavedBrokers";
 import { supabase } from "@/integrations/supabase/client";
@@ -346,7 +347,10 @@ export default function Brokers() {
           </>
         )}
 
-        {/* ─── Section 6: Education cards ─── */}
+        {/* ─── Section 6: How to open a brokerage account ─── */}
+        <OpenBrokerageGuide />
+
+        {/* ─── Section 7: Education cards ─── */}
         <BrokerEducationCards />
 
         {/* ─── Section 7: Disclosures ─── */}
