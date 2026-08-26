@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="delegation_service_features">
+        <item>browser.trusted_web_activity.PLAY_BILLING</item>
+    </string-array>
+</resources>

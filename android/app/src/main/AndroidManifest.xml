@@ -84,6 +84,9 @@
                 <action android:name="android.support.customtabs.trusted.TRUSTED_WEB_ACTIVITY_SERVICE" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+            <meta-data
+                android:name="android.support.customtabs.trusted.SUPPORTED_DELEGATIONS"
+                android:resource="@array/delegation_service_features" />
         </service>
 
         <provider
