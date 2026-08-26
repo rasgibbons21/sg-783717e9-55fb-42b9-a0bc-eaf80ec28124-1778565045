@@ -5,7 +5,8 @@
       "namespace": "android_app",
       "package_name": "app.shebloomswealth.mobile",
       "sha256_cert_fingerprints": [
-        "C5:56:12:9B:CE:19:29:BC:6C:CD:95:9C:82:2D:E6:FD:C3:93:03:D9:45:5B:4B:1C:CC:B3:BB:E2:A2:07:88:A5"
+        "C5:56:12:9B:CE:19:29:BC:6C:CD:95:9C:82:2D:E6:FD:C3:93:03:D9:45:5B:4B:1C:CC:B3:BB:E2:A2:07:88:A5",
+        "9A:D1:71:E5:C7:B3:FE:B6:D0:9D:42:C5:43:98:D9:12:62:7E:81:9E:B6:14:2A:67:08:DD:B5:A8:4D:5B:75:8A"
       ]
     }
   }
