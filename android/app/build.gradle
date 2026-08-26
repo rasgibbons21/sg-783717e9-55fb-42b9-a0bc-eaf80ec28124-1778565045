@@ -10,8 +10,8 @@ android {
         applicationId "app.shebloomswealth.mobile"
         minSdk 23
         targetSdk 35
-        versionCode 27
-        versionName "1.0.26"
+        versionCode 28
+        versionName "1.0.27"
 
         manifestPlaceholders = [
             hostName        : "shebloomswealth.app",
@@ -51,6 +51,8 @@ configurations.all {
         force 'org.jetbrains.kotlin:kotlin-stdlib:1.8.22'
         force 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22'
         force 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22'
+        force 'com.android.billingclient:billing:8.0.0'
+        force 'com.android.billingclient:billing-ktx:8.0.0'
     }
 }
 
