@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,28 @@ export default function GooglePlaySubscription() {
     manageSubscriptionUrl,
     hasFreeTrial,
   } = useGooglePlayBilling();
+
+  const [showDebug, setShowDebug] = useState(false);
+  const [debugInfo, setDebugInfo] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    const info: Record<string, string> = {
+      "App Version": "v28 (1.0.27)",
+      "Build": "2026-08-26",
+      "API exists": String("getDigitalGoodsService" in window),
+      "PaymentRequest": String("PaymentRequest" in window),
+      "Standalone": String(
+        window.matchMedia("(display-mode: standalone)").matches ||
+        (window.navigator as any).standalone === true
+      ),
+      "TWA referrer": String(document.referrer.includes("android-app://")),
+      "Referrer": document.referrer || "(empty)",
+      "Billing state": state,
+      "Chrome": navigator.userAgent.match(/Chrome\/[\d.]+/)?.[0] || "unknown",
+    };
+    if (error) info["Error"] = error;
+    setDebugInfo(info);
+  }, [state, error]);
 
   if (state === "success") {
     refresh();
@@ -292,6 +315,24 @@ export default function GooglePlaySubscription() {
         Educational content only. Not financial advice. Bloom is not liable for
         any investment decisions or losses.
       </p>
+
+      {/* Debug panel — tap version to toggle */}
+      <p
+        className="text-[10px] text-center text-muted-foreground/40 cursor-pointer"
+        onClick={() => setShowDebug((v) => !v)}
+      >
+        v28 (1.0.27)
+      </p>
+      {showDebug && (
+        <Card className="p-3 bg-muted/50 border-border text-[10px] font-mono space-y-0.5">
+          {Object.entries(debugInfo).map(([k, v]) => (
+            <div key={k} className="flex justify-between gap-2">
+              <span className="text-muted-foreground">{k}:</span>
+              <span className="text-foreground text-right break-all">{v}</span>
+            </div>
+          ))}
+        </Card>
+      )}
     </div>
   );
 }
