@@ -75,8 +75,17 @@ export function useGooglePlayBilling(): UseBillingReturn {
   const purchasingRef = useRef(false);
 
   const initBilling = useCallback(async () => {
-    if (!("getDigitalGoodsService" in window)) {
+    const hasApi = "getDigitalGoodsService" in window;
+    const isStandalone =
+      window.matchMedia("(display-mode: standalone)").matches ||
+      (window.navigator as any).standalone === true;
+    const isTwa = document.referrer.includes("android-app://");
+
+    if (!hasApi) {
       setState("unavailable");
+      setError(
+        `Billing unavailable — API: ${hasApi}, standalone: ${isStandalone}, twa-ref: ${isTwa}, ua: ${navigator.userAgent.slice(-60)}`
+      );
       return;
     }
 
@@ -109,7 +118,9 @@ export function useGooglePlayBilling(): UseBillingReturn {
     } catch (err: any) {
       console.error("Billing init failed:", err);
       setState("error");
-      setError(`Could not connect to Google Play: ${err.message || err}`);
+      setError(
+        `Play error: ${err.message || err} | API: ${hasApi}, standalone: ${isStandalone}, twa-ref: ${isTwa}`
+      );
     }
   }, []);
 
