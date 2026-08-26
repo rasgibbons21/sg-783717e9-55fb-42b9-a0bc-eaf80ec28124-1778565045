@@ -109,7 +109,7 @@ export function useGooglePlayBilling(): UseBillingReturn {
     } catch (err: any) {
       console.error("Billing init failed:", err);
       setState("error");
-      setError("Could not connect to Google Play. Please try again.");
+      setError(`Could not connect to Google Play: ${err.message || err}`);
     }
   }, []);
 
