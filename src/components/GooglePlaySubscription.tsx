@@ -34,7 +34,7 @@ export default function GooglePlaySubscription() {
 
   useEffect(() => {
     const info: Record<string, string> = {
-      "App Version": "v28 (1.0.27)",
+      "App Version": "v31 (1.0.30)",
       "Build": "2026-08-26",
       "API exists": String("getDigitalGoodsService" in window),
       "PaymentRequest": String("PaymentRequest" in window),
@@ -321,7 +321,7 @@ export default function GooglePlaySubscription() {
         className="text-[10px] text-center text-muted-foreground/40 cursor-pointer"
         onClick={() => setShowDebug((v) => !v)}
       >
-        v28 (1.0.27)
+        v31 (1.0.30)
       </p>
       {showDebug && (
         <Card className="p-3 bg-muted/50 border-border text-[10px] font-mono space-y-0.5">

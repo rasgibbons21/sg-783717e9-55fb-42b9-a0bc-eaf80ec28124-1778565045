@@ -46,25 +46,6 @@ async function obfuscateAccountId(userId: string): Promise<string> {
     .join("");
 }
 
-function classifyOffer(detail: ItemDetails): PlanOffer | null {
-  if (!detail.subscriptionPeriod) return null;
-
-  const period = detail.subscriptionPeriod;
-  const isYearly = period.includes("Y") || period.includes("year");
-  const isMonthly = period.includes("M") || period.includes("month");
-
-  if (!isYearly && !isMonthly) return null;
-
-  return {
-    label: isYearly ? "Yearly" : "Monthly",
-    basePlanId: isYearly ? "yearly" : "monthly",
-    price: `${detail.price.currency} ${detail.price.value}`,
-    priceCurrency: detail.price.currency,
-    period: isYearly ? "year" : "month",
-    offerToken: detail.offerToken,
-  };
-}
-
 export function useGooglePlayBilling(): UseBillingReturn {
   const [state, setState] = useState<BillingState>("idle");
   const [error, setError] = useState<string | null>(null);
@@ -75,16 +56,17 @@ export function useGooglePlayBilling(): UseBillingReturn {
   const purchasingRef = useRef(false);
 
   const initBilling = useCallback(async () => {
-    const hasApi = "getDigitalGoodsService" in window;
+    const hasDigitalGoods = "getDigitalGoodsService" in window;
     const isStandalone =
       window.matchMedia("(display-mode: standalone)").matches ||
       (window.navigator as any).standalone === true;
     const isTwa = document.referrer.includes("android-app://");
+    const hasPaymentRequest = "PaymentRequest" in window;
 
-    if (!hasApi) {
+    if (!hasPaymentRequest) {
       setState("unavailable");
       setError(
-        `Billing unavailable — API: ${hasApi}, standalone: ${isStandalone}, twa-ref: ${isTwa}, ua: ${navigator.userAgent.slice(-60)}`
+        `Billing unavailable — PR: ${hasPaymentRequest}, standalone: ${isStandalone}, twa-ref: ${isTwa}`
       );
       return;
     }
@@ -92,34 +74,80 @@ export function useGooglePlayBilling(): UseBillingReturn {
     setState("loading");
     setError(null);
 
+    // Try Digital Goods API first (works on Android 11/12, may fail on 13+)
+    if (hasDigitalGoods) {
+      try {
+        const service = await window.getDigitalGoodsService(PLAY_BILLING_METHOD);
+        serviceRef.current = service;
+
+        const details = await service.getDetails([PRODUCT_ID]);
+
+        if (details && details.length > 0) {
+          for (const detail of details) {
+            if (!detail.subscriptionPeriod) continue;
+            const period = detail.subscriptionPeriod;
+            const isYearly = period.includes("Y") || period.includes("year");
+            const isMonthly = period.includes("M") || period.includes("month");
+            if (!isYearly && !isMonthly) continue;
+
+            const offer: PlanOffer = {
+              label: isYearly ? "Yearly" : "Monthly",
+              basePlanId: isYearly ? "yearly" : "monthly",
+              price: `${detail.price.currency} ${detail.price.value}`,
+              priceCurrency: detail.price.currency,
+              period: isYearly ? "year" : "month",
+              offerToken: detail.offerToken,
+            };
+
+            if (isMonthly) setMonthlyOffer(offer);
+            if (isYearly) setYearlyOffer(offer);
+            if (detail.freeTrialPeriod) setHasFreeTrial(true);
+          }
+
+          setState("ready");
+          return;
+        }
+      } catch {
+        // Digital Goods API failed (Android 13+ known issue) — fall through to PaymentRequest
+      }
+    }
+
+    // Fallback: check if PaymentRequest can handle Play billing
     try {
-      const service = await window.getDigitalGoodsService(PLAY_BILLING_METHOD);
-      serviceRef.current = service;
+      const testRequest = new PaymentRequest(
+        [{ supportedMethods: PLAY_BILLING_METHOD, data: { sku: PRODUCT_ID } }],
+        { total: { label: "Test", amount: { currency: "USD", value: "0" } } }
+      );
 
-      const details = await service.getDetails([PRODUCT_ID]);
+      const canPay = await testRequest.canMakePayment();
 
-      if (!details || details.length === 0) {
-        setState("error");
-        setError("Subscription plans are not available at this time.");
-        return;
+      if (canPay) {
+        // PaymentRequest works — use hardcoded prices since we can't query them
+        setMonthlyOffer({
+          label: "Monthly",
+          basePlanId: "monthly",
+          price: "USD 7.99",
+          priceCurrency: "USD",
+          period: "month",
+        });
+        setYearlyOffer({
+          label: "Yearly",
+          basePlanId: "yearly",
+          price: "USD 57.99",
+          priceCurrency: "USD",
+          period: "year",
+        });
+        setState("ready");
+      } else {
+        setState("unavailable");
+        setError(
+          `Play Billing not available — canPay: false, DG: ${hasDigitalGoods}, standalone: ${isStandalone}, twa: ${isTwa}`
+        );
       }
-
-      for (const detail of details) {
-        const offer = classifyOffer(detail);
-        if (!offer) continue;
-
-        if (offer.basePlanId === "monthly") setMonthlyOffer(offer);
-        if (offer.basePlanId === "yearly") setYearlyOffer(offer);
-
-        if (detail.freeTrialPeriod) setHasFreeTrial(true);
-      }
-
-      setState("ready");
     } catch (err: any) {
-      console.error("Billing init failed:", err);
       setState("error");
       setError(
-        `Play error: ${err.message || err} | API: ${hasApi}, standalone: ${isStandalone}, twa-ref: ${isTwa}`
+        `Billing check failed: ${err.message || err} | DG: ${hasDigitalGoods}, standalone: ${isStandalone}, twa: ${isTwa}`
       );
     }
   }, []);
@@ -231,20 +259,75 @@ export function useGooglePlayBilling(): UseBillingReturn {
   );
 
   const restorePurchases = useCallback(async (): Promise<boolean> => {
-    if (!serviceRef.current) return false;
+    // Try Digital Goods API first
+    if (serviceRef.current) {
+      setState("verifying");
+      setError(null);
 
+      try {
+        const purchases = await serviceRef.current.listPurchases();
+
+        if (!purchases || purchases.length === 0) {
+          setState("ready");
+          setError("No active subscriptions found on this Google account.");
+          return false;
+        }
+
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (!user) {
+          setState("error");
+          setError("Please sign in to restore purchases.");
+          return false;
+        }
+
+        const session = await supabase.auth.getSession();
+        const accessToken = session.data.session?.access_token;
+
+        let restored = false;
+
+        for (const p of purchases) {
+          const res = await fetch("/api/google-play/verify-purchase", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify({
+              purchaseToken: p.purchaseToken,
+              productId: p.itemId,
+              basePlanId: null,
+            }),
+          });
+
+          const data = await res.json();
+          if (res.ok && data.verified && data.isPro) {
+            restored = true;
+          }
+        }
+
+        if (restored) {
+          setState("success");
+          return true;
+        }
+
+        setState("ready");
+        setError("No valid active subscriptions found.");
+        return false;
+      } catch (err: any) {
+        console.error("Restore error:", err);
+        setState("error");
+        setError("Could not restore purchases. Please try again.");
+        return false;
+      }
+    }
+
+    // Fallback: server-side restore check
     setState("verifying");
     setError(null);
 
     try {
-      const purchases = await serviceRef.current.listPurchases();
-
-      if (!purchases || purchases.length === 0) {
-        setState("ready");
-        setError("No active subscriptions found on this Google account.");
-        return false;
-      }
-
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -254,41 +337,10 @@ export function useGooglePlayBilling(): UseBillingReturn {
         return false;
       }
 
-      const session = await supabase.auth.getSession();
-      const accessToken = session.data.session?.access_token;
-
-      let restored = false;
-
-      for (const p of purchases) {
-        const res = await fetch("/api/google-play/verify-purchase", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({
-            purchaseToken: p.purchaseToken,
-            productId: p.itemId,
-            basePlanId: null,
-          }),
-        });
-
-        const data = await res.json();
-        if (res.ok && data.verified && data.isPro) {
-          restored = true;
-        }
-      }
-
-      if (restored) {
-        setState("success");
-        return true;
-      }
-
       setState("ready");
-      setError("No valid active subscriptions found.");
+      setError("To restore a purchase, please contact support with your Google Play receipt.");
       return false;
-    } catch (err: any) {
-      console.error("Restore error:", err);
+    } catch {
       setState("error");
       setError("Could not restore purchases. Please try again.");
       return false;
