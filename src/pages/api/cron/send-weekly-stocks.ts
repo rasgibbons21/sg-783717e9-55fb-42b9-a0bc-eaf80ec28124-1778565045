@@ -11,12 +11,13 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  if (req.method !== "POST") {
+  if (req.method !== "GET" && req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
   const authHeader = req.headers.authorization;
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  const cronSecret = process.env.CRON_SECRET;
+  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 

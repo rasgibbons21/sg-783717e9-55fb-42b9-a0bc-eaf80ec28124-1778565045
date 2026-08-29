@@ -26,5 +26,11 @@
     }
   ],
   "cleanUrls": true,
-  "trailingSlash": false
+  "trailingSlash": false,
+  "crons": [
+    {
+      "path": "/api/cron/send-weekly-stocks",
+      "schedule": "0 18 * * 5"
+    }
+  ]
 }
