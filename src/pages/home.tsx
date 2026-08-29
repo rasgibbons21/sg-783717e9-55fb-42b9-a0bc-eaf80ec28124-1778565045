@@ -25,6 +25,7 @@ import { TrophyCase } from "@/components/TrophyCase";
 import { PushNotificationPrompt } from "@/components/PushNotificationPrompt";
 import { AdMobBanner } from "@/components/AdMobBanner";
 import { LateBloomersSignup, LateBloomersCard } from "@/components/LateBloomersSignup";
+import { PansyStory } from "@/components/PansyStory";
 
 import { haptic as hx } from "@/lib/motion";
 const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
@@ -733,6 +734,8 @@ export default function Home() {
             ))}
           </div>
         </motion.div>
+
+        <PansyStory />
 
         <LateBloomersSignup />
 
