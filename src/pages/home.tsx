@@ -24,7 +24,7 @@ import { DailyChallenge } from "@/components/DailyChallenge";
 import { TrophyCase } from "@/components/TrophyCase";
 import { PushNotificationPrompt } from "@/components/PushNotificationPrompt";
 import { AdMobBanner } from "@/components/AdMobBanner";
-import { LateBloomersSignup } from "@/components/LateBloomersSignup";
+import { LateBloomersSignup, LateBloomersCard } from "@/components/LateBloomersSignup";
 
 import { haptic as hx } from "@/lib/motion";
 const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
@@ -625,6 +625,8 @@ export default function Home() {
               </div>
             </div>
           </motion.div>
+
+          <LateBloomersCard />
         </motion.div>
 
         <PushNotificationPrompt />

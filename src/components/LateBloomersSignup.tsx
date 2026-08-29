@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { authService } from "@/services/authService";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Mail, TrendingUp, Shield, Clock } from "lucide-react";
+import { X, Mail, TrendingUp, Shield, Clock, ChevronRight } from "lucide-react";
 
 const haptic = (ms = 8) => {
   try { navigator?.vibrate?.(ms); } catch {}
@@ -191,5 +191,106 @@ export function LateBloomersSignup() {
         </motion.div>
       )}
     </AnimatePresence>
+  );
+}
+
+export function LateBloomersCard() {
+  const { isLoggedIn, userId } = useSubscription();
+  const [subscribed, setSubscribed] = useState<boolean | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    if (!isLoggedIn || !userId) return;
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const session = await authService.getCurrentSession();
+        if (!session || cancelled) return;
+        const res = await fetch("/api/late-bloomers", {
+          headers: { Authorization: `Bearer ${session.access_token}` },
+        });
+        if (!res.ok || cancelled) return;
+        const data = await res.json();
+        setSubscribed(data.subscribed);
+      } catch {}
+    })();
+
+    return () => { cancelled = true; };
+  }, [isLoggedIn, userId]);
+
+  const handleJoin = async () => {
+    setLoading(true);
+    haptic(12);
+    try {
+      const session = await authService.getCurrentSession();
+      if (!session) return;
+      const res = await fetch("/api/late-bloomers", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+      if (res.ok) {
+        setDone(true);
+        setSubscribed(true);
+        haptic(20);
+      }
+    } catch {} finally {
+      setLoading(false);
+    }
+  };
+
+  if (subscribed === null || (subscribed && !done)) return null;
+
+  if (done) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="rounded-2xl border border-[#49B06E]/30 p-4 flex items-center gap-3"
+        style={{ background: "rgba(73,176,110,0.06)" }}
+      >
+        <span className="text-2xl">🌸</span>
+        <p className="text-sm text-foreground font-medium">
+          You&apos;re in! Check your inbox every Friday.
+        </p>
+      </motion.div>
+    );
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.2, type: "spring", stiffness: 300, damping: 28 }}
+      className="rounded-2xl border border-border p-4 cursor-pointer hover:border-[#27B7C8]/40 transition-colors"
+      style={{ background: "linear-gradient(135deg, rgba(39,183,200,0.06), rgba(73,176,110,0.04))" }}
+      onClick={handleJoin}
+    >
+      <div className="flex items-start gap-3">
+        <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-lg"
+          style={{ background: "rgba(39,183,200,0.1)" }}>
+          📬
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="font-semibold text-sm text-foreground mb-0.5">
+            Get Pansy&apos;s weekly stock picks
+          </p>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Every Friday — 3 stocks she&apos;s researching, with real breakdowns.
+          </p>
+        </div>
+        <motion.div
+          whileTap={{ scale: 0.9, x: 2 }}
+          className="shrink-0 self-center flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg"
+          style={{ background: "rgba(39,183,200,0.15)", color: "#27B7C8" }}
+        >
+          {loading ? "Joining..." : <>Join <ChevronRight className="w-3.5 h-3.5" /></>}
+        </motion.div>
+      </div>
+    </motion.div>
   );
 }
