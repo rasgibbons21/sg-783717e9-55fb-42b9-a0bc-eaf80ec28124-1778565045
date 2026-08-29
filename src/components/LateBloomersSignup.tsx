@@ -36,7 +36,7 @@ export function LateBloomersSignup() {
         } else {
           const timer = setTimeout(() => {
             if (!cancelled) setShow(true);
-          }, 90_000);
+          }, 10_000);
           return () => clearTimeout(timer);
         }
       } catch {}
