@@ -7,11 +7,12 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { authService } from "@/services/authService";
 import { userService } from "@/services/userService";
-import { Check, Loader2, AlertCircle, Lock } from "lucide-react";
+import { Check, Loader2, AlertCircle, Lock, Share2 } from "lucide-react";
 import { SEO } from "@/components/SEO";
 import { PRO_PLAN } from "@/config/proPlan";
 import { usePaymentProvider } from "@/lib/payments";
 import GooglePlaySubscription from "@/components/GooglePlaySubscription";
+import { QRCodeSVG } from "qrcode.react";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -302,6 +303,33 @@ export default function Subscription() {
             <p className="text-xs text-center text-muted-foreground leading-relaxed">
               Educational content only. Not financial advice. Bloom is not liable for any investment decisions or losses.
             </p>
+          </Card>
+
+          {/* Share QR */}
+          <Card className="p-5 bg-card text-center">
+            <div className="flex items-center justify-center gap-1.5 mb-2">
+              <Share2 className="w-3.5 h-3.5 text-accent" />
+              <span className="text-xs font-semibold text-accent uppercase tracking-wide">Share Bloom</span>
+            </div>
+            <p className="text-sm text-muted-foreground mb-3">
+              Know someone who needs this? Scan to share.
+            </p>
+            <div className="inline-block p-3 rounded-xl bg-white">
+              <QRCodeSVG
+                value="https://shebloomswealth.app"
+                size={120}
+                level="M"
+                fgColor="#0E1B30"
+                bgColor="white"
+                imageSettings={{
+                  src: "/bloom-logo.png",
+                  height: 24,
+                  width: 24,
+                  excavate: true,
+                }}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">shebloomswealth.app</p>
           </Card>
         </div>
       </div>
