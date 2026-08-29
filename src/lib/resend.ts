@@ -47,19 +47,43 @@ export async function sendTrialExpiringEmail(to: string, name: string) {
   });
 }
 
+export interface LateBloomersStock {
+  symbol: string;
+  price: number;
+  why: string;
+  entry_zone: string;
+  risk: string;
+  technical_brief?: string;
+  fundamental_brief?: string;
+  timeframe?: string;
+}
+
 export async function sendLateBloomersEmail(
   to: string,
-  stocks: { symbol: string; price: number; why: string; entry_zone: string; risk: string }[]
+  stocks: LateBloomersStock[]
 ) {
   const stockCards = stocks
     .map(
-      (s) => `
+      (s) => {
+        const techFundSection = (s.technical_brief || s.fundamental_brief) ? `
+          <div style="margin:10px 0;padding:10px;background:rgba(148,163,184,0.06);border-radius:6px">
+            ${s.technical_brief ? `<div style="margin:0 0 6px"><strong style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:0.5px">Technical:</strong> <span style="color:#cbd5e1;font-size:13px">${s.technical_brief}</span></div>` : ""}
+            ${s.fundamental_brief ? `<div style="margin:0"><strong style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:0.5px">Fundamental:</strong> <span style="color:#cbd5e1;font-size:13px">${s.fundamental_brief}</span></div>` : ""}
+          </div>` : "";
+
+        const timeframeTag = s.timeframe ? `
+          <div style="margin:10px 0 0;color:#64748b;font-size:11px">
+            <strong>Timeframe:</strong> ${s.timeframe}
+          </div>` : "";
+
+        return `
       <div style="border-left:4px solid #49B06E;padding:16px;margin:16px 0;background:rgba(73,176,110,0.06);border-radius:0 8px 8px 0">
         <h3 style="margin:0 0 10px;color:#27B7C8;font-size:18px">${s.symbol} @ $${s.price.toFixed(2)}</h3>
         <div style="margin:8px 0">
           <strong style="color:#e2e8f0">Why I'm looking:</strong><br/>
           <span style="color:#94a3b8">${s.why}</span>
         </div>
+        ${techFundSection}
         <div style="margin:8px 0;background:rgba(39,183,200,0.08);padding:10px;border-radius:6px">
           <strong style="color:#e2e8f0">Entry zone:</strong>
           <span style="color:#94a3b8"> ${s.entry_zone}</span>
@@ -68,7 +92,9 @@ export async function sendLateBloomersEmail(
           <strong>Risk I see:</strong>
           <span style="color:#f87171"> ${s.risk}</span>
         </div>
-      </div>`
+        ${timeframeTag}
+      </div>`;
+      }
     )
     .join("");
 
