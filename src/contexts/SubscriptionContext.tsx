@@ -6,6 +6,7 @@ interface SubscriptionContextType {
   isPro: boolean;
   isTrial: boolean;
   trialDaysLeft: number;
+  trialEndsAt: Date | null;
   isLoggedIn: boolean;
   isLoading: boolean;
   userName: string | null;
@@ -20,6 +21,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const [isPro, setIsPro] = useState(false);
   const [isTrial, setIsTrial] = useState(false);
   const [trialDaysLeft, setTrialDaysLeft] = useState(0);
+  const [trialEndsAt, setTrialEndsAt] = useState<Date | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [userName, setUserName] = useState<string | null>(null);
@@ -36,6 +38,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
         setIsPro(false);
         setIsTrial(false);
         setTrialDaysLeft(0);
+        setTrialEndsAt(null);
         setUserName(null);
         setUserId(null);
         return;
@@ -59,6 +62,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
       setIsPro(hasActiveSubscription || onTrial || (profile?.is_pro === true && !trialEnd));
       setIsTrial(onTrial);
       setTrialDaysLeft(daysLeft);
+      setTrialEndsAt(onTrial && trialEnd ? trialEnd : null);
 
       const first = profile?.full_name
         ? (profile.full_name as string).trim().split(" ")[0]
@@ -69,6 +73,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
       setIsPro(false);
       setIsTrial(false);
       setTrialDaysLeft(0);
+      setTrialEndsAt(null);
       setUserName(null);
       setUserId(null);
     } finally {
@@ -81,8 +86,20 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     await loadAuthStatus();
   }, [loadAuthStatus]);
 
+  // Dev-only: ?pro=1 overrides subscription state for previewing Pro features
+  useEffect(() => {
+    if (process.env.NODE_ENV === "development" && router.query.pro === "1") {
+      setIsPro(true);
+      setIsLoggedIn(true);
+      setUserName("Preview");
+      setUserId("dev-preview");
+      setIsLoading(false);
+    }
+  }, [router.query.pro]);
+
   useEffect(() => {
     // Initial load
+    if (process.env.NODE_ENV === "development" && router.query.pro === "1") return;
     loadAuthStatus();
 
     // Supabase fires this on sign-in, sign-out, token refresh — re-validate immediately
@@ -120,7 +137,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   }, [loadAuthStatus, router.events]);
 
   return (
-    <SubscriptionContext.Provider value={{ isPro, isTrial, trialDaysLeft, isLoggedIn, isLoading, userName, userId, refresh }}>
+    <SubscriptionContext.Provider value={{ isPro, isTrial, trialDaysLeft, trialEndsAt, isLoggedIn, isLoading, userName, userId, refresh }}>
       {children}
     </SubscriptionContext.Provider>
   );

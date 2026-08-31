@@ -202,11 +202,15 @@ export const authService = {
 
       // Create profile row in profiles table after successful auth signup
       if (data.user) {
+        const trialEnd = new Date();
+        trialEnd.setDate(trialEnd.getDate() + 1);
+
         await supabase.from('profiles').insert({
           id: data.user.id,
           email: data.user.email || email,
           full_name: fullName,
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
+          trial_ends_at: trialEnd.toISOString(),
         });
 
         // Fire welcome email (best-effort, don't block signup)

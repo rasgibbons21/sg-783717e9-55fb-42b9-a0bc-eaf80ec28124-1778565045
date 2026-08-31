@@ -12,7 +12,7 @@ import { userService } from "@/services/userService";
 import { supabase } from "@/integrations/supabase/client";
 import {
   BookOpen, TrendingUp, MessageCircle,
-  ChevronRight, Flame, Sparkles, Play, Target, Trophy,
+  ChevronRight, Flame, Play, Target, Trophy,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { fadeUp, staggerContainer, staggerChild, cardHover } from "@/lib/motion";
@@ -26,6 +26,7 @@ import { PushNotificationPrompt } from "@/components/PushNotificationPrompt";
 import { AdMobBanner } from "@/components/AdMobBanner";
 import { LateBloomersSignup, LateBloomersCard } from "@/components/LateBloomersSignup";
 import { PansyStory } from "@/components/PansyStory";
+import { TrialCountdown } from "@/components/TrialCountdown";
 
 import { haptic as hx } from "@/lib/motion";
 const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
@@ -339,25 +340,7 @@ export default function Home() {
           <p className="text-muted-foreground mt-1 text-sm">Your next step is ready.</p>
         </div>
 
-        {isTrial && (
-          <Link href="/subscription" className="block">
-            <div className="rounded-xl px-4 py-3 flex items-center justify-between" style={{
-              background: "linear-gradient(135deg, rgba(39,183,200,0.15), rgba(73,176,110,0.1))",
-              border: "1px solid rgba(39,183,200,0.3)",
-            }}>
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-[#27B7C8]" />
-                <span className="text-sm text-foreground">
-                  <span className="font-semibold">{trialDaysLeft} day{trialDaysLeft !== 1 ? "s" : ""}</span>
-                  <span className="text-muted-foreground"> left in your free trial</span>
-                </span>
-              </div>
-              <span className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-[#27B7C8] text-[#0E1B30]">
-                Subscribe
-              </span>
-            </div>
-          </Link>
-        )}
+        <TrialCountdown />
 
         {/* ══════ OVERALL PROGRESS + STATS ══════ */}
         <motion.div
