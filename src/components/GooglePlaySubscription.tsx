@@ -23,6 +23,7 @@ export default function GooglePlaySubscription() {
     error,
     monthlyOffer,
     yearlyOffer,
+    lifetimeOffer,
     purchase,
     restorePurchases,
     manageSubscriptionUrl,
@@ -171,13 +172,11 @@ export default function GooglePlaySubscription() {
       </Card>
 
       {/* Plan cards */}
-      {(monthlyOffer || yearlyOffer) && (
+      {(monthlyOffer || yearlyOffer || lifetimeOffer) && (
         <div className="space-y-3">
           {monthlyOffer && (
             <Card
-              className={`p-5 border transition-all cursor-pointer ${
-                !yearlyOffer ? "border-accent" : "border-border hover:border-accent/50"
-              }`}
+              className="p-5 border border-border hover:border-accent/50 transition-all cursor-pointer"
               onClick={() => !isLoading && purchase(monthlyOffer)}
             >
               <div className="flex items-center justify-between">
@@ -203,7 +202,7 @@ export default function GooglePlaySubscription() {
               onClick={() => !isLoading && purchase(yearlyOffer)}
             >
               <Badge className="absolute -top-2.5 right-4 bg-accent text-accent-foreground text-[10px] px-2 py-0.5 gap-1">
-                <Sparkles className="w-3 h-3" /> Best value
+                <Sparkles className="w-3 h-3" /> Save 50%
               </Badge>
               <div className="flex items-center justify-between">
                 <div>
@@ -216,6 +215,29 @@ export default function GooglePlaySubscription() {
                   </p>
                   <p className="text-xs text-muted-foreground mt-0.5">
                     Billed yearly
+                  </p>
+                </div>
+              </div>
+            </Card>
+          )}
+
+          {lifetimeOffer && (
+            <Card
+              className="p-5 relative transition-all cursor-pointer hover:shadow-md hover:shadow-accent/10"
+              style={{ border: "2px solid transparent", backgroundImage: "linear-gradient(hsl(var(--card)), hsl(var(--card))), linear-gradient(135deg, hsl(var(--accent)), #a855f7)", backgroundOrigin: "border-box", backgroundClip: "padding-box, border-box" }}
+              onClick={() => !isLoading && purchase(lifetimeOffer)}
+            >
+              <Badge className="absolute -top-2.5 right-4 text-[10px] px-2 py-0.5 gap-1 text-white" style={{ background: "linear-gradient(135deg, hsl(var(--accent)), #a855f7)" }}>
+                <Sparkles className="w-3 h-3" /> Best Value
+              </Badge>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-semibold text-foreground">Lifetime</p>
+                  <p className="text-2xl font-bold text-foreground mt-1">
+                    {lifetimeOffer.price?.replace(/(\.\d{2})\d*/, "$1") || lifetimeOffer.price}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    One-time payment — forever access
                   </p>
                 </div>
               </div>
@@ -235,7 +257,7 @@ export default function GooglePlaySubscription() {
       )}
 
       {/* Purchase button */}
-      {(monthlyOffer || yearlyOffer) && (
+      {(monthlyOffer || yearlyOffer || lifetimeOffer) && (
         <div className="space-y-3">
           {state === "purchasing" && (
             <div className="flex items-center justify-center gap-2 py-3">

@@ -92,6 +92,47 @@ function mapSubscriptionState(
   }
 }
 
+export async function verifyOneTimeProduct(
+  purchaseToken: string,
+  productId: string
+): Promise<VerificationResult> {
+  const publisher = getPublisherClient();
+
+  const response = await publisher.purchases.products.get({
+    packageName: PACKAGE_NAME,
+    productId,
+    token: purchaseToken,
+  });
+
+  const purchase = response.data;
+
+  // purchaseState: 0 = purchased, 1 = canceled, 2 = pending
+  const purchased = purchase.purchaseState === 0;
+  const acknowledged = purchase.acknowledgementState === 1;
+
+  return {
+    valid: true,
+    isPro: purchased,
+    subscriptionStatus: purchased ? "lifetime" : "canceled",
+    expiryTime: null,
+    acknowledged,
+  };
+}
+
+export async function acknowledgeProduct(
+  purchaseToken: string,
+  productId: string
+): Promise<void> {
+  const publisher = getPublisherClient();
+
+  await publisher.purchases.products.acknowledge({
+    packageName: PACKAGE_NAME,
+    productId,
+    token: purchaseToken,
+    requestBody: {},
+  });
+}
+
 export async function verifySubscription(
   purchaseToken: string,
   productId: string
@@ -175,17 +216,25 @@ export async function verifyAndUpdateProfile(
     };
   }
 
-  const result = await verifySubscription(purchaseToken, productId);
+  const isLifetime = productId === "bloom_lifetime" || basePlanId === "lifetime";
+
+  const result = isLifetime
+    ? await verifyOneTimeProduct(purchaseToken, productId)
+    : await verifySubscription(purchaseToken, productId);
 
   if (!result.valid) return result;
 
   // Acknowledge if not yet acknowledged
   if (!result.acknowledged) {
     try {
-      await acknowledgeSubscription(purchaseToken, productId);
+      if (isLifetime) {
+        await acknowledgeProduct(purchaseToken, productId);
+      } else {
+        await acknowledgeSubscription(purchaseToken, productId);
+      }
       result.acknowledged = true;
     } catch (ackErr: any) {
-      console.error("Failed to acknowledge subscription:", ackErr.message);
+      console.error("Failed to acknowledge purchase:", ackErr.message);
     }
   }
 
