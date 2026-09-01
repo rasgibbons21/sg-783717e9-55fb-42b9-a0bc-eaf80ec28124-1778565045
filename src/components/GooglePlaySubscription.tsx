@@ -184,7 +184,7 @@ export default function GooglePlaySubscription() {
                 <div>
                   <p className="font-semibold text-foreground">Monthly</p>
                   <p className="text-2xl font-bold text-foreground mt-1">
-                    {monthlyOffer.price}
+                    {monthlyOffer.price?.replace(/(\.\d{2})\d*/, "$1") || monthlyOffer.price}
                     <span className="text-sm font-normal text-muted-foreground">
                       /month
                     </span>
@@ -209,7 +209,7 @@ export default function GooglePlaySubscription() {
                 <div>
                   <p className="font-semibold text-foreground">Yearly</p>
                   <p className="text-2xl font-bold text-foreground mt-1">
-                    {yearlyOffer.price}
+                    {yearlyOffer.price?.replace(/(\.\d{2})\d*/, "$1") || yearlyOffer.price}
                     <span className="text-sm font-normal text-muted-foreground">
                       /year
                     </span>
