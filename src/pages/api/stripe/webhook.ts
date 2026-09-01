@@ -75,29 +75,48 @@ export default async function handler(
           return res.status(400).json({ error: "No user ID found" });
         }
 
-        // Get the subscription ID
-        const subscriptionId = session.subscription as string;
+        const isLifetime = session.metadata?.plan === "lifetime";
 
-        // Update user profile to Pro
-        const { error: updateError } = await supabaseAdmin
-          .from("profiles")
-          .update({
-            is_pro: true,
-            stripe_customer_id: session.customer as string,
-            stripe_subscription_id: subscriptionId,
-            subscription_status: "active",
-            current_period_end: new Date(
-              Date.now() + 30 * 24 * 60 * 60 * 1000
-            ).toISOString(), // Default to 30 days, will be updated by subscription webhook
-          })
-          .eq("id", userId);
+        if (isLifetime) {
+          const { error: updateError } = await supabaseAdmin
+            .from("profiles")
+            .update({
+              is_pro: true,
+              stripe_customer_id: session.customer as string,
+              subscription_status: "lifetime",
+              current_period_end: null,
+            })
+            .eq("id", userId);
 
-        if (updateError) {
-          console.error("Error updating user profile:", updateError);
-          return res.status(500).json({ error: updateError.message });
+          if (updateError) {
+            console.error("Error updating user profile:", updateError);
+            return res.status(500).json({ error: updateError.message });
+          }
+
+          console.log(`User ${userId} upgraded to Lifetime Pro`);
+        } else {
+          const subscriptionId = session.subscription as string;
+
+          const { error: updateError } = await supabaseAdmin
+            .from("profiles")
+            .update({
+              is_pro: true,
+              stripe_customer_id: session.customer as string,
+              stripe_subscription_id: subscriptionId,
+              subscription_status: "active",
+              current_period_end: new Date(
+                Date.now() + 30 * 24 * 60 * 60 * 1000
+              ).toISOString(),
+            })
+            .eq("id", userId);
+
+          if (updateError) {
+            console.error("Error updating user profile:", updateError);
+            return res.status(500).json({ error: updateError.message });
+          }
+
+          console.log(`User ${userId} upgraded to Pro`);
         }
-
-        console.log(`User ${userId} upgraded to Pro`);
         break;
       }
 

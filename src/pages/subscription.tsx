@@ -4,7 +4,6 @@ import { Layout } from "@/components/Layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
 import { authService } from "@/services/authService";
 import { userService } from "@/services/userService";
 import { Check, Loader2, AlertCircle, Lock, Share2 } from "lucide-react";
@@ -19,7 +18,6 @@ import { QRCodeSVG } from "qrcode.react";
 export default function Subscription() {
   const router = useRouter();
   const { canShowExternalPayment, canShowInAppPayment } = usePaymentProvider();
-  const [isYearly, setIsYearly] = useState(false);
   const [currentPlan, setCurrentPlan] = useState<"free" | "pro">("free");
   const [isProcessing, setIsProcessing] = useState(false);
   const [user, setUser] = useState<any>(null);
@@ -45,13 +43,16 @@ export default function Subscription() {
     }
   }, [router]);
 
-  const handleSubscribe = async () => {
+  const handleSubscribe = async (plan: "monthly" | "yearly" | "lifetime") => {
     setIsProcessing(true);
     setErrorMsg(null);
     try {
-      const priceId = isYearly 
-        ? process.env.NEXT_PUBLIC_STRIPE_YEARLY_PRICE_ID 
-        : process.env.NEXT_PUBLIC_STRIPE_MONTHLY_PRICE_ID;
+      const priceIdMap: Record<string, string | undefined> = {
+        monthly: process.env.NEXT_PUBLIC_STRIPE_MONTHLY_PRICE_ID,
+        yearly: process.env.NEXT_PUBLIC_STRIPE_YEARLY_PRICE_ID,
+        lifetime: process.env.NEXT_PUBLIC_STRIPE_LIFETIME_PRICE_ID,
+      };
+      const priceId = priceIdMap[plan];
 
       if (!priceId) {
         throw new Error("Subscription pricing is not configured correctly.");
@@ -65,7 +66,8 @@ export default function Subscription() {
         body: JSON.stringify({
           priceId,
           userId: user?.id,
-          email: user?.email
+          email: user?.email,
+          isLifetime: plan === "lifetime",
         }),
       });
 
@@ -76,7 +78,6 @@ export default function Subscription() {
       }
 
       if (data.url) {
-        // Redirect to Stripe hosted checkout
         window.location.href = data.url;
       } else {
         throw new Error("No checkout URL returned");
@@ -91,6 +92,7 @@ export default function Subscription() {
   const monthlyPrice = PRO_PLAN.monthlyPrice;
   const yearlyPrice = PRO_PLAN.yearlyPrice;
   const yearlyMonthly = PRO_PLAN.yearlyMonthly;
+  const lifetimePrice = PRO_PLAN.lifetimePrice;
 
   if (canShowInAppPayment) {
     return (
@@ -144,27 +146,6 @@ export default function Subscription() {
             </Card>
           )}
 
-          <Card className="p-4 bg-card">
-            <div className="flex items-center justify-center gap-4">
-              <span className={`text-sm font-medium ${!isYearly ? "text-foreground" : "text-muted-foreground"}`}>
-                Monthly
-              </span>
-              <Switch
-                checked={isYearly}
-                onCheckedChange={setIsYearly}
-                className="data-[state=checked]:bg-accent"
-              />
-              <span className={`text-sm font-medium ${isYearly ? "text-foreground" : "text-muted-foreground"}`}>
-                Yearly
-              </span>
-              {isYearly && (
-                <Badge className="bg-accent text-accent-foreground">
-                  Save 40%
-                </Badge>
-              )}
-            </div>
-          </Card>
-
           <div className="space-y-4">
             {/* Free Plan */}
             <Card className={`p-6 ${currentPlan === "free" ? "border-primary border-2" : ""}`}>
@@ -212,33 +193,56 @@ export default function Subscription() {
               </div>
             </Card>
 
-            {/* Pro Plan */}
-            <Card className={`p-6 border-accent ${currentPlan === "pro" ? "border-2" : "border"}`}>
+            {/* Monthly Plan */}
+            <Card className="p-6 border border-accent">
               <div className="space-y-4">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-serif text-xl font-bold text-foreground">Bloom Pro</h3>
-                      <Badge className="bg-accent text-accent-foreground">Popular</Badge>
-                    </div>
-                    <div className="mt-2">
-                      {isYearly ? (
-                        <>
-                          <p className="text-2xl font-bold text-foreground">${yearlyMonthly}/mo</p>
-                          <p className="text-sm text-muted-foreground">
-                            Billed ${yearlyPrice}/year
-                          </p>
-                        </>
-                      ) : (
-                        <p className="text-2xl font-bold text-foreground">${monthlyPrice}/mo</p>
-                      )}
-                    </div>
+                <div>
+                  <h3 className="font-serif text-xl font-bold text-foreground">Monthly</h3>
+                  <p className="text-2xl font-bold text-foreground mt-1">${monthlyPrice}<span className="text-sm font-normal text-muted-foreground">/mo</span></p>
+                  <p className="text-sm text-muted-foreground">Cancel anytime</p>
+                </div>
+
+                {currentPlan === "free" && (
+                  <div className="pt-2">
+                    {user ? (
+                      <Button
+                        className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
+                        onClick={() => handleSubscribe("monthly")}
+                        disabled={isProcessing}
+                      >
+                        {isProcessing ? (
+                          <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Redirecting...</>
+                        ) : (
+                          "Subscribe Monthly"
+                        )}
+                      </Button>
+                    ) : (
+                      <Button
+                        className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
+                        onClick={() => router.push("/onboarding")}
+                      >
+                        Sign Up Free, Then Upgrade
+                      </Button>
+                    )}
                   </div>
-                  {currentPlan === "pro" && (
-                    <Badge variant="outline" className="border-accent text-accent">
-                      Current Plan
-                    </Badge>
-                  )}
+                )}
+
+                {currentPlan === "pro" && (
+                  <Button variant="outline" className="w-full border-accent text-accent" disabled>
+                    Active Plan
+                  </Button>
+                )}
+              </div>
+            </Card>
+
+            {/* Yearly Plan */}
+            <Card className="p-6 border-2 border-accent relative">
+              <Badge className="absolute -top-2.5 left-4 bg-accent text-accent-foreground">Save 50%</Badge>
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-serif text-xl font-bold text-foreground">Yearly</h3>
+                  <p className="text-2xl font-bold text-foreground mt-1">${yearlyMonthly}<span className="text-sm font-normal text-muted-foreground">/mo</span></p>
+                  <p className="text-sm text-muted-foreground">Billed ${yearlyPrice}/year</p>
                 </div>
 
                 <ul className="space-y-2">
@@ -260,20 +264,17 @@ export default function Subscription() {
                 </ul>
 
                 {currentPlan === "free" && (
-                  <div className="space-y-3 pt-4">
+                  <div className="space-y-3 pt-2">
                     {user ? (
                       <Button
                         className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
-                        onClick={handleSubscribe}
+                        onClick={() => handleSubscribe("yearly")}
                         disabled={isProcessing}
                       >
                         {isProcessing ? (
-                          <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            Redirecting to Stripe...
-                          </>
+                          <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Redirecting...</>
                         ) : (
-                          "Upgrade to Bloom Pro"
+                          "Subscribe Yearly"
                         )}
                       </Button>
                     ) : (
@@ -287,6 +288,67 @@ export default function Subscription() {
                     <p className="text-xs text-center text-muted-foreground">
                       Secure checkout powered by Stripe
                     </p>
+                  </div>
+                )}
+
+                {currentPlan === "pro" && (
+                  <Button variant="outline" className="w-full border-accent text-accent" disabled>
+                    Active Plan
+                  </Button>
+                )}
+              </div>
+            </Card>
+
+            {/* Lifetime Plan */}
+            <Card className="p-6 border border-border relative overflow-hidden">
+              <div className="absolute top-0 right-0 px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-bl-lg"
+                style={{ background: "linear-gradient(135deg, #27B7C8, #49B06E)", color: "#0E1B30" }}>
+                Best Value
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-serif text-xl font-bold text-foreground">Lifetime</h3>
+                  <p className="text-2xl font-bold text-foreground mt-1">${lifetimePrice}<span className="text-sm font-normal text-muted-foreground"> one-time</span></p>
+                  <p className="text-sm text-muted-foreground">Pay once, yours forever</p>
+                </div>
+
+                <ul className="space-y-2">
+                  {[
+                    "Everything in Bloom Pro",
+                    "All future updates included",
+                    "No recurring payments ever",
+                  ].map((feature) => (
+                    <li key={feature} className="flex items-start gap-2">
+                      <Check className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
+                      <span className="text-sm text-foreground">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                {currentPlan === "free" && (
+                  <div className="pt-2">
+                    {user ? (
+                      <Button
+                        className="w-full text-[#0E1B30] font-bold"
+                        style={{ background: "linear-gradient(135deg, #27B7C8, #49B06E)" }}
+                        onClick={() => handleSubscribe("lifetime")}
+                        disabled={isProcessing}
+                      >
+                        {isProcessing ? (
+                          <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Redirecting...</>
+                        ) : (
+                          "Get Lifetime Access"
+                        )}
+                      </Button>
+                    ) : (
+                      <Button
+                        className="w-full text-[#0E1B30] font-bold"
+                        style={{ background: "linear-gradient(135deg, #27B7C8, #49B06E)" }}
+                        onClick={() => router.push("/onboarding")}
+                      >
+                        Sign Up Free, Then Upgrade
+                      </Button>
+                    )}
                   </div>
                 )}
 

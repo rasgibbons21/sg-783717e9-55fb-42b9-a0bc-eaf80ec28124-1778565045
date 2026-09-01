@@ -978,7 +978,7 @@ export default function PaperTraderV2() {
                 <Link href="/subscription"
                   className="inline-block px-5 py-2 rounded-xl text-xs font-semibold"
                   style={{ background: `linear-gradient(135deg, ${C.emerald}, ${C.teal})`, color: "#fff" }}>
-                  $7.99/mo — Subscribe
+                  $4.99/mo — Subscribe
                 </Link>
               </div>
             </div>

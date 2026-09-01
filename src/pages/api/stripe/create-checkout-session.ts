@@ -12,7 +12,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const { priceId, userId, email } = req.body;
+    const { priceId, userId, email, isLifetime } = req.body;
 
     if (!priceId) {
       return res.status(400).json({ error: 'Price ID is required' });
@@ -20,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
-      mode: 'subscription',
+      mode: isLifetime ? 'payment' : 'subscription',
       line_items: [
         {
           price: priceId,
@@ -33,6 +33,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       client_reference_id: userId || undefined,
       metadata: {
         userId: userId || '',
+        plan: isLifetime ? 'lifetime' : 'subscription',
       }
     });
 

@@ -1,10 +1,12 @@
 export const PRO_PLAN = {
-  monthlyPrice: 7.99,
-  yearlyPrice: 57.99,
-  yearlyMonthly: (57.99 / 12).toFixed(2),
-  monthlyLabel: "$7.99/mo",
-  yearlyLabel: "$57.99/yr",
-  yearlySavingsLabel: "Save 40% · nearly 5 months free",
+  monthlyPrice: 4.99,
+  yearlyPrice: 29.99,
+  yearlyMonthly: (29.99 / 12).toFixed(2),
+  lifetimePrice: 69.99,
+  monthlyLabel: "$4.99/mo",
+  yearlyLabel: "$29.99/yr",
+  lifetimeLabel: "$69.99 one-time",
+  yearlySavingsLabel: "Save 50%",
   benefits: [
     "Save your portfolio — your holdings and progress, there every time you come back.",
     "Unlock every locked lesson — the income-stream playbooks (real estate, digital products, affiliate, REITs, LLC, cash-flow business) plus the full trading-psychology system.",

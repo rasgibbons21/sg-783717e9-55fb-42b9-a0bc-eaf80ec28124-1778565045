@@ -797,7 +797,7 @@ function ProUpsellBanner() {
       </div>
       <Link href="/subscription" className="text-xs font-semibold px-3 py-1.5 rounded-lg transition-all hover:brightness-110 flex-shrink-0"
         style={{ background: C.accent, color: C.bg }}>
-        $7.99/mo
+        $4.99/mo
       </Link>
     </div>
   );

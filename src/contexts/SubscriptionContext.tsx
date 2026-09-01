@@ -53,7 +53,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
         .eq("id", user.id)
         .single();
 
-      const hasActiveSubscription = profile?.subscription_status === "active";
+      const hasActiveSubscription = profile?.subscription_status === "active" || profile?.subscription_status === "lifetime";
       const trialEnd = profile?.trial_ends_at ? new Date(profile.trial_ends_at as string) : null;
       const now = new Date();
       const onTrial = trialEnd !== null && trialEnd > now && !hasActiveSubscription;
