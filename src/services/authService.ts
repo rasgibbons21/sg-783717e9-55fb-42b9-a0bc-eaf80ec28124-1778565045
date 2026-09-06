@@ -203,7 +203,7 @@ export const authService = {
       // Create profile row in profiles table after successful auth signup
       if (data.user) {
         const trialEnd = new Date();
-        trialEnd.setDate(trialEnd.getDate() + 1);
+        trialEnd.setDate(trialEnd.getDate() + 7);
 
         await supabase.from('profiles').insert({
           id: data.user.id,
