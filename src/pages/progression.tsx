@@ -9,8 +9,9 @@ import { useSubscription } from "@/contexts/SubscriptionContext";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Trophy, Lock, CheckCircle, Sparkles, AlertTriangle,
-  Loader2, TrendingUp, BookOpen, NotebookPen, ChevronRight,
+  Loader2, TrendingUp, BookOpen, NotebookPen, ChevronRight, Share2,
 } from "lucide-react";
+import { useShareAchievement } from "@/components/ShareAchievement";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 interface Level { level: number; name: string; badge: string; xpRequired: number }
@@ -236,6 +237,7 @@ export default function ProgressionPage(_props: PageProps) {
   const [data, setData] = useState<ProgressionData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const { share, ShareModal } = useShareAchievement();
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -328,6 +330,25 @@ export default function ProgressionPage(_props: PageProps) {
                     <span className="text-sm text-[#49B06E] font-semibold">🎓 Maximum level achieved!</span>
                   </div>
                 )}
+
+                <button
+                  onClick={() => share({
+                    type: 'achievement',
+                    title: `Level ${data.level.current.level} — ${data.level.current.name}`,
+                    subtitle: `${data.xp.toLocaleString()} XP earned on Bloom`,
+                    emoji: data.level.current.badge,
+                    stats: [
+                      { label: 'Level', value: String(data.level.current.level) },
+                      { label: 'XP', value: data.xp.toLocaleString() },
+                      { label: 'Missions', value: `${data.missions.filter(m => m.status === "completed").length}/${data.missions.length}` },
+                    ],
+                  })}
+                  className="w-full mt-3 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-medium transition-all hover:brightness-125"
+                  style={{ color: '#27B7C8', background: 'rgba(39,183,200,0.08)', border: '1px solid rgba(39,183,200,0.15)' }}
+                >
+                  <Share2 className="w-3.5 h-3.5" />
+                  Share My Progress
+                </button>
               </div>
 
               {/* ── Discipline Habits ────────────────────────────────────── */}
@@ -447,6 +468,7 @@ export default function ProgressionPage(_props: PageProps) {
             </div>
           )}
         </div>
+        {ShareModal}
       </Layout>
     </>
   );

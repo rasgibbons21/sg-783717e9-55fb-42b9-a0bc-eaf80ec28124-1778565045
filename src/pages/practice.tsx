@@ -20,8 +20,9 @@ import {
   Sparkles, NotebookPen, Loader2, Trophy, BarChart3, Globe,
   Calculator, Calendar, Settings, Wallet, LayoutDashboard,
   Bell, ChevronDown, Bookmark, Menu, DollarSign, Clock,
-  ArrowUpRight, ArrowDownRight, Target, Sun, Moon,
+  ArrowUpRight, ArrowDownRight, Target, Sun, Moon, Share2,
 } from "lucide-react";
+import { useShareAchievement } from "@/components/ShareAchievement";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 interface Account {
@@ -235,7 +236,7 @@ function gradeColor(g: string) {
   return { color: C.red, bg: "rgba(239,68,68,0.1)", border: "rgba(239,68,68,0.3)" };
 }
 
-function TradeReviewModal({ state, onClose }: { state: ReviewState; onClose: () => void }) {
+function TradeReviewModal({ state, onClose, onShare }: { state: ReviewState; onClose: () => void; onShare?: () => void }) {
   const { review, journal_id, loading, error, ticker, pnl } = state;
   const win = pnl >= 0;
   const gc = review ? gradeColor(review.overall_grade) : null;
@@ -300,10 +301,18 @@ function TradeReviewModal({ state, onClose }: { state: ReviewState; onClose: () 
             )}
           </>
         )}
-        <button onClick={onClose} className="w-full py-3 rounded-xl font-semibold text-sm transition-colors"
-          style={{ background: "rgba(255,255,255,0.05)", color: C.textDim, border: `1px solid ${C.cardBorder}` }}>
-          Close
-        </button>
+        <div className="flex gap-2">
+          {win && onShare && (
+            <button onClick={onShare} className="flex items-center justify-center gap-1.5 px-5 py-3 rounded-xl font-semibold text-sm transition-all hover:scale-105"
+              style={{ background: "rgba(39,183,200,0.1)", color: C.accent, border: `1px solid rgba(39,183,200,0.2)` }}>
+              <Share2 className="w-4 h-4" /> Share Win
+            </button>
+          )}
+          <button onClick={onClose} className="flex-1 py-3 rounded-xl font-semibold text-sm transition-colors"
+            style={{ background: "rgba(255,255,255,0.05)", color: C.textDim, border: `1px solid ${C.cardBorder}` }}>
+            Close
+          </button>
+        </div>
         <p className="mt-3 text-[10px] text-center" style={{ color: C.textMuted }}>
           Educational simulator — not a brokerage, not financial advice.
         </p>
@@ -818,6 +827,7 @@ export default function PracticePage(_props: PageProps) {
   const [showOpenModal, setShowOpenModal] = useState(false);
   const [closingTrade, setClosingTrade] = useState<Trade | null>(null);
   const [reviewState, setReviewState] = useState<ReviewState | null>(null);
+  const { share, ShareModal } = useShareAchievement();
   const [tab, setTab] = useState<"open" | "closed">("open");
   const [livePrices, setLivePrices] = useState<Record<string, number>>({});
   const [pricesLoading, setPricesLoading] = useState(false);
@@ -1431,8 +1441,26 @@ export default function PracticePage(_props: PageProps) {
           onSubmit={handleCloseTrade} onCancel={() => setClosingTrade(null)} />
       )}
       {reviewState && (
-        <TradeReviewModal state={reviewState} onClose={() => setReviewState(null)} />
+        <TradeReviewModal
+          state={reviewState}
+          onClose={() => setReviewState(null)}
+          onShare={() => {
+            share({
+              type: 'trade',
+              title: `+$${Math.abs(reviewState.pnl).toFixed(2)} on ${reviewState.ticker}`,
+              subtitle: reviewState.review ? `Grade: ${reviewState.review.overall_grade}` : 'Profitable trade on Bloom Practice Trader',
+              emoji: reviewState.pnl >= 100 ? '🚀' : reviewState.pnl >= 50 ? '🔥' : '💚',
+              stats: [
+                { label: 'P&L', value: `+$${Math.abs(reviewState.pnl).toFixed(2)}` },
+                ...(reviewState.review ? [{ label: 'Grade', value: reviewState.review.overall_grade }] : []),
+                { label: 'Ticker', value: reviewState.ticker },
+              ],
+              accentColor: '#49B06E',
+            });
+          }}
+        />
       )}
+      {ShareModal}
     </>
   );
 }

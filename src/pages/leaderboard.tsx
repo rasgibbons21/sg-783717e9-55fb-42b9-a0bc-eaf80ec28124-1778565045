@@ -5,7 +5,8 @@ import { Layout } from "@/components/Layout";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { supabase } from "@/integrations/supabase/client";
 import { AdMobBanner } from "@/components/AdMobBanner";
-import { Trophy, Loader2, ArrowLeft } from "lucide-react";
+import { Trophy, Loader2, ArrowLeft, Share2 } from "lucide-react";
+import { useShareAchievement } from "@/components/ShareAchievement";
 
 interface LeaderboardRow {
   user_id: string;
@@ -39,6 +40,7 @@ export default function LeaderboardPage() {
   const [top, setTop] = useState<LeaderboardRow[]>([]);
   const [me, setMe] = useState<LeaderboardRow | null>(null);
   const [loading, setLoading] = useState(true);
+  const { share, ShareModal } = useShareAchievement();
 
   const fetchLeaderboard = useCallback(async () => {
     setLoading(true);
@@ -242,18 +244,47 @@ export default function LeaderboardPage() {
             )}
 
             {!authLoading && !loading && isLoggedIn && (
-              <button
-                onClick={fetchLeaderboard}
-                className="mt-4 w-full py-2.5 rounded-xl text-xs font-medium transition-colors"
-                style={{
-                  color: C.textDim,
-                  background: "rgba(255,255,255,0.03)",
-                  border: `1px solid ${C.cardBorder}`,
-                }}
-              >
-                Refresh
-              </button>
+              <div className="flex gap-2 mt-4">
+                <button
+                  onClick={fetchLeaderboard}
+                  className="flex-1 py-2.5 rounded-xl text-xs font-medium transition-colors"
+                  style={{
+                    color: C.textDim,
+                    background: "rgba(255,255,255,0.03)",
+                    border: `1px solid ${C.cardBorder}`,
+                  }}
+                >
+                  Refresh
+                </button>
+                {me && (
+                  <button
+                    onClick={() => share({
+                      type: 'leaderboard',
+                      title: `#${me.rank} on Bloom`,
+                      subtitle: `${me.total_trades} trades · ${me.win_rate}% win rate`,
+                      emoji: me.rank === 1 ? '🥇' : me.rank === 2 ? '🥈' : me.rank === 3 ? '🥉' : '🏆',
+                      stats: [
+                        { label: 'Rank', value: `#${me.rank}` },
+                        { label: 'P&L', value: `${me.total_pnl >= 0 ? '+' : ''}$${Math.abs(me.total_pnl).toFixed(2)}` },
+                        { label: 'Win Rate', value: `${me.win_rate}%` },
+                      ],
+                      accentColor: '#D4AF37',
+                    })}
+                    className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-medium transition-all hover:scale-105"
+                    style={{
+                      color: C.accent,
+                      background: "rgba(39,183,200,0.08)",
+                      border: `1px solid rgba(39,183,200,0.2)`,
+                    }}
+                  >
+                    <Share2 className="w-3.5 h-3.5" />
+                    Share
+                  </button>
+                )}
+              </div>
             )}
+
+            {ShareModal}
 
             <div className="mt-8 text-center">
               <p className="text-[10px]" style={{ color: C.textMuted }}>
