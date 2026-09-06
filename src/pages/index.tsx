@@ -337,6 +337,45 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* ── FREE EBOOK PROMO ─────────────────────────────────────────── */}
+        <section style={{ maxWidth:720, margin:"0 auto", padding:"3rem 1.5rem 0" }}>
+          <Link href="/ebook" style={{ textDecoration:"none", display:"block" }}>
+            <div style={{
+              ...glass,
+              borderRadius:20,
+              padding:"2rem 1.75rem",
+              position:"relative",
+              overflow:"hidden",
+              cursor:"pointer",
+              transition:"transform 0.2s, box-shadow 0.2s",
+              border:"1px solid rgba(212,168,83,0.2)",
+              boxShadow:"0 4px 24px rgba(0,0,0,0.24)",
+            }}
+              onMouseEnter={e => { e.currentTarget.style.transform="translateY(-2px)"; e.currentTarget.style.boxShadow="0 12px 40px rgba(212,168,83,0.15)"; }}
+              onMouseLeave={e => { e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="0 4px 24px rgba(0,0,0,0.24)"; }}
+            >
+              <div style={{ position:"absolute", top:0, left:0, right:0, height:3, background:"linear-gradient(90deg, #D4A853, #F0D78C, #D4A853)" }} />
+              <div style={{ position:"absolute", top:-30, right:-30, width:100, height:100, borderRadius:"50%", background:"radial-gradient(circle, rgba(212,168,83,0.12), transparent)", pointerEvents:"none" }} />
+
+              <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10 }}>
+                <span style={{ fontSize:18 }}>📖</span>
+                <span style={{ fontSize:11, fontWeight:700, letterSpacing:"0.12em", textTransform:"uppercase", color:"#D4A853" }}>Free Ebook</span>
+              </div>
+
+              <h3 style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:"clamp(1.3rem, 3vw, 1.7rem)", fontWeight:700, color:C.ivory, marginBottom:6, lineHeight:1.2 }}>
+                From Broke to Blooming
+              </h3>
+              <p style={{ fontSize:13.5, color:"rgba(244,247,250,0.6)", lineHeight:1.6, marginBottom:16, maxWidth:460 }}>
+                The 3-phase wealth-building system that took 12 years to learn — budgeting, side hustles, then investing. Free PDF, no strings.
+              </p>
+
+              <div style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"10px 20px", borderRadius:10, background:"linear-gradient(135deg, #D4A853, #F0D78C)", color:C.deep, fontSize:13, fontWeight:700 }}>
+                Download Free <ArrowRight size={14} />
+              </div>
+            </div>
+          </Link>
+        </section>
+
         {/* ── ADD TO HOME SCREEN TUTORIAL ─────────────────────────────────── */}
         <section style={{ maxWidth:800, margin:"0 auto", padding:"3.5rem 1.5rem" }}>
           <div style={{ textAlign:"center", marginBottom:"2.5rem" }}>
