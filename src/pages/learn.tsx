@@ -22,6 +22,8 @@ import { AdMobBanner } from "@/components/AdMobBanner";
 import { UpgradeModal } from "@/components/UpgradeModal";
 import { BloomGarden } from "@/components/BloomGarden";
 import { PansyContextCard } from "@/components/PansyContextCard";
+import { ReviewPrompt, shouldShowReviewPrompt } from "@/components/ReviewPrompt";
+import { useShareAchievement } from "@/components/ShareAchievement";
 
 const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
 
@@ -51,7 +53,7 @@ interface Lesson {
 
 export default function Learn() {
   const router = useRouter();
-  const { isPro, isLoading: subscriptionLoading } = useSubscription();
+  const { isPro, isPaidPro, isTrial, isLoading: subscriptionLoading } = useSubscription();
   const [user, setUser] = useState<any>(null);
   const [showLearnUpgradeModal, setShowLearnUpgradeModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -66,6 +68,9 @@ export default function Learn() {
   const contentRef = useRef<HTMLDivElement>(null);
   const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
   const [confettiFired, setConfettiFired] = useState(false);
+  const [showReviewPrompt, setShowReviewPrompt] = useState(false);
+  const [reviewTrigger, setReviewTrigger] = useState('');
+  const { share, ShareModal } = useShareAchievement();
 
   const lessons: Lesson[] = [
     {
@@ -2194,6 +2199,9 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
       if (!error) {
         const updated = [...completedLessons, lessonId];
         setCompletedLessons(updated);
+
+        const lessonTitle = lessons.find(l => l.id === lessonId)?.title || 'a lesson';
+
         if (updated.length === lessons.length && !confettiFired) {
           setConfettiFired(true);
           try { navigator?.vibrate?.([8, 60, 12]); } catch {}
@@ -2201,6 +2209,29 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
           setTimeout(() => confetti({ particleCount: 100, spread: 120, origin: { y: 0.4, x: 0.3 } }), 300);
           setTimeout(() => confetti({ particleCount: 100, spread: 120, origin: { y: 0.4, x: 0.7 } }), 600);
         }
+
+        // Share prompt for every completed lesson
+        setTimeout(() => {
+          share({
+            type: 'achievement',
+            title: lessonTitle,
+            subtitle: `Completed ${updated.length} of ${lessons.length} lessons on Bloom`,
+            emoji: updated.length === lessons.length ? '🎓' : '📚',
+            stats: [
+              { label: 'Completed', value: `${updated.length}/${lessons.length}` },
+              { label: 'Progress', value: `${Math.round((updated.length / lessons.length) * 100)}%` },
+            ],
+          });
+        }, 1500);
+
+        // Review prompt at milestones
+        if (shouldShowReviewPrompt(updated.length)) {
+          setTimeout(() => {
+            setReviewTrigger(lessonTitle);
+            setShowReviewPrompt(true);
+          }, 3000);
+        }
+
         const session = await authService.getCurrentSession();
         if (session) {
           fetch("/api/check-achievements", {
@@ -2902,7 +2933,9 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
               filteredLessons.map((lesson, idx) => {
                 const isCompleted = completedLessons.includes(lesson.id);
                 const isBookmarked = bookmarkedLessons.includes(lesson.id);
-                const isGated = lesson.isPro === true && !isPro;
+                const TRIAL_LESSON_LIMIT = 5;
+                const isTrialLocked = isTrial && !isPaidPro && idx >= TRIAL_LESSON_LIMIT;
+                const isGated = (lesson.isPro === true && !isPro) || isTrialLocked;
                 return (
                   <motion.div
                     key={lesson.id}
@@ -3045,6 +3078,15 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
         onClose={() => setShowLearnUpgradeModal(false)}
         trigger="view_limit"
       />
+
+      {showReviewPrompt && (
+        <ReviewPrompt
+          trigger={reviewTrigger}
+          onClose={() => setShowReviewPrompt(false)}
+        />
+      )}
+
+      {ShareModal}
     </Layout>
   );
 }

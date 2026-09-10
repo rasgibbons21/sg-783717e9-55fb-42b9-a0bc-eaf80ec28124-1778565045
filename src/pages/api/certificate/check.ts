@@ -27,12 +27,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const { data: profile } = await supabaseAdmin
     .from("profiles")
-    .select("full_name")
+    .select("full_name, subscription_status, trial_ends_at, is_pro")
     .eq("id", user.id)
     .single();
 
   const userName = profile?.full_name || "Bloom Member";
   const type = req.query.type as string;
+
+  const hasActiveSubscription = profile?.subscription_status === "active" || profile?.subscription_status === "lifetime";
+  const isPaidPro = hasActiveSubscription || (profile?.is_pro === true && !profile?.trial_ends_at);
+  if (!isPaidPro) {
+    return res.status(403).json({ error: "Certificates require an active paid subscription", requiresPaid: true });
+  }
 
   if (type === "basics") {
     const { data: progress } = await supabaseAdmin

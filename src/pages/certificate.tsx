@@ -20,6 +20,7 @@ export default function CertificatePage() {
   const { type, module: moduleSlug } = router.query;
   const [cert, setCert] = useState<CertData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [requiresPaid, setRequiresPaid] = useState(false);
   const certRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -35,7 +36,11 @@ export default function CertificatePage() {
       const res = await fetch(`/api/certificate/check?${params}`, {
         headers: { Authorization: `Bearer ${session.access_token}` },
       });
-      if (res.ok) setCert(await res.json());
+      if (res.status === 403) {
+        setRequiresPaid(true);
+      } else if (res.ok) {
+        setCert(await res.json());
+      }
       setLoading(false);
     })();
   }, [router.isReady, type, moduleSlug, router]);
@@ -97,6 +102,40 @@ export default function CertificatePage() {
       <div className="fixed inset-0 flex items-center justify-center" style={{ background: "#0E1B30" }}>
         <Loader2 className="w-8 h-8 animate-spin text-[#27B7C8]" />
       </div>
+    );
+  }
+
+  if (requiresPaid) {
+    return (
+      <>
+        <Head><title>Certificate | Bloom</title></Head>
+        <div className="fixed inset-0 flex items-center justify-center" style={{ background: "#0E1B30" }}>
+          <div className="text-center max-w-sm mx-4">
+            <div className="w-20 h-20 mx-auto mb-5 rounded-full flex items-center justify-center" style={{ background: "rgba(201,168,76,0.1)", border: "2px solid rgba(201,168,76,0.3)" }}>
+              <Lock className="w-8 h-8 text-[#C9A84C]" />
+            </div>
+            <h2 className="text-xl font-serif font-bold text-[#F4F7FA] mb-2">
+              Certificates are for Subscribers
+            </h2>
+            <p className="text-sm text-[#F4F7FA]/50 mb-6 leading-relaxed">
+              Subscribe to Bloom Pro to unlock certificates, download them, and share your achievements.
+            </p>
+            <button
+              onClick={() => router.push("/subscription")}
+              className="px-8 py-3 rounded-xl font-bold text-sm transition-all hover:scale-105"
+              style={{ background: "linear-gradient(135deg, #C9A84C, #D4AF37)", color: "#0E1B30" }}
+            >
+              Subscribe to Bloom Pro
+            </button>
+            <button
+              onClick={() => router.back()}
+              className="block mx-auto mt-4 text-sm text-[#F4F7FA]/40 hover:text-[#F4F7FA]/60"
+            >
+              Go back
+            </button>
+          </div>
+        </div>
+      </>
     );
   }
 

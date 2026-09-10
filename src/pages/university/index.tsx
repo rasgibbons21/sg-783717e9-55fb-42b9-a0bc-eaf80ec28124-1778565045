@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
 import { GraduationCap, BookOpen, Lock, CheckCircle, Clock, FlaskConical } from "lucide-react";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 
 interface LessonProgress {
   lesson_slug: string;
@@ -29,11 +30,13 @@ const UNLOCKED_SLUGS = [
   "m5-strategies", "m6-entering", "m7-managing", "m8-exiting", "m10-candlestick-patterns",
 ];
 const UNLOCKED = new Set(UNLOCKED_SLUGS);
+const TRIAL_MODULE_LIMIT = 1;
 
 export default function UniversityIndex({ requiresClientAuth }: Props) {
   const [isVerifying, setIsVerifying] = useState(!!requiresClientAuth);
   const [isAuthorized, setIsAuthorized] = useState(!requiresClientAuth);
   const [progressMap, setProgressMap] = useState<Record<string, LessonProgress[]>>({});
+  const { isTrial, isPaidPro } = useSubscription();
 
   useEffect(() => {
     if (!requiresClientAuth) {
@@ -195,8 +198,10 @@ export default function UniversityIndex({ requiresClientAuth }: Props) {
           <h2 className="text-xl font-semibold text-[#F4F7FA] mb-8">All Modules</h2>
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {UNIVERSITY_MODULES.map((mod) => {
-              const isUnlocked = UNLOCKED.has(mod.slug);
+            {UNIVERSITY_MODULES.map((mod, idx) => {
+              const isContentLive = UNLOCKED.has(mod.slug);
+              const isTrialLocked = isTrial && !isPaidPro && idx >= TRIAL_MODULE_LIMIT;
+              const isUnlocked = isContentLive && !isTrialLocked;
               const progress = progressMap[mod.slug] ?? [];
               const completed = progress.length;
               const pct = isUnlocked ? Math.round((completed / mod.lessonCount) * 100) : 0;
@@ -252,7 +257,13 @@ export default function UniversityIndex({ requiresClientAuth }: Props) {
                     </>
                   )}
 
-                  {!isUnlocked && (
+                  {isTrialLocked && (
+                    <div className="text-xs text-center py-1" style={{ color: '#D4AF37' }}>
+                      Subscribe to unlock
+                    </div>
+                  )}
+
+                  {!isContentLive && !isTrialLocked && (
                     <div className="text-xs text-[#F4F7FA]/30 text-center py-1">Coming soon</div>
                   )}
                 </div>

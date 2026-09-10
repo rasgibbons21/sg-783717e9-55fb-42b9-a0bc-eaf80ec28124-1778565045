@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface SubscriptionContextType {
   isPro: boolean;
+  isPaidPro: boolean;
   isTrial: boolean;
   trialDaysLeft: number;
   trialEndsAt: Date | null;
@@ -19,6 +20,7 @@ const SubscriptionContext = createContext<SubscriptionContextType | undefined>(u
 export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const [isPro, setIsPro] = useState(false);
+  const [isPaidPro, setIsPaidPro] = useState(false);
   const [isTrial, setIsTrial] = useState(false);
   const [trialDaysLeft, setTrialDaysLeft] = useState(0);
   const [trialEndsAt, setTrialEndsAt] = useState<Date | null>(null);
@@ -36,6 +38,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
       if (error || !user) {
         setIsLoggedIn(false);
         setIsPro(false);
+        setIsPaidPro(false);
         setIsTrial(false);
         setTrialDaysLeft(0);
         setTrialEndsAt(null);
@@ -60,6 +63,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
       const daysLeft = trialEnd ? Math.max(0, Math.ceil((trialEnd.getTime() - now.getTime()) / 86400000)) : 0;
 
       setIsPro(hasActiveSubscription || onTrial || (profile?.is_pro === true && !trialEnd));
+      setIsPaidPro(hasActiveSubscription || (profile?.is_pro === true && !trialEnd));
       setIsTrial(onTrial);
       setTrialDaysLeft(daysLeft);
       setTrialEndsAt(onTrial && trialEnd ? trialEnd : null);
@@ -71,6 +75,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     } catch {
       setIsLoggedIn(false);
       setIsPro(false);
+      setIsPaidPro(false);
       setIsTrial(false);
       setTrialDaysLeft(0);
       setTrialEndsAt(null);
@@ -137,7 +142,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   }, [loadAuthStatus, router.events]);
 
   return (
-    <SubscriptionContext.Provider value={{ isPro, isTrial, trialDaysLeft, trialEndsAt, isLoggedIn, isLoading, userName, userId, refresh }}>
+    <SubscriptionContext.Provider value={{ isPro, isPaidPro, isTrial, trialDaysLeft, trialEndsAt, isLoggedIn, isLoading, userName, userId, refresh }}>
       {children}
     </SubscriptionContext.Provider>
   );

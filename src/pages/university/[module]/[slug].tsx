@@ -16,6 +16,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
 import { ArrowLeft, Bookmark, BookmarkCheck, CheckCircle, Clock, Sparkles } from "lucide-react";
+import { ReviewPrompt, shouldShowReviewPrompt } from "@/components/ReviewPrompt";
+import { useShareAchievement } from "@/components/ShareAchievement";
 
 interface Props {
   moduleSlug: string;
@@ -181,6 +183,8 @@ export default function LessonPage({ moduleSlug, lessonSlug, requiresClientAuth 
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [progressMarked, setProgressMarked] = useState(false);
   const [progressReward, setProgressReward] = useState<{ xp: number; mission: string | null } | null>(null);
+  const [showReviewPrompt, setShowReviewPrompt] = useState(false);
+  const { share, ShareModal } = useShareAchievement();
 
   // Load lesson client-side (always from static data, no API call needed)
   const lesson =
@@ -209,9 +213,26 @@ export default function LessonPage({ moduleSlug, lessonSlug, requiresClientAuth 
         if (data.xp_awarded > 0 || data.mission_unlocked) {
           setProgressReward({ xp: data.xp_awarded ?? 0, mission: data.mission_unlocked ?? null });
         }
+
+        const mod = getModuleBySlug(moduleSlug);
+        const lessonTitle = lesson?.title || lessonSlug;
+        setTimeout(() => {
+          share({
+            type: 'achievement',
+            title: lessonTitle,
+            subtitle: mod ? `${mod.title} — Bloom University` : 'Bloom University',
+            emoji: '🎓',
+            stats: data.xp_awarded > 0 ? [{ label: 'XP Earned', value: `+${data.xp_awarded}` }] : undefined,
+          });
+        }, 1500);
+
+        const completed = data.total_completed ?? 0;
+        if (shouldShowReviewPrompt(completed)) {
+          setTimeout(() => setShowReviewPrompt(true), 3000);
+        }
       }
     },
-    [moduleSlug, lessonSlug, progressMarked]
+    [moduleSlug, lessonSlug, progressMarked, lesson, share]
   );
 
   useEffect(() => {
@@ -418,9 +439,18 @@ export default function LessonPage({ moduleSlug, lessonSlug, requiresClientAuth 
           </div>
         </div>
       </div>
+      {showReviewPrompt && (
+        <ReviewPrompt
+          trigger={lesson?.title || 'a university lesson'}
+          onClose={() => setShowReviewPrompt(false)}
+        />
+      )}
+      {ShareModal}
     </Layout>
   );
 }
+
+const TRIAL_ALLOWED_MODULES = new Set(["m1-chart-reading"]);
 
 export const getServerSideProps: GetServerSideProps = async ({ req, params }) => {
   const moduleSlug = params?.module as string;
@@ -437,6 +467,10 @@ export const getServerSideProps: GetServerSideProps = async ({ req, params }) =>
 
   if (result.status === "no-cookie") {
     return { props: { moduleSlug, lessonSlug, requiresClientAuth: true } };
+  }
+
+  if (result.isTrial && !TRIAL_ALLOWED_MODULES.has(moduleSlug)) {
+    return { redirect: { destination: "/subscription", permanent: false } };
   }
 
   return { props: { moduleSlug, lessonSlug } };
