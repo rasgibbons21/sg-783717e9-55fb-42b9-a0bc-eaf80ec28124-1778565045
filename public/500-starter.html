@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yes, $500 Is Enough | The $500 Starter</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#0E1B30',
+                        gold: '#C8A45D',
+                        ivory: '#F7F4ED',
+                        teal: '#2C9AA0',
+                        darkgray: '#273142',
+                        lightgray: '#EEF1F5'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Chart.js for Compounding Visualizer -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root { color-scheme: light dark; }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; color: black !important; }
+            .print-break { page-break-before: always; }
+            .shadow-lg, .shadow-md, .shadow-sm { box-shadow: none !important; }
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body.bg-lightgray { background-color: #12161d !important; }
+            .bg-white { background-color: #1b212c !important; }
+            .bg-gray-50 { background-color: #222a37 !important; }
+            .bg-ivory { background-color: #232a35 !important; }
+            .text-darkgray { color: #dbe1ea !important; }
+            .text-navy { color: #f1c98a !important; }
+            .text-gray-600 { color: #a8b2c2 !important; }
+            .text-gray-700 { color: #b7c0cf !important; }
+            .text-gray-500 { color: #8892a3 !important; }
+            .border-gray-200 { border-color: #313b4a !important; }
+            .border-gray-300 { border-color: #3c4756 !important; }
+            .divide-gray-200 > :not([hidden]) ~ :not([hidden]) { border-color: #313b4a !important; }
+            input, select, textarea {
+                background-color: #1b212c !important;
+                color: #e7ecf3 !important;
+                border-color: #3c4756 !important;
+            }
+            input::placeholder, textarea::placeholder { color: #6b7686 !important; }
+            .bg-gray-200 { background-color: #2b3444 !important; color: #e7ecf3 !important; }
+        }
+    </style>
+</head>
+<body class="bg-lightgray text-darkgray font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- Navigation Header -->
+    <header class="bg-navy text-white sticky top-0 z-50 shadow-md no-print">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex flex-wrap justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <span class="bg-gold text-navy font-extrabold px-3 py-1 rounded text-sm tracking-wider">THE $500 STARTER</span>
+                <h1 class="text-lg font-bold hidden md:inline">Interactive Wealth-Building Guide</h1>
+            </div>
+            <nav class="flex flex-wrap space-x-2 text-xs md:text-sm">
+                <button onclick="scrollToSec('start')" class="px-2 py-1 hover:text-gold transition">Start</button>
+                <button onclick="scrollToSec('plan')" class="px-2 py-1 hover:text-gold transition">Plan</button>
+                <button onclick="scrollToSec('research')" class="px-2 py-1 hover:text-gold transition">Research</button>
+                <button onclick="scrollToSec('calculator')" class="px-2 py-1 hover:text-gold transition">Calculator</button>
+                <button onclick="scrollToSec('chart')" class="px-2 py-1 hover:text-gold transition">Charts</button>
+                <button onclick="scrollToSec('options')" class="px-2 py-1 hover:text-gold transition">Options</button>
+                <button onclick="scrollToSec('chain')" class="px-2 py-1 hover:text-gold transition">Chain</button>
+                <button onclick="scrollToSec('brokers')" class="px-2 py-1 hover:text-gold transition">Brokers</button>
+                <button onclick="scrollToSec('tracker')" class="px-2 py-1 hover:text-gold transition">Tracker</button>
+                <button onclick="scrollToSec('quiz')" class="px-2 py-1 hover:text-gold transition">Quiz</button>
+                <button onclick="scrollToSec('blueprint')" class="px-2 py-1 hover:text-gold transition">Blueprint</button>
+            </nav>
+            <div class="flex items-center space-x-2">
+                <button onclick="window.print()" class="bg-teal hover:bg-opacity-90 text-white font-medium px-3 py-1.5 rounded text-xs transition">Export / Print</button>
+                <button onclick="resetData()" class="bg-red-600 hover:bg-red-700 text-white font-medium px-2 py-1.5 rounded text-xs transition" title="Reset all saved data">Reset</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-5xl mx-auto px-4 py-8 flex-grow space-y-12">
+
+        <!-- Hero / Banner -->
+        <section class="bg-navy text-white rounded-2xl p-8 md:p-14 shadow-xl border-b-4 border-gold text-center relative overflow-hidden">
+            <!-- Decorative accents -->
+            <div class="absolute -top-16 -left-16 w-72 h-72 bg-gold/20 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-20 -right-10 w-80 h-80 bg-teal/20 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gold/5 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="relative z-10 space-y-5 max-w-3xl mx-auto">
+                <span class="inline-block bg-white/10 border border-gold/40 text-gold text-xs font-semibold tracking-wide uppercase px-4 py-1.5 rounded-full">For the person who thinks $500 isn't enough</span>
+
+                <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight leading-tight">
+                    YES, <span class="text-gold">$500</span> IS ENOUGH.
+                </h1>
+
+                <p class="text-gold text-lg md:text-xl font-medium">This is where you turn it into your Freedom Fund.</p>
+
+                <p class="text-gray-300 text-sm md:text-base leading-relaxed">
+                    One habit, one share, one week at a time.<br/>
+                    Fill-in worksheets &bull; Portfolio plan builder &bull; Chart & options basics &bull; Knowledge quiz &bull; 90-day habit tracker
+                </p>
+
+                <!-- Mini roadmap strip -->
+                <div class="flex flex-wrap justify-center gap-2 pt-2">
+                    <div class="flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-2 text-xs font-semibold">
+                        <span class="text-gold">1</span> Learn the framework
+                    </div>
+                    <span class="text-gray-500 self-center hidden sm:inline">&rarr;</span>
+                    <div class="flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-2 text-xs font-semibold">
+                        <span class="text-gold">2</span> Build your plan
+                    </div>
+                    <span class="text-gray-500 self-center hidden sm:inline">&rarr;</span>
+                    <div class="flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-2 text-xs font-semibold">
+                        <span class="text-gold">3</span> Track the habit
+                    </div>
+                    <span class="text-gray-500 self-center hidden sm:inline">&rarr;</span>
+                    <div class="flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-2 text-xs font-semibold">
+                        <span class="text-gold">4</span> Grow the fund
+                    </div>
+                </div>
+
+                <div class="pt-4 text-xs text-gray-400 border-t border-gray-700 max-w-lg mx-auto">
+                    Educational use only &bull; Not personalized financial advice &bull; Investing involves risk
+                </div>
+            </div>
+        </section>
+
+        <!-- Module 1: Welcome & Starting Point -->
+        <section id="start" class="bg-white rounded-xl p-6 md:p-8 shadow-sm border border-gray-200 space-y-6">
+            <div class="border-b pb-4">
+                <span class="text-teal font-semibold text-xs tracking-wider uppercase">Section 1</span>
+                <h2 class="text-2xl font-bold text-navy">Welcome & Your Starting Point</h2>
+                <p class="text-gray-600 text-sm mt-1">
+                    The most useful lesson in a small starting account is not that $500 magically becomes a fortune. It is that a small amount can become the beginning of a repeatable system.
+                </p>
+            </div>
+
+            <!-- Starting Point Form -->
+            <form id="form-starting-point" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-semibold text-navy mb-1">Your Name / Nickname</label>
+                    <input type="text" data-key="sp_name" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-teal outline-none" placeholder="e.g. Alex">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-navy mb-1">Starting Amount ($)</label>
+                    <input type="number" data-key="sp_amount" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-teal outline-none" placeholder="500">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-navy mb-1">Recurring Contribution Amount ($)</label>
+                    <input type="number" data-key="sp_contrib" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-teal outline-none" placeholder="50">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-navy mb-1">Pay Frequency</label>
+                    <select data-key="sp_freq" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-teal outline-none">
+                        <option value="">Select Frequency</option>
+                        <option value="Weekly">Weekly</option>
+                        <option value="Every 2 weeks">Every 2 weeks</option>
+                        <option value="Twice monthly">Twice monthly</option>
+                        <option value="Monthly">Monthly</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-navy mb-1">Main Reason for Investing</label>
+                    <select data-key="sp_reason" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-teal outline-none">
+                        <option value="">Select Primary Goal</option>
+                        <option value="Long-term wealth">Long-term wealth</option>
+                        <option value="Retirement">Retirement</option>
+                        <option value="Future purchase">Future purchase</option>
+                        <option value="Financial independence">Financial independence</option>
+                        <option value="Learning">Learning</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-navy mb-1">Time Horizon</label>
+                    <select data-key="sp_horizon" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-teal outline-none">
+                        <option value="">Select Horizon</option>
+                        <option value="Under 3 years">Under 3 years</option>
+                        <option value="3–5 years">3–5 years</option>
+                        <option value="5–10 years">5–10 years</option>
+                        <option value="10+ years">10+ years</option>
+                    </select>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-semibold text-navy mb-1">What do you want this money to help you do?</label>
+                    <textarea data-key="sp_purpose" rows="2" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-teal outline-none" placeholder="Describe your purpose..."></textarea>
+                </div>
+            </form>
+
+            <div class="bg-ivory border-l-4 border-gold p-4 rounded-r-lg">
+                <h4 class="text-sm font-bold text-navy">The Habit Principle</h4>
+                <p class="text-xs text-gray-700 mt-1">A contribution you can repeat is more useful than a contribution that looks impressive once. Your first goal is to create sustainable investing behavior.</p>
+            </div>
+        </section>
+
+        <!-- Module 2: Give Your $500 a Job & Decision Tree -->
+        <section id="plan" class="bg-white rounded-xl p-6 md:p-8 shadow-sm border border-gray-200 space-y-6">
+            <div class="border-b pb-4">
+                <span class="text-teal font-semibold text-xs tracking-wider uppercase">Section 2</span>
+                <h2 class="text-2xl font-bold text-navy">Give Your $500 a Job</h2>
+                <p class="text-gray-600 text-sm mt-1">
+                    Separate money you may need soon from money intended for longer-term growth. A brokerage account is not a replacement for emergency savings or money needed for near-term bills.
+                </p>
+            </div>
+
+            <!-- Interactive Decision Tree -->
+            <div class="space-y-3">
+                <h3 class="text-sm font-bold text-navy">Interactive Decision Checklist</h3>
+                <div class="grid grid-cols-1 gap-3">
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <span class="text-sm font-medium text-darkgray">1. Do you need this money for bills or a near-term emergency?</span>
+                        <div class="space-x-2">
+                            <button onclick="checkDecision(this, 'Keep it available in cash.', 'danger')" class="px-3 py-1 bg-gray-200 hover:bg-red-100 text-xs font-semibold rounded">YES</button>
+                            <button onclick="checkDecision(this, 'Great! Safe to consider investing.', 'success')" class="px-3 py-1 bg-gray-200 hover:bg-green-100 text-xs font-semibold rounded">NO</button>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <span class="text-sm font-medium text-darkgray">2. Is high-interest debt under control?</span>
+                        <div class="space-x-2">
+                            <button onclick="checkDecision(this, 'Great! Proceed to next step.', 'success')" class="px-3 py-1 bg-gray-200 hover:bg-green-100 text-xs font-semibold rounded">YES</button>
+                            <button onclick="checkDecision(this, 'Consider prioritizing expensive debt first.', 'danger')" class="px-3 py-1 bg-gray-200 hover:bg-red-100 text-xs font-semibold rounded">NO</button>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <span class="text-sm font-medium text-darkgray">3. Can you leave the investment alone through market declines?</span>
+                        <div class="space-x-2">
+                            <button onclick="checkDecision(this, 'Great! You have long-term mindset.', 'success')" class="px-3 py-1 bg-gray-200 hover:bg-green-100 text-xs font-semibold rounded">YES</button>
+                            <button onclick="checkDecision(this, 'Use a smaller amount or wait until ready.', 'danger')" class="px-3 py-1 bg-gray-200 hover:bg-red-100 text-xs font-semibold rounded">NO</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Starting Plan Worksheet -->
+            <div class="space-y-3 pt-4 border-t">
+                <h3 class="text-sm font-bold text-navy">Starting-Plan Allocation Worksheet</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Amount I Will Invest Initially ($)</label>
+                        <input type="number" data-key="plan_initial" class="w-full border border-gray-300 rounded p-2 text-sm focus:ring-2 focus:ring-teal outline-none" placeholder="300">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Cash I Will Keep Available ($)</label>
+                        <input type="number" data-key="plan_cash" class="w-full border border-gray-300 rounded p-2 text-sm focus:ring-2 focus:ring-teal outline-none" placeholder="200">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Recurring Contribution ($)</label>
+                        <input type="number" data-key="plan_recur" class="w-full border border-gray-300 rounded p-2 text-sm focus:ring-2 focus:ring-teal outline-none" placeholder="50">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">First 90-Day Goal</label>
+                        <input type="text" data-key="plan_goal" class="w-full border border-gray-300 rounded p-2 text-sm focus:ring-2 focus:ring-teal outline-none" placeholder="e.g. Build $1,000 total habit balance">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Position Ladder -->
+            <div class="space-y-3 pt-4 border-t">
+                <h3 class="text-sm font-bold text-navy">The Position Ladder</h3>
+                <p class="text-xs text-gray-600">Instead of chasing a dollar target, build up share by share. Pick 2-3 companies from your research and climb the same ladder in each one.</p>
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="bg-navy text-white text-xs font-bold px-3 py-1.5 rounded-full">3 shares</span>
+                    <span class="text-gray-400">&rarr;</span>
+                    <span class="bg-navy text-white text-xs font-bold px-3 py-1.5 rounded-full">10 shares</span>
+                    <span class="text-gray-400">&rarr;</span>
+                    <span class="bg-navy text-white text-xs font-bold px-3 py-1.5 rounded-full">15 shares</span>
+                    <span class="text-gray-400">&rarr;</span>
+                    <span class="bg-navy text-white text-xs font-bold px-3 py-1.5 rounded-full">20 shares</span>
+                    <span class="text-gray-400">&rarr;</span>
+                    <span class="bg-navy text-white text-xs font-bold px-3 py-1.5 rounded-full">25 shares</span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Position 1 - Company & Current Rung</label>
+                        <input type="text" data-key="ladder_pos1" class="w-full border border-gray-300 rounded p-2 text-sm focus:ring-2 focus:ring-teal outline-none" placeholder="e.g. NKE - 3 shares">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Position 2 - Company & Current Rung</label>
+                        <input type="text" data-key="ladder_pos2" class="w-full border border-gray-300 rounded p-2 text-sm focus:ring-2 focus:ring-teal outline-none" placeholder="e.g. KO - 3 shares">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Position 3 - Company & Current Rung</label>
+                        <input type="text" data-key="ladder_pos3" class="w-full border border-gray-300 rounded p-2 text-sm focus:ring-2 focus:ring-teal outline-none" placeholder="e.g. SBUX - 3 shares">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tax Refund Boost -->
+            <div class="bg-ivory border-l-4 border-gold p-4 rounded-r-lg">
+                <h4 class="text-sm font-bold text-navy">The Tax-Season Boost</h4>
+                <p class="text-xs text-gray-700 mt-1">If you get a tax refund, consider directing roughly 45-50% of it into your account each spring. It's a once-a-year lump sum that can jump you several rungs on the ladder at once, without changing your weekly habit.</p>
+            </div>
+        </section>
+
+        <!-- Module 3: Investment Research Card -->
+        <section id="research" class="bg-white rounded-xl p-6 md:p-8 shadow-sm border border-gray-200 space-y-6">
+            <div class="border-b pb-4">
+                <span class="text-teal font-semibold text-xs tracking-wider uppercase">Section 3</span>
+                <h2 class="text-2xl font-bold text-navy">Stop Shopping by Share Price</h2>
+                <p class="text-gray-600 text-sm mt-1">
+                    "Under $100" is not the same thing as "cheap." Share price is only the price of one single share, not a measure of valuation. Use this research card before making any purchase.
+                </p>
+            </div>
+
+            <div class="bg-ivory p-6 rounded-xl border border-gold/40 space-y-4">
+                <h3 class="text-base font-bold text-navy border-b border-gold/30 pb-2">Asset / Fund Research Card</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-navy mb-1">Company / ETF Name or Ticker</label>
+                        <input type="text" data-key="rc_ticker" class="w-full border border-gray-300 rounded p-2 text-sm focus:ring-2 focus:ring-teal outline-none" placeholder="e.g. VTI, AAPL">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-navy mb-1">Target Time Horizon</label>
+                        <input type="text" data-key="rc_horizon" class="w-full border border-gray-300 rounded p-2 text-sm focus:ring-2 focus:ring-teal outline-none" placeholder="e.g. 5-10 Years">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-semibold text-navy mb-1">What does it do?</label>
+                        <input type="text" data-key="rc_desc" class="w-full border border-gray-300 rounded p-2 text-sm focus:ring-2 focus:ring-teal outline-none" placeholder="Core business model or index tracked">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-semibold text-navy mb-1">How does it make money?</label>
+                        <input type="text" data-key="rc_revenue" class="w-full border border-gray-300 rounded p-2 text-sm focus:ring-2 focus:ring-teal outline-none" placeholder="Primary revenue streams or holdings structure">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-navy mb-1">Why might it grow?</label>
+                        <textarea data-key="rc_growth" rows="2" class="w-full border border-gray-300 rounded p-2 text-sm focus:ring-2 focus:ring-teal outline-none" placeholder="Growth catalysts..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-navy mb-1">What could go wrong?</label>
+                        <textarea data-key="rc_risks" rows="2" class="w-full border border-gray-300 rounded p-2 text-sm focus:ring-2 focus:ring-teal outline-none" placeholder="Key risk factors..."></textarea>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-semibold text-navy mb-1">What would change my mind (thesis breaker)?</label>
+                        <input type="text" data-key="rc_mindchange" class="w-full border border-gray-300 rounded p-2 text-sm focus:ring-2 focus:ring-teal outline-none" placeholder="What conditions would lead you to sell?">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Beginner Case Studies -->
+            <div class="space-y-3">
+                <h3 class="text-sm font-bold text-navy">Practice the Process: 5 Beginner Case Studies</h3>
+                <p class="text-xs text-gray-600">These are companies most beginners already recognize - use them to practice filling out the research card above. This is a starting point for your own research, not a recommendation to buy.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" id="case-study-grid">
+                    <!-- populated by JS -->
+                </div>
+                <p class="text-[11px] text-gray-500 pt-1">Prices shown are illustrative snapshots and will move - always check a live quote before making any decision.</p>
+            </div>
+        </section>
+
+        <!-- Module 4: Dynamic Compounding Calculator -->
+        <section id="calculator" class="bg-white rounded-xl p-6 md:p-8 shadow-sm border border-gray-200 space-y-6">
+            <div class="border-b pb-4">
+                <span class="text-teal font-semibold text-xs tracking-wider uppercase">Section 4</span>
+                <h2 class="text-2xl font-bold text-navy">Interactive Compounding Calculator</h2>
+                <p class="text-gray-600 text-sm mt-1">
+                    See how regular contributions and compound returns work together over long horizons.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Controls -->
+                <div class="space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                    <div>
+                        <label class="block text-xs font-bold text-navy mb-1">Initial Deposit ($)</label>
+                        <input type="number" id="calc-init" value="500" oninput="updateCalculator()" class="w-full border border-gray-300 rounded p-2 text-sm focus:ring-2 focus:ring-teal">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-navy mb-1">Monthly Contribution ($)</label>
+                        <input type="number" id="calc-monthly" value="100" oninput="updateCalculator()" class="w-full border border-gray-300 rounded p-2 text-sm focus:ring-2 focus:ring-teal">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-navy mb-1">Estimated Annual Return (%)</label>
+                        <input type="number" id="calc-rate" value="7" step="0.5" oninput="updateCalculator()" class="w-full border border-gray-300 rounded p-2 text-sm focus:ring-2 focus:ring-teal">
+                    </div>
+                    <div class="pt-2 text-xs text-gray-500">
+                        *Illustrative calculations assuming monthly compounding. Excludes fees, taxes, and inflation.
+                    </div>
+                </div>
+
+                <!-- Chart & Table -->
+                <div class="lg:col-span-2 space-y-4">
+                    <div class="h-64 relative">
+                        <canvas id="compoundingChart"></canvas>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-xs text-left border-collapse">
+                            <thead>
+                                <tr class="bg-navy text-white">
+                                    <th class="p-2">Year</th>
+                                    <th class="p-2">Total Contributions</th>
+                                    <th class="p-2">Illustrative Portfolio Value</th>
+                                </tr>
+                            </thead>
+                            <tbody id="calc-table-body" class="divide-y divide-gray-200 text-gray-700">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Module 5: How to Read a Chart -->
+        <section id="chart" class="bg-white rounded-xl p-6 md:p-8 shadow-sm border border-gray-200 space-y-6">
+            <div class="border-b pb-4">
+                <span class="text-teal font-semibold text-xs tracking-wider uppercase">Section 5</span>
+                <h2 class="text-2xl font-bold text-navy">How to Read a Chart</h2>
+                <p class="text-gray-600 text-sm mt-1">
+                    A price chart is a record of the tug-of-war between buyers and sellers. Once you know the basic vocabulary, most charts start to tell a simple story.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-gray-50 rounded-xl border border-gray-200 p-4">
+                    <h3 class="text-sm font-bold text-navy mb-2">Anatomy of a Candlestick</h3>
+                    <svg viewBox="0 0 500 260" class="w-full h-52" xmlns="http://www.w3.org/2000/svg">
+                        <line x1="40" y1="20" x2="40" y2="230" stroke="#D1D5DB" stroke-width="1"/>
+                        <line x1="40" y1="230" x2="460" y2="230" stroke="#D1D5DB" stroke-width="1"/>
+                        <line x1="150" y1="40" x2="150" y2="210" stroke="#0E1B30" stroke-width="2"/>
+                        <rect x="120" y="90" width="60" height="80" fill="#2C9AA0" stroke="#0E1B30" stroke-width="1.5"/>
+                        <text x="150" y="32" text-anchor="middle" font-size="12" fill="#0E1B30" font-weight="700">High</text>
+                        <text x="150" y="225" text-anchor="middle" font-size="12" fill="#0E1B30" font-weight="700">Low</text>
+                        <text x="188" y="95" font-size="11" fill="#273142">Close</text>
+                        <text x="188" y="175" font-size="11" fill="#273142">Open</text>
+                        <text x="150" y="250" text-anchor="middle" font-size="12" fill="#2C9AA0" font-weight="700">Bullish candle</text>
+                        <line x1="350" y1="35" x2="350" y2="205" stroke="#0E1B30" stroke-width="2"/>
+                        <rect x="320" y="75" width="60" height="70" fill="#DC2626" stroke="#0E1B30" stroke-width="1.5"/>
+                        <text x="350" y="27" text-anchor="middle" font-size="12" fill="#0E1B30" font-weight="700">High</text>
+                        <text x="350" y="220" text-anchor="middle" font-size="12" fill="#0E1B30" font-weight="700">Low</text>
+                        <text x="388" y="80" font-size="11" fill="#273142">Open</text>
+                        <text x="388" y="150" font-size="11" fill="#273142">Close</text>
+                        <text x="350" y="250" text-anchor="middle" font-size="12" fill="#DC2626" font-weight="700">Bearish candle</text>
+                    </svg>
+                    <p class="text-xs text-gray-600 mt-2">Each candle shows four prices for one time period: open, high, low, and close. The thin wicks mark the high and low; the thick body marks the range between open and close.</p>
+                </div>
+
+                <div class="bg-gray-50 rounded-xl border border-gray-200 p-4">
+                    <h3 class="text-sm font-bold text-navy mb-2">Support & Resistance</h3>
+                    <svg viewBox="0 0 700 260" class="w-full h-52" xmlns="http://www.w3.org/2000/svg">
+                        <line x1="40" y1="20" x2="40" y2="230" stroke="#D1D5DB" stroke-width="1"/>
+                        <line x1="40" y1="230" x2="680" y2="230" stroke="#D1D5DB" stroke-width="1"/>
+                        <line x1="60" y1="60" x2="660" y2="60" stroke="#C8A45D" stroke-width="1.5" stroke-dasharray="6,4"/>
+                        <text x="500" y="52" font-size="11" fill="#C8A45D" font-weight="700">Resistance</text>
+                        <line x1="60" y1="180" x2="660" y2="180" stroke="#2C9AA0" stroke-width="1.5" stroke-dasharray="6,4"/>
+                        <text x="520" y="196" font-size="11" fill="#2C9AA0" font-weight="700">Support</text>
+                        <polyline points="60,150 120,100 160,140 220,65 260,120 320,80 360,180 420,110 460,180 520,90 560,150 620,60" fill="none" stroke="#0E1B30" stroke-width="2.5"/>
+                    </svg>
+                    <p class="text-xs text-gray-600 mt-2">Resistance is a price level a stock struggles to break above; support is a level it tends to bounce off of. Watch what happens when price revisits these levels - a clean break can signal the next move.</p>
+                </div>
+            </div>
+
+            <div class="bg-ivory border-l-4 border-gold p-4 rounded-r-lg">
+                <h4 class="text-sm font-bold text-navy">Don't Trade the Chart Alone</h4>
+                <p class="text-xs text-gray-700 mt-1">Chart patterns describe what has already happened - they don't guarantee what happens next. Use them alongside the research process from Section 3, not as a replacement for it.</p>
+            </div>
+        </section>
+
+        <!-- Module 6: Options 101 -->
+        <section id="options" class="bg-white rounded-xl p-6 md:p-8 shadow-sm border border-gray-200 space-y-6">
+            <div class="border-b pb-4">
+                <span class="text-teal font-semibold text-xs tracking-wider uppercase">Section 6</span>
+                <h2 class="text-2xl font-bold text-navy">Options 101</h2>
+                <p class="text-gray-600 text-sm mt-1">
+                    An option is a contract, not a stock. It gives you the right, but not the obligation, to buy or sell 100 shares of a company at an agreed price, by an agreed date.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-teal/10 border border-teal/30 rounded-xl p-4 space-y-2">
+                    <h3 class="text-sm font-bold text-teal">Call Option</h3>
+                    <p class="text-xs text-gray-700">Gives you the right to <span class="font-semibold">buy</span> 100 shares at the strike price. Buyers typically want the stock to go up.</p>
+                </div>
+                <div class="bg-red-50 border border-red-200 rounded-xl p-4 space-y-2">
+                    <h3 class="text-sm font-bold text-red-600">Put Option</h3>
+                    <p class="text-xs text-gray-700">Gives you the right to <span class="font-semibold">sell</span> 100 shares at the strike price. Buyers typically want the stock to go down.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                <div class="bg-gray-50 rounded-lg border border-gray-200 p-3">
+                    <span class="font-bold text-navy">Strike Price</span> - the fixed price at which the contract lets you buy (call) or sell (put) the stock.
+                </div>
+                <div class="bg-gray-50 rounded-lg border border-gray-200 p-3">
+                    <span class="font-bold text-navy">Premium</span> - the price you pay to buy the contract. This is the most a buyer can lose.
+                </div>
+                <div class="bg-gray-50 rounded-lg border border-gray-200 p-3">
+                    <span class="font-bold text-navy">Expiration Date</span> - the last date the contract is valid. After this, it is either exercised or expires worthless.
+                </div>
+                <div class="bg-gray-50 rounded-lg border border-gray-200 p-3">
+                    <span class="font-bold text-navy">In / At / Out of the Money</span> - whether the strike price is currently favorable (ITM), right at the stock price (ATM), or unfavorable (OTM) if exercised today.
+                </div>
+                <div class="bg-gray-50 rounded-lg border border-gray-200 p-3">
+                    <span class="font-bold text-navy">Intrinsic Value</span> - the real, built-in profit an option already has if exercised right now. Never below zero.
+                </div>
+                <div class="bg-gray-50 rounded-lg border border-gray-200 p-3">
+                    <span class="font-bold text-navy">Time (Extrinsic) Value</span> - the rest of the premium, reflecting the chance the option becomes more valuable before it expires. Shrinks to zero by expiration.
+                </div>
+            </div>
+
+            <div class="bg-navy text-white p-4 rounded-xl border border-gold">
+                <h4 class="text-gold font-bold text-sm">Why This Matters for a $500 Account</h4>
+                <p class="text-xs text-gray-200 mt-1">Options add leverage - bigger potential gains, but the whole premium can be lost if the stock doesn't move your way in time. Most beginners are better off building the share-by-share habit from Sections 1-3 first, and treating this section as background knowledge for later, not a starting strategy.</p>
+            </div>
+        </section>
+
+        <!-- Module 7: Options Chain Explorer -->
+        <section id="chain" class="bg-white rounded-xl p-6 md:p-8 shadow-sm border border-gray-200 space-y-6">
+            <div class="border-b pb-4">
+                <span class="text-teal font-semibold text-xs tracking-wider uppercase">Section 7</span>
+                <h2 class="text-2xl font-bold text-navy">The Options Chain, Explained</h2>
+                <p class="text-gray-600 text-sm mt-1">
+                    An options chain lists every available strike price for a given expiration date, with calls on one side and puts on the other. Adjust the inputs below to see how premiums shift.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-navy mb-1">Stock Price ($)</label>
+                    <input type="number" id="chain-price" value="50" oninput="buildOptionsChain()" class="w-full border border-gray-300 rounded p-2 text-sm focus:ring-2 focus:ring-teal">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-navy mb-1">Days to Expiration</label>
+                    <input type="number" id="chain-days" value="30" oninput="buildOptionsChain()" class="w-full border border-gray-300 rounded p-2 text-sm focus:ring-2 focus:ring-teal">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-navy mb-1">Implied Volatility (%)</label>
+                    <input type="number" id="chain-iv" value="35" oninput="buildOptionsChain()" class="w-full border border-gray-300 rounded p-2 text-sm focus:ring-2 focus:ring-teal">
+                </div>
+                <div class="flex items-end">
+                    <p class="text-[11px] text-gray-500">Theoretical premiums, modeled with Black-Scholes. Not a live quote.</p>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-xs text-center border-collapse">
+                    <thead>
+                        <tr class="bg-navy text-white text-[11px] uppercase tracking-wide">
+                            <th class="p-2" colspan="3">Calls</th>
+                            <th class="p-2">Strike</th>
+                            <th class="p-2" colspan="3">Puts</th>
+                        </tr>
+                        <tr class="bg-gray-100 text-navy text-[11px] font-semibold">
+                            <th class="p-1.5">Premium</th>
+                            <th class="p-1.5">Intrinsic</th>
+                            <th class="p-1.5">Time Value</th>
+                            <th class="p-1.5"></th>
+                            <th class="p-1.5">Premium</th>
+                            <th class="p-1.5">Intrinsic</th>
+                            <th class="p-1.5">Time Value</th>
+                        </tr>
+                    </thead>
+                    <tbody id="chain-table-body" class="divide-y divide-gray-200">
+                        <!-- Populated dynamically -->
+                    </tbody>
+                </table>
+            </div>
+
+            <p id="chain-atm-note" class="text-xs text-gray-600"></p>
+
+            <div class="bg-ivory border-l-4 border-gold p-4 rounded-r-lg text-xs text-gray-700 space-y-1">
+                <p><span class="font-bold text-navy">Call breakeven</span> = strike price + premium paid</p>
+                <p><span class="font-bold text-navy">Put breakeven</span> = strike price - premium paid</p>
+            </div>
+        </section>
+
+        <!-- Module 8: Brokers -->
+        <section id="brokers" class="bg-white rounded-xl p-6 md:p-8 shadow-sm border border-gray-200 space-y-6">
+            <div class="border-b pb-4">
+                <span class="text-teal font-semibold text-xs tracking-wider uppercase">Section 8</span>
+                <h2 class="text-2xl font-bold text-navy">Where to Open Your Account</h2>
+                <p class="text-gray-600 text-sm mt-1">
+                    The account you open matters less than actually opening one - but a few things are worth checking: no account minimum, no monthly fees, and fractional shares so your $500 stretches further.
+                </p>
+            </div>
+
+            <div class="bg-ivory border-l-4 border-gold p-4 rounded-r-lg">
+                <h4 class="text-sm font-bold text-navy">Best Fit for This Guide</h4>
+                <p class="text-xs text-gray-700 mt-1">Webull and TradingView are the closest match to the share-buying approach in Sections 1-4 - real stock and ETF ownership, plus charting. The partners below trade forex and CFDs, a different, higher-leverage product worth knowing about, but not what this guide walks you through.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 flex flex-col gap-2">
+                    <div class="flex justify-between items-start gap-2">
+                        <h3 class="font-bold text-navy text-sm">Webull</h3>
+                        <span class="text-[10px] uppercase tracking-wide font-semibold text-teal bg-teal/10 px-2 py-0.5 rounded-full whitespace-nowrap">Stocks, ETFs &amp; Options</span>
+                    </div>
+                    <p class="text-xs text-gray-600">Commission-free stock and ETF trading with fractional shares - a natural fit for building the Position Ladder above.</p>
+                    <a href="https://webull.com" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-white bg-teal hover:bg-opacity-90 rounded px-3 py-1.5 text-center transition">Visit Webull</a>
+                </div>
+
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 flex flex-col gap-2">
+                    <div class="flex justify-between items-start gap-2">
+                        <h3 class="font-bold text-navy text-sm">TradingView</h3>
+                        <span class="text-[10px] uppercase tracking-wide font-semibold text-teal bg-teal/10 px-2 py-0.5 rounded-full whitespace-nowrap">Charting &amp; Research</span>
+                    </div>
+                    <p class="text-xs text-gray-600">Professional charting and market analysis - the best place to practice reading the candlesticks and support/resistance from Section 5.</p>
+                    <a href="https://tradingview.com?aff_id=169003" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-white bg-teal hover:bg-opacity-90 rounded px-3 py-1.5 text-center transition">Visit TradingView</a>
+                </div>
+
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 flex flex-col gap-2">
+                    <div class="flex justify-between items-start gap-2">
+                        <h3 class="font-bold text-navy text-sm">Deriv</h3>
+                        <span class="text-[10px] uppercase tracking-wide font-semibold text-gray-500 bg-gray-200 px-2 py-0.5 rounded-full whitespace-nowrap">Forex, CFDs &amp; Derivatives</span>
+                    </div>
+                    <p class="text-xs text-gray-600">Trade forex, CFDs, and derivatives with competitive spreads.</p>
+                    <p class="text-[11px] text-gray-500">Use partner code <span class="font-mono font-semibold text-navy">NPQCUG86TJTE</span> at signup.</p>
+                    <a href="https://deriv.com" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-white bg-navy hover:bg-opacity-90 rounded px-3 py-1.5 text-center transition">Visit Deriv</a>
+                </div>
+
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 flex flex-col gap-2">
+                    <div class="flex justify-between items-start gap-2">
+                        <h3 class="font-bold text-navy text-sm">XM</h3>
+                        <span class="text-[10px] uppercase tracking-wide font-semibold text-gray-500 bg-gray-200 px-2 py-0.5 rounded-full whitespace-nowrap">Forex &amp; CFDs</span>
+                    </div>
+                    <p class="text-xs text-gray-600">Global forex and CFD broker with tight spreads.</p>
+                    <p class="text-[11px] text-gray-500">Use partner code <span class="font-mono font-semibold text-navy">TFDCK</span> at signup.</p>
+                    <a href="https://xm.com" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-white bg-navy hover:bg-opacity-90 rounded px-3 py-1.5 text-center transition">Visit XM</a>
+                </div>
+
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 flex flex-col gap-2">
+                    <div class="flex justify-between items-start gap-2">
+                        <h3 class="font-bold text-navy text-sm">Exness</h3>
+                        <span class="text-[10px] uppercase tracking-wide font-semibold text-gray-500 bg-gray-200 px-2 py-0.5 rounded-full whitespace-nowrap">Forex &amp; CFDs</span>
+                    </div>
+                    <p class="text-xs text-gray-600">High-leverage forex trading with ultra-low spreads.</p>
+                    <a href="https://exness.com" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-white bg-navy hover:bg-opacity-90 rounded px-3 py-1.5 text-center transition">Visit Exness</a>
+                </div>
+
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 flex flex-col gap-2">
+                    <div class="flex justify-between items-start gap-2">
+                        <h3 class="font-bold text-navy text-sm">Vantage</h3>
+                        <span class="text-[10px] uppercase tracking-wide font-semibold text-gray-500 bg-gray-200 px-2 py-0.5 rounded-full whitespace-nowrap">Forex &amp; CFDs</span>
+                    </div>
+                    <p class="text-xs text-gray-600">Award-winning forex and CFD broker.</p>
+                    <p class="text-[11px] text-gray-500">Use partner code <span class="font-mono font-semibold text-navy">CPA00ixMG</span> at signup.</p>
+                    <a href="https://vantage.com" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-white bg-navy hover:bg-opacity-90 rounded px-3 py-1.5 text-center transition">Visit Vantage</a>
+                </div>
+
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 flex flex-col gap-2 md:col-span-2">
+                    <div class="flex justify-between items-start gap-2">
+                        <h3 class="font-bold text-navy text-sm">AvaTrade</h3>
+                        <span class="text-[10px] uppercase tracking-wide font-semibold text-gray-500 bg-gray-200 px-2 py-0.5 rounded-full whitespace-nowrap">Forex, CFDs &amp; Multi-Asset</span>
+                    </div>
+                    <p class="text-xs text-gray-600">Trade forex, stocks, ETFs, crypto, and more in one account.</p>
+                    <a href="https://avatrade.com?tag=222519" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-white bg-navy hover:bg-opacity-90 rounded px-3 py-1.5 text-center transition self-start px-6">Visit AvaTrade</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Module 9: 90-Day Habit Tracker -->
+        <section id="tracker" class="bg-white rounded-xl p-6 md:p-8 shadow-sm border border-gray-200 space-y-6">
+            <div class="border-b pb-4 flex justify-between items-center">
+                <div>
+                    <span class="text-teal font-semibold text-xs tracking-wider uppercase">Section 9</span>
+                    <h2 class="text-2xl font-bold text-navy">90-Day Habit Tracker</h2>
+                </div>
+                <div class="text-right">
+                    <span id="tracker-progress-text" class="text-sm font-bold text-teal">0% Completed</span>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                <div id="tracker-progress-bar" class="bg-teal h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-navy text-white text-xs">
+                            <th class="p-2.5 w-16 text-center">Done</th>
+                            <th class="p-2.5 w-20">Week</th>
+                            <th class="p-2.5">Planned Action</th>
+                            <th class="p-2.5">Notes / Reflection</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tracker-rows" class="divide-y divide-gray-200">
+                        <!-- Generated via JS for 13 weeks -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Module 10: Knowledge Quiz -->
+        <section id="quiz" class="bg-white rounded-xl p-6 md:p-8 shadow-sm border border-gray-200 space-y-6">
+            <div class="border-b pb-4 flex justify-between items-center">
+                <div>
+                    <span class="text-teal font-semibold text-xs tracking-wider uppercase">Section 10</span>
+                    <h2 class="text-2xl font-bold text-navy">Knowledge Check</h2>
+                </div>
+                <div id="quiz-score-badge" class="bg-navy text-gold px-3 py-1 rounded-full text-xs font-bold">
+                    Score: - / 9
+                </div>
+            </div>
+
+            <div id="quiz-container" class="space-y-6">
+                <!-- Questions injected by JS -->
+            </div>
+        </section>
+
+        <!-- Module 7: Personal Blueprint & Summary -->
+        <section id="blueprint" class="bg-white rounded-xl p-6 md:p-8 shadow-sm border-2 border-navy space-y-6">
+            <div class="border-b pb-4 text-center">
+                <span class="text-gold font-bold text-xs tracking-wider uppercase">Final Step</span>
+                <h2 class="text-3xl font-extrabold text-navy mt-1">Your Personal Investing Blueprint</h2>
+                <p class="text-gray-600 text-sm mt-1">
+                    Make this simple enough to follow when the market is boring—and when it is chaotic.
+                </p>
+            </div>
+
+            <form id="form-blueprint" class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div class="bg-ivory p-3 rounded border">
+                    <label class="block font-bold text-navy text-xs mb-1">Starting Amount</label>
+                    <input type="text" data-key="bp_start" class="w-full bg-white border border-gray-300 rounded p-2 text-sm" placeholder="$500">
+                </div>
+                <div class="bg-ivory p-3 rounded border">
+                    <label class="block font-bold text-navy text-xs mb-1">Recurring Contribution</label>
+                    <input type="text" data-key="bp_contrib" class="w-full bg-white border border-gray-300 rounded p-2 text-sm" placeholder="$100 / month">
+                </div>
+                <div class="bg-ivory p-3 rounded border">
+                    <label class="block font-bold text-navy text-xs mb-1">Contribution Schedule</label>
+                    <input type="text" data-key="bp_sched" class="w-full bg-white border border-gray-300 rounded p-2 text-sm" placeholder="1st of every month">
+                </div>
+                <div class="bg-ivory p-3 rounded border">
+                    <label class="block font-bold text-navy text-xs mb-1">Core Investment/Fund to Research</label>
+                    <input type="text" data-key="bp_core" class="w-full bg-white border border-gray-300 rounded p-2 text-sm" placeholder="e.g. Broad S&P 500 ETF">
+                </div>
+                <div class="bg-ivory p-3 rounded border md:col-span-2">
+                    <label class="block font-bold text-navy text-xs mb-1">Single-Position Max Concentration Limit (%)</label>
+                    <input type="text" data-key="bp_limit" class="w-full bg-white border border-gray-300 rounded p-2 text-sm" placeholder="e.g. Max 10% per individual stock">
+                </div>
+                <div class="bg-ivory p-3 rounded border md:col-span-2">
+                    <label class="block font-bold text-navy text-xs mb-1">Rule for Adding Money</label>
+                    <input type="text" data-key="bp_add" class="w-full bg-white border border-gray-300 rounded p-2 text-sm" placeholder="e.g. Stick to auto-deposit schedule regardless of market noise">
+                </div>
+                <div class="bg-ivory p-3 rounded border md:col-span-2">
+                    <label class="block font-bold text-navy text-xs mb-1">Rule for Taking Money Out</label>
+                    <input type="text" data-key="bp_withdraw" class="w-full bg-white border border-gray-300 rounded p-2 text-sm" placeholder="e.g. Only for planned target goals or rebalancing after 5+ years">
+                </div>
+            </form>
+
+            <div class="bg-navy text-white p-6 rounded-xl border border-gold text-center space-y-2">
+                <h3 class="text-gold font-bold text-base">My Investing Promise</h3>
+                <p class="text-sm italic max-w-2xl mx-auto">
+                    "I will not measure progress only by today's account balance. I will measure it by whether I am learning, contributing within my means, managing risk, and following a plan."
+                </p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-navy text-gray-400 text-xs py-6 border-t border-gray-800 no-print">
+        <div class="max-w-5xl mx-auto px-4 text-center space-y-2">
+            <p>500 → Wealth-Building Habit | Educational Interactive Web Application</p>
+            <p class="text-gray-500">Educational use only. Not financial advice. Past performance does not guarantee future results.</p>
+        </div>
+    </footer>
+
+    <!-- Application Script Logic -->
+    <script>
+        // -------------------------------------------------------------
+        // LocalStorage & Form Persistence
+        // -------------------------------------------------------------
+        function saveInputData() {
+            try {
+                const inputs = document.querySelectorAll('[data-key]');
+                const data = {};
+                inputs.forEach(input => {
+                    if (input.type === 'checkbox') {
+                        data[input.dataset.key] = input.checked;
+                    } else {
+                        data[input.dataset.key] = input.value;
+                    }
+                });
+                localStorage.setItem('wealth_builder_data', JSON.stringify(data));
+            } catch (e) {
+                console.warn('Could not save progress locally:', e);
+            }
+            updateTrackerProgress();
+        }
+
+        function loadInputData() {
+            try {
+                const saved = localStorage.getItem('wealth_builder_data');
+                if (!saved) return;
+                const data = JSON.parse(saved);
+                Object.keys(data).forEach(key => {
+                    const el = document.querySelector(`[data-key="${key}"]`);
+                    if (el) {
+                        if (el.type === 'checkbox') {
+                            el.checked = data[key];
+                        } else {
+                            el.value = data[key];
+                        }
+                    }
+                });
+            } catch (e) {
+                console.warn('Could not load saved progress:', e);
+            }
+        }
+
+        function resetData() {
+            if (confirm('Are you sure you want to reset all saved inputs and tracker progress?')) {
+                try {
+                    localStorage.removeItem('wealth_builder_data');
+                } catch (e) {
+                    console.warn('Could not clear saved progress:', e);
+                }
+                location.reload();
+            }
+        }
+
+        function scrollToSec(id) {
+            document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // -------------------------------------------------------------
+        // Decision Checklist Assistant
+        // -------------------------------------------------------------
+        function checkDecision(btn, message, type) {
+            const parent = btn.parentElement;
+            let note = parent.querySelector('.decision-note');
+            if (!note) {
+                note = document.createElement('span');
+                note.className = 'decision-note block text-xs font-bold mt-1';
+                parent.appendChild(note);
+            }
+            note.textContent = message;
+            note.className = `decision-note block text-xs font-bold mt-1 ${type === 'success' ? 'text-green-600' : 'text-red-600'}`;
+        }
+
+        // -------------------------------------------------------------
+        // Compounding Calculator & Chart.js Integration
+        // -------------------------------------------------------------
+        let compChart = null;
+
+        function updateCalculator() {
+            const P = parseFloat(document.getElementById('calc-init').value) || 0;
+            const PMT = parseFloat(document.getElementById('calc-monthly').value) || 0;
+            const rate = (parseFloat(document.getElementById('calc-rate').value) || 0) / 100;
+
+            const years = [1, 5, 10, 20, 30];
+            const tableBody = document.getElementById('calc-table-body');
+            tableBody.innerHTML = '';
+
+            const chartLabels = [];
+            const chartDataValues = [];
+            const chartDataContrib = [];
+
+            const r = rate / 12;
+
+            for (let y = 1; y <= 30; y++) {
+                const n = y * 12;
+                const totalContrib = P + (PMT * n);
+                let fv = P * Math.pow(1 + r, n);
+                if (r > 0) {
+                    fv += PMT * ((Math.pow(1 + r, n) - 1) / r);
+                } else {
+                    fv += PMT * n;
+                }
+
+                if (years.includes(y)) {
+                    const tr = document.createElement('tr');
+                    tr.className = y % 2 === 0 ? 'bg-gray-50' : 'bg-white';
+                    tr.innerHTML = `
+                        <td class="p-2 font-semibold">Year ${y}</td>
+                        <td class="p-2">$${Math.round(totalContrib).toLocaleString()}</td>
+                        <td class="p-2 font-bold text-teal">$${Math.round(fv).toLocaleString()}</td>
+                    `;
+                    tableBody.appendChild(tr);
+                }
+
+                chartLabels.push(`Y${y}`);
+                chartDataValues.push(Math.round(fv));
+                chartDataContrib.push(Math.round(totalContrib));
+            }
+
+            renderChart(chartLabels, chartDataValues, chartDataContrib);
+        }
+
+        function renderChart(labels, values, contribs) {
+            const ctx = document.getElementById('compoundingChart').getContext('2d');
+            if (compChart) compChart.destroy();
+
+            compChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Portfolio Value ($)',
+                            data: values,
+                            borderColor: '#2C9AA0',
+                            backgroundColor: 'rgba(44, 154, 160, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Total Contributions ($)',
+                            data: contribs,
+                            borderColor: '#0E1B30',
+                            borderDash: [4, 4],
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        // -------------------------------------------------------------
+        // Options Chain Calculator (Black-Scholes)
+        // -------------------------------------------------------------
+        function normCDF(x) {
+            const t = 1 / (1 + 0.2316419 * Math.abs(x));
+            const d = 0.3989423 * Math.exp(-x * x / 2);
+            let prob = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
+            if (x > 0) prob = 1 - prob;
+            return prob;
+        }
+
+        function blackScholes(S, K, T, r, sigma) {
+            if (T <= 0) T = 0.0001;
+            if (sigma <= 0) sigma = 0.0001;
+            const d1 = (Math.log(S / K) + (r + (sigma * sigma) / 2) * T) / (sigma * Math.sqrt(T));
+            const d2 = d1 - sigma * Math.sqrt(T);
+            const call = S * normCDF(d1) - K * Math.exp(-r * T) * normCDF(d2);
+            const put = K * Math.exp(-r * T) * normCDF(-d2) - S * normCDF(-d1);
+            return { call: Math.max(call, 0), put: Math.max(put, 0) };
+        }
+
+        function buildOptionsChain() {
+            const priceInput = document.getElementById('chain-price');
+            const daysInput = document.getElementById('chain-days');
+            const ivInput = document.getElementById('chain-iv');
+            if (!priceInput || !daysInput || !ivInput) return;
+
+            const S = Math.max(parseFloat(priceInput.value) || 50, 1);
+            const days = Math.max(parseFloat(daysInput.value) || 30, 1);
+            const ivPct = Math.max(parseFloat(ivInput.value) || 35, 1);
+            const r = 0.045;
+            const sigma = ivPct / 100;
+            const T = days / 365;
+
+            let increment;
+            if (S < 20) increment = 1;
+            else if (S < 50) increment = 2.5;
+            else if (S < 100) increment = 5;
+            else increment = 10;
+
+            const atmStrike = Math.round(S / increment) * increment;
+            const strikes = [];
+            for (let i = -5; i <= 5; i++) {
+                const k = atmStrike + i * increment;
+                if (k > 0) strikes.push(k);
+            }
+
+            const tbody = document.getElementById('chain-table-body');
+            tbody.innerHTML = '';
+
+            strikes.forEach((K, idx) => {
+                const { call, put } = blackScholes(S, K, T, r, sigma);
+                const callIntrinsic = Math.max(S - K, 0);
+                const putIntrinsic = Math.max(K - S, 0);
+                const callTime = Math.max(call - callIntrinsic, 0);
+                const putTime = Math.max(put - putIntrinsic, 0);
+                const isAtm = K === atmStrike;
+
+                const tr = document.createElement('tr');
+                tr.className = isAtm ? 'bg-ivory font-semibold' : (idx % 2 === 0 ? 'bg-white' : 'bg-gray-50');
+                tr.innerHTML = `
+                    <td class="p-1.5 text-teal font-semibold">$${call.toFixed(2)}</td>
+                    <td class="p-1.5 text-gray-600">$${callIntrinsic.toFixed(2)}</td>
+                    <td class="p-1.5 text-gray-600">$${callTime.toFixed(2)}</td>
+                    <td class="p-1.5 font-bold text-navy">$${K.toFixed(2)}</td>
+                    <td class="p-1.5 text-red-600 font-semibold">$${put.toFixed(2)}</td>
+                    <td class="p-1.5 text-gray-600">$${putIntrinsic.toFixed(2)}</td>
+                    <td class="p-1.5 text-gray-600">$${putTime.toFixed(2)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            const note = document.getElementById('chain-atm-note');
+            if (note) {
+                note.textContent = `At a stock price of $${S.toFixed(2)}, the nearest at-the-money strike is $${atmStrike.toFixed(2)} (highlighted below).`;
+            }
+        }
+
+        // -------------------------------------------------------------
+        // Beginner Case Studies
+        // -------------------------------------------------------------
+        const caseStudies = [
+            { ticker: 'NKE', name: 'Nike', price: '$37.04', bull: 'Iconic global brand pushing a turnaround under new leadership.', watch: 'Shares are down sharply this year - a recovery is not guaranteed.' },
+            { ticker: 'SBUX', name: 'Starbucks', price: '$99.27', bull: 'Loyal customer base and thousands of familiar locations worldwide.', watch: 'Priced for a comeback that still has to show up in the numbers.' },
+            { ticker: 'KO', name: 'Coca-Cola', price: '$88.29', bull: 'Decades of consistent dividends and a product sold almost everywhere.', watch: 'A slow-growth business - do not expect fast price appreciation.' },
+            { ticker: 'T', name: 'AT&T', price: '$26.51', bull: 'High dividend yield backed by steady telecom cash flow.', watch: 'Carries a heavy debt load and has cut its dividend before.' },
+            { ticker: 'F', name: 'Ford', price: '$13.97', bull: 'Low share price makes it easy to build a full position quickly.', watch: 'Auto manufacturing is capital-intensive and swings with the economy.' }
+        ];
+
+        function buildCaseStudies() {
+            const grid = document.getElementById('case-study-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+            caseStudies.forEach(c => {
+                const card = document.createElement('div');
+                card.className = 'bg-gray-50 border border-gray-200 rounded-lg p-3 space-y-1.5';
+                card.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-navy text-sm">${c.ticker}</span>
+                        <span class="text-xs text-gray-500">${c.name}</span>
+                        <span class="text-xs font-semibold text-teal">${c.price}</span>
+                    </div>
+                    <p class="text-[11px] text-gray-700"><span class="font-semibold text-teal">Bull case:</span> ${c.bull}</p>
+                    <p class="text-[11px] text-gray-700"><span class="font-semibold text-red-500">Watch for:</span> ${c.watch}</p>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // -------------------------------------------------------------
+        // 90-Day Tracker Builder
+        // -------------------------------------------------------------
+        function buildTracker() {
+            const container = document.getElementById('tracker-rows');
+            container.innerHTML = '';
+
+            for (let w = 1; w <= 13; w++) {
+                const tr = document.createElement('tr');
+                tr.className = w % 2 === 0 ? 'bg-gray-50' : 'bg-white';
+                tr.innerHTML = `
+                    <td class="p-2 text-center">
+                        <input type="checkbox" data-key="tr_cb_${w}" onchange="saveInputData()" class="w-4 h-4 text-teal rounded focus:ring-teal cursor-pointer">
+                    </td>
+                    <td class="p-2 font-bold text-navy">Week ${w}</td>
+                    <td class="p-2 text-xs text-gray-600">Contribution / Portfolio Review</td>
+                    <td class="p-2">
+                        <input type="text" data-key="tr_note_${w}" oninput="saveInputData()" placeholder="Add notes..." class="w-full border border-gray-200 rounded p-1 text-xs">
+                    </td>
+                `;
+                container.appendChild(tr);
+            }
+        }
+
+        function updateTrackerProgress() {
+            let checked = 0;
+            for (let w = 1; w <= 13; w++) {
+                const cb = document.querySelector(`[data-key="tr_cb_${w}"]`);
+                if (cb && cb.checked) checked++;
+            }
+            const pct = Math.round((checked / 13) * 100);
+            document.getElementById('tracker-progress-bar').style.width = `${pct}%`;
+            document.getElementById('tracker-progress-text').textContent = `${pct}% Completed (${checked}/13 Weeks)`;
+        }
+
+        // -------------------------------------------------------------
+        // Quiz System
+        // -------------------------------------------------------------
+        const quizData = [
+            {
+                q: "1. Which statement regarding share price is most accurate?",
+                options: [
+                    "A stock under $50 is automatically cheap.",
+                    "Share price alone does not determine valuation.",
+                    "A lower share price means lower overall risk.",
+                    "Cheap stocks cannot fall much further in price."
+                ],
+                correct: 1,
+                explanation: "Share price only tells you the cost of one share, not whether the overall company is undervalued or overvalued."
+            },
+            {
+                q: "2. An ETF (Exchange-Traded Fund) can:",
+                options: [
+                    "Hold a collection of multiple investments.",
+                    "Guarantee a profit regardless of market conditions.",
+                    "Eliminate all forms of market risk.",
+                    "Predict upcoming economic recessions."
+                ],
+                correct: 0,
+                explanation: "ETFs hold baskets of assets to provide instant diversification, though they are still subject to market fluctuations."
+            },
+            {
+                q: "3. An index is best described as:",
+                options: [
+                    "A guaranteed financial investment product.",
+                    "A rules-based measure or market benchmark basket.",
+                    "A high-interest bank savings account.",
+                    "A recurring dividend payment."
+                ],
+                correct: 1,
+                explanation: "An index is a statistical metric or benchmark that measures a market section (e.g., S&P 500)."
+            },
+            {
+                q: "4. Why might a beginner prefer a broad diversified index fund?",
+                options: [
+                    "It guarantees higher annual returns than any single stock.",
+                    "It can reduce exposure and reliance on any single company.",
+                    "It never declines in market value.",
+                    "It requires no financial knowledge whatsoever."
+                ],
+                correct: 1,
+                explanation: "Diversification spreads risk so that poor performance in one company doesn't destroy your entire portfolio."
+            },
+            {
+                q: "5. Which represents the strongest wealth-building habit?",
+                options: [
+                    "Buy stocks only when social media is excited.",
+                    "Change your trading strategy every single day.",
+                    "Make a sustainable contribution on a consistent schedule.",
+                    "Invest money you need for next month's living expenses."
+                ],
+                correct: 2,
+                explanation: "A repeatable, automated habit generates consistent long-term progress over emotional speculation."
+            },
+            {
+                q: "6. Before buying an unfamiliar company, you should:",
+                options: [
+                    "Check only its daily price movements.",
+                    "Understand its core business, risks, and reason for ownership.",
+                    "Buy immediately because an online creator suggested it.",
+                    "Assume a stock split makes the company cheaper."
+                ],
+                correct: 1,
+                explanation: "Always research what the business does, how it earns revenue, and the risk factors before investing."
+            },
+            {
+                q: "7. On a candlestick chart, a bullish (green) candle means:",
+                options: [
+                    "The stock closed higher than it opened.",
+                    "The stock hit a new 52-week high.",
+                    "The company just reported earnings.",
+                    "Trading volume was unusually low."
+                ],
+                correct: 0,
+                explanation: "A bullish candle simply means the close was above the open for that period - it says nothing on its own about highs, earnings, or volume."
+            },
+            {
+                q: "8. In options trading, the 'strike price' is:",
+                options: [
+                    "The current market price of the stock.",
+                    "The price you originally paid for the premium.",
+                    "The fixed price at which the contract lets you buy or sell the stock.",
+                    "The price the stock is forecast to reach by expiration."
+                ],
+                correct: 2,
+                explanation: "The strike price is set when the contract is created and does not change - it is the price at which the option can be exercised."
+            },
+            {
+                q: "9. An option that is 'out of the money' currently has:",
+                options: [
+                    "Only intrinsic value.",
+                    "No intrinsic value, only time value.",
+                    "Guaranteed future profit.",
+                    "The same value as owning the stock outright."
+                ],
+                correct: 1,
+                explanation: "Out-of-the-money options have no built-in (intrinsic) value yet - their entire premium is time value, which shrinks as expiration approaches."
+            }
+        ];
+
+        function buildQuiz() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = '';
+
+            quizData.forEach((item, qIdx) => {
+                const qBox = document.createElement('div');
+                qBox.className = 'p-4 bg-gray-50 rounded-lg border border-gray-200 space-y-3';
+                
+                let html = `<p class="font-bold text-navy text-sm">${item.q}</p>`;
+                html += `<div class="space-y-2">`;
+                item.options.forEach((opt, oIdx) => {
+                    html += `
+                        <label class="flex items-center space-x-2 text-xs text-darkgray cursor-pointer hover:text-teal">
+                            <input type="radio" name="quiz_q_${qIdx}" value="${oIdx}" onchange="checkQuizScore()" class="text-teal focus:ring-teal">
+                            <span>${opt}</span>
+                        </label>
+                    `;
+                });
+                html += `</div>`;
+                html += `<div id="quiz-exp-${qIdx}" class="hidden text-xs p-2.5 rounded mt-2"></div>`;
+
+                qBox.innerHTML = html;
+                container.appendChild(qBox);
+            });
+        }
+
+        function checkQuizScore() {
+            let score = 0;
+            let answered = 0;
+
+            quizData.forEach((item, qIdx) => {
+                const selected = document.querySelector(`input[name="quiz_q_${qIdx}"]:checked`);
+                const expBox = document.getElementById(`quiz-exp-${qIdx}`);
+
+                if (selected) {
+                    answered++;
+                    const val = parseInt(selected.value);
+                    if (val === item.correct) {
+                        score++;
+                        expBox.className = 'text-xs p-2.5 rounded mt-2 bg-green-100 text-green-800 border border-green-300 block';
+                        expBox.innerHTML = `✓ <b>Correct!</b> ${item.explanation}`;
+                    } else {
+                        expBox.className = 'text-xs p-2.5 rounded mt-2 bg-red-100 text-red-800 border border-red-300 block';
+                        expBox.innerHTML = `✗ <b>Incorrect.</b> ${item.explanation}`;
+                    }
+                }
+            });
+
+            document.getElementById('quiz-score-badge').textContent = `Score: ${score} / ${quizData.length}`;
+        }
+
+        // -------------------------------------------------------------
+        // Initialization
+        // -------------------------------------------------------------
+        document.addEventListener('DOMContentLoaded', () => {
+            buildTracker();
+            buildQuiz();
+            updateCalculator();
+            buildOptionsChain();
+            buildCaseStudies();
+            loadInputData();
+
+            // Attach input listener to all data-key elements
+            document.querySelectorAll('[data-key]').forEach(el => {
+                el.addEventListener('input', saveInputData);
+                el.addEventListener('change', saveInputData);
+            });
+        });
+    </script>
+</body>
+</html>
