@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { Layout } from "@/components/Layout";
@@ -7,7 +6,7 @@ import { SEO } from "@/components/SEO";
 import { motion } from "framer-motion";
 import {
   ArrowLeft, TrendingUp, AlertTriangle, Shield, Target,
-  BarChart3, Newspaper, Clock, CheckCircle, XCircle, Info,
+  Newspaper, CheckCircle, XCircle, Info,
   ChevronDown, ChevronUp,
 } from "lucide-react";
 

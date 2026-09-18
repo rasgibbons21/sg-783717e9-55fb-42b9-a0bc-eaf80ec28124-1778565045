@@ -202,7 +202,7 @@ export function filterAndSort(
   candidates: ScannerCandidate[],
   filters: ScannerFilters,
 ): ScannerCandidate[] {
-  let filtered = candidates.filter((c) => {
+  const filtered = candidates.filter((c) => {
     if (c.price < filters.minPrice || c.price > filters.maxPrice) return false;
     if (c.change < filters.minChange) return false;
     if (c.rvol < filters.minRvol) return false;

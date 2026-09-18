@@ -1,15 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/router";
-import Link from "next/link";
 import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
-import { useSubscription } from "@/contexts/SubscriptionContext";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Activity, TrendingUp, Zap, AlertTriangle, Clock, ChevronRight,
-  RefreshCw, Filter, ArrowUpRight, ArrowDownRight, Shield, Eye,
-  Newspaper, BarChart3, Target, Volume2,
+  Activity, Zap, AlertTriangle,
+  RefreshCw, Filter, ArrowUpRight, Eye,
+  Newspaper,
 } from "lucide-react";
 
 const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
@@ -200,7 +198,6 @@ function SignalCard({ c, rank }: { c: ScannerCandidate; rank: number }) {
 
 export default function SignalsPage() {
   const router = useRouter();
-  const { isPro, isLoading: subLoading } = useSubscription();
   const [candidates, setCandidates] = useState<ScannerCandidate[]>([]);
   const [news, setNews] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
