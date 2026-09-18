@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Activity, Zap, AlertTriangle,
   RefreshCw, Filter, ArrowUpRight, Eye,
-  Newspaper,
+  Newspaper, Sparkles, Target, ShieldCheck,
 } from "lucide-react";
 
 const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
@@ -43,6 +43,20 @@ interface NewsArticle {
   image?: string;
   publishedAt: string;
   symbols: string[];
+}
+
+interface PansyPick {
+  symbol: string;
+  confidence: "high" | "moderate" | "speculative";
+  take: string;
+  tradePlan: {
+    entry: string;
+    stop: string;
+    target1: string;
+    target2: string;
+    riskReward: string;
+  };
+  keyFactors: string[];
 }
 
 function formatVolume(v: number): string {
@@ -196,6 +210,96 @@ function SignalCard({ c, rank }: { c: ScannerCandidate; rank: number }) {
   );
 }
 
+function PansyPickCard({ pick, rank }: { pick: PansyPick; rank: number }) {
+  const router = useRouter();
+  const confColor = pick.confidence === "high" ? "#49B06E" : pick.confidence === "moderate" ? "#27B7C8" : "#F59E0B";
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: rank * 0.1, duration: 0.4 }}
+      onClick={() => { haptic(); router.push(`/scanner/${pick.symbol}`); }}
+      className="rounded-2xl border p-4 cursor-pointer transition-all active:scale-[0.98]"
+      style={{
+        background: "linear-gradient(145deg, rgba(168,85,247,0.08), rgba(14,27,48,1))",
+        borderColor: "rgba(168,85,247,0.25)",
+      }}
+    >
+      <div className="flex items-start justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <div
+            className="w-8 h-8 rounded-full flex items-center justify-center text-sm"
+            style={{ background: "rgba(168,85,247,0.15)" }}
+          >
+            🌸
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-lg font-bold text-[#F4F7FA]">{pick.symbol}</span>
+              <span
+                className="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase"
+                style={{ background: `${confColor}20`, color: confColor }}
+              >
+                {pick.confidence}
+              </span>
+            </div>
+          </div>
+        </div>
+        <Sparkles className="w-4 h-4 text-purple-400/60" />
+      </div>
+
+      <p className="text-[13px] text-[#F4F7FA]/70 leading-relaxed mb-3">
+        {pick.take}
+      </p>
+
+      <div
+        className="rounded-xl p-3 mb-3 space-y-2"
+        style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
+      >
+        <div className="flex items-center gap-1.5 mb-1">
+          <Target className="w-3 h-3 text-purple-400" />
+          <span className="text-[10px] font-bold text-purple-400 uppercase tracking-wider">Hypothetical Trade Plan</span>
+        </div>
+        <div className="grid grid-cols-2 gap-2 text-[11px]">
+          <div>
+            <span className="text-[#F4F7FA]/40">Entry: </span>
+            <span className="text-[#49B06E] font-medium">{pick.tradePlan.entry}</span>
+          </div>
+          <div>
+            <span className="text-[#F4F7FA]/40">Stop: </span>
+            <span className="text-[#EF4444] font-medium">{pick.tradePlan.stop}</span>
+          </div>
+          <div>
+            <span className="text-[#F4F7FA]/40">Target 1: </span>
+            <span className="text-[#27B7C8] font-medium">{pick.tradePlan.target1}</span>
+          </div>
+          <div>
+            <span className="text-[#F4F7FA]/40">Target 2: </span>
+            <span className="text-[#27B7C8] font-medium">{pick.tradePlan.target2}</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-1 pt-1">
+          <ShieldCheck className="w-3 h-3 text-[#49B06E]" />
+          <span className="text-[10px] text-[#49B06E] font-semibold">R:R {pick.tradePlan.riskReward}</span>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap gap-1">
+        {pick.keyFactors.map((f, i) => (
+          <span
+            key={i}
+            className="text-[9px] px-2 py-0.5 rounded-full font-medium"
+            style={{ background: "rgba(168,85,247,0.1)", color: "rgba(168,85,247,0.7)" }}
+          >
+            {f}
+          </span>
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
 export default function SignalsPage() {
   const router = useRouter();
   const [candidates, setCandidates] = useState<ScannerCandidate[]>([]);
@@ -206,11 +310,34 @@ export default function SignalsPage() {
   const [lastScan, setLastScan] = useState<number | null>(null);
   const [tab, setTab] = useState<"signals" | "news">("signals");
   const [showFilters, setShowFilters] = useState(false);
+  const [pansyPicks, setPansyPicks] = useState<PansyPick[]>([]);
+  const [pansyNote, setPansyNote] = useState("");
+  const [pansyLoading, setPansyLoading] = useState(false);
   const [filters, setFilters] = useState({
     catalystOnly: false,
     minRvol: 5,
     sortBy: "score" as string,
   });
+
+  const loadPansyAnalysis = useCallback(async (scanCandidates: ScannerCandidate[]) => {
+    const worthy = scanCandidates.filter(c => c.status === "qualified" || c.status === "watchlist");
+    if (worthy.length === 0) return;
+    setPansyLoading(true);
+    try {
+      const res = await fetch("/api/scanner/pansy-analysis", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ candidates: worthy.slice(0, 5) }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setPansyPicks(data.picks || []);
+        setPansyNote(data.marketNote || "");
+      }
+    } catch {} finally {
+      setPansyLoading(false);
+    }
+  }, []);
 
   const loadScan = useCallback(async () => {
     setLoading(true);
@@ -227,14 +354,16 @@ export default function SignalsPage() {
       const res = await fetch(`/api/scanner/scan?${params}`);
       if (!res.ok) throw new Error("Scanner unavailable");
       const data = await res.json();
-      setCandidates(data.candidates || []);
+      const results = data.candidates || [];
+      setCandidates(results);
       setLastScan(data.timestamp);
+      loadPansyAnalysis(results);
     } catch (err: any) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, [filters, loadPansyAnalysis]);
 
   const loadNews = useCallback(async () => {
     setNewsLoading(true);
@@ -457,6 +586,46 @@ export default function SignalsPage() {
                 <Activity className="w-8 h-8 text-[#F4F7FA]/20 mx-auto mb-3" />
                 <p className="text-sm text-[#F4F7FA]/40">No candidates match your filters right now.</p>
                 <p className="text-xs text-[#F4F7FA]/25 mt-1">Try lowering the minimum RVOL or check back during market hours.</p>
+              </div>
+            )}
+
+            {/* Pansy's Picks */}
+            {(pansyLoading || pansyPicks.length > 0) && !loading && !error && (
+              <div className="mb-6">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-base">🌸</span>
+                  <h2 className="text-sm font-bold text-[#F4F7FA]">Pansy&apos;s Top Picks</h2>
+                  <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+                </div>
+                {pansyNote && (
+                  <p className="text-[11px] text-[#F4F7FA]/40 mb-3 ml-7">{pansyNote}</p>
+                )}
+                {pansyLoading ? (
+                  <div className="space-y-3">
+                    {[1, 2].map((i) => (
+                      <div
+                        key={i}
+                        className="rounded-2xl border p-4 animate-pulse"
+                        style={{ background: "rgba(168,85,247,0.04)", borderColor: "rgba(168,85,247,0.15)" }}
+                      >
+                        <div className="flex items-center gap-2 mb-3">
+                          <div className="w-8 h-8 rounded-full bg-purple-500/10" />
+                          <div className="h-4 w-16 rounded bg-white/5" />
+                        </div>
+                        <div className="h-3 w-full rounded bg-white/5 mb-2" />
+                        <div className="h-3 w-3/4 rounded bg-white/5 mb-3" />
+                        <div className="h-16 rounded-xl bg-white/5" />
+                      </div>
+                    ))}
+                    <p className="text-[10px] text-purple-400/50 text-center">Pansy is analyzing today&apos;s setups...</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {pansyPicks.map((pick, i) => (
+                      <PansyPickCard key={pick.symbol} pick={pick} rank={i} />
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
