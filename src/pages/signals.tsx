@@ -5,7 +5,7 @@ import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Activity, Zap, AlertTriangle,
+  Zap, AlertTriangle,
   RefreshCw, Filter, ArrowUpRight, Eye,
   Newspaper, Sparkles, Target, ShieldCheck,
 } from "lucide-react";
@@ -300,6 +300,20 @@ function PansyPickCard({ pick, rank }: { pick: PansyPick; rank: number }) {
   );
 }
 
+function isMarketHours(): { open: boolean; message: string } {
+  const now = new Date();
+  const et = new Date(now.toLocaleString("en-US", { timeZone: "America/New_York" }));
+  const day = et.getDay();
+  const hour = et.getHours();
+  const min = et.getMinutes();
+  const time = hour * 60 + min;
+  if (day === 0 || day === 6) return { open: false, message: "Markets are closed for the weekend" };
+  if (time < 4 * 60) return { open: false, message: "Pre-market opens at 4:00 AM ET" };
+  if (time < 9 * 60 + 30) return { open: false, message: "Pre-market is open — regular session at 9:30 AM ET" };
+  if (time < 16 * 60) return { open: true, message: "Markets are open" };
+  return { open: false, message: "Markets closed — scanner updates during trading hours" };
+}
+
 export default function SignalsPage() {
   const router = useRouter();
   const [candidates, setCandidates] = useState<ScannerCandidate[]>([]);
@@ -308,7 +322,6 @@ export default function SignalsPage() {
   const [newsLoading, setNewsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastScan, setLastScan] = useState<number | null>(null);
-  const [tab, setTab] = useState<"signals" | "news">("signals");
   const [showFilters, setShowFilters] = useState(false);
   const [pansyPicks, setPansyPicks] = useState<PansyPick[]>([]);
   const [pansyNote, setPansyNote] = useState("");
@@ -386,16 +399,18 @@ export default function SignalsPage() {
   const qualified = candidates.filter((c) => c.status === "qualified");
   const watchlist = candidates.filter((c) => c.status === "watchlist");
   const nearMisses = candidates.filter((c) => c.status === "near-miss" || c.status === "rejected");
+  const market = isMarketHours();
+  const hasScanData = !loading && !error && candidates.length > 0;
 
   return (
     <Layout>
-      <SEO title="Signals | Bloom" description="Live Gap-and-Go trading signals powered by the SheBlooms strategy" />
+      <SEO title="Bloom | Gap-and-Go Trading Signals" description="AI-powered Gap-and-Go scanner with Pansy's trade analysis, live signals, and market news" />
 
       <div className="max-w-lg mx-auto px-4 pt-4 pb-32">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-2xl font-bold text-[#F4F7FA]">Market Signals</h1>
+            <h1 className="text-2xl font-bold text-[#F4F7FA]">Bloom</h1>
             <p className="text-xs text-[#F4F7FA]/40 mt-0.5">
               Gap-and-Go Scanner
               {lastScan && <> &middot; Updated {timeAgo(new Date(lastScan).toISOString())}</>}
@@ -427,18 +442,18 @@ export default function SignalsPage() {
         {/* Market status bar */}
         <div
           className="rounded-xl p-3 mb-4 flex items-center justify-between"
-          style={{ background: "rgba(39,183,200,0.06)", border: "1px solid rgba(39,183,200,0.12)" }}
+          style={{ background: market.open ? "rgba(73,176,110,0.06)" : "rgba(39,183,200,0.06)", border: `1px solid ${market.open ? "rgba(73,176,110,0.15)" : "rgba(39,183,200,0.12)"}` }}
         >
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-[#49B06E] animate-pulse" />
-            <span className="text-xs font-medium text-[#F4F7FA]/70">Market Data</span>
-            <span className="text-[10px] text-[#F4F7FA]/40">Delayed</span>
+            <div className={`w-2 h-2 rounded-full ${market.open ? "bg-[#49B06E] animate-pulse" : "bg-[#F4F7FA]/30"}`} />
+            <span className="text-xs font-medium text-[#F4F7FA]/70">{market.message}</span>
           </div>
-          <div className="flex items-center gap-3 text-[10px] text-[#F4F7FA]/40">
-            <span>{qualified.length} signals</span>
-            <span>{watchlist.length} watching</span>
-            <span>{candidates.length} scanned</span>
-          </div>
+          {hasScanData && (
+            <div className="flex items-center gap-3 text-[10px] text-[#F4F7FA]/40">
+              <span>{qualified.length} signals</span>
+              <span>{watchlist.length} watching</span>
+            </div>
+          )}
         </div>
 
         {/* Filter panel */}
@@ -517,211 +532,164 @@ export default function SignalsPage() {
           )}
         </AnimatePresence>
 
-        {/* Tabs: Signals / News */}
-        <div className="flex gap-1 mb-5 p-1 rounded-xl" style={{ background: "rgba(255,255,255,0.04)" }}>
-          {[
-            { id: "signals" as const, label: "Signals", icon: <Zap className="w-3.5 h-3.5" /> },
-            { id: "news" as const, label: "News", icon: <Newspaper className="w-3.5 h-3.5" /> },
-          ].map((t) => (
-            <button
-              key={t.id}
-              onClick={() => { haptic(); setTab(t.id); }}
-              className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-medium transition-all"
-              style={{
-                background: tab === t.id ? "rgba(39,183,200,0.15)" : "transparent",
-                color: tab === t.id ? "#27B7C8" : "rgba(244,247,250,0.4)",
-              }}
-            >
-              {t.icon} {t.label}
-            </button>
-          ))}
-        </div>
+        {/* ═══ SCANNER SECTION ═══ */}
 
-        {/* Signals tab */}
-        {tab === "signals" && (
-          <>
-            {loading && (
-              <div className="space-y-3">
-                {[1, 2, 3].map((i) => (
-                  <div
-                    key={i}
-                    className="rounded-2xl border border-white/5 p-4 animate-pulse"
-                    style={{ background: "#162540" }}
-                  >
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 rounded-xl bg-white/5" />
-                      <div className="flex-1">
-                        <div className="h-4 w-20 rounded bg-white/5 mb-1" />
-                        <div className="h-3 w-14 rounded bg-white/5" />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-4 gap-2">
-                      {[1, 2, 3, 4].map((j) => (
-                        <div key={j} className="h-8 rounded bg-white/5" />
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {error && (
+        {/* Loading state */}
+        {loading && (
+          <div className="space-y-3 mb-6">
+            {[1, 2, 3].map((i) => (
               <div
-                className="rounded-xl p-4 text-center mb-4"
-                style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)" }}
+                key={i}
+                className="rounded-2xl border border-white/5 p-4 animate-pulse"
+                style={{ background: "#162540" }}
               >
-                <AlertTriangle className="w-5 h-5 text-[#EF4444] mx-auto mb-2" />
-                <p className="text-sm text-[#EF4444] font-medium">{error}</p>
-                <button
-                  onClick={loadScan}
-                  className="text-xs text-[#27B7C8] mt-2 underline"
-                >
-                  Retry
-                </button>
-              </div>
-            )}
-
-            {!loading && !error && candidates.length === 0 && (
-              <div className="text-center py-12">
-                <Activity className="w-8 h-8 text-[#F4F7FA]/20 mx-auto mb-3" />
-                <p className="text-sm text-[#F4F7FA]/40">No candidates match your filters right now.</p>
-                <p className="text-xs text-[#F4F7FA]/25 mt-1">Try lowering the minimum RVOL or check back during market hours.</p>
-              </div>
-            )}
-
-            {/* Pansy's Picks */}
-            {(pansyLoading || pansyPicks.length > 0) && !loading && !error && (
-              <div className="mb-6">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-base">🌸</span>
-                  <h2 className="text-sm font-bold text-[#F4F7FA]">Pansy&apos;s Top Picks</h2>
-                  <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-                </div>
-                {pansyNote && (
-                  <p className="text-[11px] text-[#F4F7FA]/40 mb-3 ml-7">{pansyNote}</p>
-                )}
-                {pansyLoading ? (
-                  <div className="space-y-3">
-                    {[1, 2].map((i) => (
-                      <div
-                        key={i}
-                        className="rounded-2xl border p-4 animate-pulse"
-                        style={{ background: "rgba(168,85,247,0.04)", borderColor: "rgba(168,85,247,0.15)" }}
-                      >
-                        <div className="flex items-center gap-2 mb-3">
-                          <div className="w-8 h-8 rounded-full bg-purple-500/10" />
-                          <div className="h-4 w-16 rounded bg-white/5" />
-                        </div>
-                        <div className="h-3 w-full rounded bg-white/5 mb-2" />
-                        <div className="h-3 w-3/4 rounded bg-white/5 mb-3" />
-                        <div className="h-16 rounded-xl bg-white/5" />
-                      </div>
-                    ))}
-                    <p className="text-[10px] text-purple-400/50 text-center">Pansy is analyzing today&apos;s setups...</p>
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 rounded-xl bg-white/5" />
+                  <div className="flex-1">
+                    <div className="h-4 w-20 rounded bg-white/5 mb-1" />
+                    <div className="h-3 w-14 rounded bg-white/5" />
                   </div>
-                ) : (
-                  <div className="space-y-3">
-                    {pansyPicks.map((pick, i) => (
-                      <PansyPickCard key={pick.symbol} pick={pick} rank={i} />
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {!loading && !error && qualified.length > 0 && (
-              <div className="mb-6">
-                <div className="flex items-center gap-2 mb-3">
-                  <Zap className="w-4 h-4 text-[#49B06E]" />
-                  <h2 className="text-sm font-bold text-[#F4F7FA]">Qualified Signals</h2>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#49B06E]/15 text-[#49B06E] font-semibold">
-                    {qualified.length}
-                  </span>
                 </div>
-                <div className="space-y-3">
-                  {qualified.map((c, i) => <SignalCard key={c.symbol} c={c} rank={i} />)}
-                </div>
-              </div>
-            )}
-
-            {!loading && !error && watchlist.length > 0 && (
-              <div className="mb-6">
-                <div className="flex items-center gap-2 mb-3">
-                  <Eye className="w-4 h-4 text-[#27B7C8]" />
-                  <h2 className="text-sm font-bold text-[#F4F7FA]">Watchlist</h2>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#27B7C8]/15 text-[#27B7C8] font-semibold">
-                    {watchlist.length}
-                  </span>
-                </div>
-                <div className="space-y-3">
-                  {watchlist.map((c, i) => <SignalCard key={c.symbol} c={c} rank={i} />)}
-                </div>
-              </div>
-            )}
-
-            {!loading && !error && nearMisses.length > 0 && (
-              <div className="mb-6">
-                <div className="flex items-center gap-2 mb-3">
-                  <AlertTriangle className="w-4 h-4 text-[#F59E0B]" />
-                  <h2 className="text-sm font-bold text-[#F4F7FA]/60">Near Misses</h2>
-                </div>
-                <div className="space-y-2">
-                  {nearMisses.slice(0, 5).map((c) => (
-                    <div
-                      key={c.symbol}
-                      onClick={() => router.push(`/scanner/${c.symbol}`)}
-                      className="flex items-center justify-between rounded-xl p-3 cursor-pointer"
-                      style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)" }}
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-[#F4F7FA]/60">{c.symbol}</span>
-                        <span className="text-[10px] text-[#49B06E]">+{c.change.toFixed(1)}%</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] text-[#F4F7FA]/30">{c.rvol.toFixed(1)}x</span>
-                        <span className="text-[10px] text-[#F4F7FA]/30">Score: {c.score}</span>
-                      </div>
-                    </div>
+                <div className="grid grid-cols-4 gap-2">
+                  {[1, 2, 3, 4].map((j) => (
+                    <div key={j} className="h-8 rounded bg-white/5" />
                   ))}
                 </div>
               </div>
-            )}
-
-            {/* Disclaimer */}
-            <div
-              className="rounded-xl p-3 mt-6"
-              style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}
-            >
-              <p className="text-[10px] text-[#F4F7FA]/30 leading-relaxed">
-                <strong className="text-[#F4F7FA]/40">Educational decision support only.</strong>{" "}
-                Signals are hypothetical paper-trade candidates, not investment advice. Market data may be delayed.
-                Day trading involves significant risk of loss. Verify all data and make your own decisions.
-              </p>
-            </div>
-          </>
+            ))}
+          </div>
         )}
 
-        {/* News tab */}
-        {tab === "news" && (
-          <>
-            {newsLoading && (
+        {/* Scanner offline — graceful, not scary */}
+        {!loading && (error || candidates.length === 0) && (
+          <div
+            className="rounded-2xl p-5 mb-6 text-center"
+            style={{ background: "linear-gradient(145deg, rgba(39,183,200,0.06), rgba(14,27,48,1))", border: "1px solid rgba(39,183,200,0.15)" }}
+          >
+            <div className="w-14 h-14 mx-auto mb-3 rounded-2xl flex items-center justify-center text-2xl"
+              style={{ background: "rgba(39,183,200,0.1)" }}>
+              {error ? "📡" : "🔍"}
+            </div>
+            <p className="text-sm font-semibold text-[#F4F7FA]/80 mb-1">
+              {error ? "Scanner is reconnecting" : "No setups found right now"}
+            </p>
+            <p className="text-xs text-[#F4F7FA]/40 mb-3 max-w-xs mx-auto">
+              {error
+                ? "Market data feeds refresh during trading hours (9:30 AM – 4 PM ET). Check out the latest news below."
+                : "Gap-and-Go setups appear when small-caps gap up with volume. Try adjusting filters or check back during market hours."
+              }
+            </p>
+            <button
+              onClick={loadScan}
+              className="text-xs font-semibold px-4 py-2 rounded-xl transition-colors"
+              style={{ background: "rgba(39,183,200,0.15)", color: "#27B7C8", border: "1px solid rgba(39,183,200,0.25)" }}
+            >
+              <RefreshCw className="w-3 h-3 inline mr-1.5" />
+              Refresh Scanner
+            </button>
+          </div>
+        )}
+
+        {/* Pansy's Picks */}
+        {(pansyLoading || pansyPicks.length > 0) && !loading && (
+          <div className="mb-6">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-base">🌸</span>
+              <h2 className="text-sm font-bold text-[#F4F7FA]">Pansy&apos;s Top Picks</h2>
+              <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+            </div>
+            {pansyNote && (
+              <p className="text-[11px] text-[#F4F7FA]/40 mb-3 ml-7">{pansyNote}</p>
+            )}
+            {pansyLoading ? (
               <div className="space-y-3">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="rounded-xl p-3 animate-pulse" style={{ background: "#162540" }}>
-                    <div className="h-4 w-3/4 rounded bg-white/5 mb-2" />
-                    <div className="h-3 w-1/2 rounded bg-white/5" />
+                {[1, 2].map((i) => (
+                  <div
+                    key={i}
+                    className="rounded-2xl border p-4 animate-pulse"
+                    style={{ background: "rgba(168,85,247,0.04)", borderColor: "rgba(168,85,247,0.15)" }}
+                  >
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-8 h-8 rounded-full bg-purple-500/10" />
+                      <div className="h-4 w-16 rounded bg-white/5" />
+                    </div>
+                    <div className="h-3 w-full rounded bg-white/5 mb-2" />
+                    <div className="h-3 w-3/4 rounded bg-white/5 mb-3" />
+                    <div className="h-16 rounded-xl bg-white/5" />
                   </div>
+                ))}
+                <p className="text-[10px] text-purple-400/50 text-center">Pansy is analyzing today&apos;s setups...</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {pansyPicks.map((pick, i) => (
+                  <PansyPickCard key={pick.symbol} pick={pick} rank={i} />
                 ))}
               </div>
             )}
+          </div>
+        )}
 
-            {!newsLoading && news.length === 0 && (
-              <div className="text-center py-12">
-                <Newspaper className="w-8 h-8 text-[#F4F7FA]/20 mx-auto mb-3" />
-                <p className="text-sm text-[#F4F7FA]/40">No market news available right now.</p>
-              </div>
-            )}
+        {/* Qualified Signals */}
+        {hasScanData && qualified.length > 0 && (
+          <div className="mb-6">
+            <div className="flex items-center gap-2 mb-3">
+              <Zap className="w-4 h-4 text-[#49B06E]" />
+              <h2 className="text-sm font-bold text-[#F4F7FA]">Qualified Signals</h2>
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#49B06E]/15 text-[#49B06E] font-semibold">
+                {qualified.length}
+              </span>
+            </div>
+            <div className="space-y-3">
+              {qualified.map((c, i) => <SignalCard key={c.symbol} c={c} rank={i} />)}
+            </div>
+          </div>
+        )}
 
+        {/* Watchlist */}
+        {hasScanData && watchlist.length > 0 && (
+          <div className="mb-6">
+            <div className="flex items-center gap-2 mb-3">
+              <Eye className="w-4 h-4 text-[#27B7C8]" />
+              <h2 className="text-sm font-bold text-[#F4F7FA]">Watchlist</h2>
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#27B7C8]/15 text-[#27B7C8] font-semibold">
+                {watchlist.length}
+              </span>
+            </div>
+            <div className="space-y-3">
+              {watchlist.map((c, i) => <SignalCard key={c.symbol} c={c} rank={i} />)}
+            </div>
+          </div>
+        )}
+
+        {/* ═══ NEWS SECTION — always shows ═══ */}
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <Newspaper className="w-4 h-4 text-[#F59E0B]" />
+            <h2 className="text-sm font-bold text-[#F4F7FA]">Market News</h2>
+          </div>
+
+          {newsLoading && (
+            <div className="space-y-2">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="rounded-xl p-3 animate-pulse" style={{ background: "#162540" }}>
+                  <div className="h-4 w-3/4 rounded bg-white/5 mb-2" />
+                  <div className="h-3 w-1/2 rounded bg-white/5" />
+                </div>
+              ))}
+            </div>
+          )}
+
+          {!newsLoading && news.length === 0 && (
+            <div
+              className="rounded-xl p-4 text-center"
+              style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}
+            >
+              <p className="text-sm text-[#F4F7FA]/40">No market news available right now.</p>
+            </div>
+          )}
+
+          {!newsLoading && news.length > 0 && (
             <div className="space-y-2">
               {news.map((article) => (
                 <a
@@ -761,8 +729,49 @@ export default function SignalsPage() {
                 </a>
               ))}
             </div>
-          </>
+          )}
+        </div>
+
+        {/* Near Misses */}
+        {hasScanData && nearMisses.length > 0 && (
+          <div className="mb-6">
+            <div className="flex items-center gap-2 mb-3">
+              <AlertTriangle className="w-4 h-4 text-[#F59E0B]" />
+              <h2 className="text-sm font-bold text-[#F4F7FA]/60">Near Misses</h2>
+            </div>
+            <div className="space-y-2">
+              {nearMisses.slice(0, 5).map((c) => (
+                <div
+                  key={c.symbol}
+                  onClick={() => router.push(`/scanner/${c.symbol}`)}
+                  className="flex items-center justify-between rounded-xl p-3 cursor-pointer"
+                  style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)" }}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-[#F4F7FA]/60">{c.symbol}</span>
+                    <span className="text-[10px] text-[#49B06E]">+{c.change.toFixed(1)}%</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-[#F4F7FA]/30">{c.rvol.toFixed(1)}x</span>
+                    <span className="text-[10px] text-[#F4F7FA]/30">Score: {c.score}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
+
+        {/* Disclaimer */}
+        <div
+          className="rounded-xl p-3 mt-2"
+          style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}
+        >
+          <p className="text-[10px] text-[#F4F7FA]/30 leading-relaxed">
+            <strong className="text-[#F4F7FA]/40">Educational decision support only.</strong>{" "}
+            Signals are hypothetical paper-trade candidates, not investment advice. Market data may be delayed.
+            Day trading involves significant risk of loss. Verify all data and make your own decisions.
+          </p>
+        </div>
       </div>
     </Layout>
   );
