@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @next/next/no-img-element */
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/router";
@@ -12,8 +10,7 @@ import { userService } from "@/services/userService";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Loader2, Eye, EyeOff, ChevronRight, Sparkles, Shield, Target,
-  TrendingUp, Landmark, Wallet, ArrowLeft, BookOpen, BarChart3,
-  Brain, PiggyBank, Clock, GraduationCap, Rocket, Check,
+  TrendingUp, Wallet, ArrowLeft, Brain, Clock, Rocket, Check,
 } from "lucide-react";
 
 type Step = "welcome" | "auth" | "check-email" | "q-experience" | "q-excites" | "q-capital" | "q-style" | "building" | "ready";
@@ -94,7 +91,7 @@ export default function Onboarding() {
 
   const goToStep = (next: Step) => setStep(next);
 
-  const quizIndex = quizSteps.indexOf(step as any);
+  const quizIndex = quizSteps.indexOf(step as typeof quizSteps[number]);
   const isQuizStep = quizIndex >= 0;
 
   const handleAuth = async () => {
@@ -198,9 +195,9 @@ export default function Onboarding() {
         }
         if (user) router.push("/signals");
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Auth error:", err);
-      setError(err?.message || "An unexpected error occurred");
+      setError(err instanceof Error ? err.message : "An unexpected error occurred");
       submitLock.current = false;
       setIsSubmitting(false);
     }
@@ -257,23 +254,6 @@ export default function Onboarding() {
       }}
     >
       {selected && <div className="w-2.5 h-2.5 rounded-full bg-[#0E1B30]" />}
-    </div>
-  );
-
-  const CheckDot = ({ selected, color = "#27B7C8" }: { selected: boolean; color?: string }) => (
-    <div
-      className="w-5 h-5 rounded-full flex items-center justify-center transition-all duration-300 shrink-0"
-      style={{
-        background: selected ? `linear-gradient(135deg, ${color}, ${color}cc)` : "rgba(255,255,255,0.06)",
-        border: selected ? "none" : "2px solid rgba(255,255,255,0.12)",
-        boxShadow: selected ? `0 0 8px ${color}40` : "none",
-      }}
-    >
-      {selected && (
-        <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-          <path d="M1 4L3.5 6.5L9 1" stroke="#0E1B30" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      )}
     </div>
   );
 
