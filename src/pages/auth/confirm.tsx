@@ -14,7 +14,7 @@ export default function AuthConfirm() {
     );
     supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
-        router.push('/home');
+        router.push('/signals');
       }
     });
   }, [router]);

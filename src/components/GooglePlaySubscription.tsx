@@ -68,7 +68,7 @@ export default function GooglePlaySubscription() {
           </p>
           <Button
             className="bg-accent hover:bg-accent/90 text-accent-foreground"
-            onClick={() => router.push("/home")}
+            onClick={() => router.push("/signals")}
           >
             Start Exploring
           </Button>

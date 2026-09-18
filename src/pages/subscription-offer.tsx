@@ -187,7 +187,7 @@ export default function SubscriptionOffer() {
         <div className="text-center">
           <Button
             variant="ghost"
-            onClick={() => router.push("/home")}
+            onClick={() => router.push("/signals")}
             className="text-muted-foreground hover:text-foreground"
           >
             Start with Free →

@@ -448,7 +448,7 @@ export default function PaperTraderV2() {
                       <Eye className="w-4 h-4" style={{ color: C.teal }} />
                       <h3 className="text-sm font-semibold" style={{ color: C.textPrimary }}>Your Watchlist</h3>
                     </div>
-                    <Link href="/discover" className="text-[10px] font-medium flex items-center gap-1" style={{ color: C.teal }}>
+                    <Link href="/signals" className="text-[10px] font-medium flex items-center gap-1" style={{ color: C.teal }}>
                       <Plus className="w-3 h-3" /> Add
                     </Link>
                   </div>
@@ -485,7 +485,7 @@ export default function PaperTraderV2() {
 
               {/* No watchlist — prompt */}
               {watchlist.length === 0 && (
-                <Link href="/discover">
+                <Link href="/signals">
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}

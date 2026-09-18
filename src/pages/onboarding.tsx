@@ -69,7 +69,7 @@ export default function Onboarding() {
         .eq("id", session.user.id)
         .single();
       if (profile?.onboarding_complete) {
-        router.push("/home");
+        router.push("/signals");
       } else {
         setStep("q-struggle");
       }
@@ -196,7 +196,7 @@ export default function Onboarding() {
           setIsSubmitting(false);
           return;
         }
-        if (user) router.push("/home");
+        if (user) router.push("/signals");
       }
     } catch (err: any) {
       console.error("Auth error:", err);

@@ -141,7 +141,7 @@ export function ReviewPrompt({ onClose, trigger }: ReviewPromptProps) {
 }
 
 export function shouldShowReviewPrompt(completedCount: number): boolean {
-  const milestones = [3, 10, 20];
+  const milestones = [5, 10, 20];
   if (!milestones.includes(completedCount)) return false;
   try {
     const last = localStorage.getItem(STORAGE_KEY);

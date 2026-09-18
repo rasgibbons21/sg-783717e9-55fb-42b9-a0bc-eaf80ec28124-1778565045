@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { Home, Search, User, GraduationCap, TrendingUp, ChevronLeft } from "lucide-react";
+import { Zap, BarChart3, User, GraduationCap, TrendingUp, ChevronLeft } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { pageVariants, pageTransition } from "@/lib/motion";
 import { PansyMilestones } from "./PansyMilestones";
@@ -28,8 +28,7 @@ export function Layout({ children }: LayoutProps) {
   const { isLoggedIn, isLoading } = useSubscription();
 
   const isActivePath = (path: string) => {
-    if (path === "/home") return currentPath === "/home";
-    if (path === "/discover") return currentPath.startsWith("/discover") || currentPath.startsWith("/stock");
+    if (path === "/signals") return currentPath === "/signals" || currentPath.startsWith("/scanner");
     if (path === "/practice") return currentPath.startsWith("/practice") || currentPath.startsWith("/research");
     if (path === "/learn") return currentPath === "/learn" || currentPath.startsWith("/university");
     if (path === "/profile") return currentPath.startsWith("/profile") || currentPath.startsWith("/subscription");
@@ -74,7 +73,7 @@ export function Layout({ children }: LayoutProps) {
                 <ChevronLeft className="w-5 h-5 stroke-[2.5]" />
               </motion.button>
             )}
-            <Link href="/home" className="flex items-center gap-3">
+            <Link href="/signals" className="flex items-center gap-3">
               <img
                 src="/icon-192.png"
                 alt="Bloom"
@@ -133,10 +132,9 @@ export function Layout({ children }: LayoutProps) {
 
       {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-40 safe-area-bottom">
-        <div className="grid grid-cols-5 gap-1 px-2 py-2 max-w-md mx-auto">
+        <div className="grid grid-cols-4 gap-1 px-2 py-2 max-w-md mx-auto">
           {[
-            { href: "/home", icon: Home, label: "Home" },
-            { href: "/discover", icon: Search, label: "Discover" },
+            { href: "/signals", icon: Zap, label: "Signals" },
             { href: "/learn", icon: GraduationCap, label: "Learn" },
             { href: "/paper-trader-v2", icon: TrendingUp, label: "Trade" },
             { href: "/profile", icon: User, label: "Profile" },
