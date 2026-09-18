@@ -1,635 +1,402 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
- 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
-import Link from "next/link";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
-import { useSubscription } from "@/contexts/SubscriptionContext";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Input } from "@/components/ui/input";
-import { marketService } from "@/services/marketService";
-import { Search, TrendingUp, TrendingDown, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
-import { userService } from "@/services/userService";
-import { supabase } from "@/integrations/supabase/client";
-import { AdMobBanner } from "@/components/AdMobBanner";
-import { UpgradeBanner } from "@/components/UpgradeModal";
-import { canShowExternalPayment } from "@/lib/payments";
-import { PansyContextCard } from "@/components/PansyContextCard";
+import { Search, TrendingUp, ArrowUpRight, ArrowDownRight, Clock } from "lucide-react";
 
 const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
 
-interface Asset {
-  ticker: string;
+type ChartMarket = "stocks" | "crypto" | "forex";
+
+interface QuickTicker {
+  symbol: string;
+  label: string;
+  market: ChartMarket;
+}
+
+const QUICK_TICKERS: QuickTicker[] = [
+  { symbol: "AAPL", label: "AAPL", market: "stocks" },
+  { symbol: "NVDA", label: "NVDA", market: "stocks" },
+  { symbol: "TSLA", label: "TSLA", market: "stocks" },
+  { symbol: "MSFT", label: "MSFT", market: "stocks" },
+  { symbol: "SPY", label: "SPY", market: "stocks" },
+  { symbol: "QQQ", label: "QQQ", market: "stocks" },
+  { symbol: "BTCUSD", label: "BTC", market: "crypto" },
+  { symbol: "ETHUSD", label: "ETH", market: "crypto" },
+  { symbol: "SOLUSD", label: "SOL", market: "crypto" },
+  { symbol: "EURUSD", label: "EUR/USD", market: "forex" },
+];
+
+interface TrendingItem {
+  symbol: string;
   name: string;
   price: number;
   change: number;
   changePercent: number;
-  type: "stock" | "etf" | "mutual-fund";
-  trend?: string;
-  riskLevel?: string;
-  pansyQuote?: string;
-  error?: boolean;
 }
 
-interface MarketIndex {
-  name: string;
-  symbol: string;
-  value: number;
-  change: number;
-  changePercent: number;
-  error?: boolean;
-}
-
-const STOCK_TICKERS = [
-  "AAPL", "MSFT", "NVDA", "GOOGL", "AMZN", "META", "TSLA", "JPM", "V", "JNJ",
-  "WMT", "BAC", "XOM", "UNH", "PG", "HD", "MA", "ABBV", "AVGO", "CRM"
-];
-
-const ETF_TICKERS = [
-  "VOO", "QQQ", "SPY", "SCHD", "VTI", "IVV", "VGT", "ARKK", "SCHG", "VYM",
-  "BND", "AGG", "GLD", "IWM", "JEPI"
-];
-
-const MUTUAL_FUND_TICKERS = [
-  "FXAIX", "VTSAX", "VFIAX", "FCNTX", "PRGFX", "VWELX", "FDGRX", "AGTHX", "DODFX", "VBTLX"
-];
-
-const ASSET_NAMES: Record<string, string> = {
-  "AAPL": "Apple Inc.", "MSFT": "Microsoft", "NVDA": "NVIDIA", "GOOGL": "Alphabet", 
-  "AMZN": "Amazon", "META": "Meta Platforms", "TSLA": "Tesla", "JPM": "JPMorgan Chase", 
-  "V": "Visa", "JNJ": "Johnson & Johnson", "WMT": "Walmart", "BAC": "Bank of America", 
-  "XOM": "Exxon Mobil", "UNH": "UnitedHealth", "PG": "Procter & Gamble", "HD": "Home Depot", 
-  "MA": "Mastercard", "ABBV": "AbbVie", "AVGO": "Broadcom", "CRM": "Salesforce",
-  "VOO": "Vanguard S&P 500 ETF", "QQQ": "Invesco QQQ Trust", "SPY": "SPDR S&P 500 ETF",
-  "SCHD": "Schwab US Dividend Equity ETF", "VTI": "Vanguard Total Stock Market ETF", 
-  "IVV": "iShares Core S&P 500 ETF", "VGT": "Vanguard Information Tech ETF", 
-  "ARKK": "ARK Innovation ETF", "SCHG": "Schwab US Large-Cap Growth ETF", 
-  "VYM": "Vanguard High Dividend Yield ETF", "BND": "Vanguard Total Bond Market ETF", 
-  "AGG": "iShares Core US Aggregate Bond ETF", "GLD": "SPDR Gold Shares", 
-  "IWM": "iShares Russell 2000 ETF", "JEPI": "JPMorgan Equity Premium Income ETF",
-  "FXAIX": "Fidelity 500 Index Fund", "VTSAX": "Vanguard Total Stock Market Index Fund", 
-  "VFIAX": "Vanguard 500 Index Fund", "FCNTX": "Fidelity Contrafund", 
-  "PRGFX": "T. Rowe Price Growth Stock Fund", "VWELX": "Vanguard Wellington Fund", 
-  "FDGRX": "Fidelity Growth Company Fund", "AGTHX": "The Growth Fund of America", 
-  "DODFX": "Dodge & Cox International Stock Fund", "VBTLX": "Vanguard Total Bond Market Index Fund"
-};
-
-const PANSYS_DEFAULT_PICKS: Asset[] = [
-  {
-    ticker: "NVDA",
-    name: "NVIDIA Corporation",
-    price: 0,
-    change: 0,
-    changePercent: 0,
-    type: "stock",
-    trend: "Bullish",
-    riskLevel: "Aggressive",
-    pansyQuote: "At the center of the AI boom and its chip demand — but richly valued and sharply volatile when sentiment turns.",
-  },
-  {
-    ticker: "VOO",
-    name: "Vanguard S&P 500 ETF",
-    price: 0,
-    change: 0,
-    changePercent: 0,
-    type: "etf",
-    trend: "Bullish",
-    riskLevel: "Moderate",
-    pansyQuote: "A low-cost way to own 500 large US companies at once — broadly diversified, though it still falls with the whole market.",
-  },
-  {
-    ticker: "FXAIX",
-    name: "Fidelity 500 Index Fund",
-    price: 0,
-    change: 0,
-    changePercent: 0,
-    type: "mutual-fund",
-    trend: "Sideways",
-    riskLevel: "Conservative",
-    pansyQuote: "A very low-cost S&P 500 index fund built for set-and-forget — steady, but with no protection from broad market downturns.",
-  },
-];
-
-export default function Discover() {
-  const router = useRouter();
-  const { isPro } = useSubscription();
-  const [activeTab, setActiveTab] = useState("stocks");
-  const [activeFilter, setActiveFilter] = useState("top-performers");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isSearching, setIsSearching] = useState(false);
-  const [searchResults, setSearchResults] = useState<any[]>([]);
-  const [userPlan, setUserPlan] = useState<string>("free");
-  const [stocks, setStocks] = useState<Asset[]>([]);
-  const [etfs, setEtfs] = useState<Asset[]>([]);
-  const [mutualFunds, setMutualFunds] = useState<Asset[]>([]);
-  const [pansysPicks, setPansysPicks] = useState<Asset[]>(PANSYS_DEFAULT_PICKS);
-  const [marketIndices, setMarketIndices] = useState<MarketIndex[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isLoadingPicks, setIsLoadingPicks] = useState(false);
-  const [isLoadingIndices, setIsLoadingIndices] = useState(true);
+function TradingViewChart({ symbol, theme }: { symbol: string; theme: string }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const widgetRef = useRef<string | null>(null);
 
   useEffect(() => {
-    const checkUserPlan = async () => {
-      const user = await userService.getCurrentUser();
-      if (user) {
-        // Default to free plan since plan_type doesn't exist in profiles
-        setUserPlan("free");
+    if (!containerRef.current) return;
+
+    const tvSymbol = symbol.includes("USD") && !symbol.includes("/")
+      ? `CRYPTO:${symbol}`
+      : symbol.includes("/")
+        ? `FX:${symbol.replace("/", "")}`
+        : symbol;
+
+    if (widgetRef.current === tvSymbol) return;
+    widgetRef.current = tvSymbol;
+
+    containerRef.current.innerHTML = "";
+
+    const script = document.createElement("script");
+    script.src = "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
+    script.type = "text/javascript";
+    script.async = true;
+    script.innerHTML = JSON.stringify({
+      autosize: true,
+      symbol: tvSymbol,
+      interval: "15",
+      timezone: "America/New_York",
+      theme: theme,
+      style: "1",
+      locale: "en",
+      allow_symbol_change: true,
+      calendar: false,
+      hide_top_toolbar: false,
+      hide_legend: false,
+      save_image: false,
+      hide_volume: false,
+      support_host: "https://www.tradingview.com",
+    });
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "tradingview-widget-container__widget";
+    wrapper.style.height = "100%";
+    wrapper.style.width = "100%";
+
+    containerRef.current.appendChild(wrapper);
+    containerRef.current.appendChild(script);
+  }, [symbol, theme]);
+
+  return (
+    <div
+      ref={containerRef}
+      className="tradingview-widget-container"
+      style={{ height: "100%", width: "100%" }}
+    />
+  );
+}
+
+function MiniChart({ symbol, theme }: { symbol: string; theme: string }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const widgetRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const tvSymbol = symbol.includes("USD") && !symbol.includes("/")
+      ? `CRYPTO:${symbol}`
+      : symbol;
+
+    if (widgetRef.current === tvSymbol) return;
+    widgetRef.current = tvSymbol;
+
+    containerRef.current.innerHTML = "";
+
+    const script = document.createElement("script");
+    script.src = "https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js";
+    script.type = "text/javascript";
+    script.async = true;
+    script.innerHTML = JSON.stringify({
+      symbol: tvSymbol,
+      width: "100%",
+      height: "100%",
+      locale: "en",
+      dateRange: "1D",
+      colorTheme: theme,
+      isTransparent: true,
+      autosize: true,
+      largeChartUrl: "",
+      noTimeScale: false,
+    });
+
+    containerRef.current.appendChild(script);
+  }, [symbol, theme]);
+
+  return (
+    <div
+      ref={containerRef}
+      style={{ height: "100%", width: "100%" }}
+    />
+  );
+}
+
+export default function Discover() {
+  const [selectedSymbol, setSelectedSymbol] = useState("AAPL");
+  const [marketFilter, setMarketFilter] = useState<"all" | ChartMarket>("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [trending, setTrending] = useState<TrendingItem[]>([]);
+  const [trendingLoading, setTrendingLoading] = useState(true);
+
+  const loadTrending = useCallback(async () => {
+    setTrendingLoading(true);
+    try {
+      const res = await fetch("/api/scanner/scan?minChange=3&minRvol=2");
+      if (res.ok) {
+        const data = await res.json();
+        const items = (data.candidates || []).slice(0, 6).map((c: Record<string, unknown>) => ({
+          symbol: c.symbol as string,
+          name: c.symbol as string,
+          price: c.price as number,
+          change: c.changeAbs as number,
+          changePercent: c.change as number,
+        }));
+        setTrending(items);
       }
-    };
-    checkUserPlan();
-    loadMarketIndices();
-    loadMarketData();
+    } catch {} finally {
+      setTrendingLoading(false);
+    }
   }, []);
 
   useEffect(() => {
-    if (activeFilter === "pansy-picks") {
-      loadPansysPicks();
+    loadTrending();
+  }, [loadTrending]);
+
+  const filteredTickers = QUICK_TICKERS.filter(t =>
+    marketFilter === "all" || t.market === marketFilter
+  );
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      setSelectedSymbol(searchQuery.trim().toUpperCase());
+      setSearchOpen(false);
+      setSearchQuery("");
     }
-  }, [activeFilter]);
-
-  const loadMarketIndices = async () => {
-    setIsLoadingIndices(true);
-    try {
-      const indexData = await marketService.getMarketIndices();
-      setMarketIndices(indexData.map(i => ({
-        ...i,
-        value: i.price, // Map price back to value for existing UI
-      })));
-    } catch (error) {
-      console.error("Error loading market indices:", error);
-    } finally {
-      setIsLoadingIndices(false);
-    }
-  };
-
-  const loadMarketData = async () => {
-    setIsLoading(true);
-    try {
-      // Load stocks
-      const stockData: Asset[] = [];
-      for (const ticker of STOCK_TICKERS) {
-        try {
-          const quote = await marketService.getRealTimeQuote(ticker);
-          const hasError = !quote || quote.c === 0;
-          stockData.push({
-            ticker,
-            name: ASSET_NAMES[ticker] || ticker,
-            price: quote?.c || 0,
-            change: quote?.d || 0,
-            changePercent: quote?.dp || 0,
-            type: "stock",
-            trend: getTrend(quote?.dp || 0),
-            riskLevel: getRiskLevel(ticker, "stock"),
-            error: hasError
-          });
-        } catch (error) {
-          console.error(`Error loading ${ticker}:`, error);
-        }
-      }
-      setStocks(stockData);
-
-      // Load ETFs
-      const etfData: Asset[] = [];
-      for (const ticker of ETF_TICKERS) {
-        try {
-          const quote = await marketService.getRealTimeQuote(ticker);
-          const hasError = !quote || quote.c === 0;
-          etfData.push({
-            ticker,
-            name: ASSET_NAMES[ticker] || ticker,
-            price: quote?.c || 0,
-            change: quote?.d || 0,
-            changePercent: quote?.dp || 0,
-            type: "etf",
-            trend: getTrend(quote?.dp || 0),
-            riskLevel: getRiskLevel(ticker, "etf"),
-            error: hasError
-          });
-        } catch (error) {
-          console.error(`Error loading ${ticker}:`, error);
-        }
-      }
-      setEtfs(etfData);
-
-      // Load Mutual Funds
-      const mfData: Asset[] = [];
-      for (const ticker of MUTUAL_FUND_TICKERS) {
-        try {
-          const quote = await marketService.getRealTimeQuote(ticker);
-          const hasError = !quote || quote.c === 0;
-          mfData.push({
-            ticker,
-            name: ASSET_NAMES[ticker] || ticker,
-            price: quote?.c || 0,
-            change: quote?.d || 0,
-            changePercent: quote?.dp || 0,
-            type: "mutual-fund",
-            trend: getTrend(quote?.dp || 0),
-            riskLevel: getRiskLevel(ticker, "mutual-fund"),
-            error: hasError
-          });
-        } catch (error) {
-          console.error(`Error loading ${ticker}:`, error);
-        }
-      }
-      setMutualFunds(mfData);
-    } catch (error) {
-      console.error("Error loading market data:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const loadPansysPicks = async () => {
-    setIsLoadingPicks(true);
-    try {
-      // Load live prices for default picks sequentially
-      const defaultPicksWithPrices = [];
-      for (const pick of PANSYS_DEFAULT_PICKS) {
-        try {
-          const quote = await marketService.getRealTimeQuote(pick.ticker);
-          const hasError = !quote || quote.c === 0;
-          defaultPicksWithPrices.push({
-            ...pick,
-            price: quote?.c || pick.price,
-            change: quote?.d || pick.change,
-            changePercent: quote?.dp || pick.changePercent,
-            error: hasError
-          });
-        } catch (error) {
-          defaultPicksWithPrices.push({ ...pick, error: true });
-        }
-      }
-
-      // Try to get additional picks from API
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        const response = await fetch("/api/pansy-picks", {
-          headers: session?.access_token
-            ? { Authorization: `Bearer ${session.access_token}` }
-            : {},
-        });
-        if (response.ok) {
-          const additionalPicks = await response.json();
-          const processedAdditionalPicks = additionalPicks.map((p: any) => ({
-            ...p,
-            error: !p.price || p.price === 0
-          }));
-          setPansysPicks([...defaultPicksWithPrices, ...processedAdditionalPicks]);
-        } else {
-          setPansysPicks(defaultPicksWithPrices);
-        }
-      } catch (error) {
-        console.error("Error loading additional picks:", error);
-        setPansysPicks(defaultPicksWithPrices);
-      }
-    } catch (error) {
-      console.error("Error loading Pansy's picks:", error);
-      setPansysPicks(PANSYS_DEFAULT_PICKS);
-    } finally {
-      setIsLoadingPicks(false);
-    }
-  };
-
-  const getTrend = (changePercent: number): string => {
-    if (changePercent > 1) return "Bullish";
-    if (changePercent < -1) return "Bearish";
-    return "Sideways";
-  };
-
-  const getRiskLevel = (ticker: string, type: string): string => {
-    // Aggressive risk tickers
-    const aggressive = ["NVDA", "TSLA", "ARKK", "QQQ", "AVGO", "META"];
-    // Conservative risk tickers
-    const conservative = ["JNJ", "PG", "WMT", "BND", "AGG", "VBTLX", "VWELX"];
-    
-    if (aggressive.includes(ticker)) return "Aggressive";
-    if (conservative.includes(ticker)) return "Conservative";
-    return "Moderate";
-  };
-
-  const getDisplayAssets = (): Asset[] => {
-    let assets: Asset[] = [];
-    
-    if (activeTab === "stocks") assets = stocks;
-    else if (activeTab === "etfs") assets = etfs;
-    else if (activeTab === "mutual-funds") assets = mutualFunds;
-
-    // Apply filter
-    if (activeFilter === "top-performers") {
-      assets = [...assets].sort((a, b) => b.changePercent - a.changePercent);
-    } else if (activeFilter === "most-watched") {
-      // For now, show all - can be enhanced with actual analytics
-      assets = [...assets];
-    } else if (activeFilter === "pansy-picks") {
-      return pansysPicks.filter(p => {
-        if (activeTab === "stocks") return p.type === "stock";
-        if (activeTab === "etfs") return p.type === "etf";
-        if (activeTab === "mutual-funds") return p.type === "mutual-fund";
-        return false;
-      });
-    }
-
-    // Apply search filter
-    if (searchQuery) {
-      assets = assets.filter(
-        (asset) =>
-          asset.ticker.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          asset.name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    return assets;
-  };
-
-  const displayAssets = getDisplayAssets();
-
-  const getTrendColor = (trend: string) => {
-    if (trend === "Bullish") return "bg-[#49B06E]/10 text-[#49B06E] border-[#49B06E]/20";
-    if (trend === "Bearish") return "bg-[#ef4444]/10 text-[#ef4444] border-[#ef4444]/20";
-    return "bg-muted text-muted-foreground border-border";
-  };
-
-  const getRiskColor = (risk: string) => {
-    if (risk === "Aggressive") return "bg-[#ef4444]/10 text-[#ef4444] border-[#ef4444]/20";
-    if (risk === "Conservative") return "bg-[#49B06E]/10 text-[#49B06E] border-[#49B06E]/20";
-    return "bg-[#27B7C8]/10 text-[#27B7C8] border-[#27B7C8]/20";
   };
 
   return (
     <Layout>
       <SEO
-        title="Discover Stocks, ETFs & Mutual Funds — Bloom"
-        description="Browse and research stocks, ETFs, and mutual funds. Get real-time prices, interactive charts, and plain-language analysis from Pansy. Compare companies side by side. Free stock research for women investors."
+        title="Bloom | Discover — Live Charts & Markets"
+        description="Real-time TradingView charts for stocks, crypto, and forex. Research any ticker with interactive charting."
       />
-      <div className="container-full py-8 space-y-6 pb-24">
-        <AdMobBanner format="banner" />
-        {/* Market Summary Bar */}
-        <Card className="p-4 bg-card border-border rounded-2xl">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {isLoadingIndices ? (
-              [1, 2, 3, 4].map((i) => (
-                <div key={i} className="space-y-1">
-                  <Skeleton className="h-4 w-20" />
-                  <Skeleton className="h-6 w-24" />
-                  <Skeleton className="h-5 w-16" />
-                </div>
-              ))
-            ) : marketIndices.map((index) => (
-              <div key={index.symbol} className="space-y-1">
-                <p className="text-sm text-muted-foreground">{index.name}</p>
-                {index.error ? (
-                  <p className="font-semibold text-destructive text-sm mt-2">Data unavailable</p>
-                ) : (
-                  <>
-                    <p className="font-semibold text-foreground">
-                      {index.value > 0 ? index.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "—"}
-                    </p>
-                    {index.value > 0 && (
-                      <Badge
-                        className={
-                          index.changePercent >= 0
-                            ? "bg-[#49B06E]/20 text-[#49B06E] text-xs"
-                            : "bg-[#ef4444]/20 text-[#ef4444] text-xs"
-                        }
-                      >
-                        {index.changePercent >= 0 ? "+" : ""}
-                        {index.changePercent.toFixed(2)}%
-                      </Badge>
-                    )}
-                  </>
-                )}
-              </div>
-            ))}
-          </div>
-        </Card>
 
+      <div className="max-w-lg mx-auto px-4 pt-4 pb-32">
         {/* Header */}
-        <div className="space-y-4">
-          <h1 className="font-serif text-3xl md:text-4xl font-bold text-foreground">
-            Discover
-          </h1>
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h1 className="text-2xl font-bold text-[#F4F7FA]">Discover</h1>
+            <p className="text-xs text-[#F4F7FA]/40 mt-0.5">Live charts &amp; market research</p>
+          </div>
+          <motion.button
+            whileTap={{ scale: 0.85 }}
+            onClick={() => { haptic(); setSearchOpen(!searchOpen); }}
+            className="w-9 h-9 rounded-xl flex items-center justify-center"
+            style={{ background: "rgba(39,183,200,0.1)", border: "1px solid rgba(39,183,200,0.2)" }}
+          >
+            <Search className="w-4 h-4 text-[#27B7C8]" />
+          </motion.button>
+        </div>
 
-          <PansyContextCard
-            message="This is your research playground! Browse real market data, explore Pansy's Picks for curated ideas, or search for any company you're curious about."
-            tip="Tip: Try the 'Pansy's Picks' filter to see investments I've hand-picked with beginner-friendly analysis."
-            variant="tip"
-            compact
-          />
+        {/* Search bar */}
+        {searchOpen && (
+          <motion.form
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            onSubmit={handleSearch}
+            className="mb-4"
+          >
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search ticker (AAPL, BTCUSD, EURUSD...)"
+                className="flex-1 rounded-xl px-4 py-2.5 text-sm text-[#F4F7FA] placeholder:text-[#F4F7FA]/30"
+                style={{ background: "rgba(22,37,64,0.8)", border: "1px solid rgba(39,183,200,0.15)" }}
+                autoFocus
+              />
+              <motion.button
+                whileTap={{ scale: 0.9 }}
+                type="submit"
+                className="px-4 py-2.5 rounded-xl text-xs font-semibold"
+                style={{ background: "rgba(39,183,200,0.2)", color: "#27B7C8", border: "1px solid rgba(39,183,200,0.3)" }}
+              >
+                Go
+              </motion.button>
+            </div>
+          </motion.form>
+        )}
 
-          {/* Search */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-            <Input
-              placeholder="Search by ticker or company name..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
+        {/* Market filter */}
+        <div className="flex gap-1 mb-4 overflow-x-auto">
+          {([
+            { key: "all" as const, label: "All" },
+            { key: "stocks" as const, label: "Stocks" },
+            { key: "crypto" as const, label: "Crypto" },
+            { key: "forex" as const, label: "Forex" },
+          ]).map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => { haptic(); setMarketFilter(key); }}
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors"
+              style={{
+                background: marketFilter === key ? "rgba(39,183,200,0.15)" : "rgba(255,255,255,0.04)",
+                color: marketFilter === key ? "#27B7C8" : "rgba(244,247,250,0.4)",
+                border: `1px solid ${marketFilter === key ? "rgba(39,183,200,0.25)" : "transparent"}`,
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {/* Quick ticker chips */}
+        <div className="flex gap-1.5 mb-4 overflow-x-auto pb-1 scrollbar-hide">
+          {filteredTickers.map((t) => (
+            <motion.button
+              key={t.symbol}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => { haptic(); setSelectedSymbol(t.symbol); }}
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all"
+              style={{
+                background: selectedSymbol === t.symbol
+                  ? "rgba(39,183,200,0.2)"
+                  : "rgba(255,255,255,0.05)",
+                color: selectedSymbol === t.symbol ? "#27B7C8" : "#F4F7FA",
+                border: `1px solid ${selectedSymbol === t.symbol ? "rgba(39,183,200,0.35)" : "rgba(255,255,255,0.08)"}`,
+              }}
+            >
+              {t.label}
+            </motion.button>
+          ))}
+        </div>
+
+        {/* Current symbol label */}
+        <div className="flex items-center gap-2 mb-2">
+          <TrendingUp className="w-4 h-4 text-[#27B7C8]" />
+          <span className="text-sm font-bold text-[#F4F7FA]">{selectedSymbol}</span>
+          <span className="text-[10px] text-[#F4F7FA]/30">TradingView</span>
+        </div>
+
+        {/* TradingView chart */}
+        <div
+          className="rounded-2xl overflow-hidden mb-6"
+          style={{
+            height: 420,
+            background: "#0E1B30",
+            border: "1px solid rgba(39,183,200,0.12)",
+          }}
+        >
+          <TradingViewChart symbol={selectedSymbol} theme="dark" />
+        </div>
+
+        {/* Trending stocks from scanner */}
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <TrendingUp className="w-4 h-4 text-[#49B06E]" />
+            <h2 className="text-sm font-bold text-[#F4F7FA]">Trending Today</h2>
           </div>
 
-          {/* Filter Buttons */}
-          <div className="flex gap-2 overflow-x-auto pb-2">
-            {[
-              { key: "top-performers", label: "Top Performers", icon: <TrendingUp className="w-4 h-4 mr-2" /> },
-              { key: "most-watched", label: "Most Watched", icon: null },
-              { key: "pansy-picks", label: "🌺 Pansy's Analyses", icon: null },
-            ].map((f) => (
-              <motion.div key={f.key} whileTap={{ scale: 0.92 }} transition={{ type: "spring", stiffness: 500, damping: 25 }}>
-                <Button
-                  size="sm"
-                  variant={activeFilter === f.key ? "default" : "outline"}
-                  onClick={() => { setActiveFilter(f.key); haptic(); }}
+          {trendingLoading ? (
+            <div className="grid grid-cols-2 gap-2">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="rounded-xl p-3 animate-pulse" style={{ background: "#162540" }}>
+                  <div className="h-4 w-14 rounded bg-white/5 mb-2" />
+                  <div className="h-3 w-20 rounded bg-white/5" />
+                </div>
+              ))}
+            </div>
+          ) : trending.length > 0 ? (
+            <div className="grid grid-cols-2 gap-2">
+              {trending.map((item) => (
+                <motion.button
+                  key={item.symbol}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => { haptic(); setSelectedSymbol(item.symbol); }}
+                  className="rounded-xl p-3 text-left transition-all"
+                  style={{
+                    background: selectedSymbol === item.symbol
+                      ? "rgba(39,183,200,0.08)"
+                      : "rgba(255,255,255,0.03)",
+                    border: `1px solid ${selectedSymbol === item.symbol ? "rgba(39,183,200,0.2)" : "rgba(255,255,255,0.05)"}`,
+                  }}
                 >
-                  {f.icon}{f.label}
-                </Button>
-              </motion.div>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm font-bold text-[#F4F7FA]">{item.symbol}</span>
+                    <div className="flex items-center gap-0.5">
+                      {item.changePercent >= 0
+                        ? <ArrowUpRight className="w-3 h-3 text-[#49B06E]" />
+                        : <ArrowDownRight className="w-3 h-3 text-[#EF4444]" />
+                      }
+                      <span
+                        className="text-xs font-semibold"
+                        style={{ color: item.changePercent >= 0 ? "#49B06E" : "#EF4444" }}
+                      >
+                        {item.changePercent >= 0 ? "+" : ""}{item.changePercent.toFixed(1)}%
+                      </span>
+                    </div>
+                  </div>
+                  <span className="text-xs text-[#F4F7FA]/40">
+                    ${item.price.toFixed(2)}
+                  </span>
+                </motion.button>
+              ))}
+            </div>
+          ) : (
+            <div
+              className="rounded-xl p-4 text-center"
+              style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}
+            >
+              <Clock className="w-5 h-5 mx-auto mb-2 text-[#F4F7FA]/20" />
+              <p className="text-xs text-[#F4F7FA]/40">Trending data loads during market hours</p>
+            </div>
+          )}
+        </div>
+
+        {/* Crypto mini charts */}
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-sm">₿</span>
+            <h2 className="text-sm font-bold text-[#F4F7FA]">Crypto Overview</h2>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            {["BTCUSD", "ETHUSD", "SOLUSD", "XRPUSD"].map((sym) => (
+              <motion.button
+                key={sym}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => { haptic(); setSelectedSymbol(sym); }}
+                className="rounded-xl overflow-hidden"
+                style={{
+                  height: 140,
+                  background: "rgba(255,255,255,0.02)",
+                  border: `1px solid ${selectedSymbol === sym ? "rgba(39,183,200,0.25)" : "rgba(255,255,255,0.05)"}`,
+                }}
+              >
+                <MiniChart symbol={sym} theme="dark" />
+              </motion.button>
             ))}
           </div>
         </div>
 
-        {/* Upgrade Banner - Hidden for Pro users and non-Stripe builds */}
-        {!isPro && canShowExternalPayment && (
-          <Card className="p-5 bg-gradient-to-br from-accent/20 to-primary/10 border-accent rounded-2xl">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-2xl shrink-0">
-                🌺
-              </div>
-              <div className="flex-1">
-                <p className="text-sm text-foreground font-medium">
-                  Want Pansy's full breakdown on every stock? Upgrade to Pro 🌸
-                </p>
-              </div>
-              <Link href="/subscription">
-                <Button className="bg-accent hover:bg-accent/90 text-white shrink-0">
-                  Upgrade
-                </Button>
-              </Link>
-            </div>
-          </Card>
-        )}
-
-        {/* Loading state */}
-        {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-32 animate-in fade-in duration-300">
-            <Loader2 className="w-8 h-8 animate-spin text-accent mb-3" />
-            <span className="text-muted-foreground text-sm">Loading market data...</span>
-          </div>
-        ) : (
-          <div className="animate-in fade-in duration-500">
-            {/* Tabs */}
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="stocks">Stocks</TabsTrigger>
-                <TabsTrigger value="etfs">ETFs</TabsTrigger>
-                <TabsTrigger value="mutual-funds">Mutual Funds</TabsTrigger>
-              </TabsList>
-
-              {(["stocks", "etfs", "mutual-funds"] as const).map((tab) => (
-                <TabsContent key={tab} value={tab} className="mt-6">
-                  {displayAssets.length > 0 ? (
-                    <div className="space-y-3">
-                      {displayAssets.map((asset, i) => (
-                        <motion.div
-                          key={asset.ticker}
-                          initial={{ opacity: 0, x: -30, scale: 0.95 }}
-                          animate={{ opacity: 1, x: 0, scale: 1 }}
-                          transition={{ delay: Math.min(i * 0.06, 0.5), type: "spring", stiffness: 300, damping: 22 }}
-                        >
-                          <AssetCard asset={asset} />
-                        </motion.div>
-                      ))}
-                    </div>
-                  ) : (
-                    <Card className="p-8 text-center">
-                      <p className="text-muted-foreground">
-                        No {tab === "stocks" ? "stocks" : tab === "etfs" ? "ETFs" : "mutual funds"} found
-                      </p>
-                    </Card>
-                  )}
-                </TabsContent>
-              ))}
-            </Tabs>
-          </div>
-        )}
+        {/* Disclaimer */}
+        <div
+          className="rounded-xl p-3"
+          style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}
+        >
+          <p className="text-[10px] text-[#F4F7FA]/30 leading-relaxed">
+            <strong className="text-[#F4F7FA]/40">Charts powered by TradingView.</strong>{" "}
+            Data may be delayed. Not investment advice. Do your own research before trading.
+          </p>
+        </div>
       </div>
     </Layout>
   );
-}
-
-function AssetCard({ asset }: { asset: Asset }) {
-  const isPositive = asset.changePercent >= 0;
-  return (
-    <motion.div
-      whileTap={{ scale: 0.97 }}
-      whileHover={{ scale: 1.01, boxShadow: isPositive ? "0 6px 24px rgba(73,176,110,0.12)" : "0 6px 24px rgba(239,68,68,0.12)" }}
-      transition={{ type: "spring", stiffness: 400, damping: 25 }}
-      onClick={() => haptic()}
-    >
-    <Card className="p-4 hover:bg-muted/50 transition-colors border-border rounded-xl">
-      <div className="flex items-start justify-between mb-3">
-        <Link href={`/stock/${asset.ticker}`} className="flex-1">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <p className="font-semibold text-foreground text-lg">
-                {asset.ticker}
-              </p>
-              <Badge variant="outline" className="text-xs">
-                {asset.type === "stock" ? "Stock" : asset.type === "etf" ? "ETF" : "Mutual Fund"}
-              </Badge>
-            </div>
-            <p className="text-sm text-muted-foreground">{asset.name}</p>
-          </div>
-        </Link>
-        <div className="text-right">
-          {asset.error ? (
-            <p className="text-sm font-medium text-destructive mt-1">Data unavailable</p>
-          ) : (
-            <>
-              <p className="font-semibold text-foreground">
-                ${asset.price.toFixed(2)}
-              </p>
-              {asset.price > 0 && (
-                <Badge
-                  className={
-                    asset.changePercent >= 0
-                      ? "bg-[#49B06E]/20 text-[#49B06E]"
-                      : "bg-[#ef4444]/20 text-[#ef4444]"
-                  }
-                >
-                  {asset.changePercent >= 0 ? <TrendingUp className="w-3 h-3 mr-1" /> : <TrendingDown className="w-3 h-3 mr-1" />}
-                  {asset.changePercent >= 0 ? "+" : ""}
-                  {asset.changePercent.toFixed(2)}%
-                </Badge>
-              )}
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* Trend and Risk Badges */}
-      {(asset.trend || asset.riskLevel) && (
-        <div className="flex gap-2 mb-3">
-          {asset.trend && (
-            <Badge className={`text-xs font-normal ${getTrendColor(asset.trend)}`}>
-              Trend: {asset.trend}
-            </Badge>
-          )}
-          {asset.riskLevel && (
-            <Badge className={`text-xs font-normal ${getRiskColor(asset.riskLevel)}`}>
-              Risk: {asset.riskLevel}
-            </Badge>
-          )}
-        </div>
-      )}
-
-      {/* Pansy's Quote */}
-      {asset.pansyQuote && (
-        <Link href={`/stock/${asset.ticker}`}>
-          <Card className="p-3 bg-accent/5 border-accent/20 rounded-lg flex gap-3 items-start mb-3">
-            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-xs shrink-0 mt-0.5">
-              🌺
-            </div>
-            <p className="text-sm italic text-foreground leading-relaxed">
-              "{asset.pansyQuote}"
-            </p>
-          </Card>
-        </Link>
-      )}
-
-      {/* Action Buttons */}
-      <div className="flex gap-2">
-        <Link href={`/stock/${asset.ticker}`} className="flex-1">
-          <Button variant="outline" size="sm" className="w-full">
-            Full Analysis
-          </Button>
-        </Link>
-        <Link href={`/compare?tickers=${asset.ticker}`}>
-          <Button variant="outline" size="sm">
-            Compare
-          </Button>
-        </Link>
-      </div>
-    </Card>
-    </motion.div>
-  );
-}
-
-function getTrendColor(trend: string) {
-  if (trend === "Bullish") return "bg-[#49B06E]/10 text-[#49B06E] border-[#49B06E]/20";
-  if (trend === "Bearish") return "bg-[#ef4444]/10 text-[#ef4444] border-[#ef4444]/20";
-  return "bg-muted text-muted-foreground border-border";
-}
-
-function getRiskColor(risk: string) {
-  if (risk === "Aggressive") return "bg-[#ef4444]/10 text-[#ef4444] border-[#ef4444]/20";
-  if (risk === "Conservative") return "bg-[#49B06E]/10 text-[#49B06E] border-[#49B06E]/20";
-  return "bg-[#27B7C8]/10 text-[#27B7C8] border-[#27B7C8]/20";
 }

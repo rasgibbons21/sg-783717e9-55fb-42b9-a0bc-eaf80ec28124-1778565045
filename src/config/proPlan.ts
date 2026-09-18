@@ -8,11 +8,20 @@ export const PRO_PLAN = {
   lifetimeLabel: "$69.99 one-time",
   yearlySavingsLabel: "Save 50%",
   benefits: [
-    "Save your portfolio — your holdings and progress, there every time you come back.",
-    "Unlock every locked lesson — the income-stream playbooks (real estate, digital products, affiliate, REITs, LLC, cash-flow business) plus the full trading-psychology system.",
-    "Unlimited analysis — research any stock or ETF, as often as you want.",
-    "Daily price charts and the latest news — on every stock and ETF you look up.",
-    "Pansy, unlimited — ask your guide anything, anytime, with no daily limit.",
-    "Your whole journey, tracked — completed lessons, saved analyses, progress over time.",
+    "AI-powered stock & crypto scanner — Gap-and-Go signals + crypto movers, scored and ranked daily.",
+    "Pansy's trade analysis — AI trade plans with entry, stop, and targets on every top signal.",
+    "Real-time TradingView charts — interactive charting for stocks, crypto, and forex.",
+    "Unlimited market research — analyze any ticker, any time, no daily limits.",
+    "Paper trading simulator — practice strategies risk-free with $10K virtual capital.",
+    "Full education library — 150+ lessons, 32 strategies, and the trading psychology system.",
   ],
+} as const;
+
+export const FOUNDERS_PLAN = {
+  monthlyPrice: 4.99,
+  yearlyPrice: 29.99,
+  lifetimePrice: 69.99,
+  regularMonthlyPrice: 9.99,
+  regularYearlyPrice: 59.99,
+  regularLifetimePrice: 149.99,
 } as const;

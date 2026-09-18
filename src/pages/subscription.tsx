@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { authService } from "@/services/authService";
 import { userService } from "@/services/userService";
-import { Check, Loader2, AlertCircle, Lock, Share2 } from "lucide-react";
+import { Check, Loader2, AlertCircle, Lock, Share2, Clock } from "lucide-react";
 import { SEO } from "@/components/SEO";
-import { PRO_PLAN } from "@/config/proPlan";
+import { PRO_PLAN, FOUNDERS_PLAN } from "@/config/proPlan";
 import { usePaymentProvider } from "@/lib/payments";
 import GooglePlaySubscription from "@/components/GooglePlaySubscription";
 import { QRCodeSVG } from "qrcode.react";
@@ -131,11 +131,14 @@ export default function Subscription() {
       <div className="max-w-lg mx-auto p-4">
         <div className="space-y-6">
           <div className="text-center space-y-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold mb-2" style={{ background: "rgba(245,158,11,0.15)", color: "#F59E0B" }}>
+              <Clock className="w-3 h-3" /> Founders Pricing — Limited Time
+            </div>
             <h1 className="font-serif text-3xl font-bold text-foreground">
               Choose Your Plan
             </h1>
             <p className="text-muted-foreground">
-              Unlock 150+ lessons, 32 strategies, and earn your certificate
+              AI trading signals, crypto scanner, TradingView charts &amp; Pansy analysis
             </p>
           </div>
           
@@ -198,7 +201,10 @@ export default function Subscription() {
               <div className="space-y-4">
                 <div>
                   <h3 className="font-serif text-xl font-bold text-foreground">Monthly</h3>
-                  <p className="text-2xl font-bold text-foreground mt-1">${monthlyPrice}<span className="text-sm font-normal text-muted-foreground">/mo</span></p>
+                  <div className="flex items-baseline gap-2 mt-1">
+                    <p className="text-2xl font-bold text-foreground">${monthlyPrice}<span className="text-sm font-normal text-muted-foreground">/mo</span></p>
+                    <span className="text-sm text-muted-foreground line-through">${FOUNDERS_PLAN.regularMonthlyPrice}</span>
+                  </div>
                   <p className="text-sm text-muted-foreground">Cancel anytime</p>
                 </div>
 
@@ -237,23 +243,26 @@ export default function Subscription() {
 
             {/* Yearly Plan */}
             <Card className="p-6 border-2 border-accent relative">
-              <Badge className="absolute -top-2.5 left-4 bg-accent text-accent-foreground">Save 50%</Badge>
+              <Badge className="absolute -top-2.5 left-4 bg-accent text-accent-foreground">Founders Price</Badge>
               <div className="space-y-4">
                 <div>
                   <h3 className="font-serif text-xl font-bold text-foreground">Yearly</h3>
-                  <p className="text-2xl font-bold text-foreground mt-1">${yearlyMonthly}<span className="text-sm font-normal text-muted-foreground">/mo</span></p>
+                  <div className="flex items-baseline gap-2 mt-1">
+                    <p className="text-2xl font-bold text-foreground">${yearlyMonthly}<span className="text-sm font-normal text-muted-foreground">/mo</span></p>
+                    <span className="text-sm text-muted-foreground line-through">${FOUNDERS_PLAN.regularYearlyPrice}/yr</span>
+                  </div>
                   <p className="text-sm text-muted-foreground">Billed ${yearlyPrice}/year</p>
                 </div>
 
                 <ul className="space-y-2">
                   {[
                     "Everything in Free, plus:",
-                    "16 income stream & side hustle lessons",
-                    "32 pro trading & investing strategies",
-                    "9-module university — 89 deep-dive lessons",
-                    "Unlimited stock & ETF analysis",
-                    "Certificate of completion",
-                    "Save your portfolio & progress forever",
+                    "AI stock & crypto scanner — daily signals",
+                    "Pansy's AI trade analysis with entry/stop/targets",
+                    "Real-time TradingView charts",
+                    "Unlimited market research & analysis",
+                    "Paper trading simulator",
+                    "150+ lessons & 32 strategies",
                     "Pansy unlimited — ask anything, anytime",
                   ].map((feature) => (
                     <li key={feature} className="flex items-start gap-2">
@@ -308,7 +317,10 @@ export default function Subscription() {
               <div className="space-y-4">
                 <div>
                   <h3 className="font-serif text-xl font-bold text-foreground">Lifetime</h3>
-                  <p className="text-2xl font-bold text-foreground mt-1">${lifetimePrice}<span className="text-sm font-normal text-muted-foreground"> one-time</span></p>
+                  <div className="flex items-baseline gap-2 mt-1">
+                    <p className="text-2xl font-bold text-foreground">${lifetimePrice}<span className="text-sm font-normal text-muted-foreground"> one-time</span></p>
+                    <span className="text-sm text-muted-foreground line-through">${FOUNDERS_PLAN.regularLifetimePrice}</span>
+                  </div>
                   <p className="text-sm text-muted-foreground">Pay once, yours forever</p>
                 </div>
 

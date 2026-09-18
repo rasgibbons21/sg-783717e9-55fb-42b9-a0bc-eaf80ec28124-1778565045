@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { Zap, BarChart3, User, GraduationCap, TrendingUp, ChevronLeft } from "lucide-react";
+import { Zap, User, TrendingUp, ChevronLeft, Compass } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { pageVariants, pageTransition } from "@/lib/motion";
 import { PansyMilestones } from "./PansyMilestones";
@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 import { useSubscription } from "@/contexts/SubscriptionContext";
+import { FoundersPricingModal } from "./FoundersPricingModal";
 
 const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
 
@@ -29,13 +30,14 @@ export function Layout({ children }: LayoutProps) {
 
   const isActivePath = (path: string) => {
     if (path === "/signals") return currentPath === "/signals" || currentPath.startsWith("/scanner");
-    if (path === "/practice") return currentPath.startsWith("/practice") || currentPath.startsWith("/research");
+    if (path === "/discover") return currentPath === "/discover" || currentPath.startsWith("/stock/");
+    if (path === "/paper-trader-v2") return currentPath.startsWith("/paper-trader") || currentPath.startsWith("/practice") || currentPath.startsWith("/research");
     if (path === "/learn") return currentPath === "/learn" || currentPath.startsWith("/university");
     if (path === "/profile") return currentPath.startsWith("/profile") || currentPath.startsWith("/subscription");
     return false;
   };
 
-  const mainPaths = ["/home", "/discover", "/learn", "/paper-trader-v2", "/profile", "/", "/onboarding", "/ask-pansy"];
+  const mainPaths = ["/home", "/signals", "/discover", "/learn", "/paper-trader-v2", "/profile", "/", "/onboarding", "/ask-pansy"];
   const isInnerPage = !mainPaths.some(p =>
     p === "/" ? currentPath === "/" : currentPath === p || currentPath.startsWith(p + "/")
   );
@@ -130,12 +132,15 @@ export function Layout({ children }: LayoutProps) {
       {/* Global Toaster for Rate Limits */}
       <Toaster />
 
+      {/* Founders Pricing Modal */}
+      <FoundersPricingModal />
+
       {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-40 safe-area-bottom">
         <div className="grid grid-cols-4 gap-1 px-2 py-2 max-w-md mx-auto">
           {[
             { href: "/signals", icon: Zap, label: "Signals" },
-            { href: "/learn", icon: GraduationCap, label: "Learn" },
+            { href: "/discover", icon: Compass, label: "Discover" },
             { href: "/paper-trader-v2", icon: TrendingUp, label: "Trade" },
             { href: "/profile", icon: User, label: "Profile" },
           ].map(({ href, icon: Icon, label }) => {
