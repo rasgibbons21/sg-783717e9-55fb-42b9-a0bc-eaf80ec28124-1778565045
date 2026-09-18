@@ -138,7 +138,7 @@ export default function Subscription() {
               Choose Your Plan
             </h1>
             <p className="text-muted-foreground">
-              AI trading signals, crypto scanner, TradingView charts &amp; Pansy analysis
+              AI trading signals, crypto scanner, TradingView charts &amp; Pansy AI analyst
             </p>
           </div>
           
@@ -258,12 +258,12 @@ export default function Subscription() {
                   {[
                     "Everything in Free, plus:",
                     "AI stock & crypto scanner — daily signals",
-                    "Pansy's AI trade analysis with entry/stop/targets",
+                    "Pansy AI analyst — entries, stops & targets",
                     "Real-time TradingView charts",
                     "Unlimited market research & analysis",
                     "Paper trading simulator",
                     "150+ lessons & 32 strategies",
-                    "Pansy unlimited — ask anything, anytime",
+                    "Pansy unlimited — setups, analysis, anytime",
                   ].map((feature) => (
                     <li key={feature} className="flex items-start gap-2">
                       <Check className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />

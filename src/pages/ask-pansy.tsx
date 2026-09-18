@@ -14,10 +14,10 @@ interface Message {
 }
 
 const SUGGESTED = [
-  "What's the difference between a stock and an ETF?",
-  "I have $500 — where do I even start?",
-  "How do options work?",
-  "What's a good side hustle to start this month?",
+  "What setups should I watch for today?",
+  "How do I find a good entry on a gap-and-go?",
+  "Where should I set my stop loss on a breakout trade?",
+  "What's moving in crypto right now?",
 ];
 
 export default function AskPansyPage() {
@@ -93,7 +93,7 @@ export default function AskPansyPage() {
 
   return (
     <Layout>
-      <SEO title="Ask Pansy — Free AI Financial Guide for Women | Bloom" description="Ask Pansy anything about investing, budgeting, stocks, side hustles, or personal finance. She explains complex money topics in plain language — like a smart friend who happens to know about money." />
+      <SEO title="Ask Pansy — AI Trading Analyst | Bloom" description="Ask Pansy about setups, entries, stop losses, market conditions, and trading strategies. Your AI trading analyst that watches the markets 24/7." />
 
       <div className="mx-auto flex h-[calc(100vh-8rem)] max-w-3xl flex-col px-4 py-6">
         {/* Header */}
@@ -103,7 +103,7 @@ export default function AskPansyPage() {
           </div>
           <div>
             <h1 className="font-serif text-2xl font-bold text-primary">Ask Pansy</h1>
-            <p className="text-sm text-muted-foreground">Ask me anything — money, markets, or your next side hustle.</p>
+            <p className="text-sm text-muted-foreground">Your AI trading analyst — setups, entries, stops &amp; targets.</p>
           </div>
         </div>
 
@@ -117,7 +117,7 @@ export default function AskPansyPage() {
                 </div>
                 <Card className="flex-1 border-primary/20 bg-primary/5 p-3">
                   <p className="text-sm text-foreground">
-                    Hey love 🌸 Ask me anything. If it&apos;s about money or the markets, I&apos;ll point you to exactly where to learn it across the She Blooms Wealth family. Pick a starter below or type your own.
+                    Hey 🌸 I&apos;m watching the markets right now. Ask me about any setup, ticker, or strategy — I&apos;ll give you the entry, stop, and targets. Pick a question below or type your own.
                   </p>
                 </Card>
               </div>

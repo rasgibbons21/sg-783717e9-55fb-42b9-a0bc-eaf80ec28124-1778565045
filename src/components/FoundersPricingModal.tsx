@@ -211,7 +211,7 @@ export function FoundersPricingModal() {
                   "AI trading signals",
                   "Crypto scanner",
                   "TradingView charts",
-                  "Pansy AI analysis",
+                  "Pansy AI analyst",
                   "Paper trader",
                   "150+ lessons",
                 ].map((f) => (

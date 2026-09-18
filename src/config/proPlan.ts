@@ -8,10 +8,10 @@ export const PRO_PLAN = {
   lifetimeLabel: "$69.99 one-time",
   yearlySavingsLabel: "Save 50%",
   benefits: [
-    "AI-powered stock & crypto scanner — Gap-and-Go signals + crypto movers, scored and ranked daily.",
-    "Pansy's trade analysis — AI trade plans with entry, stop, and targets on every top signal.",
+    "AI-powered stock & crypto scanner — scored and ranked using high-probability strategies.",
+    "Pansy AI analyst — entries, stop losses at invalidation levels, and take profit targets on every setup.",
+    "24/7 market briefings — Pansy watches news, gainers, and crypto movers so you don't have to.",
     "Real-time TradingView charts — interactive charting for stocks, crypto, and forex.",
-    "Unlimited market research — analyze any ticker, any time, no daily limits.",
     "Paper trading simulator — practice strategies risk-free with $10K virtual capital.",
     "Full education library — 150+ lessons, 32 strategies, and the trading psychology system.",
   ],
