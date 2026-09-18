@@ -11,6 +11,7 @@ import {
 
 let cryptoCache: { data: CryptoCandidate[]; ts: number } | null = null;
 const CACHE_MS = 2 * 60 * 1000;
+const STALE_CACHE_MS = 60 * 60 * 1000;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });
@@ -90,6 +91,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Crypto scanner failed";
     console.error("Crypto scanner error:", message);
-    return res.status(500).json({ error: message });
+    if (cryptoCache && Date.now() - cryptoCache.ts < STALE_CACHE_MS) {
+      return res.status(200).json({
+        candidates: filterAndSortCrypto(cryptoCache.data, sortBy),
+        cached: true,
+        stale: true,
+        timestamp: cryptoCache.ts,
+      });
+    }
+    return res.status(200).json({ candidates: [], cached: false, timestamp: Date.now() });
   }
 }

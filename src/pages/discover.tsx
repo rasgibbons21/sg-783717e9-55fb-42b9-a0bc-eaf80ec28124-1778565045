@@ -2,7 +2,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
 import { motion } from "framer-motion";
-import { Search, TrendingUp, ArrowUpRight, ArrowDownRight, Clock } from "lucide-react";
+import { Search, TrendingUp, ArrowUpRight, ArrowDownRight } from "lucide-react";
 
 const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
 
@@ -355,8 +355,8 @@ export default function Discover() {
               className="rounded-xl p-4 text-center"
               style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}
             >
-              <Clock className="w-5 h-5 mx-auto mb-2 text-[#F4F7FA]/20" />
-              <p className="text-xs text-[#F4F7FA]/40">Trending data loads during market hours</p>
+              <TrendingUp className="w-5 h-5 mx-auto mb-2 text-[#F4F7FA]/20" />
+              <p className="text-xs text-[#F4F7FA]/40">No movers right now — check back when markets get active</p>
             </div>
           )}
         </div>

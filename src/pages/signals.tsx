@@ -63,6 +63,14 @@ interface PansyPick {
   keyFactors: string[];
 }
 
+interface PansyBriefing {
+  greeting: string;
+  briefing: string;
+  watchlist: { symbol: string; reason: string; type: "stock" | "crypto" }[];
+  mood: "bullish" | "bearish" | "cautious" | "mixed";
+  moodNote: string;
+}
+
 function formatVolume(v: number): string {
   if (v >= 1_000_000) return `${(v / 1_000_000).toFixed(1)}M`;
   if (v >= 1_000) return `${(v / 1_000).toFixed(0)}K`;
@@ -406,11 +414,11 @@ function isMarketHours(): { open: boolean; message: string } {
   const hour = et.getHours();
   const min = et.getMinutes();
   const time = hour * 60 + min;
-  if (day === 0 || day === 6) return { open: false, message: "Markets are closed for the weekend" };
+  if (day === 0 || day === 6) return { open: false, message: "Weekend — markets reopen Monday" };
   if (time < 4 * 60) return { open: false, message: "Pre-market opens at 4:00 AM ET" };
   if (time < 9 * 60 + 30) return { open: false, message: "Pre-market is open — regular session at 9:30 AM ET" };
   if (time < 16 * 60) return { open: true, message: "Markets are open" };
-  return { open: false, message: "Markets closed — scanner updates during trading hours" };
+  return { open: false, message: "After hours — Pansy is watching the news" };
 }
 
 export default function SignalsPage() {
@@ -422,8 +430,6 @@ export default function SignalsPage() {
   const [loading, setLoading] = useState(true);
   const [cryptoLoading, setCryptoLoading] = useState(true);
   const [newsLoading, setNewsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [cryptoError, setCryptoError] = useState<string | null>(null);
   const [lastScan, setLastScan] = useState<number | null>(null);
   const [lastCryptoScan, setLastCryptoScan] = useState<number | null>(null);
   const [showFilters, setShowFilters] = useState(false);
@@ -433,15 +439,34 @@ export default function SignalsPage() {
   const [cryptoPansyPicks, setCryptoPansyPicks] = useState<PansyPick[]>([]);
   const [cryptoPansyNote, setCryptoPansyNote] = useState("");
   const [cryptoPansyLoading, setCryptoPansyLoading] = useState(false);
+  const [pansyBriefing, setPansyBriefing] = useState<PansyBriefing | null>(null);
+  const [briefingLoading, setBriefingLoading] = useState(false);
   const [filters, setFilters] = useState({
     catalystOnly: false,
     minRvol: 5,
     sortBy: "score" as string,
   });
 
+  const loadPansyBriefing = useCallback(async () => {
+    if (pansyBriefing) return;
+    setBriefingLoading(true);
+    try {
+      const res = await fetch("/api/scanner/pansy-briefing");
+      if (res.ok) {
+        const data = await res.json();
+        setPansyBriefing(data);
+      }
+    } catch {} finally {
+      setBriefingLoading(false);
+    }
+  }, [pansyBriefing]);
+
   const loadPansyAnalysis = useCallback(async (scanCandidates: ScannerCandidate[]) => {
     const worthy = scanCandidates.filter(c => c.status === "qualified" || c.status === "watchlist");
-    if (worthy.length === 0) return;
+    if (worthy.length === 0) {
+      loadPansyBriefing();
+      return;
+    }
     setPansyLoading(true);
     try {
       const res = await fetch("/api/scanner/pansy-analysis", {
@@ -457,11 +482,14 @@ export default function SignalsPage() {
     } catch {} finally {
       setPansyLoading(false);
     }
-  }, []);
+  }, [loadPansyBriefing]);
 
   const loadCryptoPansyAnalysis = useCallback(async (scanCandidates: CryptoCandidate[]) => {
     const worthy = scanCandidates.filter(c => c.status === "hot" || c.status === "moving");
-    if (worthy.length === 0) return;
+    if (worthy.length === 0) {
+      loadPansyBriefing();
+      return;
+    }
     setCryptoPansyLoading(true);
     try {
       const res = await fetch("/api/scanner/pansy-crypto-analysis", {
@@ -477,29 +505,26 @@ export default function SignalsPage() {
     } catch {} finally {
       setCryptoPansyLoading(false);
     }
-  }, []);
+  }, [loadPansyBriefing]);
 
   const loadCryptoScan = useCallback(async () => {
     setCryptoLoading(true);
-    setCryptoError(null);
     try {
       const res = await fetch("/api/scanner/crypto-scan?sortBy=score");
-      if (!res.ok) throw new Error("Crypto scanner unavailable");
-      const data = await res.json();
+      const data = res.ok ? await res.json() : { candidates: [] };
       const results = data.candidates || [];
       setCryptoCandidates(results);
-      setLastCryptoScan(data.timestamp);
+      setLastCryptoScan(data.timestamp || Date.now());
       loadCryptoPansyAnalysis(results);
-    } catch (err: any) {
-      setCryptoError(err.message);
+    } catch {
+      loadPansyBriefing();
     } finally {
       setCryptoLoading(false);
     }
-  }, [loadCryptoPansyAnalysis]);
+  }, [loadCryptoPansyAnalysis, loadPansyBriefing]);
 
   const loadScan = useCallback(async () => {
     setLoading(true);
-    setError(null);
     try {
       const params = new URLSearchParams({
         minPrice: "2",
@@ -510,18 +535,17 @@ export default function SignalsPage() {
         sortBy: filters.sortBy,
       });
       const res = await fetch(`/api/scanner/scan?${params}`);
-      if (!res.ok) throw new Error("Scanner unavailable");
-      const data = await res.json();
+      const data = res.ok ? await res.json() : { candidates: [] };
       const results = data.candidates || [];
       setCandidates(results);
-      setLastScan(data.timestamp);
+      setLastScan(data.timestamp || Date.now());
       loadPansyAnalysis(results);
-    } catch (err: any) {
-      setError(err.message);
+    } catch {
+      loadPansyBriefing();
     } finally {
       setLoading(false);
     }
-  }, [filters, loadPansyAnalysis]);
+  }, [filters, loadPansyAnalysis, loadPansyBriefing]);
 
   const loadNews = useCallback(async () => {
     setNewsLoading(true);
@@ -546,12 +570,12 @@ export default function SignalsPage() {
   const watchlist = candidates.filter((c) => c.status === "watchlist");
   const nearMisses = candidates.filter((c) => c.status === "near-miss" || c.status === "rejected");
   const market = isMarketHours();
-  const hasScanData = !loading && !error && candidates.length > 0;
+  const hasScanData = !loading && candidates.length > 0;
 
   const cryptoHot = cryptoCandidates.filter((c) => c.status === "hot");
   const cryptoMoving = cryptoCandidates.filter((c) => c.status === "moving");
   const cryptoWarming = cryptoCandidates.filter((c) => c.status === "warming");
-  const hasCryptoData = !cryptoLoading && !cryptoError && cryptoCandidates.length > 0;
+  const hasCryptoData = !cryptoLoading && cryptoCandidates.length > 0;
 
   return (
     <Layout>
@@ -760,23 +784,23 @@ export default function SignalsPage() {
           </div>
         )}
 
-        {/* Scanner offline — graceful, not scary */}
-        {!loading && (error || candidates.length === 0) && (
+        {/* No stock setups right now */}
+        {!loading && candidates.length === 0 && (
           <div
             className="rounded-2xl p-5 mb-6 text-center"
             style={{ background: "linear-gradient(145deg, rgba(39,183,200,0.06), rgba(14,27,48,1))", border: "1px solid rgba(39,183,200,0.15)" }}
           >
             <div className="w-14 h-14 mx-auto mb-3 rounded-2xl flex items-center justify-center text-2xl"
               style={{ background: "rgba(39,183,200,0.1)" }}>
-              {error ? "📡" : "🔍"}
+              🔍
             </div>
             <p className="text-sm font-semibold text-[#F4F7FA]/80 mb-1">
-              {error ? "Scanner is reconnecting" : "No setups found right now"}
+              {!market.open ? "Markets are closed" : "No setups found right now"}
             </p>
             <p className="text-xs text-[#F4F7FA]/40 mb-3 max-w-xs mx-auto">
-              {error
-                ? "Market data feeds refresh during trading hours (9:30 AM – 4 PM ET). Check out the latest news below."
-                : "Gap-and-Go setups appear when small-caps gap up with volume. Try adjusting filters or check back during market hours."
+              {!market.open
+                ? "Gap-and-Go setups appear when small-caps gap up at market open. Pansy is watching the news for you below."
+                : "No small-caps are gapping up with volume right now. Check Pansy's briefing below or adjust your filters."
               }
             </p>
             <button
@@ -893,24 +917,21 @@ export default function SignalsPage() {
           </div>
         )}
 
-        {/* Crypto offline */}
-        {!cryptoLoading && (cryptoError || cryptoCandidates.length === 0) && (
+        {/* No crypto movers */}
+        {!cryptoLoading && cryptoCandidates.length === 0 && (
           <div
             className="rounded-2xl p-5 mb-6 text-center"
             style={{ background: "linear-gradient(145deg, rgba(245,158,11,0.06), rgba(14,27,48,1))", border: "1px solid rgba(245,158,11,0.15)" }}
           >
             <div className="w-14 h-14 mx-auto mb-3 rounded-2xl flex items-center justify-center text-2xl"
               style={{ background: "rgba(245,158,11,0.1)" }}>
-              {cryptoError ? "📡" : "🔍"}
+              🔍
             </div>
             <p className="text-sm font-semibold text-[#F4F7FA]/80 mb-1">
-              {cryptoError ? "Crypto scanner is reconnecting" : "No crypto movers right now"}
+              Crypto is quiet right now
             </p>
             <p className="text-xs text-[#F4F7FA]/40 mb-3 max-w-xs mx-auto">
-              {cryptoError
-                ? "The crypto data feed is temporarily unavailable. Crypto markets trade 24/7 — check back soon."
-                : "Crypto movers appear when coins gain 2%+ with volume. Check the news below or try again later."
-              }
+              No coins are moving 2%+ with volume at the moment. Check Pansy&apos;s briefing below for what to watch.
             </p>
             <button
               onClick={loadCryptoScan}
@@ -1024,6 +1045,89 @@ export default function SignalsPage() {
         )}
 
         </>}
+
+        {/* ═══ PANSY BRIEFING — shows when scanner has no picks ═══ */}
+        {(briefingLoading || pansyBriefing) && pansyPicks.length === 0 && cryptoPansyPicks.length === 0 && (
+          <div className="mb-6">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-base">🌸</span>
+              <h2 className="text-sm font-bold text-[#F4F7FA]">Pansy&apos;s Market Briefing</h2>
+              <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+            </div>
+
+            {briefingLoading ? (
+              <div className="space-y-3">
+                <div
+                  className="rounded-2xl border p-4 animate-pulse"
+                  style={{ background: "rgba(168,85,247,0.04)", borderColor: "rgba(168,85,247,0.15)" }}
+                >
+                  <div className="h-4 w-3/4 rounded bg-white/5 mb-3" />
+                  <div className="h-3 w-full rounded bg-white/5 mb-2" />
+                  <div className="h-3 w-5/6 rounded bg-white/5 mb-4" />
+                  <div className="space-y-2">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="h-10 rounded-xl bg-white/5" />
+                    ))}
+                  </div>
+                </div>
+                <p className="text-[10px] text-purple-400/50 text-center">Pansy is checking the markets...</p>
+              </div>
+            ) : pansyBriefing ? (
+              <div
+                className="rounded-2xl border p-4"
+                style={{ background: "rgba(168,85,247,0.04)", borderColor: "rgba(168,85,247,0.15)" }}
+              >
+                <p className="text-xs text-[#F4F7FA]/60 mb-2 italic">{pansyBriefing.greeting}</p>
+                <p className="text-sm text-[#F4F7FA]/80 mb-3 leading-relaxed">{pansyBriefing.briefing}</p>
+
+                {/* Mood indicator */}
+                <div
+                  className="flex items-center gap-2 rounded-lg px-3 py-1.5 mb-3 w-fit"
+                  style={{
+                    background: pansyBriefing.mood === "bullish" ? "rgba(73,176,110,0.1)" :
+                      pansyBriefing.mood === "bearish" ? "rgba(239,68,68,0.1)" :
+                      "rgba(245,158,11,0.1)",
+                    border: `1px solid ${
+                      pansyBriefing.mood === "bullish" ? "rgba(73,176,110,0.2)" :
+                      pansyBriefing.mood === "bearish" ? "rgba(239,68,68,0.2)" :
+                      "rgba(245,158,11,0.2)"
+                    }`,
+                  }}
+                >
+                  <span className="text-xs">
+                    {pansyBriefing.mood === "bullish" ? "🟢" : pansyBriefing.mood === "bearish" ? "🔴" : "🟡"}
+                  </span>
+                  <span className="text-[11px] font-semibold capitalize" style={{
+                    color: pansyBriefing.mood === "bullish" ? "#49B06E" :
+                      pansyBriefing.mood === "bearish" ? "#EF4444" : "#F59E0B",
+                  }}>
+                    {pansyBriefing.mood}
+                  </span>
+                  <span className="text-[10px] text-[#F4F7FA]/40">— {pansyBriefing.moodNote}</span>
+                </div>
+
+                {/* Watchlist */}
+                {pansyBriefing.watchlist.length > 0 && (
+                  <div>
+                    <p className="text-[10px] text-purple-400/60 font-semibold uppercase tracking-wider mb-2">Watching</p>
+                    <div className="space-y-1.5">
+                      {pansyBriefing.watchlist.map((item) => (
+                        <div
+                          key={item.symbol}
+                          className="flex items-start gap-2 rounded-lg p-2"
+                          style={{ background: "rgba(255,255,255,0.03)" }}
+                        >
+                          <span className="text-xs font-bold text-[#27B7C8] min-w-[60px]">{item.symbol}</span>
+                          <span className="text-[11px] text-[#F4F7FA]/50 leading-snug">{item.reason}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : null}
+          </div>
+        )}
 
         {/* ═══ NEWS SECTION — always shows ═══ */}
         <div className="mb-6">

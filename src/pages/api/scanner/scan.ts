@@ -10,9 +10,9 @@ import {
   DEFAULT_FILTERS,
 } from "@/lib/scanner";
 
-const cache: { data: ScannerCandidate[]; ts: number } | null = null;
 let scanCache: { data: ScannerCandidate[]; ts: number } | null = null;
-const CACHE_MS = 2 * 60 * 1000; // 2 min cache
+const CACHE_MS = 2 * 60 * 1000;
+const STALE_CACHE_MS = 60 * 60 * 1000; // serve stale data up to 1 hour
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });
@@ -122,7 +122,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
   } catch (error: any) {
     console.error("Scanner error:", error);
-    return res.status(500).json({ error: error.message || "Scanner failed" });
+    if (scanCache && Date.now() - scanCache.ts < STALE_CACHE_MS) {
+      return res.status(200).json({
+        candidates: applyQueryFilters(scanCache.data, req.query),
+        cached: true,
+        stale: true,
+        timestamp: scanCache.ts,
+        dataMode: "stale",
+      });
+    }
+    return res.status(200).json({ candidates: [], cached: false, timestamp: Date.now(), dataMode: "offline" });
   }
 }
 
