@@ -16,15 +16,15 @@ import {
   Brain, PiggyBank, Clock, GraduationCap, Rocket, Check,
 } from "lucide-react";
 
-type Step = "welcome" | "auth" | "check-email" | "q-struggle" | "q-situation" | "q-topics" | "q-time" | "building" | "ready";
+type Step = "welcome" | "auth" | "check-email" | "q-experience" | "q-excites" | "q-capital" | "q-style" | "building" | "ready";
 type AuthMode = "signup" | "login" | "forgot";
 
-type LearningTopic = "stocks_etfs" | "budgeting" | "retirement" | "crypto" | "real_estate" | "side_hustle";
-type FinancialSituation = "under_100" | "100_to_1000" | "1000_to_5000" | "over_5000";
-type MoneyStruggle = "spending" | "saving" | "earning" | "investing" | "debt";
-type DailyTime = "5min" | "10min" | "20min" | "no_limit";
+type TradingExperience = "never" | "dabbled" | "active" | "paper_only";
+type TradingExcitement = "winning_setups" | "grow_account" | "learn_strategies" | "freedom";
+type TradingCapital = "under_500" | "500_to_2k" | "2k_to_10k" | "over_10k";
+type TradingStyle = "premarket" | "first_hour" | "all_day" | "evenings";
 
-const quizSteps = ["q-struggle", "q-situation", "q-topics", "q-time"] as const;
+const quizSteps = ["q-experience", "q-excites", "q-capital", "q-style"] as const;
 
 export default function Onboarding() {
   const router = useRouter();
@@ -44,10 +44,10 @@ export default function Onboarding() {
   const [animateIn, setAnimateIn] = useState(false);
   const [referralCode, setReferralCode] = useState("");
 
-  const [topics, setTopics] = useState<LearningTopic[]>([]);
-  const [financialSituation, setFinancialSituation] = useState<FinancialSituation | null>(null);
-  const [moneyStruggle, setMoneyStruggle] = useState<MoneyStruggle | null>(null);
-  const [dailyTime, setDailyTime] = useState<DailyTime | null>(null);
+  const [tradingExperience, setTradingExperience] = useState<TradingExperience | null>(null);
+  const [tradingExcitement, setTradingExcitement] = useState<TradingExcitement | null>(null);
+  const [tradingCapital, setTradingCapital] = useState<TradingCapital | null>(null);
+  const [tradingStyle, setTradingStyle] = useState<TradingStyle | null>(null);
   const [buildingProgress, setBuildingProgress] = useState(0);
 
   const submitLock = useRef(false);
@@ -71,7 +71,7 @@ export default function Onboarding() {
       if (profile?.onboarding_complete) {
         router.push("/signals");
       } else {
-        setStep("q-struggle");
+        setStep("q-experience");
       }
     })();
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -85,10 +85,10 @@ export default function Onboarding() {
 
   useEffect(() => {
     if (step !== "building") { setBuildingProgress(0); return; }
-    const timers = [600, 1200, 1800, 2400].map((ms, i) =>
+    const timers = [600, 1200, 1800, 2400, 3000].map((ms, i) =>
       setTimeout(() => setBuildingProgress(i + 1), ms)
     );
-    const nav = setTimeout(() => setStep("ready"), 3200);
+    const nav = setTimeout(() => setStep("ready"), 3800);
     return () => { timers.forEach(clearTimeout); clearTimeout(nav); };
   }, [step]);
 
@@ -185,7 +185,7 @@ export default function Onboarding() {
           }
           submitLock.current = false;
           setIsSubmitting(false);
-          goToStep("q-struggle");
+          goToStep("q-experience");
           return;
         }
       } else {
@@ -211,7 +211,7 @@ export default function Onboarding() {
     if (!user) { setError("Session expired — please sign in again."); return; }
     const { error } = await supabase.from("profiles").upsert({ id: user.id, onboarding_complete: true });
     if (error) { setError("Something went wrong. Please try again."); return; }
-    window.location.href = "/home";
+    window.location.href = "/signals";
   };
 
   const handleCompleteOnboarding = async () => {
@@ -220,13 +220,13 @@ export default function Onboarding() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { setError("Session expired — please sign in again."); return; }
 
-      const experienceLevel = financialSituation === "under_100" ? "beginner" : financialSituation === "over_5000" ? "advanced" : "intermediate";
+      const experienceLevel = tradingExperience === "never" || tradingExperience === "paper_only" ? "beginner" : tradingExperience === "active" ? "advanced" : "intermediate";
 
       const { error: saveError } = await supabase.from("profiles").upsert({
         id: user.id,
         experience_level: experienceLevel,
-        investment_goals: topics as string[],
-        risk_tolerance: moneyStruggle || "investing",
+        investment_goals: [tradingExcitement || "winning_setups"] as string[],
+        risk_tolerance: tradingCapital === "under_500" ? "conservative" : tradingCapital === "over_10k" ? "aggressive" : "moderate",
         onboarding_complete: true,
       });
       if (saveError) {
@@ -295,7 +295,7 @@ export default function Onboarding() {
                       const prev = quizSteps[quizIndex - 1];
                       if (prev) goToStep(prev);
                     }}
-                    className={`flex items-center gap-1 text-sm text-[#F4F7FA]/50 hover:text-[#F4F7FA]/80 transition-colors ${step === "q-struggle" ? "invisible" : ""}`}
+                    className={`flex items-center gap-1 text-sm text-[#F4F7FA]/50 hover:text-[#F4F7FA]/80 transition-colors ${step === "q-experience" ? "invisible" : ""}`}
                   >
                     <ArrowLeft className="w-4 h-4" /> Back
                   </button>
@@ -338,64 +338,56 @@ export default function Onboarding() {
               {/* ═══════════ WELCOME ═══════════ */}
               {step === "welcome" && (
                 <div className={`space-y-7 ${animateIn ? "step-animate" : "opacity-0"}`}>
-                  {/* Logo + pain-point hook */}
                   <div className="text-center space-y-5">
                     <div className="relative inline-block">
-                      <img src="/bloom-logo.png" alt="Bloom" className="w-20 h-20 mx-auto rounded-3xl object-cover" style={{ boxShadow: "0 0 50px rgba(39,183,200,0.25)" }} />
-                      <div className="absolute -inset-3 rounded-3xl opacity-50" style={{ background: "linear-gradient(135deg, rgba(39,183,200,0.15), rgba(73,176,110,0.15))", filter: "blur(12px)", zIndex: -1 }} />
+                      <img src="/bloom-logo.png" alt="Bloom" className="w-20 h-20 mx-auto rounded-3xl object-cover" style={{ boxShadow: "0 0 50px rgba(73,176,110,0.3)" }} />
+                      <div className="absolute -inset-3 rounded-3xl opacity-50" style={{ background: "linear-gradient(135deg, rgba(73,176,110,0.2), rgba(39,183,200,0.15))", filter: "blur(12px)", zIndex: -1 }} />
                     </div>
-                    <h1 className="font-serif text-4xl font-bold text-[#F4F7FA] leading-tight">Does this sound<br />like you?</h1>
+                    <h1 className="font-serif text-4xl font-bold text-[#F4F7FA] leading-tight">Find winning trades<br />before everyone else.</h1>
                   </div>
 
-                  {/* Pain points — the user's inner voice */}
                   <div className="space-y-3">
                     {[
-                      { text: "“Where does all my money even go?”", delay: "0.15s" },
-                      { text: "“I know I should invest but… where do I start?”", delay: "0.3s" },
-                      { text: "“Am I the only one who feels this behind?”", delay: "0.45s" },
-                    ].map((pain, i) => (
+                      { text: "AI scans the market every morning for Gap-and-Go setups", icon: "🔍", delay: "0.15s" },
+                      { text: "Pansy scores each trade 0–100 and tells you exactly why", icon: "🌸", delay: "0.3s" },
+                      { text: "Practice risk-free in the paper trader before going live", icon: "📊", delay: "0.45s" },
+                    ].map((item, i) => (
                       <div
                         key={i}
                         className={`${glassCard} ${glassCardBg} px-5 py-4`}
-                        style={{ animation: animateIn ? `cardEntrance 0.5s ease-out ${pain.delay} both` : "none" }}
+                        style={{ animation: animateIn ? `cardEntrance 0.5s ease-out ${item.delay} both` : "none" }}
                       >
-                        <p className="text-[#F4F7FA]/70 text-base italic">{pain.text}</p>
+                        <div className="flex items-center gap-3">
+                          <span className="text-xl">{item.icon}</span>
+                          <p className="text-[#F4F7FA]/70 text-sm font-medium">{item.text}</p>
+                        </div>
                       </div>
                     ))}
                   </div>
 
-                  {/* Shame reframe + social proof */}
-                  <div className="text-center space-y-2" style={{ animation: animateIn ? "fadeSlideUp 0.6s ease-out 0.6s both" : "none" }}>
-                    <p className="text-xl font-serif font-bold text-[#F4F7FA]">You&apos;re not broken.</p>
-                    <p className="text-lg text-[#27B7C8] font-medium">You just weren&apos;t taught this.</p>
-                    <p className="text-sm text-[#F4F7FA]/40 mt-1">78% of women say the same thing.</p>
-                  </div>
-
-                  {/* Pansy intro — shorter, trust-focused */}
-                  <div className={`${glassCard} ${glassCardBg} ${glowBorder} p-5`} style={{ animation: animateIn ? "fadeSlideUp 0.6s ease-out 0.75s both" : "none" }}>
-                    <div className="absolute inset-0 rounded-3xl" style={{ background: "linear-gradient(135deg, rgba(39,183,200,0.06) 0%, transparent 50%, rgba(73,176,110,0.04) 100%)" }} />
+                  <div className={`${glassCard} ${glassCardBg} ${glowBorder} p-5`} style={{ animation: animateIn ? "fadeSlideUp 0.6s ease-out 0.6s both" : "none" }}>
+                    <div className="absolute inset-0 rounded-3xl" style={{ background: "linear-gradient(135deg, rgba(73,176,110,0.06) 0%, transparent 50%, rgba(39,183,200,0.04) 100%)" }} />
                     <div className="relative flex items-start gap-4">
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-xl" style={{ background: "linear-gradient(135deg, rgba(39,183,200,0.2), rgba(73,176,110,0.2))", boxShadow: "0 0 20px rgba(39,183,200,0.15)" }}>
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-xl" style={{ background: "linear-gradient(135deg, rgba(73,176,110,0.2), rgba(39,183,200,0.2))", boxShadow: "0 0 20px rgba(73,176,110,0.15)" }}>
                         🌺
                       </div>
                       <div className="flex-1 space-y-1">
-                        <h3 className="font-serif text-base font-semibold text-[#27B7C8]">Meet Pansy, your guide</h3>
+                        <h3 className="font-serif text-base font-semibold text-[#49B06E]">Meet Pansy, your trading coach</h3>
                         <p className="text-sm leading-relaxed text-[#F4F7FA]/50">
-                          I built Bloom for women exactly like you. No jargon, no judgment — just clear steps to take control of your money.
+                          I scan the market every day using the Gap-and-Go strategy — the same setups that move small-cap stocks 20%, 50%, even 100%+ in a single session. I&apos;ll show you exactly what I see and why.
                         </p>
                       </div>
                     </div>
                   </div>
 
-                  {/* Social proof */}
-                  <p className="text-center text-sm text-[#F4F7FA]/30" style={{ animation: animateIn ? "fadeSlideUp 0.5s ease-out 0.9s both" : "none" }}>
-                    Join 10,000+ women already on their journey
-                  </p>
+                  <div className="text-center space-y-1" style={{ animation: animateIn ? "fadeSlideUp 0.5s ease-out 0.75s both" : "none" }}>
+                    <p className="text-sm text-[#49B06E] font-semibold">7-day free trial &middot; Cancel anytime</p>
+                    <p className="text-xs text-[#F4F7FA]/30">No credit card required to start</p>
+                  </div>
 
-                  {/* CTAs */}
                   <div className="space-y-3">
                     <button type="button" onClick={() => goToStep("auth")} className="glass-btn flex items-center justify-center gap-2 text-lg">
-                      Let&apos;s Fix This <ChevronRight className="w-5 h-5" />
+                      Start Scanning <ChevronRight className="w-5 h-5" />
                     </button>
                     <button
                       type="button"
@@ -566,135 +558,81 @@ export default function Onboarding() {
                 </div>
               )}
 
-              {/* ═══════════ Q1: WHAT DO YOU WANT TO LEARN? ═══════════ */}
-              {step === "q-topics" && (
+              {/* ═══════════ Q1: TRADING EXPERIENCE ═══════════ */}
+              {step === "q-experience" && (
                 <div className={`space-y-6 ${animateIn ? "step-animate" : "opacity-0"}`}>
                   <div className="text-center space-y-3">
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold text-[#27B7C8]" style={{ background: "rgba(39,183,200,0.1)", border: "1px solid rgba(39,183,200,0.15)" }}>
-                      <Sparkles className="w-3.5 h-3.5" /> Let&apos;s personalize
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold text-[#49B06E]" style={{ background: "rgba(73,176,110,0.1)", border: "1px solid rgba(73,176,110,0.15)" }}>
+                      <Target className="w-3.5 h-3.5" /> Let&apos;s set you up
                     </div>
-                    <h2 className="font-serif text-3xl font-bold text-[#F4F7FA]">What would change<br />your life to learn?</h2>
-                    <p className="text-[#F4F7FA]/40 text-base">Pick all that interest you — we&apos;ll prioritize these</p>
+                    <h2 className="font-serif text-3xl font-bold text-[#F4F7FA]">Have you traded<br />stocks before?</h2>
+                    <p className="text-[#F4F7FA]/40 text-base">No wrong answer — Pansy adapts to you</p>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-3">
                     {([
-                      { value: "stocks_etfs" as LearningTopic, label: "Stocks & ETFs", icon: <TrendingUp className="w-6 h-6" />, color: "#49B06E" },
-                      { value: "budgeting" as LearningTopic, label: "Budgeting", icon: <Wallet className="w-6 h-6" />, color: "#27B7C8" },
-                      { value: "retirement" as LearningTopic, label: "Retirement", icon: <Landmark className="w-6 h-6" />, color: "#8B5CF6" },
-                      { value: "crypto" as LearningTopic, label: "Crypto", icon: <BarChart3 className="w-6 h-6" />, color: "#F59E0B" },
-                      { value: "real_estate" as LearningTopic, label: "Real Estate", icon: <PiggyBank className="w-6 h-6" />, color: "#EC4899" },
-                      { value: "side_hustle" as LearningTopic, label: "Side Hustle", icon: <Rocket className="w-6 h-6" />, color: "#EF4444" },
+                      { value: "never" as TradingExperience, label: "Brand new to this", desc: "Never placed a trade — teach me everything", icon: "🌱", color: "#49B06E" },
+                      { value: "dabbled" as TradingExperience, label: "I've tried a little", desc: "Bought a few stocks, still learning", icon: "📱", color: "#27B7C8" },
+                      { value: "paper_only" as TradingExperience, label: "Paper traded only", desc: "Practiced with fake money, ready for more", icon: "📝", color: "#8B5CF6" },
+                      { value: "active" as TradingExperience, label: "I trade actively", desc: "I know the basics, need better setups", icon: "🔥", color: "#F59E0B" },
                     ]).map((option, i) => {
-                      const isSelected = topics.includes(option.value);
+                      const isSelected = tradingExperience === option.value;
                       return (
                         <div
                           key={option.value}
-                          onClick={() => setTopics(prev => prev.includes(option.value) ? prev.filter(t => t !== option.value) : [...prev, option.value])}
+                          onClick={() => setTradingExperience(option.value)}
                           className={`option-card ${glassCard} ${isSelected ? "selected" : ""}`}
                           style={{
                             background: isSelected ? `linear-gradient(135deg, ${option.color}15, ${option.color}08)` : "rgba(255,255,255,0.03)",
                             borderColor: isSelected ? `${option.color}50` : "rgba(255,255,255,0.06)",
                             boxShadow: isSelected ? `0 0 25px ${option.color}18, inset 0 1px 0 rgba(255,255,255,0.06)` : "inset 0 1px 0 rgba(255,255,255,0.03)",
                             padding: "16px",
-                            animation: animateIn ? `cardEntrance 0.5s ease-out ${i * 0.06}s both` : "none",
-                          }}
-                        >
-                          <div className="flex flex-col items-center text-center gap-2.5">
-                            <div className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300" style={{ background: isSelected ? `${option.color}20` : "rgba(255,255,255,0.04)", color: isSelected ? option.color : "rgba(244,247,250,0.4)" }}>
-                              {option.icon}
-                            </div>
-                            <p className="font-semibold text-sm text-[#F4F7FA]">{option.label}</p>
-                            <CheckDot selected={isSelected} color={option.color} />
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  <button type="button" onClick={() => goToStep("q-time")} disabled={topics.length === 0} className="glass-btn flex items-center justify-center gap-2">
-                    Continue <ChevronRight className="w-5 h-5" />
-                  </button>
-                  <button type="button" onClick={handleSkip} className="w-full text-center text-sm text-[#F4F7FA]/30 hover:text-[#F4F7FA]/60 transition-colors py-2">Skip for now →</button>
-                </div>
-              )}
-
-              {/* ═══════════ Q1: WHERE ARE YOU WITH MONEY? ═══════════ */}
-              {step === "q-situation" && (
-                <div className={`space-y-6 ${animateIn ? "step-animate" : "opacity-0"}`}>
-                  <div className="text-center space-y-3">
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold text-[#49B06E]" style={{ background: "rgba(73,176,110,0.1)", border: "1px solid rgba(73,176,110,0.15)" }}>
-                      <Wallet className="w-3.5 h-3.5" /> Let&apos;s get real
-                    </div>
-                    <h2 className="font-serif text-3xl font-bold text-[#F4F7FA]">Where are you<br />starting from?</h2>
-                    <p className="text-[#F4F7FA]/40 text-base">No judgment — everyone starts somewhere different</p>
-                  </div>
-
-                  <div className="space-y-3">
-                    {([
-                      { value: "under_100" as FinancialSituation, label: "Under $100 saved", desc: "Starting from scratch — and that's okay", icon: "💸" },
-                      { value: "100_to_1000" as FinancialSituation, label: "$100 – $1,000", desc: "Building up, one step at a time", icon: "🌱" },
-                      { value: "1000_to_5000" as FinancialSituation, label: "$1,000 – $5,000", desc: "Got a cushion, ready to grow it", icon: "🌿" },
-                      { value: "over_5000" as FinancialSituation, label: "$5,000+", desc: "Ready to make my money work", icon: "🌳" },
-                    ]).map((option, i) => {
-                      const isSelected = financialSituation === option.value;
-                      return (
-                        <div
-                          key={option.value}
-                          onClick={() => setFinancialSituation(option.value)}
-                          className={`option-card ${glassCard} ${isSelected ? "selected" : ""}`}
-                          style={{
-                            background: isSelected ? "linear-gradient(135deg, rgba(39,183,200,0.12), rgba(73,176,110,0.08))" : "rgba(255,255,255,0.03)",
-                            borderColor: isSelected ? "rgba(39,183,200,0.35)" : "rgba(255,255,255,0.06)",
-                            boxShadow: isSelected ? "0 0 25px rgba(39,183,200,0.12), inset 0 1px 0 rgba(255,255,255,0.06)" : "inset 0 1px 0 rgba(255,255,255,0.03)",
-                            padding: "20px",
-                            animation: animateIn ? `cardEntrance 0.5s ease-out ${i * 0.1}s both` : "none",
+                            animation: animateIn ? `cardEntrance 0.5s ease-out ${i * 0.08}s both` : "none",
                           }}
                         >
                           <div className="flex items-center gap-4">
                             <span className="text-3xl">{option.icon}</span>
                             <div className="flex-1">
-                              <p className="font-semibold text-lg text-[#F4F7FA]">{option.label}</p>
-                              <p className="text-sm text-[#F4F7FA]/40 mt-0.5">{option.desc}</p>
+                              <p className="font-semibold text-base text-[#F4F7FA]">{option.label}</p>
+                              <p className="text-xs text-[#F4F7FA]/40 mt-0.5">{option.desc}</p>
                             </div>
-                            <SelectionDot selected={isSelected} />
+                            <SelectionDot selected={isSelected} color={option.color} />
                           </div>
                         </div>
                       );
                     })}
                   </div>
 
-                  <button type="button" onClick={() => goToStep("q-topics")} disabled={!financialSituation} className="glass-btn flex items-center justify-center gap-2">
+                  <button type="button" onClick={() => goToStep("q-excites")} disabled={!tradingExperience} className="glass-btn flex items-center justify-center gap-2">
                     Continue <ChevronRight className="w-5 h-5" />
                   </button>
-                  <button type="button" onClick={handleSkip} className="w-full text-center text-sm text-[#F4F7FA]/30 hover:text-[#F4F7FA]/60 transition-colors py-2">Skip for now →</button>
+                  <button type="button" onClick={handleSkip} className="w-full text-center text-sm text-[#F4F7FA]/30 hover:text-[#F4F7FA]/60 transition-colors py-2">Skip for now</button>
                 </div>
               )}
 
-              {/* ═══════════ Q2: WHAT'S YOUR BIGGEST MONEY CHALLENGE? ═══════════ */}
-              {step === "q-struggle" && (
+              {/* ═══════════ Q2: WHAT EXCITES YOU ═══════════ */}
+              {step === "q-excites" && (
                 <div className={`space-y-6 ${animateIn ? "step-animate" : "opacity-0"}`}>
                   <div className="text-center space-y-3">
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold text-[#8B5CF6]" style={{ background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.15)" }}>
-                      <Shield className="w-3.5 h-3.5" /> You&apos;re safe here
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold text-[#27B7C8]" style={{ background: "rgba(39,183,200,0.1)", border: "1px solid rgba(39,183,200,0.15)" }}>
+                      <Sparkles className="w-3.5 h-3.5" /> Your motivation
                     </div>
-                    <h2 className="font-serif text-3xl font-bold text-[#F4F7FA]">What keeps you up<br />at night about money?</h2>
-                    <p className="text-[#F4F7FA]/40 text-base">Most women feel this — naming it is the first step</p>
+                    <h2 className="font-serif text-3xl font-bold text-[#F4F7FA]">What gets you<br />most excited?</h2>
+                    <p className="text-[#F4F7FA]/40 text-base">This helps Pansy tailor your experience</p>
                   </div>
 
                   <div className="space-y-3">
                     {([
-                      { value: "spending" as MoneyStruggle, label: "I spend too much", desc: "Money comes in and disappears", icon: <Wallet className="w-6 h-6" />, color: "#EF4444" },
-                      { value: "saving" as MoneyStruggle, label: "I can't seem to save", desc: "I try but there's never enough left", icon: <PiggyBank className="w-6 h-6" />, color: "#F59E0B" },
-                      { value: "earning" as MoneyStruggle, label: "I need more income", desc: "My paycheck barely covers basics", icon: <TrendingUp className="w-6 h-6" />, color: "#49B06E" },
-                      { value: "investing" as MoneyStruggle, label: "I don't know how to invest", desc: "I have money but it just sits there", icon: <BarChart3 className="w-6 h-6" />, color: "#27B7C8" },
-                      { value: "debt" as MoneyStruggle, label: "I'm drowning in debt", desc: "Credit cards, loans — it's overwhelming", icon: <Shield className="w-6 h-6" />, color: "#8B5CF6" },
+                      { value: "winning_setups" as TradingExcitement, label: "Finding winning setups", desc: "I want to spot the plays before they run", icon: <Target className="w-6 h-6" />, color: "#49B06E" },
+                      { value: "grow_account" as TradingExcitement, label: "Growing a small account", desc: "Start with a little, build it into a lot", icon: <TrendingUp className="w-6 h-6" />, color: "#27B7C8" },
+                      { value: "learn_strategies" as TradingExcitement, label: "Learning real strategies", desc: "Not theory — actual methods that work", icon: <Brain className="w-6 h-6" />, color: "#8B5CF6" },
+                      { value: "freedom" as TradingExcitement, label: "Financial freedom", desc: "Trade from anywhere, on my own terms", icon: <Rocket className="w-6 h-6" />, color: "#F59E0B" },
                     ]).map((option, i) => {
-                      const isSelected = moneyStruggle === option.value;
+                      const isSelected = tradingExcitement === option.value;
                       return (
                         <div
                           key={option.value}
-                          onClick={() => setMoneyStruggle(option.value)}
+                          onClick={() => setTradingExcitement(option.value)}
                           className={`option-card ${glassCard} ${isSelected ? "selected" : ""}`}
                           style={{
                             background: isSelected ? `linear-gradient(135deg, ${option.color}15, ${option.color}08)` : "rgba(255,255,255,0.03)",
@@ -719,36 +657,88 @@ export default function Onboarding() {
                     })}
                   </div>
 
-                  <button type="button" onClick={() => goToStep("q-situation")} disabled={!moneyStruggle} className="glass-btn flex items-center justify-center gap-2">
+                  <button type="button" onClick={() => goToStep("q-capital")} disabled={!tradingExcitement} className="glass-btn flex items-center justify-center gap-2">
                     Continue <ChevronRight className="w-5 h-5" />
                   </button>
-                  <button type="button" onClick={handleSkip} className="w-full text-center text-sm text-[#F4F7FA]/30 hover:text-[#F4F7FA]/60 transition-colors py-2">Skip for now →</button>
+                  <button type="button" onClick={handleSkip} className="w-full text-center text-sm text-[#F4F7FA]/30 hover:text-[#F4F7FA]/60 transition-colors py-2">Skip for now</button>
                 </div>
               )}
 
-              {/* ═══════════ Q4: HOW MUCH TIME? ═══════════ */}
-              {step === "q-time" && (
+              {/* ═══════════ Q3: TRADING CAPITAL ═══════════ */}
+              {step === "q-capital" && (
+                <div className={`space-y-6 ${animateIn ? "step-animate" : "opacity-0"}`}>
+                  <div className="text-center space-y-3">
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold text-[#8B5CF6]" style={{ background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.15)" }}>
+                      <Wallet className="w-3.5 h-3.5" /> Your starting point
+                    </div>
+                    <h2 className="font-serif text-3xl font-bold text-[#F4F7FA]">How much are you<br />working with?</h2>
+                    <p className="text-[#F4F7FA]/40 text-base">Gap-and-Go works at any account size</p>
+                  </div>
+
+                  <div className="space-y-3">
+                    {([
+                      { value: "under_500" as TradingCapital, label: "Under $500", desc: "Starting small — smart move to learn first", icon: "🌱", color: "#49B06E" },
+                      { value: "500_to_2k" as TradingCapital, label: "$500 – $2,000", desc: "Enough to take real positions", icon: "💰", color: "#27B7C8" },
+                      { value: "2k_to_10k" as TradingCapital, label: "$2,000 – $10,000", desc: "Solid starting capital for day trading", icon: "📈", color: "#8B5CF6" },
+                      { value: "over_10k" as TradingCapital, label: "$10,000+", desc: "Ready to trade with size", icon: "🚀", color: "#F59E0B" },
+                    ]).map((option, i) => {
+                      const isSelected = tradingCapital === option.value;
+                      return (
+                        <div
+                          key={option.value}
+                          onClick={() => setTradingCapital(option.value)}
+                          className={`option-card ${glassCard} ${isSelected ? "selected" : ""}`}
+                          style={{
+                            background: isSelected ? `linear-gradient(135deg, ${option.color}15, ${option.color}08)` : "rgba(255,255,255,0.03)",
+                            borderColor: isSelected ? `${option.color}50` : "rgba(255,255,255,0.06)",
+                            boxShadow: isSelected ? `0 0 25px ${option.color}18, inset 0 1px 0 rgba(255,255,255,0.06)` : "inset 0 1px 0 rgba(255,255,255,0.03)",
+                            padding: "20px",
+                            animation: animateIn ? `cardEntrance 0.5s ease-out ${i * 0.1}s both` : "none",
+                          }}
+                        >
+                          <div className="flex items-center gap-4">
+                            <span className="text-3xl">{option.icon}</span>
+                            <div className="flex-1">
+                              <p className="font-semibold text-lg text-[#F4F7FA]">{option.label}</p>
+                              <p className="text-sm text-[#F4F7FA]/40 mt-0.5">{option.desc}</p>
+                            </div>
+                            <SelectionDot selected={isSelected} />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <button type="button" onClick={() => goToStep("q-style")} disabled={!tradingCapital} className="glass-btn flex items-center justify-center gap-2">
+                    Continue <ChevronRight className="w-5 h-5" />
+                  </button>
+                  <button type="button" onClick={handleSkip} className="w-full text-center text-sm text-[#F4F7FA]/30 hover:text-[#F4F7FA]/60 transition-colors py-2">Skip for now</button>
+                </div>
+              )}
+
+              {/* ═══════════ Q4: TRADING STYLE ═══════════ */}
+              {step === "q-style" && (
                 <div className={`space-y-6 ${animateIn ? "step-animate" : "opacity-0"}`}>
                   <div className="text-center space-y-3">
                     <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold text-[#F59E0B]" style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.15)" }}>
-                      <Clock className="w-3.5 h-3.5" /> Almost done
+                      <Clock className="w-3.5 h-3.5" /> Almost there
                     </div>
-                    <h2 className="font-serif text-3xl font-bold text-[#F4F7FA]">How much time can you<br />learn each day?</h2>
-                    <p className="text-[#F4F7FA]/40 text-base">Even 5 minutes makes a difference</p>
+                    <h2 className="font-serif text-3xl font-bold text-[#F4F7FA]">When do you<br />want to trade?</h2>
+                    <p className="text-[#F4F7FA]/40 text-base">Pansy will time your alerts around this</p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
                     {([
-                      { value: "5min" as DailyTime, label: "5 minutes", desc: "Quick bites", icon: "☕", color: "#49B06E" },
-                      { value: "10min" as DailyTime, label: "10 minutes", desc: "A good pace", icon: "📖", color: "#27B7C8" },
-                      { value: "20min" as DailyTime, label: "20 minutes", desc: "Deep dives", icon: "🧠", color: "#8B5CF6" },
-                      { value: "no_limit" as DailyTime, label: "No limit", desc: "I'll keep going", icon: "🚀", color: "#F59E0B" },
+                      { value: "premarket" as TradingStyle, label: "Pre-market", desc: "4AM–9:30AM scans", icon: "🌅", color: "#F59E0B" },
+                      { value: "first_hour" as TradingStyle, label: "Power hour", desc: "9:30–10:30AM action", icon: "⚡", color: "#49B06E" },
+                      { value: "all_day" as TradingStyle, label: "All day", desc: "I watch the market", icon: "📊", color: "#27B7C8" },
+                      { value: "evenings" as TradingStyle, label: "Evenings", desc: "Research after hours", icon: "🌙", color: "#8B5CF6" },
                     ]).map((option, i) => {
-                      const isSelected = dailyTime === option.value;
+                      const isSelected = tradingStyle === option.value;
                       return (
                         <div
                           key={option.value}
-                          onClick={() => setDailyTime(option.value)}
+                          onClick={() => setTradingStyle(option.value)}
                           className={`option-card ${glassCard} ${isSelected ? "selected" : ""}`}
                           style={{
                             background: isSelected ? `linear-gradient(135deg, ${option.color}15, ${option.color}08)` : "rgba(255,255,255,0.03)",
@@ -777,31 +767,32 @@ export default function Onboarding() {
                     </div>
                   )}
 
-                  <button type="button" onClick={handleCompleteOnboarding} disabled={isSubmitting || !dailyTime} className="glass-btn flex items-center justify-center gap-2">
-                    {isSubmitting ? <><Loader2 className="w-5 h-5 animate-spin" /> Building your journey...</> : <>See My Journey <Sparkles className="w-5 h-5" /></>}
+                  <button type="button" onClick={handleCompleteOnboarding} disabled={isSubmitting || !tradingStyle} className="glass-btn flex items-center justify-center gap-2">
+                    {isSubmitting ? <><Loader2 className="w-5 h-5 animate-spin" /> Calibrating your scanner...</> : <>Launch My Scanner <Sparkles className="w-5 h-5" /></>}
                   </button>
-                  <button type="button" onClick={handleSkip} className="w-full text-center text-sm text-[#F4F7FA]/30 hover:text-[#F4F7FA]/60 transition-colors py-2">Skip for now →</button>
+                  <button type="button" onClick={handleSkip} className="w-full text-center text-sm text-[#F4F7FA]/30 hover:text-[#F4F7FA]/60 transition-colors py-2">Skip for now</button>
                 </div>
               )}
 
-              {/* ═══════════ BUILDING YOUR PLAN ═══════════ */}
+              {/* ═══════════ BUILDING YOUR SCANNER ═══════════ */}
               {step === "building" && (
                 <div className={`space-y-8 ${animateIn ? "step-animate" : "opacity-0"}`}>
                   <div className="text-center space-y-4">
-                    <div className="w-20 h-20 mx-auto rounded-full flex items-center justify-center text-4xl" style={{ background: "linear-gradient(135deg, rgba(39,183,200,0.2), rgba(73,176,110,0.2))", animation: "pulse-glow 3s ease-in-out infinite" }}>
-                      🌸
+                    <div className="w-20 h-20 mx-auto rounded-full flex items-center justify-center text-4xl" style={{ background: "linear-gradient(135deg, rgba(73,176,110,0.2), rgba(39,183,200,0.2))", animation: "pulse-glow 3s ease-in-out infinite" }}>
+                      🔍
                     </div>
-                    <h2 className="font-serif text-3xl font-bold text-[#F4F7FA]">Creating your<br />Bloom plan...</h2>
-                    <p className="text-[#F4F7FA]/40">Personalizing your wealth journey</p>
+                    <h2 className="font-serif text-3xl font-bold text-[#F4F7FA]">Calibrating<br />your scanner...</h2>
+                    <p className="text-[#F4F7FA]/40">Setting up Pansy for your trading style</p>
                   </div>
 
                   <div className={`${glassCard} ${glassCardBg} ${glowBorder} p-6`}>
                     <div className="space-y-5">
                       {[
-                        "Analyzing your financial profile",
-                        "Identifying your key challenges",
-                        "Matching you with the right content",
-                        "Building your personalized roadmap",
+                        "Connecting to live market data",
+                        "Loading Gap-and-Go strategy engine",
+                        "Tuning Pansy to your experience level",
+                        "Setting up your scoring algorithm",
+                        "Scanner ready — let's find some plays",
                       ].map((label, i) => (
                         <div key={i} className="flex items-center gap-3" style={{ opacity: buildingProgress > i ? 1 : 0.3, transition: "all 0.5s ease" }}>
                           <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0" style={{
@@ -818,7 +809,7 @@ export default function Onboarding() {
 
                   <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
                     <div className="h-full rounded-full" style={{
-                      width: `${(buildingProgress / 4) * 100}%`,
+                      width: `${(buildingProgress / 5) * 100}%`,
                       background: "linear-gradient(90deg, #49B06E, #27B7C8)",
                       transition: "width 0.7s ease-out",
                       boxShadow: "0 0 12px rgba(39,183,200,0.4)",
@@ -827,142 +818,79 @@ export default function Onboarding() {
 
                   <div className="text-center pt-2">
                     <p className="text-sm text-[#F4F7FA]/30 italic">
-                      &quot;Women with a financial plan save 3x more than those without one.&quot;
+                      &quot;The best traders don&apos;t predict — they prepare.&quot;
                     </p>
                   </div>
                 </div>
               )}
 
               {/* ═══════════ READY SCREEN ═══════════ */}
-              {step === "ready" && (() => {
-                const path: "side_hustle" | "budgeting" | "investing" =
-                  (financialSituation === "under_100" || moneyStruggle === "earning") ? "side_hustle"
-                  : (moneyStruggle === "spending" || moneyStruggle === "debt") ? "budgeting"
-                  : "investing";
-
-                const identityLabel = {
-                  side_hustle: "The Rising Hustler",
-                  budgeting: "The Money Master",
-                  investing: "The Wealth Builder",
-                };
-
-                const pathConfig = {
-                  side_hustle: {
-                    emoji: "🚀",
-                    title: "Your plan is ready!",
-                    message: "Girl, before we talk investing, let’s build your income first. I’ve got step-by-step guides for dropshipping, TikTok Shop, UGC, and more. Pick one, follow the steps, and watch your money grow.",
-                    cta: "Start My Side Hustle",
-                    route: "/side-hustle",
-                    firstStep: "Pick Your First Side Hustle",
-                    firstStepDesc: "Browse income streams and choose the one that fits your life — no experience needed.",
-                    color: "#49B06E",
-                  },
-                  budgeting: {
-                    emoji: "💰",
-                    title: "Your plan is ready!",
-                    message: "No judgment, love — most people don’t know where their money goes. I set up a Budget Tracker where you can see every dollar. Once you know the truth, you can change it.",
-                    cta: "Start Tracking My Money",
-                    route: "/budget-tracker",
-                    firstStep: "Where Does Your Money Go?",
-                    firstStepDesc: "Add your first expense and see your spending broken down by category — takes 30 seconds.",
-                    color: "#F59E0B",
-                  },
-                  investing: {
-                    emoji: "📈",
-                    title: "Your plan is ready!",
-                    message: "You’ve got savings ready to work for you — let’s learn how. I’ll walk you through investing in plain language, no confusing jargon. Your money deserves to bloom.",
-                    cta: "Start Learning to Invest",
-                    route: "/home",
-                    firstStep: "What Is Investing?",
-                    firstStepDesc: "Start here — we’ll explain investing in plain language, no jargon. Takes about 5 minutes.",
-                    color: "#27B7C8",
-                  },
-                };
-
-                const cfg = pathConfig[path];
-
-                return (
+              {step === "ready" && (
                 <div className={`space-y-6 ${animateIn ? "step-animate" : "opacity-0"}`}>
-                  {/* Identity label */}
                   <div className="text-center space-y-4">
-                    <div className="w-20 h-20 mx-auto rounded-full flex items-center justify-center text-4xl" style={{ background: `linear-gradient(135deg, ${cfg.color}30, ${cfg.color}15)`, animation: "pulse-glow 3s ease-in-out infinite" }}>
-                      {cfg.emoji}
+                    <div className="w-20 h-20 mx-auto rounded-full flex items-center justify-center text-4xl" style={{ background: "linear-gradient(135deg, rgba(73,176,110,0.25), rgba(39,183,200,0.2))", animation: "pulse-glow 3s ease-in-out infinite" }}>
+                      🌸
                     </div>
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider" style={{ background: `${cfg.color}15`, border: `1px solid ${cfg.color}30`, color: cfg.color }}>
-                      <Sparkles className="w-3.5 h-3.5" /> {identityLabel[path]}
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider" style={{ background: "rgba(73,176,110,0.12)", border: "1px solid rgba(73,176,110,0.3)", color: "#49B06E" }}>
+                      <Sparkles className="w-3.5 h-3.5" /> Scanner Ready
                     </div>
-                    <h2 className="font-serif text-3xl font-bold text-[#F4F7FA]">{cfg.title}</h2>
+                    <h2 className="font-serif text-3xl font-bold text-[#F4F7FA]">You&apos;re all set.</h2>
                   </div>
 
-                  {/* Pansy’s personalized message */}
                   <div className={`${glassCard} ${glassCardBg} ${glowBorder} p-5`}>
-                    <div className="absolute inset-0 rounded-3xl" style={{ background: "linear-gradient(135deg, rgba(39,183,200,0.06) 0%, transparent 50%, rgba(73,176,110,0.04) 100%)" }} />
+                    <div className="absolute inset-0 rounded-3xl" style={{ background: "linear-gradient(135deg, rgba(73,176,110,0.06) 0%, transparent 50%, rgba(39,183,200,0.04) 100%)" }} />
                     <div className="relative flex items-start gap-3">
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-xl" style={{ background: "linear-gradient(135deg, rgba(39,183,200,0.2), rgba(73,176,110,0.2))" }}>
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-xl" style={{ background: "linear-gradient(135deg, rgba(73,176,110,0.2), rgba(39,183,200,0.2))" }}>
                         🌺
                       </div>
                       <div className="flex-1 space-y-1">
-                        <p className="font-serif text-sm font-semibold text-[#27B7C8]">Pansy says</p>
-                        <p className="text-sm leading-relaxed text-[#F4F7FA]/60">{cfg.message}</p>
+                        <p className="font-serif text-sm font-semibold text-[#49B06E]">Pansy says</p>
+                        <p className="text-sm leading-relaxed text-[#F4F7FA]/60">
+                          {tradingExperience === "never"
+                            ? "Welcome to the game! I'll walk you through every setup step by step. Start with the paper trader — practice risk-free until you're confident, then go live when YOU'RE ready."
+                            : tradingExperience === "active"
+                            ? "Love that you already trade — my scanner is going to save you hours of manual screening. I score every candidate 0–100 so you can focus on the A+ setups and skip the noise."
+                            : "Great — you've got some context, and that's going to make this click fast. I'll scan the market, score the setups, and show you exactly what to look for. Let's build on what you know."}
+                        </p>
                       </div>
                     </div>
                   </div>
 
-                  {/* Recommended first step */}
-                  <div className={`${glassCard} ${glassCardBg} p-5`}>
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shrink-0" style={{ background: `${cfg.color}20` }}>
-                        {cfg.emoji}
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: cfg.color }}>Your first step</p>
-                        <h3 className="font-serif text-lg font-bold text-[#F4F7FA]">{cfg.firstStep}</h3>
-                        <p className="text-xs text-[#F4F7FA]/40 mt-1">{cfg.firstStepDesc}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Three journeys preview */}
                   <div className={`${glassCard} ${glassCardBg} p-4`}>
-                    <p className="text-xs text-[#F4F7FA]/40 font-semibold uppercase tracking-wider mb-3">Your Bloom journeys</p>
-                    <div className="flex items-center justify-between gap-2">
-                      {([
-                        { label: "Side Hustle", emoji: "🚀", key: "side_hustle" },
-                        { label: "Budgeting", emoji: "💰", key: "budgeting" },
-                        { label: "Investing", emoji: "📈", key: "investing" },
-                      ] as const).map((j) => (
-                        <div key={j.key} className="flex flex-col items-center gap-1.5 flex-1">
-                          <div
-                            className="w-12 h-12 rounded-full flex items-center justify-center text-xl"
-                            style={{
-                              background: j.key === path ? `linear-gradient(135deg, ${cfg.color}30, ${cfg.color}15)` : "rgba(255,255,255,0.04)",
-                              border: j.key === path ? `2px solid ${cfg.color}50` : "1px solid rgba(255,255,255,0.08)",
-                            }}
-                          >
-                            {j.emoji}
+                    <p className="text-xs text-[#F4F7FA]/40 font-semibold uppercase tracking-wider mb-3">What&apos;s waiting for you</p>
+                    <div className="space-y-3">
+                      {[
+                        { emoji: "🔍", label: "Live Scanner", desc: "Gap-and-Go candidates scored 0–100 in real time", color: "#49B06E" },
+                        { emoji: "🌸", label: "Pansy's Picks", desc: "AI analysis with entry, stop, and target for each play", color: "#8B5CF6" },
+                        { emoji: "📊", label: "Paper Trader", desc: "Practice every setup risk-free before going live", color: "#27B7C8" },
+                        { emoji: "📰", label: "Market News", desc: "Catalyst-driven news feed to spot what's moving", color: "#F59E0B" },
+                      ].map((item, i) => (
+                        <div key={i} className="flex items-center gap-3" style={{ animation: animateIn ? `cardEntrance 0.4s ease-out ${i * 0.1}s both` : "none" }}>
+                          <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0" style={{ background: `${item.color}15` }}>
+                            {item.emoji}
                           </div>
-                          <span className={`text-[10px] font-medium ${j.key === path ? "text-[#F4F7FA]" : "text-[#F4F7FA]/30"}`}>{j.label}</span>
-                          {j.key === path && <span className="text-[8px] font-bold uppercase tracking-wider" style={{ color: cfg.color }}>Start here</span>}
+                          <div className="flex-1">
+                            <p className="text-sm font-semibold text-[#F4F7FA]">{item.label}</p>
+                            <p className="text-[11px] text-[#F4F7FA]/40">{item.desc}</p>
+                          </div>
                         </div>
                       ))}
                     </div>
                   </div>
 
-                  {/* Social proof */}
                   <p className="text-center text-xs text-[#F4F7FA]/30">
-                    10,000+ women started their journey with Bloom
+                    7-day free trial &middot; $4.99/mo after &middot; Cancel anytime
                   </p>
 
                   <button
                     type="button"
-                    onClick={() => { window.location.href = cfg.route; }}
+                    onClick={() => { window.location.href = "/signals"; }}
                     className="glass-btn flex items-center justify-center gap-2 text-lg"
                   >
-                    {cfg.cta} <ChevronRight className="w-5 h-5" />
+                    Open My Scanner <ChevronRight className="w-5 h-5" />
                   </button>
                 </div>
-                );
-              })()}
+              )}
 
             </div>
           </div>
