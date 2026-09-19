@@ -17,18 +17,18 @@ import {
 } from "lucide-react";
 
 const C = {
-  navy: "#0E1B30",
-  navyLight: "#162540",
+  navy: "#07080C",
+  navyLight: "#121821",
   navyCard: "#1A2D4A",
   teal: "#27B7C8",
   tealDim: "rgba(39, 183, 200, 0.15)",
   emerald: "#49B06E",
   emeraldDim: "rgba(73, 176, 110, 0.15)",
-  ivory: "#F4F7FA",
+  ivory: "#F3EDE3",
   ivoryDim: "rgba(244, 247, 250, 0.7)",
   red: "#E5484D",
   redDim: "rgba(229, 72, 77, 0.12)",
-  textPrimary: "#F4F7FA",
+  textPrimary: "#F3EDE3",
   textSecondary: "rgba(244, 247, 250, 0.6)",
   textMuted: "rgba(244, 247, 250, 0.35)",
   border: "rgba(39, 183, 200, 0.15)",

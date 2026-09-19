@@ -108,7 +108,7 @@ export default function AskPansyPage() {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 space-y-4 overflow-y-auto rounded-2xl border border-border bg-[#0E1B30] p-4">
+        <div className="flex-1 space-y-4 overflow-y-auto rounded-2xl border border-border bg-[#07080C] p-4">
           {messages.length === 0 && !isLoading ? (
             <div className="space-y-4">
               <div className="flex items-start gap-3">

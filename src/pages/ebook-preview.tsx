@@ -1,11 +1,11 @@
 import Head from "next/head";
 
 const C = {
-  deep: "#0E1B30",
+  deep: "#07080C",
   surface: "#16264A",
   teal: "#27B7C8",
   green: "#49B06E",
-  ivory: "#F4F7FA",
+  ivory: "#F3EDE3",
 };
 
 export default function EbookPreview() {
@@ -22,7 +22,7 @@ export default function EbookPreview() {
         `}</style>
       </Head>
 
-      <div id="ebook-content" style={{ fontFamily: "'DM Sans', sans-serif", color: "#1e293b" }}>
+      <div id="ebook-content" style={{ fontFamily: "'Inter', sans-serif", color: "#1e293b" }}>
 
         {/* COVER */}
         <div style={{ background: `linear-gradient(135deg, ${C.deep}, ${C.surface})`, color: C.ivory, padding: "80px 48px", minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center" }}>

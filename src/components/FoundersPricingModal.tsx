@@ -112,7 +112,7 @@ export function FoundersPricingModal() {
             exit={{ y: 100, opacity: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
             className="w-full max-w-md mx-4 mb-4 sm:mb-0 rounded-3xl overflow-hidden"
-            style={{ background: "linear-gradient(180deg, #0E1B30, #162540)" }}
+            style={{ background: "linear-gradient(180deg, #0C1016, #121821)" }}
           >
             {/* Header */}
             <div className="relative px-6 pt-6 pb-3">
@@ -125,12 +125,12 @@ export function FoundersPricingModal() {
                 className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center z-10"
                 style={{ background: "rgba(255,255,255,0.08)" }}
               >
-                <X className="w-4 h-4 text-[#F4F7FA]/50" />
+                <X className="w-4 h-4 text-[#F3EDE3]/50" />
               </button>
 
               <div className="relative text-center">
-                <h2 className="text-xl font-bold text-[#F4F7FA] mb-1">Unlock Radar Core</h2>
-                <p className="text-xs text-[#F4F7FA]/50">Founders pricing — lock it in before it&apos;s gone</p>
+                <h2 className="text-xl font-bold text-[#F3EDE3] mb-1">Unlock Radar Core</h2>
+                <p className="text-xs text-[#F3EDE3]/50">Founders pricing — lock it in before it&apos;s gone</p>
               </div>
             </div>
 
@@ -143,7 +143,7 @@ export function FoundersPricingModal() {
               ].map((f) => (
                 <div key={f} className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-[#27B7C8] flex-shrink-0" />
-                  <span className="text-[13px] text-[#F4F7FA]/80">{f}</span>
+                  <span className="text-[13px] text-[#F3EDE3]/80">{f}</span>
                 </div>
               ))}
             </div>
@@ -166,7 +166,7 @@ export function FoundersPricingModal() {
                     {plan.badge && (
                       <div
                         className="absolute -top-2 left-3 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider"
-                        style={{ background: "#27B7C8", color: "#0E1B30" }}
+                        style={{ background: "#27B7C8", color: "#07080C" }}
                       >
                         {plan.badge}
                       </div>
@@ -181,16 +181,16 @@ export function FoundersPricingModal() {
                         )}
                       </div>
                       <div className="text-left">
-                        <span className="text-sm font-semibold text-[#F4F7FA]">{plan.label}</span>
-                        {plan.note && <div className="text-[10px] text-[#F4F7FA]/35">{plan.note}</div>}
+                        <span className="text-sm font-semibold text-[#F3EDE3]">{plan.label}</span>
+                        {plan.note && <div className="text-[10px] text-[#F3EDE3]/35">{plan.note}</div>}
                       </div>
                     </div>
                     <div className="text-right">
                       <div className="flex items-baseline gap-0.5">
                         <span className="text-lg font-bold text-[#27B7C8]">{plan.price}</span>
-                        <span className="text-[11px] text-[#F4F7FA]/30">{plan.period}</span>
+                        <span className="text-[11px] text-[#F3EDE3]/30">{plan.period}</span>
                       </div>
-                      <span className="text-[10px] text-[#F4F7FA]/25 line-through">${plan.regular}</span>
+                      <span className="text-[10px] text-[#F3EDE3]/25 line-through">${plan.regular}</span>
                     </div>
                   </motion.button>
                 );
@@ -220,8 +220,8 @@ export function FoundersPricingModal() {
                   { value: countdown.seconds, label: "s" },
                 ].map(({ value, label }, i) => (
                   <span key={i} className="flex items-baseline gap-0.5">
-                    <span className="text-sm font-bold text-[#F4F7FA] tabular-nums w-5 text-center">{String(value).padStart(2, "0")}</span>
-                    <span className="text-[10px] text-[#F4F7FA]/30">{label}</span>
+                    <span className="text-sm font-bold text-[#F3EDE3] tabular-nums w-5 text-center">{String(value).padStart(2, "0")}</span>
+                    <span className="text-[10px] text-[#F3EDE3]/30">{label}</span>
                   </span>
                 ))}
               </div>
@@ -233,13 +233,13 @@ export function FoundersPricingModal() {
                 whileTap={{ scale: 0.96 }}
                 onClick={goToSubscription}
                 className="w-full py-3.5 rounded-xl text-sm font-bold transition-colors"
-                style={{ background: "linear-gradient(135deg, #27B7C8, #49B06E)", color: "#0E1B30" }}
+                style={{ background: "linear-gradient(135deg, #27B7C8, #49B06E)", color: "#07080C" }}
               >
                 Subscribe to Radar Core
               </motion.button>
               <button
                 onClick={dismiss}
-                className="w-full py-2 text-xs text-[#F4F7FA]/30 hover:text-[#F4F7FA]/50 transition-colors"
+                className="w-full py-2 text-xs text-[#F3EDE3]/30 hover:text-[#F3EDE3]/50 transition-colors"
               >
                 Maybe later
               </button>
@@ -247,7 +247,7 @@ export function FoundersPricingModal() {
 
             {/* Fine print */}
             <div className="px-6 pb-5">
-              <p className="text-[9px] text-center text-[#F4F7FA]/20 leading-relaxed">
+              <p className="text-[9px] text-center text-[#F3EDE3]/20 leading-relaxed">
                 Educational decision support only. Not financial advice. Works on web + Android. Cancel before renewal to avoid charges.
               </p>
             </div>

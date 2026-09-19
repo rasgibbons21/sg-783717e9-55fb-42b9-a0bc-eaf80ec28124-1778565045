@@ -10,12 +10,12 @@ import { QRCodeSVG } from "qrcode.react";
 
 /* ─── Palette ─────────────────────────────────────────────────────────────── */
 const C = {
-  deep:    "#0E1B30",
+  deep:    "#07080C",
   surface: "#16264A",
   brand:   "#1E2C6B",
   teal:    "#27B7C8",
   green:   "#49B06E",
-  ivory:   "#F4F7FA",
+  ivory:   "#F3EDE3",
   red:     "#E05A6A",
 };
 
@@ -204,7 +204,7 @@ export default function LandingPage() {
         }}
       />
 
-      <div style={{ fontFamily: "'DM Sans', sans-serif", background: C.deep, color: C.ivory, minHeight: "100vh" }}>
+      <div style={{ fontFamily: "'Inter', sans-serif", background: C.deep, color: C.ivory, minHeight: "100vh" }}>
 
         {/* ── NAVIGATION ──────────────────────────────────────────────────── */}
         <nav style={{ position:"sticky", top:0, zIndex:50, background:"rgba(14,27,48,0.92)", backdropFilter:"blur(18px)", WebkitBackdropFilter:"blur(18px)", borderBottom:"1px solid rgba(255,255,255,0.05)" }}>
@@ -483,7 +483,7 @@ export default function LandingPage() {
             <div className="flex flex-col md:flex-row md:items-start gap-8 md:gap-12 mb-8">
               <div className="flex-1 space-y-2">
                 <div className="flex items-center gap-2">
-                  <Image src="/bloom-logo.png" alt="Radar" width={24} height={24} className="rounded-full bg-[#F4F7FA]" />
+                  <Image src="/bloom-logo.png" alt="Radar" width={24} height={24} className="rounded-full bg-[#F3EDE3]" />
                   <p className="text-sm font-semibold" style={{ color:"rgba(244,247,250,0.60)" }}>Bloom Radar</p>
                 </div>
                 <p className="text-xs" style={{ color:"rgba(244,247,250,0.35)" }}>Invest in yourself first 🌸</p>

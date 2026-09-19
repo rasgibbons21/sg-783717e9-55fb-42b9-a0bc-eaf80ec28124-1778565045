@@ -82,7 +82,7 @@ export default function ModulePage({ moduleSlug, requiresClientAuth }: Props) {
   if (isVerifying) {
     return (
       <Layout>
-        <div className="min-h-screen flex items-center justify-center bg-[#0E1B30]">
+        <div className="min-h-screen flex items-center justify-center bg-[#07080C]">
           <div className="w-12 h-12 border-4 border-[#27B7C8] border-t-transparent rounded-full animate-spin" />
         </div>
       </Layout>
@@ -98,7 +98,7 @@ export default function ModulePage({ moduleSlug, requiresClientAuth }: Props) {
     <Layout>
       <SEO title={`${mod.title} — Bloom University`} description={mod.subtitle} />
 
-      <div className="bg-[#0E1B30] min-h-screen">
+      <div className="bg-[#07080C] min-h-screen">
         {/* Header */}
         <div className="border-b border-white/10 bg-[#0F1E33]">
           <div className="max-w-3xl mx-auto px-4 py-8">
@@ -110,14 +110,14 @@ export default function ModulePage({ moduleSlug, requiresClientAuth }: Props) {
               <span className="text-4xl">{mod.icon}</span>
               <div className="flex-1">
                 <div className="text-xs text-[#27B7C8] font-medium mb-1">Module {mod.number} · {mod.difficulty}</div>
-                <h1 className="text-2xl font-serif font-bold text-[#F4F7FA] mb-2">{mod.title}</h1>
-                <p className="text-[#F4F7FA]/60 text-sm leading-relaxed">{mod.subtitle}</p>
+                <h1 className="text-2xl font-serif font-bold text-[#F3EDE3] mb-2">{mod.title}</h1>
+                <p className="text-[#F3EDE3]/60 text-sm leading-relaxed">{mod.subtitle}</p>
               </div>
             </div>
 
             {/* Progress */}
             <div className="mt-6">
-              <div className="flex justify-between text-xs text-[#F4F7FA]/50 mb-1.5">
+              <div className="flex justify-between text-xs text-[#F3EDE3]/50 mb-1.5">
                 <span>{completedCount} of {lessons.length} lessons complete</span>
                 <span>{pct}%</span>
               </div>
@@ -159,21 +159,21 @@ export default function ModulePage({ moduleSlug, requiresClientAuth }: Props) {
                   <div className={`flex items-center gap-4 p-4 rounded-xl border transition-all cursor-pointer ${
                     done
                       ? "border-[#49B06E]/30 bg-[#49B06E]/5 hover:border-[#49B06E]/50"
-                      : "border-white/10 bg-[#162540] hover:border-[#27B7C8]/40"
+                      : "border-white/10 bg-[#121821] hover:border-[#27B7C8]/40"
                   }`}>
                     {/* Number / check */}
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${
-                      done ? "bg-[#49B06E] text-white" : "bg-white/10 text-[#F4F7FA]/60"
+                      done ? "bg-[#49B06E] text-white" : "bg-white/10 text-[#F3EDE3]/60"
                     }`}>
                       {done ? <CheckCircle className="w-4 h-4" /> : idx + 1}
                     </div>
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <h3 className="text-[#F4F7FA] font-medium text-sm">{lesson.title}</h3>
+                        <h3 className="text-[#F3EDE3] font-medium text-sm">{lesson.title}</h3>
                         {bookmarked && <Bookmark className="w-3 h-3 text-[#27B7C8] flex-shrink-0" />}
                       </div>
-                      <p className="text-[#F4F7FA]/40 text-xs mt-0.5 truncate">{lesson.subtitle}</p>
+                      <p className="text-[#F3EDE3]/40 text-xs mt-0.5 truncate">{lesson.subtitle}</p>
                     </div>
 
                     <div className="flex items-center gap-3 flex-shrink-0">
@@ -184,7 +184,7 @@ export default function ModulePage({ moduleSlug, requiresClientAuth }: Props) {
                       }`}>
                         {lesson.difficulty}
                       </span>
-                      <span className="text-xs text-[#F4F7FA]/30 flex items-center gap-1">
+                      <span className="text-xs text-[#F3EDE3]/30 flex items-center gap-1">
                         <Clock className="w-3 h-3" />
                         {lesson.readingMinutes}m
                       </span>
@@ -198,8 +198,8 @@ export default function ModulePage({ moduleSlug, requiresClientAuth }: Props) {
           {completedCount === lessons.length && lessons.length > 0 && (
             <div className="mt-8 p-6 rounded-2xl border border-[#49B06E]/30 bg-[#49B06E]/5 text-center">
               <div className="text-3xl mb-2">🎉</div>
-              <h3 className="text-[#F4F7FA] font-semibold mb-1">Module Complete!</h3>
-              <p className="text-[#F4F7FA]/60 text-sm">
+              <h3 className="text-[#F3EDE3] font-semibold mb-1">Module Complete!</h3>
+              <p className="text-[#F3EDE3]/60 text-sm">
                 {mod.badgeName} badge earned. You&apos;ve worked through all {lessons.length} lessons in {mod.title}.
               </p>
             </div>

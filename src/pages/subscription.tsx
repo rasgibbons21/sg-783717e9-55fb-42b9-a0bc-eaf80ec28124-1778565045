@@ -311,7 +311,7 @@ export default function Subscription() {
             {/* Lifetime Plan */}
             <Card className="p-6 border border-border relative overflow-hidden">
               <div className="absolute top-0 right-0 px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-bl-lg"
-                style={{ background: "linear-gradient(135deg, #27B7C8, #49B06E)", color: "#0E1B30" }}>
+                style={{ background: "linear-gradient(135deg, #27B7C8, #49B06E)", color: "#07080C" }}>
                 Best Value
               </div>
               <div className="space-y-4">
@@ -341,7 +341,7 @@ export default function Subscription() {
                   <div className="pt-2">
                     {user ? (
                       <Button
-                        className="w-full text-[#0E1B30] font-bold"
+                        className="w-full text-[#07080C] font-bold"
                         style={{ background: "linear-gradient(135deg, #27B7C8, #49B06E)" }}
                         onClick={() => handleSubscribe("lifetime")}
                         disabled={isProcessing}
@@ -354,7 +354,7 @@ export default function Subscription() {
                       </Button>
                     ) : (
                       <Button
-                        className="w-full text-[#0E1B30] font-bold"
+                        className="w-full text-[#07080C] font-bold"
                         style={{ background: "linear-gradient(135deg, #27B7C8, #49B06E)" }}
                         onClick={() => router.push("/onboarding")}
                       >
@@ -393,7 +393,7 @@ export default function Subscription() {
                 value="https://shebloomswealth.app"
                 size={120}
                 level="M"
-                fgColor="#0E1B30"
+                fgColor="#07080C"
                 bgColor="white"
                 imageSettings={{
                   src: "/bloom-logo.png",

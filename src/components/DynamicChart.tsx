@@ -13,7 +13,7 @@ interface Props {
 // Never SSR — lightweight-charts touches DOM at module evaluation time
 const Chart = dynamic<Props>(
   () => import("./CandlestickChart").then(m => m.CandlestickChart),
-  { ssr: false, loading: () => <div className="h-[280px] bg-[#0E1B30] rounded-lg animate-pulse" /> }
+  { ssr: false, loading: () => <div className="h-[280px] bg-[#07080C] rounded-lg animate-pulse" /> }
 );
 
 export default Chart;

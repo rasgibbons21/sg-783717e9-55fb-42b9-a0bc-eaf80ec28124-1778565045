@@ -32,7 +32,7 @@ interface Props {
   height?: number;
 }
 
-const CHART_BG = "#0E1B30";
+const CHART_BG = "#07080C";
 const SURFACE = "#16264A";
 const GRID = "rgba(39,183,200,0.08)";
 const TEXT = "rgba(244,247,250,0.4)";

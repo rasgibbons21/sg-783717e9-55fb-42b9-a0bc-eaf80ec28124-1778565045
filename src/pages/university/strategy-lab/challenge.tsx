@@ -153,7 +153,7 @@ export default function ChallengePage({ requiresClientAuth }: Props) {
   if (isVerifying) {
     return (
       <Layout>
-        <div className="min-h-screen flex items-center justify-center bg-[#0E1B30]">
+        <div className="min-h-screen flex items-center justify-center bg-[#07080C]">
           <div className="w-12 h-12 border-4 border-[#27B7C8] border-t-transparent rounded-full animate-spin mx-auto" />
         </div>
       </Layout>
@@ -171,7 +171,7 @@ export default function ChallengePage({ requiresClientAuth }: Props) {
     <Layout>
       <SEO title="Strategy Challenge — Bloom Strategy Lab" description="Test your strategy knowledge with the final 10-chart challenge." />
 
-      <div className="bg-[#0E1B30] min-h-screen">
+      <div className="bg-[#07080C] min-h-screen">
         <div className="max-w-3xl mx-auto px-4 py-6">
           <Link href="/university/strategy-lab" className="inline-flex items-center gap-1.5 text-xs text-[#27B7C8] hover:text-[#27B7C8]/80 mb-6">
             <ArrowLeft className="w-3 h-3" />
@@ -182,8 +182,8 @@ export default function ChallengePage({ requiresClientAuth }: Props) {
             /* Pre-challenge screen */
             <div className="text-center py-12">
               <Trophy className="w-16 h-16 text-[#FFD700] mx-auto mb-4" />
-              <h1 className="text-3xl font-serif font-bold text-[#F4F7FA] mb-3">Final Strategy Challenge</h1>
-              <p className="text-sm text-[#F4F7FA]/50 max-w-md mx-auto mb-6">
+              <h1 className="text-3xl font-serif font-bold text-[#F3EDE3] mb-3">Final Strategy Challenge</h1>
+              <p className="text-sm text-[#F3EDE3]/50 max-w-md mx-auto mb-6">
                 {TOTAL_CHARTS} charts. Each one asks you to identify the setup — or recognize there isn't one.
                 "No valid setup" is frequently the correct answer.
               </p>
@@ -198,7 +198,7 @@ export default function ChallengePage({ requiresClientAuth }: Props) {
                 ].map(({ icon: Icon, label }) => (
                   <div key={label} className="bg-white/5 rounded-lg p-2 text-center">
                     <Icon className="w-4 h-4 text-[#27B7C8] mx-auto mb-1" />
-                    <p className="text-[8px] text-[#F4F7FA]/30">{label}</p>
+                    <p className="text-[8px] text-[#F3EDE3]/30">{label}</p>
                   </div>
                 ))}
               </div>
@@ -213,13 +213,13 @@ export default function ChallengePage({ requiresClientAuth }: Props) {
               {/* Past scores */}
               {pastScores.length > 0 && (
                 <div className="mt-8">
-                  <p className="text-xs text-[#F4F7FA]/30 mb-2">Previous Attempts</p>
+                  <p className="text-xs text-[#F3EDE3]/30 mb-2">Previous Attempts</p>
                   <div className="flex gap-2 justify-center">
                     {pastScores.slice(0, 5).map((s, i) => (
                       <div key={i} className={`px-3 py-1.5 rounded-lg text-xs ${
                         s.total_score >= 80 ? "bg-[#49B06E]/10 text-[#49B06E]" :
                         s.total_score >= 60 ? "bg-[#27B7C8]/10 text-[#27B7C8]" :
-                        "bg-white/5 text-[#F4F7FA]/40"
+                        "bg-white/5 text-[#F3EDE3]/40"
                       }`}>
                         {s.total_score}%
                       </div>
@@ -228,7 +228,7 @@ export default function ChallengePage({ requiresClientAuth }: Props) {
                 </div>
               )}
 
-              <p className="mt-8 text-[9px] text-[#F4F7FA]/20 max-w-sm mx-auto">
+              <p className="mt-8 text-[9px] text-[#F3EDE3]/20 max-w-sm mx-auto">
                 All charts use hypothetical educational data. This is a learning exercise, not financial advice.
               </p>
             </div>
@@ -236,10 +236,10 @@ export default function ChallengePage({ requiresClientAuth }: Props) {
             /* Active challenge */
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-[#F4F7FA]">
+                <h2 className="text-lg font-semibold text-[#F3EDE3]">
                   Chart {currentChart + 1} of {TOTAL_CHARTS}
                 </h2>
-                <span className="text-xs text-[#F4F7FA]/30">
+                <span className="text-xs text-[#F3EDE3]/30">
                   {answers.filter((a) => a !== null).length} answered
                 </span>
               </div>
@@ -259,7 +259,7 @@ export default function ChallengePage({ requiresClientAuth }: Props) {
               </div>
 
               {/* Chart */}
-              <div className="bg-[#162540] rounded-xl border border-white/5 p-2 mb-4">
+              <div className="bg-[#121821] rounded-xl border border-white/5 p-2 mb-4">
                 {CHALLENGE_QUESTIONS[currentChart] && (
                   <DynamicChart data={CHALLENGE_QUESTIONS[currentChart].chartData} height={240} />
                 )}
@@ -273,7 +273,7 @@ export default function ChallengePage({ requiresClientAuth }: Props) {
               </div>
 
               {/* Options */}
-              <p className="text-sm font-medium text-[#F4F7FA] mb-3">What setup do you see?</p>
+              <p className="text-sm font-medium text-[#F3EDE3] mb-3">What setup do you see?</p>
               <div className="space-y-2 mb-4">
                 {OPTIONS.map((opt, i) => (
                   <button
@@ -285,8 +285,8 @@ export default function ChallengePage({ requiresClientAuth }: Props) {
                     }}
                     className={`w-full text-left px-4 py-3 rounded-lg border text-sm transition-all ${
                       answers[currentChart] === i
-                        ? "border-[#27B7C8]/50 bg-[#27B7C8]/10 text-[#F4F7FA]"
-                        : "border-white/10 text-[#F4F7FA]/60 hover:border-white/20"
+                        ? "border-[#27B7C8]/50 bg-[#27B7C8]/10 text-[#F3EDE3]"
+                        : "border-white/10 text-[#F3EDE3]/60 hover:border-white/20"
                     }`}
                   >
                     {opt}
@@ -325,13 +325,13 @@ export default function ChallengePage({ requiresClientAuth }: Props) {
           ) : (
             /* Results */
             <div className="text-center py-8">
-              <Trophy className={`w-16 h-16 mx-auto mb-4 ${scorePct >= 80 ? "text-[#FFD700]" : scorePct >= 60 ? "text-[#27B7C8]" : "text-[#F4F7FA]/30"}`} />
-              <h2 className="text-3xl font-bold text-[#F4F7FA] mb-1">{scorePct}%</h2>
-              <p className="text-sm text-[#F4F7FA]/50 mb-6">
+              <Trophy className={`w-16 h-16 mx-auto mb-4 ${scorePct >= 80 ? "text-[#FFD700]" : scorePct >= 60 ? "text-[#27B7C8]" : "text-[#F3EDE3]/30"}`} />
+              <h2 className="text-3xl font-bold text-[#F3EDE3] mb-1">{scorePct}%</h2>
+              <p className="text-sm text-[#F3EDE3]/50 mb-6">
                 {totalCorrect}/{TOTAL_CHARTS} correct
               </p>
 
-              <p className="text-sm text-[#F4F7FA]/60 mb-8">
+              <p className="text-sm text-[#F3EDE3]/60 mb-8">
                 {scorePct >= 80 ? "Outstanding! You have a strong grasp of chart reading and strategy identification." :
                  scorePct >= 60 ? "Good work! You're developing solid pattern recognition skills." :
                  "Keep studying! Review the strategies and practice more chart exercises."}
@@ -339,7 +339,7 @@ export default function ChallengePage({ requiresClientAuth }: Props) {
 
               {/* Chart-by-chart review */}
               <div className="text-left space-y-3 max-w-lg mx-auto mb-8">
-                <h3 className="text-sm font-semibold text-[#F4F7FA]">Review</h3>
+                <h3 className="text-sm font-semibold text-[#F3EDE3]">Review</h3>
                 {answers.map((a, i) => {
                   const correct = CHALLENGE_QUESTIONS[i]?.correctOption ?? 3;
                   const isCorrect = a === correct;
@@ -352,8 +352,8 @@ export default function ChallengePage({ requiresClientAuth }: Props) {
                       ) : (
                         <XCircle className="w-4 h-4 text-red-400 shrink-0" />
                       )}
-                      <div className="text-xs text-[#F4F7FA]/60">
-                        <span className="text-[#F4F7FA]/80">Chart {i + 1}:</span>{" "}
+                      <div className="text-xs text-[#F3EDE3]/60">
+                        <span className="text-[#F3EDE3]/80">Chart {i + 1}:</span>{" "}
                         {isCorrect ? OPTIONS[correct] : (
                           <>
                             You said "{OPTIONS[a ?? 0]}" — correct answer: "{OPTIONS[correct]}"
@@ -374,7 +374,7 @@ export default function ChallengePage({ requiresClientAuth }: Props) {
                     setAnswers(new Array(TOTAL_CHARTS).fill(null));
                     loadScores();
                   }}
-                  className="px-6 py-2.5 bg-white/5 border border-white/10 text-[#F4F7FA]/60 rounded-xl text-sm hover:bg-white/10 transition-colors"
+                  className="px-6 py-2.5 bg-white/5 border border-white/10 text-[#F3EDE3]/60 rounded-xl text-sm hover:bg-white/10 transition-colors"
                 >
                   Try Again
                 </button>
@@ -386,7 +386,7 @@ export default function ChallengePage({ requiresClientAuth }: Props) {
                 </Link>
               </div>
 
-              <p className="mt-8 text-[9px] text-[#F4F7FA]/20">
+              <p className="mt-8 text-[9px] text-[#F3EDE3]/20">
                 All charts used hypothetical data. Performance on this challenge does not predict real trading results.
               </p>
             </div>

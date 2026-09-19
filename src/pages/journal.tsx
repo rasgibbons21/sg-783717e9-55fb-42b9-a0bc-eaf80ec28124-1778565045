@@ -83,7 +83,7 @@ function fmtDuration(minutes: number | null) {
 }
 
 function gradeStyle(g: string | null) {
-  if (!g) return "text-[#F4F7FA]/30 bg-[#16264A] border-[#27B7C8]/10";
+  if (!g) return "text-[#F3EDE3]/30 bg-[#16264A] border-[#27B7C8]/10";
   if (g === "A") return "text-[#49B06E] bg-[#49B06E]/10 border-[#49B06E]/30";
   if (g === "B") return "text-[#27B7C8] bg-[#27B7C8]/10 border-[#27B7C8]/30";
   if (g === "C") return "text-yellow-400 bg-yellow-400/10 border-yellow-400/30";
@@ -97,10 +97,10 @@ function ScoreBar({ label, score }: { label: string; score: number | null }) {
   return (
     <div>
       <div className="flex justify-between mb-0.5">
-        <span className="text-[9px] text-[#F4F7FA]/40 uppercase tracking-wide">{label}</span>
-        <span className="text-[9px] font-mono text-[#F4F7FA]/50">{score}</span>
+        <span className="text-[9px] text-[#F3EDE3]/40 uppercase tracking-wide">{label}</span>
+        <span className="text-[9px] font-mono text-[#F3EDE3]/50">{score}</span>
       </div>
-      <div className="h-1 rounded-full bg-[#0E1B30] overflow-hidden">
+      <div className="h-1 rounded-full bg-[#07080C] overflow-hidden">
         <div className={`h-full rounded-full ${color}`} style={{ width: `${score}%` }} />
       </div>
     </div>
@@ -124,10 +124,10 @@ function EditableField({ label, value, onSave }: {
   if (editing) {
     return (
       <div>
-        <label className="text-[9px] text-[#F4F7FA]/30 uppercase tracking-wide block mb-0.5">{label}</label>
+        <label className="text-[9px] text-[#F3EDE3]/30 uppercase tracking-wide block mb-0.5">{label}</label>
         <div className="flex gap-1">
           <textarea
-            className="flex-1 text-xs bg-[#0E1B30] border border-[#27B7C8]/30 rounded-lg px-2 py-1.5 text-[#F4F7FA] resize-none focus:outline-none focus:border-[#27B7C8]"
+            className="flex-1 text-xs bg-[#07080C] border border-[#27B7C8]/30 rounded-lg px-2 py-1.5 text-[#F3EDE3] resize-none focus:outline-none focus:border-[#27B7C8]"
             rows={2}
             value={val}
             onChange={e => setVal(e.target.value)}
@@ -150,8 +150,8 @@ function EditableField({ label, value, onSave }: {
 
   return (
     <button onClick={() => setEditing(true)} className="text-left w-full group">
-      <p className="text-[9px] text-[#F4F7FA]/30 uppercase tracking-wide mb-0.5">{label}</p>
-      <p className={`text-xs leading-relaxed ${value ? "text-[#F4F7FA]/65" : "text-[#F4F7FA]/20 italic"} group-hover:text-[#27B7C8]/70 transition-colors`}>
+      <p className="text-[9px] text-[#F3EDE3]/30 uppercase tracking-wide mb-0.5">{label}</p>
+      <p className={`text-xs leading-relaxed ${value ? "text-[#F3EDE3]/65" : "text-[#F3EDE3]/20 italic"} group-hover:text-[#27B7C8]/70 transition-colors`}>
         {value || `Add ${label.toLowerCase()}…`}
       </p>
     </button>
@@ -192,16 +192,16 @@ function EntryCard({ entry, onUpdate }: { entry: JournalEntry; onUpdate: (update
         {/* Ticker + direction */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className="font-mono font-bold text-[#F4F7FA] text-sm">{entry.ticker}</span>
+            <span className="font-mono font-bold text-[#F3EDE3] text-sm">{entry.ticker}</span>
             {entry.direction && (
               <span className={`text-[10px] px-1.5 py-0.5 rounded font-semibold flex items-center gap-0.5 ${entry.direction === "long" ? "bg-[#49B06E]/15 text-[#49B06E]" : "bg-[#ef4444]/15 text-[#ef4444]"}`}>
                 {entry.direction === "long" ? <TrendingUp className="w-2.5 h-2.5" /> : <TrendingDown className="w-2.5 h-2.5" />}
                 {entry.direction.toUpperCase()}
               </span>
             )}
-            <span className="text-[10px] text-[#F4F7FA]/30">{closedDate}</span>
+            <span className="text-[10px] text-[#F3EDE3]/30">{closedDate}</span>
           </div>
-          <p className="text-[10px] text-[#F4F7FA]/40 mt-0.5">
+          <p className="text-[10px] text-[#F3EDE3]/40 mt-0.5">
             {fmtDuration(entry.duration_minutes)} · Entry {fmt(entry.entry_price)} · Exit {fmt(entry.exit_price)}
           </p>
         </div>
@@ -211,7 +211,7 @@ function EntryCard({ entry, onUpdate }: { entry: JournalEntry; onUpdate: (update
           {win ? "+" : ""}{fmt(entry.pnl)}
         </span>
 
-        {expanded ? <ChevronUp className="w-4 h-4 text-[#F4F7FA]/30 flex-shrink-0" /> : <ChevronDown className="w-4 h-4 text-[#F4F7FA]/30 flex-shrink-0" />}
+        {expanded ? <ChevronUp className="w-4 h-4 text-[#F3EDE3]/30 flex-shrink-0" /> : <ChevronDown className="w-4 h-4 text-[#F3EDE3]/30 flex-shrink-0" />}
       </button>
 
       {expanded && (
@@ -236,9 +236,9 @@ function EntryCard({ entry, onUpdate }: { entry: JournalEntry; onUpdate: (update
                 { label: "Did you follow your plan?", text: entry.followed_plan, color: "text-[#27B7C8]" },
                 { label: "Remember next time", text: entry.remember_next, color: "text-yellow-400" },
               ].map(({ label, text, color }) => text && (
-                <div key={label} className="rounded-lg bg-[#0E1B30] px-3 py-2.5">
+                <div key={label} className="rounded-lg bg-[#07080C] px-3 py-2.5">
                   <p className={`text-[9px] uppercase tracking-wide font-semibold mb-1 ${color}`}>{label}</p>
-                  <p className="text-xs text-[#F4F7FA]/70 leading-relaxed">{text}</p>
+                  <p className="text-xs text-[#F3EDE3]/70 leading-relaxed">{text}</p>
                 </div>
               ))}
             </div>
@@ -251,9 +251,9 @@ function EntryCard({ entry, onUpdate }: { entry: JournalEntry; onUpdate: (update
               ["Target", entry.target_price != null ? fmt(entry.target_price) : "—"],
               ["Risk", entry.risk_amount != null ? fmt(entry.risk_amount) : "—"],
             ].map(([l, v]) => (
-              <div key={l} className="bg-[#0E1B30] px-2 py-2 text-center">
-                <p className="text-[9px] text-[#F4F7FA]/30 uppercase tracking-wide">{l}</p>
-                <p className="font-mono text-xs text-[#F4F7FA]/70 mt-0.5">{v}</p>
+              <div key={l} className="bg-[#07080C] px-2 py-2 text-center">
+                <p className="text-[9px] text-[#F3EDE3]/30 uppercase tracking-wide">{l}</p>
+                <p className="font-mono text-xs text-[#F3EDE3]/70 mt-0.5">{v}</p>
               </div>
             ))}
           </div>
@@ -261,14 +261,14 @@ function EntryCard({ entry, onUpdate }: { entry: JournalEntry; onUpdate: (update
           {/* Thesis */}
           {entry.thesis && (
             <div className="mx-4 mb-3">
-              <p className="text-[9px] text-[#F4F7FA]/30 uppercase tracking-wide mb-1">Pre-trade plan</p>
-              <p className="text-xs text-[#F4F7FA]/50 leading-relaxed whitespace-pre-wrap line-clamp-4">{entry.thesis}</p>
+              <p className="text-[9px] text-[#F3EDE3]/30 uppercase tracking-wide mb-1">Pre-trade plan</p>
+              <p className="text-xs text-[#F3EDE3]/50 leading-relaxed whitespace-pre-wrap line-clamp-4">{entry.thesis}</p>
             </div>
           )}
 
           {/* User-editable fields */}
-          <div className="mx-4 mb-4 rounded-lg bg-[#0E1B30] border border-[#27B7C8]/10 p-3 space-y-3">
-            <p className="text-[9px] text-[#F4F7FA]/30 uppercase tracking-wide font-semibold">Your notes (tap to edit)</p>
+          <div className="mx-4 mb-4 rounded-lg bg-[#07080C] border border-[#27B7C8]/10 p-3 space-y-3">
+            <p className="text-[9px] text-[#F3EDE3]/30 uppercase tracking-wide font-semibold">Your notes (tap to edit)</p>
             <div className="grid grid-cols-2 gap-3">
               <EditableField label="Chart Pattern" value={entry.chart_pattern} onSave={v => saveField("chart_pattern", v)} />
               <EditableField label="Candlestick" value={entry.candlestick_confirmation} onSave={v => saveField("candlestick_confirmation", v)} />
@@ -293,19 +293,19 @@ function ProGate() {
   return (
     <div className="flex flex-col items-center justify-center py-20 text-center">
       <Lock className="w-10 h-10 text-[#27B7C8]/40 mb-4" />
-      <h2 className="font-serif text-xl font-bold text-[#F4F7FA] mb-2">Pro Feature</h2>
+      <h2 className="font-serif text-xl font-bold text-[#F3EDE3] mb-2">Pro Feature</h2>
       {canShowExternalPayment ? (
         <>
-          <p className="text-sm text-[#F4F7FA]/50 mb-6 max-w-xs">
+          <p className="text-sm text-[#F3EDE3]/50 mb-6 max-w-xs">
             The Trade Journal is available to Pro subscribers. Upgrade to track your process and build better habits.
           </p>
           <Link href="/subscription-offer"
-            className="px-6 py-3 rounded-xl bg-[#27B7C8] text-[#0E1B30] font-semibold text-sm hover:bg-[#27B7C8]/90 transition-colors">
+            className="px-6 py-3 rounded-xl bg-[#27B7C8] text-[#07080C] font-semibold text-sm hover:bg-[#27B7C8]/90 transition-colors">
             Upgrade to Pro
           </Link>
         </>
       ) : (
-        <p className="text-sm text-[#F4F7FA]/50 max-w-xs">
+        <p className="text-sm text-[#F3EDE3]/50 max-w-xs">
           This feature isn&apos;t available in this version.
         </p>
       )}
@@ -364,13 +364,13 @@ export default function JournalPage(_props: PageProps) {
         <title>Trade Journal — Bloom</title>
       </Head>
       <Layout>
-        <div className="min-h-screen bg-[#0E1B30] px-4 py-6 max-w-2xl mx-auto">
+        <div className="min-h-screen bg-[#07080C] px-4 py-6 max-w-2xl mx-auto">
 
           {/* Header */}
           <div className="mb-6">
             <div className="flex items-center gap-3 mb-2">
               <NotebookPen className="w-6 h-6 text-[#27B7C8]" />
-              <h1 className="font-serif text-2xl font-bold text-[#F4F7FA]">Trade Journal</h1>
+              <h1 className="font-serif text-2xl font-bold text-[#F3EDE3]">Trade Journal</h1>
             </div>
             <div className="flex items-start gap-2 rounded-lg bg-[#27B7C8]/10 border border-[#27B7C8]/20 px-3 py-2">
               <AlertTriangle className="w-4 h-4 text-[#27B7C8] flex-shrink-0 mt-0.5" />
@@ -383,7 +383,7 @@ export default function JournalPage(_props: PageProps) {
           {(authLoading || (loading && isPro)) && (
             <div className="flex items-center justify-center py-16 gap-3">
               <Loader2 className="w-5 h-5 text-[#27B7C8] animate-spin" />
-              <span className="text-sm text-[#F4F7FA]/50">Loading journal…</span>
+              <span className="text-sm text-[#F3EDE3]/50">Loading journal…</span>
             </div>
           )}
 
@@ -401,14 +401,14 @@ export default function JournalPage(_props: PageProps) {
               <div className="rounded-xl bg-[#16264A] border border-[#27B7C8]/15 p-4 mb-4 space-y-3">
                 <div className="flex items-center gap-2 mb-1">
                   <Filter className="w-3.5 h-3.5 text-[#27B7C8]/60" />
-                  <span className="text-xs text-[#F4F7FA]/40 uppercase tracking-wide">Filter</span>
+                  <span className="text-xs text-[#F3EDE3]/40 uppercase tracking-wide">Filter</span>
                 </div>
 
                 {/* Ticker search */}
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#F4F7FA]/30" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#F3EDE3]/30" />
                   <input
-                    className="w-full bg-[#0E1B30] border border-[#27B7C8]/15 rounded-lg pl-8 pr-3 py-2 text-sm text-[#F4F7FA] placeholder-[#F4F7FA]/25 focus:outline-none focus:border-[#27B7C8]"
+                    className="w-full bg-[#07080C] border border-[#27B7C8]/15 rounded-lg pl-8 pr-3 py-2 text-sm text-[#F3EDE3] placeholder-[#F3EDE3]/25 focus:outline-none focus:border-[#27B7C8]"
                     placeholder="Search by ticker…"
                     value={ticker}
                     onChange={e => setTicker(e.target.value.toUpperCase())}
@@ -417,9 +417,9 @@ export default function JournalPage(_props: PageProps) {
 
                 <div className="grid grid-cols-3 gap-2">
                   <div>
-                    <label className="text-[9px] text-[#F4F7FA]/30 uppercase tracking-wide block mb-1">Grade</label>
+                    <label className="text-[9px] text-[#F3EDE3]/30 uppercase tracking-wide block mb-1">Grade</label>
                     <select
-                      className="w-full bg-[#0E1B30] border border-[#27B7C8]/15 rounded-lg px-2 py-2 text-xs text-[#F4F7FA] focus:outline-none focus:border-[#27B7C8]"
+                      className="w-full bg-[#07080C] border border-[#27B7C8]/15 rounded-lg px-2 py-2 text-xs text-[#F3EDE3] focus:outline-none focus:border-[#27B7C8]"
                       value={grade} onChange={e => setGrade(e.target.value)}
                     >
                       <option value="all">All</option>
@@ -427,9 +427,9 @@ export default function JournalPage(_props: PageProps) {
                     </select>
                   </div>
                   <div>
-                    <label className="text-[9px] text-[#F4F7FA]/30 uppercase tracking-wide block mb-1">Direction</label>
+                    <label className="text-[9px] text-[#F3EDE3]/30 uppercase tracking-wide block mb-1">Direction</label>
                     <select
-                      className="w-full bg-[#0E1B30] border border-[#27B7C8]/15 rounded-lg px-2 py-2 text-xs text-[#F4F7FA] focus:outline-none focus:border-[#27B7C8]"
+                      className="w-full bg-[#07080C] border border-[#27B7C8]/15 rounded-lg px-2 py-2 text-xs text-[#F3EDE3] focus:outline-none focus:border-[#27B7C8]"
                       value={direction} onChange={e => setDirection(e.target.value)}
                     >
                       <option value="all">All</option>
@@ -438,9 +438,9 @@ export default function JournalPage(_props: PageProps) {
                     </select>
                   </div>
                   <div>
-                    <label className="text-[9px] text-[#F4F7FA]/30 uppercase tracking-wide block mb-1">Period</label>
+                    <label className="text-[9px] text-[#F3EDE3]/30 uppercase tracking-wide block mb-1">Period</label>
                     <select
-                      className="w-full bg-[#0E1B30] border border-[#27B7C8]/15 rounded-lg px-2 py-2 text-xs text-[#F4F7FA] focus:outline-none focus:border-[#27B7C8]"
+                      className="w-full bg-[#07080C] border border-[#27B7C8]/15 rounded-lg px-2 py-2 text-xs text-[#F3EDE3] focus:outline-none focus:border-[#27B7C8]"
                       value={range} onChange={e => setRange(e.target.value)}
                     >
                       <option value="all">All time</option>
@@ -454,7 +454,7 @@ export default function JournalPage(_props: PageProps) {
               {/* Summary bar */}
               {entries.length > 0 && (
                 <div className="flex items-center justify-between px-1 mb-3">
-                  <span className="text-xs text-[#F4F7FA]/40">{entries.length} entr{entries.length === 1 ? "y" : "ies"}</span>
+                  <span className="text-xs text-[#F3EDE3]/40">{entries.length} entr{entries.length === 1 ? "y" : "ies"}</span>
                   <Link href="/practice" className="text-xs text-[#27B7C8] hover:underline">← Back to Trader</Link>
                 </div>
               )}
@@ -463,16 +463,16 @@ export default function JournalPage(_props: PageProps) {
                 <div className="flex flex-col items-center py-16 text-center">
                   {ticker || grade !== "all" || direction !== "all" || range !== "all" ? (
                     <>
-                      <Search className="w-10 h-10 text-[#F4F7FA]/15 mb-4" />
-                      <p className="text-sm text-[#F4F7FA]/40">No entries match your filters.</p>
+                      <Search className="w-10 h-10 text-[#F3EDE3]/15 mb-4" />
+                      <p className="text-sm text-[#F3EDE3]/40">No entries match your filters.</p>
                     </>
                   ) : (
                     <>
                       <div className="w-14 h-14 rounded-full bg-[#27B7C8]/10 flex items-center justify-center mb-4">
                         <NotebookPen className="w-6 h-6 text-[#27B7C8]/60" />
                       </div>
-                      <p className="text-sm font-medium text-[#F4F7FA]/50 mb-1">No journal entries yet</p>
-                      <p className="text-xs text-[#F4F7FA]/30 max-w-[260px] mb-5">
+                      <p className="text-sm font-medium text-[#F3EDE3]/50 mb-1">No journal entries yet</p>
+                      <p className="text-xs text-[#F3EDE3]/30 max-w-[260px] mb-5">
                         Close a practice trade and Pansy will generate your first review automatically.
                       </p>
                       <Link href="/practice"
@@ -492,7 +492,7 @@ export default function JournalPage(_props: PageProps) {
               )}
 
               <div className="mt-8 text-center">
-                <p className="text-[10px] text-[#F4F7FA]/25 leading-relaxed max-w-sm mx-auto">
+                <p className="text-[10px] text-[#F3EDE3]/25 leading-relaxed max-w-sm mx-auto">
                   Bloom Trade Journal is an educational tool. Simulated trades only. Not financial advice.
                 </p>
               </div>

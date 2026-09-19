@@ -209,7 +209,7 @@ export function OrderTicket({ buyingPower, onClose, onPlaced }: Props) {
       <div className="w-full max-w-md bg-background rounded-2xl border border-accent/30 my-4">
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-accent/10">
-          <h2 className="font-serif text-lg font-bold text-foreground">New Trade</h2>
+          <h2 className="text-lg font-bold text-foreground">New Trade</h2>
           <button onClick={onClose} className="text-foreground/40 hover:text-foreground"><X className="w-5 h-5" /></button>
         </div>
 

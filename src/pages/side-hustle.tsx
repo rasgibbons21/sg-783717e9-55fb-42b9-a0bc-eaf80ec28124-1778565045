@@ -23,12 +23,12 @@ const AFF = {
 };
 
 const C = {
-  bg: "#0E1B30",
+  bg: "#07080C",
   card: "rgba(255,255,255,0.03)",
   cardBorder: "rgba(255,255,255,0.06)",
   accent: "#27B7C8",
   green: "#49B06E",
-  text: "#F4F7FA",
+  text: "#F3EDE3",
   textDim: "rgba(244,247,250,0.6)",
   textMuted: "rgba(244,247,250,0.35)",
 };
@@ -697,12 +697,12 @@ export default function SideHustlePage() {
     const newCompleted = [...completedSteps, stepNum].sort((a, b) => a - b);
     setCompletedSteps(newCompleted);
     setCelebrating(true);
-    confetti({ particleCount: 80, spread: 70, origin: { y: 0.7 }, colors: [hustle?.color || "#49B06E", "#27B7C8", "#F4F7FA"] });
+    confetti({ particleCount: 80, spread: 70, origin: { y: 0.7 }, colors: [hustle?.color || "#49B06E", "#27B7C8", "#F3EDE3"] });
     const isComplete = newCompleted.length === 12;
     if (isComplete) {
       setJourneyComplete(true);
       setTimeout(() => {
-        confetti({ particleCount: 200, spread: 120, origin: { y: 0.5 }, colors: [hustle?.color || "#49B06E", "#27B7C8", "#F4F7FA", "#F59E0B", "#8B5CF6"] });
+        confetti({ particleCount: 200, spread: 120, origin: { y: 0.5 }, colors: [hustle?.color || "#49B06E", "#27B7C8", "#F3EDE3", "#F59E0B", "#8B5CF6"] });
       }, 500);
     } else {
       setExpandedStep(stepNum + 1);

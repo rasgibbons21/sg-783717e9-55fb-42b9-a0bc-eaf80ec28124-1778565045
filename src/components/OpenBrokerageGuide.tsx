@@ -60,7 +60,7 @@ export default function OpenBrokerageGuide() {
                 <Landmark className="w-5 h-5 text-accent" />
               </div>
               <div>
-                <h2 className="font-serif text-lg md:text-xl font-bold text-foreground">
+                <h2 className="text-lg md:text-xl font-bold text-foreground">
                   How to Open a Brokerage Account
                 </h2>
                 <p className="text-xs text-muted-foreground mt-0.5">

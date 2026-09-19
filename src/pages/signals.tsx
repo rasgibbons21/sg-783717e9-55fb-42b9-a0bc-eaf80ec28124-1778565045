@@ -10,10 +10,7 @@ import {
   Newspaper, Sparkles, Target, ShieldCheck,
   TrendingUp, Lock,
 } from "lucide-react";
-import type { CryptoCandidate, CryptoStatus } from "@/lib/cryptoScanner";
 import { PlayReviewsRail } from "@/components/PlayReviewsRail";
-
-type MarketTab = "stocks" | "crypto";
 
 const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
 
@@ -67,7 +64,7 @@ interface PansyPick {
 interface PansyBriefing {
   greeting: string;
   briefing: string;
-  watchlist: { symbol: string; reason: string; type: "stock" | "crypto" }[];
+  watchlist: { symbol: string; reason: string }[];
   mood: "bullish" | "bearish" | "cautious" | "mixed";
   moodNote: string;
 }
@@ -140,8 +137,8 @@ function SignalCard({ c, rank }: { c: ScannerCandidate; rank: number }) {
       className="rounded-2xl border p-4 cursor-pointer transition-all active:scale-[0.98]"
       style={{
         background: isQualified
-          ? "linear-gradient(145deg, rgba(73,176,110,0.06), rgba(14,27,48,1))"
-          : "linear-gradient(145deg, #0E1B30, #162540)",
+          ? "linear-gradient(145deg, rgba(73,176,110,0.06), rgba(7,8,12,1))"
+          : "linear-gradient(145deg, #121821, #171E28)",
         borderColor: isQualified ? "rgba(73,176,110,0.25)" : "rgba(39,183,200,0.15)",
       }}
     >
@@ -151,7 +148,7 @@ function SignalCard({ c, rank }: { c: ScannerCandidate; rank: number }) {
           <ScoreBadge score={c.score} />
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-lg font-bold text-[#F4F7FA]">{c.symbol}</span>
+              <span className="text-lg font-bold text-[#F3EDE3]">{c.symbol}</span>
               <span
                 className="text-xs font-semibold px-1.5 py-0.5 rounded"
                 style={{
@@ -162,7 +159,7 @@ function SignalCard({ c, rank }: { c: ScannerCandidate; rank: number }) {
                 {c.status === "qualified" ? "SIGNAL" : c.status === "watchlist" ? "WATCH" : "NEAR MISS"}
               </span>
             </div>
-            <span className="text-xs text-[#F4F7FA]/40">${c.price.toFixed(2)}</span>
+            <span className="text-xs text-[#F3EDE3]/40">${c.price.toFixed(2)}</span>
           </div>
         </div>
         <div className="text-right">
@@ -170,37 +167,37 @@ function SignalCard({ c, rank }: { c: ScannerCandidate; rank: number }) {
             <ArrowUpRight className="w-4 h-4" />
             +{c.change.toFixed(1)}%
           </div>
-          <span className="text-[10px] text-[#F4F7FA]/30">+${c.changeAbs.toFixed(2)}</span>
+          <span className="text-[10px] text-[#F3EDE3]/30">+${c.changeAbs.toFixed(2)}</span>
         </div>
       </div>
 
       {/* Metrics row */}
       <div className="grid grid-cols-4 gap-2 mb-3">
         <div className="text-center">
-          <div className="text-[10px] text-[#F4F7FA]/40 mb-0.5">RVOL</div>
+          <div className="text-[10px] text-[#F3EDE3]/40 mb-0.5">RVOL</div>
           <div className="text-xs font-semibold" style={{ color: c.rvol >= 10 ? "#49B06E" : c.rvol >= 5 ? "#27B7C8" : "#F59E0B" }}>
             {c.rvol.toFixed(1)}x
           </div>
         </div>
         <div className="text-center">
-          <div className="text-[10px] text-[#F4F7FA]/40 mb-0.5">Volume</div>
-          <div className="text-xs font-semibold text-[#F4F7FA]">{formatVolume(c.volume)}</div>
+          <div className="text-[10px] text-[#F3EDE3]/40 mb-0.5">Volume</div>
+          <div className="text-xs font-semibold text-[#F3EDE3]">{formatVolume(c.volume)}</div>
         </div>
         <div className="text-center">
-          <div className="text-[10px] text-[#F4F7FA]/40 mb-0.5">Float</div>
-          <div className="text-xs font-semibold" style={{ color: floatM !== null && floatM <= 20 ? "#49B06E" : "#F4F7FA" }}>
+          <div className="text-[10px] text-[#F3EDE3]/40 mb-0.5">Float</div>
+          <div className="text-xs font-semibold" style={{ color: floatM !== null && floatM <= 20 ? "#49B06E" : "#F3EDE3" }}>
             {formatFloat(c.float)}
           </div>
         </div>
         <div className="text-center">
-          <div className="text-[10px] text-[#F4F7FA]/40 mb-0.5">Catalyst</div>
+          <div className="text-[10px] text-[#F3EDE3]/40 mb-0.5">Catalyst</div>
           <CatalystBadge quality={c.catalyst} />
         </div>
       </div>
 
       {/* Catalyst headline */}
       {c.catalystHeadline && (
-        <p className="text-[11px] text-[#F4F7FA]/50 leading-relaxed mb-2 line-clamp-2">
+        <p className="text-[11px] text-[#F3EDE3]/50 leading-relaxed mb-2 line-clamp-2">
           {c.catalystHeadline}
         </p>
       )}
@@ -235,7 +232,7 @@ function PansyPickCard({ pick, rank }: { pick: PansyPick; rank: number }) {
       onClick={() => { haptic(); router.push(`/scanner/${pick.symbol}`); }}
       className="rounded-2xl border p-4 cursor-pointer transition-all active:scale-[0.98]"
       style={{
-        background: "linear-gradient(145deg, rgba(168,85,247,0.08), rgba(14,27,48,1))",
+        background: "linear-gradient(145deg, rgba(168,85,247,0.08), rgba(7,8,12,1))",
         borderColor: "rgba(168,85,247,0.25)",
       }}
     >
@@ -249,7 +246,7 @@ function PansyPickCard({ pick, rank }: { pick: PansyPick; rank: number }) {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-lg font-bold text-[#F4F7FA]">{pick.symbol}</span>
+              <span className="text-lg font-bold text-[#F3EDE3]">{pick.symbol}</span>
               <span
                 className="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase"
                 style={{ background: `${confColor}20`, color: confColor }}
@@ -262,7 +259,7 @@ function PansyPickCard({ pick, rank }: { pick: PansyPick; rank: number }) {
         <Sparkles className="w-4 h-4 text-purple-400/60" />
       </div>
 
-      <p className="text-[13px] text-[#F4F7FA]/70 leading-relaxed mb-3">
+      <p className="text-[13px] text-[#F3EDE3]/70 leading-relaxed mb-3">
         {pick.take}
       </p>
 
@@ -276,19 +273,19 @@ function PansyPickCard({ pick, rank }: { pick: PansyPick; rank: number }) {
         </div>
         <div className="grid grid-cols-2 gap-2 text-[11px]">
           <div>
-            <span className="text-[#F4F7FA]/40">Entry: </span>
+            <span className="text-[#F3EDE3]/40">Entry: </span>
             <span className="text-[#49B06E] font-medium">{pick.tradePlan.entry}</span>
           </div>
           <div>
-            <span className="text-[#F4F7FA]/40">Stop: </span>
+            <span className="text-[#F3EDE3]/40">Stop: </span>
             <span className="text-[#EF4444] font-medium">{pick.tradePlan.stop}</span>
           </div>
           <div>
-            <span className="text-[#F4F7FA]/40">Target 1: </span>
+            <span className="text-[#F3EDE3]/40">Target 1: </span>
             <span className="text-[#27B7C8] font-medium">{pick.tradePlan.target1}</span>
           </div>
           <div>
-            <span className="text-[#F4F7FA]/40">Target 2: </span>
+            <span className="text-[#F3EDE3]/40">Target 2: </span>
             <span className="text-[#27B7C8] font-medium">{pick.tradePlan.target2}</span>
           </div>
         </div>
@@ -313,101 +310,6 @@ function PansyPickCard({ pick, rank }: { pick: PansyPick; rank: number }) {
   );
 }
 
-function formatMarketCap(mc: number): string {
-  if (mc >= 1_000_000_000) return `$${(mc / 1_000_000_000).toFixed(1)}B`;
-  if (mc >= 1_000_000) return `$${(mc / 1_000_000).toFixed(1)}M`;
-  return `$${(mc / 1_000).toFixed(0)}K`;
-}
-
-function cryptoStatusLabel(s: CryptoStatus): { label: string; bg: string; color: string } {
-  switch (s) {
-    case "hot": return { label: "HOT", bg: "rgba(73,176,110,0.2)", color: "#49B06E" };
-    case "moving": return { label: "MOVING", bg: "rgba(39,183,200,0.15)", color: "#27B7C8" };
-    case "warming": return { label: "WARMING", bg: "rgba(245,158,11,0.15)", color: "#F59E0B" };
-    default: return { label: "QUIET", bg: "rgba(156,163,175,0.15)", color: "#9CA3AF" };
-  }
-}
-
-function CryptoCard({ c, rank }: { c: CryptoCandidate; rank: number }) {
-  const isHot = c.status === "hot";
-  const sl = cryptoStatusLabel(c.status);
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: rank * 0.05, duration: 0.3 }}
-      className="rounded-2xl border p-4 transition-all active:scale-[0.98]"
-      style={{
-        background: isHot
-          ? "linear-gradient(145deg, rgba(245,158,11,0.06), rgba(14,27,48,1))"
-          : "linear-gradient(145deg, #0E1B30, #162540)",
-        borderColor: isHot ? "rgba(245,158,11,0.25)" : "rgba(39,183,200,0.15)",
-      }}
-    >
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex items-center gap-3">
-          <ScoreBadge score={c.score} />
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-lg font-bold text-[#F4F7FA]">{c.symbol.replace("USD", "")}</span>
-              <span
-                className="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase"
-                style={{ background: sl.bg, color: sl.color }}
-              >
-                {sl.label}
-              </span>
-            </div>
-            <span className="text-xs text-[#F4F7FA]/40">${c.price < 1 ? c.price.toPrecision(4) : c.price.toFixed(2)}</span>
-          </div>
-        </div>
-        <div className="text-right">
-          <div className="flex items-center gap-1 text-[#49B06E] font-bold text-base">
-            <ArrowUpRight className="w-4 h-4" />
-            +{c.change.toFixed(1)}%
-          </div>
-          <span className="text-[10px] text-[#F4F7FA]/30">{formatMarketCap(c.marketCap)}</span>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-4 gap-2 mb-3">
-        <div className="text-center">
-          <div className="text-[10px] text-[#F4F7FA]/40 mb-0.5">Vol Ratio</div>
-          <div className="text-xs font-semibold" style={{ color: c.volumeRatio >= 5 ? "#49B06E" : c.volumeRatio >= 2 ? "#27B7C8" : "#F59E0B" }}>
-            {c.volumeRatio.toFixed(1)}x
-          </div>
-        </div>
-        <div className="text-center">
-          <div className="text-[10px] text-[#F4F7FA]/40 mb-0.5">Volume</div>
-          <div className="text-xs font-semibold text-[#F4F7FA]">{formatVolume(c.volume)}</div>
-        </div>
-        <div className="text-center">
-          <div className="text-[10px] text-[#F4F7FA]/40 mb-0.5">24h High</div>
-          <div className="text-xs font-semibold text-[#F4F7FA]">${c.dayHigh < 1 ? c.dayHigh.toPrecision(4) : c.dayHigh.toFixed(2)}</div>
-        </div>
-        <div className="text-center">
-          <div className="text-[10px] text-[#F4F7FA]/40 mb-0.5">24h Low</div>
-          <div className="text-xs font-semibold text-[#F4F7FA]">${c.dayLow < 1 ? c.dayLow.toPrecision(4) : c.dayLow.toFixed(2)}</div>
-        </div>
-      </div>
-
-      {c.flags.length > 0 && (
-        <div className="flex flex-wrap gap-1">
-          {c.flags.slice(0, 3).map((f, i) => (
-            <span
-              key={i}
-              className="text-[9px] px-1.5 py-0.5 rounded-full"
-              style={{ background: "rgba(245,158,11,0.1)", color: "#F59E0B" }}
-            >
-              {f}
-            </span>
-          ))}
-        </div>
-      )}
-    </motion.div>
-  );
-}
-
 function isMarketHours(): { open: boolean; message: string } {
   const now = new Date();
   const et = new Date(now.toLocaleString("en-US", { timeZone: "America/New_York" }));
@@ -424,22 +326,15 @@ function isMarketHours(): { open: boolean; message: string } {
 
 export default function SignalsPage() {
   const router = useRouter();
-  const [marketTab, setMarketTab] = useState<MarketTab>("stocks");
   const [candidates, setCandidates] = useState<ScannerCandidate[]>([]);
-  const [cryptoCandidates, setCryptoCandidates] = useState<CryptoCandidate[]>([]);
   const [news, setNews] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
-  const [cryptoLoading, setCryptoLoading] = useState(true);
   const [newsLoading, setNewsLoading] = useState(true);
   const [lastScan, setLastScan] = useState<number | null>(null);
-  const [lastCryptoScan, setLastCryptoScan] = useState<number | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [pansyPicks, setPansyPicks] = useState<PansyPick[]>([]);
   const [pansyNote, setPansyNote] = useState("");
   const [pansyLoading, setPansyLoading] = useState(false);
-  const [cryptoPansyPicks, setCryptoPansyPicks] = useState<PansyPick[]>([]);
-  const [cryptoPansyNote, setCryptoPansyNote] = useState("");
-  const [cryptoPansyLoading, setCryptoPansyLoading] = useState(false);
   const [pansyBriefing, setPansyBriefing] = useState<PansyBriefing | null>(null);
   const [briefingLoading, setBriefingLoading] = useState(false);
   const [filters, setFilters] = useState({
@@ -485,45 +380,6 @@ export default function SignalsPage() {
     }
   }, [loadPansyBriefing]);
 
-  const loadCryptoPansyAnalysis = useCallback(async (scanCandidates: CryptoCandidate[]) => {
-    const worthy = scanCandidates.filter(c => c.status === "hot" || c.status === "moving");
-    if (worthy.length === 0) {
-      loadPansyBriefing();
-      return;
-    }
-    setCryptoPansyLoading(true);
-    try {
-      const res = await fetch("/api/scanner/pansy-crypto-analysis", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ candidates: worthy.slice(0, 5) }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setCryptoPansyPicks(data.picks || []);
-        setCryptoPansyNote(data.marketNote || "");
-      }
-    } catch {} finally {
-      setCryptoPansyLoading(false);
-    }
-  }, [loadPansyBriefing]);
-
-  const loadCryptoScan = useCallback(async () => {
-    setCryptoLoading(true);
-    try {
-      const res = await fetch("/api/scanner/crypto-scan?sortBy=score");
-      const data = res.ok ? await res.json() : { candidates: [] };
-      const results = data.candidates || [];
-      setCryptoCandidates(results);
-      setLastCryptoScan(data.timestamp || Date.now());
-      loadCryptoPansyAnalysis(results);
-    } catch {
-      loadPansyBriefing();
-    } finally {
-      setCryptoLoading(false);
-    }
-  }, [loadCryptoPansyAnalysis, loadPansyBriefing]);
-
   const loadScan = useCallback(async () => {
     setLoading(true);
     try {
@@ -563,9 +419,8 @@ export default function SignalsPage() {
 
   useEffect(() => {
     loadScan();
-    loadCryptoScan();
     loadNews();
-  }, [loadScan, loadCryptoScan, loadNews]);
+  }, [loadScan, loadNews]);
 
   const qualified = candidates.filter((c) => c.status === "qualified");
   const watchlist = candidates.filter((c) => c.status === "watchlist");
@@ -573,106 +428,54 @@ export default function SignalsPage() {
   const market = isMarketHours();
   const hasScanData = !loading && candidates.length > 0;
 
-  const cryptoHot = cryptoCandidates.filter((c) => c.status === "hot");
-  const cryptoMoving = cryptoCandidates.filter((c) => c.status === "moving");
-  const cryptoWarming = cryptoCandidates.filter((c) => c.status === "warming");
-  const hasCryptoData = !cryptoLoading && cryptoCandidates.length > 0;
-
   return (
     <Layout>
       <SEO title="Radar | Stock Screener & Alerts" description="Stock screener, price alerts, and Pansy AI market chat. Watchlist, market movers, and paper trading." />
 
       <div className="max-w-lg mx-auto px-4 pt-4 pb-32">
-        {/* Header */}
+        {/* Subheader */}
         <div className="flex items-center justify-between mb-4">
-          <div>
-            <h1 className="text-2xl font-bold text-[#F4F7FA]">Radar</h1>
-            <p className="text-xs text-[#F4F7FA]/40 mt-0.5">
-              {marketTab === "stocks" ? "Stock Screener" : "Crypto Scanner"}
-              {marketTab === "stocks" && lastScan && <> &middot; Updated {timeAgo(new Date(lastScan).toISOString())}</>}
-              {marketTab === "crypto" && lastCryptoScan && <> &middot; Updated {timeAgo(new Date(lastCryptoScan).toISOString())}</>}
-            </p>
-          </div>
+          <p className="text-xs" style={{ color: "var(--r-meta)" }}>
+            Stock Screener
+            {lastScan && <> &middot; Updated {timeAgo(new Date(lastScan).toISOString())}</>}
+          </p>
           <div className="flex items-center gap-2">
             <motion.button
               whileTap={{ scale: 0.85, rotate: 180 }}
-              onClick={() => { haptic(); if (marketTab === "stocks") loadScan(); else loadCryptoScan(); }}
+              onClick={() => { haptic(); loadScan(); }}
               className="w-9 h-9 rounded-xl flex items-center justify-center"
               style={{ background: "rgba(39,183,200,0.1)", border: "1px solid rgba(39,183,200,0.2)" }}
             >
-              <RefreshCw className={`w-4 h-4 text-[#27B7C8] ${(marketTab === "stocks" ? loading : cryptoLoading) ? "animate-spin" : ""}`} />
+              <RefreshCw className={`w-4 h-4 text-[#27B7C8] ${loading ? "animate-spin" : ""}`} />
             </motion.button>
-            {marketTab === "stocks" && (
-              <motion.button
-                whileTap={{ scale: 0.85 }}
-                onClick={() => { haptic(); setShowFilters(!showFilters); }}
-                className="w-9 h-9 rounded-xl flex items-center justify-center"
-                style={{
-                  background: showFilters ? "rgba(39,183,200,0.2)" : "rgba(39,183,200,0.1)",
-                  border: "1px solid rgba(39,183,200,0.2)",
-                }}
-              >
-                <Filter className="w-4 h-4 text-[#27B7C8]" />
-              </motion.button>
-            )}
+            <motion.button
+              whileTap={{ scale: 0.85 }}
+              onClick={() => { haptic(); setShowFilters(!showFilters); }}
+              className="w-9 h-9 rounded-xl flex items-center justify-center"
+              style={{
+                background: showFilters ? "rgba(39,183,200,0.2)" : "rgba(39,183,200,0.1)",
+                border: "1px solid rgba(39,183,200,0.2)",
+              }}
+            >
+              <Filter className="w-4 h-4 text-[#27B7C8]" />
+            </motion.button>
           </div>
         </div>
 
-        {/* Market toggle tabs */}
-        <div className="flex gap-1 mb-4 p-1 rounded-xl" style={{ background: "rgba(255,255,255,0.04)" }}>
-          {([
-            { key: "stocks" as MarketTab, label: "Stocks", icon: <TrendingUp className="w-3.5 h-3.5" /> },
-            { key: "crypto" as MarketTab, label: "Crypto", icon: <span className="text-sm">₿</span> },
-          ]).map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => { haptic(); setMarketTab(tab.key); }}
-              className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold transition-all"
-              style={{
-                background: marketTab === tab.key ? "rgba(39,183,200,0.15)" : "transparent",
-                color: marketTab === tab.key ? "#27B7C8" : "rgba(244,247,250,0.4)",
-                border: marketTab === tab.key ? "1px solid rgba(39,183,200,0.25)" : "1px solid transparent",
-              }}
-            >
-              {tab.icon}
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Market status bar — stocks */}
-        {marketTab === "stocks" && (
+        {/* Market status bar */}
+        {(
           <div
             className="rounded-xl p-3 mb-4 flex items-center justify-between"
             style={{ background: market.open ? "rgba(73,176,110,0.06)" : "rgba(39,183,200,0.06)", border: `1px solid ${market.open ? "rgba(73,176,110,0.15)" : "rgba(39,183,200,0.12)"}` }}
           >
             <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${market.open ? "bg-[#49B06E] animate-pulse" : "bg-[#F4F7FA]/30"}`} />
-              <span className="text-xs font-medium text-[#F4F7FA]/70">{market.message}</span>
+              <div className={`w-2 h-2 rounded-full ${market.open ? "bg-[#49B06E] animate-pulse" : "bg-[#F3EDE3]/30"}`} />
+              <span className="text-xs font-medium text-[#F3EDE3]/70">{market.message}</span>
             </div>
             {hasScanData && (
-              <div className="flex items-center gap-3 text-[10px] text-[#F4F7FA]/40">
+              <div className="flex items-center gap-3 text-[10px] text-[#F3EDE3]/40">
                 <span>{qualified.length} signals</span>
                 <span>{watchlist.length} watching</span>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Market status bar — crypto (24/7) */}
-        {marketTab === "crypto" && (
-          <div
-            className="rounded-xl p-3 mb-4 flex items-center justify-between"
-            style={{ background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.15)" }}
-          >
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-[#49B06E] animate-pulse" />
-              <span className="text-xs font-medium text-[#F4F7FA]/70">Crypto markets are always open</span>
-            </div>
-            {hasCryptoData && (
-              <div className="flex items-center gap-3 text-[10px] text-[#F4F7FA]/40">
-                <span>{cryptoHot.length} hot</span>
-                <span>{cryptoMoving.length} moving</span>
               </div>
             )}
           </div>
@@ -686,7 +489,7 @@ export default function SignalsPage() {
           >
             <div className="flex items-center gap-2 mb-2">
               <span className="text-sm">🌸</span>
-              <span className="text-xs font-semibold text-[#F4F7FA]/70">Pansy Screen Queries</span>
+              <span className="text-xs font-semibold text-[#F3EDE3]/70">Pansy Screen Queries</span>
             </div>
             <div className="flex flex-wrap gap-1.5">
               {[
@@ -736,7 +539,7 @@ export default function SignalsPage() {
         {/* ═══ FIRST-RUN PANSY CARD ═══ */}
         <div
           className="rounded-2xl border p-4 mb-4"
-          style={{ background: "linear-gradient(145deg, rgba(168,85,247,0.06), rgba(14,27,48,1))", borderColor: "rgba(168,85,247,0.2)" }}
+          style={{ background: "linear-gradient(145deg, rgba(168,85,247,0.06), rgba(7,8,12,1))", borderColor: "rgba(168,85,247,0.2)" }}
         >
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 rounded-full flex items-center justify-center text-xl flex-shrink-0"
@@ -744,8 +547,8 @@ export default function SignalsPage() {
               🌺
             </div>
             <div>
-              <p className="text-sm font-semibold text-[#F4F7FA] mb-1">Meet Pansy — your AI analyst</p>
-              <p className="text-xs text-[#F4F7FA]/50 leading-relaxed italic">
+              <p className="text-sm font-semibold text-[#F3EDE3] mb-1">Meet Pansy — your AI analyst</p>
+              <p className="text-xs text-[#F3EDE3]/50 leading-relaxed italic">
                 &ldquo;I screen, I explain the alert, I do not place the trade.&rdquo;
               </p>
               <a
@@ -776,15 +579,13 @@ export default function SignalsPage() {
                 style={{ background: `${tool.color}08`, border: `1px solid ${tool.color}20` }}
               >
                 <span className="text-lg block mb-1.5">{tool.icon}</span>
-                <p className="text-xs font-bold text-[#F4F7FA] mb-0.5">{tool.title}</p>
-                <p className="text-[10px] text-[#F4F7FA]/40">{tool.desc}</p>
+                <p className="text-xs font-bold text-[#F3EDE3] mb-0.5">{tool.title}</p>
+                <p className="text-[10px] text-[#F3EDE3]/40">{tool.desc}</p>
               </a>
             ))}
           </div>
         </div>
 
-        {/* ═══ STOCKS TAB ═══ */}
-        {marketTab === "stocks" && <>
 
         {/* Filter panel */}
         <AnimatePresence>
@@ -800,7 +601,7 @@ export default function SignalsPage() {
                 style={{ background: "rgba(22,37,64,0.8)", border: "1px solid rgba(39,183,200,0.15)" }}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-[#F4F7FA]/60">Min RVOL</span>
+                  <span className="text-xs text-[#F3EDE3]/60">Min RVOL</span>
                   <div className="flex gap-1">
                     {[2, 5, 10, 15].map((v) => (
                       <button
@@ -809,7 +610,7 @@ export default function SignalsPage() {
                         className="text-xs px-2.5 py-1 rounded-lg font-medium transition-colors"
                         style={{
                           background: filters.minRvol === v ? "rgba(39,183,200,0.2)" : "rgba(255,255,255,0.05)",
-                          color: filters.minRvol === v ? "#27B7C8" : "#F4F7FA80",
+                          color: filters.minRvol === v ? "#27B7C8" : "#F3EDE380",
                           border: `1px solid ${filters.minRvol === v ? "rgba(39,183,200,0.3)" : "transparent"}`,
                         }}
                       >
@@ -820,7 +621,7 @@ export default function SignalsPage() {
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-[#F4F7FA]/60">Catalyst only</span>
+                  <span className="text-xs text-[#F3EDE3]/60">Catalyst only</span>
                   <button
                     onClick={() => setFilters((f) => ({ ...f, catalystOnly: !f.catalystOnly }))}
                     className="w-10 h-5 rounded-full transition-colors relative"
@@ -834,7 +635,7 @@ export default function SignalsPage() {
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-[#F4F7FA]/60">Sort by</span>
+                  <span className="text-xs text-[#F3EDE3]/60">Sort by</span>
                   <div className="flex gap-1">
                     {[
                       { v: "score", l: "Score" },
@@ -848,7 +649,7 @@ export default function SignalsPage() {
                         className="text-xs px-2.5 py-1 rounded-lg font-medium transition-colors"
                         style={{
                           background: filters.sortBy === v ? "rgba(39,183,200,0.2)" : "rgba(255,255,255,0.05)",
-                          color: filters.sortBy === v ? "#27B7C8" : "#F4F7FA80",
+                          color: filters.sortBy === v ? "#27B7C8" : "#F3EDE380",
                           border: `1px solid ${filters.sortBy === v ? "rgba(39,183,200,0.3)" : "transparent"}`,
                         }}
                       >
@@ -871,7 +672,7 @@ export default function SignalsPage() {
               <div
                 key={i}
                 className="rounded-2xl border border-white/5 p-4 animate-pulse"
-                style={{ background: "#162540" }}
+                style={{ background: "#121821" }}
               >
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 rounded-xl bg-white/5" />
@@ -894,16 +695,16 @@ export default function SignalsPage() {
         {!loading && candidates.length === 0 && (
           <div
             className="rounded-2xl p-5 mb-6 text-center"
-            style={{ background: "linear-gradient(145deg, rgba(39,183,200,0.06), rgba(14,27,48,1))", border: "1px solid rgba(39,183,200,0.15)" }}
+            style={{ background: "linear-gradient(145deg, rgba(39,183,200,0.06), rgba(7,8,12,1))", border: "1px solid rgba(39,183,200,0.15)" }}
           >
             <div className="w-14 h-14 mx-auto mb-3 rounded-2xl flex items-center justify-center text-2xl"
               style={{ background: "rgba(39,183,200,0.1)" }}>
               🔍
             </div>
-            <p className="text-sm font-semibold text-[#F4F7FA]/80 mb-1">
+            <p className="text-sm font-semibold text-[#F3EDE3]/80 mb-1">
               {!market.open ? "Markets are closed" : "No setups found right now"}
             </p>
-            <p className="text-xs text-[#F4F7FA]/40 mb-3 max-w-xs mx-auto">
+            <p className="text-xs text-[#F3EDE3]/40 mb-3 max-w-xs mx-auto">
               {!market.open
                 ? "Gap-and-Go setups appear when small-caps gap up at market open. Pansy is watching the news for you below."
                 : "No small-caps are gapping up with volume right now. Check Pansy's briefing below or adjust your filters."
@@ -925,11 +726,11 @@ export default function SignalsPage() {
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-1">
               <span className="text-base">🌸</span>
-              <h2 className="text-sm font-bold text-[#F4F7FA]">Pansy&apos;s Top Picks</h2>
+              <h2 className="text-sm font-bold text-[#F3EDE3]">Pansy&apos;s Top Picks</h2>
               <Sparkles className="w-3.5 h-3.5 text-purple-400" />
             </div>
             {pansyNote && (
-              <p className="text-[11px] text-[#F4F7FA]/40 mb-3 ml-7">{pansyNote}</p>
+              <p className="text-[11px] text-[#F3EDE3]/40 mb-3 ml-7">{pansyNote}</p>
             )}
             {pansyLoading ? (
               <div className="space-y-3">
@@ -965,7 +766,7 @@ export default function SignalsPage() {
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-3">
               <Zap className="w-4 h-4 text-[#49B06E]" />
-              <h2 className="text-sm font-bold text-[#F4F7FA]">Qualified Signals</h2>
+              <h2 className="text-sm font-bold text-[#F3EDE3]">Qualified Signals</h2>
               <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#49B06E]/15 text-[#49B06E] font-semibold">
                 {qualified.length}
               </span>
@@ -981,7 +782,7 @@ export default function SignalsPage() {
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-3">
               <Eye className="w-4 h-4 text-[#27B7C8]" />
-              <h2 className="text-sm font-bold text-[#F4F7FA]">Watchlist</h2>
+              <h2 className="text-sm font-bold text-[#F3EDE3]">Watchlist</h2>
               <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#27B7C8]/15 text-[#27B7C8] font-semibold">
                 {watchlist.length}
               </span>
@@ -992,172 +793,13 @@ export default function SignalsPage() {
           </div>
         )}
 
-        </>}
-
-        {/* ═══ CRYPTO TAB ═══ */}
-        {marketTab === "crypto" && <>
-
-        {/* Crypto loading */}
-        {cryptoLoading && (
-          <div className="space-y-3 mb-6">
-            {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="rounded-2xl border border-white/5 p-4 animate-pulse"
-                style={{ background: "#162540" }}
-              >
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-xl bg-white/5" />
-                  <div className="flex-1">
-                    <div className="h-4 w-20 rounded bg-white/5 mb-1" />
-                    <div className="h-3 w-14 rounded bg-white/5" />
-                  </div>
-                </div>
-                <div className="grid grid-cols-4 gap-2">
-                  {[1, 2, 3, 4].map((j) => (
-                    <div key={j} className="h-8 rounded bg-white/5" />
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* No crypto movers */}
-        {!cryptoLoading && cryptoCandidates.length === 0 && (
-          <div
-            className="rounded-2xl p-5 mb-6 text-center"
-            style={{ background: "linear-gradient(145deg, rgba(245,158,11,0.06), rgba(14,27,48,1))", border: "1px solid rgba(245,158,11,0.15)" }}
-          >
-            <div className="w-14 h-14 mx-auto mb-3 rounded-2xl flex items-center justify-center text-2xl"
-              style={{ background: "rgba(245,158,11,0.1)" }}>
-              🔍
-            </div>
-            <p className="text-sm font-semibold text-[#F4F7FA]/80 mb-1">
-              Crypto is quiet right now
-            </p>
-            <p className="text-xs text-[#F4F7FA]/40 mb-3 max-w-xs mx-auto">
-              No coins are moving 2%+ with volume at the moment. Check Pansy&apos;s briefing below for what to watch.
-            </p>
-            <button
-              onClick={loadCryptoScan}
-              className="text-xs font-semibold px-4 py-2 rounded-xl transition-colors"
-              style={{ background: "rgba(245,158,11,0.15)", color: "#F59E0B", border: "1px solid rgba(245,158,11,0.25)" }}
-            >
-              <RefreshCw className="w-3 h-3 inline mr-1.5" />
-              Refresh Scanner
-            </button>
-          </div>
-        )}
-
-        {/* Pansy's Crypto Picks */}
-        {(cryptoPansyLoading || cryptoPansyPicks.length > 0) && !cryptoLoading && (
-          <div className="mb-6">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-base">🌸</span>
-              <h2 className="text-sm font-bold text-[#F4F7FA]">Pansy&apos;s Crypto Picks</h2>
-              <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-            </div>
-            {cryptoPansyNote && (
-              <p className="text-[11px] text-[#F4F7FA]/40 mb-3 ml-7">{cryptoPansyNote}</p>
-            )}
-            {cryptoPansyLoading ? (
-              <div className="space-y-3">
-                {[1, 2].map((i) => (
-                  <div
-                    key={i}
-                    className="rounded-2xl border p-4 animate-pulse"
-                    style={{ background: "rgba(168,85,247,0.04)", borderColor: "rgba(168,85,247,0.15)" }}
-                  >
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="w-8 h-8 rounded-full bg-purple-500/10" />
-                      <div className="h-4 w-16 rounded bg-white/5" />
-                    </div>
-                    <div className="h-3 w-full rounded bg-white/5 mb-2" />
-                    <div className="h-3 w-3/4 rounded bg-white/5 mb-3" />
-                    <div className="h-16 rounded-xl bg-white/5" />
-                  </div>
-                ))}
-                <p className="text-[10px] text-purple-400/50 text-center">Pansy is analyzing today&apos;s crypto movers...</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {cryptoPansyPicks.map((pick, i) => (
-                  <PansyPickCard key={pick.symbol} pick={pick} rank={i} />
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Hot Crypto */}
-        {hasCryptoData && cryptoHot.length > 0 && (
-          <div className="mb-6">
-            <div className="flex items-center gap-2 mb-3">
-              <Zap className="w-4 h-4 text-[#F59E0B]" />
-              <h2 className="text-sm font-bold text-[#F4F7FA]">Hot Movers</h2>
-              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#F59E0B]/15 text-[#F59E0B] font-semibold">
-                {cryptoHot.length}
-              </span>
-            </div>
-            <div className="space-y-3">
-              {cryptoHot.map((c, i) => <CryptoCard key={c.symbol} c={c} rank={i} />)}
-            </div>
-          </div>
-        )}
-
-        {/* Moving Crypto */}
-        {hasCryptoData && cryptoMoving.length > 0 && (
-          <div className="mb-6">
-            <div className="flex items-center gap-2 mb-3">
-              <Eye className="w-4 h-4 text-[#27B7C8]" />
-              <h2 className="text-sm font-bold text-[#F4F7FA]">Moving</h2>
-              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#27B7C8]/15 text-[#27B7C8] font-semibold">
-                {cryptoMoving.length}
-              </span>
-            </div>
-            <div className="space-y-3">
-              {cryptoMoving.map((c, i) => <CryptoCard key={c.symbol} c={c} rank={i} />)}
-            </div>
-          </div>
-        )}
-
-        {/* Warming Crypto */}
-        {hasCryptoData && cryptoWarming.length > 0 && (
-          <div className="mb-6">
-            <div className="flex items-center gap-2 mb-3">
-              <AlertTriangle className="w-4 h-4 text-[#F59E0B]" />
-              <h2 className="text-sm font-bold text-[#F4F7FA]/60">Warming Up</h2>
-            </div>
-            <div className="space-y-2">
-              {cryptoWarming.slice(0, 10).map((c) => (
-                <div
-                  key={c.symbol}
-                  className="flex items-center justify-between rounded-xl p-3"
-                  style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)" }}
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-[#F4F7FA]/60">{c.symbol.replace("USD", "")}</span>
-                    <span className="text-[10px] text-[#49B06E]">+{c.change.toFixed(1)}%</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] text-[#F4F7FA]/30">{c.volumeRatio.toFixed(1)}x vol</span>
-                    <span className="text-[10px] text-[#F4F7FA]/30">Score: {c.score}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        </>}
 
         {/* ═══ PANSY BRIEFING — shows when scanner has no picks ═══ */}
-        {(briefingLoading || pansyBriefing) && pansyPicks.length === 0 && cryptoPansyPicks.length === 0 && (
+        {(briefingLoading || pansyBriefing) && pansyPicks.length === 0 && (
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-1">
               <span className="text-base">🌸</span>
-              <h2 className="text-sm font-bold text-[#F4F7FA]">Pansy&apos;s Market Briefing</h2>
+              <h2 className="text-sm font-bold text-[#F3EDE3]">Pansy&apos;s Market Briefing</h2>
               <Sparkles className="w-3.5 h-3.5 text-purple-400" />
             </div>
 
@@ -1183,8 +825,8 @@ export default function SignalsPage() {
                 className="rounded-2xl border p-4"
                 style={{ background: "rgba(168,85,247,0.04)", borderColor: "rgba(168,85,247,0.15)" }}
               >
-                <p className="text-xs text-[#F4F7FA]/60 mb-2 italic">{pansyBriefing.greeting}</p>
-                <p className="text-sm text-[#F4F7FA]/80 mb-3 leading-relaxed">{pansyBriefing.briefing}</p>
+                <p className="text-xs text-[#F3EDE3]/60 mb-2 italic">{pansyBriefing.greeting}</p>
+                <p className="text-sm text-[#F3EDE3]/80 mb-3 leading-relaxed">{pansyBriefing.briefing}</p>
 
                 {/* Mood indicator */}
                 <div
@@ -1209,7 +851,7 @@ export default function SignalsPage() {
                   }}>
                     {pansyBriefing.mood}
                   </span>
-                  <span className="text-[10px] text-[#F4F7FA]/40">— {pansyBriefing.moodNote}</span>
+                  <span className="text-[10px] text-[#F3EDE3]/40">— {pansyBriefing.moodNote}</span>
                 </div>
 
                 {/* Watchlist */}
@@ -1224,7 +866,7 @@ export default function SignalsPage() {
                           style={{ background: "rgba(255,255,255,0.03)" }}
                         >
                           <span className="text-xs font-bold text-[#27B7C8] min-w-[60px]">{item.symbol}</span>
-                          <span className="text-[11px] text-[#F4F7FA]/50 leading-snug">{item.reason}</span>
+                          <span className="text-[11px] text-[#F3EDE3]/50 leading-snug">{item.reason}</span>
                         </div>
                       ))}
                     </div>
@@ -1239,13 +881,13 @@ export default function SignalsPage() {
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-3">
             <Newspaper className="w-4 h-4 text-[#F59E0B]" />
-            <h2 className="text-sm font-bold text-[#F4F7FA]">Market News</h2>
+            <h2 className="text-sm font-bold text-[#F3EDE3]">Market News</h2>
           </div>
 
           {newsLoading && (
             <div className="space-y-2">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="rounded-xl p-3 animate-pulse" style={{ background: "#162540" }}>
+                <div key={i} className="rounded-xl p-3 animate-pulse" style={{ background: "#121821" }}>
                   <div className="h-4 w-3/4 rounded bg-white/5 mb-2" />
                   <div className="h-3 w-1/2 rounded bg-white/5" />
                 </div>
@@ -1258,7 +900,7 @@ export default function SignalsPage() {
               className="rounded-xl p-4 text-center"
               style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}
             >
-              <p className="text-sm text-[#F4F7FA]/40">No market news available right now.</p>
+              <p className="text-sm text-[#F3EDE3]/40">No market news available right now.</p>
             </div>
           )}
 
@@ -1283,10 +925,10 @@ export default function SignalsPage() {
                       />
                     )}
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-sm font-medium text-[#F4F7FA] line-clamp-2 leading-snug mb-1">
+                      <h3 className="text-sm font-medium text-[#F3EDE3] line-clamp-2 leading-snug mb-1">
                         {article.title}
                       </h3>
-                      <div className="flex items-center gap-2 text-[10px] text-[#F4F7FA]/30">
+                      <div className="flex items-center gap-2 text-[10px] text-[#F3EDE3]/30">
                         <span>{article.source}</span>
                         <span>&middot;</span>
                         <span>{timeAgo(article.publishedAt)}</span>
@@ -1313,9 +955,9 @@ export default function SignalsPage() {
           >
             <div className="flex items-center gap-2 mb-2">
               <span className="text-base">🌸</span>
-              <h2 className="text-sm font-bold text-[#F4F7FA]">Pansy&apos;s Take</h2>
+              <h2 className="text-sm font-bold text-[#F3EDE3]">Pansy&apos;s Take</h2>
             </div>
-            <p className="text-sm text-[#F4F7FA]/80 leading-relaxed mb-2">{pansyBriefing.briefing}</p>
+            <p className="text-sm text-[#F3EDE3]/80 leading-relaxed mb-2">{pansyBriefing.briefing}</p>
             <div
               className="flex items-center gap-2 rounded-lg px-3 py-1.5 w-fit"
               style={{
@@ -1338,17 +980,17 @@ export default function SignalsPage() {
               }}>
                 {pansyBriefing.mood}
               </span>
-              <span className="text-[10px] text-[#F4F7FA]/40">— {pansyBriefing.moodNote}</span>
+              <span className="text-[10px] text-[#F3EDE3]/40">— {pansyBriefing.moodNote}</span>
             </div>
           </div>
         )}
 
-        {/* Near Misses — stocks only */}
-        {marketTab === "stocks" && hasScanData && nearMisses.length > 0 && (
+        {/* Near Misses */}
+        {hasScanData && nearMisses.length > 0 && (
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-3">
               <AlertTriangle className="w-4 h-4 text-[#F59E0B]" />
-              <h2 className="text-sm font-bold text-[#F4F7FA]/60">Near Misses</h2>
+              <h2 className="text-sm font-bold text-[#F3EDE3]/60">Near Misses</h2>
             </div>
             <div className="space-y-2">
               {nearMisses.slice(0, 5).map((c) => (
@@ -1359,12 +1001,12 @@ export default function SignalsPage() {
                   style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)" }}
                 >
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-[#F4F7FA]/60">{c.symbol}</span>
+                    <span className="text-xs font-bold text-[#F3EDE3]/60">{c.symbol}</span>
                     <span className="text-[10px] text-[#49B06E]">+{c.change.toFixed(1)}%</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] text-[#F4F7FA]/30">{c.rvol.toFixed(1)}x</span>
-                    <span className="text-[10px] text-[#F4F7FA]/30">Score: {c.score}</span>
+                    <span className="text-[10px] text-[#F3EDE3]/30">{c.rvol.toFixed(1)}x</span>
+                    <span className="text-[10px] text-[#F3EDE3]/30">Score: {c.score}</span>
                   </div>
                 </div>
               ))}
@@ -1376,17 +1018,17 @@ export default function SignalsPage() {
         <div className="mb-6 relative">
           <div className="flex items-center gap-2 mb-3">
             <Zap className="w-4 h-4 text-[#27B7C8]" />
-            <h2 className="text-sm font-bold text-[#F4F7FA]">Live Alert Tape</h2>
-            <Lock className="w-3 h-3 text-[#F4F7FA]/30" />
+            <h2 className="text-sm font-bold text-[#F3EDE3]">Live Alert Tape</h2>
+            <Lock className="w-3 h-3 text-[#F3EDE3]/30" />
           </div>
           <div className="rounded-xl overflow-hidden relative" style={{ border: "1px solid rgba(255,255,255,0.06)" }}>
             <table className="w-full text-[11px]">
               <thead>
                 <tr style={{ background: "rgba(255,255,255,0.04)" }}>
-                  <th className="text-left px-3 py-2 font-semibold text-[#F4F7FA]/50">Time</th>
-                  <th className="text-left px-3 py-2 font-semibold text-[#F4F7FA]/50">Symbol</th>
-                  <th className="text-left px-3 py-2 font-semibold text-[#F4F7FA]/50">Bias</th>
-                  <th className="text-right px-3 py-2 font-semibold text-[#F4F7FA]/50">Chg%</th>
+                  <th className="text-left px-3 py-2 font-semibold text-[#F3EDE3]/50">Time</th>
+                  <th className="text-left px-3 py-2 font-semibold text-[#F3EDE3]/50">Symbol</th>
+                  <th className="text-left px-3 py-2 font-semibold text-[#F3EDE3]/50">Bias</th>
+                  <th className="text-right px-3 py-2 font-semibold text-[#F3EDE3]/50">Chg%</th>
                 </tr>
               </thead>
               <tbody className="blur-[4px] select-none pointer-events-none">
@@ -1397,18 +1039,18 @@ export default function SignalsPage() {
                   { time: "9:45", sym: "MNOP", bias: "Bullish", chg: "+5.7%" },
                 ].map((row, i) => (
                   <tr key={i} style={{ background: i % 2 === 0 ? "rgba(255,255,255,0.02)" : "transparent" }}>
-                    <td className="px-3 py-2 text-[#F4F7FA]/40">{row.time}</td>
-                    <td className="px-3 py-2 font-semibold text-[#F4F7FA]">{row.sym}</td>
+                    <td className="px-3 py-2 text-[#F3EDE3]/40">{row.time}</td>
+                    <td className="px-3 py-2 font-semibold text-[#F3EDE3]">{row.sym}</td>
                     <td className="px-3 py-2 text-[#49B06E]">{row.bias}</td>
                     <td className="px-3 py-2 text-right text-[#49B06E]">{row.chg}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ background: "rgba(14,27,48,0.6)" }}>
+            <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ background: "rgba(7,8,12,0.75)" }}>
               <Lock className="w-5 h-5 text-[#27B7C8] mb-2" />
-              <p className="text-xs font-semibold text-[#F4F7FA]/80 mb-1">Unlock live alert tape</p>
-              <p className="text-[10px] text-[#F4F7FA]/40 mb-2">Real-time screen matches and price alerts</p>
+              <p className="text-xs font-semibold text-[#F3EDE3]/80 mb-1">Unlock live alert tape</p>
+              <p className="text-[10px] text-[#F3EDE3]/40 mb-2">Real-time screen matches and price alerts</p>
               <a
                 href="/subscription"
                 className="text-[10px] font-bold px-4 py-1.5 rounded-lg transition-colors"
@@ -1428,8 +1070,8 @@ export default function SignalsPage() {
           className="rounded-xl p-3 mt-2"
           style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}
         >
-          <p className="text-[10px] text-[#F4F7FA]/30 leading-relaxed">
-            <strong className="text-[#F4F7FA]/40">Educational decision support only.</strong>{" "}
+          <p className="text-[10px] text-[#F3EDE3]/30 leading-relaxed">
+            <strong className="text-[#F3EDE3]/40">Educational decision support only.</strong>{" "}
             Alerts are price/level/screen-match notifications, not trade recommendations.
             Market data may be delayed. Day trading involves significant risk of loss. Verify all data and make your own decisions.
           </p>

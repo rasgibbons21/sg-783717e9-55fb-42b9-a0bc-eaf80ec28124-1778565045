@@ -28,7 +28,7 @@ export function StrategyChartLesson({ exercise, onComplete }: Props) {
   return (
     <div className="bg-[#16264A] rounded-xl border border-white/5 overflow-hidden">
       {/* Header */}
-      <div className="px-4 py-3 bg-[#0E1B30] border-b border-white/5">
+      <div className="px-4 py-3 bg-[#07080C] border-b border-white/5">
         <div className="flex items-center gap-2">
           <BarChart3 className="w-4 h-4 text-[#27B7C8]" />
           <h3 className="text-sm font-semibold text-white">{exercise.title}</h3>
@@ -42,7 +42,7 @@ export function StrategyChartLesson({ exercise, onComplete }: Props) {
 
       {/* Instruction */}
       <div className="px-4 py-3 border-b border-white/5">
-        <p className="text-xs text-[#F4F7FA]/70 leading-relaxed">{exercise.instruction}</p>
+        <p className="text-xs text-[#F3EDE3]/70 leading-relaxed">{exercise.instruction}</p>
       </div>
 
       {/* Chart */}
@@ -89,7 +89,7 @@ export function StrategyChartLesson({ exercise, onComplete }: Props) {
                   key={i}
                   onClick={() => !submitted && setSelected(i)}
                   disabled={submitted}
-                  className={`w-full text-left px-3 py-2.5 rounded-lg border ${borderColor} ${bgColor} transition-all text-xs text-[#F4F7FA]/80 hover:border-[#27B7C8]/30 disabled:cursor-default flex items-center gap-2`}
+                  className={`w-full text-left px-3 py-2.5 rounded-lg border ${borderColor} ${bgColor} transition-all text-xs text-[#F3EDE3]/80 hover:border-[#27B7C8]/30 disabled:cursor-default flex items-center gap-2`}
                 >
                   {icon}
                   <span>{option.label}</span>
@@ -124,7 +124,7 @@ export function StrategyChartLesson({ exercise, onComplete }: Props) {
               <p className={`text-xs font-medium mb-1 ${isCorrect ? "text-[#49B06E]" : "text-red-400"}`}>
                 {isCorrect ? "Correct!" : "Not quite."}
               </p>
-              <p className="text-xs text-[#F4F7FA]/60 leading-relaxed">
+              <p className="text-xs text-[#F3EDE3]/60 leading-relaxed">
                 {exercise.options[selected].explanation}
               </p>
             </div>
@@ -134,7 +134,7 @@ export function StrategyChartLesson({ exercise, onComplete }: Props) {
               <div className="mx-4 mb-4 p-3 rounded-lg border border-[#27B7C8]/10 bg-[#27B7C8]/5">
                 <div className="flex items-start gap-2">
                   <span className="text-sm">🌸</span>
-                  <p className="text-xs text-[#F4F7FA]/70 leading-relaxed italic">
+                  <p className="text-xs text-[#F3EDE3]/70 leading-relaxed italic">
                     {exercise.pansyExplanation}
                   </p>
                 </div>

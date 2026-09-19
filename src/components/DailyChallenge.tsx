@@ -96,7 +96,7 @@ export function DailyChallenge() {
       >
         <div className="flex items-center gap-2">
           <Zap className="w-4 h-4" style={{ color: completed ? "#49B06E" : config.color }} />
-          <h3 className="font-serif text-sm font-bold text-foreground">Daily Challenge</h3>
+          <h3 className="text-sm font-bold text-foreground">Daily Challenge</h3>
         </div>
         <div className="flex items-center gap-1.5">
           <span className="text-xs px-2 py-0.5 rounded-full font-medium"

@@ -88,7 +88,7 @@ export default function Goals() {
       spread: 360, 
       ticks: 60, 
       zIndex: 9999,
-      colors: ['#49B06E', '#27B7C8', '#ef4444', '#F4F7FA']
+      colors: ['#49B06E', '#27B7C8', '#ef4444', '#F3EDE3']
     };
 
     const randomInRange = (min: number, max: number) => {

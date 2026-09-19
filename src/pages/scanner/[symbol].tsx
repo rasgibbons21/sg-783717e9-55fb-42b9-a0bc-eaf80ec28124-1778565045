@@ -52,9 +52,9 @@ function formatVol(v: number): string {
 function Metric({ label, value, sub, color }: { label: string; value: string; sub?: string; color?: string }) {
   return (
     <div className="text-center">
-      <div className="text-[10px] text-[#F4F7FA]/40 mb-0.5">{label}</div>
-      <div className="text-sm font-bold" style={{ color: color || "#F4F7FA" }}>{value}</div>
-      {sub && <div className="text-[9px] text-[#F4F7FA]/30">{sub}</div>}
+      <div className="text-[10px] text-[#F3EDE3]/40 mb-0.5">{label}</div>
+      <div className="text-sm font-bold" style={{ color: color || "#F3EDE3" }}>{value}</div>
+      {sub && <div className="text-[9px] text-[#F3EDE3]/30">{sub}</div>}
     </div>
   );
 }
@@ -63,15 +63,15 @@ function CriteriaCheck({ label, pass, detail }: { label: string; pass: boolean |
   return (
     <div className="flex items-start gap-2 py-1.5">
       {pass === null ? (
-        <Info className="w-4 h-4 text-[#F4F7FA]/30 flex-shrink-0 mt-0.5" />
+        <Info className="w-4 h-4 text-[#F3EDE3]/30 flex-shrink-0 mt-0.5" />
       ) : pass ? (
         <CheckCircle className="w-4 h-4 text-[#49B06E] flex-shrink-0 mt-0.5" />
       ) : (
         <XCircle className="w-4 h-4 text-[#EF4444] flex-shrink-0 mt-0.5" />
       )}
       <div>
-        <div className="text-xs font-medium text-[#F4F7FA]/80">{label}</div>
-        <div className="text-[10px] text-[#F4F7FA]/40">{detail}</div>
+        <div className="text-xs font-medium text-[#F3EDE3]/80">{label}</div>
+        <div className="text-[10px] text-[#F3EDE3]/40">{detail}</div>
       </div>
     </div>
   );
@@ -152,7 +152,7 @@ export default function SymbolDetail() {
         {loading && (
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="rounded-2xl p-4 animate-pulse" style={{ background: "#162540" }}>
+              <div key={i} className="rounded-2xl p-4 animate-pulse" style={{ background: "#121821" }}>
                 <div className="h-6 w-24 rounded bg-white/5 mb-3" />
                 <div className="h-4 w-full rounded bg-white/5" />
               </div>
@@ -165,15 +165,15 @@ export default function SymbolDetail() {
             {/* Symbol header */}
             <div
               className="rounded-2xl p-5 mb-4"
-              style={{ background: "linear-gradient(145deg, #0E1B30, #162540)", border: "1px solid rgba(39,183,200,0.15)" }}
+              style={{ background: "linear-gradient(145deg, #07080C, #121821)", border: "1px solid rgba(39,183,200,0.15)" }}
             >
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <h1 className="text-3xl font-bold text-[#F4F7FA]">{sym}</h1>
-                  <span className="text-xs text-[#F4F7FA]/40">Market data · Delayed</span>
+                  <h1 className="text-3xl font-bold text-[#F3EDE3]">{sym}</h1>
+                  <span className="text-xs text-[#F3EDE3]/40">Market data · Delayed</span>
                 </div>
                 <div className="text-right">
-                  <div className="text-2xl font-bold text-[#F4F7FA]">${quote.price.toFixed(2)}</div>
+                  <div className="text-2xl font-bold text-[#F3EDE3]">${quote.price.toFixed(2)}</div>
                   <div
                     className="text-sm font-semibold flex items-center gap-1 justify-end"
                     style={{ color: isGainer ? "#49B06E" : "#EF4444" }}
@@ -196,9 +196,9 @@ export default function SymbolDetail() {
             {/* Strategy criteria checklist */}
             <div
               className="rounded-2xl p-4 mb-4"
-              style={{ background: "linear-gradient(145deg, #0E1B30, #162540)", border: "1px solid rgba(39,183,200,0.1)" }}
+              style={{ background: "linear-gradient(145deg, #07080C, #121821)", border: "1px solid rgba(39,183,200,0.1)" }}
             >
-              <h2 className="text-sm font-bold text-[#F4F7FA] mb-3 flex items-center gap-2">
+              <h2 className="text-sm font-bold text-[#F3EDE3] mb-3 flex items-center gap-2">
                 <Shield className="w-4 h-4 text-[#27B7C8]" />
                 Gap-and-Go Criteria
               </h2>
@@ -236,17 +236,17 @@ export default function SymbolDetail() {
             {/* Hypothetical trade plan */}
             <div
               className="rounded-2xl p-4 mb-4"
-              style={{ background: "linear-gradient(145deg, #0E1B30, #162540)", border: "1px solid rgba(39,183,200,0.1)" }}
+              style={{ background: "linear-gradient(145deg, #07080C, #121821)", border: "1px solid rgba(39,183,200,0.1)" }}
             >
               <button
                 onClick={() => { haptic(); setShowPlan(!showPlan); }}
                 className="w-full flex items-center justify-between"
               >
-                <h2 className="text-sm font-bold text-[#F4F7FA] flex items-center gap-2">
+                <h2 className="text-sm font-bold text-[#F3EDE3] flex items-center gap-2">
                   <Target className="w-4 h-4 text-[#D4AF37]" />
                   Hypothetical Trade Plan
                 </h2>
-                {showPlan ? <ChevronUp className="w-4 h-4 text-[#F4F7FA]/40" /> : <ChevronDown className="w-4 h-4 text-[#F4F7FA]/40" />}
+                {showPlan ? <ChevronUp className="w-4 h-4 text-[#F3EDE3]/40" /> : <ChevronDown className="w-4 h-4 text-[#F3EDE3]/40" />}
               </button>
 
               {showPlan && (
@@ -272,19 +272,19 @@ export default function SymbolDetail() {
 
                   <div className="grid grid-cols-4 gap-2 text-center">
                     <div>
-                      <div className="text-[9px] text-[#F4F7FA]/30">Risk/Share</div>
+                      <div className="text-[9px] text-[#F3EDE3]/30">Risk/Share</div>
                       <div className="text-xs font-semibold text-[#EF4444]">${risk.toFixed(2)}</div>
                     </div>
                     <div>
-                      <div className="text-[9px] text-[#F4F7FA]/30">Reward</div>
+                      <div className="text-[9px] text-[#F3EDE3]/30">Reward</div>
                       <div className="text-xs font-semibold text-[#49B06E]">${(target1 - entry).toFixed(2)}</div>
                     </div>
                     <div>
-                      <div className="text-[9px] text-[#F4F7FA]/30">R:R</div>
+                      <div className="text-[9px] text-[#F3EDE3]/30">R:R</div>
                       <div className="text-xs font-semibold" style={{ color: rr >= 2 ? "#49B06E" : "#F59E0B" }}>{rr}:1</div>
                     </div>
                     <div>
-                      <div className="text-[9px] text-[#F4F7FA]/30">Target 2</div>
+                      <div className="text-[9px] text-[#F3EDE3]/30">Target 2</div>
                       <div className="text-xs font-semibold text-[#49B06E]">${target2.toFixed(2)}</div>
                     </div>
                   </div>
@@ -294,13 +294,13 @@ export default function SymbolDetail() {
                     <motion.button
                       whileTap={{ scale: 0.95 }}
                       className="w-full py-3 rounded-xl font-bold text-sm mt-2"
-                      style={{ background: "linear-gradient(135deg, #C9A84C, #D4AF37)", color: "#0E1B30" }}
+                      style={{ background: "linear-gradient(135deg, #C9A84C, #D4AF37)", color: "#07080C" }}
                     >
                       Paper Trade This Setup
                     </motion.button>
                   </Link>
 
-                  <p className="text-[9px] text-[#F4F7FA]/25 text-center leading-relaxed">
+                  <p className="text-[9px] text-[#F3EDE3]/25 text-center leading-relaxed">
                     Hypothetical paper trade only. Entry at current price with 5% stop.
                     Verify all levels before any real decision.
                   </p>
@@ -312,9 +312,9 @@ export default function SymbolDetail() {
             {news.length > 0 && (
               <div
                 className="rounded-2xl p-4 mb-4"
-                style={{ background: "linear-gradient(145deg, #0E1B30, #162540)", border: "1px solid rgba(39,183,200,0.1)" }}
+                style={{ background: "linear-gradient(145deg, #07080C, #121821)", border: "1px solid rgba(39,183,200,0.1)" }}
               >
-                <h2 className="text-sm font-bold text-[#F4F7FA] mb-3 flex items-center gap-2">
+                <h2 className="text-sm font-bold text-[#F3EDE3] mb-3 flex items-center gap-2">
                   <Newspaper className="w-4 h-4 text-[#27B7C8]" />
                   Catalyst / News
                 </h2>
@@ -328,8 +328,8 @@ export default function SymbolDetail() {
                       className="block rounded-xl p-3 transition-all hover:bg-white/5"
                       style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}
                     >
-                      <p className="text-xs text-[#F4F7FA] leading-snug line-clamp-2 mb-1">{n.title}</p>
-                      <div className="flex items-center gap-2 text-[9px] text-[#F4F7FA]/30">
+                      <p className="text-xs text-[#F3EDE3] leading-snug line-clamp-2 mb-1">{n.title}</p>
+                      <div className="flex items-center gap-2 text-[9px] text-[#F3EDE3]/30">
                         <span>{n.site}</span>
                         {n.publishedDate && (
                           <>
@@ -346,8 +346,8 @@ export default function SymbolDetail() {
 
             {/* Disclaimer */}
             <div className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
-              <p className="text-[9px] text-[#F4F7FA]/25 leading-relaxed">
-                <strong className="text-[#F4F7FA]/35">Educational decision support only.</strong>{" "}
+              <p className="text-[9px] text-[#F3EDE3]/25 leading-relaxed">
+                <strong className="text-[#F3EDE3]/35">Educational decision support only.</strong>{" "}
                 This is a hypothetical paper-trade analysis, not investment advice. Market data may be delayed or incorrect.
                 Day trading involves significant risk of rapid losses. Verify all data and make your own decision.
               </p>
@@ -357,9 +357,9 @@ export default function SymbolDetail() {
 
         {!loading && !quote && (
           <div className="text-center py-16">
-            <AlertTriangle className="w-8 h-8 text-[#F4F7FA]/20 mx-auto mb-3" />
-            <p className="text-sm text-[#F4F7FA]/40">Could not load data for {sym}.</p>
-            <p className="text-xs text-[#F4F7FA]/25 mt-1">The symbol may be invalid or data is temporarily unavailable.</p>
+            <AlertTriangle className="w-8 h-8 text-[#F3EDE3]/20 mx-auto mb-3" />
+            <p className="text-sm text-[#F3EDE3]/40">Could not load data for {sym}.</p>
+            <p className="text-xs text-[#F3EDE3]/25 mt-1">The symbol may be invalid or data is temporarily unavailable.</p>
           </div>
         )}
       </div>

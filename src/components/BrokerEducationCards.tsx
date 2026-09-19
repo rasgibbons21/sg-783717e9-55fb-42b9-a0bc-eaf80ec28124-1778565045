@@ -27,7 +27,7 @@ const cards = [
 export default function BrokerEducationCards() {
   return (
     <div className="space-y-4">
-      <h2 className="font-serif text-2xl font-bold text-foreground">Learn Before You Trade</h2>
+      <h2 className="text-2xl font-bold text-foreground">Learn Before You Trade</h2>
       <div className="grid gap-4 sm:grid-cols-2">
         {cards.map((card) => (
           <Card key={card.title} className="p-5 bg-card/80 border-border/50 rounded-2xl">

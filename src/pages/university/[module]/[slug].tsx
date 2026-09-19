@@ -92,12 +92,12 @@ function QuizSection({
 
   return (
     <div className="mt-10">
-      <h2 className="text-xl font-serif font-semibold text-[#F4F7FA] mb-6">Knowledge Check</h2>
+      <h2 className="text-xl font-serif font-semibold text-[#F3EDE3] mb-6">Knowledge Check</h2>
 
       <div className="space-y-8">
         {lesson.quiz.map((q, qIdx) => (
-          <div key={qIdx} className="p-5 rounded-2xl border border-white/10 bg-[#162540]">
-            <p className="text-[#F4F7FA] font-medium mb-4 text-sm leading-relaxed">
+          <div key={qIdx} className="p-5 rounded-2xl border border-white/10 bg-[#121821]">
+            <p className="text-[#F3EDE3] font-medium mb-4 text-sm leading-relaxed">
               {qIdx + 1}. {q.q}
             </p>
             <div className="space-y-2">
@@ -106,7 +106,7 @@ function QuizSection({
                 const isCorrect = optIdx === q.correct;
                 let borderColor = "border-white/10";
                 let bg = "bg-transparent";
-                let textColor = "text-[#F4F7FA]/70";
+                let textColor = "text-[#F3EDE3]/70";
 
                 if (submitted) {
                   if (isCorrect) {
@@ -138,7 +138,7 @@ function QuizSection({
               })}
             </div>
             {submitted && (
-              <div className="mt-3 p-3 rounded-lg bg-white/5 text-xs text-[#F4F7FA]/60 leading-relaxed">
+              <div className="mt-3 p-3 rounded-lg bg-white/5 text-xs text-[#F3EDE3]/60 leading-relaxed">
                 {q.explanation}
               </div>
             )}
@@ -150,7 +150,7 @@ function QuizSection({
         <button
           onClick={handleSubmit}
           disabled={selected.some((s) => s === null)}
-          className="mt-6 w-full py-3 rounded-xl font-medium text-sm bg-[#27B7C8] text-[#0E1B30] hover:bg-[#27B7C8]/90 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+          className="mt-6 w-full py-3 rounded-xl font-medium text-sm bg-[#27B7C8] text-[#07080C] hover:bg-[#27B7C8]/90 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
         >
           Submit Answers
         </button>
@@ -161,13 +161,13 @@ function QuizSection({
           passed ? "border-[#49B06E]/40 bg-[#49B06E]/5" : "border-white/10 bg-white/5"
         }`}>
           <div className="text-3xl mb-2">{passed ? "🎉" : "📚"}</div>
-          <p className="text-[#F4F7FA] font-semibold">
+          <p className="text-[#F3EDE3] font-semibold">
             {score} / {lesson.quiz.length} correct
           </p>
-          <p className="text-[#F4F7FA]/50 text-sm mt-1">
+          <p className="text-[#F3EDE3]/50 text-sm mt-1">
             {passed ? "Nicely done! You passed the quiz." : "Review the lesson and try again — patterns take time to internalize."}
           </p>
-          {saving && <p className="text-xs text-[#F4F7FA]/30 mt-2">Saving result…</p>}
+          {saving && <p className="text-xs text-[#F3EDE3]/30 mt-2">Saving result…</p>}
           {saved && !saving && <p className="text-xs text-[#49B06E] mt-2">Result saved ✓</p>}
         </div>
       )}
@@ -299,7 +299,7 @@ export default function LessonPage({ moduleSlug, lessonSlug, requiresClientAuth 
   if (isVerifying) {
     return (
       <Layout>
-        <div className="min-h-screen flex items-center justify-center bg-[#0E1B30]">
+        <div className="min-h-screen flex items-center justify-center bg-[#07080C]">
           <div className="w-12 h-12 border-4 border-[#27B7C8] border-t-transparent rounded-full animate-spin" />
         </div>
       </Layout>
@@ -312,18 +312,18 @@ export default function LessonPage({ moduleSlug, lessonSlug, requiresClientAuth 
     <Layout>
       <SEO title={`${lesson.title} — ${mod.title} — Bloom University`} description={lesson.subtitle} />
 
-      <div className="bg-[#0E1B30] min-h-screen pb-16">
+      <div className="bg-[#07080C] min-h-screen pb-16">
         {/* Breadcrumb */}
         <div className="border-b border-white/10 bg-[#0F1E33]">
           <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs text-[#F4F7FA]/40">
+            <div className="flex items-center gap-2 text-xs text-[#F3EDE3]/40">
               <Link href="/university" className="hover:text-[#27B7C8] transition-colors">University</Link>
               <span>/</span>
               <Link href={`/university/${moduleSlug}`} className="hover:text-[#27B7C8] transition-colors">{mod.title}</Link>
               <span>/</span>
-              <span className="text-[#F4F7FA]/70">{lesson.title}</span>
+              <span className="text-[#F3EDE3]/70">{lesson.title}</span>
             </div>
-            <button onClick={toggleBookmark} className="text-[#F4F7FA]/40 hover:text-[#27B7C8] transition-colors">
+            <button onClick={toggleBookmark} className="text-[#F3EDE3]/40 hover:text-[#27B7C8] transition-colors">
               {isBookmarked
                 ? <BookmarkCheck className="w-5 h-5 text-[#27B7C8]" />
                 : <Bookmark className="w-5 h-5" />
@@ -341,17 +341,17 @@ export default function LessonPage({ moduleSlug, lessonSlug, requiresClientAuth 
               }`}>
                 {lesson.difficulty}
               </span>
-              <span className="text-xs text-[#F4F7FA]/40 flex items-center gap-1">
+              <span className="text-xs text-[#F3EDE3]/40 flex items-center gap-1">
                 <Clock className="w-3 h-3" />
                 {lesson.readingMinutes} min read
               </span>
             </div>
-            <h1 className="text-3xl font-serif font-bold text-[#F4F7FA] mb-2">{lesson.title}</h1>
-            <p className="text-[#F4F7FA]/60 leading-relaxed">{lesson.subtitle}</p>
+            <h1 className="text-3xl font-serif font-bold text-[#F3EDE3] mb-2">{lesson.title}</h1>
+            <p className="text-[#F3EDE3]/60 leading-relaxed">{lesson.subtitle}</p>
           </div>
 
           {/* Diagram */}
-          <div className="mb-10 rounded-2xl overflow-hidden border border-white/10 bg-[#162540] p-4">
+          <div className="mb-10 rounded-2xl overflow-hidden border border-white/10 bg-[#121821] p-4">
             <div
               dangerouslySetInnerHTML={{ __html: lesson.diagram }}
               className="w-full"
@@ -362,10 +362,10 @@ export default function LessonPage({ moduleSlug, lessonSlug, requiresClientAuth 
           <div className="space-y-10">
             {lesson.sections.map((section, idx) => (
               <div key={idx}>
-                <h2 className="text-xl font-serif font-semibold text-[#F4F7FA] mb-4">{section.heading}</h2>
+                <h2 className="text-xl font-serif font-semibold text-[#F3EDE3] mb-4">{section.heading}</h2>
                 <div className="space-y-4">
                   {section.content.split("\n\n").map((para, pIdx) => (
-                    <p key={pIdx} className="text-[#F4F7FA]/75 leading-relaxed text-sm">
+                    <p key={pIdx} className="text-[#F3EDE3]/75 leading-relaxed text-sm">
                       {para}
                     </p>
                   ))}
@@ -380,7 +380,7 @@ export default function LessonPage({ moduleSlug, lessonSlug, requiresClientAuth 
               <span className="text-2xl flex-shrink-0">🌸</span>
               <div>
                 <p className="text-xs font-semibold text-[#27B7C8] mb-2">Pansy&apos;s Girl-to-Girl Tip</p>
-                <p className="text-[#F4F7FA]/80 text-sm leading-relaxed italic">{lesson.girlToGirlTip}</p>
+                <p className="text-[#F3EDE3]/80 text-sm leading-relaxed italic">{lesson.girlToGirlTip}</p>
               </div>
             </div>
           </div>
@@ -410,7 +410,7 @@ export default function LessonPage({ moduleSlug, lessonSlug, requiresClientAuth 
                   <Sparkles className="w-4 h-4 text-[#27B7C8] flex-shrink-0" />
                   <div>
                     <p className="text-xs font-semibold text-[#27B7C8]">Mission Unlocked!</p>
-                    <p className="text-xs text-[#F4F7FA]/60">
+                    <p className="text-xs text-[#F3EDE3]/60">
                       Head to{" "}
                       <Link href="/progression" className="underline text-[#27B7C8]">My Progression</Link>
                       {" "}to see your new mission in the Practice Trader.
@@ -424,7 +424,7 @@ export default function LessonPage({ moduleSlug, lessonSlug, requiresClientAuth 
           {/* Navigation */}
           <div className="mt-10 flex justify-between">
             <Link href={`/university/${moduleSlug}`}>
-              <button className="flex items-center gap-2 text-sm text-[#F4F7FA]/50 hover:text-[#27B7C8] transition-colors">
+              <button className="flex items-center gap-2 text-sm text-[#F3EDE3]/50 hover:text-[#27B7C8] transition-colors">
                 <ArrowLeft className="w-4 h-4" />
                 Back to {mod.title}
               </button>
@@ -433,7 +433,7 @@ export default function LessonPage({ moduleSlug, lessonSlug, requiresClientAuth 
 
           {/* Disclaimer */}
           <div className="mt-12 p-4 rounded-xl border border-white/10 bg-white/5">
-            <p className="text-xs text-[#F4F7FA]/30 leading-relaxed">
+            <p className="text-xs text-[#F3EDE3]/30 leading-relaxed">
               Educational content only. Nothing in this lesson constitutes financial advice or a recommendation to buy or sell any security. All patterns discussed can and do fail — nothing in technical analysis guarantees profitable outcomes. Trading involves significant risk of loss.
             </p>
           </div>

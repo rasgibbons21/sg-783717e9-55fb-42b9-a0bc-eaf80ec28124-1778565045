@@ -64,7 +64,7 @@ export function TrophyCase() {
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             <Trophy className="w-5 h-5 text-[#F59E0B]" />
-            <h3 className="font-serif text-base font-bold text-foreground">Trophy Case</h3>
+            <h3 className="text-base font-bold text-foreground">Trophy Case</h3>
           </div>
           <span className="text-xs text-muted-foreground">
             <span className="font-bold text-foreground">{data.earnedCount}</span>/{data.totalCount}

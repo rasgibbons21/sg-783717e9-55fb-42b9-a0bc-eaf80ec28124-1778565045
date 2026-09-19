@@ -77,7 +77,7 @@ export function GemsLeaderboard() {
     <Card className="p-6 bg-card border-border rounded-2xl shadow-sm">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="font-serif font-bold text-foreground text-lg">🏆 Lessons Leaderboard</h3>
+          <h3 className="font-bold text-foreground text-lg">🏆 Lessons Leaderboard</h3>
           <p className="text-xs text-muted-foreground mt-0.5">
             Top learners by gems earned — complete lessons to climb.
           </p>

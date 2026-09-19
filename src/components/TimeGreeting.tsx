@@ -18,7 +18,7 @@ export function TimeGreeting({ fullName }: { fullName?: string | null }) {
   const firstName = toFirstName(fullName);
 
   return (
-    <h1 className="font-serif text-3xl md:text-4xl font-bold text-foreground">
+    <h1 className="text-3xl md:text-4xl font-bold text-foreground">
       <span className="text-[#27B7C8]">{greeting}</span>
       {firstName ? `, ${firstName}` : ""} 🌸
     </h1>

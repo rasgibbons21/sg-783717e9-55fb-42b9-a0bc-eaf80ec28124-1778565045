@@ -99,7 +99,7 @@ export default function CertificatePage() {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center" style={{ background: "#0E1B30" }}>
+      <div className="fixed inset-0 flex items-center justify-center" style={{ background: "#07080C" }}>
         <Loader2 className="w-8 h-8 animate-spin text-[#27B7C8]" />
       </div>
     );
@@ -109,27 +109,27 @@ export default function CertificatePage() {
     return (
       <>
         <Head><title>Certificate | Bloom</title></Head>
-        <div className="fixed inset-0 flex items-center justify-center" style={{ background: "#0E1B30" }}>
+        <div className="fixed inset-0 flex items-center justify-center" style={{ background: "#07080C" }}>
           <div className="text-center max-w-sm mx-4">
             <div className="w-20 h-20 mx-auto mb-5 rounded-full flex items-center justify-center" style={{ background: "rgba(201,168,76,0.1)", border: "2px solid rgba(201,168,76,0.3)" }}>
               <Lock className="w-8 h-8 text-[#C9A84C]" />
             </div>
-            <h2 className="text-xl font-serif font-bold text-[#F4F7FA] mb-2">
+            <h2 className="text-xl font-serif font-bold text-[#F3EDE3] mb-2">
               Certificates are for Subscribers
             </h2>
-            <p className="text-sm text-[#F4F7FA]/50 mb-6 leading-relaxed">
+            <p className="text-sm text-[#F3EDE3]/50 mb-6 leading-relaxed">
               Subscribe to Radar Core to unlock certificates, download them, and share your achievements.
             </p>
             <button
               onClick={() => router.push("/subscription")}
               className="px-8 py-3 rounded-xl font-bold text-sm transition-all hover:scale-105"
-              style={{ background: "linear-gradient(135deg, #C9A84C, #D4AF37)", color: "#0E1B30" }}
+              style={{ background: "linear-gradient(135deg, #C9A84C, #D4AF37)", color: "#07080C" }}
             >
               Subscribe to Radar Core
             </button>
             <button
               onClick={() => router.back()}
-              className="block mx-auto mt-4 text-sm text-[#F4F7FA]/40 hover:text-[#F4F7FA]/60"
+              className="block mx-auto mt-4 text-sm text-[#F3EDE3]/40 hover:text-[#F3EDE3]/60"
             >
               Go back
             </button>
@@ -146,9 +146,9 @@ export default function CertificatePage() {
   return (
     <>
       <Head><title>Certificate of Completion | Bloom</title></Head>
-      <div className="fixed inset-0 overflow-y-auto" style={{ background: "#0E1B30" }}>
+      <div className="fixed inset-0 overflow-y-auto" style={{ background: "#07080C" }}>
         <div className="max-w-3xl mx-auto p-4 sm:p-8 space-y-6">
-          <button onClick={() => router.back()} className="flex items-center gap-2 text-[#F4F7FA]/50 hover:text-[#F4F7FA]/80 transition-colors">
+          <button onClick={() => router.back()} className="flex items-center gap-2 text-[#F3EDE3]/50 hover:text-[#F3EDE3]/80 transition-colors">
             <ArrowLeft className="w-4 h-4" /> Back
           </button>
 
@@ -168,14 +168,14 @@ export default function CertificatePage() {
             {/* Locked overlay */}
             {notEligible && (
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center bg-[#0E1B30]/90 backdrop-blur-sm rounded-2xl border border-[#C9A84C]/20 px-8 py-8 max-w-sm mx-4 shadow-2xl">
+                <div className="text-center bg-[#07080C]/90 backdrop-blur-sm rounded-2xl border border-[#C9A84C]/20 px-8 py-8 max-w-sm mx-4 shadow-2xl">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#C9A84C]/10 border-2 border-[#C9A84C]/30 flex items-center justify-center">
                     <Lock className="w-7 h-7 text-[#C9A84C]" />
                   </div>
-                  <h3 className="text-lg font-serif font-bold text-[#F4F7FA] mb-2">
+                  <h3 className="text-lg font-serif font-bold text-[#F3EDE3] mb-2">
                     Almost Yours
                   </h3>
-                  <p className="text-sm text-[#F4F7FA]/50 mb-4 leading-relaxed">
+                  <p className="text-sm text-[#F3EDE3]/50 mb-4 leading-relaxed">
                     Complete all lessons to unlock your certificate and download it.
                   </p>
                   {cert!.totalRequired && (
@@ -193,7 +193,7 @@ export default function CertificatePage() {
                   )}
                   <button
                     onClick={() => router.back()}
-                    className="px-6 py-2.5 rounded-xl text-sm font-semibold text-[#0E1B30] transition-all hover:scale-105"
+                    className="px-6 py-2.5 rounded-xl text-sm font-semibold text-[#07080C] transition-all hover:scale-105"
                     style={{ background: "linear-gradient(135deg, #C9A84C, #D4AF37)" }}
                   >
                     Keep Learning
@@ -284,7 +284,7 @@ function BasicsCert({ name, date, certId }: { name: string; date: string; certId
             <div style={{ textAlign: "center", marginBottom: 28 }}>
               <h1 style={{
                 fontFamily: "'Georgia', 'Times New Roman', serif", fontSize: 32, fontWeight: 700,
-                color: "#0E1B30", margin: 0, letterSpacing: 6, textTransform: "uppercase",
+                color: "#07080C", margin: 0, letterSpacing: 6, textTransform: "uppercase",
               }}>
                 BLOOM
               </h1>
@@ -324,7 +324,7 @@ function BasicsCert({ name, date, certId }: { name: string; date: string; certId
               textAlign: "center",
               fontFamily: "'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif",
               fontSize: 44, fontWeight: 400, fontStyle: "italic",
-              color: "#0E1B30", margin: "0 0 4px", lineHeight: 1.2,
+              color: "#07080C", margin: "0 0 4px", lineHeight: 1.2,
             }}>
               {name}
             </h3>
@@ -342,7 +342,7 @@ function BasicsCert({ name, date, certId }: { name: string; date: string; certId
             {/* Course name */}
             <h4 style={{
               textAlign: "center", fontFamily: "'Georgia', serif",
-              fontSize: 26, fontWeight: 700, color: "#0E1B30", margin: "0 0 20px",
+              fontSize: 26, fontWeight: 700, color: "#07080C", margin: "0 0 20px",
             }}>
               Bloom Investing Foundations
             </h4>
@@ -359,7 +359,7 @@ function BasicsCert({ name, date, certId }: { name: string; date: string; certId
               <div style={{ textAlign: "center", width: 140 }}>
                 <p style={{
                   fontFamily: "'Palatino Linotype', Georgia, serif",
-                  fontSize: 22, fontStyle: "italic", color: "#0E1B30", margin: "0 0 6px",
+                  fontSize: 22, fontStyle: "italic", color: "#07080C", margin: "0 0 6px",
                 }}>Pansy</p>
                 <div style={{ width: "100%", height: 1, background: "#C9A84C", marginBottom: 6 }} />
                 <p style={{ fontSize: 10, color: "#64748B", margin: 0, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase" }}>Bloom Guide</p>
@@ -388,13 +388,13 @@ function BasicsCert({ name, date, certId }: { name: string; date: string; certId
             {/* Bottom bar */}
             <div style={{
               marginTop: 40, padding: "14px 24px",
-              background: "linear-gradient(135deg, #0E1B30, #162844)",
+              background: "linear-gradient(135deg, #07080C, #162844)",
               borderRadius: 6,
               display: "flex", justifyContent: "space-between", alignItems: "center",
             }}>
               <div>
                 <p style={{ fontSize: 8, color: "#C9A84C", margin: 0, textTransform: "uppercase", letterSpacing: 2, fontWeight: 600 }}>Certificate ID</p>
-                <p style={{ fontSize: 12, color: "#F4F7FA", margin: "2px 0 0", fontFamily: "'Courier New', monospace", fontWeight: 700, letterSpacing: 1 }}>{certId}</p>
+                <p style={{ fontSize: 12, color: "#F3EDE3", margin: "2px 0 0", fontFamily: "'Courier New', monospace", fontWeight: 700, letterSpacing: 1 }}>{certId}</p>
               </div>
               <div style={{ textAlign: "center" }}>
                 <p style={{ fontSize: 9, color: "#C9A84C", margin: 0, fontWeight: 700, letterSpacing: 2 }}>
@@ -450,7 +450,7 @@ function UniversityCert({ name, date, certId, title, moduleName }: { name: strin
           {/* Navy ribbon accent on left */}
           <div style={{
             position: "absolute", top: 0, left: 0, width: 6, height: "100%",
-            background: "linear-gradient(180deg, #0E1B30, #27B7C8, #0E1B30)",
+            background: "linear-gradient(180deg, #07080C, #27B7C8, #07080C)",
           }} />
 
           <div style={{ padding: "56px 48px 56px 56px", position: "relative" }}>
@@ -476,7 +476,7 @@ function UniversityCert({ name, date, certId, title, moduleName }: { name: strin
             <div style={{ textAlign: "center", marginBottom: 24 }}>
               <h1 style={{
                 fontFamily: "'Georgia', 'Times New Roman', serif", fontSize: 32, fontWeight: 700,
-                color: "#0E1B30", margin: 0, letterSpacing: 6, textTransform: "uppercase",
+                color: "#07080C", margin: 0, letterSpacing: 6, textTransform: "uppercase",
               }}>
                 BLOOM
               </h1>
@@ -516,7 +516,7 @@ function UniversityCert({ name, date, certId, title, moduleName }: { name: strin
               textAlign: "center",
               fontFamily: "'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif",
               fontSize: 44, fontWeight: 400, fontStyle: "italic",
-              color: "#0E1B30", margin: "0 0 4px", lineHeight: 1.2,
+              color: "#07080C", margin: "0 0 4px", lineHeight: 1.2,
             }}>
               {name}
             </h3>
@@ -533,7 +533,7 @@ function UniversityCert({ name, date, certId, title, moduleName }: { name: strin
             {/* Program name */}
             <h4 style={{
               textAlign: "center", fontFamily: "'Georgia', serif",
-              fontSize: 24, fontWeight: 700, color: "#0E1B30", margin: "0 0 4px",
+              fontSize: 24, fontWeight: 700, color: "#07080C", margin: "0 0 4px",
               textTransform: "uppercase", letterSpacing: 3,
             }}>
               {title}
@@ -563,7 +563,7 @@ function UniversityCert({ name, date, certId, title, moduleName }: { name: strin
               <div style={{ textAlign: "center", width: 140 }}>
                 <p style={{
                   fontFamily: "'Palatino Linotype', Georgia, serif",
-                  fontSize: 22, fontStyle: "italic", color: "#0E1B30", margin: "0 0 6px",
+                  fontSize: 22, fontStyle: "italic", color: "#07080C", margin: "0 0 6px",
                 }}>Pansy</p>
                 <div style={{ width: "100%", height: 1, background: "#C9A84C", marginBottom: 6 }} />
                 <p style={{ fontSize: 10, color: "#64748B", margin: 0, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase" }}>Bloom Guide & Founder</p>
@@ -592,13 +592,13 @@ function UniversityCert({ name, date, certId, title, moduleName }: { name: strin
             {/* Bottom bar */}
             <div style={{
               marginTop: 40, padding: "14px 24px",
-              background: "linear-gradient(135deg, #0E1B30, #162844)",
+              background: "linear-gradient(135deg, #07080C, #162844)",
               borderRadius: 6,
               display: "flex", justifyContent: "space-between", alignItems: "center",
             }}>
               <div>
                 <p style={{ fontSize: 8, color: "#C9A84C", margin: 0, textTransform: "uppercase", letterSpacing: 2, fontWeight: 600 }}>Certificate ID</p>
-                <p style={{ fontSize: 12, color: "#F4F7FA", margin: "2px 0 0", fontFamily: "'Courier New', monospace", fontWeight: 700, letterSpacing: 1 }}>{certId}</p>
+                <p style={{ fontSize: 12, color: "#F3EDE3", margin: "2px 0 0", fontFamily: "'Courier New', monospace", fontWeight: 700, letterSpacing: 1 }}>{certId}</p>
               </div>
               <div style={{ textAlign: "center" }}>
                 <p style={{ fontSize: 9, color: "#C9A84C", margin: 0, fontWeight: 700, letterSpacing: 2 }}>

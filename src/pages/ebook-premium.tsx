@@ -12,7 +12,7 @@ export default function EbookPremium() {
         <div
           className="min-h-screen flex flex-col justify-center items-center text-white p-8"
           style={{
-            background: 'linear-gradient(135deg, #0E1B30 0%, #27B7C8 100%)',
+            background: 'linear-gradient(135deg, #07080C 0%, #27B7C8 100%)',
           }}
         >
           <div className="text-center max-w-2xl">
@@ -53,7 +53,7 @@ export default function EbookPremium() {
         {/* Page 2: The Problem (Pain Points) */}
         <div className="min-h-screen p-12 bg-gradient-to-b from-white to-slate-50">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-5xl font-black mb-12" style={{ color: '#0E1B30' }}>
+            <h2 className="text-5xl font-black mb-12" style={{ color: '#07080C' }}>
               You&apos;re Not Broken
             </h2>
 
@@ -129,7 +129,7 @@ export default function EbookPremium() {
         {/* Page 3: The Plot Twist */}
         <div
           className="min-h-screen p-12 flex flex-col justify-center"
-          style={{ background: 'linear-gradient(135deg, #0E1B30 0%, #1E293B 100%)', color: 'white' }}
+          style={{ background: 'linear-gradient(135deg, #07080C 0%, #1E293B 100%)', color: 'white' }}
         >
           <div className="max-w-4xl mx-auto">
             <div className="mb-8">
@@ -171,7 +171,7 @@ export default function EbookPremium() {
         {/* Page 4: The 3 Phases */}
         <div className="min-h-screen p-12 bg-white">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-5xl font-black mb-4" style={{ color: '#0E1B30' }}>
+            <h2 className="text-5xl font-black mb-4" style={{ color: '#07080C' }}>
               The 3-Phase System
             </h2>
             <p className="text-xl text-slate-600 mb-12">
@@ -186,7 +186,7 @@ export default function EbookPremium() {
               >
                 1
               </div>
-              <h3 className="text-3xl font-black mb-4" style={{ color: '#0E1B30' }}>
+              <h3 className="text-3xl font-black mb-4" style={{ color: '#07080C' }}>
                 Budget Like Your Life Depends On It
               </h3>
               <p className="text-lg text-slate-700 mb-6 leading-relaxed">
@@ -218,7 +218,7 @@ export default function EbookPremium() {
               >
                 2
               </div>
-              <h3 className="text-3xl font-black mb-4" style={{ color: '#0E1B30' }}>
+              <h3 className="text-3xl font-black mb-4" style={{ color: '#07080C' }}>
                 Build Multiple Income Streams
               </h3>
               <p className="text-lg text-slate-700 mb-6 leading-relaxed">
@@ -258,7 +258,7 @@ export default function EbookPremium() {
               >
                 3
               </div>
-              <h3 className="text-3xl font-black mb-4" style={{ color: '#0E1B30' }}>
+              <h3 className="text-3xl font-black mb-4" style={{ color: '#07080C' }}>
                 Invest With Real Capital
               </h3>
               <p className="text-lg text-slate-700 mb-6 leading-relaxed">
@@ -288,7 +288,7 @@ export default function EbookPremium() {
         {/* Page 5: Why This Works */}
         <div className="min-h-screen p-12 bg-gradient-to-b from-slate-50 to-white">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-4xl font-black mb-12" style={{ color: '#0E1B30' }}>
+            <h2 className="text-4xl font-black mb-12" style={{ color: '#07080C' }}>
               Why This Actually Works
             </h2>
 
@@ -360,7 +360,7 @@ export default function EbookPremium() {
         {/* Page 7: 5 Mistakes */}
         <div className="min-h-screen p-12 bg-white">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-5xl font-black mb-12" style={{ color: '#0E1B30' }}>
+            <h2 className="text-5xl font-black mb-12" style={{ color: '#07080C' }}>
               5 Mistakes Don&apos;t Make
             </h2>
 
@@ -396,7 +396,7 @@ export default function EbookPremium() {
         {/* Page 8: Your First Week */}
         <div className="min-h-screen p-12 bg-gradient-to-b from-slate-50 to-white">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-5xl font-black mb-4" style={{ color: '#0E1B30' }}>
+            <h2 className="text-5xl font-black mb-4" style={{ color: '#07080C' }}>
               Your First 7 Days
             </h2>
             <p className="text-xl text-slate-600 mb-12">
@@ -434,7 +434,7 @@ export default function EbookPremium() {
         <div
           className="min-h-screen p-12 flex flex-col justify-center"
           style={{
-            background: 'linear-gradient(135deg, #0E1B30 0%, #27B7C8 100%)',
+            background: 'linear-gradient(135deg, #07080C 0%, #27B7C8 100%)',
             color: 'white'
           }}
         >

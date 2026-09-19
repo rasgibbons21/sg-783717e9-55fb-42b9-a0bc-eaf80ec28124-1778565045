@@ -227,7 +227,7 @@ export default function StockPage() {
               </div>
               <Button
                 onClick={() => loadPansyAnalysis(ticker as string, stockData)}
-                className="bg-[#27B7C8] hover:bg-[#27B7C8]/90 text-[#0E1B30] font-semibold px-6 py-3 text-base shadow-lg shrink-0"
+                className="bg-[#27B7C8] hover:bg-[#27B7C8]/90 text-[#07080C] font-semibold px-6 py-3 text-base shadow-lg shrink-0"
               >
                 {isPro ? (
                   <>✨ Get Pansy's Take</>
@@ -240,7 +240,7 @@ export default function StockPage() {
         )}
 
         {/* TradingView Chart */}
-        <Card className="p-6 bg-[#0E1B30] border-border rounded-2xl space-y-4">
+        <Card className="p-6 bg-[#07080C] border-border rounded-2xl space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div className="flex items-center gap-2">
               <BarChart3 className="w-5 h-5 text-foreground" />
@@ -248,7 +248,7 @@ export default function StockPage() {
             </div>
           </div>
           
-          <div className="w-full h-[400px] rounded-lg overflow-hidden mt-4 bg-[#0E1B30] relative border border-white/5">
+          <div className="w-full h-[400px] rounded-lg overflow-hidden mt-4 bg-[#07080C] relative border border-white/5">
             {ticker && (
               <iframe 
                 src={`https://s.tradingview.com/widgetembed/?symbol=${ticker}&interval=D&theme=dark&studies=RSI@tv-basicstudies&studies=VWAP@tv-basicstudies`}

@@ -160,7 +160,7 @@ export default function Ebook() {
         image="/bloom-share.png"
       />
 
-      <div style={{ fontFamily: "'DM Sans', sans-serif", background: C.bg, color: C.white, minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+      <div style={{ fontFamily: "'Inter', sans-serif", background: C.bg, color: C.white, minHeight: "100vh", display: "flex", flexDirection: "column" }}>
         {/* Nav */}
         <nav style={{ borderBottom: `1px solid ${C.border}`, background: "rgba(8,15,26,0.9)", backdropFilter: "blur(20px)", position: "sticky", top: 0, zIndex: 50 }}>
           <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 1.5rem", height: 56, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -229,7 +229,7 @@ export default function Ebook() {
             <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
               {chapters.map((ch, i) => (
                 <div key={ch.num} style={{ display: "flex", gap: 16, padding: "14px 0", borderTop: i > 0 ? `1px solid rgba(255,255,255,0.05)` : "none" }}>
-                  <span style={{ color: C.accent, fontWeight: 700, fontSize: 13, fontFamily: "'DM Sans', monospace", letterSpacing: "0.05em", flexShrink: 0, width: 28, paddingTop: 2 }}>{ch.num}</span>
+                  <span style={{ color: C.accent, fontWeight: 700, fontSize: 13, fontFamily: "'Inter', monospace", letterSpacing: "0.05em", flexShrink: 0, width: 28, paddingTop: 2 }}>{ch.num}</span>
                   <div>
                     <p style={{ fontSize: 15, fontWeight: 600, color: C.white, marginBottom: 3 }}>{ch.title}</p>
                     <p style={{ fontSize: 13, color: C.muted, margin: 0 }}>{ch.desc}</p>

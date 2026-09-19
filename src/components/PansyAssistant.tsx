@@ -67,7 +67,7 @@ export function PansyAssistant() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 12, scale: 0.95 }}
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
-            className="w-72 rounded-2xl border border-[#27B7C8]/20 bg-[#0E1B30]/95 backdrop-blur-xl shadow-2xl shadow-[#27B7C8]/10 overflow-hidden"
+            className="w-72 rounded-2xl border border-[#27B7C8]/20 bg-[#07080C]/95 backdrop-blur-xl shadow-2xl shadow-[#27B7C8]/10 overflow-hidden"
           >
             {/* Header */}
             <div className="flex items-center justify-between px-4 pt-3 pb-2">
@@ -152,7 +152,7 @@ export function PansyAssistant() {
         {/* Notification dot */}
         {!isOpen && !dismissed && (
           <motion.div
-            className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-[#F59E0B] border-2 border-[#0E1B30]"
+            className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-[#F59E0B] border-2 border-[#07080C]"
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.5, type: "spring" }}

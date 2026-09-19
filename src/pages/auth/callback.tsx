@@ -57,7 +57,7 @@ export default function AuthCallback() {
 
   return (
     <div style={{
-      background: "#0E1B30",
+      background: "#07080C",
       color: "#ffffff",
       height: "100vh",
       display: "flex",

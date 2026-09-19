@@ -47,7 +47,7 @@ export const LeaderboardMini = ({ userId }: { userId?: string | null }) => {
     accentDim: "rgba(39, 183, 200, 0.12)",
     green: "#49B06E",
     red: "#E5484D",
-    text: "#F4F7FA",
+    text: "#F3EDE3",
     textDim: "rgba(244, 247, 250, 0.6)",
     textMuted: "rgba(244, 247, 250, 0.35)",
   };
@@ -56,7 +56,7 @@ export const LeaderboardMini = ({ userId }: { userId?: string | null }) => {
     <div
       className="rounded-2xl p-5"
       style={{
-        background: "linear-gradient(135deg, #0E1B30, #162540)",
+        background: "linear-gradient(135deg, #07080C, #121821)",
         border: "1px solid rgba(39, 183, 200, 0.2)",
       }}
     >

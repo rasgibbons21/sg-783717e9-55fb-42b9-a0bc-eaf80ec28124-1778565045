@@ -38,7 +38,7 @@ export function ReviewPrompt({ onClose, trigger }: ReviewPromptProps) {
       <div
         className="w-full max-w-sm rounded-2xl p-6 relative"
         style={{
-          background: 'linear-gradient(145deg, #0E1B30, #162540)',
+          background: 'linear-gradient(145deg, #07080C, #121821)',
           border: '1px solid rgba(39,183,200,0.2)',
           boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
         }}
@@ -54,10 +54,10 @@ export function ReviewPrompt({ onClose, trigger }: ReviewPromptProps) {
         {step === 'rate' && (
           <div className="text-center">
             <div style={{ fontSize: 48 }} className="mb-3">&#127800;</div>
-            <h3 className="text-lg font-bold text-[#F4F7FA] mb-1">
+            <h3 className="text-lg font-bold text-[#F3EDE3] mb-1">
               Enjoying Radar?
             </h3>
-            <p className="text-sm text-[#F4F7FA]/50 mb-5 leading-relaxed">
+            <p className="text-sm text-[#F3EDE3]/50 mb-5 leading-relaxed">
               {trigger
                 ? `Nice work completing ${trigger}! How are you enjoying the app so far?`
                 : 'Your feedback helps other traders find Radar. How would you rate us?'}
@@ -82,7 +82,7 @@ export function ReviewPrompt({ onClose, trigger }: ReviewPromptProps) {
 
             <button
               onClick={onClose}
-              className="text-xs text-[#F4F7FA]/30"
+              className="text-xs text-[#F3EDE3]/30"
             >
               Not now
             </button>
@@ -92,10 +92,10 @@ export function ReviewPrompt({ onClose, trigger }: ReviewPromptProps) {
         {step === 'thanks' && (
           <div className="text-center">
             <div style={{ fontSize: 48 }} className="mb-3">&#128150;</div>
-            <h3 className="text-lg font-bold text-[#F4F7FA] mb-1">
+            <h3 className="text-lg font-bold text-[#F3EDE3] mb-1">
               Thank you!
             </h3>
-            <p className="text-sm text-[#F4F7FA]/50 mb-5 leading-relaxed">
+            <p className="text-sm text-[#F3EDE3]/50 mb-5 leading-relaxed">
               Would you mind leaving a quick review? It helps so much — other traders find Radar because of reviews like yours.
             </p>
             <a
@@ -104,13 +104,13 @@ export function ReviewPrompt({ onClose, trigger }: ReviewPromptProps) {
               rel="noopener noreferrer"
               onClick={onClose}
               className="inline-block px-8 py-3 rounded-xl font-bold text-sm transition-all hover:scale-105"
-              style={{ background: 'linear-gradient(135deg, #C9A84C, #D4AF37)', color: '#0E1B30' }}
+              style={{ background: 'linear-gradient(135deg, #C9A84C, #D4AF37)', color: '#07080C' }}
             >
               Leave a Review
             </a>
             <button
               onClick={onClose}
-              className="block mx-auto mt-3 text-xs text-[#F4F7FA]/30"
+              className="block mx-auto mt-3 text-xs text-[#F3EDE3]/30"
             >
               Maybe later
             </button>
@@ -120,10 +120,10 @@ export function ReviewPrompt({ onClose, trigger }: ReviewPromptProps) {
         {step === 'feedback' && (
           <div className="text-center">
             <div style={{ fontSize: 48 }} className="mb-3">&#128172;</div>
-            <h3 className="text-lg font-bold text-[#F4F7FA] mb-1">
+            <h3 className="text-lg font-bold text-[#F3EDE3] mb-1">
               We hear you
             </h3>
-            <p className="text-sm text-[#F4F7FA]/50 mb-5 leading-relaxed">
+            <p className="text-sm text-[#F3EDE3]/50 mb-5 leading-relaxed">
               We&apos;re always improving Radar. Thanks for your honest feedback — it helps us build a better app for you.
             </p>
             <button

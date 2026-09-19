@@ -65,7 +65,7 @@ export default function AcademyCertificatePage() {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center" style={{ background: '#0E1B30' }}>
+      <div className="fixed inset-0 flex items-center justify-center" style={{ background: '#07080C' }}>
         <Loader2 className="w-8 h-8 animate-spin text-[#27B7C8]" />
       </div>
     );
@@ -77,7 +77,7 @@ export default function AcademyCertificatePage() {
         <title>Your Certificate - She Blooms Wealth</title>
       </Head>
 
-      <div className="min-h-screen p-4 sm:p-8" style={{ background: '#0E1B30' }}>
+      <div className="min-h-screen p-4 sm:p-8" style={{ background: '#07080C' }}>
         <div className="max-w-6xl mx-auto">
           {!nameConfirmed ? (
             /* ── Name input step ── */
@@ -85,7 +85,7 @@ export default function AcademyCertificatePage() {
               <div style={{ fontSize: 64 }} className="mb-4">&#127800;</div>
               <h1
                 className="text-3xl font-bold mb-2"
-                style={{ color: '#F4F7FA', fontFamily: 'Georgia, serif' }}
+                style={{ color: '#F3EDE3', fontFamily: 'Georgia, serif' }}
               >
                 Congratulations!
               </h1>
@@ -104,7 +104,7 @@ export default function AcademyCertificatePage() {
                   style={{
                     background: 'rgba(255,255,255,0.05)',
                     border: '1px solid rgba(201,168,76,0.3)',
-                    color: '#F4F7FA',
+                    color: '#F3EDE3',
                     fontFamily: 'Georgia, serif',
                     caretColor: '#D4AF37',
                   }}
@@ -126,7 +126,7 @@ export default function AcademyCertificatePage() {
                   className="w-full py-3.5 rounded-xl font-bold text-sm transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-40"
                   style={{
                     background: 'linear-gradient(135deg, #C9A84C, #D4AF37)',
-                    color: '#0E1B30',
+                    color: '#07080C',
                   }}
                 >
                   Generate My Certificate
@@ -149,7 +149,7 @@ export default function AcademyCertificatePage() {
               <div className="text-center mb-8">
                 <h1
                   className="text-3xl font-bold mb-2"
-                  style={{ color: '#F4F7FA', fontFamily: 'Georgia, serif' }}
+                  style={{ color: '#F3EDE3', fontFamily: 'Georgia, serif' }}
                 >
                   Your Certificate
                 </h1>

@@ -25,7 +25,7 @@ Return ONLY valid JSON:
     {
       "symbol": "TICKER",
       "reason": "Why this is interesting + what setup to watch for (be specific with levels if the data shows them)",
-      "type": "stock" | "crypto"
+      "type": "stock"
     }
   ],
   "mood": "bullish" | "bearish" | "cautious" | "mixed",
@@ -77,24 +77,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           `- ${g.symbol}: $${g.price?.toFixed(2)} (+${g.changesPercentage?.toFixed(1)}%) vol ${(g.volume || 0).toLocaleString()}`
         ).join("\n");
         context.push(`Top stock gainers:\n${top}`);
-      }
-    }
-  } catch {}
-
-  // Fetch crypto movers
-  try {
-    if (fmpKey) {
-      const r = await fetch(`https://financialmodelingprep.com/api/v3/quotes/crypto?apikey=${fmpKey}`);
-      if (r.ok) {
-        const data: any[] = await r.json();
-        const movers = data
-          .filter((q: any) => q.changesPercentage > 1 && q.marketCap > 1_000_000 && q.symbol?.endsWith("USD"))
-          .sort((a: any, b: any) => b.changesPercentage - a.changesPercentage)
-          .slice(0, 6);
-        const cryptoList = movers.map((c: any) =>
-          `- ${c.symbol}: $${c.price?.toFixed(2)} (${c.changesPercentage >= 0 ? "+" : ""}${c.changesPercentage?.toFixed(1)}%)`
-        ).join("\n");
-        if (cryptoList) context.push(`Crypto movers:\n${cryptoList}`);
       }
     }
   } catch {}

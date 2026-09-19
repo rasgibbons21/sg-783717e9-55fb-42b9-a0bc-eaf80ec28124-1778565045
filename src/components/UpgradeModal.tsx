@@ -31,7 +31,7 @@ export function UpgradeModal({ isOpen, onClose, trigger = "view_limit" }: Upgrad
                 <X className="w-4 h-4" />
               </Button>
             </div>
-            <DialogTitle className="font-serif text-2xl text-foreground mt-4">
+            <DialogTitle className="text-2xl text-foreground mt-4">
               Unlock Radar Core
             </DialogTitle>
           </DialogHeader>
@@ -67,7 +67,7 @@ export function UpgradeModal({ isOpen, onClose, trigger = "view_limit" }: Upgrad
                 <X className="w-4 h-4" />
               </Button>
             </div>
-            <DialogTitle className="font-serif text-2xl text-foreground mt-4">
+            <DialogTitle className="text-2xl text-foreground mt-4">
               Not available in this version
             </DialogTitle>
           </DialogHeader>
@@ -94,7 +94,7 @@ export function UpgradeModal({ isOpen, onClose, trigger = "view_limit" }: Upgrad
               <X className="w-4 h-4" />
             </Button>
           </div>
-          <DialogTitle className="font-serif text-2xl text-foreground mt-4">
+          <DialogTitle className="text-2xl text-foreground mt-4">
             Go from learning to building it.
           </DialogTitle>
         </DialogHeader>
@@ -106,7 +106,7 @@ export function UpgradeModal({ isOpen, onClose, trigger = "view_limit" }: Upgrad
 
           <Card className="p-4 border-accent/20 bg-accent/5">
             <div className="space-y-3">
-              <h4 className="font-serif text-lg font-semibold text-foreground">Radar Core</h4>
+              <h4 className="text-lg font-semibold text-foreground">Radar Core</h4>
               <ul className="space-y-2">
                 {[
                   "Stock screener — strategies scored 0–100, ranked by probability.",
@@ -127,7 +127,7 @@ export function UpgradeModal({ isOpen, onClose, trigger = "view_limit" }: Upgrad
           <div className="grid grid-cols-2 gap-3">
             <div className="rounded-lg border border-border p-3 text-center">
               <p className="text-xs text-muted-foreground">Monthly</p>
-              <p className="font-serif text-xl font-semibold text-foreground">${CORE_PLAN.monthlyPrice}<span className="text-sm font-normal text-muted-foreground">/mo</span></p>
+              <p className="text-xl font-semibold text-foreground">${CORE_PLAN.monthlyPrice}<span className="text-sm font-normal text-muted-foreground">/mo</span></p>
             </div>
             <div className="relative rounded-lg border border-accent p-3 text-center bg-accent/5">
               <Badge className="absolute -top-2 right-2 bg-accent text-accent-foreground text-[10px] px-1.5 py-0.5">
@@ -135,7 +135,7 @@ export function UpgradeModal({ isOpen, onClose, trigger = "view_limit" }: Upgrad
                 {CORE_PLAN.yearlySavingsLabel}
               </Badge>
               <p className="text-xs text-muted-foreground">Yearly</p>
-              <p className="font-serif text-xl font-semibold text-foreground">${CORE_PLAN.yearlyPrice}<span className="text-sm font-normal text-muted-foreground">/yr</span></p>
+              <p className="text-xl font-semibold text-foreground">${CORE_PLAN.yearlyPrice}<span className="text-sm font-normal text-muted-foreground">/yr</span></p>
             </div>
           </div>
 

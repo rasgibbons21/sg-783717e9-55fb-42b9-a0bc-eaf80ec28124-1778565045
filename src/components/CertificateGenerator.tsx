@@ -134,7 +134,7 @@ export const CertificateGenerator = ({
           {/* Logo */}
           <div className="mb-4">
             <div style={{ fontSize: '48px', marginBottom: '8px' }}>&#127800;</div>
-            <p style={{ fontSize: '24px', fontWeight: 'bold', color: '#0E1B30', letterSpacing: '2px' }}>
+            <p style={{ fontSize: '24px', fontWeight: 'bold', color: '#07080C', letterSpacing: '2px' }}>
               BLOOM
             </p>
             <p style={{ fontSize: '12px', color: accentColor, letterSpacing: '1px', marginTop: '2px' }}>
@@ -158,7 +158,7 @@ export const CertificateGenerator = ({
           </div>
 
           {/* Recognition */}
-          <p style={{ fontSize: '12px', color: '#0E1B30', marginBottom: '12px', letterSpacing: '1px' }}>
+          <p style={{ fontSize: '12px', color: '#07080C', marginBottom: '12px', letterSpacing: '1px' }}>
             THIS CERTIFICATE RECOGNIZES THAT
           </p>
 
@@ -166,7 +166,7 @@ export const CertificateGenerator = ({
           <h2
             style={{
               fontSize: '42px',
-              color: '#0E1B30',
+              color: '#07080C',
               fontStyle: 'italic',
               fontFamily: 'Georgia, serif',
               marginBottom: '16px',
@@ -180,7 +180,7 @@ export const CertificateGenerator = ({
           <div style={{ width: '200px', height: '2px', backgroundColor: borderColor, margin: '0 auto 16px' }} />
 
           {/* Achievement */}
-          <p style={{ fontSize: '12px', color: '#0E1B30', marginBottom: '8px', letterSpacing: '1px' }}>
+          <p style={{ fontSize: '12px', color: '#07080C', marginBottom: '8px', letterSpacing: '1px' }}>
             HAS SUCCESSFULLY COMPLETED
           </p>
 
@@ -198,7 +198,7 @@ export const CertificateGenerator = ({
           </h3>
 
           {/* Description */}
-          <p style={{ fontSize: '10px', color: '#0E1B30', marginBottom: '20px', lineHeight: '1.6', maxWidth: '600px', margin: '0 auto 20px' }}>
+          <p style={{ fontSize: '10px', color: '#07080C', marginBottom: '20px', lineHeight: '1.6', maxWidth: '600px', margin: '0 auto 20px' }}>
             Demonstrating completion of educational modules covering investing fundamentals, stocks &
             ETFs, market concepts, chart reading, risk awareness, trading psychology and practical
             market education.
@@ -218,7 +218,7 @@ export const CertificateGenerator = ({
           >
             {/* Signature */}
             <div style={{ textAlign: 'center' }}>
-              <p style={{ fontSize: '11px', color: '#0E1B30', fontStyle: 'italic' }}>Pansy</p>
+              <p style={{ fontSize: '11px', color: '#07080C', fontStyle: 'italic' }}>Pansy</p>
               <div style={{ width: '60px', height: '1px', backgroundColor: borderColor, margin: '4px auto' }} />
               <p style={{ fontSize: '9px', color: borderColor, marginTop: '4px' }}>PANSY</p>
               <p style={{ fontSize: '8px', color: borderColor }}>Learning Guide</p>
@@ -231,7 +231,7 @@ export const CertificateGenerator = ({
 
             {/* Date */}
             <div style={{ textAlign: 'center' }}>
-              <p style={{ fontSize: '11px', color: '#0E1B30', fontStyle: 'italic' }}>{completionDate}</p>
+              <p style={{ fontSize: '11px', color: '#07080C', fontStyle: 'italic' }}>{completionDate}</p>
               <div style={{ width: '60px', height: '1px', backgroundColor: borderColor, margin: '4px auto' }} />
               <p style={{ fontSize: '9px', color: borderColor, marginTop: '4px' }}>DATE COMPLETED</p>
             </div>
@@ -241,12 +241,12 @@ export const CertificateGenerator = ({
           <div style={{ marginTop: '24px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '120px', fontSize: '10px' }}>
             <div>
               <p style={{ color: borderColor, letterSpacing: '1px' }}>CERTIFICATE ID</p>
-              <p style={{ color: '#0E1B30', fontWeight: 'bold', fontFamily: 'monospace' }}>
+              <p style={{ color: '#07080C', fontWeight: 'bold', fontFamily: 'monospace' }}>
                 {certificateId}
               </p>
             </div>
             <div style={{ textAlign: 'right' }}>
-              <p style={{ fontSize: '8px', color: '#0E1B30', opacity: 0.6 }}>
+              <p style={{ fontSize: '8px', color: '#07080C', opacity: 0.6 }}>
                 For educational achievement only —<br />
                 not a professional or financial-services certification.
               </p>
@@ -261,7 +261,7 @@ export const CertificateGenerator = ({
           onClick={downloadPDF}
           disabled={isGenerating}
           className="px-8 py-3 text-white font-bold rounded-lg hover:shadow-lg transition disabled:opacity-50"
-          style={{ background: 'linear-gradient(135deg, #0E1B30, #27B7C8)' }}
+          style={{ background: 'linear-gradient(135deg, #07080C, #27B7C8)' }}
         >
           {isGenerating ? 'Generating PDF...' : 'Download Certificate'}
         </button>

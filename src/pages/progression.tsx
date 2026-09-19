@@ -85,18 +85,18 @@ function HabitBar({ label, value, suffix = "%", description }: {
   return (
     <div>
       <div className="flex items-center justify-between mb-1">
-        <span className="text-xs text-[#F4F7FA]/70">{label}</span>
+        <span className="text-xs text-[#F3EDE3]/70">{label}</span>
         <span className={`text-xs font-mono font-semibold ${habitTextColor(pct)}`}>
           {value != null ? `${pct}${suffix}` : "—"}
         </span>
       </div>
-      <div className="h-1.5 rounded-full bg-[#0E1B30] overflow-hidden">
+      <div className="h-1.5 rounded-full bg-[#07080C] overflow-hidden">
         <div
           className={`h-full rounded-full transition-all ${habitColor(pct)}`}
           style={{ width: `${Math.min(100, pct)}%` }}
         />
       </div>
-      <p className="text-[9px] text-[#F4F7FA]/30 mt-0.5">{description}</p>
+      <p className="text-[9px] text-[#F3EDE3]/30 mt-0.5">{description}</p>
     </div>
   );
 }
@@ -115,26 +115,26 @@ function MissionCard({ mission }: { mission: MissionStatus }) {
     }`}>
       <div className="flex items-start gap-3">
         <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 ${
-          completed ? "bg-[#49B06E]/20" : unlocked ? "bg-[#27B7C8]/15" : "bg-[#0E1B30]"
+          completed ? "bg-[#49B06E]/20" : unlocked ? "bg-[#27B7C8]/15" : "bg-[#07080C]"
         }`}>
           {completed ? <CheckCircle className="w-4 h-4 text-[#49B06E]" /> :
            unlocked  ? <Sparkles className="w-4 h-4 text-[#27B7C8]" /> :
-                       <Lock className="w-4 h-4 text-[#F4F7FA]/20" />}
+                       <Lock className="w-4 h-4 text-[#F3EDE3]/20" />}
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap mb-1">
             <span className={`text-sm font-semibold ${
-              completed ? "text-[#49B06E]" : unlocked ? "text-[#F4F7FA]" : "text-[#F4F7FA]/40"
+              completed ? "text-[#49B06E]" : unlocked ? "text-[#F3EDE3]" : "text-[#F3EDE3]/40"
             }`}>{mission.title}</span>
             <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded font-semibold ${
               completed ? "bg-[#49B06E]/15 text-[#49B06E]" : "bg-[#27B7C8]/10 text-[#27B7C8]"
             }`}>+{mission.xpReward} XP</span>
           </div>
           <p className={`text-xs leading-relaxed mb-2 ${
-            locked ? "text-[#F4F7FA]/30" : "text-[#F4F7FA]/60"
+            locked ? "text-[#F3EDE3]/30" : "text-[#F3EDE3]/60"
           }`}>{mission.description}</p>
           {locked && (
-            <p className="text-[10px] text-[#F4F7FA]/30">
+            <p className="text-[10px] text-[#F3EDE3]/30">
               Complete{" "}
               <Link
                 href={`/university/${mission.unlockedByLesson.moduleSlug}/${mission.unlockedByLesson.lessonSlug}`}
@@ -170,7 +170,7 @@ function LevelJourney({ allLevels, currentLevel, xp }: {
 }) {
   return (
     <div className="rounded-xl bg-[#16264A] border border-[#27B7C8]/15 p-4">
-      <h2 className="text-sm font-semibold text-[#F4F7FA] mb-4 flex items-center gap-2">
+      <h2 className="text-sm font-semibold text-[#F3EDE3] mb-4 flex items-center gap-2">
         <Trophy className="w-4 h-4 text-[#27B7C8]" />
         Level Journey
       </h2>
@@ -182,21 +182,21 @@ function LevelJourney({ allLevels, currentLevel, xp }: {
             <div key={lvl.level} className={`flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all ${
               isCurrent ? "bg-[#27B7C8]/10 border border-[#27B7C8]/30" :
               achieved  ? "bg-[#49B06E]/5 border border-[#49B06E]/15" :
-                          "bg-[#0E1B30] border border-transparent opacity-40"
+                          "bg-[#07080C] border border-transparent opacity-40"
             }`}>
               <span className="text-lg w-8 text-center flex-shrink-0">{lvl.badge}</span>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <span className={`text-xs font-semibold ${
-                    isCurrent ? "text-[#27B7C8]" : achieved ? "text-[#49B06E]" : "text-[#F4F7FA]/40"
+                    isCurrent ? "text-[#27B7C8]" : achieved ? "text-[#49B06E]" : "text-[#F3EDE3]/40"
                   }`}>{lvl.name}</span>
                   {isCurrent && <span className="text-[9px] bg-[#27B7C8]/20 text-[#27B7C8] px-1.5 py-0.5 rounded font-semibold">CURRENT</span>}
                   {achieved && !isCurrent && <CheckCircle className="w-3 h-3 text-[#49B06E]" />}
                 </div>
-                <p className="text-[9px] text-[#F4F7FA]/30">{lvl.xpRequired.toLocaleString()} XP required</p>
+                <p className="text-[9px] text-[#F3EDE3]/30">{lvl.xpRequired.toLocaleString()} XP required</p>
               </div>
               <span className={`text-xs font-mono flex-shrink-0 ${
-                isCurrent ? "text-[#27B7C8]" : achieved ? "text-[#49B06E]/60" : "text-[#F4F7FA]/20"
+                isCurrent ? "text-[#27B7C8]" : achieved ? "text-[#49B06E]/60" : "text-[#F3EDE3]/20"
               }`}>Lv {lvl.level}</span>
             </div>
           );
@@ -211,19 +211,19 @@ function ProGate() {
   return (
     <div className="flex flex-col items-center justify-center py-20 text-center">
       <Lock className="w-10 h-10 text-[#27B7C8]/40 mb-4" />
-      <h2 className="font-serif text-xl font-bold text-[#F4F7FA] mb-2">Pro Feature</h2>
+      <h2 className="font-serif text-xl font-bold text-[#F3EDE3] mb-2">Pro Feature</h2>
       {canShowExternalPayment ? (
         <>
-          <p className="text-sm text-[#F4F7FA]/50 mb-6 max-w-xs">
+          <p className="text-sm text-[#F3EDE3]/50 mb-6 max-w-xs">
             Progression, missions, and discipline tracking are available to Pro subscribers.
           </p>
           <Link href="/subscription-offer"
-            className="px-6 py-3 rounded-xl bg-[#27B7C8] text-[#0E1B30] font-semibold text-sm hover:bg-[#27B7C8]/90 transition-colors">
+            className="px-6 py-3 rounded-xl bg-[#27B7C8] text-[#07080C] font-semibold text-sm hover:bg-[#27B7C8]/90 transition-colors">
             Upgrade to Pro
           </Link>
         </>
       ) : (
-        <p className="text-sm text-[#F4F7FA]/50 max-w-xs">
+        <p className="text-sm text-[#F3EDE3]/50 max-w-xs">
           This feature isn&apos;t available in this version.
         </p>
       )}
@@ -265,13 +265,13 @@ export default function ProgressionPage(_props: PageProps) {
     <>
       <Head><title>My Progression — Bloom</title></Head>
       <Layout>
-        <div className="min-h-screen bg-[#0E1B30] px-4 py-6 max-w-2xl mx-auto">
+        <div className="min-h-screen bg-[#07080C] px-4 py-6 max-w-2xl mx-auto">
 
           {/* Header */}
           <div className="mb-6">
             <div className="flex items-center gap-3 mb-2">
               <Trophy className="w-6 h-6 text-[#27B7C8]" />
-              <h1 className="font-serif text-2xl font-bold text-[#F4F7FA]">My Progression</h1>
+              <h1 className="font-serif text-2xl font-bold text-[#F3EDE3]">My Progression</h1>
             </div>
             <div className="flex items-start gap-2 rounded-lg bg-[#27B7C8]/10 border border-[#27B7C8]/20 px-3 py-2">
               <AlertTriangle className="w-4 h-4 text-[#27B7C8] flex-shrink-0 mt-0.5" />
@@ -284,7 +284,7 @@ export default function ProgressionPage(_props: PageProps) {
           {(authLoading || (loading && isPro)) && (
             <div className="flex items-center justify-center py-16 gap-3">
               <Loader2 className="w-5 h-5 text-[#27B7C8] animate-spin" />
-              <span className="text-sm text-[#F4F7FA]/50">Loading your progression…</span>
+              <span className="text-sm text-[#F3EDE3]/50">Loading your progression…</span>
             </div>
           )}
 
@@ -302,25 +302,25 @@ export default function ProgressionPage(_props: PageProps) {
               {/* ── Level Card ──────────────────────────────────────────── */}
               <div className="rounded-2xl bg-[#16264A] border border-[#27B7C8]/20 p-5">
                 <div className="flex items-center gap-4 mb-4">
-                  <div className="w-16 h-16 rounded-2xl bg-[#0E1B30] border border-[#27B7C8]/20 flex items-center justify-center text-3xl flex-shrink-0">
+                  <div className="w-16 h-16 rounded-2xl bg-[#07080C] border border-[#27B7C8]/20 flex items-center justify-center text-3xl flex-shrink-0">
                     {data.level.current.badge}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[10px] text-[#F4F7FA]/40 uppercase tracking-wide mb-0.5">Level {data.level.current.level} of 9</p>
-                    <h2 className="font-serif text-xl font-bold text-[#F4F7FA]">{data.level.current.name}</h2>
+                    <p className="text-[10px] text-[#F3EDE3]/40 uppercase tracking-wide mb-0.5">Level {data.level.current.level} of 9</p>
+                    <h2 className="font-serif text-xl font-bold text-[#F3EDE3]">{data.level.current.name}</h2>
                     <p className="text-xs text-[#27B7C8] font-mono mt-0.5">{data.xp.toLocaleString()} XP total</p>
                   </div>
                 </div>
 
                 {data.level.next ? (
                   <>
-                    <div className="h-2 rounded-full bg-[#0E1B30] overflow-hidden mb-1.5">
+                    <div className="h-2 rounded-full bg-[#07080C] overflow-hidden mb-1.5">
                       <div
                         className="h-full rounded-full bg-[#27B7C8] transition-all"
                         style={{ width: `${data.level.progressPct}%` }}
                       />
                     </div>
-                    <div className="flex justify-between text-[10px] text-[#F4F7FA]/40">
+                    <div className="flex justify-between text-[10px] text-[#F3EDE3]/40">
                       <span>{data.level.current.name}</span>
                       <span>{data.level.xpToNext?.toLocaleString()} XP to {data.level.next.name} {data.level.next.badge}</span>
                     </div>
@@ -354,7 +354,7 @@ export default function ProgressionPage(_props: PageProps) {
               {/* ── Discipline Habits ────────────────────────────────────── */}
               <div className="rounded-xl bg-[#16264A] border border-[#27B7C8]/15 p-4">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-sm font-semibold text-[#F4F7FA] flex items-center gap-2">
+                  <h2 className="text-sm font-semibold text-[#F3EDE3] flex items-center gap-2">
                     <BookOpen className="w-4 h-4 text-[#27B7C8]" />
                     Discipline Habits
                   </h2>
@@ -368,7 +368,7 @@ export default function ProgressionPage(_props: PageProps) {
                 </div>
 
                 {data.habits.totalClosedTrades === 0 ? (
-                  <div className="text-center py-6 text-[#F4F7FA]/30 text-sm">
+                  <div className="text-center py-6 text-[#F3EDE3]/30 text-sm">
                     Close your first trade to see habit metrics.
                     <div className="mt-2">
                       <Link href="/practice" className="text-[#27B7C8] hover:underline text-xs">Go to Practice Trader →</Link>
@@ -401,7 +401,7 @@ export default function ProgressionPage(_props: PageProps) {
                       value={data.habits.journalCompletionRate}
                       description="% of closed trades that triggered a full Pansy review and journal entry"
                     />
-                    <p className="text-[9px] text-[#F4F7FA]/25 leading-relaxed pt-1">
+                    <p className="text-[9px] text-[#F3EDE3]/25 leading-relaxed pt-1">
                       Discipline is rewarded by habits, not by profits. A losing trade with a written plan, a stop, and a journal entry scores higher than a winning trade with no process.
                     </p>
                   </div>
@@ -411,11 +411,11 @@ export default function ProgressionPage(_props: PageProps) {
               {/* ── Missions ────────────────────────────────────────────── */}
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-sm font-semibold text-[#F4F7FA] flex items-center gap-2">
+                  <h2 className="text-sm font-semibold text-[#F3EDE3] flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-[#27B7C8]" />
                     Missions
                   </h2>
-                  <div className="flex gap-2 text-[10px] text-[#F4F7FA]/40">
+                  <div className="flex gap-2 text-[10px] text-[#F3EDE3]/40">
                     <span className="text-[#49B06E]">{data.missions.filter(m => m.status === "completed").length} done</span>
                     <span>·</span>
                     <span className="text-[#27B7C8]">{data.missions.filter(m => m.status === "unlocked").length} active</span>
@@ -423,7 +423,7 @@ export default function ProgressionPage(_props: PageProps) {
                     <span>{data.missions.filter(m => m.status === "locked").length} locked</span>
                   </div>
                 </div>
-                <p className="text-xs text-[#F4F7FA]/40 mb-3 leading-relaxed">
+                <p className="text-xs text-[#F3EDE3]/40 mb-3 leading-relaxed">
                   Each mission is unlocked by completing its paired lesson in Bloom University. Then apply what you learned in the Practice Trader to complete it.
                 </p>
                 <div className="space-y-3">
@@ -453,15 +453,15 @@ export default function ProgressionPage(_props: PageProps) {
                   <Link key={href} href={href}
                     className="rounded-xl bg-[#16264A] border border-[#27B7C8]/10 p-3 hover:border-[#27B7C8]/30 hover:bg-[#27B7C8]/5 transition-colors group">
                     <div className="text-[#27B7C8]/70 group-hover:text-[#27B7C8] mb-2">{icon}</div>
-                    <p className="text-xs font-semibold text-[#F4F7FA]">{label}</p>
-                    <p className="text-[9px] text-[#F4F7FA]/35 mt-0.5 leading-snug">{sub}</p>
-                    <ChevronRight className="w-3 h-3 text-[#F4F7FA]/20 mt-1 group-hover:text-[#27B7C8]/50" />
+                    <p className="text-xs font-semibold text-[#F3EDE3]">{label}</p>
+                    <p className="text-[9px] text-[#F3EDE3]/35 mt-0.5 leading-snug">{sub}</p>
+                    <ChevronRight className="w-3 h-3 text-[#F3EDE3]/20 mt-1 group-hover:text-[#27B7C8]/50" />
                   </Link>
                 ))}
               </div>
 
               <div className="text-center pb-4">
-                <p className="text-[10px] text-[#F4F7FA]/20 leading-relaxed max-w-sm mx-auto">
+                <p className="text-[10px] text-[#F3EDE3]/20 leading-relaxed max-w-sm mx-auto">
                   Bloom is an educational simulator. XP and progression reflect practice habits only — not real trading performance. Not financial advice.
                 </p>
               </div>

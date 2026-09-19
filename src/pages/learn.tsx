@@ -2205,7 +2205,7 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
         if (updated.length === lessons.length && !confettiFired) {
           setConfettiFired(true);
           try { navigator?.vibrate?.([8, 60, 12]); } catch {}
-          confetti({ particleCount: 200, spread: 90, origin: { y: 0.6 }, colors: ["#27B7C8", "#49B06E", "#FFD700", "#F4F7FA"] });
+          confetti({ particleCount: 200, spread: 90, origin: { y: 0.6 }, colors: ["#27B7C8", "#49B06E", "#FFD700", "#F3EDE3"] });
           setTimeout(() => confetti({ particleCount: 100, spread: 120, origin: { y: 0.4, x: 0.3 } }), 300);
           setTimeout(() => confetti({ particleCount: 100, spread: 120, origin: { y: 0.4, x: 0.7 } }), 600);
         }
@@ -2280,7 +2280,7 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
         if (updated.length === lessons.length && !confettiFired) {
           setConfettiFired(true);
           try { navigator?.vibrate?.([8, 60, 12]); } catch {}
-          confetti({ particleCount: 200, spread: 90, origin: { y: 0.6 }, colors: ["#27B7C8", "#49B06E", "#FFD700", "#F4F7FA"] });
+          confetti({ particleCount: 200, spread: 90, origin: { y: 0.6 }, colors: ["#27B7C8", "#49B06E", "#FFD700", "#F3EDE3"] });
           setTimeout(() => confetti({ particleCount: 100, spread: 120, origin: { y: 0.4, x: 0.3 } }), 300);
           setTimeout(() => confetti({ particleCount: 100, spread: 120, origin: { y: 0.4, x: 0.7 } }), 600);
         }

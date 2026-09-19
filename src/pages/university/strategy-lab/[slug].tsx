@@ -154,9 +154,9 @@ export default function StrategyLessonPage({ slug, requiresClientAuth }: Props) 
   if (!strategy) {
     return (
       <Layout>
-        <div className="min-h-screen flex items-center justify-center bg-[#0E1B30]">
+        <div className="min-h-screen flex items-center justify-center bg-[#07080C]">
           <div className="text-center">
-            <p className="text-[#F4F7FA]/60 mb-4">Strategy not found.</p>
+            <p className="text-[#F3EDE3]/60 mb-4">Strategy not found.</p>
             <Link href="/university/strategy-lab" className="text-[#27B7C8] text-sm">
               Back to Strategy Lab
             </Link>
@@ -169,7 +169,7 @@ export default function StrategyLessonPage({ slug, requiresClientAuth }: Props) 
   if (isVerifying) {
     return (
       <Layout>
-        <div className="min-h-screen flex items-center justify-center bg-[#0E1B30]">
+        <div className="min-h-screen flex items-center justify-center bg-[#07080C]">
           <div className="w-12 h-12 border-4 border-[#27B7C8] border-t-transparent rounded-full animate-spin mx-auto" />
         </div>
       </Layout>
@@ -192,7 +192,7 @@ export default function StrategyLessonPage({ slug, requiresClientAuth }: Props) 
         description={`Learn the ${strategy.name} strategy with interactive charts and exercises. Educational only.`}
       />
 
-      <div className="bg-[#0E1B30] min-h-screen">
+      <div className="bg-[#07080C] min-h-screen">
         <div className="max-w-3xl mx-auto px-4 py-6">
           {/* Back + breadcrumb */}
           <Link
@@ -208,8 +208,8 @@ export default function StrategyLessonPage({ slug, requiresClientAuth }: Props) 
             <div className="flex items-center gap-3 mb-2">
               <span className="text-3xl">{strategy.icon}</span>
               <div>
-                <h1 className="text-2xl font-serif font-bold text-[#F4F7FA]">{strategy.name}</h1>
-                <div className="flex items-center gap-2 text-xs text-[#F4F7FA]/40 mt-0.5">
+                <h1 className="text-2xl font-serif font-bold text-[#F3EDE3]">{strategy.name}</h1>
+                <div className="flex items-center gap-2 text-xs text-[#F3EDE3]/40 mt-0.5">
                   <span className={`px-1.5 py-0.5 rounded ${
                     strategy.difficulty === "Beginner" ? "bg-[#49B06E]/10 text-[#49B06E]" :
                     strategy.difficulty === "Intermediate" ? "bg-[#27B7C8]/10 text-[#27B7C8]" :
@@ -225,8 +225,8 @@ export default function StrategyLessonPage({ slug, requiresClientAuth }: Props) 
             </div>
 
             {/* Market conditions */}
-            <p className="text-xs text-[#F4F7FA]/40 mt-2">
-              <span className="text-[#F4F7FA]/60">Best studied during:</span> {strategy.marketConditions}
+            <p className="text-xs text-[#F3EDE3]/40 mt-2">
+              <span className="text-[#F3EDE3]/60">Best studied during:</span> {strategy.marketConditions}
             </p>
 
             {/* Toolbelt toggle */}
@@ -236,7 +236,7 @@ export default function StrategyLessonPage({ slug, requiresClientAuth }: Props) 
               className={`mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                 inToolbelt
                   ? "bg-[#49B06E]/10 text-[#49B06E] border border-[#49B06E]/20"
-                  : "bg-white/5 text-[#F4F7FA]/50 border border-white/10 hover:border-[#27B7C8]/30"
+                  : "bg-white/5 text-[#F3EDE3]/50 border border-white/10 hover:border-[#27B7C8]/30"
               }`}
             >
               {inToolbelt ? <Check className="w-3 h-3" /> : <Plus className="w-3 h-3" />}
@@ -248,7 +248,7 @@ export default function StrategyLessonPage({ slug, requiresClientAuth }: Props) 
           <div className="mb-6 p-4 rounded-xl border border-[#27B7C8]/10 bg-[#27B7C8]/5">
             <div className="flex items-start gap-2">
               <span className="text-lg">🌸</span>
-              <p className="text-sm text-[#F4F7FA]/70 italic leading-relaxed">{strategy.pansy.intro}</p>
+              <p className="text-sm text-[#F3EDE3]/70 italic leading-relaxed">{strategy.pansy.intro}</p>
             </div>
           </div>
 
@@ -279,7 +279,7 @@ export default function StrategyLessonPage({ slug, requiresClientAuth }: Props) 
                 className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                   activeSection === i
                     ? "bg-[#27B7C8] text-white"
-                    : "bg-white/5 text-[#F4F7FA]/50 hover:bg-white/10"
+                    : "bg-white/5 text-[#F3EDE3]/50 hover:bg-white/10"
                 }`}
               >
                 {s.heading.length > 20 ? s.heading.slice(0, 20) + "…" : s.heading}
@@ -297,9 +297,9 @@ export default function StrategyLessonPage({ slug, requiresClientAuth }: Props) 
               transition={{ duration: 0.2 }}
               className="mb-6"
             >
-              <div className="bg-[#162540] rounded-xl border border-white/5 p-5">
-                <h2 className="text-lg font-semibold text-[#F4F7FA] mb-3">{section.heading}</h2>
-                <div className="text-sm text-[#F4F7FA]/70 leading-relaxed whitespace-pre-line">
+              <div className="bg-[#121821] rounded-xl border border-white/5 p-5">
+                <h2 className="text-lg font-semibold text-[#F3EDE3] mb-3">{section.heading}</h2>
+                <div className="text-sm text-[#F3EDE3]/70 leading-relaxed whitespace-pre-line">
                   {section.content}
                 </div>
               </div>
@@ -335,7 +335,7 @@ export default function StrategyLessonPage({ slug, requiresClientAuth }: Props) 
           {/* Diagram */}
           {strategy.diagram && (
             <div className="mb-6">
-              <h3 className="text-sm font-semibold text-[#F4F7FA] mb-3 flex items-center gap-2">
+              <h3 className="text-sm font-semibold text-[#F3EDE3] mb-3 flex items-center gap-2">
                 <BookOpen className="w-4 h-4 text-[#27B7C8]" />
                 Visual Diagram
               </h3>
@@ -349,7 +349,7 @@ export default function StrategyLessonPage({ slug, requiresClientAuth }: Props) 
           {/* Chart exercises */}
           {strategy.chartExercises.length > 0 && (
             <div className="mb-6 space-y-4">
-              <h3 className="text-sm font-semibold text-[#F4F7FA] flex items-center gap-2">
+              <h3 className="text-sm font-semibold text-[#F3EDE3] flex items-center gap-2">
                 📊 Chart Exercises
               </h3>
               {strategy.chartExercises.map((ex) => (
@@ -367,11 +367,11 @@ export default function StrategyLessonPage({ slug, requiresClientAuth }: Props) 
           {/* Quiz */}
           {strategy.quiz.length > 0 && (
             <div className="mb-6">
-              <h3 className="text-sm font-semibold text-[#F4F7FA] mb-3">Knowledge Check</h3>
+              <h3 className="text-sm font-semibold text-[#F3EDE3] mb-3">Knowledge Check</h3>
 
               {!quizStarted ? (
-                <div className="bg-[#162540] rounded-xl border border-white/5 p-5 text-center">
-                  <p className="text-sm text-[#F4F7FA]/60 mb-4">
+                <div className="bg-[#121821] rounded-xl border border-white/5 p-5 text-center">
+                  <p className="text-sm text-[#F3EDE3]/60 mb-4">
                     {strategy.quiz.length} questions to test your understanding.
                   </p>
                   <button
@@ -387,8 +387,8 @@ export default function StrategyLessonPage({ slug, requiresClientAuth }: Props) 
               ) : (
                 <div className="space-y-4">
                   {strategy.quiz.map((q, qi) => (
-                    <div key={qi} className="bg-[#162540] rounded-xl border border-white/5 p-4">
-                      <p className="text-sm font-medium text-[#F4F7FA] mb-3">
+                    <div key={qi} className="bg-[#121821] rounded-xl border border-white/5 p-4">
+                      <p className="text-sm font-medium text-[#F3EDE3] mb-3">
                         {qi + 1}. {q.q}
                       </p>
                       <div className="space-y-2">
@@ -418,7 +418,7 @@ export default function StrategyLessonPage({ slug, requiresClientAuth }: Props) 
                                 setQuizAnswers(newAnswers);
                               }}
                               disabled={quizSubmitted}
-                              className={`w-full text-left px-3 py-2 rounded-lg border ${optClass} text-xs text-[#F4F7FA]/70 transition-all flex items-center gap-2 disabled:cursor-default`}
+                              className={`w-full text-left px-3 py-2 rounded-lg border ${optClass} text-xs text-[#F3EDE3]/70 transition-all flex items-center gap-2 disabled:cursor-default`}
                             >
                               {icon}
                               {opt}
@@ -428,7 +428,7 @@ export default function StrategyLessonPage({ slug, requiresClientAuth }: Props) 
                       </div>
 
                       {quizSubmitted && quizAnswers[qi] !== null && (
-                        <p className="mt-2 text-[10px] text-[#F4F7FA]/50 leading-relaxed">
+                        <p className="mt-2 text-[10px] text-[#F3EDE3]/50 leading-relaxed">
                           {q.explanation}
                         </p>
                       )}
@@ -449,10 +449,10 @@ export default function StrategyLessonPage({ slug, requiresClientAuth }: Props) 
                         ? "border-[#49B06E]/20 bg-[#49B06E]/5"
                         : "border-amber-400/20 bg-amber-400/5"
                     }`}>
-                      <p className="text-lg font-bold text-[#F4F7FA]">
+                      <p className="text-lg font-bold text-[#F3EDE3]">
                         {quizScore}/{strategy.quiz.length}
                       </p>
-                      <p className="text-xs text-[#F4F7FA]/50">
+                      <p className="text-xs text-[#F3EDE3]/50">
                         {quizScore / strategy.quiz.length >= 0.75 ? "Great work!" : "Review and try again next time."}
                       </p>
                     </div>
@@ -469,24 +469,24 @@ export default function StrategyLessonPage({ slug, requiresClientAuth }: Props) 
                 <span className="text-lg">🌸</span>
                 <div>
                   {strategy.pansy.afterQuiz.map((line, i) => (
-                    <p key={i} className="text-sm text-[#F4F7FA]/70 italic leading-relaxed mb-1">
+                    <p key={i} className="text-sm text-[#F3EDE3]/70 italic leading-relaxed mb-1">
                       {line}
                     </p>
                   ))}
-                  <p className="text-xs text-[#F4F7FA]/50 mt-2">{strategy.pansy.encouragement}</p>
+                  <p className="text-xs text-[#F3EDE3]/50 mt-2">{strategy.pansy.encouragement}</p>
                 </div>
               </div>
             </div>
           )}
 
           {/* Toolbelt summary */}
-          <div className="mb-6 bg-[#162540] rounded-xl border border-white/5 p-5">
+          <div className="mb-6 bg-[#121821] rounded-xl border border-white/5 p-5">
             <div className="flex items-center gap-2 mb-3">
               <Wrench className="w-4 h-4 text-[#27B7C8]" />
-              <h3 className="text-sm font-semibold text-[#F4F7FA]">Strategy Toolbelt Summary</h3>
+              <h3 className="text-sm font-semibold text-[#F3EDE3]">Strategy Toolbelt Summary</h3>
             </div>
-            <div className="space-y-2 text-xs text-[#F4F7FA]/60">
-              <p><span className="text-[#F4F7FA]/80 font-medium">Best studied during:</span> {strategy.toolbelt.bestStudiedDuring}</p>
+            <div className="space-y-2 text-xs text-[#F3EDE3]/60">
+              <p><span className="text-[#F3EDE3]/80 font-medium">Best studied during:</span> {strategy.toolbelt.bestStudiedDuring}</p>
               <p><span className="text-[#49B06E] font-medium">Look for:</span> {strategy.toolbelt.lookFor}</p>
               <p><span className="text-red-400 font-medium">Avoid:</span> {strategy.toolbelt.avoid}</p>
               <p><span className="text-[#27B7C8] font-medium">Confirmation:</span> {strategy.toolbelt.confirmation}</p>
@@ -504,8 +504,8 @@ export default function StrategyLessonPage({ slug, requiresClientAuth }: Props) 
 
           {/* Disclaimer */}
           <div className="mb-8 p-4 rounded-xl border border-white/5 bg-white/5">
-            <p className="text-[9px] text-[#F4F7FA]/25 leading-relaxed">
-              <strong className="text-[#F4F7FA]/40">Educational purposes only.</strong>{" "}
+            <p className="text-[9px] text-[#F3EDE3]/25 leading-relaxed">
+              <strong className="text-[#F3EDE3]/40">Educational purposes only.</strong>{" "}
               This strategy lesson is designed for learning. Nothing here constitutes financial advice.
               All examples use hypothetical educational data. Simulated/historical chart performance does not represent future expected results.
               All strategies can and do fail. Trading involves significant risk of loss.
@@ -528,8 +528,8 @@ function InfoCard({ title, content, color }: { title: string; content: string; c
 
   return (
     <div className={`rounded-lg border p-3 ${colorMap[color] ?? colorMap.teal}`}>
-      <p className="text-xs font-medium text-[#F4F7FA]/80 mb-1">{title}</p>
-      <p className="text-[11px] text-[#F4F7FA]/55 leading-relaxed">{content}</p>
+      <p className="text-xs font-medium text-[#F3EDE3]/80 mb-1">{title}</p>
+      <p className="text-[11px] text-[#F3EDE3]/55 leading-relaxed">{content}</p>
     </div>
   );
 }

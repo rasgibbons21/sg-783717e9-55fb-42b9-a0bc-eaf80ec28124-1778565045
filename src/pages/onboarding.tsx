@@ -253,7 +253,7 @@ export default function Onboarding() {
         boxShadow: selected ? `0 0 12px ${color}40` : "none",
       }}
     >
-      {selected && <div className="w-2.5 h-2.5 rounded-full bg-[#0E1B30]" />}
+      {selected && <div className="w-2.5 h-2.5 rounded-full bg-[#07080C]" />}
     </div>
   );
 
@@ -261,7 +261,7 @@ export default function Onboarding() {
     <>
       <OnboardingStyles />
 
-      <div className="fixed inset-0 overflow-y-auto" style={{ background: "linear-gradient(135deg, #0E1B30 0%, #0a1525 40%, #0d1f35 70%, #0E1B30 100%)" }}>
+      <div className="fixed inset-0 overflow-y-auto" style={{ background: "linear-gradient(135deg, #07080C 0%, #0a1525 40%, #0d1f35 70%, #07080C 100%)" }}>
         <FloatingOrbs />
 
         <div className="relative z-10 flex flex-col min-h-screen">
@@ -275,7 +275,7 @@ export default function Onboarding() {
                       const prev = quizSteps[quizIndex - 1];
                       if (prev) goToStep(prev);
                     }}
-                    className={`flex items-center gap-1 text-sm text-[#F4F7FA]/50 hover:text-[#F4F7FA]/80 transition-colors ${step === "q-experience" ? "invisible" : ""}`}
+                    className={`flex items-center gap-1 text-sm text-[#F3EDE3]/50 hover:text-[#F3EDE3]/80 transition-colors ${step === "q-experience" ? "invisible" : ""}`}
                   >
                     <ArrowLeft className="w-4 h-4" /> Back
                   </button>
@@ -296,7 +296,7 @@ export default function Onboarding() {
                       </div>
                     ))}
                   </div>
-                  <span className="text-xs text-[#F4F7FA]/30 font-medium">{quizIndex + 1}/4</span>
+                  <span className="text-xs text-[#F3EDE3]/30 font-medium">{quizIndex + 1}/4</span>
                 </div>
                 <div className="h-1 rounded-full overflow-hidden backdrop-blur-xl border border-white/[0.08]" style={{ background: "rgba(255,255,255,0.04)" }}>
                   <div
@@ -323,7 +323,7 @@ export default function Onboarding() {
                       <img src="/bloom-logo.png" alt="Bloom" className="w-20 h-20 mx-auto rounded-3xl object-cover" style={{ boxShadow: "0 0 50px rgba(73,176,110,0.3)" }} />
                       <div className="absolute -inset-3 rounded-3xl opacity-50" style={{ background: "linear-gradient(135deg, rgba(73,176,110,0.2), rgba(39,183,200,0.15))", filter: "blur(12px)", zIndex: -1 }} />
                     </div>
-                    <h1 className="font-serif text-4xl font-bold text-[#F4F7FA] leading-tight">Find winning trades<br />before everyone else.</h1>
+                    <h1 className="font-serif text-4xl font-bold text-[#F3EDE3] leading-tight">Find winning trades<br />before everyone else.</h1>
                   </div>
 
                   <div className="space-y-3">
@@ -339,7 +339,7 @@ export default function Onboarding() {
                       >
                         <div className="flex items-center gap-3">
                           <span className="text-xl">{item.icon}</span>
-                          <p className="text-[#F4F7FA]/70 text-sm font-medium">{item.text}</p>
+                          <p className="text-[#F3EDE3]/70 text-sm font-medium">{item.text}</p>
                         </div>
                       </div>
                     ))}
@@ -353,7 +353,7 @@ export default function Onboarding() {
                       </div>
                       <div className="flex-1 space-y-1">
                         <h3 className="font-serif text-base font-semibold text-[#49B06E]">Meet Pansy, your trading coach</h3>
-                        <p className="text-sm leading-relaxed text-[#F4F7FA]/50">
+                        <p className="text-sm leading-relaxed text-[#F3EDE3]/50">
                           I scan the market every day using the Gap-and-Go strategy — the same setups that move small-cap stocks 20%, 50%, even 100%+ in a single session. I&apos;ll show you exactly what I see and why.
                         </p>
                       </div>
@@ -362,7 +362,7 @@ export default function Onboarding() {
 
                   <div className="text-center space-y-1" style={{ animation: animateIn ? "fadeSlideUp 0.5s ease-out 0.75s both" : "none" }}>
                     <p className="text-sm text-[#49B06E] font-semibold">7-day free trial &middot; Cancel anytime</p>
-                    <p className="text-xs text-[#F4F7FA]/30">No credit card required to start</p>
+                    <p className="text-xs text-[#F3EDE3]/30">No credit card required to start</p>
                   </div>
 
                   <div className="space-y-3">
@@ -372,7 +372,7 @@ export default function Onboarding() {
                     <button
                       type="button"
                       onClick={() => { setAuthMode("login"); goToStep("auth"); }}
-                      className="w-full py-3 rounded-2xl text-[#F4F7FA]/50 hover:text-[#F4F7FA]/80 text-base font-medium transition-colors"
+                      className="w-full py-3 rounded-2xl text-[#F3EDE3]/50 hover:text-[#F3EDE3]/80 text-base font-medium transition-colors"
                       style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
                     >
                       I already have an account
@@ -386,7 +386,7 @@ export default function Onboarding() {
                 <div className={`space-y-6 ${animateIn ? "step-animate" : "opacity-0"}`}>
                   <div className="text-center space-y-2">
                     <img src="/bloom-logo.png" alt="Bloom" className="w-14 h-14 mx-auto rounded-2xl object-cover" style={{ boxShadow: "0 0 30px rgba(39,183,200,0.15)" }} />
-                    <h2 className="font-serif text-3xl font-bold text-[#F4F7FA]">
+                    <h2 className="font-serif text-3xl font-bold text-[#F3EDE3]">
                       {authMode === "signup" ? "Create your account" : authMode === "login" ? "Welcome back" : "Reset password"}
                     </h2>
                   </div>
@@ -401,7 +401,7 @@ export default function Onboarding() {
                           onCheckedChange={(checked) => setTermsAccepted(checked as boolean)}
                           className="mt-0.5 border-white/20 data-[state=checked]:bg-[#27B7C8] data-[state=checked]:border-[#27B7C8]"
                         />
-                        <Label htmlFor="terms" className="cursor-pointer text-sm leading-relaxed text-[#F4F7FA]/60">
+                        <Label htmlFor="terms" className="cursor-pointer text-sm leading-relaxed text-[#F3EDE3]/60">
                           I agree to the{" "}
                           <Link href="/terms" target="_blank" className="text-[#27B7C8] underline hover:text-[#27B7C8]/80">Terms of Service</Link>{" "}
                           and{" "}
@@ -424,7 +424,7 @@ export default function Onboarding() {
                               className="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300"
                               style={{
                                 background: authMode === mode ? "linear-gradient(135deg, #49B06E, #27B7C8)" : "transparent",
-                                color: authMode === mode ? "#0E1B30" : "rgba(244,247,250,0.5)",
+                                color: authMode === mode ? "#07080C" : "rgba(244,247,250,0.5)",
                                 boxShadow: authMode === mode ? "0 4px 15px rgba(39,183,200,0.25)" : "none",
                               }}
                             >
@@ -436,10 +436,10 @@ export default function Onboarding() {
 
                       {authMode === "forgot" && !resetEmailSent && (
                         <div className="space-y-2">
-                          <button type="button" onClick={() => { setAuthMode("login"); setResetEmailSent(false); setResetStep("email"); setResetCode(""); setNewPassword(""); setError(""); }} className="flex items-center gap-1 text-sm text-[#F4F7FA]/50 hover:text-[#F4F7FA]/80 transition-colors">
+                          <button type="button" onClick={() => { setAuthMode("login"); setResetEmailSent(false); setResetStep("email"); setResetCode(""); setNewPassword(""); setError(""); }} className="flex items-center gap-1 text-sm text-[#F3EDE3]/50 hover:text-[#F3EDE3]/80 transition-colors">
                             <ArrowLeft className="w-4 h-4" /> Back to Log In
                           </button>
-                          <p className="text-sm text-[#F4F7FA]/40">
+                          <p className="text-sm text-[#F3EDE3]/40">
                             {resetStep === "email" ? "Enter your email and we'll send a reset code." : "Enter the 6-digit code and your new password."}
                           </p>
                         </div>
@@ -448,28 +448,28 @@ export default function Onboarding() {
                       {authMode === "forgot" && resetEmailSent ? (
                         <div className="space-y-4 py-4 text-center">
                           <div className="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center text-3xl" style={{ background: "rgba(73,176,110,0.15)", animation: "pulse-glow 3s ease-in-out infinite" }}>✅</div>
-                          <h3 className="font-serif text-xl font-bold text-[#F4F7FA]">Password Reset!</h3>
-                          <p className="text-sm text-[#F4F7FA]/50">Your password has been updated. You can now log in.</p>
+                          <h3 className="font-serif text-xl font-bold text-[#F3EDE3]">Password Reset!</h3>
+                          <p className="text-sm text-[#F3EDE3]/50">Your password has been updated. You can now log in.</p>
                           <button type="button" onClick={() => { setAuthMode("login"); setResetEmailSent(false); setResetStep("email"); setResetCode(""); setNewPassword(""); setEmail(""); setError(""); }} className="glass-btn">Log In</button>
                         </div>
                       ) : (
                         <>
                           {authMode === "signup" && (
                             <div className="space-y-1.5">
-                              <Label htmlFor="fullName" className="text-xs font-medium text-[#F4F7FA]/40 uppercase tracking-wider">Full Name</Label>
+                              <Label htmlFor="fullName" className="text-xs font-medium text-[#F3EDE3]/40 uppercase tracking-wider">Full Name</Label>
                               <Input id="fullName" type="text" placeholder="Jane Doe" value={fullName} onChange={(e) => setFullName(e.target.value)} disabled={isSubmitting} className="glass-input h-12" />
                             </div>
                           )}
                           <div className="space-y-1.5">
-                            <Label htmlFor="email" className="text-xs font-medium text-[#F4F7FA]/40 uppercase tracking-wider">Email</Label>
+                            <Label htmlFor="email" className="text-xs font-medium text-[#F3EDE3]/40 uppercase tracking-wider">Email</Label>
                             <Input id="email" type="email" placeholder="jane@example.com" value={email} onChange={(e) => setEmail(e.target.value)} disabled={isSubmitting} className="glass-input h-12" />
                           </div>
                           {authMode !== "forgot" && (
                             <div className="space-y-1.5">
-                              <Label htmlFor="password" className="text-xs font-medium text-[#F4F7FA]/40 uppercase tracking-wider">Password</Label>
+                              <Label htmlFor="password" className="text-xs font-medium text-[#F3EDE3]/40 uppercase tracking-wider">Password</Label>
                               <div className="relative">
                                 <Input id="password" type={showPassword ? "text" : "password"} placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required className="glass-input h-12 pr-12" />
-                                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#F4F7FA]/30 hover:text-[#F4F7FA]/60 transition-colors">
+                                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#F3EDE3]/30 hover:text-[#F3EDE3]/60 transition-colors">
                                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                                 </button>
                               </div>
@@ -483,14 +483,14 @@ export default function Onboarding() {
                           {authMode === "forgot" && resetStep === "code" && (
                             <>
                               <div className="space-y-1.5">
-                                <Label htmlFor="resetCode" className="text-xs font-medium text-[#F4F7FA]/40 uppercase tracking-wider">6-Digit Code</Label>
+                                <Label htmlFor="resetCode" className="text-xs font-medium text-[#F3EDE3]/40 uppercase tracking-wider">6-Digit Code</Label>
                                 <Input id="resetCode" type="text" inputMode="numeric" placeholder="000000" maxLength={6} value={resetCode} onChange={(e) => setResetCode(e.target.value.replace(/\D/g, ""))} className="glass-input h-12 text-center text-2xl tracking-[0.5em] font-bold" />
                               </div>
                               <div className="space-y-1.5">
-                                <Label htmlFor="newPassword" className="text-xs font-medium text-[#F4F7FA]/40 uppercase tracking-wider">New Password</Label>
+                                <Label htmlFor="newPassword" className="text-xs font-medium text-[#F3EDE3]/40 uppercase tracking-wider">New Password</Label>
                                 <div className="relative">
                                   <Input id="newPassword" type={showPassword ? "text" : "password"} placeholder="••••••••" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="glass-input h-12 pr-12" />
-                                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#F4F7FA]/30 hover:text-[#F4F7FA]/60 transition-colors">
+                                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#F3EDE3]/30 hover:text-[#F3EDE3]/60 transition-colors">
                                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                                   </button>
                                 </div>
@@ -499,7 +499,7 @@ export default function Onboarding() {
                           )}
                           {authMode === "signup" && (
                             <div className="space-y-1.5">
-                              <Label htmlFor="referral" className="text-xs font-medium text-[#F4F7FA]/40 uppercase tracking-wider">Referral Code <span className="normal-case text-[#F4F7FA]/25">(optional)</span></Label>
+                              <Label htmlFor="referral" className="text-xs font-medium text-[#F3EDE3]/40 uppercase tracking-wider">Referral Code <span className="normal-case text-[#F3EDE3]/25">(optional)</span></Label>
                               <Input id="referral" type="text" placeholder="BLOOM-XXXXXX" value={referralCode} onChange={(e) => setReferralCode(e.target.value.toUpperCase())} disabled={isSubmitting} className="glass-input h-12 tracking-wider" />
                             </div>
                           )}
@@ -523,7 +523,7 @@ export default function Onboarding() {
 
                   {/* Trust signals */}
                   {authMode === "signup" && (
-                    <div className="flex items-center justify-center gap-4 text-[#F4F7FA]/25 text-xs">
+                    <div className="flex items-center justify-center gap-4 text-[#F3EDE3]/25 text-xs">
                       <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> Encrypted</span>
                       <span>·</span>
                       <span>No spam, ever</span>
@@ -532,7 +532,7 @@ export default function Onboarding() {
                     </div>
                   )}
 
-                  <button type="button" onClick={() => goToStep("welcome")} className="w-full text-center text-sm text-[#F4F7FA]/30 hover:text-[#F4F7FA]/60 transition-colors py-2">
+                  <button type="button" onClick={() => goToStep("welcome")} className="w-full text-center text-sm text-[#F3EDE3]/30 hover:text-[#F3EDE3]/60 transition-colors py-2">
                     <ArrowLeft className="w-3.5 h-3.5 inline mr-1" /> Back
                   </button>
                 </div>
@@ -545,8 +545,8 @@ export default function Onboarding() {
                     <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold text-[#49B06E]" style={{ background: "rgba(73,176,110,0.1)", border: "1px solid rgba(73,176,110,0.15)" }}>
                       <Target className="w-3.5 h-3.5" /> Let&apos;s set you up
                     </div>
-                    <h2 className="font-serif text-3xl font-bold text-[#F4F7FA]">Have you traded<br />stocks before?</h2>
-                    <p className="text-[#F4F7FA]/40 text-base">No wrong answer — Pansy adapts to you</p>
+                    <h2 className="font-serif text-3xl font-bold text-[#F3EDE3]">Have you traded<br />stocks before?</h2>
+                    <p className="text-[#F3EDE3]/40 text-base">No wrong answer — Pansy adapts to you</p>
                   </div>
 
                   <div className="space-y-3">
@@ -573,8 +573,8 @@ export default function Onboarding() {
                           <div className="flex items-center gap-4">
                             <span className="text-3xl">{option.icon}</span>
                             <div className="flex-1">
-                              <p className="font-semibold text-base text-[#F4F7FA]">{option.label}</p>
-                              <p className="text-xs text-[#F4F7FA]/40 mt-0.5">{option.desc}</p>
+                              <p className="font-semibold text-base text-[#F3EDE3]">{option.label}</p>
+                              <p className="text-xs text-[#F3EDE3]/40 mt-0.5">{option.desc}</p>
                             </div>
                             <SelectionDot selected={isSelected} color={option.color} />
                           </div>
@@ -586,7 +586,7 @@ export default function Onboarding() {
                   <button type="button" onClick={() => goToStep("q-excites")} disabled={!tradingExperience} className="glass-btn flex items-center justify-center gap-2">
                     Continue <ChevronRight className="w-5 h-5" />
                   </button>
-                  <button type="button" onClick={handleSkip} className="w-full text-center text-sm text-[#F4F7FA]/30 hover:text-[#F4F7FA]/60 transition-colors py-2">Skip for now</button>
+                  <button type="button" onClick={handleSkip} className="w-full text-center text-sm text-[#F3EDE3]/30 hover:text-[#F3EDE3]/60 transition-colors py-2">Skip for now</button>
                 </div>
               )}
 
@@ -597,8 +597,8 @@ export default function Onboarding() {
                     <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold text-[#27B7C8]" style={{ background: "rgba(39,183,200,0.1)", border: "1px solid rgba(39,183,200,0.15)" }}>
                       <Sparkles className="w-3.5 h-3.5" /> Your motivation
                     </div>
-                    <h2 className="font-serif text-3xl font-bold text-[#F4F7FA]">What gets you<br />most excited?</h2>
-                    <p className="text-[#F4F7FA]/40 text-base">This helps Pansy tailor your experience</p>
+                    <h2 className="font-serif text-3xl font-bold text-[#F3EDE3]">What gets you<br />most excited?</h2>
+                    <p className="text-[#F3EDE3]/40 text-base">This helps Pansy tailor your experience</p>
                   </div>
 
                   <div className="space-y-3">
@@ -627,8 +627,8 @@ export default function Onboarding() {
                               {option.icon}
                             </div>
                             <div className="flex-1">
-                              <p className="font-semibold text-base text-[#F4F7FA]">{option.label}</p>
-                              <p className="text-xs text-[#F4F7FA]/40 mt-0.5">{option.desc}</p>
+                              <p className="font-semibold text-base text-[#F3EDE3]">{option.label}</p>
+                              <p className="text-xs text-[#F3EDE3]/40 mt-0.5">{option.desc}</p>
                             </div>
                             <SelectionDot selected={isSelected} color={option.color} />
                           </div>
@@ -640,7 +640,7 @@ export default function Onboarding() {
                   <button type="button" onClick={() => goToStep("q-capital")} disabled={!tradingExcitement} className="glass-btn flex items-center justify-center gap-2">
                     Continue <ChevronRight className="w-5 h-5" />
                   </button>
-                  <button type="button" onClick={handleSkip} className="w-full text-center text-sm text-[#F4F7FA]/30 hover:text-[#F4F7FA]/60 transition-colors py-2">Skip for now</button>
+                  <button type="button" onClick={handleSkip} className="w-full text-center text-sm text-[#F3EDE3]/30 hover:text-[#F3EDE3]/60 transition-colors py-2">Skip for now</button>
                 </div>
               )}
 
@@ -651,8 +651,8 @@ export default function Onboarding() {
                     <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold text-[#8B5CF6]" style={{ background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.15)" }}>
                       <Wallet className="w-3.5 h-3.5" /> Your starting point
                     </div>
-                    <h2 className="font-serif text-3xl font-bold text-[#F4F7FA]">How much are you<br />working with?</h2>
-                    <p className="text-[#F4F7FA]/40 text-base">Gap-and-Go works at any account size</p>
+                    <h2 className="font-serif text-3xl font-bold text-[#F3EDE3]">How much are you<br />working with?</h2>
+                    <p className="text-[#F3EDE3]/40 text-base">Gap-and-Go works at any account size</p>
                   </div>
 
                   <div className="space-y-3">
@@ -679,8 +679,8 @@ export default function Onboarding() {
                           <div className="flex items-center gap-4">
                             <span className="text-3xl">{option.icon}</span>
                             <div className="flex-1">
-                              <p className="font-semibold text-lg text-[#F4F7FA]">{option.label}</p>
-                              <p className="text-sm text-[#F4F7FA]/40 mt-0.5">{option.desc}</p>
+                              <p className="font-semibold text-lg text-[#F3EDE3]">{option.label}</p>
+                              <p className="text-sm text-[#F3EDE3]/40 mt-0.5">{option.desc}</p>
                             </div>
                             <SelectionDot selected={isSelected} />
                           </div>
@@ -692,7 +692,7 @@ export default function Onboarding() {
                   <button type="button" onClick={() => goToStep("q-style")} disabled={!tradingCapital} className="glass-btn flex items-center justify-center gap-2">
                     Continue <ChevronRight className="w-5 h-5" />
                   </button>
-                  <button type="button" onClick={handleSkip} className="w-full text-center text-sm text-[#F4F7FA]/30 hover:text-[#F4F7FA]/60 transition-colors py-2">Skip for now</button>
+                  <button type="button" onClick={handleSkip} className="w-full text-center text-sm text-[#F3EDE3]/30 hover:text-[#F3EDE3]/60 transition-colors py-2">Skip for now</button>
                 </div>
               )}
 
@@ -703,8 +703,8 @@ export default function Onboarding() {
                     <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold text-[#F59E0B]" style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.15)" }}>
                       <Clock className="w-3.5 h-3.5" /> Almost there
                     </div>
-                    <h2 className="font-serif text-3xl font-bold text-[#F4F7FA]">When do you<br />want to trade?</h2>
-                    <p className="text-[#F4F7FA]/40 text-base">Pansy will time your alerts around this</p>
+                    <h2 className="font-serif text-3xl font-bold text-[#F3EDE3]">When do you<br />want to trade?</h2>
+                    <p className="text-[#F3EDE3]/40 text-base">Pansy will time your alerts around this</p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
@@ -731,8 +731,8 @@ export default function Onboarding() {
                           <div className="flex flex-col items-center text-center gap-2.5">
                             <span className="text-3xl">{option.icon}</span>
                             <div>
-                              <p className="font-semibold text-base text-[#F4F7FA]">{option.label}</p>
-                              <p className="text-xs text-[#F4F7FA]/40 mt-0.5">{option.desc}</p>
+                              <p className="font-semibold text-base text-[#F3EDE3]">{option.label}</p>
+                              <p className="text-xs text-[#F3EDE3]/40 mt-0.5">{option.desc}</p>
                             </div>
                             <SelectionDot selected={isSelected} color={option.color} />
                           </div>
@@ -750,7 +750,7 @@ export default function Onboarding() {
                   <button type="button" onClick={handleCompleteOnboarding} disabled={isSubmitting || !tradingStyle} className="glass-btn flex items-center justify-center gap-2">
                     {isSubmitting ? <><Loader2 className="w-5 h-5 animate-spin" /> Calibrating your scanner...</> : <>Launch My Scanner <Sparkles className="w-5 h-5" /></>}
                   </button>
-                  <button type="button" onClick={handleSkip} className="w-full text-center text-sm text-[#F4F7FA]/30 hover:text-[#F4F7FA]/60 transition-colors py-2">Skip for now</button>
+                  <button type="button" onClick={handleSkip} className="w-full text-center text-sm text-[#F3EDE3]/30 hover:text-[#F3EDE3]/60 transition-colors py-2">Skip for now</button>
                 </div>
               )}
 
@@ -761,8 +761,8 @@ export default function Onboarding() {
                     <div className="w-20 h-20 mx-auto rounded-full flex items-center justify-center text-4xl" style={{ background: "linear-gradient(135deg, rgba(73,176,110,0.2), rgba(39,183,200,0.2))", animation: "pulse-glow 3s ease-in-out infinite" }}>
                       🔍
                     </div>
-                    <h2 className="font-serif text-3xl font-bold text-[#F4F7FA]">Calibrating<br />your scanner...</h2>
-                    <p className="text-[#F4F7FA]/40">Setting up Pansy for your trading style</p>
+                    <h2 className="font-serif text-3xl font-bold text-[#F3EDE3]">Calibrating<br />your scanner...</h2>
+                    <p className="text-[#F3EDE3]/40">Setting up Pansy for your trading style</p>
                   </div>
 
                   <div className={`${glassCard} ${glassCardBg} ${glowBorder} p-6`}>
@@ -779,9 +779,9 @@ export default function Onboarding() {
                             background: buildingProgress > i ? "linear-gradient(135deg, #49B06E, #27B7C8)" : "rgba(255,255,255,0.06)",
                             transition: "all 0.5s ease",
                           }}>
-                            {buildingProgress > i ? <Check className="w-3.5 h-3.5 text-[#0E1B30]" /> : <div className="w-2 h-2 rounded-full bg-white/20" />}
+                            {buildingProgress > i ? <Check className="w-3.5 h-3.5 text-[#07080C]" /> : <div className="w-2 h-2 rounded-full bg-white/20" />}
                           </div>
-                          <span className="text-sm font-medium" style={{ color: buildingProgress > i ? "#F4F7FA" : "rgba(244,247,250,0.3)" }}>{label}</span>
+                          <span className="text-sm font-medium" style={{ color: buildingProgress > i ? "#F3EDE3" : "rgba(244,247,250,0.3)" }}>{label}</span>
                         </div>
                       ))}
                     </div>
@@ -797,7 +797,7 @@ export default function Onboarding() {
                   </div>
 
                   <div className="text-center pt-2">
-                    <p className="text-sm text-[#F4F7FA]/30 italic">
+                    <p className="text-sm text-[#F3EDE3]/30 italic">
                       &quot;The best traders don&apos;t predict — they prepare.&quot;
                     </p>
                   </div>
@@ -814,7 +814,7 @@ export default function Onboarding() {
                     <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider" style={{ background: "rgba(73,176,110,0.12)", border: "1px solid rgba(73,176,110,0.3)", color: "#49B06E" }}>
                       <Sparkles className="w-3.5 h-3.5" /> Scanner Ready
                     </div>
-                    <h2 className="font-serif text-3xl font-bold text-[#F4F7FA]">You&apos;re all set.</h2>
+                    <h2 className="font-serif text-3xl font-bold text-[#F3EDE3]">You&apos;re all set.</h2>
                   </div>
 
                   <div className={`${glassCard} ${glassCardBg} ${glowBorder} p-5`}>
@@ -825,7 +825,7 @@ export default function Onboarding() {
                       </div>
                       <div className="flex-1 space-y-1">
                         <p className="font-serif text-sm font-semibold text-[#49B06E]">Pansy says</p>
-                        <p className="text-sm leading-relaxed text-[#F4F7FA]/60">
+                        <p className="text-sm leading-relaxed text-[#F3EDE3]/60">
                           {tradingExperience === "never"
                             ? "Welcome to the game! I'll walk you through every setup step by step. Start with the paper trader — practice risk-free until you're confident, then go live when YOU'RE ready."
                             : tradingExperience === "active"
@@ -837,7 +837,7 @@ export default function Onboarding() {
                   </div>
 
                   <div className={`${glassCard} ${glassCardBg} p-4`}>
-                    <p className="text-xs text-[#F4F7FA]/40 font-semibold uppercase tracking-wider mb-3">What&apos;s waiting for you</p>
+                    <p className="text-xs text-[#F3EDE3]/40 font-semibold uppercase tracking-wider mb-3">What&apos;s waiting for you</p>
                     <div className="space-y-3">
                       {[
                         { emoji: "🔍", label: "Live Scanner", desc: "Gap-and-Go candidates scored 0–100 in real time", color: "#49B06E" },
@@ -850,15 +850,15 @@ export default function Onboarding() {
                             {item.emoji}
                           </div>
                           <div className="flex-1">
-                            <p className="text-sm font-semibold text-[#F4F7FA]">{item.label}</p>
-                            <p className="text-[11px] text-[#F4F7FA]/40">{item.desc}</p>
+                            <p className="text-sm font-semibold text-[#F3EDE3]">{item.label}</p>
+                            <p className="text-[11px] text-[#F3EDE3]/40">{item.desc}</p>
                           </div>
                         </div>
                       ))}
                     </div>
                   </div>
 
-                  <p className="text-center text-xs text-[#F4F7FA]/30">
+                  <p className="text-center text-xs text-[#F3EDE3]/30">
                     7-day free trial &middot; $4.99/mo after &middot; Cancel anytime
                   </p>
 
@@ -905,7 +905,7 @@ function OnboardingStyles() {
       .glass-input {
         background: rgba(255,255,255,0.04) !important;
         border-color: rgba(255,255,255,0.08) !important;
-        color: #F4F7FA !important;
+        color: #F3EDE3 !important;
         border-radius: 16px !important;
         backdrop-filter: blur(10px);
         transition: all 0.3s ease;
@@ -923,7 +923,7 @@ function OnboardingStyles() {
         background: linear-gradient(135deg, #49B06E, #27B7C8);
         border: none;
         border-radius: 16px;
-        color: #0E1B30;
+        color: #07080C;
         font-weight: 700;
         padding: 14px 24px;
         font-size: 16px;

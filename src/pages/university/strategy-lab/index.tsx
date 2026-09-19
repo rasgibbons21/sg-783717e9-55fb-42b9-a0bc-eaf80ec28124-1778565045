@@ -83,7 +83,7 @@ export default function StrategyLabIndex({ requiresClientAuth }: Props) {
   if (isVerifying) {
     return (
       <Layout>
-        <div className="min-h-screen flex items-center justify-center bg-[#0E1B30]">
+        <div className="min-h-screen flex items-center justify-center bg-[#07080C]">
           <div className="w-12 h-12 border-4 border-[#27B7C8] border-t-transparent rounded-full animate-spin mx-auto" />
         </div>
       </Layout>
@@ -105,7 +105,7 @@ export default function StrategyLabIndex({ requiresClientAuth }: Props) {
       />
 
       {/* Hero */}
-      <div className="bg-gradient-to-br from-[#0E1B30] via-[#0E1B30] to-[#162540] border-b border-white/10">
+      <div className="bg-gradient-to-br from-[#07080C] via-[#07080C] to-[#121821] border-b border-white/10">
         <div className="max-w-5xl mx-auto px-4 py-12">
           <Link href="/university" className="inline-flex items-center gap-1.5 text-xs text-[#27B7C8] hover:text-[#27B7C8]/80 mb-6">
             <ArrowLeft className="w-3 h-3" />
@@ -117,16 +117,16 @@ export default function StrategyLabIndex({ requiresClientAuth }: Props) {
               <FlaskConical className="w-6 h-6 text-[#27B7C8]" />
             </div>
             <div>
-              <h1 className="text-3xl md:text-4xl font-serif font-bold text-[#F4F7FA]">
+              <h1 className="text-3xl md:text-4xl font-serif font-bold text-[#F3EDE3]">
                 Strategy Lab
               </h1>
-              <p className="text-[#F4F7FA]/50 text-sm">
+              <p className="text-[#F3EDE3]/50 text-sm">
                 {ALL_STRATEGIES.length} strategies across {STRATEGY_CATEGORIES.length} categories
               </p>
             </div>
           </div>
 
-          <p className="text-[#F4F7FA]/60 text-sm max-w-2xl leading-relaxed">
+          <p className="text-[#F3EDE3]/60 text-sm max-w-2xl leading-relaxed">
             Learn real trading strategies with interactive charts and exercises. Every strategy includes what to look for, when NOT to use it, common mistakes, and practice scenarios.
           </p>
 
@@ -135,15 +135,15 @@ export default function StrategyLabIndex({ requiresClientAuth }: Props) {
             <div className="flex gap-4 mt-6">
               <div className="bg-white/5 rounded-lg px-4 py-2 text-center">
                 <div className="text-lg font-bold text-[#27B7C8]">{startedCount}</div>
-                <div className="text-[10px] text-[#F4F7FA]/40">Started</div>
+                <div className="text-[10px] text-[#F3EDE3]/40">Started</div>
               </div>
               <div className="bg-white/5 rounded-lg px-4 py-2 text-center">
                 <div className="text-lg font-bold text-[#49B06E]">{masteredCount}</div>
-                <div className="text-[10px] text-[#F4F7FA]/40">Mastered</div>
+                <div className="text-[10px] text-[#F3EDE3]/40">Mastered</div>
               </div>
               <div className="bg-white/5 rounded-lg px-4 py-2 text-center">
-                <div className="text-lg font-bold text-[#F4F7FA]">{ALL_STRATEGIES.length - startedCount}</div>
-                <div className="text-[10px] text-[#F4F7FA]/40">Remaining</div>
+                <div className="text-lg font-bold text-[#F3EDE3]">{ALL_STRATEGIES.length - startedCount}</div>
+                <div className="text-[10px] text-[#F3EDE3]/40">Remaining</div>
               </div>
             </div>
           )}
@@ -152,14 +152,14 @@ export default function StrategyLabIndex({ requiresClientAuth }: Props) {
           <div className="flex gap-2 mt-6">
             <Link
               href="/university/strategy-lab/toolbelt"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-white/5 rounded-lg text-[#F4F7FA]/60 hover:bg-white/10 transition-colors border border-white/5"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-white/5 rounded-lg text-[#F3EDE3]/60 hover:bg-white/10 transition-colors border border-white/5"
             >
               <Wrench className="w-3 h-3" />
               My Toolbelt
             </Link>
             <Link
               href="/university/strategy-lab/challenge"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-white/5 rounded-lg text-[#F4F7FA]/60 hover:bg-white/10 transition-colors border border-white/5"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-white/5 rounded-lg text-[#F3EDE3]/60 hover:bg-white/10 transition-colors border border-white/5"
             >
               <Trophy className="w-3 h-3" />
               Final Challenge
@@ -169,11 +169,11 @@ export default function StrategyLabIndex({ requiresClientAuth }: Props) {
       </div>
 
       {/* Filters + Grid */}
-      <div className="bg-[#0E1B30] min-h-screen">
+      <div className="bg-[#07080C] min-h-screen">
         <div className="max-w-5xl mx-auto px-4 py-8">
           {/* Filter pills */}
           <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
-            <Filter className="w-3.5 h-3.5 text-[#F4F7FA]/30 shrink-0" />
+            <Filter className="w-3.5 h-3.5 text-[#F3EDE3]/30 shrink-0" />
             {STRATEGY_FILTERS.map((f) => (
               <button
                 key={f}
@@ -181,7 +181,7 @@ export default function StrategyLabIndex({ requiresClientAuth }: Props) {
                 className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                   activeFilter === f
                     ? "bg-[#27B7C8] text-white"
-                    : "bg-white/5 text-[#F4F7FA]/50 hover:bg-white/10"
+                    : "bg-white/5 text-[#F3EDE3]/50 hover:bg-white/10"
                 }`}
               >
                 {f}
@@ -198,10 +198,10 @@ export default function StrategyLabIndex({ requiresClientAuth }: Props) {
               <div key={cat.slug} className="mb-10">
                 <div className="flex items-center gap-2 mb-4">
                   <span className="text-xl">{cat.icon}</span>
-                  <h2 className="text-lg font-semibold text-[#F4F7FA]">{cat.label}</h2>
-                  <span className="text-xs text-[#F4F7FA]/30 ml-1">{catStrategies.length} strategies</span>
+                  <h2 className="text-lg font-semibold text-[#F3EDE3]">{cat.label}</h2>
+                  <span className="text-xs text-[#F3EDE3]/30 ml-1">{catStrategies.length} strategies</span>
                 </div>
-                <p className="text-xs text-[#F4F7FA]/40 mb-4">{cat.description}</p>
+                <p className="text-xs text-[#F3EDE3]/40 mb-4">{cat.description}</p>
 
                 <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
                   {catStrategies.map((strategy) => {
@@ -213,7 +213,7 @@ export default function StrategyLabIndex({ requiresClientAuth }: Props) {
                         key={strategy.slug}
                         href={`/university/strategy-lab/${strategy.slug}`}
                       >
-                        <div className="rounded-xl border border-white/10 bg-[#162540] p-4 hover:border-[#27B7C8]/40 transition-all cursor-pointer group">
+                        <div className="rounded-xl border border-white/10 bg-[#121821] p-4 hover:border-[#27B7C8]/40 transition-all cursor-pointer group">
                           <div className="flex items-start justify-between mb-2">
                             <span className="text-2xl">{strategy.icon}</span>
                             {status === "mastered" && (
@@ -227,11 +227,11 @@ export default function StrategyLabIndex({ requiresClientAuth }: Props) {
                             )}
                           </div>
 
-                          <h3 className="text-sm font-semibold text-[#F4F7FA] mb-1 group-hover:text-[#27B7C8] transition-colors">
+                          <h3 className="text-sm font-semibold text-[#F3EDE3] mb-1 group-hover:text-[#27B7C8] transition-colors">
                             {strategy.name}
                           </h3>
 
-                          <div className="flex items-center gap-2 text-[10px] text-[#F4F7FA]/40 mb-2">
+                          <div className="flex items-center gap-2 text-[10px] text-[#F3EDE3]/40 mb-2">
                             <span className={`px-1.5 py-0.5 rounded ${
                               strategy.difficulty === "Beginner" ? "bg-[#49B06E]/10 text-[#49B06E]" :
                               strategy.difficulty === "Intermediate" ? "bg-[#27B7C8]/10 text-[#27B7C8]" :
@@ -242,7 +242,7 @@ export default function StrategyLabIndex({ requiresClientAuth }: Props) {
                             <span>{strategy.timeframe}</span>
                           </div>
 
-                          <div className="flex items-center gap-1.5 text-[10px] text-[#F4F7FA]/30">
+                          <div className="flex items-center gap-1.5 text-[10px] text-[#F3EDE3]/30">
                             <BookOpen className="w-3 h-3" />
                             <span>{strategy.lessonCount} lessons</span>
                             {strategy.chartExercises.length > 0 && (
@@ -272,8 +272,8 @@ export default function StrategyLabIndex({ requiresClientAuth }: Props) {
 
           {/* Disclaimer */}
           <div className="mt-12 p-5 rounded-xl border border-white/10 bg-white/5">
-            <p className="text-[10px] text-[#F4F7FA]/30 leading-relaxed">
-              <strong className="text-[#F4F7FA]/50">Educational purposes only.</strong>{" "}
+            <p className="text-[10px] text-[#F3EDE3]/30 leading-relaxed">
+              <strong className="text-[#F3EDE3]/50">Educational purposes only.</strong>{" "}
               Strategy Lab is designed to teach trading concepts and frameworks. Nothing here constitutes financial advice or a recommendation to buy or sell any security.
               All strategies can and do fail. "No valid setup" is frequently the correct answer. Historical/simulated chart performance does not represent future expected performance.
               Trading involves significant risk of loss. Always conduct your own research and consider consulting a licensed financial advisor.

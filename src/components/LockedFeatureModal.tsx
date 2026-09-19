@@ -22,7 +22,7 @@ export function LockedFeatureModal({
           <div className="w-16 h-16 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-3xl mx-auto mb-4">
             🌺
           </div>
-          <DialogTitle className="font-serif text-2xl text-center">
+          <DialogTitle className="text-2xl text-center">
             Sign up free to unlock {featureName}
           </DialogTitle>
           {featureDescription && (

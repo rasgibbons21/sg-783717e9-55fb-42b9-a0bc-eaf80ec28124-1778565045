@@ -64,7 +64,7 @@ export function PositionSizeCalculator() {
     } else if (riskPercent > 3 && riskPercent <= 5) {
       return {
         text: "Getting aggressive girl. Make sure you can emotionally handle these losses 😬",
-        color: "text-[#F4F7FA]/70",
+        color: "text-[#F3EDE3]/70",
       };
     } else {
       return {

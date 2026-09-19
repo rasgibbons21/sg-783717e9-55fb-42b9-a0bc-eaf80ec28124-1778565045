@@ -12,12 +12,12 @@ interface ShareAchievementProps {
 }
 
 const C = {
-  bg: '#0E1B30',
-  card: '#162540',
+  bg: '#07080C',
+  card: '#121821',
   accent: '#27B7C8',
   gold: '#D4AF37',
   green: '#49B06E',
-  text: '#F4F7FA',
+  text: '#F3EDE3',
   textDim: 'rgba(244,247,250,0.6)',
 };
 

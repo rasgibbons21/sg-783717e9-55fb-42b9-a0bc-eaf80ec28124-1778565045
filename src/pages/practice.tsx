@@ -73,13 +73,13 @@ interface LeaderboardRow {
 
 // ── Theme Colors ──────────────────────────────────────────────────────────
 const C = {
-  bg: "#0E1B30",
+  bg: "#07080C",
   sidebar: "#0A1525",
-  card: "#162540",
+  card: "#121821",
   cardBorder: "rgba(39, 183, 200, 0.15)",
   accent: "#27B7C8",
   accentDim: "rgba(39, 183, 200, 0.12)",
-  text: "#F4F7FA",
+  text: "#F3EDE3",
   textDim: "rgba(244, 247, 250, 0.6)",
   textMuted: "rgba(244, 247, 250, 0.35)",
   red: "#E5484D",

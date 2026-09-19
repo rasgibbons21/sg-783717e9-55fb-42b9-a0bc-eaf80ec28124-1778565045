@@ -55,7 +55,7 @@ export function TrialCountdown() {
             <motion.button
               whileTap={{ scale: 0.95 }}
               className="w-full py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2"
-              style={{ background: "linear-gradient(135deg, #27B7C8, #49B06E)", color: "#0E1B30" }}
+              style={{ background: "linear-gradient(135deg, #27B7C8, #49B06E)", color: "#07080C" }}
             >
               <Sparkles className="w-4 h-4" /> Upgrade to Radar Core
             </motion.button>
@@ -92,7 +92,7 @@ export function TrialCountdown() {
             <motion.button
               whileTap={{ scale: 0.95 }}
               className="w-full py-2.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2"
-              style={{ background: "linear-gradient(135deg, #27B7C8, #49B06E)", color: "#0E1B30" }}
+              style={{ background: "linear-gradient(135deg, #27B7C8, #49B06E)", color: "#07080C" }}
             >
               <Sparkles className="w-4 h-4" /> Subscribe Now — Keep Full Access
             </motion.button>

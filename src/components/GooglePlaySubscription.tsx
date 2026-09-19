@@ -60,7 +60,7 @@ export default function GooglePlaySubscription() {
           <div className="w-16 h-16 rounded-full bg-accent/20 flex items-center justify-center mx-auto">
             <ShieldCheck className="w-8 h-8 text-accent" />
           </div>
-          <h1 className="font-serif text-3xl font-bold text-foreground">
+          <h1 className="text-3xl font-bold text-foreground">
             Welcome to Radar Core!
           </h1>
           <p className="text-muted-foreground">
@@ -84,7 +84,7 @@ export default function GooglePlaySubscription() {
           <div className="w-16 h-16 rounded-full bg-accent/20 flex items-center justify-center mx-auto">
             <ShieldCheck className="w-8 h-8 text-accent" />
           </div>
-          <h1 className="font-serif text-3xl font-bold text-foreground">
+          <h1 className="text-3xl font-bold text-foreground">
             You&apos;re a Radar Core member
           </h1>
           <p className="text-muted-foreground">
@@ -109,7 +109,7 @@ export default function GooglePlaySubscription() {
   return (
     <div className="max-w-lg mx-auto p-4 space-y-6">
       <div className="text-center space-y-2">
-        <h1 className="font-serif text-3xl font-bold text-foreground">
+        <h1 className="text-3xl font-bold text-foreground">
           Radar Core
         </h1>
         <p className="text-muted-foreground">
@@ -151,7 +151,7 @@ export default function GooglePlaySubscription() {
 
       {/* Features */}
       <Card className="p-5 border-accent/20 bg-accent/5">
-        <h3 className="font-serif text-lg font-semibold text-foreground mb-3">
+        <h3 className="text-lg font-semibold text-foreground mb-3">
           Everything in Radar Core
         </h3>
         <ul className="space-y-2.5">

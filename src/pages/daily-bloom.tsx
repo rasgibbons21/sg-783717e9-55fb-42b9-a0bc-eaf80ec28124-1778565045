@@ -14,11 +14,11 @@ import { LESSONS } from "@/data/lessons";
 // /api/daily-briefing yet (first authenticated request of the day generates it).
 
 const C = {
-  deep:    "#0E1B30",
+  deep:    "#07080C",
   surface: "#16264A",
   teal:    "#27B7C8",
   green:   "#49B06E",
-  ivory:   "#F4F7FA",
+  ivory:   "#F3EDE3",
 };
 
 const gradientBg: React.CSSProperties = {
@@ -87,7 +87,7 @@ export default function DailyBloom({ briefing, briefingDate, featuredLesson }: P
 
       <SEO title="Daily Bloom — Daily Market Briefing & Investing Lesson" description="Get your daily market summary, investing lesson, and wealth-building habit from Pansy. Stay on top of stocks, sectors, and economic news in plain English. Free daily financial education for women." />
 
-      <div style={{ fontFamily: "'DM Sans', sans-serif", background: C.deep, color: C.ivory, minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+      <div style={{ fontFamily: "'Inter', sans-serif", background: C.deep, color: C.ivory, minHeight: "100vh", display: "flex", flexDirection: "column" }}>
 
         {/* Nav */}
         <nav style={{ borderBottom: "1px solid rgba(255,255,255,0.06)", background: "rgba(14,27,48,0.95)", backdropFilter: "blur(16px)" }}>

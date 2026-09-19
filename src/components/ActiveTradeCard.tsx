@@ -86,7 +86,7 @@ function MiniModal({ title, onClose, children }: {
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-4">
       <div className="w-full max-w-md bg-background rounded-2xl border border-accent/30 p-5">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-serif text-base font-bold text-foreground">{title}</h3>
+          <h3 className="text-base font-bold text-foreground">{title}</h3>
           <button onClick={onClose} className="text-foreground/30 hover:text-foreground">
             <X className="w-5 h-5" />
           </button>

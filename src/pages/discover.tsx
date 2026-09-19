@@ -6,25 +6,15 @@ import { Search, TrendingUp, ArrowUpRight, ArrowDownRight } from "lucide-react";
 
 const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
 
-type ChartMarket = "stocks" | "crypto" | "forex";
-
-interface QuickTicker {
-  symbol: string;
-  label: string;
-  market: ChartMarket;
-}
-
-const QUICK_TICKERS: QuickTicker[] = [
-  { symbol: "AAPL", label: "AAPL", market: "stocks" },
-  { symbol: "NVDA", label: "NVDA", market: "stocks" },
-  { symbol: "TSLA", label: "TSLA", market: "stocks" },
-  { symbol: "MSFT", label: "MSFT", market: "stocks" },
-  { symbol: "SPY", label: "SPY", market: "stocks" },
-  { symbol: "QQQ", label: "QQQ", market: "stocks" },
-  { symbol: "BTCUSD", label: "BTC", market: "crypto" },
-  { symbol: "ETHUSD", label: "ETH", market: "crypto" },
-  { symbol: "SOLUSD", label: "SOL", market: "crypto" },
-  { symbol: "EURUSD", label: "EUR/USD", market: "forex" },
+const QUICK_TICKERS = [
+  { symbol: "AAPL", label: "AAPL" },
+  { symbol: "NVDA", label: "NVDA" },
+  { symbol: "TSLA", label: "TSLA" },
+  { symbol: "MSFT", label: "MSFT" },
+  { symbol: "SPY", label: "SPY" },
+  { symbol: "QQQ", label: "QQQ" },
+  { symbol: "AMD", label: "AMD" },
+  { symbol: "META", label: "META" },
 ];
 
 interface TrendingItem {
@@ -42,14 +32,8 @@ function TradingViewChart({ symbol, theme }: { symbol: string; theme: string }) 
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const tvSymbol = symbol.includes("USD") && !symbol.includes("/")
-      ? `CRYPTO:${symbol}`
-      : symbol.includes("/")
-        ? `FX:${symbol.replace("/", "")}`
-        : symbol;
-
-    if (widgetRef.current === tvSymbol) return;
-    widgetRef.current = tvSymbol;
+    if (widgetRef.current === symbol) return;
+    widgetRef.current = symbol;
 
     containerRef.current.innerHTML = "";
 
@@ -59,7 +43,7 @@ function TradingViewChart({ symbol, theme }: { symbol: string; theme: string }) 
     script.async = true;
     script.innerHTML = JSON.stringify({
       autosize: true,
-      symbol: tvSymbol,
+      symbol: symbol,
       interval: "15",
       timezone: "America/New_York",
       theme: theme,
@@ -92,53 +76,8 @@ function TradingViewChart({ symbol, theme }: { symbol: string; theme: string }) 
   );
 }
 
-function MiniChart({ symbol, theme }: { symbol: string; theme: string }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const widgetRef = useRef<string | null>(null);
-
-  useEffect(() => {
-    if (!containerRef.current) return;
-
-    const tvSymbol = symbol.includes("USD") && !symbol.includes("/")
-      ? `CRYPTO:${symbol}`
-      : symbol;
-
-    if (widgetRef.current === tvSymbol) return;
-    widgetRef.current = tvSymbol;
-
-    containerRef.current.innerHTML = "";
-
-    const script = document.createElement("script");
-    script.src = "https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js";
-    script.type = "text/javascript";
-    script.async = true;
-    script.innerHTML = JSON.stringify({
-      symbol: tvSymbol,
-      width: "100%",
-      height: "100%",
-      locale: "en",
-      dateRange: "1D",
-      colorTheme: theme,
-      isTransparent: true,
-      autosize: true,
-      largeChartUrl: "",
-      noTimeScale: false,
-    });
-
-    containerRef.current.appendChild(script);
-  }, [symbol, theme]);
-
-  return (
-    <div
-      ref={containerRef}
-      style={{ height: "100%", width: "100%" }}
-    />
-  );
-}
-
 export default function Discover() {
   const [selectedSymbol, setSelectedSymbol] = useState("AAPL");
-  const [marketFilter, setMarketFilter] = useState<"all" | ChartMarket>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [trending, setTrending] = useState<TrendingItem[]>([]);
@@ -168,10 +107,6 @@ export default function Discover() {
     loadTrending();
   }, [loadTrending]);
 
-  const filteredTickers = QUICK_TICKERS.filter(t =>
-    marketFilter === "all" || t.market === marketFilter
-  );
-
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
@@ -184,16 +119,16 @@ export default function Discover() {
   return (
     <Layout>
       <SEO
-        title="Bloom | Discover — Live Charts & Markets"
-        description="Real-time TradingView charts for stocks, crypto, and forex. Research any ticker with interactive charting."
+        title="Bloom | Discover — Live Stock Charts"
+        description="Real-time TradingView charts for stocks. Research any ticker with interactive charting."
       />
 
       <div className="max-w-lg mx-auto px-4 pt-4 pb-32">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-2xl font-bold text-[#F4F7FA]">Discover</h1>
-            <p className="text-xs text-[#F4F7FA]/40 mt-0.5">Live charts &amp; market research</p>
+            <h1 className="text-2xl font-bold text-[#F3EDE3]">Discover</h1>
+            <p className="text-xs text-[#F3EDE3]/40 mt-0.5">Live charts &amp; market research</p>
           </div>
           <motion.button
             whileTap={{ scale: 0.85 }}
@@ -218,8 +153,8 @@ export default function Discover() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search ticker (AAPL, BTCUSD, EURUSD...)"
-                className="flex-1 rounded-xl px-4 py-2.5 text-sm text-[#F4F7FA] placeholder:text-[#F4F7FA]/30"
+                placeholder="Search ticker (AAPL, TSLA, SPY...)"
+                className="flex-1 rounded-xl px-4 py-2.5 text-sm text-[#F3EDE3] placeholder:text-[#F3EDE3]/30"
                 style={{ background: "rgba(22,37,64,0.8)", border: "1px solid rgba(39,183,200,0.15)" }}
                 autoFocus
               />
@@ -235,32 +170,9 @@ export default function Discover() {
           </motion.form>
         )}
 
-        {/* Market filter */}
-        <div className="flex gap-1 mb-4 overflow-x-auto">
-          {([
-            { key: "all" as const, label: "All" },
-            { key: "stocks" as const, label: "Stocks" },
-            { key: "crypto" as const, label: "Crypto" },
-            { key: "forex" as const, label: "Forex" },
-          ]).map(({ key, label }) => (
-            <button
-              key={key}
-              onClick={() => { haptic(); setMarketFilter(key); }}
-              className="px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors"
-              style={{
-                background: marketFilter === key ? "rgba(39,183,200,0.15)" : "rgba(255,255,255,0.04)",
-                color: marketFilter === key ? "#27B7C8" : "rgba(244,247,250,0.4)",
-                border: `1px solid ${marketFilter === key ? "rgba(39,183,200,0.25)" : "transparent"}`,
-              }}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-
         {/* Quick ticker chips */}
         <div className="flex gap-1.5 mb-4 overflow-x-auto pb-1 scrollbar-hide">
-          {filteredTickers.map((t) => (
+          {QUICK_TICKERS.map((t) => (
             <motion.button
               key={t.symbol}
               whileTap={{ scale: 0.9 }}
@@ -270,7 +182,7 @@ export default function Discover() {
                 background: selectedSymbol === t.symbol
                   ? "rgba(39,183,200,0.2)"
                   : "rgba(255,255,255,0.05)",
-                color: selectedSymbol === t.symbol ? "#27B7C8" : "#F4F7FA",
+                color: selectedSymbol === t.symbol ? "#27B7C8" : "#F3EDE3",
                 border: `1px solid ${selectedSymbol === t.symbol ? "rgba(39,183,200,0.35)" : "rgba(255,255,255,0.08)"}`,
               }}
             >
@@ -282,8 +194,8 @@ export default function Discover() {
         {/* Current symbol label */}
         <div className="flex items-center gap-2 mb-2">
           <TrendingUp className="w-4 h-4 text-[#27B7C8]" />
-          <span className="text-sm font-bold text-[#F4F7FA]">{selectedSymbol}</span>
-          <span className="text-[10px] text-[#F4F7FA]/30">TradingView</span>
+          <span className="text-sm font-bold text-[#F3EDE3]">{selectedSymbol}</span>
+          <span className="text-[10px] text-[#F3EDE3]/30">TradingView</span>
         </div>
 
         {/* TradingView chart */}
@@ -291,7 +203,7 @@ export default function Discover() {
           className="rounded-2xl overflow-hidden mb-6"
           style={{
             height: 420,
-            background: "#0E1B30",
+            background: "#07080C",
             border: "1px solid rgba(39,183,200,0.12)",
           }}
         >
@@ -302,13 +214,13 @@ export default function Discover() {
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-3">
             <TrendingUp className="w-4 h-4 text-[#49B06E]" />
-            <h2 className="text-sm font-bold text-[#F4F7FA]">Trending Today</h2>
+            <h2 className="text-sm font-bold text-[#F3EDE3]">Trending Today</h2>
           </div>
 
           {trendingLoading ? (
             <div className="grid grid-cols-2 gap-2">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="rounded-xl p-3 animate-pulse" style={{ background: "#162540" }}>
+                <div key={i} className="rounded-xl p-3 animate-pulse" style={{ background: "#121821" }}>
                   <div className="h-4 w-14 rounded bg-white/5 mb-2" />
                   <div className="h-3 w-20 rounded bg-white/5" />
                 </div>
@@ -330,7 +242,7 @@ export default function Discover() {
                   }}
                 >
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-bold text-[#F4F7FA]">{item.symbol}</span>
+                    <span className="text-sm font-bold text-[#F3EDE3]">{item.symbol}</span>
                     <div className="flex items-center gap-0.5">
                       {item.changePercent >= 0
                         ? <ArrowUpRight className="w-3 h-3 text-[#49B06E]" />
@@ -344,7 +256,7 @@ export default function Discover() {
                       </span>
                     </div>
                   </div>
-                  <span className="text-xs text-[#F4F7FA]/40">
+                  <span className="text-xs text-[#F3EDE3]/40">
                     ${item.price.toFixed(2)}
                   </span>
                 </motion.button>
@@ -355,35 +267,10 @@ export default function Discover() {
               className="rounded-xl p-4 text-center"
               style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}
             >
-              <TrendingUp className="w-5 h-5 mx-auto mb-2 text-[#F4F7FA]/20" />
-              <p className="text-xs text-[#F4F7FA]/40">No movers right now — check back when markets get active</p>
+              <TrendingUp className="w-5 h-5 mx-auto mb-2 text-[#F3EDE3]/20" />
+              <p className="text-xs text-[#F3EDE3]/40">No movers right now — check back when markets get active</p>
             </div>
           )}
-        </div>
-
-        {/* Crypto mini charts */}
-        <div className="mb-6">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-sm">₿</span>
-            <h2 className="text-sm font-bold text-[#F4F7FA]">Crypto Overview</h2>
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            {["BTCUSD", "ETHUSD", "SOLUSD", "XRPUSD"].map((sym) => (
-              <motion.button
-                key={sym}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => { haptic(); setSelectedSymbol(sym); }}
-                className="rounded-xl overflow-hidden"
-                style={{
-                  height: 140,
-                  background: "rgba(255,255,255,0.02)",
-                  border: `1px solid ${selectedSymbol === sym ? "rgba(39,183,200,0.25)" : "rgba(255,255,255,0.05)"}`,
-                }}
-              >
-                <MiniChart symbol={sym} theme="dark" />
-              </motion.button>
-            ))}
-          </div>
         </div>
 
         {/* Disclaimer */}
@@ -391,8 +278,8 @@ export default function Discover() {
           className="rounded-xl p-3"
           style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}
         >
-          <p className="text-[10px] text-[#F4F7FA]/30 leading-relaxed">
-            <strong className="text-[#F4F7FA]/40">Charts powered by TradingView.</strong>{" "}
+          <p className="text-[10px] text-[#F3EDE3]/30 leading-relaxed">
+            <strong className="text-[#F3EDE3]/40">Charts powered by TradingView.</strong>{" "}
             Data may be delayed. Not investment advice. Do your own research before trading.
           </p>
         </div>

@@ -1,21 +1,12 @@
-import { ReactNode, useEffect, useCallback } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { Zap, User, TrendingUp, ChevronLeft, Compass } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { pageVariants, pageTransition } from "@/lib/motion";
-import { PansyMilestones } from "./PansyMilestones";
-import { PansyPsychologyToast } from "./PansyPsychologyToast";
-import { PansyAssistant } from "./PansyAssistant";
-import { PansyEncouragement } from "./PansyEncouragement";
-import { SignUpBanner } from "./SignUpBanner";
-import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { FoundersPricingModal } from "./FoundersPricingModal";
-
-const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
+import { SignUpBanner } from "./SignUpBanner";
+import { AppShell } from "./AppShell";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -25,29 +16,13 @@ export function Layout({ children }: LayoutProps) {
   const router = useRouter();
   const { toast } = useToast();
   const currentPath = router.pathname;
-  // Single source of truth — SubscriptionContext owns auth state for the whole app
   const { isLoggedIn, isLoading } = useSubscription();
-
-  const isActivePath = (path: string) => {
-    if (path === "/signals") return currentPath === "/signals" || currentPath.startsWith("/scanner");
-    if (path === "/discover") return currentPath === "/discover" || currentPath.startsWith("/stock/");
-    if (path === "/paper-trader-v2") return currentPath.startsWith("/paper-trader") || currentPath.startsWith("/practice") || currentPath.startsWith("/research");
-    if (path === "/learn") return currentPath === "/learn" || currentPath.startsWith("/university");
-    if (path === "/profile") return currentPath.startsWith("/profile") || currentPath.startsWith("/subscription");
-    return false;
-  };
-
-  const mainPaths = ["/home", "/signals", "/discover", "/learn", "/paper-trader-v2", "/profile", "/", "/onboarding", "/ask-pansy"];
-  const isInnerPage = !mainPaths.some(p =>
-    p === "/" ? currentPath === "/" : currentPath === p || currentPath.startsWith(p + "/")
-  );
-
 
   useEffect(() => {
     const handleRateLimit = () => {
       toast({
-        title: "API Limit Reached 🐢",
-        description: "We've hit the Financial Modeling Prep free tier limit. Please wait a moment before fetching more data.",
+        title: "API Limit Reached",
+        description: "Rate limit hit. Please wait a moment before fetching more data.",
         variant: "destructive",
       });
     };
@@ -56,192 +31,84 @@ export function Layout({ children }: LayoutProps) {
     return () => window.removeEventListener("fmp-rate-limit", handleRateLimit);
   }, [toast]);
 
+  const publicPages = ["/", "/about", "/privacy", "/terms", "/disclaimer", "/refund-policy", "/contact", "/delete-account"];
+  const isPublic = publicPages.includes(currentPath);
+
+  if (!isPublic && !isLoading) {
+    return (
+      <>
+        <AppShell>
+          {!isLoggedIn && <SignUpBanner />}
+          {children}
+        </AppShell>
+        <Toaster />
+        <FoundersPricingModal />
+      </>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-background flex flex-col pb-[80px]">
-      {/* Sign-Up Banner for Logged-Out Users */}
+    <div className="min-h-screen flex flex-col" style={{ background: "var(--r-bg)" }}>
       {!isLoading && !isLoggedIn && <SignUpBanner />}
 
-      {/* Top Navbar */}
-      <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container-full flex h-16 items-center justify-between">
-          <div className="flex items-center gap-1">
-            {isInnerPage && (
-              <motion.button
-                whileTap={{ scale: 0.85 }}
-                onClick={() => { haptic(); router.back(); }}
-                className="flex items-center justify-center w-9 h-9 -ml-2 rounded-full bg-accent/10 text-accent hover:bg-accent/20 transition-colors"
-                aria-label="Go back"
-              >
-                <ChevronLeft className="w-5 h-5 stroke-[2.5]" />
-              </motion.button>
-            )}
-            <Link href="/signals" className="flex items-center gap-3">
-              <img
-                src="/icon-192.png"
-                alt="Bloom"
-                className="h-8 w-auto rounded-md"
-              />
-              <span className="font-serif text-xl font-bold text-foreground">
-                Radar
-              </span>
-            </Link>
-          </div>
-
-          <Link
-            href="/ask-pansy"
-            className={cn(
-              "flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium transition-colors",
-              currentPath === "/ask-pansy"
-                ? "bg-primary/15 text-primary"
-                : "text-muted-foreground hover:bg-primary/10 hover:text-primary"
-            )}
-          >
-            <span className="text-lg">🌺</span>
-            <span>Ask Pansy</span>
+      <header
+        className="sticky top-0 z-50 w-full"
+        style={{ background: "var(--r-elevated)", borderBottom: "1px solid var(--r-hairline)" }}
+      >
+        <div className="flex items-center h-14 px-4">
+          <Link href="/signals" className="flex items-center gap-3">
+            <img src="/icon-192.png" alt="Bloom" className="h-8 w-auto rounded-md" />
+            <span className="text-xl font-bold" style={{ color: "var(--r-ivory)" }}>Radar</span>
           </Link>
         </div>
       </header>
 
-      {/* Main Content - add top padding when banner is showing */}
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.main
-          key={currentPath}
-          variants={pageVariants}
-          initial="initial"
-          animate="enter"
-          exit="exit"
-          transition={pageTransition}
-          className={cn("flex-1 w-full", !isLoading && !isLoggedIn && "pt-[60px]")}
-        >
-          {children}
-        </motion.main>
-      </AnimatePresence>
+      <main className="flex-1 w-full">{children}</main>
 
-      {/* Pansy Floating Assistant */}
-      <PansyAssistant />
-
-      {/* Pansy Returning-User Encouragement */}
-      <PansyEncouragement />
-
-      {/* Pansy Milestone Messages */}
-      <PansyMilestones />
-
-      {/* Pansy Psychology Toast */}
-      <PansyPsychologyToast />
-
-      {/* Global Toaster for Rate Limits */}
-      <Toaster />
-
-      {/* Founders Pricing Modal */}
-      <FoundersPricingModal />
-
-      {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-40 safe-area-bottom">
-        <div className="grid grid-cols-4 gap-1 px-2 py-2 max-w-md mx-auto">
-          {[
-            { href: "/signals", icon: Zap, label: "Market" },
-            { href: "/discover", icon: Compass, label: "Discover" },
-            { href: "/paper-trader-v2", icon: TrendingUp, label: "Trade" },
-            { href: "/profile", icon: User, label: "Profile" },
-          ].map(({ href, icon: Icon, label }) => {
-            const active = isActivePath(href);
-            return (
-              <Link key={href} href={href} passHref>
-                <motion.button
-                  whileTap={{ scale: 0.75, y: 2 }}
-                  transition={{ type: "spring", stiffness: 500, damping: 20 }}
-                  onClick={() => haptic()}
-                  className={`flex flex-col items-center gap-1 px-2 py-1 rounded-lg w-full relative ${
-                    active ? "text-primary" : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  {active && (
-                    <motion.div
-                      layoutId="nav-indicator"
-                      className="absolute -top-1 w-6 h-1 rounded-full bg-primary"
-                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                    />
-                  )}
-                  <motion.div
-                    animate={active ? { scale: [1, 1.3, 1], y: [0, -3, 0] } : {}}
-                    transition={{ duration: 0.4, ease: "easeOut" }}
-                  >
-                    <Icon className={`w-5 h-5 ${active ? "drop-shadow-[0_0_6px_rgba(39,183,200,0.5)]" : ""}`} />
-                  </motion.div>
-                  <span className={`text-xs ${active ? "font-semibold" : ""}`}>{label}</span>
-                </motion.button>
-              </Link>
-            );
-          })}
-        </div>
-      </nav>
-
-      {/* Footer */}
-      <footer className="mt-auto border-t border-border bg-background py-8">
+      <footer className="mt-auto py-8" style={{ borderTop: "1px solid var(--r-hairline)" }}>
         <div className="mx-auto max-w-7xl px-4">
           <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
             <div>
-              <h3 className="mb-4 font-serif text-lg font-semibold text-primary">Radar</h3>
-              <p className="text-sm text-muted-foreground">
-                Invest in yourself first 🌸
-              </p>
+              <h3 className="mb-4 text-lg font-semibold" style={{ color: "var(--r-teal)" }}>Radar</h3>
+              <p className="text-sm" style={{ color: "var(--r-meta)" }}>Stock screener & alerts</p>
             </div>
             <div>
-              <h4 className="mb-4 text-sm font-semibold text-foreground">Legal</h4>
+              <h4 className="mb-4 text-sm font-semibold" style={{ color: "var(--r-ivory)" }}>Legal</h4>
               <ul className="space-y-2 text-sm">
-                <li>
-                  <Link href="/privacy" className="text-muted-foreground hover:text-primary">
-                    Privacy Policy
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/terms" className="text-muted-foreground hover:text-primary">
-                    Terms of Service
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/disclaimer" className="text-muted-foreground hover:text-primary">
-                    Disclaimer
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/refund-policy" className="text-muted-foreground hover:text-primary">
-                    Refund Policy
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/delete-account" className="text-muted-foreground hover:text-primary">
-                    Delete Account
-                  </Link>
-                </li>
+                {[
+                  { href: "/privacy", label: "Privacy Policy" },
+                  { href: "/terms", label: "Terms of Service" },
+                  { href: "/disclaimer", label: "Disclaimer" },
+                  { href: "/refund-policy", label: "Refund Policy" },
+                  { href: "/delete-account", label: "Delete Account" },
+                ].map(({ href, label }) => (
+                  <li key={href}>
+                    <Link href={href} className="hover:underline" style={{ color: "var(--r-meta)" }}>{label}</Link>
+                  </li>
+                ))}
               </ul>
             </div>
             <div>
-              <h4 className="mb-4 text-sm font-semibold text-foreground">Contact</h4>
+              <h4 className="mb-4 text-sm font-semibold" style={{ color: "var(--r-ivory)" }}>Contact</h4>
               <ul className="space-y-2 text-sm">
-                <li>
-                  <Link href="/contact" className="text-muted-foreground hover:text-primary">
-                    Contact Us
-                  </Link>
-                </li>
-                <li>
-                  <a href="mailto:cindervaultenterprisesllc@gmail.com" className="text-muted-foreground hover:text-primary">
-                    cindervaultenterprisesllc@gmail.com
-                  </a>
-                </li>
+                <li><Link href="/contact" className="hover:underline" style={{ color: "var(--r-meta)" }}>Contact Us</Link></li>
+                <li><a href="mailto:cindervaultenterprisesllc@gmail.com" className="hover:underline" style={{ color: "var(--r-meta)" }}>cindervaultenterprisesllc@gmail.com</a></li>
               </ul>
             </div>
           </div>
-          <div className="mt-8 border-t border-border pt-8">
-            <p className="text-xs text-muted-foreground">
-              © 2026 Cinder Vault Enterprises LLC. All rights reserved. Bloom Radar is a product of Cinder Vault Enterprises LLC.
+          <div className="mt-8 pt-8" style={{ borderTop: "1px solid var(--r-hairline)" }}>
+            <p className="text-xs" style={{ color: "var(--r-meta)" }}>
+              &copy; 2026 Cinder Vault Enterprises LLC. All rights reserved. Bloom Radar is a product of Cinder Vault Enterprises LLC.
             </p>
-            <p className="mt-2 text-xs text-muted-foreground">
+            <p className="mt-2 text-xs" style={{ color: "var(--r-meta)" }}>
               Bloom Radar is for educational purposes only and does not constitute financial advice. All investing involves risk of loss.
             </p>
           </div>
         </div>
       </footer>
+
+      <Toaster />
+      <FoundersPricingModal />
     </div>
   );
 }

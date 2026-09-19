@@ -66,7 +66,7 @@ export function PansyStory() {
           style={{ width: 52, height: 52 }}
         />
         <div className="flex-1 min-w-0">
-          <h3 className="font-serif text-base font-bold text-foreground">Pansy&apos;s Story</h3>
+          <h3 className="text-base font-bold text-foreground">Pansy&apos;s Story</h3>
           <p className="text-xs text-muted-foreground mt-0.5">
             She didn&apos;t come from money. She built it — one decision at a time.
           </p>

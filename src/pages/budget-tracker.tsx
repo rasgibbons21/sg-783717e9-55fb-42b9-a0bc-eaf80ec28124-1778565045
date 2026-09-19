@@ -307,7 +307,7 @@ export default function BudgetTracker() {
       await fetchEntries();
 
       if (entries.length === 0) {
-        confetti({ particleCount: 60, spread: 55, origin: { y: 0.7 }, colors: ["#27B7C8", "#49B06E", "#F4F7FA"] });
+        confetti({ particleCount: 60, spread: 55, origin: { y: 0.7 }, colors: ["#27B7C8", "#49B06E", "#F3EDE3"] });
       }
     }
     setSaving(false);

@@ -108,7 +108,7 @@ export function PansyEncouragement() {
           exit={{ opacity: 0, y: -20, scale: 0.95 }}
           transition={{ type: "spring", stiffness: 280, damping: 24 }}
         >
-          <div className="rounded-2xl border border-[#49B06E]/20 bg-[#0E1B30]/95 backdrop-blur-xl p-4 shadow-2xl shadow-[#49B06E]/10">
+          <div className="rounded-2xl border border-[#49B06E]/20 bg-[#07080C]/95 backdrop-blur-xl p-4 shadow-2xl shadow-[#49B06E]/10">
             <div className="flex items-start gap-3">
               <motion.div
                 className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#27B7C8] to-[#49B06E] text-lg shadow-md"

@@ -243,7 +243,7 @@ export function PansyMilestones() {
           exit={{ opacity: 0, y: 30, scale: 0.9 }}
           transition={{ type: "spring", stiffness: 260, damping: 22 }}
         >
-          <div className="relative rounded-2xl border border-[#27B7C8]/30 bg-gradient-to-br from-[#0E1B30] to-[#27B7C8]/10 p-4 shadow-2xl shadow-[#27B7C8]/10 overflow-hidden">
+          <div className="relative rounded-2xl border border-[#27B7C8]/30 bg-gradient-to-br from-[#07080C] to-[#27B7C8]/10 p-4 shadow-2xl shadow-[#27B7C8]/10 overflow-hidden">
             {/* Celebration effects */}
             {activeMilestone.celebration === "confetti" && (
               <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl">

@@ -22,29 +22,32 @@ export function SignUpBanner() {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-accent/20 to-primary/20 border-b border-accent/30 backdrop-blur-sm">
-      <div className="max-w-7xl mx-auto px-4 py-3">
-        <div className="flex items-center justify-between gap-4">
-          <p className="text-sm text-foreground flex-1">
-            Create a free account to unlock Pansy's full analysis, save your watchlist, and track your goals.
-          </p>
-          <div className="flex items-center gap-3 shrink-0">
-            <Link href="/">
-              <Button 
-                size="sm"
-                className="bg-accent hover:bg-accent/90 text-white font-semibold shadow-md"
-              >
-                Sign up free
-              </Button>
-            </Link>
-            <button
-              onClick={handleDismiss}
-              className="w-6 h-6 rounded-full hover:bg-muted transition-colors flex items-center justify-center"
-              aria-label="Dismiss banner"
+    <div
+      className="sticky top-14 left-0 right-0 z-40 px-4 py-2.5"
+      style={{ background: "var(--r-elevated)", borderBottom: "1px solid var(--r-hairline)" }}
+    >
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-xs flex-1" style={{ color: "var(--r-body)" }}>
+          Create a free account to unlock Pansy's full analysis, save your watchlist, and track your goals.
+        </p>
+        <div className="flex items-center gap-2 shrink-0">
+          <Link href="/">
+            <Button
+              size="sm"
+              className="h-8 px-3 text-xs font-semibold rounded-lg"
+              style={{ background: "var(--r-teal)", color: "var(--r-bg)" }}
             >
-              <X className="w-4 h-4 text-muted-foreground" />
-            </button>
-          </div>
+              Sign up free
+            </Button>
+          </Link>
+          <button
+            onClick={handleDismiss}
+            className="w-6 h-6 rounded-full flex items-center justify-center"
+            style={{ color: "var(--r-meta)" }}
+            aria-label="Dismiss banner"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
       </div>
     </div>

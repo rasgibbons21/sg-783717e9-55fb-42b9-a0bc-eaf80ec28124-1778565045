@@ -11,8 +11,7 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['DM Sans', 'system-ui', 'sans-serif'],
-        serif: ['Fraunces', 'Georgia', 'serif'],
+        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
       },
       colors: {
         background: "hsl(var(--background))",

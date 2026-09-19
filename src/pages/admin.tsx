@@ -39,7 +39,7 @@ const COLORS = {
   primary: '#49B06E',
   accent: '#27B7C8',
   rose: '#ef4444',
-  bg: '#0E1B30',
+  bg: '#07080C',
 };
 
 export default function AdminDashboard() {

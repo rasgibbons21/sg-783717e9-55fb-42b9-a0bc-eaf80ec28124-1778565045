@@ -102,7 +102,7 @@ export function LateBloomersSignup() {
                 >
                   🌸
                 </motion.div>
-                <h3 className="text-xl font-serif font-bold text-foreground">You&apos;re in!</h3>
+                <h3 className="text-xl font-bold text-foreground">You&apos;re in!</h3>
                 <p className="text-sm text-muted-foreground">
                   Check your inbox every Friday for Pansy&apos;s stock breakdown.
                 </p>
@@ -124,7 +124,7 @@ export function LateBloomersSignup() {
                   </button>
                   <div className="text-center space-y-2">
                     <span className="text-4xl">📬</span>
-                    <h3 className="text-xl font-serif font-bold text-foreground">
+                    <h3 className="text-xl font-bold text-foreground">
                       Join the Late Bloomers
                     </h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">
@@ -164,7 +164,7 @@ export function LateBloomersSignup() {
                       className="w-full py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 disabled:opacity-60"
                       style={{
                         background: "linear-gradient(135deg, #27B7C8, #49B06E)",
-                        color: "#0E1B30",
+                        color: "#07080C",
                       }}
                     >
                       <Mail className="w-4 h-4" />
