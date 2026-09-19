@@ -11,12 +11,12 @@ export interface SEOProps {
 }
 
 const SITE_URL = "https://shebloomswealth.app";
-const SITE_NAME = "She Blooms Wealth";
+const SITE_NAME = "Bloom Radar";
 
 const defaultSEO = {
-  title: "She Blooms Wealth — Free Financial Education for Women",
+  title: "Bloom Radar: Stock Screener & Alerts",
   description:
-    "Learn investing, budgeting, and side hustles with Pansy, your friendly AI guide. 150+ plain-language lessons, paper trading simulator, budget tracker, and certificate. Built for women. No jargon.",
+    "Stock screener, price alerts, and Pansy AI market chat. Watchlist, market movers, paper trading, and options tape. Education optional.",
   image: `${SITE_URL}/og-image.jpg`,
   url: SITE_URL,
 };

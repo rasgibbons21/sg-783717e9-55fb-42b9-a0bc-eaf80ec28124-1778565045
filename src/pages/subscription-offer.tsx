@@ -8,7 +8,7 @@ import { authService } from "@/services/authService";
 import { userService } from "@/services/userService";
 import { Check, Loader2, Sparkles } from "lucide-react";
 import { SEO } from "@/components/SEO";
-import { PRO_PLAN } from "@/config/proPlan";
+import { CORE_PLAN } from "@/config/proPlan";
 import { usePaymentProvider } from "@/lib/payments";
 
 export default function SubscriptionOffer() {
@@ -76,13 +76,13 @@ export default function SubscriptionOffer() {
     }
   };
 
-  const monthlyPrice = PRO_PLAN.monthlyPrice;
-  const yearlyPrice = PRO_PLAN.yearlyPrice;
-  const yearlyMonthly = PRO_PLAN.yearlyMonthly;
+  const monthlyPrice = CORE_PLAN.monthlyPrice;
+  const yearlyPrice = CORE_PLAN.yearlyPrice;
+  const yearlyMonthly = CORE_PLAN.yearlyMonthly;
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <SEO title="Bloom Pro — Unlock All Lessons & Features" description="Get Bloom Pro for $4.99/month, $29.99/year, or $69.99 lifetime. Unlock Bloom University, Strategy Lab with 32 trading strategies, and unlimited access to all features." />
+      <SEO title="Radar Core — Unlock All Features" description="Get Radar Core for $4.99/month, $39.99/year, or $69.99 lifetime. Unlock stock screener, price alerts, Pansy AI analyst, and unlimited access to all features." />
       
       <div className="max-w-2xl w-full space-y-8">
         {/* Hero Section */}
@@ -126,7 +126,7 @@ export default function SubscriptionOffer() {
             <div className="flex items-start justify-between">
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <h3 className="font-serif text-2xl font-bold text-foreground">Bloom Pro</h3>
+                  <h3 className="font-serif text-2xl font-bold text-foreground">Radar Core</h3>
                   <Badge className="bg-accent text-accent-foreground">
                     <Sparkles className="w-3 h-3 mr-1" />
                     Popular
@@ -172,7 +172,7 @@ export default function SubscriptionOffer() {
               ) : (
                 <>
                   <Sparkles className="w-5 h-5 mr-2" />
-                  Unlock Bloom Pro
+                  Unlock Radar Core
                 </>
               )}
             </Button>

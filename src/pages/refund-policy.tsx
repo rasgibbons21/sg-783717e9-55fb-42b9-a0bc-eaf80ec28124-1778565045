@@ -43,7 +43,7 @@ export default function RefundPolicy() {
             {/* ── Subscriptions ── */}
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Subscriptions &amp; Billing</h2>
             <p className="mb-4 text-foreground">
-              Bloom Pro is a paid subscription that gives you access to premium educational content,
+              Radar Core is a paid subscription that gives you access to premium educational content,
               the Practice Trader, Bloom University, and AI-powered features. Subscriptions are
               billed through Stripe, our secure payment processor.
             </p>
@@ -68,7 +68,7 @@ export default function RefundPolicy() {
             {/* ── How to Cancel ── */}
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">How to Cancel</h2>
             <p className="mb-4 text-foreground">
-              You can cancel your Bloom Pro subscription at any time — no questions asked.
+              You can cancel your Radar Core subscription at any time — no questions asked.
             </p>
             <ul className="mb-6 space-y-2 text-foreground">
               <li>
@@ -93,7 +93,7 @@ export default function RefundPolicy() {
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Refunds</h2>
 
             <p className="mb-4 text-foreground">
-              We want you to feel confident starting your journey with Bloom. If Bloom Pro isn&apos;t
+              We want you to feel confident starting your journey with Bloom. If Radar Core isn&apos;t
               the right fit, you may request a full refund within 7 days of your initial purchase.
             </p>
             <ul className="mb-6 space-y-2 text-foreground">

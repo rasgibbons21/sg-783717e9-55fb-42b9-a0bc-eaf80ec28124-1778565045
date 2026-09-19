@@ -8,9 +8,10 @@ import {
   Zap, AlertTriangle,
   RefreshCw, Filter, ArrowUpRight, Eye,
   Newspaper, Sparkles, Target, ShieldCheck,
-  TrendingUp,
+  TrendingUp, Lock,
 } from "lucide-react";
 import type { CryptoCandidate, CryptoStatus } from "@/lib/cryptoScanner";
+import { PlayReviewsRail } from "@/components/PlayReviewsRail";
 
 type MarketTab = "stocks" | "crypto";
 
@@ -579,15 +580,15 @@ export default function SignalsPage() {
 
   return (
     <Layout>
-      <SEO title="Bloom | AI Trading Signals" description="AI-powered stock and crypto scanner with Pansy's trade analysis, live signals, and market news" />
+      <SEO title="Radar | Stock Screener & Alerts" description="Stock screener, price alerts, and Pansy AI market chat. Watchlist, market movers, and paper trading." />
 
       <div className="max-w-lg mx-auto px-4 pt-4 pb-32">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-2xl font-bold text-[#F4F7FA]">Bloom</h1>
+            <h1 className="text-2xl font-bold text-[#F4F7FA]">Radar</h1>
             <p className="text-xs text-[#F4F7FA]/40 mt-0.5">
-              {marketTab === "stocks" ? "Gap-and-Go Scanner" : "Crypto Scanner"}
+              {marketTab === "stocks" ? "Stock Screener" : "Crypto Scanner"}
               {marketTab === "stocks" && lastScan && <> &middot; Updated {timeAgo(new Date(lastScan).toISOString())}</>}
               {marketTab === "crypto" && lastCryptoScan && <> &middot; Updated {timeAgo(new Date(lastCryptoScan).toISOString())}</>}
             </p>
@@ -676,6 +677,111 @@ export default function SignalsPage() {
             )}
           </div>
         )}
+
+        {/* ═══ PANSY SCREENER CHIP ═══ */}
+        <div className="mb-4">
+          <div
+            className="rounded-xl p-3"
+            style={{ background: "rgba(168,85,247,0.04)", border: "1px solid rgba(168,85,247,0.12)" }}
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-sm">🌸</span>
+              <span className="text-xs font-semibold text-[#F4F7FA]/70">Pansy Screen Queries</span>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {[
+                "FCF yield > 5%; FCF positive; D/E < 0.3",
+                "Golden cross, volume above 20-day avg",
+                "Low-vol stocks, beta < 0.8",
+                "Dividend growth, 5-year streak",
+              ].map((q) => (
+                <a
+                  key={q}
+                  href={`/ask-pansy`}
+                  className="text-[10px] px-2 py-1 rounded-lg transition-colors hover:bg-[#A855F7]/10"
+                  style={{ background: "rgba(168,85,247,0.08)", color: "#C084FC", border: "1px solid rgba(168,85,247,0.15)" }}
+                >
+                  {q}
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* ═══ SHORTCUT TILES ═══ */}
+        <div className="grid grid-cols-4 gap-2 mb-4">
+          {[
+            { label: "Screener", icon: "🔍", href: "#", active: true },
+            { label: "Radar+", icon: "📡", href: "/subscription" },
+            { label: "Alerts", icon: "🔔", href: "/subscription" },
+            { label: "Trade", icon: "📈", href: "/paper-trader-v2" },
+          ].map((tile) => (
+            <a
+              key={tile.label}
+              href={tile.href}
+              className="flex flex-col items-center gap-1 py-2.5 rounded-xl text-center transition-all"
+              style={{
+                background: tile.active ? "rgba(39,183,200,0.1)" : "rgba(255,255,255,0.03)",
+                border: tile.active ? "1px solid rgba(39,183,200,0.2)" : "1px solid rgba(255,255,255,0.05)",
+              }}
+            >
+              <span className="text-lg">{tile.icon}</span>
+              <span className="text-[10px] font-semibold" style={{ color: tile.active ? "#27B7C8" : "rgba(244,247,250,0.5)" }}>
+                {tile.label}
+              </span>
+            </a>
+          ))}
+        </div>
+
+        {/* ═══ FIRST-RUN PANSY CARD ═══ */}
+        <div
+          className="rounded-2xl border p-4 mb-4"
+          style={{ background: "linear-gradient(145deg, rgba(168,85,247,0.06), rgba(14,27,48,1))", borderColor: "rgba(168,85,247,0.2)" }}
+        >
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-full flex items-center justify-center text-xl flex-shrink-0"
+              style={{ background: "rgba(168,85,247,0.12)" }}>
+              🌺
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-[#F4F7FA] mb-1">Meet Pansy — your AI analyst</p>
+              <p className="text-xs text-[#F4F7FA]/50 leading-relaxed italic">
+                &ldquo;I screen, I explain the alert, I do not place the trade.&rdquo;
+              </p>
+              <a
+                href="/ask-pansy"
+                className="inline-flex items-center gap-1.5 mt-2 text-[11px] font-semibold px-3 py-1.5 rounded-lg transition-colors"
+                style={{ background: "rgba(168,85,247,0.12)", color: "#C084FC", border: "1px solid rgba(168,85,247,0.2)" }}
+              >
+                <Sparkles className="w-3 h-3" />
+                Ask Pansy anything
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* ═══ PREMIUM TOOL CARDS ═══ */}
+        <div className="mb-4 -mx-4 px-4 overflow-x-auto scrollbar-hide">
+          <div className="flex gap-2" style={{ width: "max-content" }}>
+            {[
+              { icon: "🔍", title: "Stock Screener", desc: "Scored 0–100 by strategy", color: "#27B7C8", href: "#" },
+              { icon: "🔔", title: "Price Alerts", desc: "Levels & screen matches", color: "#49B06E", href: "/subscription" },
+              { icon: "📊", title: "Options Tape", desc: "Unusual activity feed", color: "#A855F7", href: "/subscription" },
+              { icon: "📈", title: "Paper Trade", desc: "$10K virtual capital", color: "#F59E0B", href: "/paper-trader-v2" },
+            ].map((tool) => (
+              <a
+                key={tool.title}
+                href={tool.href}
+                className="flex-shrink-0 w-[140px] rounded-xl p-3 transition-all hover:scale-[1.02]"
+                style={{ background: `${tool.color}08`, border: `1px solid ${tool.color}20` }}
+              >
+                <span className="text-lg block mb-1.5">{tool.icon}</span>
+                <p className="text-xs font-bold text-[#F4F7FA] mb-0.5">{tool.title}</p>
+                <p className="text-[10px] text-[#F4F7FA]/40">{tool.desc}</p>
+              </a>
+            ))}
+          </div>
+        </div>
 
         {/* ═══ STOCKS TAB ═══ */}
         {marketTab === "stocks" && <>
@@ -1158,7 +1264,7 @@ export default function SignalsPage() {
 
           {!newsLoading && news.length > 0 && (
             <div className="space-y-2">
-              {news.map((article) => (
+              {news.slice(0, 5).map((article) => (
                 <a
                   key={article.id}
                   href={article.url}
@@ -1199,6 +1305,44 @@ export default function SignalsPage() {
           )}
         </div>
 
+        {/* ═══ PANSY'S CONCLUSION — after news ═══ */}
+        {pansyBriefing && (
+          <div
+            className="rounded-2xl border p-4 mb-6"
+            style={{ background: "rgba(168,85,247,0.04)", borderColor: "rgba(168,85,247,0.15)" }}
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-base">🌸</span>
+              <h2 className="text-sm font-bold text-[#F4F7FA]">Pansy&apos;s Take</h2>
+            </div>
+            <p className="text-sm text-[#F4F7FA]/80 leading-relaxed mb-2">{pansyBriefing.briefing}</p>
+            <div
+              className="flex items-center gap-2 rounded-lg px-3 py-1.5 w-fit"
+              style={{
+                background: pansyBriefing.mood === "bullish" ? "rgba(73,176,110,0.1)" :
+                  pansyBriefing.mood === "bearish" ? "rgba(239,68,68,0.1)" :
+                  "rgba(245,158,11,0.1)",
+                border: `1px solid ${
+                  pansyBriefing.mood === "bullish" ? "rgba(73,176,110,0.2)" :
+                  pansyBriefing.mood === "bearish" ? "rgba(239,68,68,0.2)" :
+                  "rgba(245,158,11,0.2)"
+                }`,
+              }}
+            >
+              <span className="text-xs">
+                {pansyBriefing.mood === "bullish" ? "🟢" : pansyBriefing.mood === "bearish" ? "🔴" : "🟡"}
+              </span>
+              <span className="text-[11px] font-semibold capitalize" style={{
+                color: pansyBriefing.mood === "bullish" ? "#49B06E" :
+                  pansyBriefing.mood === "bearish" ? "#EF4444" : "#F59E0B",
+              }}>
+                {pansyBriefing.mood}
+              </span>
+              <span className="text-[10px] text-[#F4F7FA]/40">— {pansyBriefing.moodNote}</span>
+            </div>
+          </div>
+        )}
+
         {/* Near Misses — stocks only */}
         {marketTab === "stocks" && hasScanData && nearMisses.length > 0 && (
           <div className="mb-6">
@@ -1228,6 +1372,57 @@ export default function SignalsPage() {
           </div>
         )}
 
+        {/* ═══ LOCKED SIGNAL TABLE ═══ */}
+        <div className="mb-6 relative">
+          <div className="flex items-center gap-2 mb-3">
+            <Zap className="w-4 h-4 text-[#27B7C8]" />
+            <h2 className="text-sm font-bold text-[#F4F7FA]">Live Alert Tape</h2>
+            <Lock className="w-3 h-3 text-[#F4F7FA]/30" />
+          </div>
+          <div className="rounded-xl overflow-hidden relative" style={{ border: "1px solid rgba(255,255,255,0.06)" }}>
+            <table className="w-full text-[11px]">
+              <thead>
+                <tr style={{ background: "rgba(255,255,255,0.04)" }}>
+                  <th className="text-left px-3 py-2 font-semibold text-[#F4F7FA]/50">Time</th>
+                  <th className="text-left px-3 py-2 font-semibold text-[#F4F7FA]/50">Symbol</th>
+                  <th className="text-left px-3 py-2 font-semibold text-[#F4F7FA]/50">Bias</th>
+                  <th className="text-right px-3 py-2 font-semibold text-[#F4F7FA]/50">Chg%</th>
+                </tr>
+              </thead>
+              <tbody className="blur-[4px] select-none pointer-events-none">
+                {[
+                  { time: "9:34", sym: "ABCD", bias: "Bullish", chg: "+8.2%" },
+                  { time: "9:37", sym: "EFGH", bias: "Bearish", chg: "-3.1%" },
+                  { time: "9:41", sym: "IJKL", bias: "Bullish", chg: "+12.5%" },
+                  { time: "9:45", sym: "MNOP", bias: "Bullish", chg: "+5.7%" },
+                ].map((row, i) => (
+                  <tr key={i} style={{ background: i % 2 === 0 ? "rgba(255,255,255,0.02)" : "transparent" }}>
+                    <td className="px-3 py-2 text-[#F4F7FA]/40">{row.time}</td>
+                    <td className="px-3 py-2 font-semibold text-[#F4F7FA]">{row.sym}</td>
+                    <td className="px-3 py-2 text-[#49B06E]">{row.bias}</td>
+                    <td className="px-3 py-2 text-right text-[#49B06E]">{row.chg}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ background: "rgba(14,27,48,0.6)" }}>
+              <Lock className="w-5 h-5 text-[#27B7C8] mb-2" />
+              <p className="text-xs font-semibold text-[#F4F7FA]/80 mb-1">Unlock live alert tape</p>
+              <p className="text-[10px] text-[#F4F7FA]/40 mb-2">Real-time screen matches and price alerts</p>
+              <a
+                href="/subscription"
+                className="text-[10px] font-bold px-4 py-1.5 rounded-lg transition-colors"
+                style={{ background: "rgba(39,183,200,0.15)", color: "#27B7C8", border: "1px solid rgba(39,183,200,0.25)" }}
+              >
+                Start Free Trial
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* Reviews rail */}
+        <PlayReviewsRail />
+
         {/* Disclaimer */}
         <div
           className="rounded-xl p-3 mt-2"
@@ -1235,8 +1430,8 @@ export default function SignalsPage() {
         >
           <p className="text-[10px] text-[#F4F7FA]/30 leading-relaxed">
             <strong className="text-[#F4F7FA]/40">Educational decision support only.</strong>{" "}
-            Signals are hypothetical paper-trade candidates, not investment advice. Market data may be delayed.
-            Day trading involves significant risk of loss. Verify all data and make your own decisions.
+            Alerts are price/level/screen-match notifications, not trade recommendations.
+            Market data may be delayed. Day trading involves significant risk of loss. Verify all data and make your own decisions.
           </p>
         </div>
       </div>

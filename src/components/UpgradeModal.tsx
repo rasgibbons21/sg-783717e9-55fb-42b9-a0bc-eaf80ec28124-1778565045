@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Check, Sparkles, X, Lock } from "lucide-react";
 import { useRouter } from "next/router";
-import { PRO_PLAN } from "@/config/proPlan";
+import { CORE_PLAN } from "@/config/proPlan";
 import { usePaymentProvider } from "@/lib/payments";
 
 interface UpgradeModalProps {
@@ -32,11 +32,11 @@ export function UpgradeModal({ isOpen, onClose, trigger = "view_limit" }: Upgrad
               </Button>
             </div>
             <DialogTitle className="font-serif text-2xl text-foreground mt-4">
-              Unlock Bloom Pro
+              Unlock Radar Core
             </DialogTitle>
           </DialogHeader>
           <p className="text-muted-foreground">
-            Get unlimited analyses, full lessons, and more with Bloom Pro.
+            Get unlimited screener access, alerts, and Pansy AI with Radar Core.
           </p>
           <div className="flex gap-3">
             <Button variant="outline" onClick={onClose} className="flex-1">
@@ -72,7 +72,7 @@ export function UpgradeModal({ isOpen, onClose, trigger = "view_limit" }: Upgrad
             </DialogTitle>
           </DialogHeader>
           <p className="text-muted-foreground">
-            This feature requires Bloom Pro. Subscriptions are not available in this version of the app.
+            This feature requires Radar Core. Subscriptions are not available in this version of the app.
           </p>
           <Button variant="outline" onClick={onClose} className="w-full">
             Got it
@@ -106,14 +106,14 @@ export function UpgradeModal({ isOpen, onClose, trigger = "view_limit" }: Upgrad
 
           <Card className="p-4 border-accent/20 bg-accent/5">
             <div className="space-y-3">
-              <h4 className="font-serif text-lg font-semibold text-foreground">Bloom Pro</h4>
+              <h4 className="font-serif text-lg font-semibold text-foreground">Radar Core</h4>
               <ul className="space-y-2">
                 {[
-                  "Save your portfolio — your holdings and progress, there every time you come back.",
-                  "Unlock every locked lesson — the income-stream playbooks (real estate, digital products, affiliate, REITs, LLC, cash-flow business) plus the full trading-psychology system.",
-                  "Unlimited analysis — research any stock or ETF, as often as you want.",
-                  "Pansy, unlimited — ask your guide anything, anytime, with no daily limit (free is capped).",
-                  "Your whole journey, tracked — completed lessons, saved analyses, progress over time.",
+                  "Stock screener — strategies scored 0–100, ranked by probability.",
+                  "Price alerts — get notified when screens match or levels hit.",
+                  "Pansy AI analyst — entries, stops at invalidation, and take profit targets.",
+                  "24/7 market briefings — news, gainers, and crypto movers.",
+                  "Paper trading simulator — practice risk-free with $10K virtual capital.",
                 ].map((feature) => (
                   <li key={feature} className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" />
@@ -127,15 +127,15 @@ export function UpgradeModal({ isOpen, onClose, trigger = "view_limit" }: Upgrad
           <div className="grid grid-cols-2 gap-3">
             <div className="rounded-lg border border-border p-3 text-center">
               <p className="text-xs text-muted-foreground">Monthly</p>
-              <p className="font-serif text-xl font-semibold text-foreground">${PRO_PLAN.monthlyPrice}<span className="text-sm font-normal text-muted-foreground">/mo</span></p>
+              <p className="font-serif text-xl font-semibold text-foreground">${CORE_PLAN.monthlyPrice}<span className="text-sm font-normal text-muted-foreground">/mo</span></p>
             </div>
             <div className="relative rounded-lg border border-accent p-3 text-center bg-accent/5">
               <Badge className="absolute -top-2 right-2 bg-accent text-accent-foreground text-[10px] px-1.5 py-0.5">
                 <Sparkles className="w-3 h-3 mr-1" />
-                {PRO_PLAN.yearlySavingsLabel}
+                {CORE_PLAN.yearlySavingsLabel}
               </Badge>
               <p className="text-xs text-muted-foreground">Yearly</p>
-              <p className="font-serif text-xl font-semibold text-foreground">${PRO_PLAN.yearlyPrice}<span className="text-sm font-normal text-muted-foreground">/yr</span></p>
+              <p className="font-serif text-xl font-semibold text-foreground">${CORE_PLAN.yearlyPrice}<span className="text-sm font-normal text-muted-foreground">/yr</span></p>
             </div>
           </div>
 
@@ -156,7 +156,7 @@ export function UpgradeModal({ isOpen, onClose, trigger = "view_limit" }: Upgrad
               className="flex-1 bg-accent hover:bg-accent/90 text-accent-foreground"
               onClick={() => router.push("/subscription")}
             >
-              Upgrade to Pro
+              Upgrade to Core
             </Button>
           </div>
         </div>

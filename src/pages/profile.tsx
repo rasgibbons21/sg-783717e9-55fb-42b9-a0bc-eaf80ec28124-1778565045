@@ -297,13 +297,13 @@ export default function Profile() {
       ? `https://shebloomswealth.app/onboarding?ref=${referralCode}`
       : "https://shebloomswealth.app";
     const shareText = referralCode
-      ? "Join me on Bloom and we both get 7 extra days of Pro! Investing made simple."
-      : "Check out Bloom — investing made simple.";
+      ? "Join me on Bloom Radar and we both get 7 extra days of Core! Stock screener & alerts made simple."
+      : "Check out Bloom Radar — stock screener & alerts.";
 
     if (navigator.share) {
       try {
         await navigator.share({
-          title: "Bloom",
+          title: "Bloom Radar",
           text: shareText,
           url: shareUrl,
         });
@@ -640,7 +640,7 @@ export default function Profile() {
                     <span className="text-2xl">✨</span>
                   </div>
                   <div>
-                    <p className="font-semibold text-foreground text-lg">Bloom Pro Member</p>
+                    <p className="font-semibold text-foreground text-lg">Radar Core Member</p>
                     <p className="text-sm text-muted-foreground">Unlimited access to all features</p>
                   </div>
                 </div>

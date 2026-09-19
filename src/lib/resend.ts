@@ -34,14 +34,14 @@ export async function sendTrialExpiringEmail(to: string, name: string) {
   return resend.emails.send({
     from: FROM,
     to,
-    subject: "Your Bloom Pro trial ends soon!",
+    subject: "Your Radar Core trial ends soon!",
     html: `
       <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:520px;margin:0 auto;padding:32px 20px;color:#e2e8f0;background:#0E1B30;border-radius:12px">
         <h1 style="color:#27B7C8;font-size:24px;margin:0 0 16px">Hey ${firstName},</h1>
-        <p style="line-height:1.6;margin:0 0 16px">Your Pro trial ends <strong style="color:#27B7C8">soon</strong>.</p>
-        <p style="line-height:1.6;margin:0 0 24px">Subscribe to keep full access to Practice Trader, Bloom University, and Pansy coaching.</p>
+        <p style="line-height:1.6;margin:0 0 16px">Your Radar Core trial ends <strong style="color:#27B7C8">soon</strong>.</p>
+        <p style="line-height:1.6;margin:0 0 24px">Subscribe to keep full access to the stock screener, price alerts, and unlimited Pansy AI analysis.</p>
         <a href="https://shebloomswealth.app/subscription" style="display:inline-block;background:#49B06E;color:#0E1B30;font-weight:600;padding:12px 28px;border-radius:8px;text-decoration:none">Subscribe Now</a>
-        <p style="margin:32px 0 0;font-size:13px;color:#94a3b8">No pressure — you can still use Bloom's free features after the trial.</p>
+        <p style="margin:32px 0 0;font-size:13px;color:#94a3b8">No pressure — you can still use Radar's free features after the trial.</p>
       </div>
     `,
   });

@@ -224,7 +224,7 @@ export default function AcademyLanding() {
                 Best Value
               </div>
               <div className="mb-6">
-                <h3 className="text-lg font-bold text-foreground mb-1">Bloom Pro</h3>
+                <h3 className="text-lg font-bold text-foreground mb-1">Radar Core</h3>
                 <div className="flex items-baseline gap-1">
                   <span className="text-4xl font-bold text-foreground">$4.99</span>
                   <span className="text-muted-foreground">/month</span>

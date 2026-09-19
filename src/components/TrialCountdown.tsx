@@ -57,7 +57,7 @@ export function TrialCountdown() {
               className="w-full py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2"
               style={{ background: "linear-gradient(135deg, #27B7C8, #49B06E)", color: "#0E1B30" }}
             >
-              <Sparkles className="w-4 h-4" /> Upgrade to Bloom Pro
+              <Sparkles className="w-4 h-4" /> Upgrade to Radar Core
             </motion.button>
           </Link>
         </div>
@@ -85,7 +85,7 @@ export function TrialCountdown() {
           </div>
 
           <p className="text-xs text-center text-muted-foreground mb-3">
-            Explore everything Bloom Pro has to offer before time runs out
+            Explore everything Radar Core has to offer before time runs out
           </p>
 
           <Link href="/subscription">

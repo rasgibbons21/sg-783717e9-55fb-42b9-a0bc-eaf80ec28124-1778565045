@@ -139,10 +139,10 @@ export function InstallPrompt() {
 
               <div className="flex-1 min-w-0">
                 <h3 className="font-semibold text-foreground text-lg mb-1">
-                  Add Bloom to your home screen
+                  Add Radar to your home screen
                 </h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Quick access to your investments 🌸
+                  Quick access to your screener 🌸
                 </p>
 
                 <div className="flex gap-2">
@@ -189,7 +189,7 @@ export function InstallPrompt() {
               </div>
               <div>
                 <h2 className="text-2xl font-bold text-foreground mb-2">
-                  Add Bloom to Your Home Screen
+                  Add Radar to Your Home Screen
                 </h2>
                 <p className="text-sm text-muted-foreground">
                   Follow these 3 quick steps in Safari

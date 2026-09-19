@@ -163,33 +163,33 @@ export default function LandingPage() {
       <style>{KEYFRAMES}</style>
 
       <SEO
-        title="She Blooms Wealth — Free Financial Education for Women"
-        description="Learn investing, budgeting, side hustles, and trading strategies with Pansy, your friendly guide. 150+ plain-language lessons, paper trading simulator, budget tracker, and more. Built for women. No jargon."
+        title="Bloom Radar: Stock Screener & Alerts"
+        description="Stock screener, price alerts, and Pansy AI market chat. Watchlist, market movers, paper trading, and options tape. Education optional."
         jsonLd={{
           "@context": "https://schema.org",
           "@graph": [
             {
               "@type": "Organization",
               "@id": "https://shebloomswealth.app/#organization",
-              name: "She Blooms Wealth",
+              name: "Bloom Radar",
               url: "https://shebloomswealth.app",
               logo: "https://shebloomswealth.app/bloom-logo.png",
-              description: "Financial education platform built for women — teaching investing, budgeting, and side hustles in plain language.",
+              description: "Stock screener, trade alerts, and AI market analysis platform.",
               foundingDate: "2026",
               founder: { "@type": "Organization", name: "Cinder Vault Enterprises LLC" },
             },
             {
               "@type": "SoftwareApplication",
               "@id": "https://shebloomswealth.app/#app",
-              name: "Bloom",
+              name: "Bloom Radar",
               applicationCategory: "FinanceApplication",
               operatingSystem: "Android, Web",
               offers: [
-                { "@type": "Offer", price: "0", priceCurrency: "USD", description: "Free tier with lessons, paper trading, and budget tracker" },
-                { "@type": "Offer", price: "7.99", priceCurrency: "USD", billingIncrement: "P1M", description: "Bloom Pro monthly" },
-                { "@type": "Offer", price: "49.99", priceCurrency: "USD", billingIncrement: "P1Y", description: "Bloom Pro yearly" },
+                { "@type": "Offer", price: "0", priceCurrency: "USD", description: "Free screener, paper trading, and education" },
+                { "@type": "Offer", price: "4.99", priceCurrency: "USD", billingIncrement: "P1M", description: "Radar Core monthly" },
+                { "@type": "Offer", price: "39.99", priceCurrency: "USD", billingIncrement: "P1Y", description: "Radar Core yearly" },
               ],
-              description: "Free financial education app for women. 150+ lessons on investing, budgeting, and side hustles. Paper trading simulator with $10K virtual money.",
+              description: "Stock screener, price alerts, and Pansy AI market chat. Watchlist, market movers, paper trading. Education optional.",
               url: "https://shebloomswealth.app",
               publisher: { "@id": "https://shebloomswealth.app/#organization" },
             },
@@ -197,7 +197,7 @@ export default function LandingPage() {
               "@type": "WebSite",
               "@id": "https://shebloomswealth.app/#website",
               url: "https://shebloomswealth.app",
-              name: "She Blooms Wealth",
+              name: "Bloom Radar",
               publisher: { "@id": "https://shebloomswealth.app/#organization" },
             },
           ],
@@ -215,8 +215,8 @@ export default function LandingPage() {
                   style={{ borderRadius:"50%", animation:"glow-pulse 7s ease-in-out infinite", display:"block" }} />
               </div>
               <div style={{ lineHeight:1.15 }}>
-                <div style={{ fontFamily:"'Cormorant Garamond', serif", fontWeight:700, fontSize:18, letterSpacing:"0.01em", color:C.ivory }}>Bloom</div>
-                <div style={{ fontSize:9, fontWeight:600, letterSpacing:"0.14em", textTransform:"uppercase", color:"rgba(244,247,250,0.35)" }}>She Blooms Wealth</div>
+                <div style={{ fontFamily:"'Cormorant Garamond', serif", fontWeight:700, fontSize:18, letterSpacing:"0.01em", color:C.ivory }}>Radar</div>
+                <div style={{ fontSize:9, fontWeight:600, letterSpacing:"0.14em", textTransform:"uppercase", color:"rgba(244,247,250,0.35)" }}>Bloom Radar</div>
               </div>
             </div>
             <Link href="/onboarding">
@@ -224,7 +224,7 @@ export default function LandingPage() {
                 onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = `0 8px 28px rgba(39,183,200,0.40)`; }}
                 onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)";    e.currentTarget.style.boxShadow = `0 4px 20px rgba(39,183,200,0.22)`; }}
               >
-                Start Learning Free
+                Get Started Free
               </button>
             </Link>
           </div>
@@ -240,22 +240,21 @@ export default function LandingPage() {
             {/* ── LEFT COLUMN ─────────────────────────────────────────────── */}
             <div style={{ flex:"0 0 54%" }}>
               <div style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"6px 14px", borderRadius:20, marginBottom:"1.25rem", animation:"fade-up 0.55s ease-out 0.1s both", background:"rgba(73, 176, 110, 0.12)", border:"1px solid rgba(73, 176, 110, 0.25)" }}>
-                <span style={{ fontSize:13 }}>🌱</span>
-                <span style={{ fontSize:12, fontWeight:700, color:C.green, letterSpacing:"0.04em" }}>100% Free to Start — No Credit Card</span>
+                <span style={{ fontSize:13 }}>📡</span>
+                <span style={{ fontSize:12, fontWeight:700, color:C.green, letterSpacing:"0.04em" }}>Free Stock Screener — No Credit Card</span>
               </div>
 
               <div style={{ marginBottom:"1.25rem", animation:"fade-up 0.55s ease-out 0.2s both" }}>
                 <h1 style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:"clamp(2.3rem, 5vw, 3.6rem)", fontWeight:700, lineHeight:1.12, letterSpacing:"-0.01em", color:C.ivory, margin:0 }}>
-                  Learn to build wealth
+                  Screen stocks, set alerts,
                   <br />
-                  <span style={{ ...gradientText }}>from scratch.</span>
+                  <span style={{ ...gradientText }}>trade smarter.</span>
                 </h1>
               </div>
 
               <p style={{ fontSize:"clamp(1rem, 1.9vw, 1.12rem)", lineHeight:1.72, color:"rgba(244,247,250,0.72)", maxWidth:480, marginBottom:"1.8rem", animation:"fade-up 0.55s ease-out 0.28s both" }}>
-                Bloom is a <strong style={{ color:C.ivory }}>free financial education app</strong> that teaches you investing,
-                budgeting, side hustles, and how money actually works. 150+ lessons from beginner to advanced.
-                Built for women. No jargon.
+                Bloom Radar is a <strong style={{ color:C.ivory }}>stock screener and alerts platform</strong> with Pansy AI market chat,
+                watchlist, market movers, paper trading, and options tape. Education built in.
               </p>
 
               <div style={{ display:"flex", gap:12, animation:"fade-up 0.55s ease-out 0.44s both" }}>
@@ -264,7 +263,7 @@ export default function LandingPage() {
                     onMouseEnter={e => { e.currentTarget.style.transform="translateY(-2px)"; e.currentTarget.style.boxShadow=`0 14px 40px rgba(39,183,200,0.44)`; }}
                     onMouseLeave={e => { e.currentTarget.style.transform="translateY(0)";    e.currentTarget.style.boxShadow=`0 8px 30px rgba(39,183,200,0.28)`; }}
                   >
-                    Start Learning Free <ArrowRight size={16} />
+                    Get Started Free <ArrowRight size={16} />
                   </button>
                 </Link>
               </div>
@@ -290,8 +289,8 @@ export default function LandingPage() {
                       style={{ borderRadius:"50%", flexShrink:0, marginTop:2, background:"white", display:"block" }} />
                     <p style={{ margin:0, fontSize:12.5, lineHeight:1.62, color:"rgba(244,247,250,0.88)" }}>
                       Hi, I&apos;m Pansy 🌿<br />
-                      I&apos;m here to help you understand money, markets, and investing in a way that finally makes sense.{" "}
-                      <span style={{ color:C.teal, fontWeight:600 }}>We&apos;re growing together.</span>
+                      I screen, I explain the alert, I do not place the trade.{" "}
+                      <span style={{ color:C.teal, fontWeight:600 }}>Let&apos;s find your next setup.</span>
                     </p>
                   </div>
                 </div>
@@ -305,14 +304,14 @@ export default function LandingPage() {
           <div style={{ maxWidth:720, margin:"0 auto", padding:"3rem 1.5rem", textAlign:"center" }}>
             <div style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"6px 14px", borderRadius:20, marginBottom:"1rem", background:`${C.teal}12`, border:`1px solid ${C.teal}25` }}>
               <Share2 size={13} style={{ color:C.teal }} />
-              <span style={{ fontSize:12, fontWeight:700, color:C.teal, letterSpacing:"0.04em" }}>Share Bloom</span>
+              <span style={{ fontSize:12, fontWeight:700, color:C.teal, letterSpacing:"0.04em" }}>Share Radar</span>
             </div>
 
             <h2 style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:"clamp(1.5rem, 3vw, 2rem)", fontWeight:700, color:C.ivory, marginBottom:"0.75rem" }}>
               Know someone who needs this?
             </h2>
             <p style={{ fontSize:14, color:"rgba(244,247,250,0.55)", marginBottom:"2rem", maxWidth:420, margin:"0 auto 2rem" }}>
-              Scan the QR code or share the link to help a friend start their financial education journey.
+              Scan the QR code or share the link so someone else can screen smarter too.
             </p>
 
             <div style={{ display:"inline-block", padding:20, borderRadius:20, background:"white", boxShadow:"0 8px 40px rgba(0,0,0,0.3)" }}>
@@ -334,6 +333,30 @@ export default function LandingPage() {
             <p style={{ fontSize:12, color:"rgba(244,247,250,0.35)", marginTop:"1.25rem" }}>
               shebloomswealth.app
             </p>
+          </div>
+        </section>
+
+        {/* ── PLAY REVIEWS ──────────────────────────────────────────── */}
+        <section style={{ maxWidth:720, margin:"0 auto", padding:"3rem 1.5rem 0" }}>
+          <div style={{ ...glass, borderRadius:20, padding:"2rem 1.75rem", textAlign:"center" }}>
+            <div style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"6px 14px", borderRadius:20, marginBottom:"1rem", background:"rgba(212,175,55,0.1)", border:"1px solid rgba(212,175,55,0.2)" }}>
+              <span style={{ fontSize:13 }}>⭐</span>
+              <span style={{ fontSize:12, fontWeight:700, color:"#D4AF37", letterSpacing:"0.04em" }}>Reviews</span>
+            </div>
+            <h2 style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:"clamp(1.3rem, 3vw, 1.7rem)", fontWeight:700, color:C.ivory, marginBottom:8 }}>
+              Be the first to review Radar on Play
+            </h2>
+            <p style={{ fontSize:13, color:"rgba(244,247,250,0.5)", lineHeight:1.6, marginBottom:16 }}>
+              Help other traders find Radar — your review makes a difference.
+            </p>
+            <a
+              href={`https://play.google.com/store/apps/details?id=app.shebloomswealth.mobile`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"10px 20px", borderRadius:10, background:"rgba(39,183,200,0.1)", color:C.teal, fontSize:13, fontWeight:700, border:`1px solid ${C.teal}30`, textDecoration:"none" }}
+            >
+              Open on Google Play
+            </a>
           </div>
         </section>
 
@@ -385,7 +408,7 @@ export default function LandingPage() {
             </div>
 
             <h2 style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:"clamp(1.5rem, 3vw, 2rem)", fontWeight:700, color:C.ivory, marginBottom:"0.5rem" }}>
-              Add Bloom to your home screen
+              Add Radar to your home screen
             </h2>
             <p style={{ fontSize:14, color:"rgba(244,247,250,0.55)", maxWidth:440, margin:"0 auto" }}>
               Get the full app experience in 3 quick taps — no app store needed.
@@ -410,7 +433,7 @@ export default function LandingPage() {
                 step: "3",
                 icon: "plus",
                 title: "Add to Home Screen",
-                desc: "Select \"Add to Home Screen\" and tap Add. Bloom now opens like a real app!",
+                desc: "Select \"Add to Home Screen\" and tap Add. Radar now opens like a real app!",
               },
             ].map((item) => (
               <div key={item.step} style={{ ...glass, borderRadius:16, padding:"1.5rem", textAlign:"center", boxShadow:"0 4px 24px rgba(0,0,0,0.24)", position:"relative" }}>
@@ -448,7 +471,7 @@ export default function LandingPage() {
                 onMouseEnter={e => { e.currentTarget.style.transform="translateY(-2px)"; e.currentTarget.style.boxShadow=`0 14px 40px rgba(39,183,200,0.44)`; }}
                 onMouseLeave={e => { e.currentTarget.style.transform="translateY(0)";    e.currentTarget.style.boxShadow=`0 8px 30px rgba(39,183,200,0.28)`; }}
               >
-                Start Learning Free <ArrowRight size={16} />
+                Get Started Free <ArrowRight size={16} />
               </button>
             </Link>
           </div>
@@ -460,8 +483,8 @@ export default function LandingPage() {
             <div className="flex flex-col md:flex-row md:items-start gap-8 md:gap-12 mb-8">
               <div className="flex-1 space-y-2">
                 <div className="flex items-center gap-2">
-                  <Image src="/bloom-logo.png" alt="Bloom" width={24} height={24} className="rounded-full bg-[#F4F7FA]" />
-                  <p className="text-sm font-semibold" style={{ color:"rgba(244,247,250,0.60)" }}>She Blooms Wealth</p>
+                  <Image src="/bloom-logo.png" alt="Radar" width={24} height={24} className="rounded-full bg-[#F4F7FA]" />
+                  <p className="text-sm font-semibold" style={{ color:"rgba(244,247,250,0.60)" }}>Bloom Radar</p>
                 </div>
                 <p className="text-xs" style={{ color:"rgba(244,247,250,0.35)" }}>Invest in yourself first 🌸</p>
               </div>
@@ -490,10 +513,10 @@ export default function LandingPage() {
             </div>
             <div style={{ borderTop:"1px solid rgba(255,255,255,0.06)" }} className="pt-6 space-y-2">
               <p className="text-xs" style={{ color:"rgba(244,247,250,0.28)" }}>
-                © 2026 Cinder Vault Enterprises LLC. All rights reserved. Bloom is a product of Cinder Vault Enterprises LLC.
+                © 2026 Cinder Vault Enterprises LLC. All rights reserved. Bloom Radar is a product of Cinder Vault Enterprises LLC.
               </p>
               <p className="text-xs" style={{ color:"rgba(244,247,250,0.22)" }}>
-                Bloom is for educational purposes only and does not constitute financial advice. All investing involves risk of loss, including possible loss of principal. Past performance does not guarantee future results.
+                Bloom Radar is for educational purposes only and does not constitute financial advice. Alerts are price/level/screen-match notifications, not trade recommendations. All investing involves risk of loss, including possible loss of principal. Past performance does not guarantee future results.
               </p>
             </div>
           </div>

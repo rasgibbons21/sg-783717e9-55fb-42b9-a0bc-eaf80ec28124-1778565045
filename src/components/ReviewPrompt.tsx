@@ -8,7 +8,7 @@ interface ReviewPromptProps {
 
 const STORAGE_KEY = 'bloom-review-prompted';
 const REVIEW_URL_IOS = 'https://apps.apple.com/app/id6742758994?action=write-review';
-const REVIEW_URL_ANDROID = 'https://play.google.com/store/apps/details?id=app.shebloomswealth.twa';
+const REVIEW_URL_ANDROID = 'https://play.google.com/store/apps/details?id=app.shebloomswealth.mobile';
 const REVIEW_URL_WEB = 'https://shebloomswealth.app';
 
 function getReviewUrl() {
@@ -55,12 +55,12 @@ export function ReviewPrompt({ onClose, trigger }: ReviewPromptProps) {
           <div className="text-center">
             <div style={{ fontSize: 48 }} className="mb-3">&#127800;</div>
             <h3 className="text-lg font-bold text-[#F4F7FA] mb-1">
-              Enjoying Bloom?
+              Enjoying Radar?
             </h3>
             <p className="text-sm text-[#F4F7FA]/50 mb-5 leading-relaxed">
               {trigger
                 ? `Nice work completing ${trigger}! How are you enjoying the app so far?`
-                : 'Your opinion helps other women find Bloom. How would you rate us?'}
+                : 'Your feedback helps other traders find Radar. How would you rate us?'}
             </p>
 
             <div className="flex justify-center gap-2 mb-4">
@@ -96,7 +96,7 @@ export function ReviewPrompt({ onClose, trigger }: ReviewPromptProps) {
               Thank you!
             </h3>
             <p className="text-sm text-[#F4F7FA]/50 mb-5 leading-relaxed">
-              Would you mind leaving a quick review? It helps so much — other women find Bloom because of reviews like yours.
+              Would you mind leaving a quick review? It helps so much — other traders find Radar because of reviews like yours.
             </p>
             <a
               href={getReviewUrl()}
@@ -124,7 +124,7 @@ export function ReviewPrompt({ onClose, trigger }: ReviewPromptProps) {
               We hear you
             </h3>
             <p className="text-sm text-[#F4F7FA]/50 mb-5 leading-relaxed">
-              We&apos;re always improving Bloom. Thanks for your honest feedback — it helps us build a better app for you.
+              We&apos;re always improving Radar. Thanks for your honest feedback — it helps us build a better app for you.
             </p>
             <button
               onClick={onClose}

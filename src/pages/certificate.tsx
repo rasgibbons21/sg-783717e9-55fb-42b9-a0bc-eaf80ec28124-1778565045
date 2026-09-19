@@ -118,14 +118,14 @@ export default function CertificatePage() {
               Certificates are for Subscribers
             </h2>
             <p className="text-sm text-[#F4F7FA]/50 mb-6 leading-relaxed">
-              Subscribe to Bloom Pro to unlock certificates, download them, and share your achievements.
+              Subscribe to Radar Core to unlock certificates, download them, and share your achievements.
             </p>
             <button
               onClick={() => router.push("/subscription")}
               className="px-8 py-3 rounded-xl font-bold text-sm transition-all hover:scale-105"
               style={{ background: "linear-gradient(135deg, #C9A84C, #D4AF37)", color: "#0E1B30" }}
             >
-              Subscribe to Bloom Pro
+              Subscribe to Radar Core
             </button>
             <button
               onClick={() => router.back()}

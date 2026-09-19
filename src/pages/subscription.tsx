@@ -8,7 +8,7 @@ import { authService } from "@/services/authService";
 import { userService } from "@/services/userService";
 import { Check, Loader2, AlertCircle, Lock, Share2, Clock } from "lucide-react";
 import { SEO } from "@/components/SEO";
-import { PRO_PLAN, FOUNDERS_PLAN } from "@/config/proPlan";
+import { CORE_PLAN, FOUNDERS_PLAN } from "@/config/proPlan";
 import { usePaymentProvider } from "@/lib/payments";
 import GooglePlaySubscription from "@/components/GooglePlaySubscription";
 import { QRCodeSVG } from "qrcode.react";
@@ -89,15 +89,15 @@ export default function Subscription() {
     }
   };
 
-  const monthlyPrice = PRO_PLAN.monthlyPrice;
-  const yearlyPrice = PRO_PLAN.yearlyPrice;
-  const yearlyMonthly = PRO_PLAN.yearlyMonthly;
-  const lifetimePrice = PRO_PLAN.lifetimePrice;
+  const monthlyPrice = CORE_PLAN.monthlyPrice;
+  const yearlyPrice = CORE_PLAN.yearlyPrice;
+  const yearlyMonthly = CORE_PLAN.yearlyMonthly;
+  const lifetimePrice = CORE_PLAN.lifetimePrice;
 
   if (canShowInAppPayment) {
     return (
       <Layout>
-        <SEO title="Bloom Premium" description="Subscribe to Bloom Premium via Google Play" />
+        <SEO title="Radar Core" description="Subscribe to Radar Core via Google Play" />
         <GooglePlaySubscription />
       </Layout>
     );
@@ -106,7 +106,7 @@ export default function Subscription() {
   if (!canShowExternalPayment) {
     return (
       <Layout>
-        <SEO title="Subscription - Bloom" description="Bloom Pro subscription" />
+        <SEO title="Subscription - Radar" description="Radar Core subscription" />
         <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center gap-6">
           <div className="rounded-full bg-muted p-6">
             <Lock className="w-10 h-10 text-muted-foreground" />
@@ -125,8 +125,8 @@ export default function Subscription() {
   return (
     <Layout>
       <SEO
-        title="Subscription Plans - Bloom"
-        description="Choose between Free and Bloom Pro to unlock unlimited daily stock analyses"
+        title="Subscription Plans - Radar"
+        description="Radar Core, Plus, Pro — stock screener, alerts, Pansy AI, and more"
       />
       <div className="max-w-lg mx-auto p-4">
         <div className="space-y-6">
@@ -138,7 +138,7 @@ export default function Subscription() {
               Choose Your Plan
             </h1>
             <p className="text-muted-foreground">
-              AI trading signals, crypto scanner, TradingView charts &amp; Pansy AI analyst
+              Stock screener, price alerts, Pansy AI chat &amp; TradingView charts
             </p>
           </div>
           
@@ -167,10 +167,10 @@ export default function Subscription() {
 
                 <ul className="space-y-2">
                   {[
-                    "36 core lessons (beginner & intermediate)",
+                    "Basic stock screener",
                     "Paper trading simulator with $10K",
-                    "Daily challenges & streak tracking",
-                    "Market insights & daily bloom",
+                    "Market movers & watchlist",
+                    "36 core lessons",
                   ].map((feature) => (
                     <li key={feature} className="flex items-start gap-2">
                       <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
@@ -178,13 +178,13 @@ export default function Subscription() {
                     </li>
                   ))}
                   <li className="flex items-start gap-2 opacity-50">
-                    <span className="text-sm text-muted-foreground line-through">16 income stream lessons</span>
+                    <span className="text-sm text-muted-foreground line-through">Price alerts</span>
                   </li>
                   <li className="flex items-start gap-2 opacity-50">
-                    <span className="text-sm text-muted-foreground line-through">32 pro strategies</span>
+                    <span className="text-sm text-muted-foreground line-through">Pansy AI analyst — unlimited</span>
                   </li>
                   <li className="flex items-start gap-2 opacity-50">
-                    <span className="text-sm text-muted-foreground line-through">9-module university (89 lessons)</span>
+                    <span className="text-sm text-muted-foreground line-through">Morning Tape & Open Radar</span>
                   </li>
                 </ul>
 
@@ -257,13 +257,13 @@ export default function Subscription() {
                 <ul className="space-y-2">
                   {[
                     "Everything in Free, plus:",
-                    "AI stock & crypto scanner — daily signals",
+                    "Stock screener — strategies scored 0–100",
+                    "Price alerts — levels & screen matches",
                     "Pansy AI analyst — entries, stops & targets",
-                    "Real-time TradingView charts",
-                    "Unlimited market research & analysis",
-                    "Paper trading simulator",
+                    "24/7 market briefings",
+                    "TradingView charts",
                     "150+ lessons & 32 strategies",
-                    "Pansy unlimited — setups, analysis, anytime",
+                    "Pansy unlimited — analysis anytime",
                   ].map((feature) => (
                     <li key={feature} className="flex items-start gap-2">
                       <Check className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
@@ -326,7 +326,7 @@ export default function Subscription() {
 
                 <ul className="space-y-2">
                   {[
-                    "Everything in Bloom Pro",
+                    "Everything in Radar Core",
                     "All future updates included",
                     "No recurring payments ever",
                   ].map((feature) => (
@@ -375,7 +375,7 @@ export default function Subscription() {
 
           <Card className="p-3 bg-muted border-muted-foreground/20">
             <p className="text-xs text-center text-muted-foreground leading-relaxed">
-              Educational content only. Not financial advice. Bloom is not liable for any investment decisions or losses.
+              Educational content only. Not financial advice. Bloom Radar is not liable for any investment decisions or losses.
             </p>
           </Card>
 
@@ -383,7 +383,7 @@ export default function Subscription() {
           <Card className="p-5 bg-card text-center">
             <div className="flex items-center justify-center gap-1.5 mb-2">
               <Share2 className="w-3.5 h-3.5 text-accent" />
-              <span className="text-xs font-semibold text-accent uppercase tracking-wide">Share Bloom</span>
+              <span className="text-xs font-semibold text-accent uppercase tracking-wide">Share Radar</span>
             </div>
             <p className="text-sm text-muted-foreground mb-3">
               Know someone who needs this? Scan to share.

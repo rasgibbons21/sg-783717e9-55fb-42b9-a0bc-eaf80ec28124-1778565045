@@ -145,8 +145,8 @@ export default function SplashScreen({ onComplete }: { onComplete: () => void })
         <canvas ref={bgRef} width={360} height={560} style={{position:'absolute',inset:0,width:'100%',height:'100%'}}/>
         <canvas ref={flowerRef} width={280} height={280} style={{position:'relative',zIndex:2,width:280,height:280}}/>
         <div ref={wordmarkRef} style={{position:'relative',zIndex:2,textAlign:'center',marginTop:24,opacity:0,transform:'translateY(14px)',transition:'opacity 1s ease, transform 1s ease'}}>
-          <div style={{fontFamily:'Georgia,serif',fontStyle:'italic',fontWeight:300,fontSize:60,color:'#f5f0ea',letterSpacing:10,lineHeight:1}}>Bloom</div>
-          <div style={{fontFamily:'sans-serif',fontSize:10,letterSpacing:5,color:'#27B7C8',textTransform:'uppercase',marginTop:6}}>She Blooms Wealth</div>
+          <div style={{fontFamily:'Georgia,serif',fontStyle:'italic',fontWeight:300,fontSize:60,color:'#f5f0ea',letterSpacing:10,lineHeight:1}}>Radar</div>
+          <div style={{fontFamily:'sans-serif',fontSize:10,letterSpacing:5,color:'#27B7C8',textTransform:'uppercase',marginTop:6}}>Bloom Radar</div>
         </div>
         <div ref={taglineRef} style={{position:'relative',zIndex:2,fontFamily:'sans-serif',fontSize:10,letterSpacing:3,color:'rgba(255,255,255,0.3)',textTransform:'uppercase',marginTop:10,opacity:0,transition:'opacity 1.2s ease 0.3s'}}>Your money. Your terms. Your future.</div>
       </div>

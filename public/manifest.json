@@ -1,7 +1,7 @@
 {
-  "name": "She Blooms Wealth",
-  "short_name": "Bloom",
-  "description": "Investing made simple for women",
+  "name": "Bloom Radar: Stock Screener & Alerts",
+  "short_name": "Radar",
+  "description": "Stock screener, price alerts, and Pansy market chat. Watchlist, movers, and paper trading. Education optional.",
   "id": "/",
   "scope": "/",
   "start_url": "/",
