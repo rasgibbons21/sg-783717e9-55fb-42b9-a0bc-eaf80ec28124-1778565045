@@ -1,33 +1,34 @@
 # Bloom Radar — Google Play Listing
 
-## Title (≤30 chars visible)
-Bloom Radar: Stock Screener
+## Title
+Bloom Radar: Stock Screener & Alerts
 
 ## Short Description
-Stock screener, price alerts, and Pansy market chat. Watchlist, movers, and paper trading. Education optional.
+Stock screener, price alerts, and Pansy chat. Watchlist, movers, paper trade.
+
+## Tagline
+Screen the market. Get the alert. Decide if it's a trade.
 
 ## Full Description
 
-Bloom Radar is a stock screener and trade alerts platform built for active traders. Screen stocks by strategy, set price alerts, track market movers, and chat with Pansy — your AI trading analyst — all in one app.
+Bloom Radar is a stock screener and alerts desk for U.S. stocks.
 
-**What you get free:**
-- Stock screener — filter by gap-and-go, VWAP reclaim, breakout, support bounce, and more
-- Trade alerts — get notified when screens match or price levels hit
-- Watchlist — save tickers and track them across sessions
-- Market movers — top gainers, losers, and most active stocks and crypto
-- Paper trading — practice strategies risk-free with $10K virtual capital
-- Pansy AI chat — ask about any setup, ticker, or strategy
+It keeps scanning for Gap & Go, Opening Range Breakout, VWAP reclaim/bounce, first pullback, HOD break, bull flag, and red-to-green — then surfaces only names that match your rules.
 
-**Radar+ (paid):**
-- Morning Tape — daily movers with clues before the open
-- Open Radar — gap / open-drive watchlist with entry levels
-- Theme Desk — personalized stock baskets (For You screens)
-- Level Seeker — key levels with invalidation markers
-- Options tape — real-time unusual activity feed (Bloom+)
-- TradingView charts — interactive charting for stocks, crypto, and forex
-- 150+ education lessons and 32 strategies
+Pansy explains the setup. Paper trade it. Journal it. Academy stays under More if you want the lesson.
 
-**Keywords:** stock screener, stock alerts, price alerts, watchlist, market movers, options flow, paper trading, AI stock chat
+**What you get:**
+- Configurable strategy scanner — set price, gap %, RVOL, float, and session filters per strategy
+- Signal states — WATCH → NEAR TRIGGER → ACTIVE → INVALIDATED / TARGET HIT / STOP HIT
+- Score 0–100 measuring how many conditions passed — not win probability
+- Entry zone, invalidation level, targets, and R:R on every setup card
+- Pansy AI analyst — explains the setup, does not place the trade
+- Paper trading simulator — practice risk-free with $10K virtual capital
+- Trade journal — grade every trade, track what works
+- Market news from licensed feeds
+- Academy with 150+ lessons and strategy lab under More
+
+**Keywords:** stock screener, stock alerts, price alerts, day trading, gap and go, VWAP, paper trading, AI stock chat
 
 **Category:** Finance
 
@@ -37,4 +38,6 @@ Bloom Radar is a stock screener and trade alerts platform built for active trade
 
 ---
 
-Educational decision support only. Alerts are price/level/screen-match notifications, not trade recommendations. All investing involves risk of loss. Past performance does not guarantee future results.
+Not financial advice. Information and simulation only.
+
+Educational decision support only. Alerts are price/level/screen-match notifications, not trade recommendations. All investing involves risk of loss.

@@ -1,13 +1,13 @@
 {
   "name": "Bloom Radar: Stock Screener & Alerts",
   "short_name": "Radar",
-  "description": "Stock screener, price alerts, and Pansy market chat. Watchlist, movers, and paper trading. Education optional.",
+  "description": "Stock screener, price alerts, and Pansy chat. Watchlist, movers, paper trade.",
   "id": "/",
   "scope": "/",
-  "start_url": "/",
+  "start_url": "/home",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#0E1B30",
+  "background_color": "#07080C",
   "theme_color": "#27B7C8",
   "icons": [
     { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },

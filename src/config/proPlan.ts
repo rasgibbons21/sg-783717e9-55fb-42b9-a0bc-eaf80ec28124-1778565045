@@ -8,11 +8,11 @@ export const CORE_PLAN = {
   lifetimeLabel: "$69.99 one-time",
   yearlySavingsLabel: "Best Value",
   benefits: [
-    "Stock screener — scored and ranked using high-probability strategies.",
+    "Stock screener — scored and ranked across 8 day-trading strategies.",
     "Price alerts — get notified when screens match or levels hit.",
     "Pansy AI analyst — entries, stops at invalidation, and take profit targets.",
-    "24/7 market briefings — Pansy watches news, gainers, and crypto movers.",
-    "TradingView charts — interactive charting for stocks, crypto, and forex.",
+    "Market briefings — Pansy watches news and top gainers.",
+    "TradingView charts — interactive charting for U.S. stocks.",
     "Paper trading simulator — practice strategies risk-free with $10K virtual capital.",
   ],
 } as const;

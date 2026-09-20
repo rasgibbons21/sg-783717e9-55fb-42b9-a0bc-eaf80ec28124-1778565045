@@ -135,7 +135,7 @@ export default function LandingPage() {
     (async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        router.push("/signals");
+        router.push("/home");
         return;
       }
       setIsCheckingAuth(false);

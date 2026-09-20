@@ -17,7 +17,7 @@ const SUGGESTED = [
   "What setups should I watch for today?",
   "How do I find a good entry on a gap-and-go?",
   "Where should I set my stop loss on a breakout trade?",
-  "What's moving in crypto right now?",
+  "Which stocks are gapping up pre-market?",
 ];
 
 export default function AskPansyPage() {
