@@ -66,7 +66,7 @@ export default function Onboarding() {
         .eq("id", session.user.id)
         .single();
       if (profile?.onboarding_complete) {
-        router.push("/signals");
+        router.push("/home");
       } else {
         setStep("q-experience");
       }
@@ -193,7 +193,7 @@ export default function Onboarding() {
           setIsSubmitting(false);
           return;
         }
-        if (user) router.push("/signals");
+        if (user) router.push("/home");
       }
     } catch (err: unknown) {
       console.error("Auth error:", err);
@@ -208,7 +208,7 @@ export default function Onboarding() {
     if (!user) { setError("Session expired — please sign in again."); return; }
     const { error } = await supabase.from("profiles").upsert({ id: user.id, onboarding_complete: true });
     if (error) { setError("Something went wrong. Please try again."); return; }
-    window.location.href = "/signals";
+    window.location.href = "/home";
   };
 
   const handleCompleteOnboarding = async () => {
@@ -858,17 +858,56 @@ export default function Onboarding() {
                     </div>
                   </div>
 
-                  <p className="text-center text-xs text-[#F3EDE3]/30">
-                    7-day free trial &middot; $4.99/mo after &middot; Cancel anytime
-                  </p>
+                  {/* Founders pricing */}
+                  <div className={`${glassCard} ${glassCardBg} p-4`}>
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full" style={{ background: "rgba(212,168,83,0.15)", color: "#D4A853", border: "1px solid rgba(212,168,83,0.3)" }}>
+                        Founders Pricing
+                      </span>
+                      <span className="text-[10px] text-[#F3EDE3]/30">Limited time</span>
+                    </div>
+                    <p className="text-xs text-[#F3EDE3]/40 mb-3">7-day free trial on every plan. Cancel anytime.</p>
+                    <div className="space-y-2">
+                      {[
+                        { label: "Monthly", price: "$4.99/mo", regular: "$9.99/mo", tag: null },
+                        { label: "Yearly", price: "$39.99/yr", regular: "$79.99/yr", tag: "Best Value" },
+                        { label: "Lifetime", price: "$69.99", regular: "$149.99", tag: "One-time" },
+                      ].map((plan, i) => (
+                        <div
+                          key={i}
+                          className="flex items-center justify-between rounded-xl px-3 py-2.5"
+                          style={{
+                            background: plan.tag === "Best Value" ? "rgba(73,176,110,0.08)" : "rgba(255,255,255,0.02)",
+                            border: plan.tag === "Best Value" ? "1px solid rgba(73,176,110,0.25)" : "1px solid rgba(255,255,255,0.05)",
+                          }}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-semibold text-[#F3EDE3]">{plan.label}</span>
+                            {plan.tag && (
+                              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: plan.tag === "Best Value" ? "rgba(73,176,110,0.2)" : "rgba(39,183,200,0.15)", color: plan.tag === "Best Value" ? "#49B06E" : "#27B7C8" }}>
+                                {plan.tag}
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-right">
+                            <span className="text-sm font-bold text-[#F3EDE3]">{plan.price}</span>
+                            <span className="text-[10px] text-[#F3EDE3]/25 line-through ml-1.5">{plan.regular}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
 
                   <button
                     type="button"
-                    onClick={() => { window.location.href = "/signals"; }}
+                    onClick={() => { window.location.href = "/home"; }}
                     className="glass-btn flex items-center justify-center gap-2 text-lg"
                   >
-                    Open My Scanner <ChevronRight className="w-5 h-5" />
+                    Start Free Trial <ChevronRight className="w-5 h-5" />
                   </button>
+                  <p className="text-center text-[10px] text-[#F3EDE3]/25">
+                    No credit card required to start
+                  </p>
                 </div>
               )}
 

@@ -3,10 +3,11 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/router";
 import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Zap, Eye, AlertTriangle, Clock,
-  RefreshCw, ArrowUpRight, Target, ShieldCheck,
+  RefreshCw, ArrowUpRight, ArrowDownRight, Target, ShieldCheck,
+  ChevronDown, ChevronUp, Info,
 } from "lucide-react";
 import type { SignalResult } from "@/lib/strategies";
 
@@ -55,6 +56,169 @@ const STATE_MAP: Record<string, Tab> = {
   NEAR_TRIGGER: "near",
   WATCH: "watch",
 };
+
+function SignalCard({ candidate: c, signal: sig, onTap }: {
+  candidate: ScanCandidate; signal: SignalResult; onTap: () => void;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const stateColor = sig.state === "ACTIVE" ? "#49B06E" : sig.state === "NEAR_TRIGGER" ? "#F59E0B" : "#27B7C8";
+  const up = c.change >= 0;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="rounded-2xl border overflow-hidden"
+      style={{ background: "linear-gradient(145deg, #121821, #171E28)", borderColor: `${stateColor}25` }}
+    >
+      {/* Main row — always visible */}
+      <button
+        onClick={() => { haptic(); setExpanded(e => !e); }}
+        className="w-full p-4 text-left active:bg-white/[0.02] transition-colors"
+      >
+        <div className="flex items-start justify-between mb-2">
+          <div className="flex items-center gap-3">
+            <div
+              className="w-11 h-11 rounded-xl flex items-center justify-center font-bold text-sm"
+              style={{ background: `${stateColor}15`, color: stateColor, border: `1px solid ${stateColor}35` }}
+            >
+              {sig.score}
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-lg font-bold text-[#F3EDE3]">{c.symbol}</span>
+                <span
+                  className="text-[9px] font-bold px-1.5 py-0.5 rounded"
+                  style={{ background: `${stateColor}20`, color: stateColor }}
+                >
+                  {sig.state.replace("_", " ")}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 mt-0.5">
+                <span className="text-[10px] text-[#F3EDE3]/40">{sig.strategyName}</span>
+                <span className="text-[10px] text-[#F3EDE3]/25">{timeAgo(sig.timestamp)}</span>
+              </div>
+            </div>
+          </div>
+          <div className="text-right flex items-start gap-2">
+            <div>
+              <div className="flex items-center gap-1 font-bold text-sm" style={{ color: up ? "#49B06E" : "#EF4444" }}>
+                {up ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
+                {up ? "+" : ""}{c.change.toFixed(1)}%
+              </div>
+              <span className="text-[10px] text-[#F3EDE3]/30">${c.price.toFixed(2)}</span>
+            </div>
+            {expanded ? <ChevronUp className="w-4 h-4 text-[#F3EDE3]/20 mt-1" /> : <ChevronDown className="w-4 h-4 text-[#F3EDE3]/20 mt-1" />}
+          </div>
+        </div>
+
+        {/* Quick metrics */}
+        <div className="flex items-center gap-3 text-[10px] text-[#F3EDE3]/40">
+          <span>RVOL {c.rvol.toFixed(1)}x</span>
+          <span>Vol {formatVolume(c.volume)}</span>
+          {c.catalystHeadline && <span className="truncate max-w-[160px]">{c.catalystHeadline}</span>}
+        </div>
+      </button>
+
+      {/* Expanded detail */}
+      <AnimatePresence>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+          >
+            <div className="px-4 pb-4 border-t border-white/5 pt-3 space-y-3">
+
+              {/* Entry / Stop / Target bar */}
+              {sig.entryZone && (
+                <div className="rounded-xl p-3 grid grid-cols-3 gap-2 text-center" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                  <div>
+                    <p className="text-[9px] text-[#49B06E] font-bold uppercase tracking-wider mb-0.5">Entry</p>
+                    <p className="text-sm font-bold text-[#F3EDE3]">{sig.entryZone}</p>
+                  </div>
+                  <div>
+                    <p className="text-[9px] text-[#EF4444] font-bold uppercase tracking-wider mb-0.5">Stop</p>
+                    <p className="text-sm font-bold text-[#F3EDE3]">{sig.invalidationLevel ?? "—"}</p>
+                  </div>
+                  <div>
+                    <p className="text-[9px] text-[#27B7C8] font-bold uppercase tracking-wider mb-0.5">Target</p>
+                    <p className="text-sm font-bold text-[#F3EDE3]">{sig.target1 ?? "—"}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* R:R badge */}
+              {sig.rr && (
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold px-2 py-1 rounded-lg" style={{ background: "rgba(39,183,200,0.1)", color: "#27B7C8", border: "1px solid rgba(39,183,200,0.2)" }}>
+                    R:R {sig.rr}
+                  </span>
+                  <span className="text-[10px] text-[#F3EDE3]/30">Risk-to-reward ratio</span>
+                </div>
+              )}
+
+              {/* Conditions breakdown */}
+              {(sig.conditionsPassed.length > 0 || sig.conditionsFailed.length > 0) && (
+                <div className="space-y-1">
+                  <p className="text-[9px] text-[#F3EDE3]/30 uppercase tracking-wider font-bold">Conditions checked</p>
+                  {sig.conditionsPassed.map((c, i) => (
+                    <div key={`p-${i}`} className="flex items-center gap-2 text-[11px]">
+                      <span className="w-4 h-4 rounded flex items-center justify-center text-[9px] bg-[#49B06E]/15 text-[#49B06E]">✓</span>
+                      <span className="text-[#F3EDE3]/60">{c}</span>
+                    </div>
+                  ))}
+                  {sig.conditionsFailed.map((c, i) => (
+                    <div key={`f-${i}`} className="flex items-center gap-2 text-[11px]">
+                      <span className="w-4 h-4 rounded flex items-center justify-center text-[9px] bg-[#EF4444]/15 text-[#EF4444]">✗</span>
+                      <span className="text-[#F3EDE3]/30">{c}</span>
+                    </div>
+                  ))}
+                  {sig.conditionsMissing.map((c, i) => (
+                    <div key={`m-${i}`} className="flex items-center gap-2 text-[11px]">
+                      <span className="w-4 h-4 rounded flex items-center justify-center text-[9px] bg-white/5 text-[#F3EDE3]/25">?</span>
+                      <span className="text-[#F3EDE3]/25">{c}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Reason / thesis */}
+              {sig.reason && (
+                <div className="rounded-lg p-2.5 flex items-start gap-2" style={{ background: "rgba(39,183,200,0.05)", border: "1px solid rgba(39,183,200,0.1)" }}>
+                  <Info className="w-3.5 h-3.5 text-[#27B7C8] flex-shrink-0 mt-0.5" />
+                  <p className="text-[11px] text-[#F3EDE3]/50 leading-relaxed">{sig.reason}</p>
+                </div>
+              )}
+
+              {/* Action buttons */}
+              <div className="flex gap-2">
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={(e) => { e.stopPropagation(); haptic(); onTap(); }}
+                  className="flex-1 py-2.5 rounded-xl text-xs font-bold text-center"
+                  style={{ background: "rgba(39,183,200,0.12)", color: "#27B7C8", border: "1px solid rgba(39,183,200,0.25)" }}
+                >
+                  Open Chart
+                </motion.button>
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={(e) => { e.stopPropagation(); haptic(); }}
+                  className="flex-1 py-2.5 rounded-xl text-xs font-bold text-center"
+                  style={{ background: "rgba(255,255,255,0.04)", color: "#F3EDE3", opacity: 0.6, border: "1px solid rgba(255,255,255,0.06)" }}
+                >
+                  Paper Trade
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+}
 
 export default function SignalsPage() {
   const router = useRouter();
@@ -163,9 +327,10 @@ export default function SignalsPage() {
             {[1, 2, 3].map(i => (
               <div key={i} className="rounded-2xl border border-white/5 p-4 animate-pulse" style={{ background: "#121821" }}>
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-xl bg-white/5" />
-                  <div className="flex-1"><div className="h-4 w-20 rounded bg-white/5 mb-1" /><div className="h-3 w-14 rounded bg-white/5" /></div>
+                  <div className="w-11 h-11 rounded-xl bg-white/5" />
+                  <div className="flex-1"><div className="h-4 w-24 rounded bg-white/5 mb-1" /><div className="h-3 w-16 rounded bg-white/5" /></div>
                 </div>
+                <div className="h-16 rounded-xl bg-white/[0.02]" />
               </div>
             ))}
           </div>
@@ -174,7 +339,7 @@ export default function SignalsPage() {
         {/* Empty state */}
         {!loading && currentSignals.length === 0 && (
           <div
-            className="rounded-2xl p-5 text-center"
+            className="rounded-2xl p-6 text-center"
             style={{ background: "linear-gradient(145deg, rgba(39,183,200,0.06), rgba(7,8,12,1))", border: "1px solid rgba(39,183,200,0.15)" }}
           >
             <div className="w-14 h-14 mx-auto mb-3 rounded-2xl flex items-center justify-center text-2xl"
@@ -184,93 +349,40 @@ export default function SignalsPage() {
             <p className="text-sm font-semibold text-[#F3EDE3]/80 mb-1">
               No {TABS.find(t => t.id === activeTab)?.label.toLowerCase()} setups right now
             </p>
-            <p className="text-xs text-[#F3EDE3]/40 max-w-xs mx-auto">
+            <p className="text-xs text-[#F3EDE3]/40 max-w-xs mx-auto mb-4">
               Setups appear when stocks match your strategy rules. Next scan runs when the tape updates.
             </p>
+            <div className="rounded-xl p-3 text-left" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)" }}>
+              <p className="text-[10px] text-[#F3EDE3]/30 uppercase tracking-wider font-bold mb-2">What you&apos;d see here</p>
+              <div className="space-y-2 text-[11px] text-[#F3EDE3]/40">
+                <div className="flex items-center gap-2">
+                  <Target className="w-3.5 h-3.5 text-[#49B06E]" />
+                  <span><strong className="text-[#F3EDE3]/60">Entry zone</strong> — where the strategy says to watch for a fill</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#EF4444]" />
+                  <span><strong className="text-[#F3EDE3]/60">Stop / invalidation</strong> — level where the thesis breaks</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <ArrowUpRight className="w-3.5 h-3.5 text-[#27B7C8]" />
+                  <span><strong className="text-[#F3EDE3]/60">Target &amp; R:R</strong> — projected move and risk-to-reward</span>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
         {/* Signal cards */}
         {!loading && currentSignals.length > 0 && (
-          <div className="space-y-2">
-            {currentSignals.map(({ candidate: c, signal: sig }, i) => {
-              const stateColor = sig.state === "ACTIVE" ? "#49B06E" : sig.state === "NEAR_TRIGGER" ? "#F59E0B" : "#27B7C8";
-              return (
-                <motion.div
-                  key={`${c.symbol}-${sig.strategyId}`}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.03 }}
-                  onClick={() => { haptic(); router.push(`/scanner/${c.symbol}`); }}
-                  className="rounded-2xl border p-4 cursor-pointer active:scale-[0.98] transition-all"
-                  style={{ background: "linear-gradient(145deg, #121821, #171E28)", borderColor: `${stateColor}25` }}
-                >
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm"
-                        style={{ background: `${stateColor}20`, color: stateColor, border: `1px solid ${stateColor}40` }}
-                      >
-                        {sig.score}
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-lg font-bold text-[#F3EDE3]">{c.symbol}</span>
-                          <span
-                            className="text-[9px] font-bold px-1.5 py-0.5 rounded"
-                            style={{ background: `${stateColor}20`, color: stateColor }}
-                          >
-                            {sig.state.replace("_", " ")}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2 mt-0.5">
-                          <span className="text-[10px] text-[#F3EDE3]/40">{sig.strategyName}</span>
-                          <span className="text-[10px] text-[#F3EDE3]/25">{timeAgo(sig.timestamp)}</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="flex items-center gap-1 font-bold text-sm" style={{ color: c.change >= 0 ? "#49B06E" : "#EF4444" }}>
-                        <ArrowUpRight className="w-3.5 h-3.5" />
-                        {c.change >= 0 ? "+" : ""}{c.change.toFixed(1)}%
-                      </div>
-                      <span className="text-[10px] text-[#F3EDE3]/30">${c.price.toFixed(2)}</span>
-                    </div>
-                  </div>
-
-                  {/* Metrics */}
-                  <div className="flex items-center gap-3 mb-2 text-[10px] text-[#F3EDE3]/40">
-                    <span>RVOL {c.rvol.toFixed(1)}x</span>
-                    <span>Vol {formatVolume(c.volume)}</span>
-                    {c.catalystHeadline && <span className="truncate max-w-[140px]">{c.catalystHeadline}</span>}
-                  </div>
-
-                  {/* Entry/Stop/Target */}
-                  {sig.entryZone && (
-                    <div className="rounded-lg p-2 flex flex-wrap gap-3 text-[10px]" style={{ background: "rgba(255,255,255,0.03)" }}>
-                      <div className="flex items-center gap-1">
-                        <Target className="w-3 h-3 text-[#49B06E]" />
-                        <span className="text-[#49B06E] font-medium">{sig.entryZone}</span>
-                      </div>
-                      {sig.invalidationLevel && (
-                        <div className="flex items-center gap-1">
-                          <ShieldCheck className="w-3 h-3 text-[#EF4444]" />
-                          <span className="text-[#EF4444] font-medium">{sig.invalidationLevel}</span>
-                        </div>
-                      )}
-                      {sig.rr && (
-                        <span className="text-[#27B7C8] font-medium">R:R {sig.rr}</span>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Reason */}
-                  {sig.reason && (
-                    <p className="text-[10px] text-[#F3EDE3]/30 mt-2">{sig.reason}</p>
-                  )}
-                </motion.div>
-              );
-            })}
+          <div className="space-y-3">
+            {currentSignals.map(({ candidate, signal }) => (
+              <SignalCard
+                key={`${candidate.symbol}-${signal.strategyId}`}
+                candidate={candidate}
+                signal={signal}
+                onTap={() => router.push(`/scanner/${candidate.symbol}`)}
+              />
+            ))}
           </div>
         )}
 
