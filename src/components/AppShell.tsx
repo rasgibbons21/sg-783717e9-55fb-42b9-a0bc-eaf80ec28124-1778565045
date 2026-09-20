@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { ReviewPrompt, useAutoReviewPrompt } from "@/components/ReviewPrompt";
 
 const haptic = (ms = 8) => {
   try { navigator?.vibrate?.(ms); } catch {}
@@ -50,6 +51,7 @@ interface AppShellProps {
 export function AppShell({ children }: AppShellProps) {
   const router = useRouter();
   const path = router.pathname;
+  const reviewPrompt = useAutoReviewPrompt();
 
   const isActive = (href: string) => {
     if (href === "/home") return path === "/home";
@@ -71,6 +73,9 @@ export function AppShell({ children }: AppShellProps) {
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: "var(--r-bg)" }}>
+      {/* Review prompt */}
+      {reviewPrompt.show && <ReviewPrompt onClose={reviewPrompt.dismiss} />}
+
       {/* Header */}
       <header
         className="sticky top-0 z-50 w-full"
