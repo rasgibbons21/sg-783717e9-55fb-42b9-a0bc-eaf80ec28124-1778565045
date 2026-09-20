@@ -9,6 +9,12 @@ import {
   filterAndSort,
   DEFAULT_FILTERS,
 } from "@/lib/scanner";
+import {
+  evaluateGapAndGo,
+  evaluateHodBreakout,
+  evaluateRedToGreen,
+  type SignalResult,
+} from "@/lib/strategies";
 
 let scanCache: { data: ScannerCandidate[]; ts: number } | null = null;
 const CACHE_MS = 2 * 60 * 1000;
@@ -85,6 +91,32 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         if (floatShares === null) flags.push("Float data unavailable");
         if (q.volume < 1_000_000) flags.push("Below 1M volume — liquidity risk");
 
+        const hasCatalyst = catalystQuality === "strong" || catalystQuality === "moderate";
+        const signals: SignalResult[] = [];
+
+        const gapResult = evaluateGapAndGo(
+          { price: q.price, changesPercentage: q.changesPercentage, volume: q.volume, avgVolume: q.avgVolume, previousClose: q.previousClose, dayHigh: q.dayHigh, open: q.open },
+          floatShares,
+          hasCatalyst,
+        );
+        gapResult.symbol = q.symbol;
+        if (gapResult.state !== "INVALIDATED") signals.push(gapResult);
+
+        const hodResult = evaluateHodBreakout(
+          { price: q.price, dayHigh: q.dayHigh, volume: q.volume, avgVolume: q.avgVolume, changesPercentage: q.changesPercentage },
+        );
+        hodResult.symbol = q.symbol;
+        if (hodResult.state !== "INVALIDATED") signals.push(hodResult);
+
+        const r2gResult = evaluateRedToGreen(
+          { price: q.price, open: q.open, previousClose: q.previousClose, volume: q.volume, avgVolume: q.avgVolume },
+        );
+        r2gResult.symbol = q.symbol;
+        if (r2gResult.state !== "INVALIDATED") signals.push(r2gResult);
+
+        signals.sort((a, b) => b.score - a.score);
+        const topStrategy = signals.length > 0 ? signals[0].strategyId : null;
+
         return {
           symbol: q.symbol,
           price: q.price,
@@ -98,13 +130,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           float: floatShares,
           catalyst: catalystQuality,
           catalystHeadline: news?.[0]?.title ?? null,
-          setup: null, // setup detection requires chart analysis
+          setup: null,
           score,
           scoreBreakdown: breakdown,
           status: classifyCandidate(score, q.changesPercentage, rvol),
           flags,
           dataSource: "FMP",
           timestamp: Date.now(),
+          signals,
+          topStrategy,
         };
       })
       .sort((a, b) => b.score - a.score);
