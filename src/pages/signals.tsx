@@ -260,6 +260,19 @@ export default function SignalsPage() {
 
   useEffect(() => { loadScan(); }, [loadScan]);
 
+  // Auto-select first tab with results after load
+  useEffect(() => {
+    if (loading || candidates.length === 0) return;
+    const order: Tab[] = ["active", "near", "watch", "recent"];
+    for (const tab of order) {
+      const count = candidates.reduce((n, c) => {
+        if (!c.signals) return n;
+        return n + c.signals.filter(s => tab === "recent" || STATE_MAP[s.state] === tab).length;
+      }, 0);
+      if (count > 0) { setActiveTab(tab); return; }
+    }
+  }, [loading, candidates]);
+
   const signalsByTab = (tab: Tab): Array<{ candidate: ScanCandidate; signal: SignalResult }> => {
     const results: Array<{ candidate: ScanCandidate; signal: SignalResult }> = [];
     for (const c of candidates) {
