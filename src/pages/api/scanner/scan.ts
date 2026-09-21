@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { createClient } from "@supabase/supabase-js";
 import {
   type ScannerCandidate,
   type FMPQuote,
@@ -25,7 +26,14 @@ import {
 
 let scanCache: { data: ScannerCandidate[]; ts: number } | null = null;
 const CACHE_MS = 2 * 60 * 1000;
-const STALE_CACHE_MS = 4 * 60 * 60 * 1000; // serve stale data up to 4 hours
+const STALE_CACHE_MS = 4 * 60 * 60 * 1000;
+
+function getSupabaseAdmin() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return null;
+  return createClient(url, key, { auth: { autoRefreshToken: false, persistSession: false } });
+}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });
@@ -171,6 +179,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Cache results
     scanCache = { data: candidates, ts: Date.now() };
 
+    // Persist ACTIVE / NEAR_TRIGGER signals as alerts (fire-and-forget)
+    persistAlerts(candidates).catch(() => {});
+
     return res.status(200).json({
       candidates: applyQueryFilters(candidates, req.query),
       cached: false,
@@ -211,6 +222,47 @@ function applyQueryFilters(candidates: ScannerCandidate[], query: Record<string,
     sortBy: (query.sortBy as any) || DEFAULT_FILTERS.sortBy,
   };
   return filterAndSort(candidates, filters);
+}
+
+async function persistAlerts(candidates: ScannerCandidate[]) {
+  const sb = getSupabaseAdmin();
+  if (!sb) return;
+
+  const rows: Array<Record<string, unknown>> = [];
+  for (const c of candidates) {
+    if (!c.signals) continue;
+    for (const sig of c.signals) {
+      if (sig.state !== "ACTIVE" && sig.state !== "NEAR_TRIGGER") continue;
+      rows.push({
+        user_id: null,
+        symbol: c.symbol,
+        strategy: sig.strategyId,
+        signal_state: sig.state,
+        score: sig.score,
+        price: c.price,
+        change_pct: c.change,
+        entry_zone: sig.entryZone ?? null,
+        stop_level: sig.invalidationLevel ?? null,
+        target: sig.target1 ?? null,
+        reason: sig.reason ?? null,
+      });
+    }
+  }
+
+  if (rows.length === 0) return;
+
+  // Deduplicate: don't insert if same symbol+strategy was alerted in last 30 min
+  const thirtyMinAgo = new Date(Date.now() - 30 * 60 * 1000).toISOString();
+  const { data: recent } = await sb
+    .from("scanner_alerts")
+    .select("symbol, strategy")
+    .gte("created_at", thirtyMinAgo);
+
+  const recentSet = new Set((recent ?? []).map((r: any) => `${r.symbol}:${r.strategy}`));
+  const fresh = rows.filter((r) => !recentSet.has(`${r.symbol}:${r.strategy}`));
+  if (fresh.length === 0) return;
+
+  await sb.from("scanner_alerts").insert(fresh);
 }
 
 function classifyCatalyst(news: NewsItem[] | undefined): CatalystQuality {

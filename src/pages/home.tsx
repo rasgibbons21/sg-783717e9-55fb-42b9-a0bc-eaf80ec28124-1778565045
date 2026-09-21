@@ -38,6 +38,19 @@ interface NewsItem {
   symbols: string[];
 }
 
+interface ScannerAlert {
+  id: string;
+  symbol: string;
+  strategy: string;
+  signal_state: string;
+  score: number;
+  price: number | null;
+  change_pct: number | null;
+  entry_zone: string | null;
+  reason: string | null;
+  created_at: string;
+}
+
 function getSession(): { label: string; detail: string; color: string } {
   const now = new Date();
   const et = new Date(now.toLocaleString("en-US", { timeZone: "America/New_York" }));
@@ -84,6 +97,8 @@ export default function HomePage() {
   const [setupsLoading, setSetupsLoading] = useState(true);
   const [news, setNews] = useState<NewsItem[]>([]);
   const [newsLoading, setNewsLoading] = useState(true);
+  const [alerts, setAlerts] = useState<ScannerAlert[]>([]);
+  const [alertsLoading, setAlertsLoading] = useState(true);
 
   const session = getSession();
 
@@ -151,11 +166,25 @@ export default function HomePage() {
     }
   }, []);
 
+  const loadAlerts = useCallback(async () => {
+    setAlertsLoading(true);
+    try {
+      const res = await fetch("/api/scanner/alerts?limit=5");
+      if (res.ok) {
+        const data = await res.json();
+        setAlerts(data.alerts || []);
+      }
+    } catch {} finally {
+      setAlertsLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     loadIndices();
     loadSetups();
     loadNews();
-  }, [loadIndices, loadSetups, loadNews]);
+    loadAlerts();
+  }, [loadIndices, loadSetups, loadNews, loadAlerts]);
 
   const stateLabel = (s: string) => {
     const map: Record<string, { label: string; color: string }> = {
@@ -395,19 +424,67 @@ export default function HomePage() {
             <Bell className="w-4 h-4 text-[#27B7C8]" />
             <h2 className="text-sm font-bold text-[#F3EDE3]">Alerts</h2>
           </div>
-          <div
-            className="rounded-xl p-4 text-center"
-            style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}
-          >
-            <Bell className="w-5 h-5 mx-auto mb-2 text-[#F3EDE3]/20" />
-            <p className="text-xs text-[#F3EDE3]/40 mb-1">No alerts yet</p>
-            <p className="text-[10px] text-[#F3EDE3]/25">
-              {session.label === "Closed" || session.label === "After Hours"
-                ? "Alerts activate during market hours when setups match your rules."
-                : "Scanner alerts fire when setups match your rules."
-              }
-            </p>
-          </div>
+          {alertsLoading ? (
+            <div className="space-y-2">
+              {[1, 2].map(i => (
+                <div key={i} className="rounded-xl p-3 animate-pulse" style={{ background: "#121821" }}>
+                  <div className="h-3.5 w-3/4 rounded bg-white/5 mb-1.5" />
+                  <div className="h-2.5 w-1/2 rounded bg-white/5" />
+                </div>
+              ))}
+            </div>
+          ) : alerts.length > 0 ? (
+            <div className="space-y-1.5">
+              {alerts.map(a => {
+                const stColor = a.signal_state === "ACTIVE" ? "#49B06E" : "#F59E0B";
+                return (
+                  <motion.div
+                    key={a.id}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    onClick={() => { haptic(); router.push(`/scanner/${a.symbol}`); }}
+                    className="rounded-xl p-3 cursor-pointer active:scale-[0.98] transition-all"
+                    style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${stColor}15` }}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-bold text-[#F3EDE3]">{a.symbol}</span>
+                        <span
+                          className="text-[8px] font-bold px-1.5 py-0.5 rounded"
+                          style={{ background: `${stColor}15`, color: stColor }}
+                        >
+                          {a.signal_state.replace("_", " ")}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1 text-xs font-semibold" style={{ color: (a.change_pct ?? 0) >= 0 ? "#49B06E" : "#EF4444" }}>
+                        {(a.change_pct ?? 0) >= 0 ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
+                        {(a.change_pct ?? 0) >= 0 ? "+" : ""}{(a.change_pct ?? 0).toFixed(1)}%
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 text-[10px] text-[#F3EDE3]/35">
+                      <span className="capitalize">{a.strategy.replace(/-/g, " ")}</span>
+                      {a.entry_zone && <span>Entry {a.entry_zone}</span>}
+                      <span className="ml-auto">{timeAgo(a.created_at)}</span>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          ) : (
+            <div
+              className="rounded-xl p-4 text-center"
+              style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}
+            >
+              <Bell className="w-5 h-5 mx-auto mb-2 text-[#F3EDE3]/20" />
+              <p className="text-xs text-[#F3EDE3]/40 mb-1">No alerts yet</p>
+              <p className="text-[10px] text-[#F3EDE3]/25">
+                {session.label === "Closed" || session.label === "After Hours"
+                  ? "Alerts activate during market hours when setups match your rules."
+                  : "Scanner alerts fire when setups match your rules."
+                }
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Disclaimer */}

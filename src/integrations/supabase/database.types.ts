@@ -562,6 +562,57 @@ export type Database = {
           },
         ]
       }
+      scanner_alerts: {
+        Row: {
+          id: string
+          user_id: string | null
+          symbol: string
+          strategy: string
+          signal_state: string
+          score: number
+          price: number | null
+          change_pct: number | null
+          entry_zone: string | null
+          stop_level: string | null
+          target: string | null
+          reason: string | null
+          read: boolean
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          user_id?: string | null
+          symbol: string
+          strategy: string
+          signal_state: string
+          score?: number
+          price?: number | null
+          change_pct?: number | null
+          entry_zone?: string | null
+          stop_level?: string | null
+          target?: string | null
+          reason?: string | null
+          read?: boolean
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string | null
+          symbol?: string
+          strategy?: string
+          signal_state?: string
+          score?: number
+          price?: number | null
+          change_pct?: number | null
+          entry_zone?: string | null
+          stop_level?: string | null
+          target?: string | null
+          reason?: string | null
+          read?: boolean
+          created_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
