@@ -164,17 +164,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     console.log("STEP 4: Checking notification infrastructure...");
 
     try {
-      const { data: pushSubs, error: pushErr } = await supabase
-        .from("push_subscriptions")
+      const { data: tokens, error: tokenErr } = await supabase
+        .from("notification_tokens")
         .select("id, user_id")
         .limit(5);
 
       result.steps.notificationSend = {
-        status: pushErr ? "error" : "checked",
-        sent: pushSubs?.length ?? 0,
-        error: pushErr?.message,
+        status: tokenErr ? "error" : "checked",
+        sent: tokens?.length ?? 0,
+        error: tokenErr?.message,
       };
-      console.log(pushErr ? `Push check error: ${pushErr.message}` : `Found ${pushSubs?.length ?? 0} push subscriptions (sample)`);
+      console.log(tokenErr ? `Token check error: ${tokenErr.message}` : `Found ${tokens?.length ?? 0} notification tokens (sample)`);
     } catch (error) {
       result.steps.notificationSend = { status: "error", error: String(error) };
     }
@@ -184,7 +184,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const tableChecks: Record<string, string> = {};
 
-    for (const table of ["scanner_alerts", "alerts", "notifications", "push_subscriptions", "profiles"]) {
+    for (const table of ["notification_tokens", "profiles", "price_alerts", "subscriptions", "watchlist"] as const) {
       try {
         const { data, error } = await supabase.from(table).select("*").limit(1);
         tableChecks[table] = error ? `error: ${error.message}` : `exists (${data?.length ?? 0} sample rows)`;
