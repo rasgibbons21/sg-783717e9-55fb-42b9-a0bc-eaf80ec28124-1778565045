@@ -152,13 +152,14 @@ export default function SymbolDetail() {
   const volumePass = quote ? quote.volume >= 1_000_000 : null;
   const hasCatalyst = news.length > 0;
 
-  // Use signal entry/stop/target if available, otherwise compute from price
-  const entry = signal?.entryZone ? parseFloat(signal.entryZone.replace("$", "")) : (quote ? Math.round(quote.price * 100) / 100 : 0);
+  const extractPrice = (s?: string) => s ? parseFloat(s.replace(/[^0-9.]/g, "")) : NaN;
+
+  const entry = signal?.entryZone ? extractPrice(signal.entryZone) : (quote ? Math.round(quote.price * 100) / 100 : 0);
   const stopPct = 0.05;
-  const stop = signal?.invalidationLevel ? parseFloat(signal.invalidationLevel.replace("$", "")) : Math.round(entry * (1 - stopPct) * 100) / 100;
+  const stop = signal?.invalidationLevel ? extractPrice(signal.invalidationLevel) : Math.round(entry * (1 - stopPct) * 100) / 100;
   const risk = Math.round((entry - stop) * 100) / 100;
-  const target1 = signal?.target1 ? parseFloat(signal.target1.replace("$", "")) : Math.round((entry + risk * 2) * 100) / 100;
-  const target2 = signal?.target2 ? parseFloat(signal.target2.replace("$", "")) : Math.round((entry + risk * 3) * 100) / 100;
+  const target1 = signal?.target1 ? extractPrice(signal.target1) : Math.round((entry + risk * 2) * 100) / 100;
+  const target2 = signal?.target2 ? extractPrice(signal.target2) : Math.round((entry + risk * 3) * 100) / 100;
   const rr = risk > 0 ? Math.round(((target1 - entry) / risk) * 10) / 10 : 0;
 
   const priceLines = entry > 0 ? { entry, stop, target: target1, target2 } : undefined;
