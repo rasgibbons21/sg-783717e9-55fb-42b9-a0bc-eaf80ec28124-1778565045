@@ -15,18 +15,27 @@ import {
   evaluateRedToGreen,
   type SignalResult,
 } from "@/lib/strategies";
+import {
+  fetchGainers,
+  fetchQuotes,
+  fetchProfiles,
+  fetchNews,
+  type NewsItem,
+} from "@/lib/marketData";
 
 let scanCache: { data: ScannerCandidate[]; ts: number } | null = null;
 const CACHE_MS = 2 * 60 * 1000;
-const STALE_CACHE_MS = 60 * 60 * 1000; // serve stale data up to 1 hour
+const STALE_CACHE_MS = 4 * 60 * 60 * 1000; // serve stale data up to 4 hours
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });
 
-  const apiKey = process.env.FMP_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: "FMP_API_KEY not configured" });
-
+  const fmpKey = process.env.FMP_API_KEY;
   const finnhubKey = process.env.FINNHUB_API_KEY;
+
+  if (!fmpKey && !finnhubKey) {
+    return res.status(500).json({ error: "No API keys configured (need FMP_API_KEY or FINNHUB_API_KEY)" });
+  }
 
   // Check cache
   if (scanCache && Date.now() - scanCache.ts < CACHE_MS) {
@@ -39,39 +48,48 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    // Step 1: Get top gainers from FMP
-    const gainersUrl = `https://financialmodelingprep.com/api/v3/stock_market/gainers?apiKey=${apiKey}`;
-    const gainersRes = await fetch(gainersUrl);
-    if (!gainersRes.ok) throw new Error(`FMP gainers: ${gainersRes.status}`);
-    const gainers: FMPQuote[] = await gainersRes.json();
+    // Step 1: Get top gainers (FMP → Finnhub fallback)
+    const { gainers, source: gainersSource } = await fetchGainers(fmpKey, finnhubKey);
 
-    // Step 2: Filter to eligible price range first (save API calls)
+    // Step 2: Filter to eligible price range
     const eligible = gainers.filter((g) =>
       g.price >= 1 && g.price <= 20 &&
       g.changesPercentage >= 5 &&
       g.volume > 50_000
     );
 
-    // Step 3: Get detailed quotes for eligible symbols
+    // Step 3: Get detailed quotes
     const symbols = eligible.slice(0, 30).map((g) => g.symbol);
     if (symbols.length === 0) {
-      return res.status(200).json({ candidates: [], cached: false, timestamp: Date.now(), dataMode: "live" });
+      if (scanCache && Date.now() - scanCache.ts < STALE_CACHE_MS) {
+        return res.status(200).json({
+          candidates: applyQueryFilters(scanCache.data, req.query),
+          cached: true,
+          stale: true,
+          timestamp: scanCache.ts,
+          dataMode: "stale",
+        });
+      }
+      return res.status(200).json({ candidates: [], cached: false, timestamp: Date.now(), dataMode: gainersSource });
     }
 
-    const quotesUrl = `https://financialmodelingprep.com/api/v3/quote/${symbols.join(",")}?apiKey=${apiKey}`;
-    const quotesRes = await fetch(quotesUrl);
-    if (!quotesRes.ok) throw new Error(`FMP quotes: ${quotesRes.status}`);
-    const quotes: FMPQuote[] = await quotesRes.json();
+    // If gainers came from Finnhub, we already have quote data — skip re-fetching
+    let quotes: FMPQuote[];
+    let quotesSource: string;
+    if (gainersSource === "finnhub") {
+      quotes = eligible.slice(0, 30);
+      quotesSource = "finnhub";
+    } else {
+      const qResult = await fetchQuotes(symbols, fmpKey, finnhubKey);
+      quotes = qResult.quotes;
+      quotesSource = qResult.source;
+    }
 
-    // Step 4: Get float data for top candidates
-    const profileUrl = `https://financialmodelingprep.com/api/v3/profile/${symbols.join(",")}?apiKey=${apiKey}`;
-    const profileRes = await fetch(profileUrl);
-    const profiles: Array<{ symbol: string; floatShares?: number; description?: string }> =
-      profileRes.ok ? await profileRes.json() : [];
-    const floatMap = new Map(profiles.map((p) => [p.symbol, p.floatShares ?? null]));
+    // Step 4: Get float data (FMP → Finnhub fallback)
+    const floatMap = await fetchProfiles(symbols, fmpKey, finnhubKey);
 
-    // Step 5: Get news for catalyst verification
-    const newsResults = await fetchNewsForSymbols(symbols.slice(0, 15), apiKey, finnhubKey);
+    // Step 5: Get news for catalyst verification (FMP → Finnhub fallback)
+    const newsResults = await fetchNews(symbols.slice(0, 15), fmpKey, finnhubKey);
 
     // Step 6: Score each candidate
     const candidates: ScannerCandidate[] = quotes
@@ -135,7 +153,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           scoreBreakdown: breakdown,
           status: classifyCandidate(score, q.changesPercentage, rvol),
           flags,
-          dataSource: "FMP",
+          dataSource: `${gainersSource}/${quotesSource}`,
           timestamp: Date.now(),
           signals,
           topStrategy,
@@ -150,7 +168,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       candidates: applyQueryFilters(candidates, req.query),
       cached: false,
       timestamp: Date.now(),
-      dataMode: "delayed",
+      dataMode: gainersSource === "fmp" ? "delayed" : "finnhub-fallback",
       totalScanned: gainers.length,
       eligible: eligible.length,
     });
@@ -182,40 +200,6 @@ function applyQueryFilters(candidates: ScannerCandidate[], query: Record<string,
   return filterAndSort(candidates, filters);
 }
 
-interface NewsItem {
-  title: string;
-  publishedDate?: string;
-  date?: string;
-  text?: string;
-  url?: string;
-  site?: string;
-}
-
-async function fetchNewsForSymbols(
-  symbols: string[],
-  fmpKey: string,
-  finnhubKey?: string,
-): Promise<Map<string, NewsItem[]>> {
-  const newsMap = new Map<string, NewsItem[]>();
-
-  // Batch FMP news (supports comma-separated tickers)
-  try {
-    const url = `https://financialmodelingprep.com/api/v3/stock_news?tickers=${symbols.join(",")}&limit=50&apiKey=${fmpKey}`;
-    const res = await fetch(url);
-    if (res.ok) {
-      const articles: Array<NewsItem & { symbol?: string }> = await res.json();
-      for (const a of articles) {
-        if (!a.symbol) continue;
-        const sym = a.symbol.toUpperCase();
-        if (!newsMap.has(sym)) newsMap.set(sym, []);
-        newsMap.get(sym)!.push(a);
-      }
-    }
-  } catch {}
-
-  return newsMap;
-}
-
 function classifyCatalyst(news: NewsItem[] | undefined): CatalystQuality {
   if (!news || news.length === 0) return "none";
 
@@ -224,7 +208,7 @@ function classifyCatalyst(news: NewsItem[] | undefined): CatalystQuality {
     const pubDate = n.publishedDate || n.date;
     if (!pubDate) return false;
     const age = now - new Date(pubDate).getTime();
-    return age < 24 * 60 * 60 * 1000; // within 24 hours
+    return age < 24 * 60 * 60 * 1000;
   });
 
   if (recentNews.length === 0) return "unverified";
