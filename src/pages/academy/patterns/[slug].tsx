@@ -199,7 +199,7 @@ function PatternDetail({ pattern }: { pattern: PatternData }) {
               className="text-[9px] font-bold uppercase tracking-wider"
               style={{ color: pattern.color }}
             >
-              {pattern.category === "chart" ? "Chart Pattern" : "Momentum Pattern"}
+              {pattern.category === "chart" ? "Chart Pattern" : pattern.category === "candlestick" ? "Candlestick Pattern" : "Momentum Pattern"}
             </span>
           </div>
           <h1 className="text-2xl font-bold text-[#F3EDE3]">{pattern.name}</h1>

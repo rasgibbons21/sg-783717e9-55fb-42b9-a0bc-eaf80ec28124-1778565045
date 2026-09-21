@@ -10,8 +10,9 @@ const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
 
 const TABS: { key: PatternCategory | "all"; label: string }[] = [
   { key: "all", label: "All" },
-  { key: "chart", label: "Chart Patterns" },
+  { key: "chart", label: "Chart" },
   { key: "momentum", label: "Momentum" },
+  { key: "candlestick", label: "Candlestick" },
 ];
 
 function MiniChart({ candles, color }: { candles: CandleData[]; color: string }) {
@@ -66,7 +67,7 @@ function PatternCard({ pattern, index }: { pattern: PatternData; index: number }
             className="absolute top-2 right-2 text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
             style={{ background: `${pattern.color}20`, color: pattern.color }}
           >
-            {pattern.category === "chart" ? "Chart" : "Momentum"}
+            {pattern.category === "chart" ? "Chart" : pattern.category === "candlestick" ? "Candle" : "Momentum"}
           </div>
         </div>
 
@@ -107,7 +108,7 @@ export default function PatternLibrary() {
     <Layout>
       <SEO
         title="Pattern Library — Bloom Academy"
-        description="Learn 24 chart and momentum trading patterns with interactive SVG illustrations, stages, entry concepts, and common mistakes."
+        description="Learn chart, momentum, and candlestick trading patterns with interactive SVG illustrations, stages, entry concepts, and common mistakes."
       />
       <div className="max-w-lg mx-auto px-4 pt-3 pb-32">
         {/* Back */}
@@ -129,7 +130,7 @@ export default function PatternLibrary() {
             <h1 className="text-xl font-bold text-[#F3EDE3]">Pattern Library</h1>
           </div>
           <p className="text-xs text-[#F3EDE3]/40">
-            {ALL_PATTERNS.length} patterns &middot; Visual guides to chart and momentum setups
+            {ALL_PATTERNS.length} patterns &middot; Chart, momentum &amp; candlestick setups
           </p>
         </div>
 
