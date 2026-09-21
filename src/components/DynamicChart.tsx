@@ -6,7 +6,7 @@ export type { OHLCBar };
 
 interface Props {
   data: OHLCBar[];
-  priceLines?: { entry?: number; stop?: number; target?: number };
+  priceLines?: { entry?: number; stop?: number; target?: number; target2?: number };
   height?: number;
 }
 
