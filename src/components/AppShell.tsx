@@ -3,10 +3,12 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import {
   Home,
+  Radar,
+  Zap,
   BarChart3,
-  Briefcase,
-  TrendingUp,
   Newspaper,
+  Briefcase,
+  MoreHorizontal,
   Search,
   Bookmark,
   ChevronLeft,
@@ -14,6 +16,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { ReviewPrompt, useAutoReviewPrompt } from "@/components/ReviewPrompt";
 
 const haptic = (ms = 8) => {
   try { navigator?.vibrate?.(ms); } catch {}
@@ -24,21 +27,21 @@ const PANSY_PROMPTS = [
   "Scan for gap-ups...",
   "Any setups near VWAP?",
   "Show me high volume...",
-  "Unusual options flow?",
+  "Find red-to-green plays...",
 ];
 
 const NAV_ITEMS: ReadonlyArray<{
   href: string;
-  icon: typeof Home | null;
+  icon: typeof Home;
   label: string;
-  center?: boolean;
 }> = [
-  { href: "/signals", icon: Home, label: "Home" },
-  { href: "/discover", icon: BarChart3, label: "Market" },
-  { href: "/ask-pansy", icon: null, label: "Pansy", center: true },
-  { href: "/portfolio", icon: Briefcase, label: "Watchlist" },
-  { href: "/paper-trader-v2", icon: TrendingUp, label: "Trade" },
-  { href: "/learn", icon: Newspaper, label: "News" },
+  { href: "/home", icon: Home, label: "Home" },
+  { href: "/scanner", icon: Radar, label: "Scanner" },
+  { href: "/signals", icon: Zap, label: "Signals" },
+  { href: "/discover", icon: BarChart3, label: "Charts" },
+  { href: "/news", icon: Newspaper, label: "News" },
+  { href: "/portfolio", icon: Briefcase, label: "Portfolio" },
+  { href: "/more", icon: MoreHorizontal, label: "More" },
 ];
 
 interface AppShellProps {
@@ -48,18 +51,20 @@ interface AppShellProps {
 export function AppShell({ children }: AppShellProps) {
   const router = useRouter();
   const path = router.pathname;
+  const reviewPrompt = useAutoReviewPrompt();
 
   const isActive = (href: string) => {
-    if (href === "/signals") return path === "/signals" || path.startsWith("/scanner");
+    if (href === "/home") return path === "/home";
+    if (href === "/scanner") return path === "/scanner" || path.startsWith("/scanner/");
+    if (href === "/signals") return path === "/signals";
     if (href === "/discover") return path === "/discover" || path.startsWith("/stock/");
-    if (href === "/paper-trader-v2") return path.startsWith("/paper-trader") || path.startsWith("/practice") || path.startsWith("/research");
+    if (href === "/news") return path === "/news";
     if (href === "/portfolio") return path === "/portfolio" || path === "/goals";
-    if (href === "/ask-pansy") return path === "/ask-pansy";
-    if (href === "/learn") return path === "/learn" || path.startsWith("/university");
+    if (href === "/more") return path === "/more";
     return false;
   };
 
-  const mainPaths = ["/signals", "/discover", "/ask-pansy", "/portfolio", "/paper-trader-v2", "/learn", "/profile", "/onboarding"];
+  const mainPaths = ["/home", "/scanner", "/signals", "/discover", "/news", "/portfolio", "/more", "/profile", "/onboarding"];
   const isInner = !mainPaths.some(p => path === p || path.startsWith(p + "/"));
 
   const promptIdx = typeof window !== "undefined"
@@ -68,6 +73,9 @@ export function AppShell({ children }: AppShellProps) {
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: "var(--r-bg)" }}>
+      {/* Review prompt */}
+      {reviewPrompt.show && <ReviewPrompt onClose={reviewPrompt.dismiss} />}
+
       {/* Header */}
       <header
         className="sticky top-0 z-50 w-full"
@@ -146,7 +154,7 @@ export function AppShell({ children }: AppShellProps) {
         </Link>
       </div>
 
-      {/* Tab bar */}
+      {/* Tab bar — 7 tabs */}
       <nav
         className="fixed bottom-0 left-0 right-0 z-50"
         style={{
@@ -155,29 +163,9 @@ export function AppShell({ children }: AppShellProps) {
           paddingBottom: "env(safe-area-inset-bottom, 0px)",
         }}
       >
-        <div className="grid grid-cols-6 h-14 max-w-md mx-auto">
-          {NAV_ITEMS.map(({ href, icon: Icon, label, center }) => {
+        <div className="grid grid-cols-7 h-14 max-w-lg mx-auto">
+          {NAV_ITEMS.map(({ href, icon: Icon, label }) => {
             const active = isActive(href);
-
-            if (center) {
-              return (
-                <Link key={href} href={href} className="flex items-center justify-center">
-                  <motion.div
-                    whileTap={{ scale: 0.85 }}
-                    onClick={() => haptic(12)}
-                    className="flex items-center justify-center w-11 h-11 -mt-4 rounded-full"
-                    style={{
-                      background: active ? "var(--r-teal)" : "var(--r-card)",
-                      border: `2px solid ${active ? "var(--r-teal)" : "var(--r-hairline)"}`,
-                      boxShadow: active ? "0 0 16px rgba(39,183,200,0.3)" : "none",
-                    }}
-                  >
-                    <span className="text-lg">🌺</span>
-                  </motion.div>
-                </Link>
-              );
-            }
-
             return (
               <Link key={href} href={href} className="flex flex-col items-center justify-center gap-0.5">
                 <motion.div
@@ -185,14 +173,12 @@ export function AppShell({ children }: AppShellProps) {
                   onClick={() => haptic()}
                   className="flex flex-col items-center gap-0.5"
                 >
-                  {Icon && (
-                    <Icon
-                      className="w-5 h-5"
-                      style={{ color: active ? "var(--r-teal)" : "var(--r-inactive)" }}
-                    />
-                  )}
+                  <Icon
+                    className="w-5 h-5"
+                    style={{ color: active ? "var(--r-teal)" : "var(--r-inactive)" }}
+                  />
                   <span
-                    className={cn("text-[10px]", active ? "font-semibold" : "font-medium")}
+                    className={cn("text-[10px] leading-tight", active ? "font-semibold" : "font-medium")}
                     style={{ color: active ? "var(--r-teal)" : "var(--r-inactive)" }}
                   >
                     {label}

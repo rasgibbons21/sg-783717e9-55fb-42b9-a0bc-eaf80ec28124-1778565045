@@ -56,7 +56,7 @@ export function Layout({ children }: LayoutProps) {
         style={{ background: "var(--r-elevated)", borderBottom: "1px solid var(--r-hairline)" }}
       >
         <div className="flex items-center h-14 px-4">
-          <Link href="/signals" className="flex items-center gap-3">
+          <Link href="/home" className="flex items-center gap-3">
             <img src="/icon-192.png" alt="Bloom" className="h-8 w-auto rounded-md" />
             <span className="text-xl font-bold" style={{ color: "var(--r-ivory)" }}>Radar</span>
           </Link>

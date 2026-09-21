@@ -8,8 +8,10 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   NotebookPen, Search, Filter, ChevronDown, ChevronUp,
   AlertTriangle, Loader2, X, Check, TrendingUp, TrendingDown, Lock,
+  Target, ShieldCheck, Clock, Brain, Heart, Scale, Award,
 } from "lucide-react";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 import { canShowExternalPayment } from "@/lib/payments";
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -55,6 +57,8 @@ interface JournalEntry {
 
 interface PageProps { requiresClientAuth?: boolean }
 
+const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
+
 // ── Helpers ────────────────────────────────────────────────────────────────
 async function getToken() {
   const { data: { session } } = await supabase.auth.getSession();
@@ -82,34 +86,44 @@ function fmtDuration(minutes: number | null) {
   return m > 0 ? `${h}h ${m}m` : `${h}h`;
 }
 
-function gradeStyle(g: string | null) {
-  if (!g) return "text-[#F3EDE3]/30 bg-[#16264A] border-[#27B7C8]/10";
-  if (g === "A") return "text-[#49B06E] bg-[#49B06E]/10 border-[#49B06E]/30";
-  if (g === "B") return "text-[#27B7C8] bg-[#27B7C8]/10 border-[#27B7C8]/30";
-  if (g === "C") return "text-yellow-400 bg-yellow-400/10 border-yellow-400/30";
-  if (g === "D") return "text-orange-400 bg-orange-400/10 border-orange-400/30";
-  return "text-[#ef4444] bg-[#ef4444]/10 border-[#ef4444]/30";
+function gradeColor(g: string | null) {
+  if (!g) return { text: "text-[#F3EDE3]/30", bg: "rgba(39,183,200,0.08)", border: "rgba(39,183,200,0.15)" };
+  if (g === "A") return { text: "text-[#49B06E]", bg: "rgba(73,176,110,0.1)", border: "rgba(73,176,110,0.3)" };
+  if (g === "B") return { text: "text-[#27B7C8]", bg: "rgba(39,183,200,0.1)", border: "rgba(39,183,200,0.3)" };
+  if (g === "C") return { text: "text-yellow-400", bg: "rgba(250,204,21,0.1)", border: "rgba(250,204,21,0.3)" };
+  if (g === "D") return { text: "text-orange-400", bg: "rgba(251,146,60,0.1)", border: "rgba(251,146,60,0.3)" };
+  return { text: "text-[#ef4444]", bg: "rgba(239,68,68,0.1)", border: "rgba(239,68,68,0.3)" };
 }
 
-function ScoreBar({ label, score }: { label: string; score: number | null }) {
+const EMOTIONS = ["😤 Frustrated", "😰 Anxious", "😐 Neutral", "🧘 Calm", "🔥 Confident", "🤑 Greedy", "😱 Fearful"];
+
+function ScoreRing({ label, score, icon: Icon }: { label: string; score: number | null; icon: typeof Target }) {
   if (score == null) return null;
-  const color = score >= 80 ? "bg-[#49B06E]" : score >= 55 ? "bg-yellow-400" : "bg-[#ef4444]";
+  const color = score >= 80 ? "#49B06E" : score >= 55 ? "#FACC15" : "#EF4444";
+  const pct = Math.min(100, score);
+  const dash = 2 * Math.PI * 18;
+  const offset = dash - (pct / 100) * dash;
+
   return (
-    <div>
-      <div className="flex justify-between mb-0.5">
-        <span className="text-[9px] text-[#F3EDE3]/40 uppercase tracking-wide">{label}</span>
-        <span className="text-[9px] font-mono text-[#F3EDE3]/50">{score}</span>
+    <div className="flex flex-col items-center gap-1">
+      <div className="relative w-12 h-12">
+        <svg className="w-12 h-12 -rotate-90" viewBox="0 0 40 40">
+          <circle cx="20" cy="20" r="18" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="3" />
+          <circle cx="20" cy="20" r="18" fill="none" stroke={color} strokeWidth="3" strokeDasharray={dash} strokeDashoffset={offset} strokeLinecap="round" />
+        </svg>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <Icon className="w-4 h-4" style={{ color }} />
+        </div>
       </div>
-      <div className="h-1 rounded-full bg-[#07080C] overflow-hidden">
-        <div className={`h-full rounded-full ${color}`} style={{ width: `${score}%` }} />
-      </div>
+      <span className="text-[9px] text-[#F3EDE3]/40 uppercase tracking-wider">{label}</span>
+      <span className="text-xs font-bold" style={{ color }}>{score}</span>
     </div>
   );
 }
 
 // ── Editable field ─────────────────────────────────────────────────────────
-function EditableField({ label, value, onSave }: {
-  label: string; value: string | null; onSave: (v: string) => Promise<void>;
+function EditableField({ label, value, placeholder, onSave, multiline }: {
+  label: string; value: string | null; placeholder?: string; onSave: (v: string) => Promise<void>; multiline?: boolean;
 }) {
   const [editing, setEditing] = useState(false);
   const [val, setVal] = useState(value ?? "");
@@ -124,23 +138,34 @@ function EditableField({ label, value, onSave }: {
   if (editing) {
     return (
       <div>
-        <label className="text-[9px] text-[#F3EDE3]/30 uppercase tracking-wide block mb-0.5">{label}</label>
-        <div className="flex gap-1">
-          <textarea
-            className="flex-1 text-xs bg-[#07080C] border border-[#27B7C8]/30 rounded-lg px-2 py-1.5 text-[#F3EDE3] resize-none focus:outline-none focus:border-[#27B7C8]"
-            rows={2}
-            value={val}
-            onChange={e => setVal(e.target.value)}
-            autoFocus
-          />
+        <label className="text-[9px] text-[#F3EDE3]/30 uppercase tracking-wide block mb-1">{label}</label>
+        <div className="flex gap-1.5">
+          {multiline ? (
+            <textarea
+              className="flex-1 text-xs bg-[#07080C] border border-[#27B7C8]/30 rounded-lg px-3 py-2 text-[#F3EDE3] resize-none focus:outline-none focus:border-[#27B7C8]"
+              rows={3}
+              value={val}
+              onChange={e => setVal(e.target.value)}
+              placeholder={placeholder}
+              autoFocus
+            />
+          ) : (
+            <input
+              className="flex-1 text-xs bg-[#07080C] border border-[#27B7C8]/30 rounded-lg px-3 py-2 text-[#F3EDE3] focus:outline-none focus:border-[#27B7C8]"
+              value={val}
+              onChange={e => setVal(e.target.value)}
+              placeholder={placeholder}
+              autoFocus
+            />
+          )}
           <div className="flex flex-col gap-1">
             <button onClick={save} disabled={saving}
               className="p-1.5 rounded-lg bg-[#49B06E]/20 text-[#49B06E] hover:bg-[#49B06E]/30 disabled:opacity-40">
-              <Check className="w-3 h-3" />
+              <Check className="w-3.5 h-3.5" />
             </button>
             <button onClick={() => { setVal(value ?? ""); setEditing(false); }}
               className="p-1.5 rounded-lg bg-[#ef4444]/10 text-[#ef4444]/70 hover:bg-[#ef4444]/20">
-              <X className="w-3 h-3" />
+              <X className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
@@ -149,12 +174,56 @@ function EditableField({ label, value, onSave }: {
   }
 
   return (
-    <button onClick={() => setEditing(true)} className="text-left w-full group">
+    <button onClick={() => { haptic(); setEditing(true); }} className="text-left w-full group">
       <p className="text-[9px] text-[#F3EDE3]/30 uppercase tracking-wide mb-0.5">{label}</p>
-      <p className={`text-xs leading-relaxed ${value ? "text-[#F3EDE3]/65" : "text-[#F3EDE3]/20 italic"} group-hover:text-[#27B7C8]/70 transition-colors`}>
-        {value || `Add ${label.toLowerCase()}…`}
+      <p className={`text-xs leading-relaxed rounded-lg px-2 py-1.5 transition-colors ${value ? "text-[#F3EDE3]/65 bg-transparent" : "text-[#F3EDE3]/20 italic bg-white/[0.02]"} group-hover:bg-[#27B7C8]/5`}>
+        {value || placeholder || `Tap to add…`}
       </p>
     </button>
+  );
+}
+
+// ── Emotion Picker ─────────────────────────────────────────────────────────
+function EmotionField({ label, value, onSave }: { label: string; value: string | null; onSave: (v: string) => Promise<void> }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div>
+      <p className="text-[9px] text-[#F3EDE3]/30 uppercase tracking-wide mb-1">{label}</p>
+      <button
+        onClick={() => { haptic(); setOpen(o => !o); }}
+        className="w-full text-left text-xs rounded-lg px-2.5 py-2 transition-colors"
+        style={{ background: value ? "rgba(39,183,200,0.06)" : "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}
+      >
+        {value || "Tap to pick…"}
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="flex flex-wrap gap-1 mt-1.5">
+              {EMOTIONS.map(em => (
+                <button
+                  key={em}
+                  onClick={async () => { haptic(); await onSave(em); setOpen(false); }}
+                  className="text-[10px] px-2 py-1 rounded-full transition-all"
+                  style={{
+                    background: value === em ? "rgba(39,183,200,0.2)" : "rgba(255,255,255,0.04)",
+                    color: value === em ? "#27B7C8" : "rgba(243,237,227,0.5)",
+                    border: value === em ? "1px solid rgba(39,183,200,0.4)" : "1px solid rgba(255,255,255,0.06)",
+                  }}
+                >
+                  {em}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
 
@@ -162,6 +231,7 @@ function EditableField({ label, value, onSave }: {
 function EntryCard({ entry, onUpdate }: { entry: JournalEntry; onUpdate: (updated: JournalEntry) => void }) {
   const [expanded, setExpanded] = useState(false);
   const win = (entry.pnl ?? 0) >= 0;
+  const gc = gradeColor(entry.overall_grade);
 
   const saveField = async (field: string, value: string) => {
     const res = await apiFetch("/api/practice/journal", {
@@ -174,117 +244,194 @@ function EntryCard({ entry, onUpdate }: { entry: JournalEntry; onUpdate: (update
   };
 
   const closedDate = entry.closed_at
-    ? new Date(entry.closed_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
-    : new Date(entry.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    ? new Date(entry.closed_at).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })
+    : new Date(entry.created_at).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+
+  const followedRules = entry.followed_plan;
+  const rulesBadge = followedRules === "Yes" || followedRules?.toLowerCase().includes("yes")
+    ? { label: "Followed rules", color: "#49B06E", icon: "✓" }
+    : followedRules === "No" || followedRules?.toLowerCase().includes("no")
+    ? { label: "Broke rules", color: "#EF4444", icon: "✗" }
+    : null;
 
   return (
-    <div className="rounded-xl border border-[#27B7C8]/15 bg-[#16264A] overflow-hidden">
-      {/* Header row */}
+    <motion.div
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="rounded-2xl border overflow-hidden"
+      style={{ background: "#121821", borderColor: gc.border }}
+    >
+      {/* Collapsed header */}
       <button
-        onClick={() => setExpanded(e => !e)}
-        className="w-full flex items-center gap-3 p-4 text-left hover:bg-[#27B7C8]/5 transition-colors"
+        onClick={() => { haptic(); setExpanded(e => !e); }}
+        className="w-full flex items-center gap-3 p-4 text-left active:bg-white/[0.02] transition-colors"
       >
-        {/* Grade */}
-        <span className={`text-sm font-bold font-mono w-9 h-9 rounded-lg border flex items-center justify-center flex-shrink-0 ${gradeStyle(entry.overall_grade)}`}>
+        {/* Grade circle */}
+        <div
+          className={`text-lg font-bold font-mono w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${gc.text}`}
+          style={{ background: gc.bg, border: `1px solid ${gc.border}` }}
+        >
           {entry.overall_grade ?? "—"}
-        </span>
+        </div>
 
-        {/* Ticker + direction */}
+        {/* Ticker + meta */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <span className="font-mono font-bold text-[#F3EDE3] text-sm">{entry.ticker}</span>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="font-mono font-bold text-[#F3EDE3] text-base">{entry.ticker}</span>
             {entry.direction && (
-              <span className={`text-[10px] px-1.5 py-0.5 rounded font-semibold flex items-center gap-0.5 ${entry.direction === "long" ? "bg-[#49B06E]/15 text-[#49B06E]" : "bg-[#ef4444]/15 text-[#ef4444]"}`}>
+              <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold flex items-center gap-0.5 ${entry.direction === "long" ? "bg-[#49B06E]/15 text-[#49B06E]" : "bg-[#ef4444]/15 text-[#ef4444]"}`}>
                 {entry.direction === "long" ? <TrendingUp className="w-2.5 h-2.5" /> : <TrendingDown className="w-2.5 h-2.5" />}
                 {entry.direction.toUpperCase()}
               </span>
             )}
-            <span className="text-[10px] text-[#F3EDE3]/30">{closedDate}</span>
+            {rulesBadge && (
+              <span className="text-[9px] px-1.5 py-0.5 rounded font-bold" style={{ background: `${rulesBadge.color}15`, color: rulesBadge.color }}>
+                {rulesBadge.icon} {rulesBadge.label}
+              </span>
+            )}
           </div>
-          <p className="text-[10px] text-[#F3EDE3]/40 mt-0.5">
-            {fmtDuration(entry.duration_minutes)} · Entry {fmt(entry.entry_price)} · Exit {fmt(entry.exit_price)}
-          </p>
+          <div className="flex items-center gap-2 mt-0.5 text-[10px] text-[#F3EDE3]/35">
+            <span>{closedDate}</span>
+            <span>&middot;</span>
+            <span>{fmtDuration(entry.duration_minutes)}</span>
+          </div>
         </div>
 
         {/* P/L */}
-        <span className={`font-mono text-sm font-bold flex-shrink-0 ${win ? "text-[#49B06E]" : "text-[#ef4444]"}`}>
-          {win ? "+" : ""}{fmt(entry.pnl)}
-        </span>
-
-        {expanded ? <ChevronUp className="w-4 h-4 text-[#F3EDE3]/30 flex-shrink-0" /> : <ChevronDown className="w-4 h-4 text-[#F3EDE3]/30 flex-shrink-0" />}
+        <div className="text-right flex items-center gap-2">
+          <span className={`font-mono text-sm font-bold ${win ? "text-[#49B06E]" : "text-[#ef4444]"}`}>
+            {win ? "+" : "-"}{fmt(entry.pnl)}
+          </span>
+          {expanded ? <ChevronUp className="w-4 h-4 text-[#F3EDE3]/20" /> : <ChevronDown className="w-4 h-4 text-[#F3EDE3]/20" />}
+        </div>
       </button>
 
-      {expanded && (
-        <div className="border-t border-[#27B7C8]/10">
-          {/* Score bars */}
-          {entry.score_discipline != null && (
-            <div className="px-4 pt-3 pb-2 grid grid-cols-5 gap-3">
-              <ScoreBar label="P/L" score={entry.score_pl} />
-              <ScoreBar label="R/R" score={entry.score_rr} />
-              <ScoreBar label="Entry" score={entry.score_entry} />
-              <ScoreBar label="Exit" score={entry.score_exit} />
-              <ScoreBar label="Disc." score={entry.score_discipline} />
-            </div>
-          )}
+      {/* Expanded detail */}
+      <AnimatePresence>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+          >
+            <div className="border-t border-white/5 px-4 pb-4 pt-3 space-y-4">
 
-          {/* Pansy commentary */}
-          {entry.what_went_well && (
-            <div className="px-4 pb-3 space-y-2">
-              {[
-                { label: "What went well", text: entry.what_went_well, color: "text-[#49B06E]" },
-                { label: "What to improve", text: entry.what_to_improve, color: "text-[#ef4444]" },
-                { label: "Did you follow your plan?", text: entry.followed_plan, color: "text-[#27B7C8]" },
-                { label: "Remember next time", text: entry.remember_next, color: "text-yellow-400" },
-              ].map(({ label, text, color }) => text && (
-                <div key={label} className="rounded-lg bg-[#07080C] px-3 py-2.5">
-                  <p className={`text-[9px] uppercase tracking-wide font-semibold mb-1 ${color}`}>{label}</p>
-                  <p className="text-xs text-[#F3EDE3]/70 leading-relaxed">{text}</p>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Trade details */}
-          <div className="mx-4 mb-3 grid grid-cols-3 gap-px bg-[#27B7C8]/8 rounded-lg overflow-hidden border border-[#27B7C8]/10">
-            {[
-              ["Stop", entry.stop_price != null ? fmt(entry.stop_price) : "—"],
-              ["Target", entry.target_price != null ? fmt(entry.target_price) : "—"],
-              ["Risk", entry.risk_amount != null ? fmt(entry.risk_amount) : "—"],
-            ].map(([l, v]) => (
-              <div key={l} className="bg-[#07080C] px-2 py-2 text-center">
-                <p className="text-[9px] text-[#F3EDE3]/30 uppercase tracking-wide">{l}</p>
-                <p className="font-mono text-xs text-[#F3EDE3]/70 mt-0.5">{v}</p>
+              {/* ── Trade Numbers ── */}
+              <div className="grid grid-cols-4 gap-px rounded-xl overflow-hidden" style={{ background: "rgba(255,255,255,0.04)" }}>
+                {[
+                  { label: "Entry", value: fmt(entry.entry_price), color: "#49B06E" },
+                  { label: "Exit", value: fmt(entry.exit_price), color: "#27B7C8" },
+                  { label: "Stop", value: fmt(entry.stop_price), color: "#EF4444" },
+                  { label: "Target", value: fmt(entry.target_price), color: "#F59E0B" },
+                ].map(({ label, value, color }) => (
+                  <div key={label} className="bg-[#0C1016] p-2.5 text-center">
+                    <p className="text-[8px] font-bold uppercase tracking-wider mb-0.5" style={{ color }}>{label}</p>
+                    <p className="font-mono text-xs text-[#F3EDE3]/80">{value}</p>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
 
-          {/* Thesis */}
-          {entry.thesis && (
-            <div className="mx-4 mb-3">
-              <p className="text-[9px] text-[#F3EDE3]/30 uppercase tracking-wide mb-1">Pre-trade plan</p>
-              <p className="text-xs text-[#F3EDE3]/50 leading-relaxed whitespace-pre-wrap line-clamp-4">{entry.thesis}</p>
-            </div>
-          )}
+              {/* ── Score rings ── */}
+              {entry.score_discipline != null && (
+                <div className="flex justify-around py-2">
+                  <ScoreRing label="P/L" score={entry.score_pl} icon={TrendingUp} />
+                  <ScoreRing label="R:R" score={entry.score_rr} icon={Scale} />
+                  <ScoreRing label="Entry" score={entry.score_entry} icon={Target} />
+                  <ScoreRing label="Exit" score={entry.score_exit} icon={ShieldCheck} />
+                  <ScoreRing label="Disc." score={entry.score_discipline} icon={Award} />
+                </div>
+              )}
 
-          {/* User-editable fields */}
-          <div className="mx-4 mb-4 rounded-lg bg-[#07080C] border border-[#27B7C8]/10 p-3 space-y-3">
-            <p className="text-[9px] text-[#F3EDE3]/30 uppercase tracking-wide font-semibold">Your notes (tap to edit)</p>
-            <div className="grid grid-cols-2 gap-3">
-              <EditableField label="Chart Pattern" value={entry.chart_pattern} onSave={v => saveField("chart_pattern", v)} />
-              <EditableField label="Candlestick" value={entry.candlestick_confirmation} onSave={v => saveField("candlestick_confirmation", v)} />
-              <EditableField label="Indicator Used" value={entry.indicator_used} onSave={v => saveField("indicator_used", v)} />
-              <EditableField label="Market Trend" value={entry.market_trend} onSave={v => saveField("market_trend", v)} />
-              <EditableField label="Emotion Before" value={entry.emotion_before} onSave={v => saveField("emotion_before", v)} />
-              <EditableField label="Emotion During" value={entry.emotion_during} onSave={v => saveField("emotion_during", v)} />
-              <EditableField label="Emotion After" value={entry.emotion_after} onSave={v => saveField("emotion_after", v)} />
-              <EditableField label="Related Lesson" value={entry.related_lesson} onSave={v => saveField("related_lesson", v)} />
+              {/* ── Pansy Assessment ── */}
+              {entry.what_went_well && (
+                <div className="space-y-2">
+                  <p className="text-[10px] text-[#F3EDE3]/30 uppercase tracking-wider font-bold flex items-center gap-1.5">
+                    <span>🌺</span> Pansy&apos;s assessment
+                  </p>
+                  {[
+                    { label: "What went well", text: entry.what_went_well, color: "#49B06E" },
+                    { label: "What to improve", text: entry.what_to_improve, color: "#EF4444" },
+                    { label: "Did you follow your plan?", text: entry.followed_plan, color: "#27B7C8" },
+                    { label: "Remember next time", text: entry.remember_next, color: "#F59E0B" },
+                  ].map(({ label, text, color }) => text && (
+                    <div key={label} className="rounded-xl px-3 py-2.5" style={{ background: `${color}08`, border: `1px solid ${color}15` }}>
+                      <p className="text-[9px] uppercase tracking-wide font-bold mb-1" style={{ color }}>{label}</p>
+                      <p className="text-xs text-[#F3EDE3]/60 leading-relaxed">{text}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* ── Your Reflection ── */}
+              <div className="space-y-3">
+                <p className="text-[10px] text-[#F3EDE3]/30 uppercase tracking-wider font-bold flex items-center gap-1.5">
+                  <Brain className="w-3.5 h-3.5" /> Your reflection
+                </p>
+
+                <EditableField
+                  label="Why I took this trade"
+                  value={entry.thesis}
+                  placeholder="What was the setup? What convinced you to enter?"
+                  onSave={v => saveField("thesis", v)}
+                  multiline
+                />
+
+                <EditableField
+                  label="Why I exited"
+                  value={entry.exit_reason}
+                  placeholder="Target hit, stopped out, changed mind?"
+                  onSave={v => saveField("exit_reason", v)}
+                />
+
+                <EditableField
+                  label="What I learned"
+                  value={entry.what_i_learned}
+                  placeholder="Key takeaway from this trade"
+                  onSave={v => saveField("what_i_learned", v)}
+                  multiline
+                />
+              </div>
+
+              {/* ── How I Felt ── */}
+              <div className="space-y-3">
+                <p className="text-[10px] text-[#F3EDE3]/30 uppercase tracking-wider font-bold flex items-center gap-1.5">
+                  <Heart className="w-3.5 h-3.5" /> How I felt
+                </p>
+                <div className="grid grid-cols-3 gap-2">
+                  <EmotionField label="Before" value={entry.emotion_before} onSave={v => saveField("emotion_before", v)} />
+                  <EmotionField label="During" value={entry.emotion_during} onSave={v => saveField("emotion_during", v)} />
+                  <EmotionField label="After" value={entry.emotion_after} onSave={v => saveField("emotion_after", v)} />
+                </div>
+              </div>
+
+              {/* ── Strategy Notes ── */}
+              <div className="space-y-3">
+                <p className="text-[10px] text-[#F3EDE3]/30 uppercase tracking-wider font-bold flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5" /> Strategy &amp; setup
+                </p>
+                <div className="grid grid-cols-2 gap-3">
+                  <EditableField label="Chart Pattern" value={entry.chart_pattern} placeholder="e.g. Bull flag" onSave={v => saveField("chart_pattern", v)} />
+                  <EditableField label="Indicator" value={entry.indicator_used} placeholder="e.g. VWAP, 9 EMA" onSave={v => saveField("indicator_used", v)} />
+                  <EditableField label="Market Trend" value={entry.market_trend} placeholder="Bullish / Bearish / Choppy" onSave={v => saveField("market_trend", v)} />
+                  <EditableField label="Candlestick" value={entry.candlestick_confirmation} placeholder="e.g. Hammer" onSave={v => saveField("candlestick_confirmation", v)} />
+                </div>
+              </div>
+
+              {/* ── Personal Notes ── */}
+              <EditableField
+                label="Personal notes"
+                value={entry.personal_notes}
+                placeholder="Anything else you want to remember about this trade"
+                onSave={v => saveField("personal_notes", v)}
+                multiline
+              />
             </div>
-            <EditableField label="What I Learned" value={entry.what_i_learned} onSave={v => saveField("what_i_learned", v)} />
-            <EditableField label="Personal Notes" value={entry.personal_notes} onSave={v => saveField("personal_notes", v)} />
-          </div>
-        </div>
-      )}
-    </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }
 
@@ -320,7 +467,6 @@ export default function JournalPage(_props: PageProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Filters
   const [ticker, setTicker] = useState("");
   const [grade, setGrade] = useState("all");
   const [direction, setDirection] = useState("all");
@@ -358,26 +504,40 @@ export default function JournalPage(_props: PageProps) {
 
   const showProGate = !authLoading && !isPro;
 
+  // Stats
+  const totalTrades = entries.length;
+  const wins = entries.filter(e => (e.pnl ?? 0) > 0).length;
+  const winRate = totalTrades > 0 ? Math.round((wins / totalTrades) * 100) : 0;
+  const totalPnl = entries.reduce((sum, e) => sum + (e.pnl ?? 0), 0);
+  const followedCount = entries.filter(e => e.followed_plan?.toLowerCase().includes("yes")).length;
+
   return (
     <>
       <Head>
-        <title>Trade Journal — Bloom</title>
+        <title>Trade Journal — Bloom Radar</title>
       </Head>
       <Layout>
-        <div className="min-h-screen bg-[#07080C] px-4 py-6 max-w-2xl mx-auto">
+        <div className="min-h-screen bg-[#07080C] px-4 py-4 max-w-lg mx-auto pb-32">
 
           {/* Header */}
-          <div className="mb-6">
-            <div className="flex items-center gap-3 mb-2">
-              <NotebookPen className="w-6 h-6 text-[#27B7C8]" />
-              <h1 className="font-serif text-2xl font-bold text-[#F3EDE3]">Trade Journal</h1>
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <NotebookPen className="w-5 h-5 text-[#27B7C8]" />
+                <h1 className="text-2xl font-bold text-[#F3EDE3]">Trade Journal</h1>
+              </div>
+              <p className="text-xs text-[#F3EDE3]/40 mt-0.5">Track, reflect, improve</p>
             </div>
-            <div className="flex items-start gap-2 rounded-lg bg-[#27B7C8]/10 border border-[#27B7C8]/20 px-3 py-2">
-              <AlertTriangle className="w-4 h-4 text-[#27B7C8] flex-shrink-0 mt-0.5" />
-              <p className="text-xs text-[#27B7C8]/90 leading-relaxed">
-                <strong>Educational simulator — not a brokerage.</strong> All trades are virtual. Not financial advice.
-              </p>
-            </div>
+            <Link href="/practice" className="text-xs text-[#27B7C8] px-3 py-1.5 rounded-lg" style={{ background: "rgba(39,183,200,0.1)", border: "1px solid rgba(39,183,200,0.2)" }}>
+              Practice Trader
+            </Link>
+          </div>
+
+          <div className="rounded-lg px-3 py-2 mb-4 flex items-start gap-2" style={{ background: "rgba(39,183,200,0.06)", border: "1px solid rgba(39,183,200,0.12)" }}>
+            <AlertTriangle className="w-3.5 h-3.5 text-[#27B7C8] flex-shrink-0 mt-0.5" />
+            <p className="text-[10px] text-[#27B7C8]/80 leading-relaxed">
+              <strong>Educational simulator.</strong> All trades are virtual. Not financial advice.
+            </p>
           </div>
 
           {(authLoading || (loading && isPro)) && (
@@ -397,67 +557,56 @@ export default function JournalPage(_props: PageProps) {
 
           {!authLoading && !loading && isPro && !error && (
             <>
-              {/* Filters */}
-              <div className="rounded-xl bg-[#16264A] border border-[#27B7C8]/15 p-4 mb-4 space-y-3">
-                <div className="flex items-center gap-2 mb-1">
-                  <Filter className="w-3.5 h-3.5 text-[#27B7C8]/60" />
-                  <span className="text-xs text-[#F3EDE3]/40 uppercase tracking-wide">Filter</span>
+              {/* Quick stats */}
+              {totalTrades > 0 && (
+                <div className="grid grid-cols-4 gap-2 mb-4">
+                  {[
+                    { label: "Trades", value: totalTrades, color: "#27B7C8" },
+                    { label: "Win rate", value: `${winRate}%`, color: winRate >= 50 ? "#49B06E" : "#EF4444" },
+                    { label: "P/L", value: `${totalPnl >= 0 ? "+" : ""}${fmt(totalPnl)}`, color: totalPnl >= 0 ? "#49B06E" : "#EF4444" },
+                    { label: "Followed", value: `${followedCount}/${totalTrades}`, color: followedCount >= totalTrades * 0.7 ? "#49B06E" : "#F59E0B" },
+                  ].map(({ label, value, color }) => (
+                    <div key={label} className="rounded-xl p-2.5 text-center" style={{ background: `${color}08`, border: `1px solid ${color}15` }}>
+                      <p className="text-[9px] font-bold uppercase tracking-wider mb-0.5" style={{ color }}>{label}</p>
+                      <p className="text-sm font-bold text-[#F3EDE3]">{value}</p>
+                    </div>
+                  ))}
                 </div>
+              )}
 
-                {/* Ticker search */}
+              {/* Filters */}
+              <div className="rounded-xl p-3 mb-4 space-y-2" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                <div className="flex items-center gap-2">
+                  <Filter className="w-3 h-3 text-[#F3EDE3]/30" />
+                  <span className="text-[9px] text-[#F3EDE3]/30 uppercase tracking-wide">Filter</span>
+                </div>
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#F3EDE3]/30" />
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#F3EDE3]/25" />
                   <input
-                    className="w-full bg-[#07080C] border border-[#27B7C8]/15 rounded-lg pl-8 pr-3 py-2 text-sm text-[#F3EDE3] placeholder-[#F3EDE3]/25 focus:outline-none focus:border-[#27B7C8]"
+                    className="w-full bg-[#07080C] border border-white/8 rounded-lg pl-8 pr-3 py-2 text-xs text-[#F3EDE3] placeholder-[#F3EDE3]/20 focus:outline-none focus:border-[#27B7C8]/50"
                     placeholder="Search by ticker…"
                     value={ticker}
                     onChange={e => setTicker(e.target.value.toUpperCase())}
                   />
                 </div>
-
                 <div className="grid grid-cols-3 gap-2">
-                  <div>
-                    <label className="text-[9px] text-[#F3EDE3]/30 uppercase tracking-wide block mb-1">Grade</label>
-                    <select
-                      className="w-full bg-[#07080C] border border-[#27B7C8]/15 rounded-lg px-2 py-2 text-xs text-[#F3EDE3] focus:outline-none focus:border-[#27B7C8]"
-                      value={grade} onChange={e => setGrade(e.target.value)}
-                    >
-                      <option value="all">All</option>
-                      {["A","B","C","D","F"].map(g => <option key={g} value={g}>{g}</option>)}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-[9px] text-[#F3EDE3]/30 uppercase tracking-wide block mb-1">Direction</label>
-                    <select
-                      className="w-full bg-[#07080C] border border-[#27B7C8]/15 rounded-lg px-2 py-2 text-xs text-[#F3EDE3] focus:outline-none focus:border-[#27B7C8]"
-                      value={direction} onChange={e => setDirection(e.target.value)}
-                    >
-                      <option value="all">All</option>
-                      <option value="long">Long</option>
-                      <option value="short">Short</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-[9px] text-[#F3EDE3]/30 uppercase tracking-wide block mb-1">Period</label>
-                    <select
-                      className="w-full bg-[#07080C] border border-[#27B7C8]/15 rounded-lg px-2 py-2 text-xs text-[#F3EDE3] focus:outline-none focus:border-[#27B7C8]"
-                      value={range} onChange={e => setRange(e.target.value)}
-                    >
-                      <option value="all">All time</option>
-                      <option value="week">This week</option>
-                      <option value="month">This month</option>
-                    </select>
-                  </div>
+                  {[
+                    { label: "Grade", value: grade, onChange: setGrade, opts: [["all", "All"], ["A", "A"], ["B", "B"], ["C", "C"], ["D", "D"], ["F", "F"]] },
+                    { label: "Direction", value: direction, onChange: setDirection, opts: [["all", "All"], ["long", "Long"], ["short", "Short"]] },
+                    { label: "Period", value: range, onChange: setRange, opts: [["all", "All time"], ["week", "This week"], ["month", "This month"]] },
+                  ].map(({ label, value, onChange, opts }) => (
+                    <div key={label}>
+                      <label className="text-[8px] text-[#F3EDE3]/25 uppercase tracking-wide block mb-0.5">{label}</label>
+                      <select
+                        className="w-full bg-[#07080C] border border-white/8 rounded-lg px-2 py-1.5 text-[10px] text-[#F3EDE3] focus:outline-none focus:border-[#27B7C8]/50"
+                        value={value} onChange={e => onChange(e.target.value)}
+                      >
+                        {opts.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+                      </select>
+                    </div>
+                  ))}
                 </div>
               </div>
-
-              {/* Summary bar */}
-              {entries.length > 0 && (
-                <div className="flex items-center justify-between px-1 mb-3">
-                  <span className="text-xs text-[#F3EDE3]/40">{entries.length} entr{entries.length === 1 ? "y" : "ies"}</span>
-                  <Link href="/practice" className="text-xs text-[#27B7C8] hover:underline">← Back to Trader</Link>
-                </div>
-              )}
 
               {entries.length === 0 ? (
                 <div className="flex flex-col items-center py-16 text-center">
@@ -472,7 +621,7 @@ export default function JournalPage(_props: PageProps) {
                         <NotebookPen className="w-6 h-6 text-[#27B7C8]/60" />
                       </div>
                       <p className="text-sm font-medium text-[#F3EDE3]/50 mb-1">No journal entries yet</p>
-                      <p className="text-xs text-[#F3EDE3]/30 max-w-[260px] mb-5">
+                      <p className="text-xs text-[#F3EDE3]/30 max-w-[280px] mb-5">
                         Close a practice trade and Pansy will generate your first review automatically.
                       </p>
                       <Link href="/practice"

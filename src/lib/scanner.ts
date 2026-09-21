@@ -1,4 +1,6 @@
-// Gap-and-Go scanner engine — scoring, filtering, and types
+// Bloom Radar scanner engine — scoring, filtering, types, and strategy evaluation
+
+import type { SignalResult, StrategyId } from "./strategies";
 
 export interface ScannerCandidate {
   symbol: string;
@@ -20,6 +22,8 @@ export interface ScannerCandidate {
   flags: string[];      // warnings/notes
   dataSource: string;
   timestamp: number;
+  signals?: SignalResult[];
+  topStrategy?: StrategyId | null;
 }
 
 export type CatalystQuality = "strong" | "moderate" | "weak" | "unverified" | "none";

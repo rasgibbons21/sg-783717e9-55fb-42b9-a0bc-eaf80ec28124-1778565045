@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
-  Wallet, Lightbulb, TrendingUp, ArrowRight,
+  Layers, TrendingUp, ArrowRight,
   CheckCircle, Star, Zap, Shield,
 } from "lucide-react";
 import { SEO } from "@/components/SEO";
@@ -15,25 +15,18 @@ const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
 
 const PILLARS = [
   {
-    icon: Wallet,
-    title: "Budget",
-    description: "Track spending, plan savings goals, and build your financial foundation with smart budgeting tools.",
-    href: "/academy/budget",
-    color: "#49B06E",
-  },
-  {
-    icon: Lightbulb,
-    title: "Side Hustle",
-    description: "Discover your niche, launch a side business, and grow your income streams with AI-powered guidance.",
-    href: "/academy/hustle",
-    color: "#27B7C8",
-  },
-  {
     icon: TrendingUp,
     title: "Learn to Trade",
     description: "Master investing from scratch. 150+ lessons, paper trading simulator, and AI-powered stock analysis.",
     href: "/academy/trade",
     color: "#A78BFA",
+  },
+  {
+    icon: Layers,
+    title: "Pattern Library",
+    description: "24 chart and momentum patterns with interactive visuals, stages, entry concepts, and common mistakes.",
+    href: "/academy/patterns",
+    color: "#27B7C8",
   },
 ];
 
@@ -43,8 +36,8 @@ const PRICING_FEATURES = [
   "Portfolio X-Ray & risk assessment",
   "Smart alerts & earnings tracker",
   "AI research reports",
-  "Budget tracker & calculators",
-  "Side hustle AI coach",
+  "24 pattern library guides",
+  "Strategy condition breakdowns",
   "Paper trading simulator",
   "No ads",
 ];
@@ -111,7 +104,7 @@ export default function AcademyLanding() {
                 <span className="text-[#27B7C8]">Education Platform</span>
               </h1>
               <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 leading-relaxed">
-                Master budgeting, launch a side hustle, and learn to trade &mdash; all with AI-powered tools built for women who want financial freedom.
+                Learn to trade with confidence &mdash; structured lessons, 24 pattern guides, and AI-powered tools built for women who want financial freedom.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                 <Link href={isLoggedIn ? "/academy/dashboard" : "/onboarding"}>
@@ -144,13 +137,13 @@ export default function AcademyLanding() {
         <section className="max-w-7xl mx-auto px-4 py-16 md:py-20">
           <div className="text-center mb-12">
             <h2 className="text-2xl md:text-3xl font-serif font-bold text-foreground mb-3">
-              Three Paths to Financial Freedom
+              Learn at Your Own Pace
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              Whether you&apos;re saving your first $1,000 or building a portfolio, we meet you where you are.
+              From your first trade to advanced pattern recognition — structured lessons and visual guides to build confidence.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
             {PILLARS.map((pillar, i) => (
               <Link key={pillar.title} href={pillar.href}>
                 <motion.div
@@ -282,15 +275,14 @@ export default function AcademyLanding() {
               <div>
                 <h3 className="mb-3 font-serif text-lg font-semibold text-[#27B7C8]">Bloom Academy</h3>
                 <p className="text-sm text-muted-foreground">
-                  Your complete financial education platform. Budget smarter, hustle harder, trade confidently.
+                  Your complete trading education platform. Learn patterns, master setups, trade confidently.
                 </p>
               </div>
               <div>
                 <h4 className="mb-3 text-sm font-semibold text-foreground">Sections</h4>
                 <ul className="space-y-2 text-sm">
-                  <li><Link href="/academy/budget" className="text-muted-foreground hover:text-primary">Budget</Link></li>
-                  <li><Link href="/academy/hustle" className="text-muted-foreground hover:text-primary">Side Hustle</Link></li>
                   <li><Link href="/academy/trade" className="text-muted-foreground hover:text-primary">Learn to Trade</Link></li>
+                  <li><Link href="/academy/patterns" className="text-muted-foreground hover:text-primary">Pattern Library</Link></li>
                   <li><Link href="/academy/tools" className="text-muted-foreground hover:text-primary">AI Tools</Link></li>
                 </ul>
               </div>

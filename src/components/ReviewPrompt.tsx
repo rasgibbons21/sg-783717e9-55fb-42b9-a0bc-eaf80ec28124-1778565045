@@ -152,3 +152,33 @@ export function shouldShowReviewPrompt(completedCount: number): boolean {
   } catch {}
   return true;
 }
+
+const VISIT_KEY = 'bloom_visit_count';
+const VISIT_THRESHOLD = 8;
+
+export function useAutoReviewPrompt(): { show: boolean; dismiss: () => void } {
+  const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    try {
+      const prompted = localStorage.getItem(STORAGE_KEY);
+      if (prompted) {
+        const daysSince = (Date.now() - Number(prompted)) / 86400000;
+        if (daysSince < 60) return;
+      }
+      const visits = Number(localStorage.getItem(VISIT_KEY) || '0') + 1;
+      localStorage.setItem(VISIT_KEY, String(visits));
+      if (visits >= VISIT_THRESHOLD) {
+        const timer = setTimeout(() => setShow(true), 4000);
+        return () => clearTimeout(timer);
+      }
+    } catch {}
+  }, []);
+
+  const dismiss = () => {
+    setShow(false);
+    try { localStorage.setItem(STORAGE_KEY, Date.now().toString()); } catch {}
+  };
+
+  return { show, dismiss };
+}
