@@ -70,7 +70,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           dataMode: "stale",
         });
       }
-      return res.status(200).json({ candidates: [], cached: false, timestamp: Date.now(), dataMode: gainersSource });
+      return res.status(200).json({
+        candidates: [],
+        cached: false,
+        timestamp: Date.now(),
+        dataMode: gainersSource === "fmp" ? "delayed" : "finnhub-fallback",
+        totalScanned: gainers.length,
+        eligible: 0,
+      });
     }
 
     // If gainers came from Finnhub, we already have quote data — skip re-fetching
@@ -173,7 +180,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       eligible: eligible.length,
     });
   } catch (error: any) {
-    console.error("Scanner error:", error);
+    console.error("Scanner error:", error?.message || error);
     if (scanCache && Date.now() - scanCache.ts < STALE_CACHE_MS) {
       return res.status(200).json({
         candidates: applyQueryFilters(scanCache.data, req.query),
@@ -183,7 +190,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         dataMode: "stale",
       });
     }
-    return res.status(200).json({ candidates: [], cached: false, timestamp: Date.now(), dataMode: "offline" });
+    return res.status(200).json({
+      candidates: [],
+      cached: false,
+      timestamp: Date.now(),
+      dataMode: "error",
+      error: error?.message || "Unknown scanner error",
+    });
   }
 }
 

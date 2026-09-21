@@ -5,6 +5,7 @@ import {
   evaluateHodBreakout,
   evaluateRedToGreen,
 } from "@/lib/strategies";
+import { fetchGainers, fetchQuotes } from "@/lib/marketData";
 
 interface DiagnosticResult {
   timestamp: string;
@@ -21,7 +22,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method !== "POST") return res.status(405).end();
 
   const fmpKey = process.env.FMP_API_KEY;
-  if (!fmpKey) return res.status(500).json({ error: "FMP_API_KEY not configured" });
+  const finnhubKey = process.env.FINNHUB_API_KEY;
+
+  if (!fmpKey && !finnhubKey) {
+    return res.status(500).json({ error: "No API keys configured (need FMP_API_KEY or FINNHUB_API_KEY)" });
+  }
 
   const result: DiagnosticResult = {
     timestamp: new Date().toISOString(),
@@ -35,14 +40,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   };
 
   try {
-    // STEP 1: Fetch real data from FMP (same source as scanner)
-    console.log("STEP 1: Fetching market data from FMP...");
+    // STEP 1: Fetch market data (FMP → Finnhub fallback)
+    console.log("STEP 1: Fetching market data...");
 
     try {
-      const gainersUrl = `https://financialmodelingprep.com/api/v3/stock_market/gainers?apiKey=${fmpKey}`;
-      const gainersRes = await fetch(gainersUrl, { signal: AbortSignal.timeout(8000) });
-      if (!gainersRes.ok) throw new Error(`FMP gainers: ${gainersRes.status}`);
-      const gainers: any[] = await gainersRes.json();
+      const { gainers, source: gainersSource } = await fetchGainers(fmpKey, finnhubKey);
 
       const eligible = gainers.filter(
         (g: any) => g.price >= 1 && g.price <= 20 && g.changesPercentage >= 5 && g.volume > 50_000,
@@ -52,14 +54,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       let quotes: any[] = [];
       if (testSymbols.length > 0) {
-        const quotesUrl = `https://financialmodelingprep.com/api/v3/quote/${testSymbols.join(",")}?apiKey=${fmpKey}`;
-        const quotesRes = await fetch(quotesUrl, { signal: AbortSignal.timeout(8000) });
-        if (quotesRes.ok) quotes = await quotesRes.json();
+        const qResult = await fetchQuotes(testSymbols, fmpKey, finnhubKey);
+        quotes = qResult.quotes;
       }
 
       result.steps.dataFetch = {
-        status: "success",
+        status: gainers.length > 0 ? "success" : "empty",
         data: {
+          source: gainersSource,
+          fmpKeySet: !!fmpKey,
+          finnhubKeySet: !!finnhubKey,
           totalGainers: gainers.length,
           eligible: eligible.length,
           testSymbols,
@@ -78,7 +82,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         },
       };
 
-      console.log(`Data fetched: ${gainers.length} gainers, ${eligible.length} eligible, testing ${testSymbols.length}`);
+      console.log(`Data fetched via ${gainersSource}: ${gainers.length} gainers, ${eligible.length} eligible, testing ${testSymbols.length}`);
     } catch (error) {
       result.steps.dataFetch = { status: "failed", error: String(error) };
       console.error("Data fetch failed:", error);

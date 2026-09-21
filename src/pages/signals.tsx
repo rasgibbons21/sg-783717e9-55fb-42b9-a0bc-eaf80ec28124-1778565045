@@ -14,6 +14,14 @@ import type { SignalResult } from "@/lib/strategies";
 
 const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
 
+function isMarketClosed(): boolean {
+  const now = new Date();
+  const et = new Date(now.toLocaleString("en-US", { timeZone: "America/New_York" }));
+  const day = et.getDay();
+  const t = et.getHours() * 60 + et.getMinutes();
+  return day === 0 || day === 6 || t < 570 || t >= 960;
+}
+
 interface ScanCandidate {
   symbol: string;
   price: number;
@@ -361,7 +369,10 @@ export default function SignalsPage() {
               No {TABS.find(t => t.id === activeTab)?.label.toLowerCase()} setups right now
             </p>
             <p className="text-xs text-[#F3EDE3]/40 max-w-xs mx-auto mb-4">
-              Setups appear when stocks match your strategy rules. Next scan runs when the tape updates.
+              {isMarketClosed()
+                ? "Markets are closed right now. Signals appear during market hours (Mon–Fri, 9:30 AM – 4:00 PM ET)."
+                : "Setups appear when stocks match your strategy rules. Next scan runs when the tape updates."
+              }
             </p>
             <div className="rounded-xl p-3 text-left" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)" }}>
               <p className="text-[10px] text-[#F3EDE3]/25 uppercase tracking-wider font-bold mb-2">What you&apos;d see here</p>

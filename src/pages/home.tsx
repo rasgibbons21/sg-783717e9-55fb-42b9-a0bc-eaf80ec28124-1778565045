@@ -401,7 +401,12 @@ export default function HomePage() {
           >
             <Bell className="w-5 h-5 mx-auto mb-2 text-[#F3EDE3]/20" />
             <p className="text-xs text-[#F3EDE3]/40 mb-1">No alerts yet</p>
-            <p className="text-[10px] text-[#F3EDE3]/25">Scanner alerts fire when setups match your rules.</p>
+            <p className="text-[10px] text-[#F3EDE3]/25">
+              {session.label === "Closed" || session.label === "After Hours"
+                ? "Alerts activate during market hours when setups match your rules."
+                : "Scanner alerts fire when setups match your rules."
+              }
+            </p>
           </div>
         </div>
 

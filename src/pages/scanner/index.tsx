@@ -14,6 +14,14 @@ import type { SignalResult } from "@/lib/strategies";
 
 const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
 
+function isMarketClosed(): boolean {
+  const now = new Date();
+  const et = new Date(now.toLocaleString("en-US", { timeZone: "America/New_York" }));
+  const day = et.getDay();
+  const t = et.getHours() * 60 + et.getMinutes();
+  return day === 0 || day === 6 || t < 570 || t >= 960;
+}
+
 interface ScanCandidate {
   symbol: string;
   price: number;
@@ -391,7 +399,9 @@ export default function ScannerIndex() {
             <p className="text-xs text-[#F3EDE3]/40 max-w-xs mx-auto">
               {searchQuery
                 ? "Try a different ticker or broaden your filters."
-                : "Setups appear when stocks match your strategy rules. Check back when markets get active."
+                : isMarketClosed()
+                  ? "Markets are closed right now. Setups appear during market hours (Mon–Fri, 9:30 AM – 4:00 PM ET)."
+                  : "Setups appear when stocks match your strategy rules. Check back when the tape gets active."
               }
             </p>
           </div>
