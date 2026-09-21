@@ -1,7 +1,7 @@
 /**
  * Server-side Pro verification for getServerSideProps.
  *
- * Architecture note: The Bloom client uses Supabase with localStorage session
+ * Architecture note: The client uses Supabase with localStorage session
  * storage (storageKey: 'bloom-auth-token', flowType: 'pkce'). This means the
  * access token is NOT automatically available in request cookies, so pure SSR
  * auth is not possible without migrating to cookie-based session storage

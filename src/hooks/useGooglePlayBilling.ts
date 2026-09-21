@@ -212,7 +212,7 @@ export function useGooglePlayBilling(): UseBillingReturn {
           ],
           {
             total: {
-              label: `Bloom Premium (${offer.label})`,
+              label: `Premium (${offer.label})`,
               amount: { currency: offer.priceCurrency, value: "0" },
             },
           }

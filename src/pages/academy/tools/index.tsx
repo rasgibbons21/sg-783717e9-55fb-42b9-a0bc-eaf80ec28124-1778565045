@@ -20,7 +20,7 @@ export default function ToolsIndex() {
   return (
     <AcademyLayout title="AI Tools">
       <SEO
-        title="AI Tools — Bloom Academy"
+        title="AI Tools — She Blooms Academy"
         description="13 AI-powered investment tools for stock analysis, screening, portfolio management, and market research."
       />
 

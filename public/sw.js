@@ -1,4 +1,4 @@
-// Bloom PWA Service Worker — network-first, minimal caching.
+// PWA Service Worker — network-first, minimal caching.
 // Replaces the kill-switch SW that was at this same path (/sw.js).
 // v1: only caches the offline fallback page and immutable Next.js
 // static assets (/_next/static/*). Everything else is network-first.

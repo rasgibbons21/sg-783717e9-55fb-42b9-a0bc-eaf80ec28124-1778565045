@@ -187,7 +187,7 @@ export default function AdminDashboard() {
                 🌸
               </div>
               <div>
-                <CardTitle className="text-xl">Bloom Admin</CardTitle>
+                <CardTitle className="text-xl">Admin</CardTitle>
                 <p className="text-sm text-muted-foreground">Cinder Vault Enterprises LLC</p>
               </div>
             </div>
@@ -224,8 +224,8 @@ export default function AdminDashboard() {
                 🌺
               </div>
               <div>
-                <h1 className="text-2xl font-serif font-semibold text-foreground">Bloom Admin Dashboard</h1>
-                <p className="text-sm text-muted-foreground">Welcome back, Admin. Here's how Bloom is growing 🌸</p>
+                <h1 className="text-2xl font-serif font-semibold text-foreground">Admin Dashboard</h1>
+                <p className="text-sm text-muted-foreground">Welcome back, Admin. Here's how the app is growing 🌸</p>
               </div>
             </div>
             <Button variant="outline" onClick={loadAnalytics} disabled={isLoading}>

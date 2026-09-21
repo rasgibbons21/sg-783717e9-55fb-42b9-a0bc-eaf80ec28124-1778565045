@@ -118,7 +118,7 @@ export default function ToolbeltPage({ requiresClientAuth }: Props) {
 
   return (
     <Layout>
-      <SEO title="My Strategy Toolbelt — Bloom Strategy Lab" description="Your saved strategies with personal notes and lessons learned." />
+      <SEO title="My Strategy Toolbelt — Strategy Lab" description="Your saved strategies with personal notes and lessons learned." />
 
       <div className="bg-[#07080C] min-h-screen">
         <div className="max-w-3xl mx-auto px-4 py-6">

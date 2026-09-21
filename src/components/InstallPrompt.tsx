@@ -131,7 +131,7 @@ export function InstallPrompt() {
                 <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center animate-pulse">
                   <img
                     src="/bloom-logo.png"
-                    alt="Bloom"
+                    alt="She Blooms Wealth"
                     className="w-10 h-10 rounded-full object-cover"
                   />
                 </div>
@@ -182,7 +182,7 @@ export function InstallPrompt() {
                 <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
                   <img
                     src="/bloom-logo.png"
-                    alt="Bloom"
+                    alt="She Blooms Wealth"
                     className="w-12 h-12 rounded-full object-cover"
                   />
                 </div>

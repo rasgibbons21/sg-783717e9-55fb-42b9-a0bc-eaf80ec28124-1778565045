@@ -167,7 +167,7 @@ export const notificationService = {
       }
 
       const registration = await navigator.serviceWorker.ready;
-      await registration.showNotification("Bloom Test Notification 🌸", {
+      await registration.showNotification("Test Notification 🌸", {
         body: "Your notifications are working perfectly! You'll get alerts when your tracked stocks move.",
         icon: "/icon-192.png",
         badge: "/icon-192.png",

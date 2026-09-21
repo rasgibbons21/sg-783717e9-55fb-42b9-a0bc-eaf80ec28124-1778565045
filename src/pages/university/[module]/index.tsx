@@ -96,7 +96,7 @@ export default function ModulePage({ moduleSlug, requiresClientAuth }: Props) {
 
   return (
     <Layout>
-      <SEO title={`${mod.title} — Bloom University`} description={mod.subtitle} />
+      <SEO title={`${mod.title} — She Blooms University`} description={mod.subtitle} />
 
       <div className="bg-[#07080C] min-h-screen">
         {/* Header */}
@@ -104,7 +104,7 @@ export default function ModulePage({ moduleSlug, requiresClientAuth }: Props) {
           <div className="max-w-3xl mx-auto px-4 py-8">
             <Link href="/university" className="inline-flex items-center gap-1 text-sm text-[#27B7C8] hover:text-[#27B7C8]/80 mb-6">
               <ArrowLeft className="w-4 h-4" />
-              Bloom University
+              She Blooms University
             </Link>
             <div className="flex items-start gap-4">
               <span className="text-4xl">{mod.icon}</span>

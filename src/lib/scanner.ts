@@ -1,4 +1,4 @@
-// Bloom Radar scanner engine — scoring, filtering, types, and strategy evaluation
+// Scanner engine — scoring, filtering, types, and strategy evaluation
 
 import type { SignalResult, StrategyId } from "./strategies";
 

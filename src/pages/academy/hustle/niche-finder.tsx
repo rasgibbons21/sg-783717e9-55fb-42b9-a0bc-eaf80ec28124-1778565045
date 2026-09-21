@@ -67,7 +67,7 @@ export default function NicheFinder() {
   if (!isPro) {
     return (
       <AcademyLayout showBack>
-        <SEO title="AI Niche Finder — Bloom Academy" />
+        <SEO title="AI Niche Finder — She Blooms Academy" />
         <div className="p-4 md:p-6 flex flex-col items-center justify-center min-h-[60vh] text-center">
           <div className="w-16 h-16 rounded-2xl bg-[#27B7C8]/15 flex items-center justify-center mb-4">
             <Search className="w-8 h-8 text-[#27B7C8]" />
@@ -90,7 +90,7 @@ export default function NicheFinder() {
   return (
     <AcademyLayout showBack>
       <SEO
-        title="AI Niche Finder — Bloom Academy"
+        title="AI Niche Finder — She Blooms Academy"
         description="Discover your perfect side hustle niche with AI-powered analysis of your skills, interests, and market demand."
       />
 

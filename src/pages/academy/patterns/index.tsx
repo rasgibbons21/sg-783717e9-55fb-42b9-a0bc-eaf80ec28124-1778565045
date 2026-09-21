@@ -107,7 +107,7 @@ export default function PatternLibrary() {
   return (
     <Layout>
       <SEO
-        title="Pattern Library — Bloom Academy"
+        title="Pattern Library — She Blooms Academy"
         description="Learn chart, momentum, and candlestick trading patterns with interactive SVG illustrations, stages, entry concepts, and common mistakes."
       />
       <div className="max-w-lg mx-auto px-4 pt-3 pb-32">

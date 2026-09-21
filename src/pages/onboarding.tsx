@@ -320,7 +320,7 @@ export default function Onboarding() {
                 <div className={`space-y-7 ${animateIn ? "step-animate" : "opacity-0"}`}>
                   <div className="text-center space-y-5">
                     <div className="relative inline-block">
-                      <img src="/bloom-logo.png" alt="Bloom" className="w-20 h-20 mx-auto rounded-3xl object-cover" style={{ boxShadow: "0 0 50px rgba(73,176,110,0.3)" }} />
+                      <img src="/bloom-logo.png" alt="She Blooms Wealth" className="w-20 h-20 mx-auto rounded-3xl object-cover" style={{ boxShadow: "0 0 50px rgba(73,176,110,0.3)" }} />
                       <div className="absolute -inset-3 rounded-3xl opacity-50" style={{ background: "linear-gradient(135deg, rgba(73,176,110,0.2), rgba(39,183,200,0.15))", filter: "blur(12px)", zIndex: -1 }} />
                     </div>
                     <h1 className="font-serif text-4xl font-bold text-[#F3EDE3] leading-tight">Find winning trades<br />before everyone else.</h1>
@@ -385,7 +385,7 @@ export default function Onboarding() {
               {step === "auth" && (
                 <div className={`space-y-6 ${animateIn ? "step-animate" : "opacity-0"}`}>
                   <div className="text-center space-y-2">
-                    <img src="/bloom-logo.png" alt="Bloom" className="w-14 h-14 mx-auto rounded-2xl object-cover" style={{ boxShadow: "0 0 30px rgba(39,183,200,0.15)" }} />
+                    <img src="/bloom-logo.png" alt="She Blooms Wealth" className="w-14 h-14 mx-auto rounded-2xl object-cover" style={{ boxShadow: "0 0 30px rgba(39,183,200,0.15)" }} />
                     <h2 className="font-serif text-3xl font-bold text-[#F3EDE3]">
                       {authMode === "signup" ? "Create your account" : authMode === "login" ? "Welcome back" : "Reset password"}
                     </h2>

@@ -86,7 +86,7 @@ const CHALLENGE_POOL = [
   {
     challenge_type: "learn",
     title: "Strategy Explorer",
-    description: "Visit the Bloom Strategy Lab and explore a strategy you haven't tried. Knowledge is your edge.",
+    description: "Visit the Strategy Lab and explore a strategy you haven't tried. Knowledge is your edge.",
     reward_xp: 20,
     reward_gems: 5,
     criteria: { type: "strategy_explored" },

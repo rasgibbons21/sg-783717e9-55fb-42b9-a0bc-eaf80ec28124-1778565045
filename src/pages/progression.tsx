@@ -263,7 +263,7 @@ export default function ProgressionPage(_props: PageProps) {
 
   return (
     <>
-      <Head><title>My Progression — Bloom</title></Head>
+      <Head><title>My Progression — She Blooms Wealth</title></Head>
       <Layout>
         <div className="min-h-screen bg-[#07080C] px-4 py-6 max-w-2xl mx-auto">
 
@@ -335,7 +335,7 @@ export default function ProgressionPage(_props: PageProps) {
                   onClick={() => share({
                     type: 'achievement',
                     title: `Level ${data.level.current.level} — ${data.level.current.name}`,
-                    subtitle: `${data.xp.toLocaleString()} XP earned on Bloom`,
+                    subtitle: `${data.xp.toLocaleString()} XP earned on She Blooms Wealth`,
                     emoji: data.level.current.badge,
                     stats: [
                       { label: 'Level', value: String(data.level.current.level) },
@@ -424,7 +424,7 @@ export default function ProgressionPage(_props: PageProps) {
                   </div>
                 </div>
                 <p className="text-xs text-[#F3EDE3]/40 mb-3 leading-relaxed">
-                  Each mission is unlocked by completing its paired lesson in Bloom University. Then apply what you learned in the Practice Trader to complete it.
+                  Each mission is unlocked by completing its paired lesson in She Blooms University. Then apply what you learned in the Practice Trader to complete it.
                 </p>
                 <div className="space-y-3">
                   {/* Completed first, then unlocked, then locked */}
@@ -462,7 +462,7 @@ export default function ProgressionPage(_props: PageProps) {
 
               <div className="text-center pb-4">
                 <p className="text-[10px] text-[#F3EDE3]/20 leading-relaxed max-w-sm mx-auto">
-                  Bloom is an educational simulator. XP and progression reflect practice habits only — not real trading performance. Not financial advice.
+                  This is an educational simulator. XP and progression reflect practice habits only — not real trading performance. Not financial advice.
                 </p>
               </div>
             </div>

@@ -229,7 +229,7 @@ export default function BrokerDetailModal({ broker, onClose, onTrackClick }: Pro
 
           {/* Affiliate Disclosure */}
           <p className="text-[10px] text-muted-foreground/50 leading-relaxed">
-            Affiliate Disclosure: This link is an affiliate or referral link. Bloom may receive compensation if you open an account or purchase a service, at no additional cost to you.
+            Affiliate Disclosure: This link is an affiliate or referral link. She Blooms Wealth may receive compensation if you open an account or purchase a service, at no additional cost to you.
           </p>
 
           {/* CTA */}

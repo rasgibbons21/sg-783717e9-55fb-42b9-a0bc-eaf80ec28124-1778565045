@@ -54,13 +54,13 @@ export default function InsightPage({ insight, prev, next }: Props) {
         <nav style={{ borderBottom: "1px solid rgba(255,255,255,0.06)", background: "rgba(14,27,48,0.95)", backdropFilter: "blur(16px)" }}>
           <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 1.5rem", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <Link href="/" style={{ display: "flex", alignItems: "center", gap: 9, textDecoration: "none" }}>
-              <Image src="/bloom-logo.png" alt="Bloom" width={32} height={32} style={{ borderRadius: "50%" }} />
-              <span style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 700, fontSize: 17, color: C.ivory }}>Bloom</span>
+              <Image src="/bloom-logo.png" alt="She Blooms Wealth" width={32} height={32} style={{ borderRadius: "50%" }} />
+              <span style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 700, fontSize: 17, color: C.ivory }}>She Blooms Wealth</span>
             </Link>
             <div style={{ display: "flex", gap: 20, alignItems: "center" }}>
               {([
                 { label: "Home",            href: "/"                },
-                { label: "Daily Bloom",     href: "/daily-bloom"     },
+                { label: "Daily Briefing",     href: "/daily-bloom"     },
                 { label: "Market Insights", href: "/market-insights" },
                 { label: "About",           href: "/about"           },
               ] as const).map(({ label, href }) => (
@@ -149,7 +149,7 @@ export default function InsightPage({ insight, prev, next }: Props) {
           </div>
 
           <p style={{ textAlign: "center", fontSize: 11, color: "rgba(244,247,250,0.28)", marginTop: "1.5rem" }}>
-            Educational only. Not financial advice. Bloom never recommends buying or selling any security.
+            Educational only. Not financial advice. We never recommend buying or selling any security.
           </p>
         </main>
 

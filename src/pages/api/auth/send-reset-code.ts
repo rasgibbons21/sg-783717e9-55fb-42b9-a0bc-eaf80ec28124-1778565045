@@ -39,9 +39,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     user.user_metadata?.full_name?.split(" ")[0] || "there";
 
   await resend.emails.send({
-    from: "Bloom <hello@shebloomswealth.app>",
+    from: "She Blooms Wealth <hello@shebloomswealth.app>",
     to: normalizedEmail,
-    subject: "Your Bloom password reset code",
+    subject: "Your password reset code",
     html: `
       <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:520px;margin:0 auto;padding:32px 20px;color:#e2e8f0;background:#0E1B30;border-radius:12px">
         <h1 style="color:#27B7C8;font-size:24px;margin:0 0 16px">Hey ${firstName}!</h1>

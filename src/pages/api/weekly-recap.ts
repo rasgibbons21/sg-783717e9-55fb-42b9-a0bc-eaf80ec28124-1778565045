@@ -39,7 +39,7 @@ function buildEmailHTML(data: {
   <div style="max-width:480px;margin:0 auto;padding:32px 20px;">
     <div style="text-align:center;margin-bottom:24px;">
       <span style="font-size:28px;">🌸</span>
-      <h1 style="font-size:20px;color:#0E1B30;margin:8px 0 4px;">Your Week in Bloom</h1>
+      <h1 style="font-size:20px;color:#0E1B30;margin:8px 0 4px;">Your Week in Review</h1>
       <p style="color:#666;font-size:13px;margin:0;">Hey ${name}, here's how your week went</p>
     </div>
 
@@ -222,7 +222,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!hadActivity && streak === 0) continue;
 
     const html = buildEmailHTML({
-      name: user.full_name?.split(" ")[0] || "Bloom friend",
+      name: user.full_name?.split(" ")[0] || "friend",
       streak,
       lessonsCompleted,
       tradesClosed,
@@ -241,9 +241,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          from: "Bloom <hello@shebloomswealth.app>",
+          from: "She Blooms Wealth <hello@shebloomswealth.app>",
           to: email,
-          subject: `Your Week in Bloom — ${streak > 0 ? `${streak}-day streak!` : "Here's your recap"}`,
+          subject: `Your Week in Review — ${streak > 0 ? `${streak}-day streak!` : "Here's your recap"}`,
           html,
         }),
       });

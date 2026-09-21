@@ -6,8 +6,8 @@ export default function Privacy() {
   return (
     <Layout>
       <SEO
-        title="Privacy Policy - Bloom"
-        description="Privacy Policy for Bloom by Cinder Vault Enterprises LLC"
+        title="Privacy Policy - She Blooms Wealth"
+        description="Privacy Policy for She Blooms Wealth by Cinder Vault Enterprises LLC"
       />
       <div className="mx-auto max-w-4xl space-y-8 px-4 py-8">
         <div>
@@ -20,21 +20,21 @@ export default function Privacy() {
           <div className="prose prose-sm max-w-none">
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Introduction</h2>
             <p className="mb-6 text-foreground">
-              Bloom ("we", "our", "us") is operated by Cinder Vault Enterprises LLC. We are committed to protecting your personal information and your right to privacy.
+              She Blooms Wealth ("we", "our", "us") is operated by Cinder Vault Enterprises LLC. We are committed to protecting your personal information and your right to privacy.
             </p>
 
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Information We Collect</h2>
             <ul className="mb-6 space-y-2 text-foreground">
               <li>Full name and email address at registration</li>
               <li>Risk tolerance and investment preferences</li>
-              <li>App usage data and browsing behavior within Bloom</li>
+              <li>App usage data and browsing behavior within She Blooms Wealth</li>
               <li>Device information and IP address</li>
               <li>Watchlist and portfolio tracking data</li>
             </ul>
 
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">How We Use Your Information</h2>
             <ul className="mb-6 space-y-2 text-foreground">
-              <li>To provide and personalize the Bloom experience</li>
+              <li>To provide and personalize the experience</li>
               <li>To send account confirmation and security emails from pansy@shebloomswealth.app</li>
               <li>To improve our AI analysis and recommendations</li>
               <li>To send educational content and market updates only if you opt in</li>
@@ -49,7 +49,7 @@ export default function Privacy() {
 
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Broker Affiliate Disclosure</h2>
             <p className="mb-6 text-foreground">
-              Some broker links on Bloom are affiliate partnerships. If you sign up with a recommended broker through our link, Bloom may earn a referral commission at no additional cost to you. We only recommend brokers we genuinely believe are good for our users.
+              Some broker links on She Blooms Wealth are affiliate partnerships. If you sign up with a recommended broker through our link, She Blooms Wealth may earn a referral commission at no additional cost to you. We only recommend brokers we genuinely believe are good for our users.
             </p>
 
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Cookies</h2>
@@ -72,7 +72,7 @@ export default function Privacy() {
 
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Children</h2>
             <p className="mb-6 text-foreground">
-              Bloom is not intended for users under 18 years old.
+              She Blooms Wealth is not intended for users under 18 years old.
             </p>
 
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Changes to This Policy</h2>
@@ -91,7 +91,7 @@ export default function Privacy() {
 
         <Card className="border-accent bg-accent/5 p-4">
           <p className="text-sm text-muted-foreground">
-            This is educational content only and does not constitute financial advice. Bloom is not liable for any investment decisions or losses.
+            This is educational content only and does not constitute financial advice. She Blooms Wealth is not liable for any investment decisions or losses.
           </p>
         </Card>
       </div>

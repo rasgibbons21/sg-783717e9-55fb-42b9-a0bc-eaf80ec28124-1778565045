@@ -138,7 +138,7 @@ export default function Brokers() {
   return (
     <Layout>
       <SEO
-        title="Best Brokers for Beginners — Compare Brokerages | Bloom"
+        title="Best Brokers for Beginners — Compare Brokerages | She Blooms Wealth"
         description="Compare the best online brokers and trading platforms for beginner investors. Take the Find My Broker quiz to match with the right brokerage. See pros, cons, fees, and features side by side. Designed for women starting their investing journey."
       />
       <div className="container-full py-8 space-y-6 pb-24">
@@ -149,7 +149,7 @@ export default function Brokers() {
           </h1>
           <p className="text-muted-foreground max-w-2xl">
             Compare brokers and platforms to find the right fit for your goals.
-            Every provider listed here has a confirmed partnership with Bloom.
+            Every provider listed here has a confirmed partnership with She Blooms Wealth.
           </p>
         </div>
 
@@ -359,7 +359,7 @@ export default function Brokers() {
         {/* Bottom disclaimer */}
         <Card className="p-4 bg-muted/50 border-border rounded-2xl">
           <p className="text-xs text-center text-muted-foreground leading-relaxed">
-            Check availability and terms on each provider&apos;s website. Bloom
+            Check availability and terms on each provider&apos;s website. She Blooms Wealth
             does not guarantee eligibility, rewards, or account approval. This
             page is for informational purposes only and is not financial advice.
           </p>

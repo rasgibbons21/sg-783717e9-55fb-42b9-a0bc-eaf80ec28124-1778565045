@@ -267,9 +267,9 @@ function PatternDetail({ pattern }: { pattern: PatternData }) {
             <BulletList items={pattern.commonMistakes} icon="warn" color="#F59E0B" />
           </Section>
 
-          {/* Bloom Strategies */}
+          {/* Strategies */}
           {pattern.bloomStrategies.length > 0 && (
-            <Section title="Used by Bloom Strategies" icon={Lightbulb} color="#A855F7">
+            <Section title="Used by Our Strategies" icon={Lightbulb} color="#A855F7">
               <div className="space-y-1.5">
                 {pattern.bloomStrategies.map((s) => (
                   <div

@@ -125,7 +125,7 @@ export function LateBloomersSignup() {
                   <div className="text-center space-y-2">
                     <span className="text-4xl">📬</span>
                     <h3 className="text-xl font-bold text-foreground">
-                      Join the Late Bloomers
+                      Join the Weekly Watchlist
                     </h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">
                       Every Friday, Pansy shares the 3 stocks she&apos;s researching — real
@@ -168,7 +168,7 @@ export function LateBloomersSignup() {
                       }}
                     >
                       <Mail className="w-4 h-4" />
-                      {loading ? "Joining..." : "Join Late Bloomers (Free)"}
+                      {loading ? "Joining..." : "Join Weekly Watchlist (Free)"}
                     </motion.button>
 
                     <motion.button

@@ -707,7 +707,7 @@ function Sidebar({ view, setView, open, onClose }: {
             <TrendingUp className="w-5 h-5" style={{ color: C.accent }} />
           </div>
           <div>
-            <p className="text-sm font-bold" style={{ color: C.text }}>Bloom Trader</p>
+            <p className="text-sm font-bold" style={{ color: C.text }}>Trader</p>
             <p className="text-[10px]" style={{ color: C.textMuted }}>Practice Mode</p>
           </div>
           <button className="ml-auto lg:hidden" onClick={onClose}>
@@ -754,7 +754,7 @@ function Sidebar({ view, setView, open, onClose }: {
               <p className="text-xs font-semibold" style={{ color: C.accent }}>Learn more</p>
             </div>
             <p className="text-[10px] leading-relaxed mb-3" style={{ color: C.textDim }}>
-              Build your skills with Bloom University — free courses on stocks, ETFs, and market fundamentals.
+              Build your skills with She Blooms University — free courses on stocks, ETFs, and market fundamentals.
             </p>
             <Link href="/learn" onClick={onClose}
               className="block text-center text-[10px] font-semibold py-1.5 rounded-lg transition-all hover:brightness-110"
@@ -991,7 +991,7 @@ export default function PracticePage(_props: PageProps) {
   // ════════════════════════════════════════════════════════════════════════
   return (
     <>
-      <Head><title>Bloom Practice Trader</title></Head>
+      <Head><title>Practice Trader</title></Head>
       <Layout>
         <div className="min-h-screen" style={{ background: C.bg }}>
 
@@ -1423,7 +1423,7 @@ export default function PracticePage(_props: PageProps) {
               {!authLoading && !loading && isLoggedIn && !error && (
                 <div className="mt-10 text-center">
                   <p className="text-[10px] leading-relaxed max-w-md mx-auto" style={{ color: C.textMuted }}>
-                    Bloom Practice Trader is an educational simulator. It does not execute real trades, connect to any broker, or involve real money. Past simulated performance does not predict real market results. Not financial advice.
+                    Practice Trader is an educational simulator. It does not execute real trades, connect to any broker, or involve real money. Past simulated performance does not predict real market results. Not financial advice.
                   </p>
                 </div>
               )}
@@ -1448,7 +1448,7 @@ export default function PracticePage(_props: PageProps) {
             share({
               type: 'trade',
               title: `+$${Math.abs(reviewState.pnl).toFixed(2)} on ${reviewState.ticker}`,
-              subtitle: reviewState.review ? `Grade: ${reviewState.review.overall_grade}` : 'Profitable trade on Bloom Practice Trader',
+              subtitle: reviewState.review ? `Grade: ${reviewState.review.overall_grade}` : 'Profitable trade on Practice Trader',
               emoji: reviewState.pnl >= 100 ? '🚀' : reviewState.pnl >= 50 ? '🔥' : '💚',
               stats: [
                 { label: 'P&L', value: `+$${Math.abs(reviewState.pnl).toFixed(2)}` },

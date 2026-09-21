@@ -57,7 +57,7 @@ export async function generateWeeklyPicks(): Promise<WeeklyStockPick[]> {
     messages: [
       {
         role: "user",
-        content: `It's ${new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}. Find 3 notable stocks for this week's Late Bloomers newsletter. Return only the JSON array of tickers.`,
+        content: `It's ${new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}. Find 3 notable stocks for this week's Weekly Watchlist newsletter. Return only the JSON array of tickers.`,
       },
     ],
   });
@@ -89,7 +89,7 @@ export async function generateWeeklyPicks(): Promise<WeeklyStockPick[]> {
         messages: [
           {
             role: "user",
-            content: `Analyze ${ticker} for this week's Late Bloomers newsletter.\n\nMARKET DATA:\n${dataBlock}`,
+            content: `Analyze ${ticker} for this week's Weekly Watchlist newsletter.\n\nMARKET DATA:\n${dataBlock}`,
           },
         ],
       });

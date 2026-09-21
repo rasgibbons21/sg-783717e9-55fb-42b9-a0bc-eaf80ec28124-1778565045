@@ -297,13 +297,13 @@ export default function Profile() {
       ? `https://shebloomswealth.app/onboarding?ref=${referralCode}`
       : "https://shebloomswealth.app";
     const shareText = referralCode
-      ? "Join me on Bloom Radar and we both get 7 extra days of Core! Stock screener & alerts made simple."
-      : "Check out Bloom Radar — stock screener & alerts.";
+      ? "Join me on She Blooms Wealth and we both get 7 extra days of Core! Stock screener & alerts made simple."
+      : "Check out She Blooms Wealth — stock screener & alerts.";
 
     if (navigator.share) {
       try {
         await navigator.share({
-          title: "Bloom Radar",
+          title: "She Blooms Wealth",
           text: shareText,
           url: shareUrl,
         });
@@ -342,7 +342,7 @@ export default function Profile() {
 
   return (
     <Layout>
-      <SEO title="Profile — Bloom" />
+      <SEO title="Profile — She Blooms Wealth" />
       <div className="container-full py-8 space-y-6 pb-24">
         {/* Header */}
         <div className="space-y-2">
@@ -402,7 +402,7 @@ export default function Profile() {
                 id="challenge-name"
                 value={challengeName}
                 onChange={(e) => setChallengeName(e.target.value)}
-                placeholder="e.g. BloomingBoss"
+                placeholder="e.g. WealthBoss"
                 maxLength={20}
                 className="flex-1"
               />
@@ -749,7 +749,7 @@ export default function Profile() {
               className="w-full bg-gradient-to-r from-accent to-primary hover:from-accent/90 hover:to-primary/90"
             >
               <Share className="w-4 h-4 mr-2" />
-              Share Bloom
+              Share
             </Button>
           </CardContent>
         </Card>
@@ -866,7 +866,7 @@ export default function Profile() {
         {/* Disclaimer */}
         <Card className="p-4 bg-muted/50 border-muted-foreground/20 rounded-2xl">
           <p className="text-xs text-muted-foreground text-center leading-relaxed">
-            This is educational content only and does not constitute financial advice. Bloom is not liable for any investment decisions or losses.<br/>
+            This is educational content only and does not constitute financial advice. She Blooms Wealth is not liable for any investment decisions or losses.<br/>
             Contact us at cindervaultenterprisesllc@gmail.com
           </p>
         </Card>

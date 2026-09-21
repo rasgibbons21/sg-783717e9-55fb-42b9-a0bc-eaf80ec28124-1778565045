@@ -7,8 +7,8 @@ export default function Contact() {
   return (
     <Layout>
       <SEO
-        title="Contact Us - Bloom"
-        description="Contact Cinder Vault Enterprises LLC for Bloom support and inquiries"
+        title="Contact Us - She Blooms Wealth"
+        description="Contact Cinder Vault Enterprises LLC for She Blooms Wealth support and inquiries"
       />
       <div className="mx-auto max-w-4xl space-y-8 px-4 py-8">
         <div className="text-center">
@@ -76,7 +76,7 @@ export default function Contact() {
                 Pansy's Support Team
               </h3>
               <p className="text-foreground leading-relaxed">
-                Have questions about Bloom, your account, or need technical help? Our team is ready to assist you. 
+                Have questions about She Blooms Wealth, your account, or need technical help? Our team is ready to assist you. 
                 Just send us an email and we'll get back to you as soon as possible 💛
               </p>
             </div>

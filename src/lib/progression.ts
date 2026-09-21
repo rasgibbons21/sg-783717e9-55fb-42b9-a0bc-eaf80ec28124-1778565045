@@ -13,15 +13,15 @@ const supabaseAdmin = createClient(
 // ── Level ladder ─────────────────────────────────────────────────────────────
 
 export const LEVELS = [
-  { level: 1, name: "Bloom Beginner",      badge: "🌱", xpRequired: 0    },
+  { level: 1, name: "Beginner",             badge: "🌱", xpRequired: 0    },
   { level: 2, name: "Chart Reader",         badge: "📊", xpRequired: 100  },
   { level: 3, name: "Candlestick Explorer", badge: "🕯️", xpRequired: 300  },
   { level: 4, name: "Pattern Spotter",      badge: "🔺", xpRequired: 600  },
   { level: 5, name: "Indicator Student",    badge: "📈", xpRequired: 1000 },
   { level: 6, name: "Trade Planner",        badge: "📋", xpRequired: 1500 },
   { level: 7, name: "Disciplined Trader",   badge: "⚖️", xpRequired: 2200 },
-  { level: 8, name: "Bloom Trader",         badge: "🌸", xpRequired: 3000 },
-  { level: 9, name: "Bloom Mentor",         badge: "🎓", xpRequired: 4200 },
+  { level: 8, name: "Trader",               badge: "🌸", xpRequired: 3000 },
+  { level: 9, name: "Mentor",               badge: "🎓", xpRequired: 4200 },
 ] as const;
 
 export type LevelEntry = typeof LEVELS[number];

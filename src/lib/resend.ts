@@ -2,7 +2,7 @@ import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-const FROM = "Bloom <hello@shebloomswealth.app>";
+const FROM = "She Blooms Wealth <hello@shebloomswealth.app>";
 
 export async function sendWelcomeEmail(to: string, name: string) {
   const firstName = name.trim().split(" ")[0] || "there";
@@ -13,7 +13,7 @@ export async function sendWelcomeEmail(to: string, name: string) {
     html: `
       <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:520px;margin:0 auto;padding:32px 20px;color:#C8C2B8;background:#07080C;border-radius:12px">
         <h1 style="color:#27B7C8;font-size:24px;margin:0 0 16px">Hey ${firstName}!</h1>
-        <p style="line-height:1.6;margin:0 0 16px">Welcome to <strong style="color:#27B7C8">Bloom Radar</strong> — your stock screener is live.</p>
+        <p style="line-height:1.6;margin:0 0 16px">Welcome to <strong style="color:#27B7C8">She Blooms Wealth</strong> — your stock screener is live.</p>
         <p style="line-height:1.6;margin:0 0 16px">Your <strong style="color:#27B7C8">7-day Radar Core trial</strong> is active. Full access to:</p>
         <ul style="line-height:1.8;margin:0 0 16px;padding-left:20px">
           <li>Stock screener — scored and ranked using trading strategies</li>
@@ -101,7 +101,7 @@ export async function sendLateBloomersEmail(
   return resend.emails.send({
     from: FROM,
     to,
-    subject: "Late Bloomers: 3 stocks I'm looking at this week",
+    subject: "Weekly Watchlist: 3 stocks I'm looking at this week",
     html: `
       <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:520px;margin:0 auto;padding:32px 20px;color:#e2e8f0;background:#07080C;border-radius:12px">
         <div style="text-align:center;margin-bottom:24px">
@@ -118,7 +118,7 @@ export async function sendLateBloomersEmail(
 
         <div style="text-align:center;margin-top:28px;padding-top:20px;border-top:1px solid rgba(148,163,184,0.15)">
           <p style="color:#94a3b8;font-size:12px;margin:0 0 8px">Educational content from Pansy at She Blooms Wealth</p>
-          <a href="https://shebloomswealth.app" style="color:#27B7C8;font-size:12px">Open Bloom</a>
+          <a href="https://shebloomswealth.app" style="color:#27B7C8;font-size:12px">Open App</a>
           <span style="color:#475569;margin:0 8px">·</span>
           <a href="https://shebloomswealth.app/unsubscribe" style="color:#64748b;font-size:12px">Unsubscribe</a>
         </div>

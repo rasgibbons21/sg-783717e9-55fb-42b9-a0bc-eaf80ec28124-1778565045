@@ -31,7 +31,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     .eq("id", user.id)
     .single();
 
-  const userName = profile?.full_name || "Bloom Member";
+  const userName = profile?.full_name || "Member";
   const type = req.query.type as string;
 
   const hasActiveSubscription = profile?.subscription_status === "active" || profile?.subscription_status === "lifetime";

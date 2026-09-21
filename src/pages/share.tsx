@@ -9,7 +9,7 @@ export default function SharePage() {
   return (
     <>
       <SEO
-        title="Bloom - Invest in Yourself First 🌸"
+        title="She Blooms Wealth - Invest in Yourself First 🌸"
         description="Investment analysis designed for women. Learn from Pansy, get personalized analyses, and build wealth with confidence."
         image="/bloom-share.png"
       />
@@ -22,11 +22,11 @@ export default function SharePage() {
           
           {/* Main Content */}
           <div className="relative z-10 mx-auto max-w-4xl text-center">
-            {/* Bloom Logo Image */}
+            {/* Logo Image */}
             <div className="mb-8 flex justify-center">
               <img
                 src="/bloom-share.png"
-                alt="Bloom - She Blooms Wealth"
+                alt="She Blooms Wealth"
                 className="h-auto w-full max-w-md drop-shadow-2xl"
               />
             </div>
@@ -67,7 +67,7 @@ export default function SharePage() {
         <div className="border-t border-zinc-800 bg-zinc-950/50 px-4 py-20">
           <div className="mx-auto max-w-6xl">
             <h2 className="mb-12 text-center font-serif text-3xl font-bold text-white sm:text-4xl">
-              What Makes Bloom Different
+              What Makes Us Different
             </h2>
             
             <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
@@ -125,7 +125,7 @@ export default function SharePage() {
               © 2026 Cinder Vault Enterprises LLC. All rights reserved.
             </p>
             <p className="mt-2 text-xs text-zinc-600">
-              Bloom is for educational purposes only and does not constitute financial advice.
+              She Blooms Wealth is for educational purposes only and does not constitute financial advice.
             </p>
             <div className="mt-4 flex flex-wrap justify-center gap-4 text-xs">
               <Link href="/privacy" className="text-zinc-500 hover:text-accent">

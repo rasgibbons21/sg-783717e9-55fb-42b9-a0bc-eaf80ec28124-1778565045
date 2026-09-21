@@ -188,7 +188,7 @@ export default function StrategyLessonPage({ slug, requiresClientAuth }: Props) 
   return (
     <Layout>
       <SEO
-        title={`${strategy.name} — Bloom Strategy Lab`}
+        title={`${strategy.name} — Strategy Lab`}
         description={`Learn the ${strategy.name} strategy with interactive charts and exercises. Educational only.`}
       />
 

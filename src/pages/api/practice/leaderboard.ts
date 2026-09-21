@@ -58,7 +58,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const rows: PracticeLeaderboardRow[] = [...stats.entries()]
       .map(([user_id, s]) => ({
         user_id,
-        display_name: names.get(user_id) ?? "Bloom Trader",
+        display_name: names.get(user_id) ?? "Trader",
         total_pnl: Math.round(s.pnl * 100) / 100,
         total_trades: s.total,
         win_rate: s.total > 0 ? Math.round((s.wins / s.total) * 100) : 0,

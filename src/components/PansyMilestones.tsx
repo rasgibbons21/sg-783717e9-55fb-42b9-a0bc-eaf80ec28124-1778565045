@@ -52,7 +52,7 @@ const MILESTONES: Milestone[] = [
   {
     id: "stage-bloom",
     check: (s) => s.completedCount >= 22 && s.previousCompleted < 22,
-    message: "Full Bloom! You've come so far — your confidence isn't luck, it's earned.",
+    message: "Amazing! You've come so far — your confidence isn't luck, it's earned.",
     emoji: "🌸",
     celebration: "confetti",
   },

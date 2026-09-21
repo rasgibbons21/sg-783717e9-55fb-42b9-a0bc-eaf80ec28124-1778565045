@@ -169,7 +169,7 @@ export default function ChallengePage({ requiresClientAuth }: Props) {
 
   return (
     <Layout>
-      <SEO title="Strategy Challenge — Bloom Strategy Lab" description="Test your strategy knowledge with the final 10-chart challenge." />
+      <SEO title="Strategy Challenge — Strategy Lab" description="Test your strategy knowledge with the final 10-chart challenge." />
 
       <div className="bg-[#07080C] min-h-screen">
         <div className="max-w-3xl mx-auto px-4 py-6">

@@ -2,7 +2,7 @@
   "packageId": "app.shebloomswealth.mobile",
   "host": "shebloomswealth.app",
   "name": "She Blooms Wealth",
-  "launcherName": "Bloom",
+  "launcherName": "SBW",
   "display": "standalone",
   "themeColor": "#27B7C8",
   "themeColorDark": "#0E1B30",
@@ -17,7 +17,7 @@
   "maskableIconUrl": "https://shebloomswealth.app/icon-512.png",
   "shortcuts": [
     {
-      "name": "Bloom Basics",
+      "name": "Investing Basics",
       "shortName": "Learn",
       "url": "/learn",
       "chosenIconUrl": "https://shebloomswealth.app/icon-192.png"

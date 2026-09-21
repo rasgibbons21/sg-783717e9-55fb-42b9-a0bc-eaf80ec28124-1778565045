@@ -305,7 +305,7 @@ export default function PaperTraderV2() {
   return (
     <>
       <Head>
-        <title>Paper Trading Simulator — Practice Stock Trading Free | Bloom</title>
+        <title>Paper Trading Simulator — Practice Stock Trading Free | She Blooms Wealth</title>
         <meta name="description" content="Practice buying and selling real stocks with $10,000 in virtual money. Real-time prices, interactive candlestick charts, trade journal, and P&amp;L tracking. Zero risk stock trading simulator for women learning to invest." />
       </Head>
       <Layout>
@@ -973,7 +973,7 @@ export default function PaperTraderV2() {
                   <span className="text-sm font-bold" style={{ color: C.textPrimary }}>Unlock Pro</span>
                 </div>
                 <p className="text-xs mb-3" style={{ color: C.textSecondary }}>
-                  Remove ads, access advanced strategies, and get the full Bloom experience.
+                  Remove ads, access advanced strategies, and get the full experience.
                 </p>
                 <Link href="/subscription"
                   className="inline-block px-5 py-2 rounded-xl text-xs font-semibold"
@@ -987,7 +987,7 @@ export default function PaperTraderV2() {
           {/* Disclaimer */}
           <div className="px-4 pb-4">
             <p className="text-[10px] text-center leading-relaxed" style={{ color: C.textMuted }}>
-              Bloom Paper Trader is an educational simulator using live market data. No real money. Not financial advice.
+              Paper Trader is an educational simulator using live market data. No real money. Not financial advice.
             </p>
           </div>
 

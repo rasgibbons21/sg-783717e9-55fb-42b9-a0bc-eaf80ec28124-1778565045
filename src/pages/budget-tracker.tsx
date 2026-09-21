@@ -321,7 +321,7 @@ export default function BudgetTracker() {
 
   return (
     <Layout>
-      <SEO title="Free Budget Tracker for Women — Track Spending | Bloom" description="Track your income and expenses by category with Pansy's smart insights. See monthly spending breakdowns, set budget goals, and find hidden savings. Free budgeting tool designed for women." />
+      <SEO title="Free Budget Tracker for Women — Track Spending | She Blooms Wealth" description="Track your income and expenses by category with Pansy's smart insights. See monthly spending breakdowns, set budget goals, and find hidden savings. Free budgeting tool designed for women." />
 
       <div className="max-w-lg mx-auto px-4 py-6 space-y-5">
 

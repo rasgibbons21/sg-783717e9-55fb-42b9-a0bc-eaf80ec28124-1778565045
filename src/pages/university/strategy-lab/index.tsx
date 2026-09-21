@@ -100,7 +100,7 @@ export default function StrategyLabIndex({ requiresClientAuth }: Props) {
   return (
     <Layout>
       <SEO
-        title="Strategy Lab — 32 Trading & Investing Strategies | Bloom"
+        title="Strategy Lab — 32 Trading & Investing Strategies | She Blooms Wealth"
         description="Learn 32 trading strategies: day trading, swing trading, long-term investing, and indicator workshops. Scalping, momentum, breakout, DCA, dividend growth, value investing, and more. Interactive charts and practice exercises for each strategy."
       />
 

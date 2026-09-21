@@ -164,7 +164,7 @@ export default function DeleteAccount() {
 
             <Card className="border-accent bg-accent/5 p-4">
               <p className="text-sm text-muted-foreground">
-                This is educational content only and does not constitute financial advice. Bloom is not liable for any investment decisions or losses.
+                This is educational content only and does not constitute financial advice. She Blooms Wealth is not liable for any investment decisions or losses.
               </p>
             </Card>
           </>

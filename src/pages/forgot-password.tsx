@@ -42,7 +42,7 @@ export default function ForgotPassword() {
   if (isSubmitted) {
     return (
       <Layout>
-        <SEO title="Check Your Email — Bloom" />
+        <SEO title="Check Your Email — She Blooms Wealth" />
         <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-background via-primary/5 to-accent/5">
           <Card className="w-full max-w-md border-border shadow-lg">
             <CardHeader className="text-center space-y-4">
@@ -77,7 +77,7 @@ export default function ForgotPassword() {
 
   return (
     <Layout>
-      <SEO title="Forgot Password — Bloom" />
+      <SEO title="Forgot Password — She Blooms Wealth" />
       <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-background via-primary/5 to-accent/5">
         <Card className="w-full max-w-md border-border shadow-lg">
           <CardHeader className="text-center space-y-2">

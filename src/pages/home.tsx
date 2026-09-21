@@ -197,7 +197,7 @@ export default function HomePage() {
 
   return (
     <Layout>
-      <SEO title="Bloom Radar | Home" description="Your radar dashboard — setups, market status, and alerts at a glance." />
+      <SEO title="She Blooms Wealth | Home" description="Your radar dashboard — setups, market status, and alerts at a glance." />
       <div className="max-w-lg mx-auto px-4 pt-4 pb-32">
 
         {/* Greeting */}

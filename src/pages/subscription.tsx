@@ -375,7 +375,7 @@ export default function Subscription() {
 
           <Card className="p-3 bg-muted border-muted-foreground/20">
             <p className="text-xs text-center text-muted-foreground leading-relaxed">
-              Educational content only. Not financial advice. Bloom Radar is not liable for any investment decisions or losses.
+              Educational content only. Not financial advice. She Blooms Wealth is not liable for any investment decisions or losses.
             </p>
           </Card>
 

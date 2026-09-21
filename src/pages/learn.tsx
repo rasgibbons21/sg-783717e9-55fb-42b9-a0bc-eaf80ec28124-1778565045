@@ -1198,7 +1198,7 @@ Real estate isn't passive income at first — there's work involved finding the 
 
 **Real talk:** This isn't get-rich-quick. It's build-wealth-slowly. One rental property cash flowing $300/month won't change your life. But 3 properties doing that is $10,800 a year. Over 10 years that compounds. Plus the property value usually goes up and your tenants are paying down your mortgage for you.
 
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
+She Blooms Wealth is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
       keyTakeaway: "Cash flow = rent minus all expenses. Positive cash flow = property pays you monthly. Negative = you feed it money. Aim for positive.",
       relatedTopics: ["income-ways-into-real-estate", "income-dscr-loans"],
       quiz: [
@@ -1260,7 +1260,7 @@ REITs typically yield 3-7% and you can buy them with as little as $100. The down
 
 You can mix these too. Start with house hacking or REITs while you save for a traditional rental. Real estate is one of the few wealth-building tools where you can literally use other people's money (the bank's + your tenants' rent) to build your net worth 💪
 
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
+She Blooms Wealth is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
       keyTakeaway: "Three paths: House hacking (live in one unit, rent others — lowest barrier). Traditional rental (20-25% down, investor path). REITs (stock-like shares, no landlord work).",
       relatedTopics: ["income-real-estate-cash-flow", "income-dscr-loans", "income-reits"],
       quiz: [
@@ -1329,7 +1329,7 @@ They literally don't care if you're employed or what you claim on taxes. They ca
 
 Who uses DSCR loans? Self-employed people, real estate investors with multiple properties, people who write off a ton of business expenses, anyone whose "official" income doesn't reflect their actual cash situation 🏡
 
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
+She Blooms Wealth is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
       keyTakeaway: "DSCR loans qualify you on the property's rent not your income. No tax returns needed. Ratio 1.0+ required, 1.25+ for best rates. Down payment 20-25%. Higher interest but flexible.",
       relatedTopics: ["income-real-estate-cash-flow", "income-conventional-loans", "income-ways-into-real-estate"],
       quiz: [
@@ -1412,7 +1412,7 @@ Here's how savvy women combine these loans with house hacking:
 
 The beauty of owner-occupied loans is you get the best rates and lowest down payment options. Then after you live there for a year you can turn it into a rental. That's how you build a real estate portfolio without needing huge cash upfront sis 💪
 
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
+She Blooms Wealth is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
       keyTakeaway: "Conventional owner-occupied: 10-15% down, 620+ credit, must live 1 year. FHA: 3.5% down, 580+ credit. House hack strategy = live in one unit, rent others, then move out after 1 year.",
       relatedTopics: ["income-dscr-loans", "income-ways-into-real-estate", "income-real-estate-cash-flow"],
       quiz: [
@@ -1492,7 +1492,7 @@ It's not zero effort. It's just WAY less effort than trading your time 1:1 for m
 
 It breaks the 1:1 time-for-money trap. You're creating assets that generate income whether you're working that day or not. That's how you build wealth — you can't trade time forever but assets can earn forever 💪
 
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
+She Blooms Wealth is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
       keyTakeaway: "Passive ≠ effortless. Passive = money with minimal ongoing effort AFTER you build the system. You put in work/money upfront then it runs with 0-10 hours/month maintenance.",
       relatedTopics: ["income-dividends-101", "income-hysa-safe-yield", "income-real-estate-cash-flow"],
       quiz: [
@@ -1588,7 +1588,7 @@ But if you invest $500/month for 20 years at 8% total return (4% dividend + 4% g
 
 Dividends are patient wealth-building. You're not getting rich overnight. But you're getting paid every quarter just for owning shares. That's real passive income girl 💛
 
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
+She Blooms Wealth is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
       keyTakeaway: "Dividends = quarterly cash from stocks. 4% yield on $300k = $1k/month income. DRIP = reinvest dividends to buy more shares automatically. Use DRIP when building, turn off when you need income.",
       relatedTopics: ["income-passive-really", "income-reits-tax-advantaged", "income-hysa-safe-yield"],
       quiz: [
@@ -1680,7 +1680,7 @@ That's $449 extra just for moving your money to a better bank. Same safety same 
 
 **Pro move:** Keep 1-2 months expenses in regular checking for bills. Move the rest to high-yield savings. Set up auto-transfers so your emergency fund earns 4-5% instead of nothing 💪
 
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
+She Blooms Wealth is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
       keyTakeaway: "Don't let cash die at 0.01%. High-yield savings = 4-5%, FDIC insured. T-bills = 4-5%, state tax exempt. I-bonds = inflation-protected. All safe options for parking cash.",
       relatedTopics: ["income-dividends-101", "income-reits-tax-advantaged", "income-passive-really"],
       quiz: [
@@ -1790,7 +1790,7 @@ That's $840,000 kept vs given to IRS. Same contributions different account massi
 
 Tax-advantaged accounts + dividend/REIT income = wealth-building machine sis 💛
 
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
+She Blooms Wealth is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
       keyTakeaway: "REITs = real estate income without owning property, yield 3-7%, taxed as ordinary income (hold in IRA). Tax-advantaged: Roth IRA = tax-free growth, Traditional IRA/401k = tax-deferred. Max accounts for wealth building.",
       relatedTopics: ["income-dividends-101", "income-hysa-safe-yield", "income-ways-into-real-estate"],
       quiz: [
@@ -1871,7 +1871,7 @@ I've seen women lose rental properties because they didn't have an LLC. Lose eve
 
 Don't let that be you sis. Build income AND protect it. Both matter equally 💛
 
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
+She Blooms Wealth is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
       keyTakeaway: "Protection = emergency fund + insurance (life, disability, health) + legal structure (LLC) + asset protection. Protect downside first then focus on upside. Both matter equally.",
       relatedTopics: ["income-insurance-explained", "income-llc-basics", "income-passive-really"],
       quiz: [
@@ -1969,7 +1969,7 @@ Buy term life if people depend on your income. Buy disability insurance if your 
 
 Don't let insurance salespeople scare you into expensive policies you don't need. Stick to the basics and invest the rest sis 💛
 
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
+She Blooms Wealth is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
       keyTakeaway: "Protection trifecta: Term life (if dependents rely on your income), Disability (1 in 4 need it), Health (medical bankruptcy is real). Skip expensive whole life and redundant policies. Basics only.",
       relatedTopics: ["income-protecting-money", "income-llc-basics", "income-passive-really"],
       quiz: [
@@ -2074,7 +2074,7 @@ Form an LLC when your side income is consistent ($10k+/year) and you want profes
 
 LLC = legal protection + professional credibility. It's not magic but it matters when your income grows sis 💪
 
-Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
+She Blooms Wealth is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
       keyTakeaway: "LLC = liability protection. File Articles of Organization with state ($50-500). Get EIN from IRS (free). Open business bank. File annual reports ($50-300/year). Form when income is $10k+/year consistent.",
       relatedTopics: ["income-protecting-money", "income-passive-really", "income-insurance-explained"],
       quiz: [
@@ -2215,7 +2215,7 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
           share({
             type: 'achievement',
             title: lessonTitle,
-            subtitle: `Completed ${updated.length} of ${lessons.length} lessons on Bloom`,
+            subtitle: `Completed ${updated.length} of ${lessons.length} lessons on She Blooms Wealth`,
             emoji: updated.length === lessons.length ? '🎓' : '📚',
             stats: [
               { label: 'Completed', value: `${updated.length}/${lessons.length}` },
@@ -2446,7 +2446,7 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
     return (
       <Layout>
         <SEO
-          title={`${lesson.title} - Bloom University`}
+          title={`${lesson.title} - She Blooms University`}
           description={lesson.summary}
         />
         <div
@@ -2518,7 +2518,7 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
                 <div>
                   <p className="font-semibold text-foreground">Pansy</p>
                   <p className="text-sm text-muted-foreground">
-                    Bloom's Investing Expert
+                    Your AI Trading Analyst
                   </p>
                 </div>
               </div>
@@ -2750,17 +2750,17 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
   return (
     <Layout>
       <SEO
-        title="Learn Investing — 150+ Free Lessons for Women | Bloom"
+        title="Learn Investing — 150+ Free Lessons for Women | She Blooms Wealth"
         description="Free investing lessons covering stocks, ETFs, mutual funds, dividends, retirement, trading psychology, side hustles, and passive income. Each lesson includes a quiz. Earn XP and a certificate of completion. No jargon — Pansy explains it all in plain language."
       />
       <div className="min-h-screen bg-background pb-20">
         <div className="max-w-4xl mx-auto p-6 space-y-6">
           <div className="text-center space-y-2">
             <h1 className="text-3xl font-bold text-foreground">
-              Bloom Basics 🌱
+              Investing Basics 🌱
             </h1>
             <p className="text-muted-foreground">
-              Your foundation — investing explained by Pansy in girlfriend language
+              Your foundation — investing explained by Pansy in clear, approachable language
             </p>
           </div>
 
@@ -2786,7 +2786,7 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
                 className="mt-3 p-3 rounded-xl bg-[#49B06E]/15 border border-[#49B06E]/30 text-center"
               >
                 <p className="text-sm font-bold text-[#49B06E]">You completed every lesson! 🎉🌸</p>
-                <p className="text-xs text-[#49B06E]/70 mt-0.5">You&apos;re officially Bloom Basics certified</p>
+                <p className="text-xs text-[#49B06E]/70 mt-0.5">You&apos;re officially Investing Basics certified</p>
               </motion.div>
             )}
             {completionPercentage >= 75 && completionPercentage < 100 && (
@@ -2869,7 +2869,7 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
 
           <div className="grid grid-cols-2 gap-3">
             {[
-              { href: "/university", icon: <BookOpen className="w-5 h-5 text-accent shrink-0" />, title: "Bloom University", sub: "Advanced modules" },
+              { href: "/university", icon: <BookOpen className="w-5 h-5 text-accent shrink-0" />, title: "She Blooms University", sub: "Advanced modules" },
               { href: "/brokers", icon: <Building2 className="w-5 h-5 text-accent shrink-0" />, title: "Find a Broker", sub: "Compare platforms" },
             ].map((item, i) => (
               <Link key={item.href} href={item.href}>
@@ -3066,7 +3066,7 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
           <Card className="p-4 bg-muted/30 border-border rounded-xl">
             <p className="text-xs text-center text-muted-foreground leading-relaxed">
               This is educational content only and does not constitute financial
-              advice. Bloom is not liable for any investment decisions or
+              advice. She Blooms Wealth is not liable for any investment decisions or
               losses.
             </p>
           </Card>

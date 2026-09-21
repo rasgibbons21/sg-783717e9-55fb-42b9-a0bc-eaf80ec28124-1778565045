@@ -514,7 +514,7 @@ export default function JournalPage(_props: PageProps) {
   return (
     <>
       <Head>
-        <title>Trade Journal — Bloom Radar</title>
+        <title>Trade Journal — She Blooms Wealth</title>
       </Head>
       <Layout>
         <div className="min-h-screen bg-[#07080C] px-4 py-4 max-w-lg mx-auto pb-32">
@@ -642,7 +642,7 @@ export default function JournalPage(_props: PageProps) {
 
               <div className="mt-8 text-center">
                 <p className="text-[10px] text-[#F3EDE3]/25 leading-relaxed max-w-sm mx-auto">
-                  Bloom Trade Journal is an educational tool. Simulated trades only. Not financial advice.
+                  Trade Journal is an educational tool. Simulated trades only. Not financial advice.
                 </p>
               </div>
             </>

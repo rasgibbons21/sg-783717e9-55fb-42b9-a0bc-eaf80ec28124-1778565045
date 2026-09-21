@@ -85,7 +85,7 @@ export default function DailyBloom({ briefing, briefingDate, featuredLesson }: P
         <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet" />
       </Head>
 
-      <SEO title="Daily Bloom — Daily Market Briefing & Investing Lesson" description="Get your daily market summary, investing lesson, and wealth-building habit from Pansy. Stay on top of stocks, sectors, and economic news in plain English. Free daily financial education for women." />
+      <SEO title="Daily Briefing — Daily Market Briefing & Investing Lesson" description="Get your daily market summary, investing lesson, and wealth-building habit from Pansy. Stay on top of stocks, sectors, and economic news in plain English. Free daily financial education for women." />
 
       <div style={{ fontFamily: "'Inter', sans-serif", background: C.deep, color: C.ivory, minHeight: "100vh", display: "flex", flexDirection: "column" }}>
 
@@ -93,13 +93,13 @@ export default function DailyBloom({ briefing, briefingDate, featuredLesson }: P
         <nav style={{ borderBottom: "1px solid rgba(255,255,255,0.06)", background: "rgba(14,27,48,0.95)", backdropFilter: "blur(16px)" }}>
           <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 1.5rem", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <Link href="/" style={{ display: "flex", alignItems: "center", gap: 9, textDecoration: "none" }}>
-              <Image src="/bloom-logo.png" alt="Bloom" width={32} height={32} style={{ borderRadius: "50%" }} />
-              <span style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 700, fontSize: 17, color: C.ivory }}>Bloom</span>
+              <Image src="/bloom-logo.png" alt="She Blooms Wealth" width={32} height={32} style={{ borderRadius: "50%" }} />
+              <span style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 700, fontSize: 17, color: C.ivory }}>She Blooms Wealth</span>
             </Link>
             <div style={{ display: "flex", gap: 20, alignItems: "center" }}>
               {([
                 { label: "Home",            href: "/"                },
-                { label: "Daily Bloom",     href: "/daily-bloom"     },
+                { label: "Daily Briefing",  href: "/daily-bloom"     },
                 { label: "Market Insights", href: "/market-insights" },
                 { label: "About",           href: "/about"           },
               ] as const).map(({ label, href }) => (
@@ -120,7 +120,7 @@ export default function DailyBloom({ briefing, briefingDate, featuredLesson }: P
         {/* Hero */}
         <div style={{ maxWidth: 760, margin: "0 auto", padding: "5rem 1.5rem 2.5rem", textAlign: "center" }}>
           <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "clamp(2.6rem, 5.5vw, 4rem)", fontWeight: 700, lineHeight: 1.1, color: C.ivory, marginBottom: "1rem" }}>
-            Daily Bloom
+            Daily Briefing
           </h1>
           <p style={{ fontSize: "1.05rem", lineHeight: 1.7, color: "rgba(244,247,250,0.6)", maxWidth: 520, margin: "0 auto 0.75rem" }}>
             Your daily investing ritual — a market briefing, a lesson, a wealth habit, and Pansy&apos;s take.
@@ -212,7 +212,7 @@ export default function DailyBloom({ briefing, briefingDate, featuredLesson }: P
           </div>
 
           <p style={{ textAlign: "center", fontSize: 12, color: "rgba(244,247,250,0.28)", marginTop: "3.5rem" }}>
-            Educational only. Not financial advice. Bloom never recommends buying or selling any security.
+            Educational only. Not financial advice. We never recommend buying or selling any security.
           </p>
         </main>
 

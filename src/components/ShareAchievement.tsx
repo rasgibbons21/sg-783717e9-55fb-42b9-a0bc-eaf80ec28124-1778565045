@@ -59,8 +59,8 @@ export function ShareAchievement({
       if (navigator.share) {
         const file = new File([blob], 'bloom-achievement.png', { type: 'image/png' });
         await navigator.share({
-          title: `${title} - Bloom`,
-          text: `${subtitle || title} on Bloom - She Blooms Wealth! Download: shebloomswealth.app`,
+          title: `${title} - She Blooms Wealth`,
+          text: `${subtitle || title} on She Blooms Wealth! Download: shebloomswealth.app`,
           files: [file],
         });
       } else {

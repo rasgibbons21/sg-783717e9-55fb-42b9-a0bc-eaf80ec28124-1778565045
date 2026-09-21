@@ -33,7 +33,7 @@ export function BloomGarden({ completedLessons, totalLessons, lessonNames }: Blo
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Flower2 className="w-5 h-5 text-[#EC4899]" />
-          <h3 className="text-lg font-bold text-foreground">Your Bloom Garden</h3>
+          <h3 className="text-lg font-bold text-foreground">Your Growth Garden</h3>
         </div>
         <span className="text-sm text-muted-foreground font-medium">{flowerCount}/{totalLessons} flowers</span>
       </div>

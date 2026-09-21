@@ -72,8 +72,8 @@ export default function CertificatePage() {
       if (blob && navigator.share) {
         const file = new File([blob], "bloom-certificate.png", { type: "image/png" });
         await navigator.share({
-          title: "My Bloom Certificate",
-          text: "I earned my certificate on Bloom - She Blooms Wealth! 🌸",
+          title: "My She Blooms Wealth Certificate",
+          text: "I earned my certificate on She Blooms Wealth! 🌸",
           files: [file],
         });
       } else if (blob) {
@@ -92,10 +92,10 @@ export default function CertificatePage() {
   const mod = moduleSlug ? UNIVERSITY_MODULES.find(m => m.slug === moduleSlug) : null;
 
   const certTitle = type === "university-all"
-    ? "Bloom University Advanced Program"
+    ? "She Blooms University Advanced Program"
     : type === "university" && mod
       ? mod.certificateName
-      : "Bloom Investing Foundations";
+      : "Investing Foundations";
 
   if (loading) {
     return (
@@ -108,7 +108,7 @@ export default function CertificatePage() {
   if (requiresPaid) {
     return (
       <>
-        <Head><title>Certificate | Bloom</title></Head>
+        <Head><title>Certificate | She Blooms Wealth</title></Head>
         <div className="fixed inset-0 flex items-center justify-center" style={{ background: "#07080C" }}>
           <div className="text-center max-w-sm mx-4">
             <div className="w-20 h-20 mx-auto mb-5 rounded-full flex items-center justify-center" style={{ background: "rgba(201,168,76,0.1)", border: "2px solid rgba(201,168,76,0.3)" }}>
@@ -145,7 +145,7 @@ export default function CertificatePage() {
 
   return (
     <>
-      <Head><title>Certificate of Completion | Bloom</title></Head>
+      <Head><title>Certificate of Completion | She Blooms Wealth</title></Head>
       <div className="fixed inset-0 overflow-y-auto" style={{ background: "#07080C" }}>
         <div className="max-w-3xl mx-auto p-4 sm:p-8 space-y-6">
           <button onClick={() => router.back()} className="flex items-center gap-2 text-[#F3EDE3]/50 hover:text-[#F3EDE3]/80 transition-colors">
@@ -344,7 +344,7 @@ function BasicsCert({ name, date, certId }: { name: string; date: string; certId
               textAlign: "center", fontFamily: "'Georgia', serif",
               fontSize: 26, fontWeight: 700, color: "#07080C", margin: "0 0 20px",
             }}>
-              Bloom Investing Foundations
+              Investing Foundations
             </h4>
 
             <p style={{
@@ -362,7 +362,7 @@ function BasicsCert({ name, date, certId }: { name: string; date: string; certId
                   fontSize: 22, fontStyle: "italic", color: "#07080C", margin: "0 0 6px",
                 }}>Pansy</p>
                 <div style={{ width: "100%", height: 1, background: "#C9A84C", marginBottom: 6 }} />
-                <p style={{ fontSize: 10, color: "#64748B", margin: 0, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase" }}>Bloom Guide</p>
+                <p style={{ fontSize: 10, color: "#64748B", margin: 0, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase" }}>Wealth Guide</p>
               </div>
 
               <div style={{ textAlign: "center" }}>
@@ -553,7 +553,7 @@ function UniversityCert({ name, date, certId, title, moduleName }: { name: strin
               maxWidth: 440, margin: "0 auto 40px",
             }}>
               Having demonstrated dedication, discipline, and a commitment to continuous growth by completing
-              {moduleName ? ` the ${moduleName} module` : " all modules"} of Bloom University.
+              {moduleName ? ` the ${moduleName} module` : " all modules"} of She Blooms University.
               This achievement reflects a thorough understanding of advanced trading education
               concepts, chart analysis, and strategic market frameworks.
             </p>
@@ -566,7 +566,7 @@ function UniversityCert({ name, date, certId, title, moduleName }: { name: strin
                   fontSize: 22, fontStyle: "italic", color: "#07080C", margin: "0 0 6px",
                 }}>Pansy</p>
                 <div style={{ width: "100%", height: 1, background: "#C9A84C", marginBottom: 6 }} />
-                <p style={{ fontSize: 10, color: "#64748B", margin: 0, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase" }}>Bloom Guide & Founder</p>
+                <p style={{ fontSize: 10, color: "#64748B", margin: 0, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase" }}>Wealth Guide & Founder</p>
               </div>
 
               <div style={{ textAlign: "center" }}>

@@ -32,7 +32,7 @@ const supabaseAdmin = createClient(
   { auth: { autoRefreshToken: false, persistSession: false } }
 );
 
-const FALLBACK_NAME = "Bloom Member";
+const FALLBACK_NAME = "Member";
 
 /** (a) One user's gem total + breakdown. */
 export async function getUserGems(userId: string): Promise<GemBreakdown> {

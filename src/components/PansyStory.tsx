@@ -122,7 +122,7 @@ export function PansyStory() {
               <div className="bg-muted/50 border border-border rounded-xl p-4 mt-2">
                 <p className="text-sm text-muted-foreground italic leading-relaxed">
                   &ldquo;That&apos;s the dream, right? Not a mansion. Just <strong className="text-foreground">time</strong>.
-                  I built Bloom so you don&apos;t have to figure it out alone like I did.&rdquo;
+                  I built this app so you don&apos;t have to figure it out alone like I did.&rdquo;
                 </p>
                 <p className="text-xs font-semibold text-[#27B7C8] mt-2">— Pansy</p>
               </div>

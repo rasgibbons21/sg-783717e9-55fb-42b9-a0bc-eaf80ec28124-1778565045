@@ -13,9 +13,9 @@ export const ACHIEVEMENTS: Achievement[] = [
   { key: "five-lessons", title: "Knowledge Seeker", description: "Complete 5 lessons", emoji: "📚", category: "learning", xpReward: 25 },
   { key: "ten-lessons", title: "Dedicated Learner", description: "Complete 10 lessons", emoji: "🎓", category: "learning", xpReward: 50 },
   { key: "twenty-lessons", title: "Scholar", description: "Complete 20 lessons", emoji: "🏅", category: "learning", xpReward: 75 },
-  { key: "all-lessons", title: "Full Bloom Graduate", description: "Complete all lessons", emoji: "🌸", category: "learning", xpReward: 150 },
+  { key: "all-lessons", title: "Graduate", description: "Complete all lessons", emoji: "🌸", category: "learning", xpReward: 150 },
   { key: "first-quiz", title: "Quiz Taker", description: "Pass your first quiz", emoji: "✅", category: "learning", xpReward: 15 },
-  { key: "strategy-explorer", title: "Strategy Explorer", description: "Visit the Bloom Strategy Lab", emoji: "🧪", category: "learning", xpReward: 10 },
+  { key: "strategy-explorer", title: "Strategy Explorer", description: "Visit the Strategy Lab", emoji: "🧪", category: "learning", xpReward: 10 },
 
   // Trading
   { key: "first-trade", title: "Market Debut", description: "Place your first paper trade", emoji: "📈", category: "trading", xpReward: 15 },

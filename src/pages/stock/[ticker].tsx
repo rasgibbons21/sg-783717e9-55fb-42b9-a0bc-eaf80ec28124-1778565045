@@ -282,7 +282,7 @@ export default function StockPage() {
               </div>
               <div className="flex-1">
                 <p className="font-semibold text-foreground text-lg">Pansy&apos;s Analysis</p>
-                <p className="text-sm text-muted-foreground">Bloom&apos;s Investing Expert</p>
+                <p className="text-sm text-muted-foreground">Your AI Trading Analyst</p>
               </div>
               {pansyAnalysis.rating && (
                 <Badge className={getRatingColor(pansyAnalysis.rating)}>

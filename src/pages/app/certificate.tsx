@@ -52,7 +52,7 @@ export default function AcademyCertificatePage() {
   }, [router.isReady, course, level, router]);
 
   const courseTitle: Record<string, string> = {
-    'investing-foundations': 'Bloom Investing Foundations',
+    'investing-foundations': 'Investing Foundations',
     'advanced-trading': 'Advanced Trading Mastery',
     'options-strategies': 'Options Trading Strategies',
     'budget-basics': 'Budget Basics',
@@ -60,7 +60,7 @@ export default function AcademyCertificatePage() {
     'trade-fundamentals': 'Trade Fundamentals',
   };
 
-  const title = courseTitle[course as string] || 'Bloom Academy Course';
+  const title = courseTitle[course as string] || 'Academy Course';
   const certificateLevel = (level as 'beginner' | 'advanced') || 'beginner';
 
   if (loading) {

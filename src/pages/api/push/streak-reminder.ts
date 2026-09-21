@@ -55,7 +55,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const streak = streakMap.get(sub.user_id) ?? 0;
     const payload = JSON.stringify({
       title: `Your ${streak}-day streak is at risk!`,
-      body: "Open Bloom today to keep your streak alive. Even 1 minute counts.",
+      body: "Open the app today to keep your streak alive. Even 1 minute counts.",
       url: "/home",
     });
 

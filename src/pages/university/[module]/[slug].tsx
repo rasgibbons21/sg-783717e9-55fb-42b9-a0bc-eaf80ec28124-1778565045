@@ -220,7 +220,7 @@ export default function LessonPage({ moduleSlug, lessonSlug, requiresClientAuth 
           share({
             type: 'achievement',
             title: lessonTitle,
-            subtitle: mod ? `${mod.title} — Bloom University` : 'Bloom University',
+            subtitle: mod ? `${mod.title} — She Blooms University` : 'She Blooms University',
             emoji: '🎓',
             stats: data.xp_awarded > 0 ? [{ label: 'XP Earned', value: `+${data.xp_awarded}` }] : undefined,
           });
@@ -310,7 +310,7 @@ export default function LessonPage({ moduleSlug, lessonSlug, requiresClientAuth 
 
   return (
     <Layout>
-      <SEO title={`${lesson.title} — ${mod.title} — Bloom University`} description={lesson.subtitle} />
+      <SEO title={`${lesson.title} — ${mod.title} — She Blooms University`} description={lesson.subtitle} />
 
       <div className="bg-[#07080C] min-h-screen pb-16">
         {/* Breadcrumb */}

@@ -260,7 +260,7 @@ export default function LeaderboardPage() {
                   <button
                     onClick={() => share({
                       type: 'leaderboard',
-                      title: `#${me.rank} on Bloom`,
+                      title: `#${me.rank} on She Blooms Wealth`,
                       subtitle: `${me.total_trades} trades · ${me.win_rate}% win rate`,
                       emoji: me.rank === 1 ? '🥇' : me.rank === 2 ? '🥈' : me.rank === 3 ? '🥉' : '🏆',
                       stats: [

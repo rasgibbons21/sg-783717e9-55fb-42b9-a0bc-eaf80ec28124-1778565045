@@ -1,4 +1,4 @@
-// Bloom Radar — configurable day-trading strategy definitions
+// Configurable day-trading strategy definitions
 // Each strategy is a data object the scanner evaluates against real quotes/candles.
 // Strategies that cannot be computed from the current data layer are marked unavailable.
 
