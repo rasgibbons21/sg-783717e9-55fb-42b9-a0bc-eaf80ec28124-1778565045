@@ -72,7 +72,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Step 3: Get detailed quotes
     const symbols = eligible.slice(0, 30).map((g) => g.symbol);
     if (symbols.length === 0) {
-      if (scanCache && Date.now() - scanCache.ts < STALE_CACHE_MS) {
+      if (scanCache && Date.now() - scanCache.ts < STALE_CACHE_MS && req.query.fresh !== "1") {
         return res.status(200).json({
           candidates: applyQueryFilters(scanCache.data, req.query),
           cached: true,
@@ -195,7 +195,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
   } catch (error: any) {
     console.error("Scanner error:", error?.message || error);
-    if (scanCache && Date.now() - scanCache.ts < STALE_CACHE_MS) {
+    if (scanCache && Date.now() - scanCache.ts < STALE_CACHE_MS && req.query.fresh !== "1") {
       return res.status(200).json({
         candidates: applyQueryFilters(scanCache.data, req.query),
         cached: true,
