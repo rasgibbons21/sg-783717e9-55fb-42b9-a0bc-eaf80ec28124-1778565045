@@ -160,10 +160,10 @@ export default function ScannerIndex() {
   const [activeStrategies, setActiveStrategies] = useState<Set<StrategyId>>(new Set());
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
-    minPrice: 2,
-    maxPrice: 20,
-    minRvol: 5,
-    minChange: 5,
+    minPrice: 1,
+    maxPrice: 50,
+    minRvol: 0,
+    minChange: 3,
   });
 
   const loadScan = useCallback(async () => {
