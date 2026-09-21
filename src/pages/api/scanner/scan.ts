@@ -45,8 +45,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(500).json({ error: "No API keys configured (need FMP_API_KEY or FINNHUB_API_KEY)" });
   }
 
-  // Check cache
-  if (scanCache && Date.now() - scanCache.ts < CACHE_MS) {
+  // Check cache (skip with ?fresh=1)
+  if (scanCache && Date.now() - scanCache.ts < CACHE_MS && req.query.fresh !== "1") {
     return res.status(200).json({
       candidates: applyQueryFilters(scanCache.data, req.query),
       cached: true,
