@@ -101,6 +101,15 @@ function NewsCard({ article, featured }: { article: Article; featured?: boolean 
     );
   }
 
+  const sectorColor = (() => {
+    const sec = categorizeSector(article);
+    if (sec === "technology") return "#A855F7";
+    if (sec === "finance") return "#27B7C8";
+    if (sec === "energy") return "#F59E0B";
+    if (sec === "healthcare") return "#49B06E";
+    return "#F3EDE3";
+  })();
+
   return (
     <motion.a
       href={article.url}
@@ -108,21 +117,30 @@ function NewsCard({ article, featured }: { article: Article; featured?: boolean 
       rel="noopener noreferrer"
       initial={{ opacity: 0, scale: 0.96 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="block rounded-xl overflow-hidden active:scale-[0.97] transition-transform"
+      className="block rounded-xl overflow-hidden active:scale-[0.97] transition-transform group"
       style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}
     >
-      {article.image && (
-        <div className="h-28 overflow-hidden">
+      {article.image ? (
+        <div className="h-28 overflow-hidden relative">
           <img
             src={article.image}
             alt=""
-            className="w-full h-full object-cover"
-            onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            onError={e => { (e.target as HTMLImageElement).parentElement!.style.display = "none"; }}
           />
+          <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(18,24,33,0.8), transparent 60%)" }} />
+        </div>
+      ) : (
+        <div className="h-16 relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${sectorColor}08, ${sectorColor}03)` }}>
+          <div className="absolute top-2 left-3">
+            <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full" style={{ background: `${sectorColor}15`, color: sectorColor }}>
+              {article.source}
+            </span>
+          </div>
         </div>
       )}
       <div className="p-3">
-        <h3 className="text-[13px] font-semibold text-[#F3EDE3] line-clamp-2 leading-snug mb-1.5">
+        <h3 className="text-[13px] font-semibold text-[#F3EDE3] line-clamp-2 leading-snug mb-1.5 group-hover:text-white transition-colors">
           {article.title}
         </h3>
         <div className="flex items-center justify-between text-[10px] text-[#F3EDE3]/30">
@@ -131,7 +149,7 @@ function NewsCard({ article, featured }: { article: Article; featured?: boolean 
             <span>&middot;</span>
             <span>{timeAgo(article.publishedAt)}</span>
           </div>
-          <ExternalLink className="w-3 h-3" />
+          <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
         </div>
         {article.symbols.length > 0 && (
           <div className="flex items-center gap-1 mt-1.5 flex-wrap">

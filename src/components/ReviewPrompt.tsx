@@ -154,7 +154,7 @@ export function shouldShowReviewPrompt(completedCount: number): boolean {
 }
 
 const VISIT_KEY = 'bloom_visit_count';
-const VISIT_THRESHOLD = 8;
+const VISIT_THRESHOLD = 15;
 
 export function useAutoReviewPrompt(): { show: boolean; dismiss: () => void } {
   const [show, setShow] = useState(false);
@@ -164,7 +164,7 @@ export function useAutoReviewPrompt(): { show: boolean; dismiss: () => void } {
       const prompted = localStorage.getItem(STORAGE_KEY);
       if (prompted) {
         const daysSince = (Date.now() - Number(prompted)) / 86400000;
-        if (daysSince < 60) return;
+        if (daysSince < 90) return;
       }
       const visits = Number(localStorage.getItem(VISIT_KEY) || '0') + 1;
       localStorage.setItem(VISIT_KEY, String(visits));
