@@ -59,7 +59,7 @@ export const DEFAULT_FILTERS: ScannerFilters = {
   minRvol: 5,
   maxPrice: 20,
   minPrice: 2,
-  minChange: 10,
+  minChange: 3,
   sortBy: "score",
 };
 
@@ -209,7 +209,7 @@ export function filterAndSort(
   const filtered = candidates.filter((c) => {
     if (c.price < filters.minPrice || c.price > filters.maxPrice) return false;
     if (c.change < filters.minChange) return false;
-    if (c.rvol < filters.minRvol) return false;
+    if (c.rvol > 0 && c.rvol < filters.minRvol) return false;
     if (filters.catalystOnly && (c.catalyst === "none" || c.catalyst === "unverified")) return false;
     return true;
   });
