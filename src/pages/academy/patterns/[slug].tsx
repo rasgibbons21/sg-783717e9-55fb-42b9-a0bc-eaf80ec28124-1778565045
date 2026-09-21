@@ -301,6 +301,10 @@ export default function PatternDetailPage() {
   const { slug } = router.query;
   const pattern = typeof slug === "string" ? getPatternBySlug(slug) : undefined;
 
+  if (!router.isReady) {
+    return <Layout><div className="max-w-lg mx-auto px-4 pt-20" /></Layout>;
+  }
+
   if (!pattern) {
     return (
       <Layout>
