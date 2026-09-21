@@ -3,11 +3,12 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/router";
 import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
+import { Sparkline } from "@/components/Sparkline";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Zap, Eye, AlertTriangle, Clock,
   RefreshCw, ArrowUpRight, ArrowDownRight, Target, ShieldCheck,
-  ChevronDown, ChevronUp, Info,
+  ChevronDown, ChevronUp, Info, TrendingUp,
 } from "lucide-react";
 import type { SignalResult } from "@/lib/strategies";
 
@@ -68,55 +69,66 @@ function SignalCard({ candidate: c, signal: sig, onTap }: {
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl border overflow-hidden"
-      style={{ background: "linear-gradient(145deg, #121821, #171E28)", borderColor: `${stateColor}25` }}
+      className="rounded-xl overflow-hidden"
+      style={{ background: "linear-gradient(145deg, #121821, #161D26)", border: `1px solid ${stateColor}18` }}
     >
       {/* Main row — always visible */}
       <button
         onClick={() => { haptic(); setExpanded(e => !e); }}
-        className="w-full p-4 text-left active:bg-white/[0.02] transition-colors"
+        className="w-full p-3.5 text-left active:bg-white/[0.02] transition-colors"
       >
-        <div className="flex items-start justify-between mb-2">
-          <div className="flex items-center gap-3">
-            <div
-              className="w-11 h-11 rounded-xl flex items-center justify-center font-bold text-sm"
-              style={{ background: `${stateColor}15`, color: stateColor, border: `1px solid ${stateColor}35` }}
-            >
-              {sig.score}
+        <div className="flex items-center gap-3 mb-2">
+          {/* Score badge */}
+          <div
+            className="w-9 h-9 rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0"
+            style={{ background: `${stateColor}15`, color: stateColor, border: `1px solid ${stateColor}30` }}
+          >
+            {sig.score}
+          </div>
+
+          {/* Ticker + state */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1.5">
+              <span className="text-base font-bold text-[#F3EDE3]">{c.symbol}</span>
+              <span
+                className="text-[8px] font-bold px-1.5 py-0.5 rounded"
+                style={{ background: `${stateColor}15`, color: stateColor }}
+              >
+                {sig.state.replace("_", " ")}
+              </span>
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-lg font-bold text-[#F3EDE3]">{c.symbol}</span>
-                <span
-                  className="text-[9px] font-bold px-1.5 py-0.5 rounded"
-                  style={{ background: `${stateColor}20`, color: stateColor }}
-                >
-                  {sig.state.replace("_", " ")}
-                </span>
-              </div>
-              <div className="flex items-center gap-2 mt-0.5">
-                <span className="text-[10px] text-[#F3EDE3]/40">{sig.strategyName}</span>
-                <span className="text-[10px] text-[#F3EDE3]/25">{timeAgo(sig.timestamp)}</span>
-              </div>
+            <div className="flex items-center gap-2 mt-0.5">
+              <span className="text-[10px] text-[#F3EDE3]/40">{sig.strategyName}</span>
+              <span className="text-[10px] text-[#F3EDE3]/20">{timeAgo(sig.timestamp)}</span>
             </div>
           </div>
-          <div className="text-right flex items-start gap-2">
-            <div>
-              <div className="flex items-center gap-1 font-bold text-sm" style={{ color: up ? "#49B06E" : "#EF4444" }}>
-                {up ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
-                {up ? "+" : ""}{c.change.toFixed(1)}%
-              </div>
-              <span className="text-[10px] text-[#F3EDE3]/30">${c.price.toFixed(2)}</span>
-            </div>
-            {expanded ? <ChevronUp className="w-4 h-4 text-[#F3EDE3]/20 mt-1" /> : <ChevronDown className="w-4 h-4 text-[#F3EDE3]/20 mt-1" />}
+
+          {/* Sparkline */}
+          <div className="flex-shrink-0">
+            <Sparkline symbol={c.symbol} width={64} height={26} />
           </div>
+
+          {/* Price + change */}
+          <div className="text-right flex-shrink-0 ml-1">
+            <div className="flex items-center gap-0.5 font-bold text-sm" style={{ color: up ? "#49B06E" : "#EF4444" }}>
+              {up ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
+              {up ? "+" : ""}{c.change.toFixed(1)}%
+            </div>
+            <span className="text-[10px] text-[#F3EDE3]/30">${c.price.toFixed(2)}</span>
+          </div>
+
+          {/* Expand arrow */}
+          {expanded
+            ? <ChevronUp className="w-3.5 h-3.5 text-[#F3EDE3]/15 flex-shrink-0" />
+            : <ChevronDown className="w-3.5 h-3.5 text-[#F3EDE3]/15 flex-shrink-0" />
+          }
         </div>
 
         {/* Quick metrics */}
-        <div className="flex items-center gap-3 text-[10px] text-[#F3EDE3]/40">
-          <span>RVOL {c.rvol.toFixed(1)}x</span>
+        <div className="flex items-center gap-3 text-[10px] text-[#F3EDE3]/30">
+          <span className="font-medium" style={{ color: c.rvol >= 5 ? "#49B06E" : undefined }}>RVOL {c.rvol.toFixed(1)}x</span>
           <span>Vol {formatVolume(c.volume)}</span>
-          {c.catalystHeadline && <span className="truncate max-w-[160px]">{c.catalystHeadline}</span>}
+          {c.catalystHeadline && <span className="truncate max-w-[140px]">{c.catalystHeadline}</span>}
         </div>
       </button>
 
@@ -130,11 +142,11 @@ function SignalCard({ candidate: c, signal: sig, onTap }: {
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <div className="px-4 pb-4 border-t border-white/5 pt-3 space-y-3">
+            <div className="px-3.5 pb-3.5 border-t border-white/5 pt-3 space-y-2.5">
 
-              {/* Entry / Stop / Target bar */}
+              {/* Entry / Stop / Target */}
               {sig.entryZone && (
-                <div className="rounded-xl p-3 grid grid-cols-3 gap-2 text-center" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                <div className="rounded-lg p-3 grid grid-cols-3 gap-2 text-center" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)" }}>
                   <div>
                     <p className="text-[9px] text-[#49B06E] font-bold uppercase tracking-wider mb-0.5">Entry</p>
                     <p className="text-sm font-bold text-[#F3EDE3]">{sig.entryZone}</p>
@@ -156,40 +168,39 @@ function SignalCard({ candidate: c, signal: sig, onTap }: {
                   <span className="text-[10px] font-bold px-2 py-1 rounded-lg" style={{ background: "rgba(39,183,200,0.1)", color: "#27B7C8", border: "1px solid rgba(39,183,200,0.2)" }}>
                     R:R {sig.rr}
                   </span>
-                  <span className="text-[10px] text-[#F3EDE3]/30">Risk-to-reward ratio</span>
                 </div>
               )}
 
               {/* Conditions breakdown */}
               {(sig.conditionsPassed.length > 0 || sig.conditionsFailed.length > 0) && (
                 <div className="space-y-1">
-                  <p className="text-[9px] text-[#F3EDE3]/30 uppercase tracking-wider font-bold">Conditions checked</p>
+                  <p className="text-[9px] text-[#F3EDE3]/25 uppercase tracking-wider font-bold">Conditions</p>
                   {sig.conditionsPassed.map((c, i) => (
                     <div key={`p-${i}`} className="flex items-center gap-2 text-[11px]">
                       <span className="w-4 h-4 rounded flex items-center justify-center text-[9px] bg-[#49B06E]/15 text-[#49B06E]">✓</span>
-                      <span className="text-[#F3EDE3]/60">{c}</span>
+                      <span className="text-[#F3EDE3]/50">{c}</span>
                     </div>
                   ))}
                   {sig.conditionsFailed.map((c, i) => (
                     <div key={`f-${i}`} className="flex items-center gap-2 text-[11px]">
                       <span className="w-4 h-4 rounded flex items-center justify-center text-[9px] bg-[#EF4444]/15 text-[#EF4444]">✗</span>
-                      <span className="text-[#F3EDE3]/30">{c}</span>
+                      <span className="text-[#F3EDE3]/25">{c}</span>
                     </div>
                   ))}
                   {sig.conditionsMissing.map((c, i) => (
                     <div key={`m-${i}`} className="flex items-center gap-2 text-[11px]">
-                      <span className="w-4 h-4 rounded flex items-center justify-center text-[9px] bg-white/5 text-[#F3EDE3]/25">?</span>
-                      <span className="text-[#F3EDE3]/25">{c}</span>
+                      <span className="w-4 h-4 rounded flex items-center justify-center text-[9px] bg-white/5 text-[#F3EDE3]/20">?</span>
+                      <span className="text-[#F3EDE3]/20">{c}</span>
                     </div>
                   ))}
                 </div>
               )}
 
-              {/* Reason / thesis */}
+              {/* Reason */}
               {sig.reason && (
-                <div className="rounded-lg p-2.5 flex items-start gap-2" style={{ background: "rgba(39,183,200,0.05)", border: "1px solid rgba(39,183,200,0.1)" }}>
+                <div className="rounded-lg p-2.5 flex items-start gap-2" style={{ background: "rgba(39,183,200,0.04)", border: "1px solid rgba(39,183,200,0.08)" }}>
                   <Info className="w-3.5 h-3.5 text-[#27B7C8] flex-shrink-0 mt-0.5" />
-                  <p className="text-[11px] text-[#F3EDE3]/50 leading-relaxed">{sig.reason}</p>
+                  <p className="text-[11px] text-[#F3EDE3]/40 leading-relaxed">{sig.reason}</p>
                 </div>
               )}
 
@@ -201,7 +212,7 @@ function SignalCard({ candidate: c, signal: sig, onTap }: {
                   className="flex-1 py-2.5 rounded-xl text-xs font-bold text-center"
                   style={{ background: "rgba(39,183,200,0.12)", color: "#27B7C8", border: "1px solid rgba(39,183,200,0.25)" }}
                 >
-                  Open Chart
+                  View Chart
                 </motion.button>
                 <motion.button
                   whileTap={{ scale: 0.95 }}
@@ -323,14 +334,14 @@ export default function SignalsPage() {
 
         {/* Loading */}
         {loading && (
-          <div className="space-y-3">
+          <div className="space-y-2">
             {[1, 2, 3].map(i => (
-              <div key={i} className="rounded-2xl border border-white/5 p-4 animate-pulse" style={{ background: "#121821" }}>
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-11 h-11 rounded-xl bg-white/5" />
-                  <div className="flex-1"><div className="h-4 w-24 rounded bg-white/5 mb-1" /><div className="h-3 w-16 rounded bg-white/5" /></div>
+              <div key={i} className="rounded-xl p-3.5 animate-pulse" style={{ background: "#121821", border: "1px solid rgba(255,255,255,0.05)" }}>
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-white/5" />
+                  <div className="flex-1"><div className="h-4 w-20 rounded bg-white/5 mb-1" /><div className="h-3 w-16 rounded bg-white/5" /></div>
+                  <div className="w-16 h-7 rounded bg-white/5" />
                 </div>
-                <div className="h-16 rounded-xl bg-white/[0.02]" />
               </div>
             ))}
           </div>
@@ -353,19 +364,19 @@ export default function SignalsPage() {
               Setups appear when stocks match your strategy rules. Next scan runs when the tape updates.
             </p>
             <div className="rounded-xl p-3 text-left" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)" }}>
-              <p className="text-[10px] text-[#F3EDE3]/30 uppercase tracking-wider font-bold mb-2">What you&apos;d see here</p>
-              <div className="space-y-2 text-[11px] text-[#F3EDE3]/40">
+              <p className="text-[10px] text-[#F3EDE3]/25 uppercase tracking-wider font-bold mb-2">What you&apos;d see here</p>
+              <div className="space-y-2 text-[11px] text-[#F3EDE3]/35">
                 <div className="flex items-center gap-2">
                   <Target className="w-3.5 h-3.5 text-[#49B06E]" />
-                  <span><strong className="text-[#F3EDE3]/60">Entry zone</strong> — where the strategy says to watch for a fill</span>
+                  <span><strong className="text-[#F3EDE3]/50">Entry zone</strong> — where the strategy says to watch</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <ShieldCheck className="w-3.5 h-3.5 text-[#EF4444]" />
-                  <span><strong className="text-[#F3EDE3]/60">Stop / invalidation</strong> — level where the thesis breaks</span>
+                  <span><strong className="text-[#F3EDE3]/50">Stop / invalidation</strong> — level where the thesis breaks</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <ArrowUpRight className="w-3.5 h-3.5 text-[#27B7C8]" />
-                  <span><strong className="text-[#F3EDE3]/60">Target &amp; R:R</strong> — projected move and risk-to-reward</span>
+                  <TrendingUp className="w-3.5 h-3.5 text-[#27B7C8]" />
+                  <span><strong className="text-[#F3EDE3]/50">Target &amp; R:R</strong> — projected move and risk-to-reward</span>
                 </div>
               </div>
             </div>
@@ -374,7 +385,7 @@ export default function SignalsPage() {
 
         {/* Signal cards */}
         {!loading && currentSignals.length > 0 && (
-          <div className="space-y-3">
+          <div className="space-y-2">
             {currentSignals.map(({ candidate, signal }) => (
               <SignalCard
                 key={`${candidate.symbol}-${signal.strategyId}`}

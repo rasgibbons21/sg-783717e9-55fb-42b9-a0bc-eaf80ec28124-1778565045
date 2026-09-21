@@ -24,6 +24,7 @@ interface PriceLines {
   entry?: number;
   stop?: number;
   target?: number;
+  target2?: number;
 }
 
 interface Props {
@@ -189,7 +190,17 @@ export function CandlestickChart({ data, priceLines, height = 280 }: Props) {
         lineWidth: 1,
         lineStyle: 2,
         axisLabelVisible: true,
-        title: "Target",
+        title: "Target 1",
+      }));
+    }
+    if (priceLines.target2 != null) {
+      linesRef.current.push(series.createPriceLine({
+        price: priceLines.target2,
+        color: "#A855F7",
+        lineWidth: 1,
+        lineStyle: 2,
+        axisLabelVisible: true,
+        title: "Target 2",
       }));
     }
   }, [priceLines, data]);

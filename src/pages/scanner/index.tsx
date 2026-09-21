@@ -3,10 +3,11 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/router";
 import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
+import { Sparkline } from "@/components/Sparkline";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search, RefreshCw, Filter, ArrowUpRight, Target,
-  ShieldCheck, ChevronRight, X,
+  ShieldCheck, ChevronRight, X, TrendingUp,
 } from "lucide-react";
 import { STRATEGY_LIST, type StrategyId } from "@/lib/strategies";
 import type { SignalResult } from "@/lib/strategies";
@@ -41,6 +42,107 @@ const STATE_COLORS: Record<string, string> = {
   WATCH: "#27B7C8",
   INVALIDATED: "#EF4444",
 };
+
+function ScannerCard({ c, i, onClick }: { c: ScanCandidate; i: number; onClick: () => void }) {
+  const bestSignal = c.signals && c.signals.length > 0 ? c.signals[0] : null;
+  const stateColor = bestSignal ? (STATE_COLORS[bestSignal.state] || "#F3EDE3") : "#27B7C8";
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: i * 0.02 }}
+      onClick={() => { haptic(); onClick(); }}
+      className="rounded-xl overflow-hidden cursor-pointer active:scale-[0.98] transition-all"
+      style={{ background: "linear-gradient(145deg, #121821, #161D26)", border: `1px solid ${stateColor}18` }}
+    >
+      <div className="p-3.5">
+        {/* Top row: Score + Symbol + Sparkline + Price */}
+        <div className="flex items-center gap-3 mb-2">
+          {/* Score badge */}
+          <div
+            className="w-9 h-9 rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0"
+            style={{ background: `${stateColor}15`, color: stateColor, border: `1px solid ${stateColor}30` }}
+          >
+            {bestSignal ? bestSignal.score : c.score}
+          </div>
+
+          {/* Ticker + state */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1.5">
+              <span className="text-base font-bold text-[#F3EDE3]">{c.symbol}</span>
+              {bestSignal && (
+                <span
+                  className="text-[8px] font-bold px-1.5 py-0.5 rounded"
+                  style={{ background: `${stateColor}15`, color: stateColor }}
+                >
+                  {bestSignal.state.replace("_", " ")}
+                </span>
+              )}
+            </div>
+            <span className="text-[10px] text-[#F3EDE3]/35">{bestSignal?.strategyName ?? "Scanning..."}</span>
+          </div>
+
+          {/* Sparkline */}
+          <div className="flex-shrink-0">
+            <Sparkline symbol={c.symbol} width={72} height={28} />
+          </div>
+
+          {/* Price + change */}
+          <div className="text-right flex-shrink-0 ml-1">
+            <div className="text-sm font-bold text-[#F3EDE3]">${c.price.toFixed(2)}</div>
+            <div className="flex items-center gap-0.5 justify-end" style={{ color: "#49B06E" }}>
+              <ArrowUpRight className="w-3 h-3" />
+              <span className="text-xs font-bold">+{c.change.toFixed(1)}%</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Metrics row */}
+        <div className="flex items-center gap-3 text-[10px] text-[#F3EDE3]/35 mb-2">
+          <span className="font-medium" style={{ color: c.rvol >= 5 ? "#49B06E" : "#F3EDE3" + "60" }}>
+            RVOL {c.rvol.toFixed(1)}x
+          </span>
+          <span>Vol {formatVolume(c.volume)}</span>
+          {c.catalystHeadline && (
+            <span className="truncate">{c.catalystHeadline}</span>
+          )}
+        </div>
+
+        {/* Entry / Stop row */}
+        {bestSignal && bestSignal.entryZone && (
+          <div
+            className="rounded-lg px-3 py-2 flex items-center gap-4 text-[10px]"
+            style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)" }}
+          >
+            <div className="flex items-center gap-1">
+              <Target className="w-3 h-3 text-[#49B06E]" />
+              <span className="text-[#F3EDE3]/40">Entry</span>
+              <span className="text-[#49B06E] font-semibold">{bestSignal.entryZone}</span>
+            </div>
+            {bestSignal.invalidationLevel && (
+              <div className="flex items-center gap-1">
+                <ShieldCheck className="w-3 h-3 text-[#EF4444]" />
+                <span className="text-[#F3EDE3]/40">Stop</span>
+                <span className="text-[#EF4444] font-semibold">{bestSignal.invalidationLevel}</span>
+              </div>
+            )}
+            {bestSignal.target1 && (
+              <div className="flex items-center gap-1">
+                <TrendingUp className="w-3 h-3 text-[#27B7C8]" />
+                <span className="text-[#F3EDE3]/40">Target</span>
+                <span className="text-[#27B7C8] font-semibold">{bestSignal.target1}</span>
+              </div>
+            )}
+            {bestSignal.rr && (
+              <span className="ml-auto text-[#F3EDE3]/25 font-medium">R:R {bestSignal.rr}</span>
+            )}
+          </div>
+        )}
+      </div>
+    </motion.div>
+  );
+}
 
 export default function ScannerIndex() {
   const router = useRouter();
@@ -153,7 +255,7 @@ export default function ScannerIndex() {
                 type="text"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                placeholder="Search ticker or describe a setup..."
+                placeholder="Search ticker..."
                 className="flex-1 bg-transparent text-sm text-[#F3EDE3] placeholder:text-[#F3EDE3]/30 outline-none"
               />
               {searchQuery && (
@@ -242,16 +344,30 @@ export default function ScannerIndex() {
           )}
         </AnimatePresence>
 
-        {/* Results */}
+        {/* Results count */}
+        {!loading && filtered.length > 0 && (
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-[10px] text-[#F3EDE3]/25 font-medium uppercase tracking-wider">
+              {filtered.length} setup{filtered.length !== 1 ? "s" : ""} found
+            </span>
+          </div>
+        )}
+
+        {/* Loading skeleton */}
         {loading && (
-          <div className="space-y-3">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="rounded-2xl border border-white/5 p-4 animate-pulse" style={{ background: "#121821" }}>
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-xl bg-white/5" />
+          <div className="space-y-2">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="rounded-xl p-3.5 animate-pulse" style={{ background: "#121821", border: "1px solid rgba(255,255,255,0.05)" }}>
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-white/5" />
                   <div className="flex-1">
-                    <div className="h-4 w-20 rounded bg-white/5 mb-1" />
-                    <div className="h-3 w-14 rounded bg-white/5" />
+                    <div className="h-4 w-16 rounded bg-white/5 mb-1" />
+                    <div className="h-3 w-20 rounded bg-white/5" />
+                  </div>
+                  <div className="w-[72px] h-7 rounded bg-white/5" />
+                  <div className="text-right">
+                    <div className="h-4 w-14 rounded bg-white/5 mb-1" />
+                    <div className="h-3 w-12 rounded bg-white/5" />
                   </div>
                 </div>
               </div>
@@ -259,6 +375,7 @@ export default function ScannerIndex() {
           </div>
         )}
 
+        {/* Empty state */}
         {!loading && filtered.length === 0 && (
           <div
             className="rounded-2xl p-5 text-center"
@@ -280,114 +397,17 @@ export default function ScannerIndex() {
           </div>
         )}
 
+        {/* Scanner cards */}
         {!loading && filtered.length > 0 && (
           <div className="space-y-2">
-            {filtered.map((c, i) => {
-              const bestSignal = c.signals && c.signals.length > 0 ? c.signals[0] : null;
-              const stateColor = bestSignal ? (STATE_COLORS[bestSignal.state] || "#F3EDE3") : "#27B7C8";
-
-              return (
-                <motion.div
-                  key={c.symbol}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.03 }}
-                  onClick={() => { haptic(); router.push(`/scanner/${c.symbol}`); }}
-                  className="rounded-2xl border p-4 cursor-pointer active:scale-[0.98] transition-all"
-                  style={{ background: "linear-gradient(145deg, #121821, #171E28)", borderColor: "rgba(39,183,200,0.15)" }}
-                >
-                  {/* Top row: symbol + score + change */}
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm"
-                        style={{ background: `${stateColor}20`, color: stateColor, border: `1px solid ${stateColor}40` }}
-                      >
-                        {bestSignal ? bestSignal.score : c.score}
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-lg font-bold text-[#F3EDE3]">{c.symbol}</span>
-                          {bestSignal && (
-                            <span
-                              className="text-[9px] font-bold px-1.5 py-0.5 rounded"
-                              style={{ background: `${stateColor}20`, color: stateColor }}
-                            >
-                              {bestSignal.state.replace("_", " ")}
-                            </span>
-                          )}
-                        </div>
-                        <span className="text-xs text-[#F3EDE3]/40">${c.price.toFixed(2)}</span>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="flex items-center gap-1 text-[#49B06E] font-bold text-base">
-                        <ArrowUpRight className="w-4 h-4" />
-                        +{c.change.toFixed(1)}%
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Strategy + metrics */}
-                  <div className="flex items-center gap-2 mb-2">
-                    {bestSignal && (
-                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
-                        style={{ background: "rgba(39,183,200,0.1)", color: "#27B7C8" }}>
-                        {bestSignal.strategyName}
-                      </span>
-                    )}
-                    <span className="text-[10px] text-[#F3EDE3]/30">RVOL {c.rvol.toFixed(1)}x</span>
-                    <span className="text-[10px] text-[#F3EDE3]/30">Vol {formatVolume(c.volume)}</span>
-                  </div>
-
-                  {/* Entry / Stop / Target */}
-                  {bestSignal && bestSignal.entryZone && (
-                    <div
-                      className="rounded-lg p-2 flex items-center gap-3 text-[10px]"
-                      style={{ background: "rgba(255,255,255,0.03)" }}
-                    >
-                      <div className="flex items-center gap-1">
-                        <Target className="w-3 h-3 text-[#49B06E]" />
-                        <span className="text-[#F3EDE3]/50">Entry:</span>
-                        <span className="text-[#49B06E] font-medium">{bestSignal.entryZone}</span>
-                      </div>
-                      {bestSignal.invalidationLevel && (
-                        <div className="flex items-center gap-1">
-                          <ShieldCheck className="w-3 h-3 text-[#EF4444]" />
-                          <span className="text-[#F3EDE3]/50">Stop:</span>
-                          <span className="text-[#EF4444] font-medium">{bestSignal.invalidationLevel}</span>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Reason */}
-                  {bestSignal && bestSignal.reason && (
-                    <p className="text-[10px] text-[#F3EDE3]/40 mt-2">
-                      {bestSignal.reason}
-                    </p>
-                  )}
-
-                  {/* Action buttons */}
-                  <div className="flex gap-2 mt-3">
-                    {[
-                      { label: "Open Chart", href: `/discover?symbol=${c.symbol}` },
-                      { label: "Paper Trade", href: "/paper-trader-v2" },
-                      { label: "Set Alert", href: "/subscription" },
-                    ].map(btn => (
-                      <button
-                        key={btn.label}
-                        onClick={e => { e.stopPropagation(); haptic(); router.push(btn.href); }}
-                        className="text-[9px] font-semibold px-2.5 py-1.5 rounded-lg transition-colors"
-                        style={{ background: "rgba(39,183,200,0.08)", color: "#27B7C8", border: "1px solid rgba(39,183,200,0.15)" }}
-                      >
-                        {btn.label}
-                      </button>
-                    ))}
-                  </div>
-                </motion.div>
-              );
-            })}
+            {filtered.map((c, i) => (
+              <ScannerCard
+                key={c.symbol}
+                c={c}
+                i={i}
+                onClick={() => router.push(`/scanner/${c.symbol}`)}
+              />
+            ))}
           </div>
         )}
 
