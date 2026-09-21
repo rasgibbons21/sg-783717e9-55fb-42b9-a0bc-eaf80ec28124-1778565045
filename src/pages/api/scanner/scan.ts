@@ -60,10 +60,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { gainers, source: gainersSource } = await fetchGainers(fmpKey, finnhubKey);
 
     // Step 2: Filter to eligible price range
+    // Finnhub fallback uses a fixed watchlist (not pre-filtered gainers),
+    // so use looser thresholds to surface candidates
+    const isFinnhub = gainersSource === "finnhub";
     const eligible = gainers.filter((g) =>
-      g.price >= 1 && g.price <= 20 &&
-      g.changesPercentage >= 5 &&
-      g.volume > 50_000
+      g.price >= 1 && g.price <= (isFinnhub ? 50 : 20) &&
+      g.changesPercentage >= (isFinnhub ? 3 : 5) &&
+      g.volume > (isFinnhub ? 10_000 : 50_000)
     );
 
     // Step 3: Get detailed quotes

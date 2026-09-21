@@ -15,12 +15,18 @@ function abortAfter(ms: number): AbortSignal {
 // Fallback: poll a watchlist of commonly-traded small caps via Finnhub
 // and return any that are up significantly today.
 
+// Front-loaded with sub-$20 volatile small/mid-caps that actually trigger scanner rules.
+// Large caps go last — they rarely gap 5%+ intraday.
 const FALLBACK_WATCHLIST = [
-  "AAPL","TSLA","AMD","NVDA","AMZN","META","MSFT","GOOGL","NFLX","BABA",
-  "NIO","PLTR","SOFI","RIVN","LCID","MARA","RIOT","COIN","SQ","SNAP",
-  "DKNG","HOOD","RKLB","IONQ","SMCI","ARM","MU","INTC","ENPH","PLUG",
-  "FCEL","SOUN","JOBY","AFRM","UPST","DNA","OPEN","WISH","BB","NOK",
-  "CLOV","SKLZ","WKHS","QS","SPCE","RUM","DJT","PHUN","KULR","BTBT",
+  // Volatile sub-$20 small caps (most likely to trigger)
+  "NIO","LCID","SOFI","RIVN","SNAP","RIOT","FCEL","PLUG","SOUN","JOBY",
+  "DNA","OPEN","WISH","BB","NOK","CLOV","WKHS","SPCE","PHUN","KULR",
+  "BTBT","RUM","DJT","SKLZ","QS","FFIE","MULN","SNDL","ASTS","GSAT",
+  "TELL","NKLA","GRAB","VFS","PSNY","GOEV","BEEM","HIMS","STEM","AEHR",
+  // Mid-caps that occasionally move big
+  "MARA","HOOD","UPST","AFRM","RKLB","IONQ","DKNG","COIN","SQ","SMCI",
+  // Large caps (reference, rarely trigger)
+  "TSLA","AMD","NVDA","AAPL","AMZN","META","PLTR","INTC","MU","ENPH",
 ];
 
 export interface GainersResult {
@@ -62,8 +68,8 @@ export async function fetchGainers(fmpKey?: string, finnhubKey?: string): Promis
 }
 
 async function finnhubWatchlistScan(key: string): Promise<FMPQuote[]> {
-  // Finnhub free tier: 60 calls/min. Batch 25 symbols max to stay safe.
-  const batch = FALLBACK_WATCHLIST.slice(0, 25);
+  // Finnhub free tier: 60 calls/min. Scan 40 small caps (front-loaded in list).
+  const batch = FALLBACK_WATCHLIST.slice(0, 40);
   const results: FMPQuote[] = [];
 
   const promises = batch.map(async (sym) => {
