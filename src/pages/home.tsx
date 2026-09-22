@@ -7,7 +7,7 @@ import { useSubscription } from "@/contexts/SubscriptionContext";
 import { motion } from "framer-motion";
 import {
   Zap, ArrowUpRight, ArrowDownRight,
-  RefreshCw, Bell, Newspaper, ChevronRight, Radar,
+  RefreshCw, Bell, Newspaper, ChevronRight, Radar, Flower2, ChevronDown,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -99,6 +99,8 @@ export default function HomePage() {
   const [newsLoading, setNewsLoading] = useState(true);
   const [alerts, setAlerts] = useState<ScannerAlert[]>([]);
   const [alertsLoading, setAlertsLoading] = useState(true);
+  const [briefing, setBriefing] = useState<string | null>(null);
+  const [briefingOpen, setBriefingOpen] = useState(false);
 
   const session = getSession();
 
@@ -179,12 +181,23 @@ export default function HomePage() {
     }
   }, []);
 
+  const loadBriefing = useCallback(async () => {
+    try {
+      const res = await fetch("/api/daily-briefing");
+      if (res.ok) {
+        const data = await res.json();
+        if (data.content) setBriefing(data.content);
+      }
+    } catch {}
+  }, []);
+
   useEffect(() => {
     loadIndices();
     loadSetups();
     loadNews();
     loadAlerts();
-  }, [loadIndices, loadSetups, loadNews, loadAlerts]);
+    loadBriefing();
+  }, [loadIndices, loadSetups, loadNews, loadAlerts, loadBriefing]);
 
   const stateLabel = (s: string) => {
     const map: Record<string, { label: string; color: string }> = {
@@ -257,6 +270,51 @@ export default function HomePage() {
             </div>
           )}
         </div>
+
+        {/* PANSY'S MORNING NOTE */}
+        {briefing && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-2xl mb-5 overflow-hidden"
+            style={{ background: "linear-gradient(145deg, rgba(139,92,246,0.06), rgba(7,8,12,1))", border: "1px solid rgba(139,92,246,0.15)" }}
+          >
+            <button
+              type="button"
+              onClick={() => { haptic(); setBriefingOpen(!briefingOpen); }}
+              className="w-full flex items-center gap-3 p-4"
+            >
+              <div
+                className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                style={{ background: "rgba(139,92,246,0.12)" }}
+              >
+                <Flower2 className="w-4.5 h-4.5 text-[#A855F7]" />
+              </div>
+              <div className="flex-1 text-left min-w-0">
+                <p className="text-xs font-bold text-[#A855F7] mb-0.5">Pansy&apos;s Morning Note</p>
+                {!briefingOpen && (
+                  <p className="text-[11px] text-[#F3EDE3]/40 line-clamp-1">{briefing.split("\n")[0]}</p>
+                )}
+              </div>
+              <ChevronDown
+                className="w-4 h-4 text-[#F3EDE3]/30 shrink-0 transition-transform duration-300"
+                style={{ transform: briefingOpen ? "rotate(180deg)" : "rotate(0deg)" }}
+              />
+            </button>
+            {briefingOpen && (
+              <div className="px-4 pb-4">
+                <div className="text-xs text-[#F3EDE3]/60 leading-relaxed whitespace-pre-line">
+                  {briefing}
+                </div>
+                <div className="mt-3 pt-3" style={{ borderTop: "1px solid rgba(139,92,246,0.1)" }}>
+                  <p className="text-[10px] text-[#F3EDE3]/25 italic">
+                    Educational context only — not financial advice.
+                  </p>
+                </div>
+              </div>
+            )}
+          </motion.div>
+        )}
 
         {/* YOUR RADAR summary */}
         <div
