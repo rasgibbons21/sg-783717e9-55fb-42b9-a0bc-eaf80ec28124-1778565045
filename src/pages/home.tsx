@@ -7,7 +7,7 @@ import { useSubscription } from "@/contexts/SubscriptionContext";
 import { motion } from "framer-motion";
 import {
   Zap, ArrowUpRight, ArrowDownRight,
-  RefreshCw, Bell, Newspaper, ChevronRight, Radar, Flower2, ChevronDown,
+  RefreshCw, Bell, Newspaper, ChevronRight, Radar, Flower2, ChevronDown, Gift,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -544,6 +544,34 @@ export default function HomePage() {
             </div>
           )}
         </div>
+
+        {/* INVITE FRIENDS */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          onClick={() => {
+            haptic();
+            const url = "https://shebloomswealth.app";
+            const text = "Check out Radar — AI stock screener & trade alerts. Free to start.";
+            if (navigator.share) {
+              navigator.share({ title: "Radar", text, url }).catch(() => {});
+            } else {
+              navigator.clipboard.writeText(url).catch(() => {});
+            }
+          }}
+          className="rounded-xl p-3.5 mb-5 flex items-center gap-3 cursor-pointer active:scale-[0.98] transition-all"
+          style={{ background: "linear-gradient(135deg, rgba(73,176,110,0.06), rgba(39,183,200,0.04))", border: "1px solid rgba(73,176,110,0.12)" }}
+        >
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: "rgba(73,176,110,0.12)" }}>
+            <Gift className="w-4 h-4 text-[#49B06E]" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-semibold text-[#F3EDE3]">Invite friends, get 7 free days</p>
+            <p className="text-[10px] text-[#F3EDE3]/35">You both earn a week of Pro</p>
+          </div>
+          <ChevronRight className="w-3.5 h-3.5 text-[#49B06E]/50 shrink-0" />
+        </motion.div>
 
         {/* Disclaimer */}
         <div className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
