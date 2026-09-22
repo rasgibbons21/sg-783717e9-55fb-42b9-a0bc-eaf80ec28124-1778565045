@@ -195,7 +195,7 @@ export default function Compare() {
   return (
     <Layout>
       <SEO
-        title="Compare Investments | She Blooms Wealth"
+        title="Compare Investments | Radar"
         description="Side-by-side comparison of stocks and ETFs with Pansy's analysis"
       />
       <div className="container-full py-8 space-y-6 pb-24">

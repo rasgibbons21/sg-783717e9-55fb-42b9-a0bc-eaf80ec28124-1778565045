@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   NotebookPen, Search, Filter, ChevronDown, ChevronUp,
   AlertTriangle, Loader2, X, Check, TrendingUp, TrendingDown, Lock,
-  Target, ShieldCheck, Clock, Brain, Heart, Scale, Award, BarChart3,
+  Target, ShieldCheck, Clock, Brain, Heart, Scale, Award, BarChart3, Sparkles,
 } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -657,6 +657,178 @@ function JournalAnalytics({ entries }: { entries: JournalEntry[] }) {
   );
 }
 
+// ── Weekly Review ─────────────────────────────────────────────────────────
+function WeeklyReview() {
+  const [review, setReview] = useState<string | null>(null);
+  const [stats, setStats] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [reviewRange, setReviewRange] = useState<"week" | "month">("week");
+  const [open, setOpen] = useState(false);
+
+  const fetchReview = async () => {
+    setLoading(true);
+    setError("");
+    setOpen(true);
+    try {
+      const res = await apiFetch("/api/journal/weekly-review", {
+        method: "POST",
+        body: JSON.stringify({ range: reviewRange }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to generate review");
+      if (data.message && !data.review) {
+        setError(data.message);
+        return;
+      }
+      setReview(data.review);
+      setStats(data.stats);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatReview = (text: string) => {
+    return text.split("\n").map((line, i) => {
+      if (line.startsWith("**") && line.endsWith("**")) {
+        return (
+          <h3 key={i} className="text-sm font-bold text-[#27B7C8] mt-3 mb-1.5 first:mt-0">
+            {line.replace(/\*\*/g, "")}
+          </h3>
+        );
+      }
+      if (line.trim() === "") return <div key={i} className="h-2" />;
+      return <p key={i} className="text-xs text-[#F3EDE3]/70 leading-relaxed mb-1">{line}</p>;
+    });
+  };
+
+  return (
+    <div className="rounded-xl mb-4 overflow-hidden" style={{ background: "rgba(168,85,247,0.04)", border: "1px solid rgba(168,85,247,0.12)" }}>
+      <button
+        onClick={() => { haptic(); if (review) setOpen(!open); else fetchReview(); }}
+        className="w-full flex items-center justify-between px-3 py-2.5"
+      >
+        <div className="flex items-center gap-2">
+          <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+          <span className="text-xs font-semibold text-[#F3EDE3]/70">Pansy&apos;s Weekly Review</span>
+        </div>
+        <div className="flex items-center gap-2">
+          {!review && !loading && (
+            <span className="text-[9px] text-purple-400/60 font-medium">Tap to generate</span>
+          )}
+          {loading && <Loader2 className="w-3.5 h-3.5 text-purple-400 animate-spin" />}
+          {review && (open
+            ? <ChevronUp className="w-3.5 h-3.5 text-[#F3EDE3]/30" />
+            : <ChevronDown className="w-3.5 h-3.5 text-[#F3EDE3]/30" />
+          )}
+        </div>
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+          >
+            <div className="px-3 pb-3">
+              {!review && !loading && !error && (
+                <div className="space-y-3">
+                  <p className="text-[11px] text-[#F3EDE3]/40 leading-relaxed">
+                    Pansy will review your recent trades, spot patterns in your wins and losses,
+                    analyze your emotional tendencies, and give you a game plan for next week.
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <div className="flex rounded-lg overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.08)" }}>
+                      {(["week", "month"] as const).map(r => (
+                        <button
+                          key={r}
+                          onClick={(e) => { e.stopPropagation(); haptic(); setReviewRange(r); }}
+                          className="px-3 py-1.5 text-[10px] font-medium transition-colors"
+                          style={{
+                            background: reviewRange === r ? "rgba(168,85,247,0.15)" : "transparent",
+                            color: reviewRange === r ? "#A855F7" : "rgba(243,237,227,0.35)",
+                          }}
+                        >
+                          {r === "week" ? "This Week" : "This Month"}
+                        </button>
+                      ))}
+                    </div>
+                    <motion.button
+                      whileTap={{ scale: 0.95 }}
+                      onClick={(e) => { e.stopPropagation(); fetchReview(); }}
+                      className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-semibold"
+                      style={{ background: "rgba(168,85,247,0.15)", color: "#A855F7", border: "1px solid rgba(168,85,247,0.25)" }}
+                    >
+                      <Sparkles className="w-3.5 h-3.5" />
+                      Get My Review
+                    </motion.button>
+                  </div>
+                </div>
+              )}
+
+              {loading && (
+                <div className="flex flex-col items-center py-8 gap-3">
+                  <div className="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center">
+                    <Loader2 className="w-5 h-5 text-purple-400 animate-spin" />
+                  </div>
+                  <p className="text-xs text-[#F3EDE3]/40">Pansy is reviewing your trades…</p>
+                </div>
+              )}
+
+              {error && !loading && (
+                <div className="rounded-lg px-3 py-2.5 mb-2" style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.15)" }}>
+                  <p className="text-xs text-[#EF4444]/80">{error}</p>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); fetchReview(); }}
+                    className="text-xs text-[#27B7C8] mt-1 underline"
+                  >
+                    Try again
+                  </button>
+                </div>
+              )}
+
+              {review && !loading && (
+                <div className="space-y-1">
+                  {stats && (
+                    <div className="grid grid-cols-4 gap-1.5 mb-3">
+                      {[
+                        { label: "Trades", value: stats.totalTrades, color: "#A855F7" },
+                        { label: "Win Rate", value: `${stats.winRate}%`, color: stats.winRate >= 50 ? "#49B06E" : "#EF4444" },
+                        { label: "P/L", value: `${stats.totalPnl >= 0 ? "+" : ""}$${Math.abs(stats.totalPnl).toFixed(0)}`, color: stats.totalPnl >= 0 ? "#49B06E" : "#EF4444" },
+                        { label: "Discipline", value: `${stats.followedPlan}/${stats.totalTrades}`, color: stats.followedPlan >= stats.totalTrades * 0.7 ? "#49B06E" : "#F59E0B" },
+                      ].map(({ label, value, color }) => (
+                        <div key={label} className="rounded-lg px-1.5 py-1 text-center" style={{ background: `${color}08`, border: `1px solid ${color}12` }}>
+                          <p className="text-[7px] uppercase tracking-wider" style={{ color: `${color}99` }}>{label}</p>
+                          <p className="text-[10px] font-bold" style={{ color }}>{value}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {formatReview(review)}
+                  <div className="pt-2 flex justify-end">
+                    <motion.button
+                      whileTap={{ scale: 0.95 }}
+                      onClick={(e) => { e.stopPropagation(); haptic(); setReview(null); setStats(null); setError(""); }}
+                      className="text-[10px] text-purple-400/50 hover:text-purple-400/80 transition-colors"
+                    >
+                      Generate new review
+                    </motion.button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 // ── Main Page ──────────────────────────────────────────────────────────────
 export default function JournalPage(_props: PageProps) {
   const { isPro, isLoading: authLoading } = useSubscription();
@@ -773,6 +945,9 @@ export default function JournalPage(_props: PageProps) {
 
               {/* Analytics section */}
               {totalTrades >= 3 && <JournalAnalytics entries={entries} />}
+
+              {/* Pansy's Weekly Review */}
+              {totalTrades >= 3 && <WeeklyReview />}
 
               {/* Filters */}
               <div className="rounded-xl p-3 mb-4 space-y-2" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
