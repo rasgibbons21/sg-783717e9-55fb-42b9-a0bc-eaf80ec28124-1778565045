@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   MessageCircle, NotebookPen, GraduationCap, TrendingUp,
-  Building2, User, FileText, ChevronRight,
+  Building2, User, FileText, ChevronRight, Activity,
 } from "lucide-react";
 
 const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
@@ -14,6 +14,7 @@ const LINKS = [
   { href: "/ask-pansy", icon: MessageCircle, label: "Pansy", desc: "AI trading analyst", color: "#A855F7" },
   { href: "/journal", icon: NotebookPen, label: "Journal", desc: "Trade journal & review", color: "#F59E0B" },
   { href: "/learn", icon: GraduationCap, label: "Academy", desc: "Lessons & strategy lab", color: "#27B7C8" },
+  { href: "/backtest", icon: Activity, label: "Backtest", desc: "Strategy performance tracker", color: "#EC4899" },
   { href: "/paper-trader-v2", icon: TrendingUp, label: "Paper Trade", desc: "$10K virtual simulator", color: "#49B06E" },
   { href: "/brokers", icon: Building2, label: "Brokers", desc: "Brokerage comparison", color: "#06B6D4" },
   { href: "/profile", icon: User, label: "Settings", desc: "Account & preferences", color: "#F3EDE3" },

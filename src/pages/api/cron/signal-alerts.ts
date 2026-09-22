@@ -60,6 +60,74 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return { s, f };
   }
 
+  // ── PART C: Check past scanner results outcomes ──────────────────────
+  let outcomesChecked = 0;
+  try {
+    const { data: pending } = await supabaseAdmin
+      .from("scanner_results")
+      .select("*")
+      .eq("outcome", "pending")
+      .lt("scanned_at", new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString());
+
+    if (pending && pending.length > 0) {
+      const finnhubKey = process.env.FINNHUB_API_KEY;
+      const symbols = [...new Set(pending.map((r: any) => r.symbol))];
+      const priceMap = new Map<string, number>();
+
+      if (finnhubKey) {
+        await Promise.all(
+          symbols.map(async (sym: string) => {
+            try {
+              const r = await fetch(
+                `https://finnhub.io/api/v1/quote?symbol=${sym}&token=${finnhubKey}`,
+                { signal: AbortSignal.timeout(6000) }
+              );
+              if (!r.ok) return;
+              const d = await r.json();
+              if (d?.c && d.c > 0) priceMap.set(sym, d.c);
+            } catch {}
+          })
+        );
+      }
+
+      for (const result of pending) {
+        const currentPrice = priceMap.get(result.symbol);
+        if (!currentPrice || !result.entry_price) continue;
+
+        let outcome = "expired";
+        let outcomePnlPct = 0;
+
+        if (result.stop_price && currentPrice <= result.stop_price) {
+          outcome = "stopped";
+          outcomePnlPct = ((result.stop_price - result.entry_price) / result.entry_price) * 100;
+        } else if (result.target2_price && currentPrice >= result.target2_price) {
+          outcome = "win_t2";
+          outcomePnlPct = ((result.target2_price - result.entry_price) / result.entry_price) * 100;
+        } else if (result.target1_price && currentPrice >= result.target1_price) {
+          outcome = "win_t1";
+          outcomePnlPct = ((result.target1_price - result.entry_price) / result.entry_price) * 100;
+        } else {
+          const hoursSinceSignal = (Date.now() - new Date(result.scanned_at).getTime()) / (1000 * 60 * 60);
+          if (hoursSinceSignal < 24) continue;
+          outcomePnlPct = ((currentPrice - result.entry_price) / result.entry_price) * 100;
+        }
+
+        await supabaseAdmin
+          .from("scanner_results")
+          .update({
+            outcome,
+            outcome_price: currentPrice,
+            outcome_pnl_pct: Math.round(outcomePnlPct * 100) / 100,
+            outcome_checked_at: new Date().toISOString(),
+          })
+          .eq("id", result.id);
+        outcomesChecked++;
+      }
+    }
+  } catch (err: any) {
+    console.error("Outcome check failed:", err?.message);
+  }
+
   // ── PART A: Scanner signal alerts (broadcast to all subscribers) ──────
 
   let signalCount = 0;
@@ -136,6 +204,54 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           metadata: { symbol: s.symbol, strategy: s.strategyId, price: s.price, change: s.change, entry: s.entryZone },
         }));
         try { await supabaseAdmin.from("notification_log").insert(logRows); } catch {}
+      }
+    }
+    // Log scanner results for performance tracking (backtest)
+    const signalsToLog = candidates.flatMap((c: any) =>
+      (c.signals ?? [])
+        .filter((s: any) => s.state === "ACTIVE" || s.state === "NEAR_TRIGGER")
+        .map((s: any) => {
+          const parsePrice = (text: string | null) => {
+            if (!text) return null;
+            const m = text.match(/\$(\d+(?:\.\d+)?)/);
+            return m ? parseFloat(m[1]) : null;
+          };
+          return {
+            symbol: c.symbol,
+            strategy_id: s.strategyId,
+            strategy_name: s.strategyName,
+            signal_state: s.state,
+            score: s.score,
+            price_at_signal: c.price,
+            change_pct: c.change,
+            volume: c.volume,
+            rvol: c.rvol,
+            catalyst: c.catalyst,
+            entry_price: parsePrice(s.entryZone) ?? c.price,
+            stop_price: parsePrice(s.invalidationLevel),
+            target1_price: parsePrice(s.target1),
+            target2_price: parsePrice(s.target2),
+            outcome: "pending",
+          };
+        })
+    );
+
+    if (signalsToLog.length > 0) {
+      const today = new Date().toISOString().split("T")[0];
+      const { data: existing } = await supabaseAdmin
+        .from("scanner_results")
+        .select("symbol, strategy_id")
+        .eq("scanned_date", today);
+
+      const existingSet = new Set(
+        (existing ?? []).map((r: any) => `${r.symbol}:${r.strategy_id}`)
+      );
+      const newResults = signalsToLog.filter(
+        (r: any) => !existingSet.has(`${r.symbol}:${r.strategy_id}`)
+      );
+
+      if (newResults.length > 0) {
+        try { await supabaseAdmin.from("scanner_results").insert(newResults); } catch {}
       }
     }
   } catch (err: any) {
@@ -227,6 +343,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     failed: totalFailed,
     signals: signalCount,
     priceAlerts: priceAlertsSent,
+    outcomesChecked,
     subscribers: allSubs.length,
   });
 }
