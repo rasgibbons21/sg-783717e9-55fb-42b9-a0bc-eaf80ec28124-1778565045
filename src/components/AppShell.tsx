@@ -7,10 +7,9 @@ import {
   Zap,
   BarChart3,
   Newspaper,
-  Briefcase,
+  Bookmark,
   MoreHorizontal,
   Search,
-  Bookmark,
   ChevronLeft,
   Mic,
 } from "lucide-react";
@@ -40,7 +39,7 @@ const NAV_ITEMS: ReadonlyArray<{
   { href: "/signals", icon: Zap, label: "Signals" },
   { href: "/discover", icon: BarChart3, label: "Charts" },
   { href: "/news", icon: Newspaper, label: "News" },
-  { href: "/portfolio", icon: Briefcase, label: "Portfolio" },
+  { href: "/portfolio", icon: Bookmark, label: "Watchlist" },
   { href: "/more", icon: MoreHorizontal, label: "More" },
 ];
 
