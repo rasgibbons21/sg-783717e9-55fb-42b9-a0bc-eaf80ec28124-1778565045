@@ -299,7 +299,7 @@ export default function SignalsPage() {
 
   return (
     <Layout>
-      <SEO title="She Blooms Wealth | Signals" description="Active setups matched by your trading strategies." />
+      <SEO title="Radar | Signals" description="Active setups matched by your trading strategies." />
       <div className="max-w-lg mx-auto px-4 pt-4 pb-32">
 
         {/* Header */}

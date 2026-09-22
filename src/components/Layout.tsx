@@ -57,7 +57,7 @@ export function Layout({ children }: LayoutProps) {
       >
         <div className="flex items-center h-14 px-4">
           <Link href="/home" className="flex items-center gap-3">
-            <img src="/icon-192.png" alt="She Blooms Wealth" className="h-8 w-auto rounded-md" />
+            <img src="/icon-192.png" alt="Radar" className="h-8 w-auto rounded-md" />
             <span className="text-xl font-bold" style={{ color: "var(--r-ivory)" }}>Radar</span>
           </Link>
         </div>
@@ -98,10 +98,10 @@ export function Layout({ children }: LayoutProps) {
           </div>
           <div className="mt-8 pt-8" style={{ borderTop: "1px solid var(--r-hairline)" }}>
             <p className="text-xs" style={{ color: "var(--r-meta)" }}>
-              &copy; 2026 Cinder Vault Enterprises LLC. All rights reserved. She Blooms Wealth is a product of Cinder Vault Enterprises LLC.
+              &copy; 2026 Cinder Vault Enterprises LLC. All rights reserved. Radar is a product of Cinder Vault Enterprises LLC.
             </p>
             <p className="mt-2 text-xs" style={{ color: "var(--r-meta)" }}>
-              She Blooms Wealth is for educational purposes only and does not constitute financial advice. All investing involves risk of loss.
+              Radar is for educational purposes only and does not constitute financial advice. All investing involves risk of loss.
             </p>
           </div>
         </div>

@@ -64,7 +64,7 @@ export default function MarketInsightsIndex() {
       </Head>
 
       <SEO
-        title="Market Insights — Stock Market Analysis in Plain English | She Blooms Wealth"
+        title="Market Insights — Stock Market Analysis in Plain English | Radar"
         description="Understand what the stock market is doing — sectors, earnings, macro trends, and investor psychology explained in plain English. Free market analysis and insights for women investors learning to read the market."
       />
 
@@ -74,8 +74,8 @@ export default function MarketInsightsIndex() {
         <nav style={{ borderBottom: "1px solid rgba(255,255,255,0.06)", background: "rgba(14,27,48,0.95)", backdropFilter: "blur(16px)" }}>
           <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 1.5rem", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <Link href="/" style={{ display: "flex", alignItems: "center", gap: 9, textDecoration: "none" }}>
-              <Image src="/bloom-logo.png" alt="She Blooms Wealth" width={32} height={32} style={{ borderRadius: "50%" }} />
-              <span style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 700, fontSize: 17, color: C.ivory }}>She Blooms Wealth</span>
+              <Image src="/bloom-logo.png" alt="Radar" width={32} height={32} style={{ borderRadius: "50%" }} />
+              <span style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 700, fontSize: 17, color: C.ivory }}>Radar</span>
             </Link>
             <div style={{ display: "flex", gap: 20, alignItems: "center" }}>
               {([

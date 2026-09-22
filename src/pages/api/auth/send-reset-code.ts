@@ -39,7 +39,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     user.user_metadata?.full_name?.split(" ")[0] || "there";
 
   await resend.emails.send({
-    from: "She Blooms Wealth <hello@shebloomswealth.app>",
+    from: "Radar <hello@shebloomswealth.app>",
     to: normalizedEmail,
     subject: "Your password reset code",
     html: `

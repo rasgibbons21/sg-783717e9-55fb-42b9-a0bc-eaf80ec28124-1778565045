@@ -46,7 +46,7 @@ export default function InsightPage({ insight, prev, next }: Props) {
         <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet" />
       </Head>
 
-      <SEO title={`${insight.title} — She Blooms Wealth`} description={insight.subtitle} />
+      <SEO title={`${insight.title} — Radar`} description={insight.subtitle} />
 
       <div style={{ fontFamily: "'Inter', sans-serif", background: C.deep, color: C.ivory, minHeight: "100vh", display: "flex", flexDirection: "column" }}>
 
@@ -54,8 +54,8 @@ export default function InsightPage({ insight, prev, next }: Props) {
         <nav style={{ borderBottom: "1px solid rgba(255,255,255,0.06)", background: "rgba(14,27,48,0.95)", backdropFilter: "blur(16px)" }}>
           <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 1.5rem", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <Link href="/" style={{ display: "flex", alignItems: "center", gap: 9, textDecoration: "none" }}>
-              <Image src="/bloom-logo.png" alt="She Blooms Wealth" width={32} height={32} style={{ borderRadius: "50%" }} />
-              <span style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 700, fontSize: 17, color: C.ivory }}>She Blooms Wealth</span>
+              <Image src="/bloom-logo.png" alt="Radar" width={32} height={32} style={{ borderRadius: "50%" }} />
+              <span style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 700, fontSize: 17, color: C.ivory }}>Radar</span>
             </Link>
             <div style={{ display: "flex", gap: 20, alignItems: "center" }}>
               {([

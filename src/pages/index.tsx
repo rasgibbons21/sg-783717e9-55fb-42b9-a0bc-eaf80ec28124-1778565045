@@ -163,7 +163,7 @@ export default function LandingPage() {
       <style>{KEYFRAMES}</style>
 
       <SEO
-        title="She Blooms Wealth: Stock Screener & Alerts"
+        title="Radar — Stock Screener & Trade Alerts"
         description="Stock screener, price alerts, and Pansy AI market chat. Watchlist, market movers, paper trading, and options tape. Education optional."
         jsonLd={{
           "@context": "https://schema.org",
@@ -181,7 +181,7 @@ export default function LandingPage() {
             {
               "@type": "SoftwareApplication",
               "@id": "https://shebloomswealth.app/#app",
-              name: "She Blooms Wealth",
+              name: "Radar",
               applicationCategory: "FinanceApplication",
               operatingSystem: "Android, Web",
               offers: [
@@ -197,7 +197,7 @@ export default function LandingPage() {
               "@type": "WebSite",
               "@id": "https://shebloomswealth.app/#website",
               url: "https://shebloomswealth.app",
-              name: "She Blooms Wealth",
+              name: "Radar",
               publisher: { "@id": "https://shebloomswealth.app/#organization" },
             },
           ],
@@ -211,12 +211,12 @@ export default function LandingPage() {
           <div style={{ maxWidth:1200, margin:"0 auto", padding:"0 1.5rem", height:64, display:"flex", alignItems:"center", justifyContent:"space-between" }}>
             <div style={{ display:"flex", alignItems:"center", gap:10 }}>
               <div style={{ animation:"breathe 8s ease-in-out infinite" }}>
-                <Image src="/bloom-logo.png" alt="She Blooms Wealth" width={36} height={36}
+                <Image src="/bloom-logo.png" alt="Radar" width={36} height={36}
                   style={{ borderRadius:"50%", animation:"glow-pulse 7s ease-in-out infinite", display:"block" }} />
               </div>
               <div style={{ lineHeight:1.15 }}>
                 <div style={{ fontFamily:"'Cormorant Garamond', serif", fontWeight:700, fontSize:18, letterSpacing:"0.01em", color:C.ivory }}>Radar</div>
-                <div style={{ fontSize:9, fontWeight:600, letterSpacing:"0.14em", textTransform:"uppercase", color:"rgba(244,247,250,0.35)" }}>She Blooms Wealth</div>
+                <div style={{ fontSize:9, fontWeight:600, letterSpacing:"0.14em", textTransform:"uppercase", color:"rgba(244,247,250,0.35)" }}>Stock Screener & Alerts</div>
               </div>
             </div>
             <Link href="/onboarding">
@@ -253,7 +253,7 @@ export default function LandingPage() {
               </div>
 
               <p style={{ fontSize:"clamp(1rem, 1.9vw, 1.12rem)", lineHeight:1.72, color:"rgba(244,247,250,0.72)", maxWidth:480, marginBottom:"1.8rem", animation:"fade-up 0.55s ease-out 0.28s both" }}>
-                She Blooms Wealth is a <strong style={{ color:C.ivory }}>stock screener and alerts platform</strong> with Pansy AI market chat,
+                Radar is a <strong style={{ color:C.ivory }}>stock screener and alerts platform</strong> with Pansy AI market chat,
                 watchlist, market movers, paper trading, and options tape. Education built in.
               </p>
 
@@ -474,10 +474,10 @@ export default function LandingPage() {
             </div>
             <div style={{ borderTop:"1px solid rgba(255,255,255,0.06)" }} className="pt-6 space-y-2">
               <p className="text-xs" style={{ color:"rgba(244,247,250,0.28)" }}>
-                © 2026 Cinder Vault Enterprises LLC. All rights reserved. She Blooms Wealth is a product of Cinder Vault Enterprises LLC.
+                © 2026 Cinder Vault Enterprises LLC. All rights reserved. Radar is a product of Cinder Vault Enterprises LLC.
               </p>
               <p className="text-xs" style={{ color:"rgba(244,247,250,0.22)" }}>
-                She Blooms Wealth is for educational purposes only and does not constitute financial advice. Alerts are price/level/screen-match notifications, not trade recommendations. All investing involves risk of loss, including possible loss of principal. Past performance does not guarantee future results.
+                Radar is for educational purposes only and does not constitute financial advice. Alerts are price/level/screen-match notifications, not trade recommendations. All investing involves risk of loss, including possible loss of principal. Past performance does not guarantee future results.
               </p>
             </div>
           </div>

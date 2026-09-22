@@ -59,7 +59,7 @@ export const CertificateGenerator = ({
         const file = new File([blob], 'bloom-certificate.png', { type: 'image/png' });
         await navigator.share({
           title: 'My Certificate',
-          text: `I earned my ${courseTitle} certificate on She Blooms Wealth!`,
+          text: `I earned my ${courseTitle} certificate on Radar!`,
           files: [file],
         });
       }

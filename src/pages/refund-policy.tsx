@@ -8,7 +8,7 @@ export default function RefundPolicy() {
   if (!canShowExternalPayment) {
     return (
       <Layout>
-        <SEO title="Refund Policy - She Blooms Wealth" description="Refund policy for She Blooms Wealth" />
+        <SEO title="Refund Policy - Radar" description="Refund policy for Radar" />
         <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center gap-6">
           <div className="rounded-full bg-muted p-6">
             <Lock className="w-10 h-10 text-muted-foreground" />
@@ -27,13 +27,13 @@ export default function RefundPolicy() {
   return (
     <Layout>
       <SEO
-        title="Refund & Cancellation Policy - She Blooms Wealth"
-        description="Refund and cancellation policy for She Blooms Wealth by Cinder Vault Enterprises LLC"
+        title="Refund & Cancellation Policy - Radar"
+        description="Refund and cancellation policy for Radar by Cinder Vault Enterprises LLC"
       />
       <div className="mx-auto max-w-4xl space-y-8 px-4 py-8">
         <div>
           <h1 className="mb-2 font-serif text-4xl font-bold text-primary">Refund &amp; Cancellation Policy</h1>
-          <p className="text-muted-foreground">Cinder Vault Enterprises LLC — She Blooms Wealth</p>
+          <p className="text-muted-foreground">Cinder Vault Enterprises LLC — Radar</p>
           <p className="text-sm text-muted-foreground">Last updated: June 2026</p>
         </div>
 
@@ -44,7 +44,7 @@ export default function RefundPolicy() {
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Subscriptions &amp; Billing</h2>
             <p className="mb-4 text-foreground">
               Radar Core is a paid subscription that gives you access to premium educational content,
-              the Practice Trader, She Blooms University, and AI-powered features. Subscriptions are
+              the Practice Trader, Radar University, and AI-powered features. Subscriptions are
               billed through Stripe, our secure payment processor.
             </p>
             <ul className="mb-6 space-y-2 text-foreground">
@@ -140,13 +140,13 @@ export default function RefundPolicy() {
             {/* ── Educational Disclaimer ── */}
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Educational Platform Disclaimer</h2>
             <p className="mb-4 text-foreground">
-              She Blooms Wealth is an educational platform operated by Cinder Vault Enterprises LLC. Your
+              Radar is an educational platform operated by Cinder Vault Enterprises LLC. Your
               subscription provides access to educational content — including lessons, the Practice
               Trader simulator, and AI-powered learning tools — and does not constitute financial
               advice, investment advice, or brokerage services.
             </p>
             <p className="mb-6 text-foreground">
-              The Practice Trader uses virtual money only. No real trades are executed. She Blooms Wealth does
+              The Practice Trader uses virtual money only. No real trades are executed. Radar does
               not manage money, execute orders, or hold securities on behalf of any user.
               Subscriptions are purchased for access to educational content, not for financial
               outcomes. All investing involves risk of loss.

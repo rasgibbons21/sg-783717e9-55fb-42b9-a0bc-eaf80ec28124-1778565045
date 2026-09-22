@@ -119,7 +119,7 @@ export default function Discover() {
   return (
     <Layout>
       <SEO
-        title="She Blooms Wealth | Discover — Live Stock Charts"
+        title="Radar | Discover — Live Stock Charts"
         description="Real-time TradingView charts for stocks. Research any ticker with interactive charting."
       />
 

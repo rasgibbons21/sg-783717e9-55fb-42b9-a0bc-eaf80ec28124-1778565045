@@ -9,7 +9,7 @@ export default function SharePage() {
   return (
     <>
       <SEO
-        title="She Blooms Wealth - Invest in Yourself First 🌸"
+        title="Radar - Invest in Yourself First 🌸"
         description="Investment analysis designed for women. Learn from Pansy, get personalized analyses, and build wealth with confidence."
         image="/bloom-share.png"
       />
@@ -26,7 +26,7 @@ export default function SharePage() {
             <div className="mb-8 flex justify-center">
               <img
                 src="/bloom-share.png"
-                alt="She Blooms Wealth"
+                alt="Radar"
                 className="h-auto w-full max-w-md drop-shadow-2xl"
               />
             </div>
@@ -125,7 +125,7 @@ export default function SharePage() {
               © 2026 Cinder Vault Enterprises LLC. All rights reserved.
             </p>
             <p className="mt-2 text-xs text-zinc-600">
-              She Blooms Wealth is for educational purposes only and does not constitute financial advice.
+              Radar is for educational purposes only and does not constitute financial advice.
             </p>
             <div className="mt-4 flex flex-wrap justify-center gap-4 text-xs">
               <Link href="/privacy" className="text-zinc-500 hover:text-accent">

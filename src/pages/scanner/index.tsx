@@ -219,7 +219,7 @@ export default function ScannerIndex() {
 
   return (
     <Layout>
-      <SEO title="She Blooms Wealth | Scanner" description="Scan for stock setups matching your day-trading strategies." />
+      <SEO title="Radar | Scanner" description="Scan for stock setups matching your day-trading strategies." />
       <div className="max-w-lg mx-auto px-4 pt-4 pb-32">
 
         {/* Header */}

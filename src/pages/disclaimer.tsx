@@ -7,8 +7,8 @@ export default function Disclaimer() {
   return (
     <Layout>
       <SEO
-        title="Investment Disclaimer - She Blooms Wealth"
-        description="Investment Disclaimer for She Blooms Wealth by Cinder Vault Enterprises LLC"
+        title="Investment Disclaimer - Radar"
+        description="Investment Disclaimer for Radar by Cinder Vault Enterprises LLC"
       />
       <div className="mx-auto max-w-4xl space-y-8 px-4 py-8">
         <div>
@@ -22,7 +22,7 @@ export default function Disclaimer() {
             <div>
               <h2 className="mb-2 font-serif text-xl font-semibold text-destructive">IMPORTANT - PLEASE READ CAREFULLY</h2>
               <p className="text-sm text-foreground">
-                The following disclaimer contains critical information about the limitations of our services. By using She Blooms Wealth, you acknowledge that you have read and understood this disclaimer.
+                The following disclaimer contains critical information about the limitations of our services. By using Radar, you acknowledge that you have read and understood this disclaimer.
               </p>
             </div>
           </div>
@@ -32,7 +32,7 @@ export default function Disclaimer() {
           <div className="prose prose-sm max-w-none">
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Not Financial Advice</h2>
             <p className="mb-2 text-foreground">
-              She Blooms Wealth and all content provided by Pansy, our AI guide, is strictly for educational and informational purposes.
+              Radar and all content provided by Pansy, our AI guide, is strictly for educational and informational purposes.
             </p>
             <p className="mb-2 text-foreground">Nothing on this platform should be interpreted as:</p>
             <ul className="mb-6 space-y-2 text-foreground">
@@ -43,7 +43,7 @@ export default function Disclaimer() {
             </ul>
 
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">No Registered Status</h2>
-            <p className="mb-2 text-foreground">Cinder Vault Enterprises LLC and She Blooms Wealth are NOT:</p>
+            <p className="mb-2 text-foreground">Cinder Vault Enterprises LLC and Radar are NOT:</p>
             <ul className="mb-6 space-y-2 text-foreground">
               <li>Registered investment advisors</li>
               <li>Licensed broker-dealers</li>
@@ -63,7 +63,7 @@ export default function Disclaimer() {
 
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Broker Affiliate Disclosure</h2>
             <p className="mb-6 text-foreground">
-              Some broker recommendations on She Blooms Wealth are part of affiliate partnerships. Cinder Vault Enterprises LLC may earn a referral fee when users sign up with recommended brokers. Affiliate relationships do not influence the educational content or analysis provided by She Blooms Wealth. We only recommend brokers we genuinely believe provide value to our users.
+              Some broker recommendations on Radar are part of affiliate partnerships. Cinder Vault Enterprises LLC may earn a referral fee when users sign up with recommended brokers. Affiliate relationships do not influence the educational content or analysis provided by Radar. We only recommend brokers we genuinely believe provide value to our users.
             </p>
 
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Consult a Professional</h2>
@@ -83,7 +83,7 @@ export default function Disclaimer() {
 
         <Card className="border-accent bg-accent/5 p-4">
           <p className="text-sm text-muted-foreground">
-            This is educational content only and does not constitute financial advice. She Blooms Wealth is not liable for any investment decisions or losses.
+            This is educational content only and does not constitute financial advice. Radar is not liable for any investment decisions or losses.
           </p>
         </Card>
       </div>

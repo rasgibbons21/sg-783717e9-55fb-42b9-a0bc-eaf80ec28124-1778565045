@@ -6,8 +6,8 @@ export default function Terms() {
   return (
     <Layout>
       <SEO
-        title="Terms of Service - She Blooms Wealth"
-        description="Terms of Service for She Blooms Wealth by Cinder Vault Enterprises LLC"
+        title="Terms of Service - Radar"
+        description="Terms of Service for Radar by Cinder Vault Enterprises LLC"
       />
       <div className="mx-auto max-w-4xl space-y-8 px-4 py-8">
         <div>
@@ -20,19 +20,19 @@ export default function Terms() {
           <div className="prose prose-sm max-w-none">
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Acceptance of Terms</h2>
             <p className="mb-6 text-foreground">
-              By accessing or using She Blooms Wealth, you agree to be bound by these Terms of Service. If you do not agree, do not use She Blooms Wealth.
+              By accessing or using Radar, you agree to be bound by these Terms of Service. If you do not agree, do not use Radar.
             </p>
 
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">The Service</h2>
             <p className="mb-6 text-foreground">
-              She Blooms Wealth is an educational investing platform operated by Cinder Vault Enterprises LLC. She Blooms Wealth provides educational content about stocks, ETFs, mutual funds, and investing through Pansy, our AI guide. She Blooms Wealth is NOT a registered investment advisor, broker-dealer, or financial institution.
+              Radar is an educational investing platform operated by Cinder Vault Enterprises LLC. Radar provides educational content about stocks, ETFs, mutual funds, and investing through Pansy, our AI guide. Radar is NOT a registered investment advisor, broker-dealer, or financial institution.
             </p>
 
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Educational Purpose Only</h2>
             <p className="mb-2 text-foreground">
-              All content on She Blooms Wealth, including Pansy's analysis, market commentary, ETF suggestions, and stock information, is for EDUCATIONAL PURPOSES ONLY.
+              All content on Radar, including Pansy's analysis, market commentary, ETF suggestions, and stock information, is for EDUCATIONAL PURPOSES ONLY.
             </p>
-            <p className="mb-2 text-foreground">Nothing on She Blooms Wealth constitutes:</p>
+            <p className="mb-2 text-foreground">Nothing on Radar constitutes:</p>
             <ul className="mb-6 space-y-2 text-foreground">
               <li>Financial advice</li>
               <li>Investment recommendations</li>
@@ -45,7 +45,7 @@ export default function Terms() {
 
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Eligibility</h2>
             <p className="mb-6 text-foreground">
-              You must be at least 18 years old to use She Blooms Wealth. You must be legally permitted to invest in your jurisdiction.
+              You must be at least 18 years old to use Radar. You must be legally permitted to invest in your jurisdiction.
             </p>
 
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">User Accounts</h2>
@@ -55,7 +55,7 @@ export default function Terms() {
 
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Affiliate Disclosure</h2>
             <p className="mb-6 text-foreground">
-              She Blooms Wealth participates in broker affiliate programs. We may earn a commission when you sign up with a recommended broker through our platform. This never affects the independence of our educational content or Pansy's analysis.
+              Radar participates in broker affiliate programs. We may earn a commission when you sign up with a recommended broker through our platform. This never affects the independence of our educational content or Pansy's analysis.
             </p>
 
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Intellectual Property</h2>
@@ -65,7 +65,7 @@ export default function Terms() {
 
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Limitation of Liability</h2>
             <p className="mb-6 text-foreground">
-              Cinder Vault Enterprises LLC shall not be liable for any investment losses or damages arising from your use of She Blooms Wealth or reliance on any content provided through our platform. Your use of She Blooms Wealth is entirely at your own risk.
+              Cinder Vault Enterprises LLC shall not be liable for any investment losses or damages arising from your use of Radar or reliance on any content provided through our platform. Your use of Radar is entirely at your own risk.
             </p>
 
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Termination</h2>
@@ -80,7 +80,7 @@ export default function Terms() {
 
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Changes to Terms</h2>
             <p className="mb-6 text-foreground">
-              We may update these terms at any time. Continued use of She Blooms Wealth after changes constitutes acceptance of the new terms.
+              We may update these terms at any time. Continued use of Radar after changes constitutes acceptance of the new terms.
             </p>
 
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Contact</h2>
@@ -94,7 +94,7 @@ export default function Terms() {
 
         <Card className="border-accent bg-accent/5 p-4">
           <p className="text-sm text-muted-foreground">
-            This is educational content only and does not constitute financial advice. She Blooms Wealth is not liable for any investment decisions or losses.
+            This is educational content only and does not constitute financial advice. Radar is not liable for any investment decisions or losses.
           </p>
         </Card>
       </div>

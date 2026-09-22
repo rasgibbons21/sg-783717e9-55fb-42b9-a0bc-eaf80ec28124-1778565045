@@ -754,7 +754,7 @@ function Sidebar({ view, setView, open, onClose }: {
               <p className="text-xs font-semibold" style={{ color: C.accent }}>Learn more</p>
             </div>
             <p className="text-[10px] leading-relaxed mb-3" style={{ color: C.textDim }}>
-              Build your skills with She Blooms University — free courses on stocks, ETFs, and market fundamentals.
+              Build your skills with Radar University — free courses on stocks, ETFs, and market fundamentals.
             </p>
             <Link href="/learn" onClick={onClose}
               className="block text-center text-[10px] font-semibold py-1.5 rounded-lg transition-all hover:brightness-110"

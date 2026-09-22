@@ -56,7 +56,7 @@ export default function BudgetHub() {
   return (
     <AcademyLayout title="Budget">
       <SEO
-        title="Budget — She Blooms Academy"
+        title="Budget — Radar Academy"
         description="Track spending, plan savings, and manage debt with smart budgeting tools and AI-powered insights."
       />
 

@@ -24,7 +24,7 @@ const LEARNING_PATHS = [
   },
   {
     icon: GraduationCap,
-    title: "She Blooms University",
+    title: "Radar University",
     desc: "Structured courses that take you from complete beginner to confident investor.",
     href: "/university",
     color: "#27B7C8",
@@ -66,7 +66,7 @@ export default function TradeHub() {
   return (
     <AcademyLayout title="Learn to Trade">
       <SEO
-        title="Learn to Trade — She Blooms Academy"
+        title="Learn to Trade — Radar Academy"
         description="Master investing from scratch with 150+ lessons, paper trading simulator, and AI-powered stock analysis tools."
       />
 

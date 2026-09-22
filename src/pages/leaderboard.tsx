@@ -72,7 +72,7 @@ export default function LeaderboardPage() {
   return (
     <>
       <Head>
-        <title>Leaderboard | She Blooms Wealth</title>
+        <title>Leaderboard | Radar</title>
       </Head>
       <Layout>
         <div className="min-h-screen" style={{ background: C.bg }}>
@@ -260,7 +260,7 @@ export default function LeaderboardPage() {
                   <button
                     onClick={() => share({
                       type: 'leaderboard',
-                      title: `#${me.rank} on She Blooms Wealth`,
+                      title: `#${me.rank} on Radar`,
                       subtitle: `${me.total_trades} trades · ${me.win_rate}% win rate`,
                       emoji: me.rank === 1 ? '🥇' : me.rank === 2 ? '🥈' : me.rank === 3 ? '🥉' : '🏆',
                       stats: [

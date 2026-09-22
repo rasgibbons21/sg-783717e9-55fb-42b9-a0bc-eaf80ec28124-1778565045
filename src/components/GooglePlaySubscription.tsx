@@ -334,7 +334,7 @@ export default function GooglePlaySubscription() {
 
       {/* Disclaimer */}
       <p className="text-[10px] text-center text-muted-foreground/60 leading-relaxed">
-        Educational content only. Not financial advice. She Blooms Wealth is not liable for
+        Educational content only. Not financial advice. Radar is not liable for
         any investment decisions or losses.
       </p>
 

@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   NotebookPen, Search, Filter, ChevronDown, ChevronUp,
   AlertTriangle, Loader2, X, Check, TrendingUp, TrendingDown, Lock,
-  Target, ShieldCheck, Clock, Brain, Heart, Scale, Award,
+  Target, ShieldCheck, Clock, Brain, Heart, Scale, Award, BarChart3,
 } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -460,6 +460,203 @@ function ProGate() {
   );
 }
 
+// ── Analytics ─────────────────────────────────────────────────────────────
+function JournalAnalytics({ entries }: { entries: JournalEntry[] }) {
+  const [open, setOpen] = useState(false);
+
+  const trades = entries.filter(e => e.pnl != null);
+  const wins = trades.filter(e => (e.pnl ?? 0) > 0);
+  const losses = trades.filter(e => (e.pnl ?? 0) < 0);
+
+  const avgWin = wins.length > 0 ? wins.reduce((s, e) => s + (e.pnl ?? 0), 0) / wins.length : 0;
+  const avgLoss = losses.length > 0 ? Math.abs(losses.reduce((s, e) => s + (e.pnl ?? 0), 0) / losses.length) : 0;
+  const profitFactor = avgLoss > 0 ? Math.round((avgWin * wins.length) / (avgLoss * losses.length) * 100) / 100 : wins.length > 0 ? Infinity : 0;
+  const largestWin = wins.length > 0 ? Math.max(...wins.map(e => e.pnl ?? 0)) : 0;
+  const largestLoss = losses.length > 0 ? Math.min(...losses.map(e => e.pnl ?? 0)) : 0;
+  const avgRR = (() => {
+    const withRR = trades.filter(e => e.score_rr != null);
+    return withRR.length > 0 ? Math.round(withRR.reduce((s, e) => s + (e.score_rr ?? 0), 0) / withRR.length) : null;
+  })();
+
+  // Win/loss streaks
+  const streaks = (() => {
+    let maxWin = 0, maxLoss = 0, curWin = 0, curLoss = 0;
+    for (const e of [...trades].reverse()) {
+      if ((e.pnl ?? 0) > 0) { curWin++; curLoss = 0; maxWin = Math.max(maxWin, curWin); }
+      else { curLoss++; curWin = 0; maxLoss = Math.max(maxLoss, curLoss); }
+    }
+    return { maxWin, maxLoss, currentWin: curWin, currentLoss: curLoss };
+  })();
+
+  // Cumulative P/L for sparkline
+  const cumPnl = (() => {
+    let cum = 0;
+    return [...trades].reverse().map(e => { cum += e.pnl ?? 0; return cum; });
+  })();
+
+  // Emotion breakdown (most common winning vs losing emotion)
+  const emotionStats = (() => {
+    const winEmotions: Record<string, number> = {};
+    const lossEmotions: Record<string, number> = {};
+    for (const e of trades) {
+      const emo = e.emotion_before || e.emotion_during;
+      if (!emo) continue;
+      if ((e.pnl ?? 0) > 0) winEmotions[emo] = (winEmotions[emo] ?? 0) + 1;
+      else lossEmotions[emo] = (lossEmotions[emo] ?? 0) + 1;
+    }
+    const topWin = Object.entries(winEmotions).sort((a, b) => b[1] - a[1])[0];
+    const topLoss = Object.entries(lossEmotions).sort((a, b) => b[1] - a[1])[0];
+    return { topWin: topWin?.[0] ?? null, topLoss: topLoss?.[0] ?? null };
+  })();
+
+  // Strategy breakdown (from chart_pattern or indicator_used)
+  const strategyStats = (() => {
+    const map: Record<string, { wins: number; losses: number; pnl: number }> = {};
+    for (const e of trades) {
+      const strat = e.chart_pattern || e.indicator_used || "Untagged";
+      if (!map[strat]) map[strat] = { wins: 0, losses: 0, pnl: 0 };
+      map[strat].pnl += e.pnl ?? 0;
+      if ((e.pnl ?? 0) > 0) map[strat].wins++;
+      else map[strat].losses++;
+    }
+    return Object.entries(map)
+      .map(([name, s]) => ({ name, ...s, total: s.wins + s.losses, wr: Math.round((s.wins / (s.wins + s.losses)) * 100) }))
+      .sort((a, b) => b.pnl - a.pnl)
+      .slice(0, 5);
+  })();
+
+  // Sparkline SVG
+  const sparkline = (() => {
+    if (cumPnl.length < 2) return null;
+    const w = 280, h = 50, pad = 2;
+    const min = Math.min(0, ...cumPnl);
+    const max = Math.max(0, ...cumPnl);
+    const range = max - min || 1;
+    const points = cumPnl.map((v, i) => {
+      const x = pad + (i / (cumPnl.length - 1)) * (w - pad * 2);
+      const y = pad + ((max - v) / range) * (h - pad * 2);
+      return `${x},${y}`;
+    }).join(" ");
+    const zeroY = pad + ((max - 0) / range) * (h - pad * 2);
+    const lastVal = cumPnl[cumPnl.length - 1];
+    const color = lastVal >= 0 ? "#49B06E" : "#EF4444";
+    return (
+      <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-[50px]">
+        <line x1={pad} y1={zeroY} x2={w - pad} y2={zeroY} stroke="rgba(255,255,255,0.06)" strokeWidth="0.5" />
+        <polyline points={points} fill="none" stroke={color} strokeWidth="1.5" strokeLinejoin="round" />
+        <circle cx={Number(points.split(" ").pop()?.split(",")[0])} cy={Number(points.split(" ").pop()?.split(",")[1])} r="2.5" fill={color} />
+      </svg>
+    );
+  })();
+
+  return (
+    <div className="rounded-xl mb-4 overflow-hidden" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+      <button
+        onClick={() => { haptic(); setOpen(!open); }}
+        className="w-full flex items-center justify-between px-3 py-2.5"
+      >
+        <div className="flex items-center gap-2">
+          <BarChart3 className="w-3.5 h-3.5 text-[#27B7C8]" />
+          <span className="text-xs font-semibold text-[#F3EDE3]/70">Performance Analytics</span>
+        </div>
+        {open ? <ChevronUp className="w-3.5 h-3.5 text-[#F3EDE3]/30" /> : <ChevronDown className="w-3.5 h-3.5 text-[#F3EDE3]/30" />}
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+          >
+            <div className="px-3 pb-3 space-y-3">
+
+              {/* Cumulative P/L chart */}
+              {sparkline && (
+                <div>
+                  <p className="text-[9px] text-[#F3EDE3]/30 uppercase tracking-wide mb-1">Cumulative P/L</p>
+                  {sparkline}
+                </div>
+              )}
+
+              {/* Detailed metrics */}
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { label: "Avg Win", value: `+${fmt(avgWin)}`, color: "#49B06E" },
+                  { label: "Avg Loss", value: `-${fmt(avgLoss)}`, color: "#EF4444" },
+                  { label: "Profit Factor", value: profitFactor === Infinity ? "∞" : profitFactor.toFixed(2), color: profitFactor >= 1.5 ? "#49B06E" : profitFactor >= 1 ? "#FACC15" : "#EF4444" },
+                  { label: "Largest Win", value: `+${fmt(largestWin)}`, color: "#49B06E" },
+                  { label: "Largest Loss", value: fmt(largestLoss), color: "#EF4444" },
+                  { label: "R:R Score", value: avgRR != null ? `${avgRR}/100` : "—", color: avgRR && avgRR >= 60 ? "#49B06E" : "#FACC15" },
+                ].map(({ label, value, color }) => (
+                  <div key={label} className="rounded-lg px-2 py-1.5 text-center" style={{ background: `${color}06`, border: `1px solid ${color}10` }}>
+                    <p className="text-[8px] text-[#F3EDE3]/30 uppercase tracking-wider">{label}</p>
+                    <p className="text-[11px] font-bold mt-0.5" style={{ color }}>{value}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Streaks */}
+              <div className="flex gap-2">
+                <div className="flex-1 rounded-lg px-2 py-1.5" style={{ background: "rgba(73,176,110,0.06)", border: "1px solid rgba(73,176,110,0.10)" }}>
+                  <p className="text-[8px] text-[#F3EDE3]/30 uppercase tracking-wider">Best Win Streak</p>
+                  <p className="text-xs font-bold text-[#49B06E]">{streaks.maxWin} trades</p>
+                  {streaks.currentWin > 1 && <p className="text-[8px] text-[#49B06E]/60 mt-0.5">Current: {streaks.currentWin}</p>}
+                </div>
+                <div className="flex-1 rounded-lg px-2 py-1.5" style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.10)" }}>
+                  <p className="text-[8px] text-[#F3EDE3]/30 uppercase tracking-wider">Worst Loss Streak</p>
+                  <p className="text-xs font-bold text-[#EF4444]">{streaks.maxLoss} trades</p>
+                  {streaks.currentLoss > 1 && <p className="text-[8px] text-[#EF4444]/60 mt-0.5">Current: {streaks.currentLoss}</p>}
+                </div>
+              </div>
+
+              {/* Emotion insight */}
+              {(emotionStats.topWin || emotionStats.topLoss) && (
+                <div className="rounded-lg px-2.5 py-2" style={{ background: "rgba(39,183,200,0.04)", border: "1px solid rgba(39,183,200,0.08)" }}>
+                  <p className="text-[9px] text-[#27B7C8]/60 uppercase tracking-wide mb-1">Emotional Patterns</p>
+                  <div className="space-y-1">
+                    {emotionStats.topWin && (
+                      <p className="text-[11px] text-[#F3EDE3]/60">
+                        Winning mood: <span className="font-semibold text-[#49B06E]">{emotionStats.topWin}</span>
+                      </p>
+                    )}
+                    {emotionStats.topLoss && (
+                      <p className="text-[11px] text-[#F3EDE3]/60">
+                        Losing mood: <span className="font-semibold text-[#EF4444]">{emotionStats.topLoss}</span>
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Strategy breakdown */}
+              {strategyStats.length > 0 && strategyStats[0].name !== "Untagged" && (
+                <div>
+                  <p className="text-[9px] text-[#F3EDE3]/30 uppercase tracking-wide mb-1.5">Strategy Breakdown</p>
+                  <div className="space-y-1">
+                    {strategyStats.map(s => (
+                      <div key={s.name} className="flex items-center gap-2 text-[11px]">
+                        <span className="text-[#F3EDE3]/50 flex-1 truncate">{s.name}</span>
+                        <span className="text-[#F3EDE3]/30">{s.total}t</span>
+                        <span style={{ color: s.wr >= 50 ? "#49B06E" : "#EF4444" }}>{s.wr}%</span>
+                        <span className="w-16 text-right font-semibold" style={{ color: s.pnl >= 0 ? "#49B06E" : "#EF4444" }}>
+                          {s.pnl >= 0 ? "+" : ""}{fmt(s.pnl)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 // ── Main Page ──────────────────────────────────────────────────────────────
 export default function JournalPage(_props: PageProps) {
   const { isPro, isLoading: authLoading } = useSubscription();
@@ -514,7 +711,7 @@ export default function JournalPage(_props: PageProps) {
   return (
     <>
       <Head>
-        <title>Trade Journal — She Blooms Wealth</title>
+        <title>Trade Journal — Radar</title>
       </Head>
       <Layout>
         <div className="min-h-screen bg-[#07080C] px-4 py-4 max-w-lg mx-auto pb-32">
@@ -573,6 +770,9 @@ export default function JournalPage(_props: PageProps) {
                   ))}
                 </div>
               )}
+
+              {/* Analytics section */}
+              {totalTrades >= 3 && <JournalAnalytics entries={entries} />}
 
               {/* Filters */}
               <div className="rounded-xl p-3 mb-4 space-y-2" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>

@@ -297,13 +297,13 @@ export default function Profile() {
       ? `https://shebloomswealth.app/onboarding?ref=${referralCode}`
       : "https://shebloomswealth.app";
     const shareText = referralCode
-      ? "Join me on She Blooms Wealth and we both get 7 extra days of Core! Stock screener & alerts made simple."
-      : "Check out She Blooms Wealth — stock screener & alerts.";
+      ? "Join me on Radar and we both get 7 extra days of Core! Stock screener & alerts made simple."
+      : "Check out Radar — stock screener & alerts.";
 
     if (navigator.share) {
       try {
         await navigator.share({
-          title: "She Blooms Wealth",
+          title: "Radar",
           text: shareText,
           url: shareUrl,
         });
@@ -342,7 +342,7 @@ export default function Profile() {
 
   return (
     <Layout>
-      <SEO title="Profile — She Blooms Wealth" />
+      <SEO title="Profile — Radar" />
       <div className="container-full py-8 space-y-6 pb-24">
         {/* Header */}
         <div className="space-y-2">
@@ -866,7 +866,7 @@ export default function Profile() {
         {/* Disclaimer */}
         <Card className="p-4 bg-muted/50 border-muted-foreground/20 rounded-2xl">
           <p className="text-xs text-muted-foreground text-center leading-relaxed">
-            This is educational content only and does not constitute financial advice. She Blooms Wealth is not liable for any investment decisions or losses.<br/>
+            This is educational content only and does not constitute financial advice. Radar is not liable for any investment decisions or losses.<br/>
             Contact us at cindervaultenterprisesllc@gmail.com
           </p>
         </Card>

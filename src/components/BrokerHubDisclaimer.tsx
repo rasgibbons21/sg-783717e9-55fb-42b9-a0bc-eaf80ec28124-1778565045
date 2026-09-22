@@ -8,7 +8,7 @@ export default function BrokerHubDisclaimer() {
         <div className="flex gap-3">
           <AlertCircle className="h-5 w-5 flex-shrink-0 text-primary mt-0.5" />
           <p className="text-xs text-muted-foreground leading-relaxed">
-            She Blooms Wealth is an educational platform and is not a broker. Some links are affiliate or referral links. She Blooms Wealth may receive compensation if you open an account or purchase a service through one of these links, at no additional cost to you.
+            Radar is an educational platform and is not a broker. Some links are affiliate or referral links. Radar may receive compensation if you open an account or purchase a service through one of these links, at no additional cost to you.
           </p>
         </div>
       </Card>

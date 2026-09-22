@@ -1,11 +1,11 @@
 self.addEventListener("push", (event) => {
-  let data = { title: "She Blooms Wealth", body: "You have a new notification", url: "/home" };
+  let data = { title: "Radar", body: "You have a new notification", url: "/home" };
   try {
     data = event.data.json();
   } catch {}
 
   event.waitUntil(
-    self.registration.showNotification(data.title || "She Blooms Wealth", {
+    self.registration.showNotification(data.title || "Radar", {
       body: data.body,
       icon: "/icon-192.png",
       badge: "/icon-192.png",

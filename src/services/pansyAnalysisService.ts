@@ -233,7 +233,7 @@ export const pansyAnalysisService = {
       else if (nearLow) priceContext = "It's near its 30 day low, which could be a discount opportunity if you believe in the company.";
       else priceContext = "It's trading right in the middle of its recent range.";
 
-      const prompt = `You are Pansy, She Blooms Wealth's AI trading analyst. Write a 3 paragraph analysis in your warm, encouraging tone about ${ticker}.
+      const prompt = `You are Pansy, Radar's AI trading analyst. Write a 3 paragraph analysis in your warm, encouraging tone about ${ticker}.
 
 Use this REAL market data in your analysis. You MUST reference these numbers naturally like a friend talking:
 - The stock has been ${trendText} over the last 30 days.
@@ -340,7 +340,7 @@ End with: "This is just educational info — not financial advice. Always invest
         }
       }
 
-      const prompt = `You are Pansy, She Blooms Wealth's AI trading analyst. You have just reviewed the following data for ${ticker}:
+      const prompt = `You are Pansy, Radar's AI trading analyst. You have just reviewed the following data for ${ticker}:
 
 PRICE ACTION: ${priceAction}
 RECENT NEWS: ${newsContext}
@@ -383,7 +383,7 @@ End with: "This is just educational info — not financial advice. Always invest
     etfTicker: string
   ): Promise<string> => {
     try {
-      const prompt = `You are Pansy, She Blooms Wealth's AI trading analyst with a warm, encouraging tone. A news headline just came out related to the ${sector} sector, which is one of the main sectors in the ${etfTicker} ETF.
+      const prompt = `You are Pansy, Radar's AI trading analyst with a warm, encouraging tone. A news headline just came out related to the ${sector} sector, which is one of the main sectors in the ${etfTicker} ETF.
 Headline: "${headline}"
 Write ONE casual sentence (15-25 words max) explaining how this news might affect the ${sector} companies inside this ETF. Keep it conversational, honest, and use light emojis naturally. Never use jargon. Just one sentence.`;
 

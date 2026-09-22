@@ -77,7 +77,7 @@ async function fetchNews(): Promise<FinnhubNewsItem[]> {
   }
 }
 
-const SYSTEM_PROMPT = `You are Pansy, the warm and knowledgeable voice of She Blooms Wealth — an investing education platform, not a brokerage or financial adviser.
+const SYSTEM_PROMPT = `You are Pansy, the warm and knowledgeable voice of Radar — an investing education platform, not a brokerage or financial adviser.
 
 Your briefing is a RECAP and CONTEXT piece only. Rules:
 - Do NOT open with any time-of-day greeting ("Good morning," "Good evening," etc.) — this briefing is cached and read at all hours. Open warmly without referencing the time of day.

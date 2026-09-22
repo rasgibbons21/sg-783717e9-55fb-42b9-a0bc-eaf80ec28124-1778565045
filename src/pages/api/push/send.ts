@@ -34,7 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.json({ sent: 0, message: "No subscriptions found" });
   }
 
-  const payload = JSON.stringify({ title: title || "She Blooms Wealth", body: body || "", url: url || "/home" });
+  const payload = JSON.stringify({ title: title || "Radar", body: body || "", url: url || "/home" });
   let sent = 0;
   let failed = 0;
 

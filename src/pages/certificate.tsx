@@ -72,8 +72,8 @@ export default function CertificatePage() {
       if (blob && navigator.share) {
         const file = new File([blob], "bloom-certificate.png", { type: "image/png" });
         await navigator.share({
-          title: "My She Blooms Wealth Certificate",
-          text: "I earned my certificate on She Blooms Wealth! 🌸",
+          title: "My Radar Certificate",
+          text: "I earned my certificate on Radar! 🌸",
           files: [file],
         });
       } else if (blob) {
@@ -92,7 +92,7 @@ export default function CertificatePage() {
   const mod = moduleSlug ? UNIVERSITY_MODULES.find(m => m.slug === moduleSlug) : null;
 
   const certTitle = type === "university-all"
-    ? "She Blooms University Advanced Program"
+    ? "Radar University Advanced Program"
     : type === "university" && mod
       ? mod.certificateName
       : "Investing Foundations";
@@ -108,7 +108,7 @@ export default function CertificatePage() {
   if (requiresPaid) {
     return (
       <>
-        <Head><title>Certificate | She Blooms Wealth</title></Head>
+        <Head><title>Certificate | Radar</title></Head>
         <div className="fixed inset-0 flex items-center justify-center" style={{ background: "#07080C" }}>
           <div className="text-center max-w-sm mx-4">
             <div className="w-20 h-20 mx-auto mb-5 rounded-full flex items-center justify-center" style={{ background: "rgba(201,168,76,0.1)", border: "2px solid rgba(201,168,76,0.3)" }}>
@@ -145,7 +145,7 @@ export default function CertificatePage() {
 
   return (
     <>
-      <Head><title>Certificate of Completion | She Blooms Wealth</title></Head>
+      <Head><title>Certificate of Completion | Radar</title></Head>
       <div className="fixed inset-0 overflow-y-auto" style={{ background: "#07080C" }}>
         <div className="max-w-3xl mx-auto p-4 sm:p-8 space-y-6">
           <button onClick={() => router.back()} className="flex items-center gap-2 text-[#F3EDE3]/50 hover:text-[#F3EDE3]/80 transition-colors">
@@ -292,7 +292,7 @@ function BasicsCert({ name, date, certId }: { name: string; date: string; certId
                 fontSize: 11, color: "#C9A84C", letterSpacing: 5, margin: "6px 0 0",
                 textTransform: "uppercase", fontWeight: 600,
               }}>
-                She Blooms Wealth
+                Radar
               </p>
             </div>
 
@@ -484,7 +484,7 @@ function UniversityCert({ name, date, certId, title, moduleName }: { name: strin
                 fontSize: 11, color: "#27B7C8", letterSpacing: 5, margin: "6px 0 0",
                 textTransform: "uppercase", fontWeight: 600,
               }}>
-                She Blooms Wealth · University
+                Radar · University
               </p>
             </div>
 
@@ -553,7 +553,7 @@ function UniversityCert({ name, date, certId, title, moduleName }: { name: strin
               maxWidth: 440, margin: "0 auto 40px",
             }}>
               Having demonstrated dedication, discipline, and a commitment to continuous growth by completing
-              {moduleName ? ` the ${moduleName} module` : " all modules"} of She Blooms University.
+              {moduleName ? ` the ${moduleName} module` : " all modules"} of Radar University.
               This achievement reflects a thorough understanding of advanced trading education
               concepts, chart analysis, and strategic market frameworks.
             </p>

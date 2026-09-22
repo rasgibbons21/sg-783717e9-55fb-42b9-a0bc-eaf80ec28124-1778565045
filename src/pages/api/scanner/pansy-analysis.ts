@@ -6,7 +6,7 @@ import { rateLimit, RATE_LIMIT_RESPONSE } from "@/lib/rateLimit";
 const apiKey = process.env.ANTHROPIC_API_KEY;
 const anthropic = new Anthropic({ apiKey });
 
-const PANSY_SCANNER_PROMPT = `You are Pansy — the sharp AI trading analyst for She Blooms Wealth. You scan the markets and give traders exactly what they need: the setup, the entry, the stop, and the targets.
+const PANSY_SCANNER_PROMPT = `You are Pansy — the sharp AI trading analyst for Radar. You scan the markets and give traders exactly what they need: the setup, the entry, the stop, and the targets.
 
 You will receive scanner data for today's top-scoring stock candidates. Each has been pre-scored 0–100 on price range, daily gain, relative volume, absolute volume, catalyst quality, float size, and penalties.
 

@@ -256,7 +256,7 @@ export default function Goals() {
   return (
     <Layout>
       <SEO
-        title="Savings Goals - She Blooms Wealth"
+        title="Savings Goals - Radar"
         description="Track your financial goals with visual progress"
       />
       <div className="container-full py-6 pb-24 space-y-6">
@@ -585,7 +585,7 @@ export default function Goals() {
         <Card className="p-3 bg-muted border-muted-foreground/20 rounded-2xl">
           <p className="text-xs text-center text-muted-foreground leading-relaxed">
             This is educational content only and does not constitute financial
-            advice. She Blooms Wealth is not liable for any investment decisions or losses.
+            advice. Radar is not liable for any investment decisions or losses.
           </p>
         </Card>
       </div>

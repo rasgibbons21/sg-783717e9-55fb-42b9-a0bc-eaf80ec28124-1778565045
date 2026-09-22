@@ -1,8 +1,8 @@
 {
   "packageId": "app.shebloomswealth.mobile",
   "host": "shebloomswealth.app",
-  "name": "She Blooms Wealth",
-  "launcherName": "SBW",
+  "name": "Radar",
+  "launcherName": "Radar",
   "display": "standalone",
   "themeColor": "#27B7C8",
   "themeColorDark": "#0E1B30",

@@ -121,7 +121,7 @@ export default function BrokerComparisonTable({ brokers, onRemove, onClose }: Pr
         {/* Disclosure */}
         <div className="px-6 py-4 border-t border-border">
           <p className="text-[10px] text-muted-foreground/50 leading-relaxed text-center">
-            Affiliate Disclosure: Links above are affiliate or referral links. She Blooms Wealth may receive compensation at no additional cost to you. Not financial advice.
+            Affiliate Disclosure: Links above are affiliate or referral links. Radar may receive compensation at no additional cost to you. Not financial advice.
           </p>
         </div>
       </div>

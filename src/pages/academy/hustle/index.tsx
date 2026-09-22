@@ -65,7 +65,7 @@ export default function HustleHub() {
   return (
     <AcademyLayout title="Side Hustle">
       <SEO
-        title="Side Hustle — She Blooms Academy"
+        title="Side Hustle — Radar Academy"
         description="Discover your perfect side hustle with AI-powered niche analysis, step-by-step guides, and income tracking."
       />
 

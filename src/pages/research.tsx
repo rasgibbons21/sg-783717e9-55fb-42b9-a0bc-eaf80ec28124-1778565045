@@ -294,7 +294,7 @@ export default function ResearchPage() {
   return (
     <>
       <Head>
-        <title>Stock Research — Deep Dive Into Any Ticker | She Blooms Wealth</title>
+        <title>Stock Research — Deep Dive Into Any Ticker | Radar</title>
         <meta name="description" content="Research any stock with real-time price data, interactive charts, and Pansy's plain-language analysis. Compare companies, discover trends, and build conviction before you invest. Free stock research tool for women." />
       </Head>
       <Layout>

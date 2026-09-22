@@ -59,8 +59,8 @@ export function ShareAchievement({
       if (navigator.share) {
         const file = new File([blob], 'bloom-achievement.png', { type: 'image/png' });
         await navigator.share({
-          title: `${title} - She Blooms Wealth`,
-          text: `${subtitle || title} on She Blooms Wealth! Download: shebloomswealth.app`,
+          title: `${title} - Radar`,
+          text: `${subtitle || title} on Radar! Download: shebloomswealth.app`,
           files: [file],
         });
       } else {
@@ -172,7 +172,7 @@ export function ShareAchievement({
             <div className="flex items-center justify-center gap-2 pt-2" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
               <span style={{ fontSize: 16 }}>&#127800;</span>
               <span className="text-xs font-semibold" style={{ color: C.textDim }}>
-                She Blooms Wealth
+                Radar
               </span>
             </div>
           </div>

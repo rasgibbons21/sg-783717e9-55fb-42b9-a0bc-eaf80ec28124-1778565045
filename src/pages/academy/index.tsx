@@ -48,7 +48,7 @@ export default function AcademyLanding() {
   return (
     <>
       <SEO
-        title="She Blooms Academy — Financial Education & AI Tools"
+        title="Radar Academy — Financial Education & AI Tools"
         description="Master budgeting, side hustles, and investing with 13 AI-powered tools. Your complete financial education platform."
         url="https://academy.shebloomswealth.app"
       />
@@ -58,9 +58,9 @@ export default function AcademyLanding() {
         <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <div className="flex h-14 items-center justify-between px-4 max-w-7xl mx-auto">
             <Link href="/academy" className="flex items-center gap-2">
-              <img src="/icon-192.png" alt="She Blooms Wealth" className="h-7 w-auto rounded-md" />
+              <img src="/icon-192.png" alt="Radar" className="h-7 w-auto rounded-md" />
               <span className="font-serif text-lg font-bold text-foreground">
-                She Blooms <span className="text-[#27B7C8]">Academy</span>
+                Radar <span className="text-[#27B7C8]">Academy</span>
               </span>
             </Link>
             <div className="flex items-center gap-3">
@@ -273,7 +273,7 @@ export default function AcademyLanding() {
           <div className="mx-auto max-w-7xl px-4">
             <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
               <div>
-                <h3 className="mb-3 font-serif text-lg font-semibold text-[#27B7C8]">She Blooms Academy</h3>
+                <h3 className="mb-3 font-serif text-lg font-semibold text-[#27B7C8]">Radar Academy</h3>
                 <p className="text-sm text-muted-foreground">
                   Your complete trading education platform. Learn patterns, master setups, trade confidently.
                 </p>
@@ -297,7 +297,7 @@ export default function AcademyLanding() {
             </div>
             <div className="mt-6 border-t border-border pt-6">
               <p className="text-xs text-muted-foreground">
-                &copy; 2026 Cinder Vault Enterprises LLC. All rights reserved. She Blooms Academy is for educational purposes only.
+                &copy; 2026 Cinder Vault Enterprises LLC. All rights reserved. Radar Academy is for educational purposes only.
               </p>
             </div>
           </div>

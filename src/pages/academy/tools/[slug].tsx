@@ -47,7 +47,7 @@ export default function ToolPage() {
     return (
       <AcademyLayout showBack>
         <SEO
-          title={`${tool.name} — She Blooms Academy`}
+          title={`${tool.name} — Radar Academy`}
           description={tool.description}
         />
         <div className="p-4 md:p-6 flex flex-col items-center justify-center min-h-[60vh] text-center max-w-md mx-auto">
@@ -95,7 +95,7 @@ export default function ToolPage() {
   return (
     <AcademyLayout showBack>
       <SEO
-        title={`${tool.name} — She Blooms Academy`}
+        title={`${tool.name} — Radar Academy`}
         description={tool.description}
       />
       <div className="p-4 md:p-6">

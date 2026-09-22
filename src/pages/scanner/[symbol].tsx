@@ -166,7 +166,7 @@ export default function SymbolDetail() {
 
   return (
     <Layout>
-      <SEO title={`${sym} Signal | She Blooms Wealth`} description={`Trading analysis for ${sym}`} />
+      <SEO title={`${sym} Signal | Radar`} description={`Trading analysis for ${sym}`} />
 
       <div className="max-w-lg mx-auto px-4 pt-4 pb-32">
         {/* Back button */}

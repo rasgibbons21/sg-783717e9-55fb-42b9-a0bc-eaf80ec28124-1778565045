@@ -6,7 +6,7 @@
 
     <application
         android:name="app.shebloomswealth.mobile.Application"
-        android:label="She Blooms Wealth"
+        android:label="Radar"
         android:icon="@mipmap/ic_launcher"
         android:allowBackup="true"
         android:supportsRtl="true"

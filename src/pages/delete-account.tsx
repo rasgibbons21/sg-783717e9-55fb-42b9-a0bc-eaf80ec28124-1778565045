@@ -41,14 +41,14 @@ export default function DeleteAccount() {
   return (
     <Layout>
       <SEO
-        title="Delete Account | She Blooms Wealth"
-        description="Request deletion of your She Blooms Wealth account and associated data."
+        title="Delete Account | Radar"
+        description="Request deletion of your Radar account and associated data."
       />
       <div className="mx-auto max-w-2xl space-y-8 px-4 py-8">
         <div>
           <h1 className="mb-2 font-serif text-4xl font-bold text-primary">Delete Account</h1>
           <p className="text-muted-foreground">
-            Request deletion of your She Blooms Wealth account
+            Request deletion of your Radar account
           </p>
         </div>
 
@@ -78,7 +78,7 @@ export default function DeleteAccount() {
                   What happens when you delete your account
                 </h2>
                 <p className="mb-4 text-foreground">
-                  When you request account deletion, the following data associated with your She Blooms Wealth account will be permanently removed:
+                  When you request account deletion, the following data associated with your Radar account will be permanently removed:
                 </p>
                 <ul className="mb-6 space-y-2 text-foreground">
                   <li>Profile information (name, email, avatar)</li>
@@ -164,7 +164,7 @@ export default function DeleteAccount() {
 
             <Card className="border-accent bg-accent/5 p-4">
               <p className="text-sm text-muted-foreground">
-                This is educational content only and does not constitute financial advice. She Blooms Wealth is not liable for any investment decisions or losses.
+                This is educational content only and does not constitute financial advice. Radar is not liable for any investment decisions or losses.
               </p>
             </Card>
           </>

@@ -24,8 +24,8 @@ def twaManifest = [
     applicationId: 'app.shebloomswealth.mobile',
     hostName: 'shebloomswealth.app', // The domain being opened in the TWA.
     launchUrl: '/', // The start path for the TWA. Must be relative to the domain.
-    name: 'She Blooms Wealth', // The application name.
-    launcherName: 'Bloom', // The name shown on the Android Launcher.
+    name: 'Radar', // The application name.
+    launcherName: 'Radar', // The name shown on the Android Launcher.
     themeColor: '#27B7C8', // The color used for the status bar.
     themeColorDark: '#0E1B30', // The color used for the dark status bar.
     navigationColor: '#0E1B30', // The color used for the navigation bar.

@@ -28,7 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const firstName = user.user_metadata?.full_name?.split(" ")[0] || "there";
 
   await resend.emails.send({
-    from: "She Blooms Wealth <hello@shebloomswealth.app>",
+    from: "Radar <hello@shebloomswealth.app>",
     to: user.email,
     subject: "Your verification code",
     html: `
@@ -39,7 +39,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           <p style="margin:0;font-size:36px;font-weight:700;color:#27B7C8;letter-spacing:8px">${code}</p>
         </div>
         <p style="line-height:1.6;margin:0 0 16px">Enter this code in the app to verify your email. It expires in 10 minutes.</p>
-        <p style="margin:0;font-size:13px;color:#94a3b8">If you didn't sign up for She Blooms Wealth, you can ignore this email.</p>
+        <p style="margin:0;font-size:13px;color:#94a3b8">If you didn't sign up for Radar, you can ignore this email.</p>
       </div>
     `,
   });

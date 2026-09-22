@@ -74,7 +74,7 @@ export default function AcademyCertificatePage() {
   return (
     <>
       <Head>
-        <title>Your Certificate - She Blooms Wealth</title>
+        <title>Your Certificate - Radar</title>
       </Head>
 
       <div className="min-h-screen p-4 sm:p-8" style={{ background: '#07080C' }}>

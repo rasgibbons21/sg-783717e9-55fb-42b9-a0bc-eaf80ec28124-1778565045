@@ -74,7 +74,7 @@ export default function ResetPassword() {
   if (isCheckingToken) {
     return (
       <Layout>
-        <SEO title="Reset Password — She Blooms Wealth" />
+        <SEO title="Reset Password — Radar" />
         <div className="min-h-screen flex items-center justify-center p-4">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </div>
@@ -85,7 +85,7 @@ export default function ResetPassword() {
   if (!isValidToken) {
     return (
       <Layout>
-        <SEO title="Reset Password — She Blooms Wealth" />
+        <SEO title="Reset Password — Radar" />
         <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-background via-primary/5 to-accent/5">
           <Card className="w-full max-w-md border-border shadow-lg">
             <CardHeader className="text-center space-y-4">
@@ -125,7 +125,7 @@ export default function ResetPassword() {
 
   return (
     <Layout>
-      <SEO title="Reset Password — She Blooms Wealth" />
+      <SEO title="Reset Password — Radar" />
       <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-background via-primary/5 to-accent/5">
         <Card className="w-full max-w-md border-border shadow-lg">
           <CardHeader className="text-center space-y-2">
