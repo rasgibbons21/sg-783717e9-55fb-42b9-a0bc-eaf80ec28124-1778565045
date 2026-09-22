@@ -1,15 +1,16 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
 const cache = new Map<string, { data: unknown; ts: number }>();
-const CACHE_MS = 3 * 60 * 1000;
+const CACHE_MS = 5 * 60 * 1000;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });
 
-  const fmpKey = process.env.FMP_API_KEY;
   const finnhubKey = process.env.FINNHUB_API_KEY;
+  const newsDataKey = process.env.NEWSDATA_API_KEY;
+  const fmpKey = process.env.FMP_API_KEY;
 
-  if (!fmpKey && !finnhubKey) {
+  if (!finnhubKey && !newsDataKey && !fmpKey) {
     return res.status(500).json({ error: "No news API key configured" });
   }
 
@@ -22,50 +23,89 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const articles: Article[] = [];
+    const seen = new Set<string>();
+
+    const addArticle = (a: Article) => {
+      const key = a.title.toLowerCase().slice(0, 60);
+      if (seen.has(key)) return;
+      seen.add(key);
+      articles.push(a);
+    };
 
     if (type === "general") {
-      // General market news from Finnhub
+      // 1. Finnhub — primary source for real-time market news
       if (finnhubKey) {
-        const url = `https://finnhub.io/api/v1/news?category=general&token=${finnhubKey}`;
-        const r = await fetch(url);
-        if (r.ok) {
-          const data = await r.json();
-          for (const a of data.slice(0, 20)) {
-            articles.push({
-              id: String(a.id),
-              title: a.headline,
-              summary: a.summary,
-              source: a.source,
-              url: a.url,
-              image: a.image,
-              publishedAt: new Date(a.datetime * 1000).toISOString(),
-              category: a.category,
-              symbols: a.related?.split(",").filter(Boolean) ?? [],
-            });
+        try {
+          const url = `https://finnhub.io/api/v1/news?category=general&token=${finnhubKey}`;
+          const r = await fetch(url, { signal: AbortSignal.timeout(8000) });
+          if (r.ok) {
+            const data = await r.json();
+            for (const a of data.slice(0, 15)) {
+              addArticle({
+                id: String(a.id),
+                title: a.headline,
+                summary: a.summary,
+                source: a.source,
+                url: a.url,
+                image: a.image,
+                publishedAt: new Date(a.datetime * 1000).toISOString(),
+                category: a.category,
+                symbols: a.related?.split(",").filter(Boolean) ?? [],
+              });
+            }
           }
-        }
+        } catch {}
       }
 
-      // Supplement with FMP general news
-      if (fmpKey && articles.length < 10) {
-        const url = `https://financialmodelingprep.com/api/v3/stock_news?limit=20&apiKey=${fmpKey}`;
-        const r = await fetch(url);
-        if (r.ok) {
-          const data = await r.json();
-          for (const a of data) {
-            articles.push({
-              id: a.url || String(Date.now()),
-              title: a.title,
-              summary: a.text?.slice(0, 200),
-              source: a.site,
-              url: a.url,
-              image: a.image,
-              publishedAt: a.publishedDate,
-              category: "general",
-              symbols: a.symbol ? [a.symbol] : [],
-            });
+      // 2. NewsData.io — broad business news, good headlines & images
+      if (newsDataKey && articles.length < 20) {
+        try {
+          const url = `https://newsdata.io/api/1/latest?apikey=${newsDataKey}&category=business&country=us&language=en&size=10`;
+          const r = await fetch(url, { signal: AbortSignal.timeout(8000) });
+          if (r.ok) {
+            const data = await r.json();
+            for (const a of data.results ?? []) {
+              if (!a.title) continue;
+              addArticle({
+                id: a.article_id || a.link || String(Date.now() + Math.random()),
+                title: a.title,
+                summary: a.description?.slice(0, 200) ?? undefined,
+                source: a.source_name || a.source_id || "NewsData",
+                url: a.link,
+                image: a.image_url ?? undefined,
+                publishedAt: a.pubDate || new Date().toISOString(),
+                category: (a.category ?? []).join(", ") || "business",
+                symbols: [],
+              });
+            }
           }
-        }
+        } catch {}
+      }
+
+      // 3. FMP fallback
+      if (fmpKey && articles.length < 10) {
+        try {
+          const url = `https://financialmodelingprep.com/api/v3/stock_news?limit=15&apiKey=${fmpKey}`;
+          const r = await fetch(url, { signal: AbortSignal.timeout(8000) });
+          if (r.ok) {
+            const data = await r.json();
+            if (Array.isArray(data)) {
+              for (const a of data) {
+                addArticle({
+                  id: a.url || String(Date.now()),
+                  title: a.title,
+                  summary: a.text?.slice(0, 200),
+                  source: a.site,
+                  url: a.url,
+                  image: a.image,
+                  publishedAt: a.publishedDate,
+                  category: "general",
+                  symbols: a.symbol ? [a.symbol] : [],
+                });
+              }
+            }
+          }
+        } catch {}
       }
     }
 
