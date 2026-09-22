@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/router";
 import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
 import { Card } from "@/components/ui/card";
@@ -21,9 +22,11 @@ const SUGGESTED = [
 ];
 
 export default function AskPansyPage() {
+  const router = useRouter();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [autoSent, setAutoSent] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -76,6 +79,14 @@ export default function AskPansyPage() {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    const q = typeof router.query.q === "string" ? router.query.q.trim() : "";
+    if (q && !autoSent && messages.length === 0) {
+      setAutoSent(true);
+      sendMessage(q);
+    }
+  }, [router.query.q, autoSent, messages.length]);
 
   const handleSend = async () => {
     if (!inputValue.trim()) return;

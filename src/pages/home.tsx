@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import {
   Zap, ArrowUpRight, ArrowDownRight,
   RefreshCw, Bell, Newspaper, ChevronRight, Radar, Flower2, ChevronDown, Gift, Flame,
+  Swords, CheckCircle2,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -103,6 +104,9 @@ export default function HomePage() {
   const [briefingOpen, setBriefingOpen] = useState(false);
   const [streak, setStreak] = useState(0);
   const [streakLogged, setStreakLogged] = useState(false);
+  const [challenge, setChallenge] = useState<{ id: string; title: string; description: string; rewardXp: number; type: string } | null>(null);
+  const [challengeCompleted, setChallengeCompleted] = useState(false);
+  const [challengeLoading, setChallengeLoading] = useState(false);
 
   const session = getSession();
 
@@ -193,6 +197,19 @@ export default function HomePage() {
     } catch {}
   }, []);
 
+  const loadChallenge = useCallback(async () => {
+    try {
+      const res = await fetch("/api/daily-challenge");
+      if (res.ok) {
+        const data = await res.json();
+        if (data.challenge) {
+          setChallenge(data.challenge);
+          setChallengeCompleted(data.completed);
+        }
+      }
+    } catch {}
+  }, []);
+
   const logStreak = useCallback(async () => {
     if (streakLogged) return;
     try {
@@ -215,8 +232,9 @@ export default function HomePage() {
     loadNews();
     loadAlerts();
     loadBriefing();
+    loadChallenge();
     logStreak();
-  }, [loadIndices, loadSetups, loadNews, loadAlerts, loadBriefing, logStreak]);
+  }, [loadIndices, loadSetups, loadNews, loadAlerts, loadBriefing, loadChallenge, logStreak]);
 
   const stateLabel = (s: string) => {
     const map: Record<string, { label: string; color: string }> = {
@@ -345,6 +363,74 @@ export default function HomePage() {
                   </p>
                 </div>
               </div>
+            )}
+          </motion.div>
+        )}
+
+        {/* DAILY CHALLENGE */}
+        {challenge && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-2xl p-4 mb-5"
+            style={{
+              background: challengeCompleted
+                ? "linear-gradient(145deg, rgba(73,176,110,0.06), rgba(7,8,12,1))"
+                : "linear-gradient(145deg, rgba(245,158,11,0.06), rgba(7,8,12,1))",
+              border: `1px solid ${challengeCompleted ? "rgba(73,176,110,0.15)" : "rgba(245,158,11,0.15)"}`,
+            }}
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <div
+                className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                style={{ background: challengeCompleted ? "rgba(73,176,110,0.12)" : "rgba(245,158,11,0.12)" }}
+              >
+                {challengeCompleted
+                  ? <CheckCircle2 className="w-4.5 h-4.5 text-[#49B06E]" />
+                  : <Swords className="w-4.5 h-4.5 text-[#F59E0B]" />
+                }
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <p className="text-xs font-bold" style={{ color: challengeCompleted ? "#49B06E" : "#F59E0B" }}>
+                    Daily Challenge
+                  </p>
+                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: "rgba(39,183,200,0.1)", color: "#27B7C8" }}>
+                    +{challenge.rewardXp} XP
+                  </span>
+                </div>
+                <p className="text-sm font-semibold text-[#F3EDE3] mt-0.5">{challenge.title}</p>
+              </div>
+            </div>
+            <p className="text-[11px] text-[#F3EDE3]/45 leading-relaxed mb-3">{challenge.description}</p>
+            {challengeCompleted ? (
+              <div className="flex items-center gap-2 py-2">
+                <CheckCircle2 className="w-4 h-4 text-[#49B06E]" />
+                <span className="text-xs font-semibold text-[#49B06E]">Completed — +{challenge.rewardXp} XP earned!</span>
+              </div>
+            ) : (
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                disabled={challengeLoading}
+                onClick={async () => {
+                  haptic(15);
+                  setChallengeLoading(true);
+                  try {
+                    const res = await fetch("/api/daily-challenge", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ challengeId: challenge.id }),
+                    });
+                    if (res.ok) setChallengeCompleted(true);
+                  } catch {} finally {
+                    setChallengeLoading(false);
+                  }
+                }}
+                className="w-full py-2.5 rounded-xl text-xs font-bold transition-all"
+                style={{ background: "rgba(245,158,11,0.15)", color: "#F59E0B", border: "1px solid rgba(245,158,11,0.25)" }}
+              >
+                {challengeLoading ? "Completing..." : "Mark Complete"}
+              </motion.button>
             )}
           </motion.div>
         )}

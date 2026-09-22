@@ -11,8 +11,11 @@ import {
   ArrowLeft, TrendingUp, AlertTriangle, Shield, Target,
   Newspaper, CheckCircle, XCircle, Info,
   ChevronDown, ChevronUp, BarChart3,
+  Flower2, Star, Share2, Calculator,
 } from "lucide-react";
 import type { SignalResult } from "@/lib/strategies";
+import { supabase } from "@/integrations/supabase/client";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 
 const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
 
@@ -81,6 +84,7 @@ function CriteriaCheck({ label, pass, detail }: { label: string; pass: boolean |
 export default function SymbolDetail() {
   const router = useRouter();
   const { symbol } = router.query;
+  const { userId } = useSubscription();
   const [quote, setQuote] = useState<Quote | null>(null);
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -89,8 +93,45 @@ export default function SymbolDetail() {
   const [chartLoading, setChartLoading] = useState(true);
   const [timeframe, setTimeframe] = useState<string>("5min");
   const [signal, setSignal] = useState<SignalResult | null>(null);
+  const [inWatchlist, setInWatchlist] = useState(false);
+  const [watchlistLoading, setWatchlistLoading] = useState(false);
+  const [showSizer, setShowSizer] = useState(false);
+  const [riskAmount, setRiskAmount] = useState("50");
 
   const sym = (typeof symbol === "string" ? symbol : "").toUpperCase();
+
+  useEffect(() => {
+    if (!sym || !userId) return;
+    supabase.from("watchlist").select("id").eq("user_id", userId).eq("ticker", sym).then(({ data }) => {
+      setInWatchlist((data ?? []).length > 0);
+    });
+  }, [sym, userId]);
+
+  const toggleWatchlist = async () => {
+    if (!userId || !sym || watchlistLoading) return;
+    setWatchlistLoading(true);
+    haptic(15);
+    if (inWatchlist) {
+      await supabase.from("watchlist").delete().eq("user_id", userId).eq("ticker", sym);
+      setInWatchlist(false);
+    } else {
+      await supabase.from("watchlist").insert({ user_id: userId, ticker: sym, asset_type: "stock" } as any);
+      setInWatchlist(true);
+    }
+    setWatchlistLoading(false);
+  };
+
+  const shareSetup = async () => {
+    haptic();
+    const text = quote
+      ? `${sym} $${quote.price.toFixed(2)} (${changePct >= 0 ? "+" : ""}${changePct.toFixed(1)}%) — Entry $${entry.toFixed(2)} / Stop $${stop.toFixed(2)} / Target $${target1.toFixed(2)} (${rr}:1 R:R)`
+      : `Check out ${sym} on Radar`;
+    if (navigator.share) {
+      try { await navigator.share({ title: `${sym} Signal`, text }); } catch {}
+    } else {
+      await navigator.clipboard.writeText(text);
+    }
+  };
 
   useEffect(() => {
     if (!sym) return;
@@ -248,6 +289,44 @@ export default function SymbolDetail() {
               </div>
             </div>
 
+            {/* Action bar */}
+            <div className="flex gap-2 mb-3">
+              <motion.button
+                whileTap={{ scale: 0.92 }}
+                onClick={toggleWatchlist}
+                disabled={watchlistLoading || !userId}
+                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[11px] font-bold transition-all"
+                style={{
+                  background: inWatchlist ? "rgba(245,158,11,0.12)" : "rgba(255,255,255,0.04)",
+                  color: inWatchlist ? "#F59E0B" : "rgba(243,237,227,0.5)",
+                  border: `1px solid ${inWatchlist ? "rgba(245,158,11,0.25)" : "rgba(255,255,255,0.08)"}`,
+                }}
+              >
+                <Star className="w-3.5 h-3.5" fill={inWatchlist ? "#F59E0B" : "none"} />
+                {inWatchlist ? "Watching" : "Watchlist"}
+              </motion.button>
+
+              <Link href={`/ask-pansy?q=Analyze ${sym} for a gap-and-go setup today`} className="flex-1">
+                <motion.div
+                  whileTap={{ scale: 0.92 }}
+                  onClick={() => haptic()}
+                  className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[11px] font-bold"
+                  style={{ background: "rgba(168,85,247,0.1)", color: "#A855F7", border: "1px solid rgba(168,85,247,0.2)" }}
+                >
+                  <Flower2 className="w-3.5 h-3.5" /> Ask Pansy
+                </motion.div>
+              </Link>
+
+              <motion.button
+                whileTap={{ scale: 0.92 }}
+                onClick={shareSetup}
+                className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-[11px] font-bold"
+                style={{ background: "rgba(39,183,200,0.08)", color: "#27B7C8", border: "1px solid rgba(39,183,200,0.15)" }}
+              >
+                <Share2 className="w-3.5 h-3.5" />
+              </motion.button>
+            </div>
+
             {/* CHART — THE MAIN EVENT */}
             <div
               className="rounded-2xl overflow-hidden mb-3"
@@ -364,6 +443,67 @@ export default function SymbolDetail() {
                   Paper Trade This Setup
                 </motion.button>
               </Link>
+
+              {/* Position size calculator */}
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                onClick={() => { haptic(); setShowSizer(!showSizer); }}
+                className="w-full flex items-center justify-center gap-1.5 py-2.5 mt-2 rounded-xl text-[11px] font-bold transition-all"
+                style={{ background: "rgba(39,183,200,0.06)", color: "#27B7C8", border: "1px solid rgba(39,183,200,0.12)" }}
+              >
+                <Calculator className="w-3.5 h-3.5" />
+                Position Sizer
+                {showSizer ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+              </motion.button>
+
+              <AnimatePresence>
+                {showSizer && risk > 0 && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="pt-3 space-y-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] text-[#F3EDE3]/40 whitespace-nowrap">Risk $</span>
+                        <input
+                          type="number"
+                          value={riskAmount}
+                          onChange={e => setRiskAmount(e.target.value)}
+                          className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-[#F3EDE3] outline-none focus:border-[#27B7C8]/40"
+                          min="1"
+                          step="10"
+                        />
+                      </div>
+                      {(() => {
+                        const riskNum = parseFloat(riskAmount) || 0;
+                        const shares = riskNum > 0 && risk > 0 ? Math.floor(riskNum / risk) : 0;
+                        const positionValue = shares * entry;
+                        return (
+                          <div className="grid grid-cols-3 gap-2 text-center">
+                            <div className="rounded-lg p-2" style={{ background: "rgba(39,183,200,0.05)" }}>
+                              <div className="text-[9px] text-[#F3EDE3]/30">Shares</div>
+                              <div className="text-sm font-bold text-[#27B7C8]">{shares}</div>
+                            </div>
+                            <div className="rounded-lg p-2" style={{ background: "rgba(39,183,200,0.05)" }}>
+                              <div className="text-[9px] text-[#F3EDE3]/30">Position</div>
+                              <div className="text-sm font-bold text-[#F3EDE3]">${positionValue.toFixed(0)}</div>
+                            </div>
+                            <div className="rounded-lg p-2" style={{ background: "rgba(73,176,110,0.05)" }}>
+                              <div className="text-[9px] text-[#F3EDE3]/30">T1 Profit</div>
+                              <div className="text-sm font-bold text-[#49B06E]">${(shares * (target1 - entry)).toFixed(0)}</div>
+                            </div>
+                          </div>
+                        );
+                      })()}
+                      <p className="text-[9px] text-[#F3EDE3]/20 text-center">
+                        Based on ${risk.toFixed(2)} risk per share. Not a recommendation.
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               <p className="text-[9px] text-[#F3EDE3]/20 text-center mt-2 leading-relaxed">
                 {signal ? "Signal levels from strategy engine. Not a trade recommendation." : "Hypothetical levels. Entry at current price with 5% stop."}
