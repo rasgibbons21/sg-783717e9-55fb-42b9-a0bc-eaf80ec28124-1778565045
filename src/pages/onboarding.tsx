@@ -10,8 +10,9 @@ import { userService } from "@/services/userService";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Loader2, Eye, EyeOff, ChevronRight, Sparkles, Shield, Target,
-  TrendingUp, Wallet, ArrowLeft, Brain, Clock, Rocket, Check,
+  TrendingUp, Wallet, ArrowLeft, Brain, Clock, Rocket, Check, Bell,
 } from "lucide-react";
+import { FOUNDERS_PLAN } from "@/config/proPlan";
 
 type Step = "welcome" | "auth" | "check-email" | "q-experience" | "q-excites" | "q-capital" | "q-style" | "building" | "ready";
 type AuthMode = "signup" | "login" | "forgot";
@@ -224,8 +225,9 @@ export default function Onboarding() {
         experience_level: experienceLevel,
         investment_goals: [tradingExcitement || "winning_setups"] as string[],
         risk_tolerance: tradingCapital === "under_500" ? "conservative" : tradingCapital === "over_10k" ? "aggressive" : "moderate",
+        preferred_trading_time: tradingStyle as string,
         onboarding_complete: true,
-      });
+      } as any);
       if (saveError) {
         console.error("Failed to save onboarding profile:", saveError);
         setError("We couldn't save your answers. Please try again.");
@@ -767,13 +769,19 @@ export default function Onboarding() {
 
                   <div className={`${glassCard} ${glassCardBg} ${glowBorder} p-6`}>
                     <div className="space-y-5">
-                      {[
+                      {(tradingExperience === "never" ? [
+                        "Connecting to live market data",
+                        "Loading Gap-and-Go strategy engine",
+                        "Setting Pansy to beginner-friendly mode",
+                        "Preparing your learning path",
+                        "All set — let’s start your journey",
+                      ] : [
                         "Connecting to live market data",
                         "Loading Gap-and-Go strategy engine",
                         "Tuning Pansy to your experience level",
                         "Setting up your scoring algorithm",
-                        "Scanner ready — let's find some plays",
-                      ].map((label, i) => (
+                        "Scanner ready — let’s find some plays",
+                      ]).map((label, i) => (
                         <div key={i} className="flex items-center gap-3" style={{ opacity: buildingProgress > i ? 1 : 0.3, transition: "all 0.5s ease" }}>
                           <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0" style={{
                             background: buildingProgress > i ? "linear-gradient(135deg, #49B06E, #27B7C8)" : "rgba(255,255,255,0.06)",
@@ -837,14 +845,21 @@ export default function Onboarding() {
                   </div>
 
                   <div className={`${glassCard} ${glassCardBg} p-4`}>
-                    <p className="text-xs text-[#F3EDE3]/40 font-semibold uppercase tracking-wider mb-3">What&apos;s waiting for you</p>
+                    <p className="text-xs text-[#F3EDE3]/40 font-semibold uppercase tracking-wider mb-3">
+                      {tradingExperience === "never" ? "Your learning path" : "What’s waiting for you"}
+                    </p>
                     <div className="space-y-3">
-                      {[
+                      {(tradingExperience === "never" ? [
+                        { emoji: "📚", label: "Academy", desc: "36 bite-sized lessons from zero to confident", color: "#27B7C8" },
+                        { emoji: "📊", label: "Paper Trader", desc: "Practice with $10K virtual cash — no risk", color: "#49B06E" },
+                        { emoji: "🌸", label: "Pansy Coach", desc: "AI explains every setup in plain English", color: "#8B5CF6" },
+                        { emoji: "🔍", label: "Live Scanner", desc: "Gap-and-Go candidates scored 0–100", color: "#F59E0B" },
+                      ] : [
                         { emoji: "🔍", label: "Live Scanner", desc: "Gap-and-Go candidates scored 0–100 in real time", color: "#49B06E" },
-                        { emoji: "🌸", label: "Pansy's Picks", desc: "AI analysis with entry, stop, and target for each play", color: "#8B5CF6" },
+                        { emoji: "🌸", label: "Pansy’s Picks", desc: "AI analysis with entry, stop, and target for each play", color: "#8B5CF6" },
                         { emoji: "📊", label: "Paper Trader", desc: "Practice every setup risk-free before going live", color: "#27B7C8" },
-                        { emoji: "📰", label: "Market News", desc: "Catalyst-driven news feed to spot what's moving", color: "#F59E0B" },
-                      ].map((item, i) => (
+                        { emoji: "📰", label: "Market News", desc: "Catalyst-driven news feed to spot what’s moving", color: "#F59E0B" },
+                      ]).map((item, i) => (
                         <div key={i} className="flex items-center gap-3" style={{ animation: animateIn ? `cardEntrance 0.4s ease-out ${i * 0.1}s both` : "none" }}>
                           <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0" style={{ background: `${item.color}15` }}>
                             {item.emoji}
@@ -869,9 +884,9 @@ export default function Onboarding() {
                     <p className="text-xs text-[#F3EDE3]/40 mb-3">7-day free trial on every plan. Cancel anytime.</p>
                     <div className="space-y-2">
                       {[
-                        { label: "Monthly", price: "$4.99/mo", regular: "$9.99/mo", tag: null },
-                        { label: "Yearly", price: "$39.99/yr", regular: "$79.99/yr", tag: "Best Value" },
-                        { label: "Lifetime", price: "$69.99", regular: "$149.99", tag: "One-time" },
+                        { label: "Monthly", price: `$${FOUNDERS_PLAN.monthlyPrice}/mo`, regular: `$${FOUNDERS_PLAN.regularMonthlyPrice}/mo`, tag: null },
+                        { label: "Yearly", price: `$${FOUNDERS_PLAN.yearlyPrice}/yr`, regular: `$${FOUNDERS_PLAN.regularYearlyPrice}/yr`, tag: "Best Value" },
+                        { label: "Lifetime", price: `$${FOUNDERS_PLAN.lifetimePrice}`, regular: `$${FOUNDERS_PLAN.regularLifetimePrice}`, tag: "One-time" },
                       ].map((plan, i) => (
                         <div
                           key={i}
@@ -898,15 +913,17 @@ export default function Onboarding() {
                     </div>
                   </div>
 
+                  <NotificationOptIn />
+
                   <button
                     type="button"
-                    onClick={() => { window.location.href = "/home"; }}
+                    onClick={() => { window.location.href = tradingExperience === "never" ? "/learn" : "/home"; }}
                     className="glass-btn flex items-center justify-center gap-2 text-lg"
                   >
-                    Start Free Trial <ChevronRight className="w-5 h-5" />
+                    {tradingExperience === "never" ? "Start Learning" : tradingExperience === "active" ? "See Today's Scans" : "Open My Dashboard"} <ChevronRight className="w-5 h-5" />
                   </button>
                   <p className="text-center text-[10px] text-[#F3EDE3]/25">
-                    No credit card required to start
+                    No credit card required to start &middot; 7-day free trial
                   </p>
                 </div>
               )}
@@ -917,6 +934,96 @@ export default function Onboarding() {
       </div>
     </>
   );
+}
+
+function NotificationOptIn() {
+  const [status, setStatus] = useState<"idle" | "enabling" | "done" | "skipped">("idle");
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !("serviceWorker" in navigator) || !("PushManager" in window)) {
+      setStatus("skipped");
+      return;
+    }
+    if (Notification.permission === "granted" || Notification.permission === "denied") {
+      setStatus("skipped");
+    }
+  }, []);
+
+  const enable = async () => {
+    setStatus("enabling");
+    try {
+      const registration = await navigator.serviceWorker.register("/sw-push.js");
+      const permission = await Notification.requestPermission();
+      if (permission !== "granted") { setStatus("skipped"); return; }
+
+      const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+      if (!vapidKey) { setStatus("done"); return; }
+
+      const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(vapidKey),
+      });
+
+      const { authService } = await import("@/services/authService");
+      const session = await authService.getCurrentSession();
+      if (session) {
+        await fetch("/api/push/subscribe", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${session.access_token}`, "Content-Type": "application/json" },
+          body: JSON.stringify({ subscription: subscription.toJSON() }),
+        });
+      }
+      setStatus("done");
+    } catch {
+      setStatus("skipped");
+    }
+  };
+
+  if (status === "skipped") return null;
+  if (status === "done") {
+    return (
+      <div className="relative backdrop-blur-xl border border-white/[0.08] rounded-3xl overflow-hidden bg-white/[0.04] p-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: "rgba(73,176,110,0.15)" }}>
+            <Check className="w-5 h-5 text-[#49B06E]" />
+          </div>
+          <p className="text-sm font-medium text-[#49B06E]">Alerts enabled — you won&apos;t miss a signal</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative backdrop-blur-xl border border-white/[0.08] rounded-3xl overflow-hidden bg-white/[0.04] p-4">
+      <div className="flex items-start gap-3">
+        <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: "rgba(39,183,200,0.15)" }}>
+          <Bell className="w-5 h-5 text-[#27B7C8]" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="font-semibold text-sm text-[#F3EDE3] mb-0.5">Turn on scanner alerts</p>
+          <p className="text-xs text-[#F3EDE3]/40 mb-3">Get notified when Pansy finds a high-scoring setup</p>
+          <button
+            type="button"
+            onClick={enable}
+            disabled={status === "enabling"}
+            className="px-4 py-2 rounded-xl text-xs font-semibold text-[#07080C] transition-all"
+            style={{ background: "linear-gradient(135deg, #27B7C8, #49B06E)" }}
+          >
+            {status === "enabling" ? "Enabling..." : "Enable Notifications"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function urlBase64ToUint8Array(base64String: string): Uint8Array {
+  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+  const rawData = atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; i++) outputArray[i] = rawData.charCodeAt(i);
+  return outputArray;
 }
 
 function FloatingOrbs() {
