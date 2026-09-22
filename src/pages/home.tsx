@@ -7,7 +7,7 @@ import { useSubscription } from "@/contexts/SubscriptionContext";
 import { motion } from "framer-motion";
 import {
   Zap, ArrowUpRight, ArrowDownRight,
-  RefreshCw, Bell, Newspaper, ChevronRight, Radar, Flower2, ChevronDown, Gift,
+  RefreshCw, Bell, Newspaper, ChevronRight, Radar, Flower2, ChevronDown, Gift, Flame,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -101,6 +101,8 @@ export default function HomePage() {
   const [alertsLoading, setAlertsLoading] = useState(true);
   const [briefing, setBriefing] = useState<string | null>(null);
   const [briefingOpen, setBriefingOpen] = useState(false);
+  const [streak, setStreak] = useState(0);
+  const [streakLogged, setStreakLogged] = useState(false);
 
   const session = getSession();
 
@@ -191,13 +193,30 @@ export default function HomePage() {
     } catch {}
   }, []);
 
+  const logStreak = useCallback(async () => {
+    if (streakLogged) return;
+    try {
+      const res = await fetch("/api/streak", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ activityType: "login" }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setStreak(data.currentStreak ?? 0);
+        setStreakLogged(true);
+      }
+    } catch {}
+  }, [streakLogged]);
+
   useEffect(() => {
     loadIndices();
     loadSetups();
     loadNews();
     loadAlerts();
     loadBriefing();
-  }, [loadIndices, loadSetups, loadNews, loadAlerts, loadBriefing]);
+    logStreak();
+  }, [loadIndices, loadSetups, loadNews, loadAlerts, loadBriefing, logStreak]);
 
   const stateLabel = (s: string) => {
     const map: Record<string, { label: string; color: string }> = {
@@ -215,7 +234,21 @@ export default function HomePage() {
 
         {/* Greeting */}
         <div className="mb-4">
-          <h1 className="text-2xl font-bold text-[#F3EDE3]">{getGreeting(userName)}</h1>
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-bold text-[#F3EDE3]">{getGreeting(userName)}</h1>
+            {streak > 0 && (
+              <motion.div
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.3, type: "spring", stiffness: 300 }}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full"
+                style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)" }}
+              >
+                <Flame className="w-3.5 h-3.5 text-[#F59E0B]" />
+                <span className="text-xs font-bold text-[#F59E0B]">{streak}</span>
+              </motion.div>
+            )}
+          </div>
           <div className="flex items-center gap-2 mt-1">
             <div
               className="w-2 h-2 rounded-full"
