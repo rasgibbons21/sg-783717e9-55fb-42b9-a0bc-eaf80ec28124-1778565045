@@ -1,64 +1,35 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function SplashScreen({ onComplete }: { onComplete: () => void }) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [fadeOut, setFadeOut] = useState(false);
+  const [show, setShow] = useState(false);
 
   useEffect(() => {
     if (sessionStorage.getItem('splashShown')) { onComplete(); return; }
     sessionStorage.setItem('splashShown', 'true');
-
-    const vid = videoRef.current;
-    if (!vid) { onComplete(); return; }
-
-    const handleEnd = () => {
-      setFadeOut(true);
-      setTimeout(onComplete, 600);
-    };
-
-    // Fallback: if video can't play or takes too long, skip after 8s
-    const fallback = setTimeout(handleEnd, 8000);
-
-    vid.addEventListener('ended', handleEnd);
-    vid.play().catch(() => {
-      // Autoplay blocked — skip splash
-      clearTimeout(fallback);
-      onComplete();
-    });
-
-    return () => {
-      clearTimeout(fallback);
-      vid.removeEventListener('ended', handleEnd);
-    };
+    requestAnimationFrame(() => setShow(true));
+    const t = setTimeout(onComplete, 1800);
+    return () => clearTimeout(t);
   }, [onComplete]);
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        inset: 0,
-        background: '#06060a',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 9999,
-        opacity: fadeOut ? 0 : 1,
-        transition: 'opacity 0.6s ease',
-      }}
-    >
-      <video
-        ref={videoRef}
-        src="/splash.mp4"
-        muted
-        playsInline
-        preload="auto"
-        style={{
-          maxWidth: '100%',
-          maxHeight: '100%',
-          objectFit: 'contain',
-        }}
-      />
+    <div style={{
+      position: 'fixed', inset: 0, background: '#07080C',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999,
+    }}>
+      <div style={{
+        textAlign: 'center',
+        opacity: show ? 1 : 0,
+        transform: show ? 'scale(1)' : 'scale(0.9)',
+        transition: 'opacity 0.6s ease, transform 0.6s ease',
+      }}>
+        <div style={{ fontFamily: "'Inter',system-ui,sans-serif", fontWeight: 800, fontSize: 48, color: '#F3EDE3', letterSpacing: 4 }}>
+          Radar
+        </div>
+        <div style={{ fontFamily: "'Inter',system-ui,sans-serif", fontSize: 10, letterSpacing: 4, color: '#27B7C8', textTransform: 'uppercase' as const, marginTop: 8, fontWeight: 500 }}>
+          Stock Screener & Alerts
+        </div>
+      </div>
     </div>
   );
 }
