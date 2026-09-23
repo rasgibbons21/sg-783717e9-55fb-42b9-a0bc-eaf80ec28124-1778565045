@@ -688,49 +688,111 @@ export default function HomePage() {
             <h2 className="text-sm font-bold text-[#F3EDE3]">Sector Heatmap</h2>
           </div>
           {sectorsLoading ? (
-            <div className="grid grid-cols-4 gap-1.5">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="rounded-lg h-14 animate-pulse" style={{ background: "#121821" }} />
-              ))}
+            <div className="rounded-xl overflow-hidden" style={{ background: "#0D1117" }}>
+              <div className="grid grid-cols-3 gap-[2px] p-[2px]">
+                {Array.from({ length: 9 }).map((_, i) => (
+                  <div key={i} className="h-16 animate-pulse" style={{ background: "#121821", borderRadius: 4 }} />
+                ))}
+              </div>
             </div>
           ) : sectors.length > 0 ? (
-            <div className="grid grid-cols-4 gap-1.5">
+            <div className="rounded-xl overflow-hidden" style={{ background: "#0D1117" }}>
               {(() => {
-                const SECTOR_NAMES: Record<string, string> = {
-                  XLK: "Tech", XLF: "Finance", XLE: "Energy", XLV: "Health",
-                  XLC: "Comms", XLI: "Industry", XLY: "Discret.", XLP: "Staples",
-                  XLB: "Materials", XLRE: "Real Est.", XLU: "Utilities",
+                const SECTOR_META: Record<string, { name: string; icon: string }> = {
+                  XLK: { name: "Tech", icon: "💻" },
+                  XLF: { name: "Finance", icon: "🏦" },
+                  XLE: { name: "Energy", icon: "⚡" },
+                  XLV: { name: "Health", icon: "🏥" },
+                  XLC: { name: "Comms", icon: "📡" },
+                  XLI: { name: "Industry", icon: "🏭" },
+                  XLY: { name: "Discret.", icon: "🛍️" },
+                  XLP: { name: "Staples", icon: "🛒" },
+                  XLB: { name: "Materials", icon: "⛏️" },
+                  XLRE: { name: "Real Est.", icon: "🏠" },
+                  XLU: { name: "Utilities", icon: "💡" },
                 };
                 const sorted = [...sectors].sort((a, b) => b.changesPercentage - a.changesPercentage);
                 const maxAbs = Math.max(...sorted.map(s => Math.abs(s.changesPercentage)), 0.5);
 
-                return sorted.map(s => {
-                  const pct = s.changesPercentage;
-                  const isUp = pct >= 0;
-                  const intensity = Math.min(Math.abs(pct) / maxAbs, 1);
-                  const bg = isUp
-                    ? `rgba(73,176,110,${0.06 + intensity * 0.18})`
-                    : `rgba(239,68,68,${0.06 + intensity * 0.18})`;
-                  const border = isUp
-                    ? `rgba(73,176,110,${0.1 + intensity * 0.2})`
-                    : `rgba(239,68,68,${0.1 + intensity * 0.2})`;
-                  const textColor = isUp ? "#49B06E" : "#EF4444";
+                const top3 = sorted.slice(0, 3);
+                const rest = sorted.slice(3);
 
-                  return (
-                    <div
-                      key={s.symbol}
-                      className="rounded-lg p-2 text-center"
-                      style={{ background: bg, border: `1px solid ${border}` }}
-                    >
-                      <p className="text-[9px] font-bold text-[#F3EDE3]/60 mb-0.5">
-                        {SECTOR_NAMES[s.symbol] || s.symbol}
-                      </p>
-                      <p className="text-xs font-bold" style={{ color: textColor }}>
-                        {isUp ? "+" : ""}{pct.toFixed(2)}%
-                      </p>
+                return (
+                  <div className="flex flex-col gap-[2px] p-[2px]">
+                    {/* Top 3 — large hero tiles */}
+                    <div className="grid grid-cols-3 gap-[2px]">
+                      {top3.map((s, i) => {
+                        const pct = s.changesPercentage;
+                        const isUp = pct >= 0;
+                        const intensity = Math.min(Math.abs(pct) / maxAbs, 1);
+                        const bg = isUp
+                          ? `rgba(73,176,110,${0.12 + intensity * 0.30})`
+                          : `rgba(239,68,68,${0.12 + intensity * 0.30})`;
+                        const textColor = isUp ? "#49B06E" : "#EF4444";
+                        const meta = SECTOR_META[s.symbol] || { name: s.symbol, icon: "📊" };
+
+                        return (
+                          <motion.div
+                            key={s.symbol}
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: i * 0.05 }}
+                            className="relative flex flex-col items-center justify-center py-4 px-2"
+                            style={{ background: bg, borderRadius: 4, minHeight: 80 }}
+                          >
+                            <span className="text-base mb-1">{meta.icon}</span>
+                            <p className="text-[10px] font-bold text-[#F3EDE3]/80 mb-0.5">{meta.name}</p>
+                            <p className="text-sm font-black tracking-tight" style={{ color: textColor }}>
+                              {isUp ? "+" : ""}{pct.toFixed(2)}%
+                            </p>
+                            {i === 0 && isUp && (
+                              <div className="absolute top-1.5 right-1.5 text-[7px] font-bold px-1 py-0.5 rounded"
+                                style={{ background: "rgba(73,176,110,0.25)", color: "#49B06E" }}>
+                                LEADING
+                              </div>
+                            )}
+                            {i === 0 && !isUp && (
+                              <div className="absolute top-1.5 right-1.5 text-[7px] font-bold px-1 py-0.5 rounded"
+                                style={{ background: "rgba(239,68,68,0.25)", color: "#EF4444" }}>
+                                TOP
+                              </div>
+                            )}
+                          </motion.div>
+                        );
+                      })}
                     </div>
-                  );
-                });
+
+                    {/* Rest — compact grid */}
+                    <div className="grid grid-cols-4 gap-[2px]">
+                      {rest.map((s, i) => {
+                        const pct = s.changesPercentage;
+                        const isUp = pct >= 0;
+                        const intensity = Math.min(Math.abs(pct) / maxAbs, 1);
+                        const bg = isUp
+                          ? `rgba(73,176,110,${0.08 + intensity * 0.22})`
+                          : `rgba(239,68,68,${0.08 + intensity * 0.22})`;
+                        const textColor = isUp ? "#49B06E" : "#EF4444";
+                        const meta = SECTOR_META[s.symbol] || { name: s.symbol, icon: "📊" };
+
+                        return (
+                          <motion.div
+                            key={s.symbol}
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: 0.15 + i * 0.03 }}
+                            className="flex flex-col items-center justify-center py-2.5 px-1"
+                            style={{ background: bg, borderRadius: 4, minHeight: 56 }}
+                          >
+                            <p className="text-[9px] font-bold text-[#F3EDE3]/60 mb-0.5">{meta.name}</p>
+                            <p className="text-[11px] font-black" style={{ color: textColor }}>
+                              {isUp ? "+" : ""}{pct.toFixed(2)}%
+                            </p>
+                          </motion.div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
               })()}
             </div>
           ) : (
