@@ -143,7 +143,7 @@ export async function fetchQuotes(
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data) && data.length > 0) {
-          return { quotes: data.map(normalizeFmpQuote) as FMPQuote[], source: "fmp" };
+          return { quotes: data.map(normalizeFmpQuote) as unknown as FMPQuote[], source: "fmp" };
         }
       }
     } catch {}
