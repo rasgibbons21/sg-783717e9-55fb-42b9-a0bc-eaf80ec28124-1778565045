@@ -9,6 +9,7 @@ import {
   NotebookPen, Search, Filter, ChevronDown, ChevronUp,
   AlertTriangle, Loader2, X, Check, TrendingUp, TrendingDown, Lock,
   Target, ShieldCheck, Clock, Brain, Heart, Scale, Award, BarChart3, Sparkles,
+  Trophy, Flame, Zap, ArrowUpRight, ArrowDownRight,
 } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -829,12 +830,419 @@ function WeeklyReview() {
   );
 }
 
+// ── Stats Dashboard ───────────────────────────────────────────────────────
+interface StatsData {
+  empty: boolean;
+  totalTrades: number;
+  tradesWithPnl: number;
+  wins: number;
+  losses: number;
+  breakeven: number;
+  winRate: number;
+  totalPnl: number;
+  grossProfit: number;
+  grossLoss: number;
+  profitFactor: number;
+  avgWin: number;
+  avgLoss: number;
+  avgDuration: number | null;
+  avgRR: number | null;
+  currentStreak: number;
+  currentStreakType: "win" | "loss" | null;
+  bestWinStreak: number;
+  worstLossStreak: number;
+  pnlCurve: { date: string; cumPnl: number }[];
+  bestTrades: { ticker: string; pnl: number; date: string }[];
+  worstTrades: { ticker: string; pnl: number; date: string }[];
+  topTickers: { ticker: string; trades: number; pnl: number }[];
+  grades: Record<string, number>;
+  avgDiscipline: number | null;
+  direction: {
+    longs: number; shorts: number;
+    longWinRate: number; shortWinRate: number;
+    longPnl: number; shortPnl: number;
+  };
+  emotionStats: { emotion: string; trades: number; winRate: number; pnl: number }[];
+}
+
+function StatTile({ label, value, sub, color, icon: Icon }: {
+  label: string; value: string; sub?: string; color: string;
+  icon?: typeof TrendingUp;
+}) {
+  return (
+    <div className="rounded-xl p-3 relative overflow-hidden" style={{ background: `${color}08`, border: `1px solid ${color}18` }}>
+      {Icon && <Icon className="absolute top-2 right-2 w-5 h-5 opacity-10" style={{ color }} />}
+      <p className="text-[9px] uppercase tracking-wider font-bold mb-1" style={{ color: `${color}99` }}>{label}</p>
+      <p className="text-lg font-bold text-[#F3EDE3]">{value}</p>
+      {sub && <p className="text-[10px] mt-0.5" style={{ color: `${color}80` }}>{sub}</p>}
+    </div>
+  );
+}
+
+function PnlChart({ data }: { data: { date: string; cumPnl: number }[] }) {
+  if (data.length < 2) return null;
+  const w = 340, h = 100, pad = 8;
+  const vals = data.map(d => d.cumPnl);
+  const min = Math.min(0, ...vals);
+  const max = Math.max(0, ...vals);
+  const range = max - min || 1;
+
+  const points = data.map((d, i) => {
+    const x = pad + (i / (data.length - 1)) * (w - pad * 2);
+    const y = pad + ((max - d.cumPnl) / range) * (h - pad * 2);
+    return { x, y };
+  });
+
+  const polyline = points.map(p => `${p.x},${p.y}`).join(" ");
+  const zeroY = pad + ((max - 0) / range) * (h - pad * 2);
+  const last = vals[vals.length - 1];
+  const lineColor = last >= 0 ? "#49B06E" : "#EF4444";
+  const gradientId = "pnlGrad";
+
+  const areaPath = `M${points[0].x},${zeroY} ` +
+    points.map(p => `L${p.x},${p.y}`).join(" ") +
+    ` L${points[points.length - 1].x},${zeroY} Z`;
+
+  return (
+    <div className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-[10px] text-[#F3EDE3]/40 uppercase tracking-wider font-bold">Equity Curve</p>
+        <p className="text-xs font-mono font-bold" style={{ color: lineColor }}>
+          {last >= 0 ? "+" : ""}${Math.abs(last).toFixed(2)}
+        </p>
+      </div>
+      <svg viewBox={`0 0 ${w} ${h}`} className="w-full" style={{ height: 100 }}>
+        <defs>
+          <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={lineColor} stopOpacity="0.15" />
+            <stop offset="100%" stopColor={lineColor} stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        <line x1={pad} y1={zeroY} x2={w - pad} y2={zeroY} stroke="rgba(255,255,255,0.06)" strokeWidth="0.5" strokeDasharray="4,4" />
+        <path d={areaPath} fill={`url(#${gradientId})`} />
+        <polyline points={polyline} fill="none" stroke={lineColor} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
+        <circle cx={points[points.length - 1].x} cy={points[points.length - 1].y} r="3" fill={lineColor} />
+      </svg>
+      <p className="text-[9px] text-[#F3EDE3]/20 mt-1 italic text-center">
+        Simulated P&amp;L — not real money
+      </p>
+    </div>
+  );
+}
+
+function GradeBar({ grades }: { grades: Record<string, number> }) {
+  const total = Object.values(grades).reduce((a, b) => a + b, 0);
+  if (total === 0) return null;
+
+  const colors: Record<string, string> = { A: "#49B06E", B: "#27B7C8", C: "#FACC15", D: "#F97316", F: "#EF4444" };
+
+  return (
+    <div className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+      <p className="text-[10px] text-[#F3EDE3]/40 uppercase tracking-wider font-bold mb-2">Grade Distribution</p>
+      <div className="flex gap-0.5 h-3 rounded-full overflow-hidden mb-2">
+        {["A", "B", "C", "D", "F"].map(g => {
+          const pct = (grades[g] / total) * 100;
+          if (pct === 0) return null;
+          return <div key={g} style={{ width: `${pct}%`, background: colors[g] }} />;
+        })}
+      </div>
+      <div className="flex justify-between">
+        {["A", "B", "C", "D", "F"].map(g => (
+          <div key={g} className="text-center">
+            <p className="text-xs font-bold" style={{ color: colors[g] }}>{grades[g]}</p>
+            <p className="text-[8px] font-bold" style={{ color: `${colors[g]}80` }}>{g}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function StatsView() {
+  const [stats, setStats] = useState<StatsData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await apiFetch("/api/journal/stats");
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Failed to load stats");
+        setStats(data);
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : "Error loading stats");
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-16 gap-3">
+        <Loader2 className="w-5 h-5 text-[#27B7C8] animate-spin" />
+        <span className="text-sm text-[#F3EDE3]/50">Crunching your numbers…</span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="rounded-xl bg-[#ef4444]/10 border border-[#ef4444]/20 px-4 py-3 text-sm text-[#ef4444]">
+        {error}
+      </div>
+    );
+  }
+
+  if (!stats || stats.empty) {
+    return (
+      <div className="flex flex-col items-center py-16 text-center">
+        <div className="w-14 h-14 rounded-full bg-[#27B7C8]/10 flex items-center justify-center mb-4">
+          <BarChart3 className="w-6 h-6 text-[#27B7C8]/60" />
+        </div>
+        <p className="text-sm font-medium text-[#F3EDE3]/50 mb-1">No stats yet</p>
+        <p className="text-xs text-[#F3EDE3]/30 max-w-[280px]">
+          Close some practice trades and your performance dashboard will appear here.
+        </p>
+      </div>
+    );
+  }
+
+  const s = stats;
+  const expectancy = s.tradesWithPnl > 0 ? Math.round(s.totalPnl / s.tradesWithPnl * 100) / 100 : 0;
+
+  return (
+    <div className="space-y-3">
+      {/* Hero stats */}
+      <div className="grid grid-cols-2 gap-2">
+        <StatTile
+          label="Win Rate"
+          value={`${s.winRate}%`}
+          sub={`${s.wins}W / ${s.losses}L / ${s.breakeven}BE`}
+          color={s.winRate >= 50 ? "#49B06E" : "#EF4444"}
+          icon={Target}
+        />
+        <StatTile
+          label="Total P&L"
+          value={`${s.totalPnl >= 0 ? "+" : "-"}$${Math.abs(s.totalPnl).toFixed(2)}`}
+          sub={`${s.totalTrades} trades`}
+          color={s.totalPnl >= 0 ? "#49B06E" : "#EF4444"}
+          icon={TrendingUp}
+        />
+        <StatTile
+          label="Profit Factor"
+          value={s.profitFactor === Infinity ? "∞" : s.profitFactor.toFixed(2)}
+          sub={s.profitFactor >= 1.5 ? "Strong edge" : s.profitFactor >= 1 ? "Slight edge" : "Negative edge"}
+          color={s.profitFactor >= 1.5 ? "#49B06E" : s.profitFactor >= 1 ? "#FACC15" : "#EF4444"}
+          icon={Zap}
+        />
+        <StatTile
+          label="Expectancy"
+          value={`${expectancy >= 0 ? "+" : ""}$${Math.abs(expectancy).toFixed(2)}`}
+          sub="Avg $/trade"
+          color={expectancy >= 0 ? "#49B06E" : "#EF4444"}
+          icon={ArrowUpRight}
+        />
+      </div>
+
+      {/* Avg win vs avg loss */}
+      <div className="grid grid-cols-2 gap-2">
+        <StatTile label="Avg Win" value={`+$${Math.abs(s.avgWin).toFixed(2)}`} color="#49B06E" />
+        <StatTile label="Avg Loss" value={`-$${Math.abs(s.avgLoss).toFixed(2)}`} color="#EF4444" />
+      </div>
+
+      {/* Duration & Discipline */}
+      <div className="grid grid-cols-2 gap-2">
+        {s.avgDuration != null && (
+          <StatTile label="Avg Duration" value={fmtDuration(s.avgDuration)} color="#27B7C8" icon={Clock} />
+        )}
+        {s.avgDiscipline != null && (
+          <StatTile
+            label="Discipline"
+            value={`${s.avgDiscipline}/100`}
+            sub={s.avgDiscipline >= 70 ? "Consistent" : "Needs work"}
+            color={s.avgDiscipline >= 70 ? "#49B06E" : "#F59E0B"}
+            icon={ShieldCheck}
+          />
+        )}
+      </div>
+
+      {/* P&L Curve */}
+      <PnlChart data={s.pnlCurve} />
+
+      {/* Streaks */}
+      <div className="grid grid-cols-3 gap-2">
+        <div className="rounded-xl p-2.5 text-center" style={{ background: "rgba(39,183,200,0.06)", border: "1px solid rgba(39,183,200,0.12)" }}>
+          <p className="text-[8px] uppercase tracking-wider text-[#27B7C8]/60 font-bold mb-0.5">Current</p>
+          {s.currentStreak > 0 ? (
+            <>
+              <p className="text-lg font-bold" style={{ color: s.currentStreakType === "win" ? "#49B06E" : "#EF4444" }}>
+                {s.currentStreak}
+              </p>
+              <p className="text-[9px]" style={{ color: s.currentStreakType === "win" ? "#49B06E80" : "#EF444480" }}>
+                {s.currentStreakType === "win" ? "wins" : "losses"}
+              </p>
+            </>
+          ) : (
+            <p className="text-lg font-bold text-[#F3EDE3]/30">—</p>
+          )}
+        </div>
+        <div className="rounded-xl p-2.5 text-center" style={{ background: "rgba(73,176,110,0.06)", border: "1px solid rgba(73,176,110,0.12)" }}>
+          <Flame className="w-3.5 h-3.5 text-[#49B06E] mx-auto mb-0.5 opacity-60" />
+          <p className="text-lg font-bold text-[#49B06E]">{s.bestWinStreak}</p>
+          <p className="text-[8px] uppercase tracking-wider text-[#49B06E]/60 font-bold">Best streak</p>
+        </div>
+        <div className="rounded-xl p-2.5 text-center" style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.12)" }}>
+          <ArrowDownRight className="w-3.5 h-3.5 text-[#EF4444] mx-auto mb-0.5 opacity-60" />
+          <p className="text-lg font-bold text-[#EF4444]">{s.worstLossStreak}</p>
+          <p className="text-[8px] uppercase tracking-wider text-[#EF4444]/60 font-bold">Worst streak</p>
+        </div>
+      </div>
+
+      {/* Direction breakdown */}
+      {(s.direction.longs > 0 || s.direction.shorts > 0) && (
+        <div className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+          <p className="text-[10px] text-[#F3EDE3]/40 uppercase tracking-wider font-bold mb-2">Long vs Short</p>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <div className="flex items-center gap-1.5 mb-1">
+                <TrendingUp className="w-3 h-3 text-[#49B06E]" />
+                <span className="text-xs font-bold text-[#49B06E]">Long</span>
+              </div>
+              <p className="text-[11px] text-[#F3EDE3]/50">{s.direction.longs} trades · {s.direction.longWinRate}% WR</p>
+              <p className="text-xs font-bold mt-0.5" style={{ color: s.direction.longPnl >= 0 ? "#49B06E" : "#EF4444" }}>
+                {s.direction.longPnl >= 0 ? "+" : ""}${Math.abs(s.direction.longPnl).toFixed(2)}
+              </p>
+            </div>
+            <div>
+              <div className="flex items-center gap-1.5 mb-1">
+                <TrendingDown className="w-3 h-3 text-[#EF4444]" />
+                <span className="text-xs font-bold text-[#EF4444]">Short</span>
+              </div>
+              <p className="text-[11px] text-[#F3EDE3]/50">{s.direction.shorts} trades · {s.direction.shortWinRate}% WR</p>
+              <p className="text-xs font-bold mt-0.5" style={{ color: s.direction.shortPnl >= 0 ? "#49B06E" : "#EF4444" }}>
+                {s.direction.shortPnl >= 0 ? "+" : ""}${Math.abs(s.direction.shortPnl).toFixed(2)}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Grade distribution */}
+      <GradeBar grades={s.grades} />
+
+      {/* Best & Worst trades */}
+      {(s.bestTrades.length > 0 || s.worstTrades.length > 0) && (
+        <div className="grid grid-cols-2 gap-2">
+          {s.bestTrades.length > 0 && (
+            <div className="rounded-xl p-3" style={{ background: "rgba(73,176,110,0.04)", border: "1px solid rgba(73,176,110,0.10)" }}>
+              <div className="flex items-center gap-1.5 mb-2">
+                <Trophy className="w-3.5 h-3.5 text-[#49B06E]" />
+                <p className="text-[9px] text-[#49B06E]/80 uppercase tracking-wider font-bold">Best Trades</p>
+              </div>
+              <div className="space-y-1.5">
+                {s.bestTrades.map((t, i) => (
+                  <div key={i} className="flex items-center justify-between">
+                    <div>
+                      <span className="text-xs font-mono font-bold text-[#F3EDE3]">{t.ticker}</span>
+                      <span className="text-[9px] text-[#F3EDE3]/25 ml-1.5">{t.date.slice(5)}</span>
+                    </div>
+                    <span className="text-xs font-bold text-[#49B06E]">+${t.pnl.toFixed(2)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {s.worstTrades.length > 0 && (
+            <div className="rounded-xl p-3" style={{ background: "rgba(239,68,68,0.04)", border: "1px solid rgba(239,68,68,0.10)" }}>
+              <div className="flex items-center gap-1.5 mb-2">
+                <AlertTriangle className="w-3.5 h-3.5 text-[#EF4444]" />
+                <p className="text-[9px] text-[#EF4444]/80 uppercase tracking-wider font-bold">Worst Trades</p>
+              </div>
+              <div className="space-y-1.5">
+                {s.worstTrades.map((t, i) => (
+                  <div key={i} className="flex items-center justify-between">
+                    <div>
+                      <span className="text-xs font-mono font-bold text-[#F3EDE3]">{t.ticker}</span>
+                      <span className="text-[9px] text-[#F3EDE3]/25 ml-1.5">{t.date.slice(5)}</span>
+                    </div>
+                    <span className="text-xs font-bold text-[#EF4444]">-${Math.abs(t.pnl).toFixed(2)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Top tickers */}
+      {s.topTickers.length > 0 && (
+        <div className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+          <p className="text-[10px] text-[#F3EDE3]/40 uppercase tracking-wider font-bold mb-2">Most Traded</p>
+          <div className="space-y-1.5">
+            {s.topTickers.map(t => (
+              <div key={t.ticker} className="flex items-center gap-3">
+                <span className="text-xs font-mono font-bold text-[#F3EDE3] w-14">{t.ticker}</span>
+                <div className="flex-1 h-1.5 rounded-full bg-white/5 overflow-hidden">
+                  <div
+                    className="h-full rounded-full"
+                    style={{
+                      width: `${(t.trades / s.topTickers[0].trades) * 100}%`,
+                      background: t.pnl >= 0 ? "#49B06E" : "#EF4444",
+                    }}
+                  />
+                </div>
+                <span className="text-[10px] text-[#F3EDE3]/40 w-6 text-right">{t.trades}</span>
+                <span className="text-[10px] font-bold w-16 text-right" style={{ color: t.pnl >= 0 ? "#49B06E" : "#EF4444" }}>
+                  {t.pnl >= 0 ? "+" : ""}${Math.abs(t.pnl).toFixed(2)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Emotion insights */}
+      {s.emotionStats.length > 0 && (
+        <div className="rounded-xl p-3" style={{ background: "rgba(168,85,247,0.04)", border: "1px solid rgba(168,85,247,0.10)" }}>
+          <div className="flex items-center gap-1.5 mb-2">
+            <Heart className="w-3.5 h-3.5 text-purple-400" />
+            <p className="text-[10px] text-purple-400/80 uppercase tracking-wider font-bold">Emotion Patterns</p>
+          </div>
+          <div className="space-y-1.5">
+            {s.emotionStats.slice(0, 5).map(e => (
+              <div key={e.emotion} className="flex items-center gap-2 text-[11px]">
+                <span className="text-[#F3EDE3]/60 flex-1 truncate">{e.emotion}</span>
+                <span className="text-[#F3EDE3]/30">{e.trades}t</span>
+                <span className="w-10 text-right" style={{ color: e.winRate >= 50 ? "#49B06E" : "#EF4444" }}>
+                  {e.winRate}%
+                </span>
+                <span className="w-14 text-right font-bold" style={{ color: e.pnl >= 0 ? "#49B06E" : "#EF4444" }}>
+                  {e.pnl >= 0 ? "+" : ""}${Math.abs(e.pnl).toFixed(2)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="mt-6 text-center">
+        <p className="text-[10px] text-[#F3EDE3]/25 leading-relaxed max-w-sm mx-auto">
+          HYPOTHETICAL / HISTORICAL SIMULATION. Not real money. Past simulated results do not guarantee future performance.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 // ── Main Page ──────────────────────────────────────────────────────────────
 export default function JournalPage(_props: PageProps) {
   const { isPro, isLoading: authLoading } = useSubscription();
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [tab, setTab] = useState<"journal" | "stats">("journal");
 
   const [ticker, setTicker] = useState("");
   const [grade, setGrade] = useState("all");
@@ -909,7 +1317,31 @@ export default function JournalPage(_props: PageProps) {
             </p>
           </div>
 
-          {(authLoading || (loading && isPro)) && (
+          {/* Tab bar */}
+          {!authLoading && isPro && (
+            <div className="flex gap-1 mb-4 p-1 rounded-xl" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)" }}>
+              {([
+                { key: "journal" as const, label: "Journal", icon: NotebookPen },
+                { key: "stats" as const, label: "Stats", icon: BarChart3 },
+              ]).map(({ key, label, icon: TabIcon }) => (
+                <button
+                  key={key}
+                  onClick={() => { haptic(); setTab(key); }}
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold transition-all"
+                  style={{
+                    background: tab === key ? "rgba(39,183,200,0.12)" : "transparent",
+                    color: tab === key ? "#27B7C8" : "rgba(243,237,227,0.35)",
+                    border: tab === key ? "1px solid rgba(39,183,200,0.25)" : "1px solid transparent",
+                  }}
+                >
+                  <TabIcon className="w-3.5 h-3.5" />
+                  {label}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {(authLoading || (loading && isPro && tab === "journal")) && (
             <div className="flex items-center justify-center py-16 gap-3">
               <Loader2 className="w-5 h-5 text-[#27B7C8] animate-spin" />
               <span className="text-sm text-[#F3EDE3]/50">Loading journal…</span>
@@ -918,13 +1350,17 @@ export default function JournalPage(_props: PageProps) {
 
           {showProGate && <ProGate />}
 
-          {!loading && !authLoading && isPro && error && (
+          {!loading && !authLoading && isPro && error && tab === "journal" && (
             <div className="rounded-xl bg-[#ef4444]/10 border border-[#ef4444]/20 px-4 py-3 text-sm text-[#ef4444] mb-4">
               {error} <button onClick={loadEntries} className="underline ml-2">Retry</button>
             </div>
           )}
 
-          {!authLoading && !loading && isPro && !error && (
+          {/* Stats tab */}
+          {!authLoading && isPro && tab === "stats" && <StatsView />}
+
+          {/* Journal tab */}
+          {!authLoading && !loading && isPro && !error && tab === "journal" && (
             <>
               {/* Quick stats */}
               {totalTrades > 0 && (
