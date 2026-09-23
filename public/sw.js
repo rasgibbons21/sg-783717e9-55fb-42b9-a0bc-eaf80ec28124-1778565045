@@ -62,3 +62,41 @@ self.addEventListener('fetch', (event) => {
 
   // All other requests: network only, no caching
 });
+
+// ── Push notifications ───────────────────────────────────────────────
+self.addEventListener('push', (event) => {
+  let data = { title: 'Radar', body: '', url: '/home' };
+  try {
+    data = Object.assign(data, event.data?.json());
+  } catch {}
+
+  event.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: '/icon-192.png',
+      badge: '/icon-192.png',
+      vibrate: [200, 100, 200],
+      tag: 'radar-signal',
+      renotify: true,
+      data: { url: data.url },
+    })
+  );
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const url = event.notification.data?.url || '/home';
+
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true })
+      .then((clients) => {
+        for (const client of clients) {
+          if (client.url.includes(self.location.origin) && 'focus' in client) {
+            client.navigate(url);
+            return client.focus();
+          }
+        }
+        return self.clients.openWindow(url);
+      })
+  );
+});

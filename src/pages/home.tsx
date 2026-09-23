@@ -4,11 +4,11 @@ import { useRouter } from "next/router";
 import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
 import { useSubscription } from "@/contexts/SubscriptionContext";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Zap, ArrowUpRight, ArrowDownRight,
   RefreshCw, Bell, Newspaper, ChevronRight, Radar, Flower2, ChevronDown, Gift, Flame,
-  Swords, CheckCircle2, LayoutGrid,
+  Swords, CheckCircle2, LayoutGrid, X, Loader2, TrendingUp, TrendingDown,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -102,6 +102,9 @@ export default function HomePage() {
   const [alertsLoading, setAlertsLoading] = useState(true);
   const [sectors, setSectors] = useState<IndexQuote[]>([]);
   const [sectorsLoading, setSectorsLoading] = useState(true);
+  const [activeSector, setActiveSector] = useState<string | null>(null);
+  const [sectorStocks, setSectorStocks] = useState<Array<{ symbol: string; name: string; price: number; change: number; marketCap: number; volume: number }>>([]);
+  const [sectorStocksLoading, setSectorStocksLoading] = useState(false);
   const [briefing, setBriefing] = useState<string | null>(null);
   const [briefingOpen, setBriefingOpen] = useState(false);
   const [streak, setStreak] = useState(0);
@@ -202,6 +205,23 @@ export default function HomePage() {
       setSectorsLoading(false);
     }
   }, []);
+
+  const openSector = useCallback(async (etf: string) => {
+    haptic();
+    if (activeSector === etf) { setActiveSector(null); return; }
+    setActiveSector(etf);
+    setSectorStocks([]);
+    setSectorStocksLoading(true);
+    try {
+      const res = await fetch(`/api/scanner/sector?etf=${etf}`);
+      if (res.ok) {
+        const data = await res.json();
+        setSectorStocks(data.stocks || []);
+      }
+    } catch {} finally {
+      setSectorStocksLoading(false);
+    }
+  }, [activeSector]);
 
   const loadBriefing = useCallback(async () => {
     try {
@@ -686,6 +706,7 @@ export default function HomePage() {
           <div className="flex items-center gap-2 mb-3">
             <LayoutGrid className="w-4 h-4 text-[#27B7C8]" />
             <h2 className="text-sm font-bold text-[#F3EDE3]">Sector Heatmap</h2>
+            <span className="text-[9px] text-[#F3EDE3]/30 ml-auto">Tap to explore</span>
           </div>
           {sectorsLoading ? (
             <div className="rounded-xl overflow-hidden" style={{ background: "#0D1117" }}>
@@ -696,7 +717,7 @@ export default function HomePage() {
               </div>
             </div>
           ) : sectors.length > 0 ? (
-            <div className="rounded-xl overflow-hidden" style={{ background: "#0D1117" }}>
+            <>
               {(() => {
                 const SECTOR_META: Record<string, { name: string; icon: string }> = {
                   XLK: { name: "Tech", icon: "💻" },
@@ -714,87 +735,153 @@ export default function HomePage() {
                 const sorted = [...sectors].sort((a, b) => b.changesPercentage - a.changesPercentage);
                 const maxAbs = Math.max(...sorted.map(s => Math.abs(s.changesPercentage)), 0.5);
 
-                const top3 = sorted.slice(0, 3);
-                const rest = sorted.slice(3);
+                const renderTile = (s: IndexQuote, i: number, isHero: boolean) => {
+                  const pct = s.changesPercentage;
+                  const isUp = pct >= 0;
+                  const intensity = Math.min(Math.abs(pct) / maxAbs, 1);
+                  const isActive = activeSector === s.symbol;
+                  const bg = isActive
+                    ? isUp ? "rgba(73,176,110,0.50)" : "rgba(239,68,68,0.50)"
+                    : isUp
+                      ? `rgba(73,176,110,${isHero ? 0.12 + intensity * 0.30 : 0.08 + intensity * 0.22})`
+                      : `rgba(239,68,68,${isHero ? 0.12 + intensity * 0.30 : 0.08 + intensity * 0.22})`;
+                  const textColor = isUp ? "#49B06E" : "#EF4444";
+                  const meta = SECTOR_META[s.symbol] || { name: s.symbol, icon: "📊" };
+
+                  return (
+                    <motion.div
+                      key={s.symbol}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: i * 0.04 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => openSector(s.symbol)}
+                      className={`relative flex flex-col items-center justify-center cursor-pointer transition-all ${isHero ? "py-4 px-2" : "py-2.5 px-1"}`}
+                      style={{
+                        background: bg,
+                        borderRadius: 4,
+                        minHeight: isHero ? 80 : 56,
+                        outline: isActive ? `2px solid ${textColor}` : "none",
+                        outlineOffset: -2,
+                      }}
+                    >
+                      {isHero && <span className="text-base mb-1">{meta.icon}</span>}
+                      <p className={`font-bold text-[#F3EDE3]/${isActive ? "90" : isHero ? "80" : "60"} mb-0.5 ${isHero ? "text-[10px]" : "text-[9px]"}`}>
+                        {meta.name}
+                      </p>
+                      <p className={`font-black tracking-tight ${isHero ? "text-sm" : "text-[11px]"}`} style={{ color: textColor }}>
+                        {isUp ? "+" : ""}{pct.toFixed(2)}%
+                      </p>
+                      {isHero && i === 0 && (
+                        <div className="absolute top-1.5 right-1.5 text-[7px] font-bold px-1 py-0.5 rounded"
+                          style={{ background: isUp ? "rgba(73,176,110,0.25)" : "rgba(239,68,68,0.25)", color: textColor }}>
+                          {isUp ? "LEADING" : "TOP"}
+                        </div>
+                      )}
+                    </motion.div>
+                  );
+                };
 
                 return (
-                  <div className="flex flex-col gap-[2px] p-[2px]">
-                    {/* Top 3 — large hero tiles */}
-                    <div className="grid grid-cols-3 gap-[2px]">
-                      {top3.map((s, i) => {
-                        const pct = s.changesPercentage;
-                        const isUp = pct >= 0;
-                        const intensity = Math.min(Math.abs(pct) / maxAbs, 1);
-                        const bg = isUp
-                          ? `rgba(73,176,110,${0.12 + intensity * 0.30})`
-                          : `rgba(239,68,68,${0.12 + intensity * 0.30})`;
-                        const textColor = isUp ? "#49B06E" : "#EF4444";
-                        const meta = SECTOR_META[s.symbol] || { name: s.symbol, icon: "📊" };
-
-                        return (
-                          <motion.div
-                            key={s.symbol}
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: i * 0.05 }}
-                            className="relative flex flex-col items-center justify-center py-4 px-2"
-                            style={{ background: bg, borderRadius: 4, minHeight: 80 }}
-                          >
-                            <span className="text-base mb-1">{meta.icon}</span>
-                            <p className="text-[10px] font-bold text-[#F3EDE3]/80 mb-0.5">{meta.name}</p>
-                            <p className="text-sm font-black tracking-tight" style={{ color: textColor }}>
-                              {isUp ? "+" : ""}{pct.toFixed(2)}%
-                            </p>
-                            {i === 0 && isUp && (
-                              <div className="absolute top-1.5 right-1.5 text-[7px] font-bold px-1 py-0.5 rounded"
-                                style={{ background: "rgba(73,176,110,0.25)", color: "#49B06E" }}>
-                                LEADING
-                              </div>
-                            )}
-                            {i === 0 && !isUp && (
-                              <div className="absolute top-1.5 right-1.5 text-[7px] font-bold px-1 py-0.5 rounded"
-                                style={{ background: "rgba(239,68,68,0.25)", color: "#EF4444" }}>
-                                TOP
-                              </div>
-                            )}
-                          </motion.div>
-                        );
-                      })}
-                    </div>
-
-                    {/* Rest — compact grid */}
-                    <div className="grid grid-cols-4 gap-[2px]">
-                      {rest.map((s, i) => {
-                        const pct = s.changesPercentage;
-                        const isUp = pct >= 0;
-                        const intensity = Math.min(Math.abs(pct) / maxAbs, 1);
-                        const bg = isUp
-                          ? `rgba(73,176,110,${0.08 + intensity * 0.22})`
-                          : `rgba(239,68,68,${0.08 + intensity * 0.22})`;
-                        const textColor = isUp ? "#49B06E" : "#EF4444";
-                        const meta = SECTOR_META[s.symbol] || { name: s.symbol, icon: "📊" };
-
-                        return (
-                          <motion.div
-                            key={s.symbol}
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: 0.15 + i * 0.03 }}
-                            className="flex flex-col items-center justify-center py-2.5 px-1"
-                            style={{ background: bg, borderRadius: 4, minHeight: 56 }}
-                          >
-                            <p className="text-[9px] font-bold text-[#F3EDE3]/60 mb-0.5">{meta.name}</p>
-                            <p className="text-[11px] font-black" style={{ color: textColor }}>
-                              {isUp ? "+" : ""}{pct.toFixed(2)}%
-                            </p>
-                          </motion.div>
-                        );
-                      })}
+                  <div className="rounded-xl overflow-hidden" style={{ background: "#0D1117" }}>
+                    <div className="flex flex-col gap-[2px] p-[2px]">
+                      <div className="grid grid-cols-3 gap-[2px]">
+                        {sorted.slice(0, 3).map((s, i) => renderTile(s, i, true))}
+                      </div>
+                      <div className="grid grid-cols-4 gap-[2px]">
+                        {sorted.slice(3).map((s, i) => renderTile(s, i + 3, false))}
+                      </div>
                     </div>
                   </div>
                 );
               })()}
-            </div>
+
+              {/* Sector detail drawer */}
+              <AnimatePresence>
+                {activeSector && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.25 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="mt-2 rounded-xl p-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm">
+                            {(() => {
+                              const meta: Record<string, string> = { XLK: "💻", XLF: "🏦", XLE: "⚡", XLV: "🏥", XLC: "📡", XLI: "🏭", XLY: "🛍️", XLP: "🛒", XLB: "⛏️", XLRE: "🏠", XLU: "💡" };
+                              return meta[activeSector] || "📊";
+                            })()}
+                          </span>
+                          <div>
+                            <p className="text-xs font-bold text-[#F3EDE3]">
+                              {(() => {
+                                const names: Record<string, string> = { XLK: "Technology", XLF: "Financial Services", XLE: "Energy", XLV: "Healthcare", XLC: "Communication Services", XLI: "Industrials", XLY: "Consumer Discretionary", XLP: "Consumer Staples", XLB: "Basic Materials", XLRE: "Real Estate", XLU: "Utilities" };
+                                return names[activeSector] || activeSector;
+                              })()}
+                            </p>
+                            {(() => {
+                              const s = sectors.find(s => s.symbol === activeSector);
+                              if (!s) return null;
+                              const isUp = s.changesPercentage >= 0;
+                              return (
+                                <p className="text-[10px] font-bold" style={{ color: isUp ? "#49B06E" : "#EF4444" }}>
+                                  ${s.price.toFixed(2)} · {isUp ? "+" : ""}{s.changesPercentage.toFixed(2)}%
+                                </p>
+                              );
+                            })()}
+                          </div>
+                        </div>
+                        <button onClick={() => { haptic(); setActiveSector(null); }} className="p-1 rounded-full" style={{ background: "rgba(255,255,255,0.05)" }}>
+                          <X className="w-3.5 h-3.5 text-[#F3EDE3]/40" />
+                        </button>
+                      </div>
+
+                      {sectorStocksLoading ? (
+                        <div className="flex items-center justify-center py-6 gap-2">
+                          <Loader2 className="w-4 h-4 text-[#27B7C8] animate-spin" />
+                          <span className="text-[10px] text-[#F3EDE3]/40">Loading stocks...</span>
+                        </div>
+                      ) : sectorStocks.length > 0 ? (
+                        <div className="space-y-1.5">
+                          <p className="text-[8px] text-[#F3EDE3]/30 uppercase tracking-wider mb-1">Top stocks by market cap</p>
+                          {sectorStocks.map(stock => {
+                            const isUp = stock.change >= 0;
+                            return (
+                              <div
+                                key={stock.symbol}
+                                onClick={() => { haptic(); router.push(`/scanner/${stock.symbol}`); }}
+                                className="flex items-center gap-3 px-2.5 py-2 rounded-lg cursor-pointer active:scale-[0.98] transition-all"
+                                style={{ background: isUp ? "rgba(73,176,110,0.06)" : "rgba(239,68,68,0.06)" }}
+                              >
+                                <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: isUp ? "rgba(73,176,110,0.15)" : "rgba(239,68,68,0.15)" }}>
+                                  {isUp ? <TrendingUp className="w-3 h-3 text-[#49B06E]" /> : <TrendingDown className="w-3 h-3 text-[#EF4444]" />}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-[11px] font-bold text-[#F3EDE3]">{stock.symbol}</p>
+                                  <p className="text-[9px] text-[#F3EDE3]/40 truncate">{stock.name}</p>
+                                </div>
+                                <div className="text-right flex-shrink-0">
+                                  <p className="text-[11px] font-bold text-[#F3EDE3]">${stock.price.toFixed(2)}</p>
+                                  <p className="text-[9px] font-bold" style={{ color: isUp ? "#49B06E" : "#EF4444" }}>
+                                    {isUp ? "+" : ""}{stock.change.toFixed(2)}%
+                                  </p>
+                                </div>
+                                <ChevronRight className="w-3 h-3 text-[#F3EDE3]/20 flex-shrink-0" />
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <p className="text-[10px] text-[#F3EDE3]/30 text-center py-4">No stock data available</p>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </>
           ) : (
             <div className="rounded-xl p-3 text-center" style={{ background: "rgba(255,255,255,0.02)" }}>
               <p className="text-xs text-[#F3EDE3]/40">Sector data unavailable</p>
