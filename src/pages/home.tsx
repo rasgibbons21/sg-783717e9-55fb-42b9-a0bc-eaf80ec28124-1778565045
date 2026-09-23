@@ -8,7 +8,7 @@ import { motion } from "framer-motion";
 import {
   Zap, ArrowUpRight, ArrowDownRight,
   RefreshCw, Bell, Newspaper, ChevronRight, Radar, Flower2, ChevronDown, Gift, Flame,
-  Swords, CheckCircle2,
+  Swords, CheckCircle2, LayoutGrid,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -100,6 +100,8 @@ export default function HomePage() {
   const [newsLoading, setNewsLoading] = useState(true);
   const [alerts, setAlerts] = useState<ScannerAlert[]>([]);
   const [alertsLoading, setAlertsLoading] = useState(true);
+  const [sectors, setSectors] = useState<IndexQuote[]>([]);
+  const [sectorsLoading, setSectorsLoading] = useState(true);
   const [briefing, setBriefing] = useState<string | null>(null);
   const [briefingOpen, setBriefingOpen] = useState(false);
   const [streak, setStreak] = useState(0);
@@ -187,6 +189,20 @@ export default function HomePage() {
     }
   }, []);
 
+  const loadSectors = useCallback(async () => {
+    setSectorsLoading(true);
+    try {
+      const syms = "XLK,XLF,XLE,XLV,XLC,XLI,XLY,XLP,XLB,XLRE,XLU";
+      const res = await fetch(`/api/scanner/quotes?symbols=${syms}`);
+      if (res.ok) {
+        const data = await res.json();
+        setSectors(data.quotes || []);
+      }
+    } catch {} finally {
+      setSectorsLoading(false);
+    }
+  }, []);
+
   const loadBriefing = useCallback(async () => {
     try {
       const res = await fetch("/api/daily-briefing");
@@ -231,10 +247,11 @@ export default function HomePage() {
     loadSetups();
     loadNews();
     loadAlerts();
+    loadSectors();
     loadBriefing();
     loadChallenge();
     logStreak();
-  }, [loadIndices, loadSetups, loadNews, loadAlerts, loadBriefing, loadChallenge, logStreak]);
+  }, [loadIndices, loadSetups, loadNews, loadAlerts, loadSectors, loadBriefing, loadChallenge, logStreak]);
 
   const stateLabel = (s: string) => {
     const map: Record<string, { label: string; color: string }> = {
@@ -660,6 +677,65 @@ export default function HomePage() {
                   : "Scanner alerts fire when setups match your rules."
                 }
               </p>
+            </div>
+          )}
+        </div>
+
+        {/* SECTOR HEATMAP */}
+        <div className="mb-5">
+          <div className="flex items-center gap-2 mb-3">
+            <LayoutGrid className="w-4 h-4 text-[#27B7C8]" />
+            <h2 className="text-sm font-bold text-[#F3EDE3]">Sector Heatmap</h2>
+          </div>
+          {sectorsLoading ? (
+            <div className="grid grid-cols-4 gap-1.5">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="rounded-lg h-14 animate-pulse" style={{ background: "#121821" }} />
+              ))}
+            </div>
+          ) : sectors.length > 0 ? (
+            <div className="grid grid-cols-4 gap-1.5">
+              {(() => {
+                const SECTOR_NAMES: Record<string, string> = {
+                  XLK: "Tech", XLF: "Finance", XLE: "Energy", XLV: "Health",
+                  XLC: "Comms", XLI: "Industry", XLY: "Discret.", XLP: "Staples",
+                  XLB: "Materials", XLRE: "Real Est.", XLU: "Utilities",
+                };
+                const sorted = [...sectors].sort((a, b) => b.changesPercentage - a.changesPercentage);
+                const maxAbs = Math.max(...sorted.map(s => Math.abs(s.changesPercentage)), 0.5);
+
+                return sorted.map(s => {
+                  const pct = s.changesPercentage;
+                  const isUp = pct >= 0;
+                  const intensity = Math.min(Math.abs(pct) / maxAbs, 1);
+                  const bg = isUp
+                    ? `rgba(73,176,110,${0.06 + intensity * 0.18})`
+                    : `rgba(239,68,68,${0.06 + intensity * 0.18})`;
+                  const border = isUp
+                    ? `rgba(73,176,110,${0.1 + intensity * 0.2})`
+                    : `rgba(239,68,68,${0.1 + intensity * 0.2})`;
+                  const textColor = isUp ? "#49B06E" : "#EF4444";
+
+                  return (
+                    <div
+                      key={s.symbol}
+                      className="rounded-lg p-2 text-center"
+                      style={{ background: bg, border: `1px solid ${border}` }}
+                    >
+                      <p className="text-[9px] font-bold text-[#F3EDE3]/60 mb-0.5">
+                        {SECTOR_NAMES[s.symbol] || s.symbol}
+                      </p>
+                      <p className="text-xs font-bold" style={{ color: textColor }}>
+                        {isUp ? "+" : ""}{pct.toFixed(2)}%
+                      </p>
+                    </div>
+                  );
+                });
+              })()}
+            </div>
+          ) : (
+            <div className="rounded-xl p-3 text-center" style={{ background: "rgba(255,255,255,0.02)" }}>
+              <p className="text-xs text-[#F3EDE3]/40">Sector data unavailable</p>
             </div>
           )}
         </div>
