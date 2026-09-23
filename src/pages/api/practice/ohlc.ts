@@ -36,11 +36,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     let url: string;
     if (timeframe === "daily") {
       // Returns { symbol, historical: [{date,open,high,low,close,volume,...}] }
-      url = `https://financialmodelingprep.com/api/v3/historical-price-full/${sym}?timeseries=90&apiKey=${apiKey}`;
+      url = `https://financialmodelingprep.com/api/v3/historical-price-full/${sym}?timeseries=90&apikey=${apiKey}`;
     } else {
       // Returns [{date: "2024-01-02 09:30:00", open, high, low, close, volume}]
       const ep = FMP_ENDPOINT[timeframe] ?? "15min";
-      url = `https://financialmodelingprep.com/api/v3/historical-chart/${ep}/${sym}?apiKey=${apiKey}`;
+      url = `https://financialmodelingprep.com/api/v3/historical-chart/${ep}/${sym}?apikey=${apiKey}`;
     }
 
     const fmpRes = await fetch(url);

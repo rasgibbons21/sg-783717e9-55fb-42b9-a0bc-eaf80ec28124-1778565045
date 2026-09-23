@@ -85,7 +85,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // 3. FMP fallback
       if (fmpKey && articles.length < 10) {
         try {
-          const url = `https://financialmodelingprep.com/api/v3/stock_news?limit=15&apiKey=${fmpKey}`;
+          const url = `https://financialmodelingprep.com/api/v3/stock_news?limit=15&apikey=${fmpKey}`;
           const r = await fetch(url, { signal: AbortSignal.timeout(8000) });
           if (r.ok) {
             const data = await r.json();

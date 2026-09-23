@@ -23,7 +23,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   // Try FMP first
   if (fmpKey) {
     try {
-      const url = `https://financialmodelingprep.com/api/v3/quote/${tickers}?apiKey=${fmpKey}`;
+      const url = `https://financialmodelingprep.com/api/v3/quote/${tickers}?apikey=${fmpKey}`;
       const r = await fetch(url, { signal: AbortSignal.timeout(TIMEOUT) });
       if (r.ok) {
         const data = await r.json();

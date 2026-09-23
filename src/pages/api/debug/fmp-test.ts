@@ -15,7 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   // Test 1: FMP single quote
   if (fmpKey) {
     try {
-      const url = `https://financialmodelingprep.com/api/v3/quote/AAPL?apiKey=${fmpKey}`;
+      const url = `https://financialmodelingprep.com/api/v3/quote/AAPL?apikey=${fmpKey}`;
       const r = await fetch(url, { signal: AbortSignal.timeout(8000) });
       const body = await r.text();
       results.fmpQuote = { status: r.status, ok: r.ok, body: body.slice(0, 300) };
@@ -27,7 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   // Test 2: FMP gainers (the one scanner uses)
   if (fmpKey) {
     try {
-      const url = `https://financialmodelingprep.com/api/v3/stock_market/gainers?apiKey=${fmpKey}`;
+      const url = `https://financialmodelingprep.com/api/v3/stock_market/gainers?apikey=${fmpKey}`;
       const r = await fetch(url, { signal: AbortSignal.timeout(8000) });
       const body = await r.text();
       results.fmpGainers = { status: r.status, ok: r.ok, body: body.slice(0, 300) };
