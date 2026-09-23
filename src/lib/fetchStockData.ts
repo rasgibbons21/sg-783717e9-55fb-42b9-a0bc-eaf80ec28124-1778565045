@@ -62,13 +62,13 @@ export async function fetchStockBundle(
 
   const [quoteData, profileData, perfData, newsItems] = await Promise.all([
     fmpKey
-      ? safeFetch(`https://financialmodelingprep.com/api/v3/quote/${sym}?apikey=${fmpKey}`)
+      ? safeFetch(`https://financialmodelingprep.com/stable/quote?symbol=${sym}&apikey=${fmpKey}`)
       : null,
     fmpKey
-      ? safeFetch(`https://financialmodelingprep.com/api/v3/profile/${sym}?apikey=${fmpKey}`)
+      ? safeFetch(`https://financialmodelingprep.com/stable/profile?symbol=${sym}&apikey=${fmpKey}`)
       : null,
     fmpKey
-      ? safeFetch(`https://financialmodelingprep.com/api/v3/stock-price-change/${sym}?apikey=${fmpKey}`)
+      ? safeFetch(`https://financialmodelingprep.com/stable/stock-price-change?symbol=${sym}&apikey=${fmpKey}`)
       : null,
     finnhubKey ? fetchFinnhubNews(sym, finnhubKey) : [],
   ]);

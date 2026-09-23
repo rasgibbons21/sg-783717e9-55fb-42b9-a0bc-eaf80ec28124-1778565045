@@ -26,7 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   // Try FMP first
   if (fmpKey) {
     try {
-      const url = `https://financialmodelingprep.com/api/v3/quote/${symbols.join(",")}?apikey=${fmpKey}`;
+      const url = `https://financialmodelingprep.com/stable/batch-quote?symbols=${symbols.join(",")}&apikey=${fmpKey}`;
       const r = await fetch(url, { signal: AbortSignal.timeout(8000) });
       if (r.ok) {
         const data = await r.json();
@@ -34,7 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           const quotes = data.map((q: Record<string, unknown>) => ({
             symbol: q.symbol,
             price: q.price,
-            changesPercentage: q.changesPercentage,
+            changesPercentage: q.changesPercentage ?? q.changePercentage,
             change: q.change,
           }));
           const result = { quotes, timestamp: Date.now() };

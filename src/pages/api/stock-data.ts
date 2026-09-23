@@ -23,13 +23,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   // Try FMP first
   if (fmpKey) {
     try {
-      const url = `https://financialmodelingprep.com/api/v3/quote/${tickers}?apikey=${fmpKey}`;
+      const url = `https://financialmodelingprep.com/stable/batch-quote?symbols=${tickers}&apikey=${fmpKey}`;
       const r = await fetch(url, { signal: AbortSignal.timeout(TIMEOUT) });
       if (r.ok) {
         const data = await r.json();
         if (Array.isArray(data) && data.length > 0) {
-          cache.set(tickers, { data, timestamp: Date.now() });
-          return res.status(200).json(data);
+          const normalized = data.map((q: Record<string, unknown>) => {
+            if (q.changePercentage !== undefined && q.changesPercentage === undefined) {
+              q.changesPercentage = q.changePercentage;
+            }
+            return q;
+          });
+          cache.set(tickers, { data: normalized, timestamp: Date.now() });
+          return res.status(200).json(normalized);
         }
       }
     } catch {}

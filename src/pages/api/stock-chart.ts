@@ -35,9 +35,9 @@ export default async function handler(
   try {
     let url = "";
     if (endpoint === "historical-price-full") {
-      url = `https://financialmodelingprep.com/api/v3/historical-price-full/${ticker}?timeseries=${timeseries || 90}&apikey=${apiKey}`;
+      url = `https://financialmodelingprep.com/stable/historical-price-eod/full?symbol=${ticker}&apikey=${apiKey}`;
     } else {
-      url = `https://financialmodelingprep.com/api/v3/historical-chart/${endpoint}/${ticker}?apikey=${apiKey}`;
+      url = `https://financialmodelingprep.com/stable/historical-chart/${endpoint}?symbol=${ticker}&apikey=${apiKey}`;
     }
 
     const response = await fetch(url);

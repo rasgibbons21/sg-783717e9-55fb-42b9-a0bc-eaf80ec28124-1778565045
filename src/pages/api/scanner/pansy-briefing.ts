@@ -70,7 +70,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   // Fetch stock gainers
   try {
     if (fmpKey) {
-      const r = await fetch(`https://financialmodelingprep.com/api/v3/stock_market/gainers?apikey=${fmpKey}`);
+      const r = await fetch(`https://financialmodelingprep.com/stable/biggest-gainers?apikey=${fmpKey}`);
       if (r.ok) {
         const data = await r.json();
         const top = data.slice(0, 8).map((g: any) =>

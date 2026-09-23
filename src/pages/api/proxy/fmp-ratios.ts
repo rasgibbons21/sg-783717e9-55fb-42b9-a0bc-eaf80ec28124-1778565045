@@ -34,7 +34,7 @@ export default async function handler(
   }
 
   try {
-    const url = `https://financialmodelingprep.com/api/v3/${endpoint}/${ticker.toUpperCase()}?apikey=${apiKey}`;
+    const url = `https://financialmodelingprep.com/stable/${endpoint}?symbol=${ticker.toUpperCase()}&apikey=${apiKey}`;
     const response = await fetch(url);
 
     if (!response.ok) {

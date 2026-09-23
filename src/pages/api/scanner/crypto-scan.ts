@@ -30,7 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const url = `https://financialmodelingprep.com/api/v3/quotes/crypto?apikey=${apiKey}`;
+    const url = `https://financialmodelingprep.com/stable/batch-crypto-quotes?apikey=${apiKey}`;
     const fmpRes = await fetch(url);
     if (!fmpRes.ok) throw new Error(`FMP crypto: ${fmpRes.status}`);
     const allQuotes: FMPCryptoQuote[] = await fmpRes.json();

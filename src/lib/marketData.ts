@@ -38,7 +38,7 @@ export async function fetchGainers(fmpKey?: string, finnhubKey?: string): Promis
   // Try FMP first
   if (fmpKey) {
     try {
-      const url = `https://financialmodelingprep.com/api/v3/stock_market/gainers?apikey=${fmpKey}`;
+      const url = `https://financialmodelingprep.com/stable/biggest-gainers?apikey=${fmpKey}`;
       const res = await fetch(url, { signal: abortAfter(TIMEOUT) });
       if (res.ok) {
         const data = await res.json();
@@ -120,6 +120,14 @@ async function finnhubWatchlistScan(key: string): Promise<FMPQuote[]> {
   return results;
 }
 
+// Stable API returns `changePercentage`; our FMPQuote type uses `changesPercentage`
+function normalizeFmpQuote(q: Record<string, unknown>): Record<string, unknown> {
+  if (q.changePercentage !== undefined && q.changesPercentage === undefined) {
+    q.changesPercentage = q.changePercentage;
+  }
+  return q;
+}
+
 // ── Batch Quotes ───────────────────────────────────────────────────
 
 export async function fetchQuotes(
@@ -130,12 +138,12 @@ export async function fetchQuotes(
   // Try FMP batch quote
   if (fmpKey) {
     try {
-      const url = `https://financialmodelingprep.com/api/v3/quote/${symbols.join(",")}?apikey=${fmpKey}`;
+      const url = `https://financialmodelingprep.com/stable/batch-quote?symbols=${symbols.join(",")}&apikey=${fmpKey}`;
       const res = await fetch(url, { signal: abortAfter(TIMEOUT) });
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data) && data.length > 0) {
-          return { quotes: data, source: "fmp" };
+          return { quotes: data.map(normalizeFmpQuote) as FMPQuote[], source: "fmp" };
         }
       }
     } catch {}
@@ -196,7 +204,7 @@ export async function fetchProfiles(
   // Try FMP batch profile
   if (fmpKey) {
     try {
-      const url = `https://financialmodelingprep.com/api/v3/profile/${symbols.join(",")}?apikey=${fmpKey}`;
+      const url = `https://financialmodelingprep.com/stable/profile?symbol=${symbols.join(",")}&apikey=${fmpKey}`;
       const res = await fetch(url, { signal: abortAfter(TIMEOUT) });
       if (res.ok) {
         const profiles: Array<{ symbol: string; floatShares?: number }> = await res.json();
@@ -246,7 +254,7 @@ export async function fetchNews(
   // Try FMP batch news
   if (fmpKey) {
     try {
-      const url = `https://financialmodelingprep.com/api/v3/stock_news?tickers=${symbols.join(",")}&limit=50&apikey=${fmpKey}`;
+      const url = `https://financialmodelingprep.com/stable/news/stock-latest?tickers=${symbols.join(",")}&limit=50&apikey=${fmpKey}`;
       const res = await fetch(url, { signal: abortAfter(TIMEOUT) });
       if (res.ok) {
         const articles: Array<NewsItem & { symbol?: string }> = await res.json();
