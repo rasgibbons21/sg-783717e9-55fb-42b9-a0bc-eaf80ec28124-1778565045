@@ -75,6 +75,7 @@ interface BacktestData {
     outcomePnlPct: number;
     scannedAt: string;
   }>;
+  tableNotReady?: boolean;
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
@@ -246,7 +247,22 @@ export default function BacktestPage(_props: PageProps) {
 
           {!loading && !error && data && s && (
             <>
-              {s.totalSignals === 0 ? (
+              {data.tableNotReady ? (
+                <div className="flex flex-col items-center py-16 text-center">
+                  <div className="w-14 h-14 rounded-full bg-[#F59E0B]/10 flex items-center justify-center mb-4">
+                    <Shield className="w-6 h-6 text-[#F59E0B]/60" />
+                  </div>
+                  <p className="text-sm font-medium text-[#F3EDE3]/50 mb-1">Setting up</p>
+                  <p className="text-xs text-[#F3EDE3]/30 max-w-[280px]">
+                    The scanner results table hasn&apos;t been created yet. Once the database migration
+                    is applied, scanner signals and performance tracking will appear here.
+                  </p>
+                  <div className="flex items-center gap-2 mt-4 text-[10px] text-[#F59E0B]/50">
+                    <Clock className="w-3 h-3" />
+                    <span>Pending database setup</span>
+                  </div>
+                </div>
+              ) : s.totalSignals === 0 ? (
                 <div className="flex flex-col items-center py-16 text-center">
                   <div className="w-14 h-14 rounded-full bg-[#27B7C8]/10 flex items-center justify-center mb-4">
                     <Activity className="w-6 h-6 text-[#27B7C8]/60" />

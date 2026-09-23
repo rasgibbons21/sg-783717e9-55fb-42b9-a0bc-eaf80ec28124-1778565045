@@ -28,7 +28,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (strategy && strategy !== "all") q = q.eq("strategy_id", strategy);
 
     const { data: results, error } = await q;
-    if (error) return res.status(500).json({ error: error.message });
+    if (error) {
+      if (error.message.includes("does not exist") || error.code === "42P01") {
+        return res.status(200).json({
+          summary: { totalSignals: 0, resolved: 0, pending: 0, wins: 0, t2Wins: 0, stopped: 0, expired: 0, winRate: 0, avgPnl: 0 },
+          byStrategy: {},
+          dailyPerformance: [],
+          recentTrades: [],
+          tableNotReady: true,
+        });
+      }
+      return res.status(500).json({ error: error.message });
+    }
 
     const rows = results ?? [];
     const resolved = rows.filter((r: any) => r.outcome && r.outcome !== "pending");
