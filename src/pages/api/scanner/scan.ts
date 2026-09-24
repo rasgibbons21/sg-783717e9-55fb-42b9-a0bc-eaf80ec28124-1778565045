@@ -64,9 +64,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // so use looser thresholds to surface candidates
     const isFinnhub = gainersSource === "finnhub";
     const eligible = gainers.filter((g) =>
-      g.price >= 1 && g.price <= (isFinnhub ? 50 : 20) &&
-      g.changesPercentage >= (isFinnhub ? 3 : 5) &&
-      (isFinnhub || g.volume > 50_000)
+      g.price >= 1 && g.price <= 50 &&
+      g.changesPercentage >= (isFinnhub ? 1.5 : 2) &&
+      (isFinnhub || g.volume > 10_000)
     );
 
     // Step 3: Get detailed quotes

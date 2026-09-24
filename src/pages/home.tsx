@@ -515,9 +515,15 @@ export default function HomePage() {
               </div>
             </>
           ) : (
-            <div>
-              <p className="text-sm text-[#F3EDE3]/60 mb-1">No setups currently meet your rules.</p>
-              <p className="text-xs text-[#F3EDE3]/30">Next scan runs when the tape updates.</p>
+            <div className="flex items-center gap-3">
+              <div className="relative flex h-2.5 w-2.5 shrink-0">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#27B7C8] opacity-40" />
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#27B7C8]" />
+              </div>
+              <div>
+                <p className="text-sm text-[#F3EDE3]/60 mb-0.5">Market is quiet — scanner is running</p>
+                <p className="text-xs text-[#F3EDE3]/30">Setups appear when stocks gap up and meet your rules.</p>
+              </div>
             </div>
           )}
 

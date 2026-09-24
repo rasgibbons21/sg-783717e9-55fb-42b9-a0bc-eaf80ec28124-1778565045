@@ -159,11 +159,12 @@ export default function ScannerIndex() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeStrategies, setActiveStrategies] = useState<Set<StrategyId>>(new Set());
   const [showFilters, setShowFilters] = useState(false);
+  const [scanMeta, setScanMeta] = useState<{ totalScanned: number; eligible: number; dataMode: string } | null>(null);
   const [filters, setFilters] = useState({
     minPrice: 1,
     maxPrice: 50,
     minRvol: 0,
-    minChange: 3,
+    minChange: 2,
   });
 
   const loadScan = useCallback(async () => {
@@ -179,6 +180,11 @@ export default function ScannerIndex() {
       if (res.ok) {
         const data = await res.json();
         setCandidates(data.candidates || []);
+        setScanMeta({
+          totalScanned: data.totalScanned ?? 0,
+          eligible: data.eligible ?? data.candidates?.length ?? 0,
+          dataMode: data.dataMode ?? "unknown",
+        });
       }
     } catch {} finally {
       setLoading(false);
@@ -186,6 +192,12 @@ export default function ScannerIndex() {
   }, [filters]);
 
   useEffect(() => { loadScan(); }, [loadScan]);
+
+  useEffect(() => {
+    if (isMarketClosed()) return;
+    const interval = setInterval(loadScan, 2 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [loadScan]);
 
   const toggleStrategy = (id: StrategyId) => {
     haptic();
@@ -325,7 +337,7 @@ export default function ScannerIndex() {
                   { label: "Min Price", key: "minPrice", options: [1, 2, 5, 10], unit: "$" },
                   { label: "Max Price", key: "maxPrice", options: [10, 20, 50, 100], unit: "$" },
                   { label: "Min RVOL", key: "minRvol", options: [2, 5, 10, 15], unit: "x" },
-                  { label: "Min Change", key: "minChange", options: [3, 5, 10, 20], unit: "%" },
+                  { label: "Min Change", key: "minChange", options: [2, 5, 10, 20], unit: "%" },
                 ].map(row => (
                   <div key={row.key} className="flex items-center justify-between">
                     <span className="text-xs text-[#F3EDE3]/60">{row.label}</span>
@@ -389,21 +401,50 @@ export default function ScannerIndex() {
             className="rounded-2xl p-5 text-center"
             style={{ background: "linear-gradient(145deg, rgba(39,183,200,0.06), rgba(7,8,12,1))", border: "1px solid rgba(39,183,200,0.15)" }}
           >
-            <div className="w-14 h-14 mx-auto mb-3 rounded-2xl flex items-center justify-center text-2xl"
-              style={{ background: "rgba(39,183,200,0.1)" }}>
-              🔍
-            </div>
-            <p className="text-sm font-semibold text-[#F3EDE3]/80 mb-1">
-              {searchQuery ? `No results for "${searchQuery}"` : "No setups found right now"}
-            </p>
-            <p className="text-xs text-[#F3EDE3]/40 max-w-xs mx-auto">
-              {searchQuery
-                ? "Try a different ticker or broaden your filters."
-                : isMarketClosed()
-                  ? "Markets are closed right now. Setups appear during market hours (Mon–Fri, 9:30 AM – 4:00 PM ET)."
-                  : "Setups appear when stocks match your strategy rules. Check back when the tape gets active."
-              }
-            </p>
+            {searchQuery ? (
+              <>
+                <div className="w-14 h-14 mx-auto mb-3 rounded-2xl flex items-center justify-center text-2xl"
+                  style={{ background: "rgba(39,183,200,0.1)" }}>
+                  🔍
+                </div>
+                <p className="text-sm font-semibold text-[#F3EDE3]/80 mb-1">No results for &ldquo;{searchQuery}&rdquo;</p>
+                <p className="text-xs text-[#F3EDE3]/40 max-w-xs mx-auto">
+                  Try a different ticker or broaden your filters.
+                </p>
+              </>
+            ) : isMarketClosed() ? (
+              <>
+                <div className="w-14 h-14 mx-auto mb-3 rounded-2xl flex items-center justify-center text-2xl"
+                  style={{ background: "rgba(39,183,200,0.1)" }}>
+                  🌙
+                </div>
+                <p className="text-sm font-semibold text-[#F3EDE3]/80 mb-1">Markets are closed</p>
+                <p className="text-xs text-[#F3EDE3]/40 max-w-xs mx-auto">
+                  Setups appear during market hours (Mon&ndash;Fri, 9:30 AM &ndash; 4:00 PM ET).
+                </p>
+              </>
+            ) : (
+              <>
+                <div className="relative w-14 h-14 mx-auto mb-3">
+                  <div className="absolute inset-0 rounded-2xl animate-ping opacity-20" style={{ background: "#27B7C8" }} />
+                  <div className="relative w-14 h-14 rounded-2xl flex items-center justify-center text-2xl"
+                    style={{ background: "rgba(39,183,200,0.15)" }}>
+                    📡
+                  </div>
+                </div>
+                <p className="text-sm font-semibold text-[#F3EDE3]/80 mb-1">Market is quiet</p>
+                <p className="text-xs text-[#F3EDE3]/40 max-w-xs mx-auto mb-3">
+                  Scanner is running{scanMeta?.totalScanned ? ` — checked ${scanMeta.totalScanned} stocks` : ""} but no setups match your rules right now. This is normal on slow or red days.
+                </p>
+                <div className="flex items-center justify-center gap-1.5 text-[10px] text-[#27B7C8]/60">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#27B7C8] opacity-40" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#27B7C8]" />
+                  </span>
+                  Scanning live &mdash; auto-refreshes every 2 min
+                </div>
+              </>
+            )}
           </div>
         )}
 
