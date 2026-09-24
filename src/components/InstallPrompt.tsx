@@ -130,7 +130,7 @@ export function InstallPrompt() {
               <div className="flex-shrink-0">
                 <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center animate-pulse">
                   <img
-                    src="/bloom-logo.png"
+                    src="/icon-192.png"
                     alt="Radar"
                     className="w-10 h-10 rounded-full object-cover"
                   />
@@ -181,7 +181,7 @@ export function InstallPrompt() {
               <div className="flex justify-center">
                 <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
                   <img
-                    src="/bloom-logo.png"
+                    src="/icon-192.png"
                     alt="Radar"
                     className="w-12 h-12 rounded-full object-cover"
                   />

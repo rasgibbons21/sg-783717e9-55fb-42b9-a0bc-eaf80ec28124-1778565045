@@ -2511,7 +2511,7 @@ Radar is for educational purposes only and does not provide financial, tax, lega
 
               <div className="flex items-center gap-3">
                 <img
-                  src="/bloom-logo.png"
+                  src="/icon-192.png"
                   alt="Pansy"
                   className="w-12 h-12 rounded-full object-cover"
                 />
@@ -2958,7 +2958,7 @@ Radar is for educational purposes only and does not provide financial, tax, lega
                   >
                     <div className="flex items-center gap-4">
                       <img
-                        src="/bloom-logo.png"
+                        src="/icon-192.png"
                         alt="Pansy"
                         className="w-12 h-12 rounded-full object-cover flex-shrink-0"
                       />
@@ -3039,7 +3039,7 @@ Radar is for educational purposes only and does not provide financial, tax, lega
           <Card className="p-6 bg-gradient-to-r from-accent/10 to-primary/10 border-accent/20 rounded-2xl">
             <div className="flex items-start gap-4">
               <img
-                src="/bloom-logo.png"
+                src="/icon-192.png"
                 alt="Pansy"
                 className="w-14 h-14 rounded-full object-cover"
               />

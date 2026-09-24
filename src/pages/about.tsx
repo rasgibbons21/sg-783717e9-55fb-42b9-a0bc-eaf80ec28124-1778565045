@@ -54,7 +54,7 @@ export default function About() {
         <nav style={{ borderBottom:"1px solid rgba(255,255,255,0.06)", background:"rgba(14,27,48,0.95)", backdropFilter:"blur(16px)" }}>
           <div style={{ maxWidth:1200, margin:"0 auto", padding:"0 1.5rem", height:60, display:"flex", alignItems:"center", justifyContent:"space-between" }}>
             <Link href="/" style={{ display:"flex", alignItems:"center", gap:9, textDecoration:"none" }}>
-              <Image src="/bloom-logo.png" alt="Radar" width={32} height={32} style={{ borderRadius:"50%" }} />
+              <Image src="/icon-192.png" alt="Radar" width={32} height={32} style={{ borderRadius:10 }} />
               <span style={{ fontFamily:"'Cormorant Garamond', serif", fontWeight:700, fontSize:17, color:C.ivory }}>Radar</span>
             </Link>
             <div style={{ display:"flex", gap:20, alignItems:"center" }}>
@@ -109,7 +109,7 @@ export default function About() {
           {/* Meet Pansy */}
           <div style={{ background:`rgba(22,38,74,0.5)`, border:`1px solid ${C.teal}20`, borderRadius:18, padding:"2rem 2.25rem", marginBottom:"2rem" }}>
             <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:"1rem" }}>
-              <Image src="/bloom-logo.png" alt="Pansy" width={40} height={40} style={{ borderRadius:"50%", background:"white" }} />
+              <Image src="/icon-192.png" alt="Pansy" width={40} height={40} style={{ borderRadius:10,  }} />
               <h2 style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:"1.75rem", fontWeight:700, color:C.ivory, margin:0 }}>
                 Meet Pansy
               </h2>

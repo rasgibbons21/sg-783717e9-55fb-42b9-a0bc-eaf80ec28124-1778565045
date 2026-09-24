@@ -412,7 +412,7 @@ export default function Goals() {
         <Card className="p-4 bg-gradient-to-br from-accent/10 to-accent/5 border-accent/20 rounded-2xl">
           <div className="flex items-start gap-3">
             <img
-              src="/bloom-logo.png"
+              src="/icon-192.png"
               alt="Pansy"
               className="w-10 h-10 rounded-full object-cover"
             />

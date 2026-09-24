@@ -93,7 +93,7 @@ export default function DailyBloom({ briefing, briefingDate, featuredLesson }: P
         <nav style={{ borderBottom: "1px solid rgba(255,255,255,0.06)", background: "rgba(14,27,48,0.95)", backdropFilter: "blur(16px)" }}>
           <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 1.5rem", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <Link href="/" style={{ display: "flex", alignItems: "center", gap: 9, textDecoration: "none" }}>
-              <Image src="/bloom-logo.png" alt="Radar" width={32} height={32} style={{ borderRadius: "50%" }} />
+              <Image src="/icon-192.png" alt="Radar" width={32} height={32} style={{ borderRadius: 10 }} />
               <span style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 700, fontSize: 17, color: C.ivory }}>Radar</span>
             </Link>
             <div style={{ display: "flex", gap: 20, alignItems: "center" }}>
@@ -151,7 +151,7 @@ export default function DailyBloom({ briefing, briefingDate, featuredLesson }: P
               </div>
               {briefing ? (
                 <div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
-                  <Image src="/bloom-logo.png" alt="Pansy" width={36} height={36} style={{ borderRadius: "50%", background: "white", flexShrink: 0, marginTop: 2 }} />
+                  <Image src="/icon-192.png" alt="Pansy" width={36} height={36} style={{ borderRadius: 10, flexShrink: 0, marginTop: 2 }} />
                   <p style={{ fontSize: "0.97rem", lineHeight: 1.78, color: "rgba(244,247,250,0.82)", margin: 0 }}>
                     {briefing}
                   </p>
@@ -201,7 +201,7 @@ export default function DailyBloom({ briefing, briefingDate, featuredLesson }: P
             {/* Pansy's Take — static (no DB source yet) */}
             <div style={{ background: "rgba(22,38,74,0.55)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, padding: "1.75rem" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: "1rem" }}>
-                <Image src="/bloom-logo.png" alt="Pansy" width={24} height={24} style={{ borderRadius: "50%", background: "white" }} />
+                <Image src="/icon-192.png" alt="Pansy" width={24} height={24} style={{ borderRadius: 10 }} />
                 <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: C.teal }}>Pansy&apos;s Take</span>
               </div>
               <p style={{ fontSize: "0.97rem", lineHeight: 1.75, color: "rgba(244,247,250,0.72)", margin: 0, fontStyle: "italic" }}>

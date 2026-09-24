@@ -396,7 +396,7 @@ export default function Subscription() {
                 fgColor="#07080C"
                 bgColor="white"
                 imageSettings={{
-                  src: "/bloom-logo.png",
+                  src: "/icon-192.png",
                   height: 24,
                   width: 24,
                   excavate: true,

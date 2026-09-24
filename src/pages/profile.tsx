@@ -596,7 +596,7 @@ export default function Profile() {
         <Card className="p-6 bg-accent/5 border-accent/20 rounded-2xl">
           <div className="flex items-start gap-4">
             <img
-              src="/bloom-logo.png"
+              src="/icon-192.png"
               alt="Pansy"
               className="w-12 h-12 rounded-full object-cover"
             />
@@ -823,7 +823,7 @@ export default function Profile() {
         <Card className="p-6 bg-accent/5 border-accent/20 rounded-2xl">
           <div className="flex items-start gap-4">
             <img
-              src="/bloom-logo.png"
+              src="/icon-192.png"
               alt="Pansy"
               className="w-12 h-12 rounded-full object-cover"
             />

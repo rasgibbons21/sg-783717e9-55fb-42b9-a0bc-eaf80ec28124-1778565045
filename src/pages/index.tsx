@@ -5,8 +5,9 @@ import Image from "next/image";
 import Head from "next/head";
 import { supabase } from "@/integrations/supabase/client";
 import { SEO } from "@/components/SEO";
-import { ArrowRight, Share2, Smartphone, Plus } from "lucide-react";
+import { ArrowRight, Share2, Smartphone, Plus, Check, Zap } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
+import { CORE_PLAN, FOUNDERS_PLAN } from "@/config/proPlan";
 
 /* ─── Palette ─────────────────────────────────────────────────────────────── */
 const C = {
@@ -173,7 +174,7 @@ export default function LandingPage() {
               "@id": "https://shebloomswealth.app/#organization",
               name: "She Blooms Wealth",
               url: "https://shebloomswealth.app",
-              logo: "https://shebloomswealth.app/bloom-logo.png",
+              logo: "https://shebloomswealth.app/icon-512.png",
               description: "Stock screener, trade alerts, and AI market analysis platform.",
               foundingDate: "2026",
               founder: { "@type": "Organization", name: "Cinder Vault Enterprises LLC" },
@@ -211,8 +212,8 @@ export default function LandingPage() {
           <div style={{ maxWidth:1200, margin:"0 auto", padding:"0 1.5rem", height:64, display:"flex", alignItems:"center", justifyContent:"space-between" }}>
             <div style={{ display:"flex", alignItems:"center", gap:10 }}>
               <div style={{ animation:"breathe 8s ease-in-out infinite" }}>
-                <Image src="/bloom-logo.png" alt="Radar" width={36} height={36}
-                  style={{ borderRadius:"50%", animation:"glow-pulse 7s ease-in-out infinite", display:"block" }} />
+                <Image src="/icon-192.png" alt="Radar" width={36} height={36}
+                  style={{ borderRadius:10, animation:"glow-pulse 7s ease-in-out infinite", display:"block" }} />
               </div>
               <div style={{ lineHeight:1.15 }}>
                 <div style={{ fontFamily:"'Cormorant Garamond', serif", fontWeight:700, fontSize:18, letterSpacing:"0.01em", color:C.ivory }}>Radar</div>
@@ -285,8 +286,8 @@ export default function LandingPage() {
                 />
                 <div style={{ position:"absolute", bottom:"7%", left:"-6%", right:"3%", zIndex:10, ...glass, borderRadius:16, padding:"15px 17px", border:`1px solid ${C.teal}28`, boxShadow:`0 8px 32px rgba(39,183,200,0.12), inset 0 1px 0 rgba(255,255,255,0.05)` }}>
                   <div style={{ display:"flex", gap:9, alignItems:"flex-start" }}>
-                    <Image src="/bloom-logo.png" alt="Pansy" width={26} height={26}
-                      style={{ borderRadius:"50%", flexShrink:0, marginTop:2, background:"white", display:"block" }} />
+                    <Image src="/icon-192.png" alt="Pansy" width={26} height={26}
+                      style={{ borderRadius:6, flexShrink:0, marginTop:2, display:"block" }} />
                     <p style={{ margin:0, fontSize:12.5, lineHeight:1.62, color:"rgba(244,247,250,0.88)" }}>
                       Hi, I&apos;m Pansy 🌿<br />
                       I screen, I explain the alert, I do not place the trade.{" "}
@@ -297,6 +298,77 @@ export default function LandingPage() {
               </div>
             </div>
           </div>
+        </section>
+
+        {/* ── PRICING ─────────────────────────────────────────────────────── */}
+        <section style={{ maxWidth:900, margin:"0 auto", padding:"3.5rem 1.5rem 2rem" }}>
+          <div style={{ textAlign:"center", marginBottom:"2.5rem" }}>
+            <div style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"6px 14px", borderRadius:20, marginBottom:"1rem", background:"rgba(39,183,200,0.1)", border:"1px solid rgba(39,183,200,0.2)" }}>
+              <Zap size={13} style={{ color:C.teal }} />
+              <span style={{ fontSize:12, fontWeight:700, color:C.teal, letterSpacing:"0.04em" }}>Founders Pricing — Lock It In</span>
+            </div>
+            <h2 style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:"clamp(1.5rem, 3vw, 2.2rem)", fontWeight:700, color:C.ivory, marginBottom:8 }}>
+              Simple pricing, no surprises
+            </h2>
+            <p style={{ fontSize:14, color:"rgba(244,247,250,0.55)", maxWidth:440, margin:"0 auto" }}>
+              Start free with a 7-day trial. Cancel anytime.
+            </p>
+          </div>
+
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(240px, 1fr))", gap:16 }}>
+            {/* FREE */}
+            <div style={{ ...glass, borderRadius:20, padding:"1.75rem", display:"flex", flexDirection:"column" }}>
+              <p style={{ fontSize:13, fontWeight:700, color:"rgba(244,247,250,0.45)", textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:12 }}>Free</p>
+              <div style={{ marginBottom:16 }}>
+                <span style={{ fontSize:36, fontWeight:800, color:C.ivory }}>$0</span>
+              </div>
+              <div style={{ flex:1, marginBottom:20 }}>
+                {["Basic stock screener", "Paper trading simulator", "Market movers & heatmap", "36 core lessons"].map(f => (
+                  <div key={f} style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10 }}>
+                    <Check size={14} style={{ color:C.green, flexShrink:0 }} />
+                    <span style={{ fontSize:13, color:"rgba(244,247,250,0.7)" }}>{f}</span>
+                  </div>
+                ))}
+              </div>
+              <Link href="/onboarding">
+                <button style={{ width:"100%", padding:"12px 0", borderRadius:10, background:"rgba(255,255,255,0.06)", color:C.ivory, fontSize:14, fontWeight:700, border:"1px solid rgba(255,255,255,0.1)", cursor:"pointer" }}>
+                  Get Started
+                </button>
+              </Link>
+            </div>
+
+            {/* CORE — highlighted */}
+            <div style={{ ...glass, borderRadius:20, padding:"1.75rem", display:"flex", flexDirection:"column", border:`1px solid ${C.teal}40`, boxShadow:`0 0 40px rgba(39,183,200,0.12)`, position:"relative" }}>
+              <div style={{ position:"absolute", top:-12, left:"50%", transform:"translateX(-50%)", padding:"4px 16px", borderRadius:20, ...gradientBg, fontSize:11, fontWeight:800, color:C.deep, letterSpacing:"0.06em" }}>BEST VALUE</div>
+              <p style={{ fontSize:13, fontWeight:700, color:C.teal, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:12 }}>Radar Core</p>
+              <div style={{ marginBottom:4 }}>
+                <span style={{ fontSize:36, fontWeight:800, color:C.ivory }}>${FOUNDERS_PLAN.monthlyPrice}</span>
+                <span style={{ fontSize:14, color:"rgba(244,247,250,0.45)", marginLeft:4 }}>/mo</span>
+              </div>
+              <p style={{ fontSize:12, color:"rgba(244,247,250,0.4)", marginBottom:16 }}>
+                or ${FOUNDERS_PLAN.yearlyPrice}/yr
+                <span style={{ marginLeft:6, color:C.green, fontWeight:600 }}>save {Math.round((1 - FOUNDERS_PLAN.yearlyPrice / (FOUNDERS_PLAN.monthlyPrice * 12)) * 100)}%</span>
+                {" · "}${FOUNDERS_PLAN.lifetimePrice} lifetime
+              </p>
+              <div style={{ flex:1, marginBottom:20 }}>
+                {CORE_PLAN.benefits.map(f => (
+                  <div key={f} style={{ display:"flex", alignItems:"flex-start", gap:8, marginBottom:10 }}>
+                    <Check size={14} style={{ color:C.teal, flexShrink:0, marginTop:2 }} />
+                    <span style={{ fontSize:13, color:"rgba(244,247,250,0.7)" }}>{f}</span>
+                  </div>
+                ))}
+              </div>
+              <Link href="/onboarding">
+                <button style={{ width:"100%", padding:"12px 0", borderRadius:10, ...gradientBg, color:C.deep, fontSize:14, fontWeight:700, border:"none", cursor:"pointer", boxShadow:`0 4px 20px rgba(39,183,200,0.25)` }}>
+                  Start 7-Day Free Trial
+                </button>
+              </Link>
+            </div>
+          </div>
+
+          <p style={{ textAlign:"center", fontSize:11, color:"rgba(244,247,250,0.28)", marginTop:16, maxWidth:480, margin:"16px auto 0" }}>
+            Founders pricing locks in your rate. Prices go up as features ship. Educational decision support only. Not financial advice.
+          </p>
         </section>
 
         {/* ── SHARE WITH QR CODE ──────────────────────────────────────────── */}
@@ -322,7 +394,7 @@ export default function LandingPage() {
                 fgColor={C.deep}
                 bgColor="white"
                 imageSettings={{
-                  src: "/bloom-logo.png",
+                  src: "/icon-192.png",
                   height: 36,
                   width: 36,
                   excavate: true,
@@ -444,7 +516,7 @@ export default function LandingPage() {
             <div className="flex flex-col md:flex-row md:items-start gap-8 md:gap-12 mb-8">
               <div className="flex-1 space-y-2">
                 <div className="flex items-center gap-2">
-                  <Image src="/bloom-logo.png" alt="Radar" width={24} height={24} className="rounded-full bg-[#F3EDE3]" />
+                  <Image src="/icon-192.png" alt="Radar" width={24} height={24} className="rounded-lg" />
                   <p className="text-sm font-semibold" style={{ color:"rgba(244,247,250,0.60)" }}>She Blooms Wealth</p>
                 </div>
                 <p className="text-xs" style={{ color:"rgba(244,247,250,0.35)" }}>Invest in yourself first 🌸</p>
