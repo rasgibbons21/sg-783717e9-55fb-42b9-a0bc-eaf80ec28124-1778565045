@@ -11,6 +11,7 @@ import {
   Swords, CheckCircle2, LayoutGrid, X, Loader2, TrendingUp, TrendingDown,
 } from "lucide-react";
 import Link from "next/link";
+import { MarketTicker } from "@/components/MarketTicker";
 
 const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
 
@@ -324,6 +325,15 @@ export default function HomePage() {
             <span className="text-xs text-[#F3EDE3]/40">{session.detail}</span>
           </div>
         </div>
+
+        {/* Bloomberg-style ticker */}
+        {!indicesLoading && indices.length > 0 && (
+          <MarketTicker
+            indices={indices}
+            briefingSnippet={briefing ? briefing.split("\n")[0].slice(0, 120) : undefined}
+            movers={topMovers.length > 0 ? topMovers : undefined}
+          />
+        )}
 
         {/* Index quotes: SPY QQQ IWM VIX */}
         <div className="grid grid-cols-4 gap-2 mb-5">
