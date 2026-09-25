@@ -5,8 +5,6 @@ export default function SplashScreen({ onComplete }: { onComplete: () => void })
   const [show, setShow] = useState(false);
 
   useEffect(() => {
-    if (sessionStorage.getItem('splashShown')) { onComplete(); return; }
-    sessionStorage.setItem('splashShown', 'true');
     requestAnimationFrame(() => setShow(true));
     const t = setTimeout(onComplete, 1800);
     return () => clearTimeout(t);

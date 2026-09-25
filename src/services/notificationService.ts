@@ -18,7 +18,7 @@ export const notificationService = {
   },
 
   // Subscribe to push notifications
-  async subscribeToPush(userId: string): Promise<boolean> {
+  async subscribeToPush(_userId: string): Promise<boolean> {
     try {
       const permission = await this.requestPermission();
       if (permission !== "granted") {
@@ -26,12 +26,10 @@ export const notificationService = {
       }
 
       const registration = await navigator.serviceWorker.ready;
-      
-      // Check if already subscribed
+
       let subscription = await registration.pushManager.getSubscription();
-      
+
       if (!subscription) {
-        // Create new subscription
         subscription = await registration.pushManager.subscribe({
           userVisibleOnly: true,
           applicationServerKey: this.urlBase64ToUint8Array(
@@ -40,21 +38,20 @@ export const notificationService = {
         });
       }
 
-      // Save subscription to Supabase
-      const subscriptionData = subscription.toJSON();
-      const { error } = await supabase.from("notification_tokens").upsert({
-        user_id: userId,
-        endpoint: subscriptionData.endpoint || "",
-        p256dh: subscriptionData.keys?.p256dh || "",
-        auth: subscriptionData.keys?.auth || "",
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token;
+      if (!token) return false;
+
+      const res = await fetch("/api/push/subscribe", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ subscription: subscription.toJSON() }),
       });
 
-      if (error) {
-        console.error("Error saving subscription:", error);
-        return false;
-      }
-
-      return true;
+      return res.ok;
     } catch (error) {
       console.error("Error subscribing to push:", error);
       return false;
@@ -62,24 +59,13 @@ export const notificationService = {
   },
 
   // Unsubscribe from push notifications
-  async unsubscribeFromPush(userId: string): Promise<boolean> {
+  async unsubscribeFromPush(_userId: string): Promise<boolean> {
     try {
       const registration = await navigator.serviceWorker.ready;
       const subscription = await registration.pushManager.getSubscription();
 
       if (subscription) {
         await subscription.unsubscribe();
-      }
-
-      // Remove from Supabase
-      const { error } = await supabase
-        .from("notification_tokens")
-        .delete()
-        .eq("user_id", userId);
-
-      if (error) {
-        console.error("Error removing subscription:", error);
-        return false;
       }
 
       return true;

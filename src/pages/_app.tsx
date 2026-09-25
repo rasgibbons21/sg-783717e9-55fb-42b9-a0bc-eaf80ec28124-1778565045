@@ -9,16 +9,33 @@ import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 
 export default function App({ Component, pageProps }: AppProps) {
-  const [showSplash, setShowSplash] = useState(true);
+  const [splashState, setSplashState] = useState<"loading" | "splash" | "ready">("loading");
 
   useEffect(() => {
     if (process.env.NODE_ENV === "production" && "serviceWorker" in navigator) {
       navigator.serviceWorker.register("/sw.js");
     }
+
+    if (typeof window !== "undefined" && sessionStorage.getItem("splashShown")) {
+      setSplashState("ready");
+    } else {
+      setSplashState("splash");
+    }
   }, []);
 
-  if (showSplash) {
-    return <SplashScreen onComplete={() => setShowSplash(false)} />;
+  if (splashState === "loading") {
+    return <div style={{ background: "#07080C", position: "fixed", inset: 0 }} />;
+  }
+
+  if (splashState === "splash") {
+    return (
+      <SplashScreen
+        onComplete={() => {
+          sessionStorage.setItem("splashShown", "true");
+          setSplashState("ready");
+        }}
+      />
+    );
   }
 
   return (
