@@ -7,8 +7,8 @@ import { Sparkline } from "@/components/Sparkline";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Zap, Eye, AlertTriangle, Clock,
-  RefreshCw, ArrowUpRight, ArrowDownRight, Target, ShieldCheck,
-  ChevronDown, ChevronUp, Info, TrendingUp,
+  RefreshCw, ArrowUpRight, ArrowDownRight,
+  ChevronDown, ChevronUp, Info, Flame, ChevronRight,
 } from "lucide-react";
 import type { SignalResult } from "@/lib/strategies";
 
@@ -239,9 +239,18 @@ function SignalCard({ candidate: c, signal: sig, onTap }: {
   );
 }
 
+interface Mover {
+  symbol: string;
+  price: number;
+  change: number;
+  changeAbs: number;
+  volume: number;
+}
+
 export default function SignalsPage() {
   const router = useRouter();
   const [candidates, setCandidates] = useState<ScanCandidate[]>([]);
+  const [movers, setMovers] = useState<Mover[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<Tab>("active");
   const [lastScan, setLastScan] = useState<number | null>(null);
@@ -250,8 +259,9 @@ export default function SignalsPage() {
     setLoading(true);
     try {
       const res = await fetch("/api/scanner/scan");
-      const data = res.ok ? await res.json() : { candidates: [] };
+      const data = res.ok ? await res.json() : { candidates: [], movers: [] };
       setCandidates(data.candidates || []);
+      setMovers(data.movers || []);
       setLastScan(data.timestamp || Date.now());
     } catch {} finally {
       setLoading(false);
@@ -368,43 +378,73 @@ export default function SignalsPage() {
           </div>
         )}
 
-        {/* Empty state */}
+        {/* Empty state + movers fallback */}
         {!loading && currentSignals.length === 0 && (
-          <div
-            className="rounded-2xl p-6 text-center"
-            style={{ background: "linear-gradient(145deg, rgba(39,183,200,0.06), rgba(7,8,12,1))", border: "1px solid rgba(39,183,200,0.15)" }}
-          >
-            <div className="w-14 h-14 mx-auto mb-3 rounded-2xl flex items-center justify-center text-2xl"
-              style={{ background: "rgba(39,183,200,0.1)" }}>
-              {activeTab === "active" ? "⚡" : activeTab === "near" ? "⚠️" : activeTab === "watch" ? "👁" : "🕐"}
+          <>
+            <div
+              className="rounded-2xl p-4 text-center mb-4"
+              style={{ background: "linear-gradient(145deg, rgba(39,183,200,0.06), rgba(7,8,12,1))", border: "1px solid rgba(39,183,200,0.15)" }}
+            >
+              <p className="text-sm font-semibold text-[#F3EDE3]/80 mb-1">
+                No {TABS.find(t => t.id === activeTab)?.label.toLowerCase()} strategy setups right now
+              </p>
+              <p className="text-xs text-[#F3EDE3]/40 max-w-xs mx-auto">
+                {isMarketClosed()
+                  ? "Markets are closed. Strategy signals appear during market hours (Mon–Fri, 9:30 AM – 4:00 PM ET)."
+                  : "Setups appear when stocks match strategy rules. Movers below may develop into signals."
+                }
+              </p>
             </div>
-            <p className="text-sm font-semibold text-[#F3EDE3]/80 mb-1">
-              No {TABS.find(t => t.id === activeTab)?.label.toLowerCase()} setups right now
-            </p>
-            <p className="text-xs text-[#F3EDE3]/40 max-w-xs mx-auto mb-4">
-              {isMarketClosed()
-                ? "Markets are closed right now. Signals appear during market hours (Mon–Fri, 9:30 AM – 4:00 PM ET)."
-                : "Setups appear when stocks match your strategy rules. Next scan runs when the tape updates."
-              }
-            </p>
-            <div className="rounded-xl p-3 text-left" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)" }}>
-              <p className="text-[10px] text-[#F3EDE3]/25 uppercase tracking-wider font-bold mb-2">What you&apos;d see here</p>
-              <div className="space-y-2 text-[11px] text-[#F3EDE3]/35">
-                <div className="flex items-center gap-2">
-                  <Target className="w-3.5 h-3.5 text-[#49B06E]" />
-                  <span><strong className="text-[#F3EDE3]/50">Entry zone</strong> — where the strategy says to watch</span>
+
+            {/* Market Movers — always-on content */}
+            {movers.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <Flame className="w-4 h-4 text-[#F59E0B]" />
+                  <h2 className="text-sm font-bold text-[#F3EDE3]">Market Movers</h2>
+                  <span className="text-[9px] text-[#F3EDE3]/30 ml-auto">Potential plays</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <ShieldCheck className="w-3.5 h-3.5 text-[#EF4444]" />
-                  <span><strong className="text-[#F3EDE3]/50">Stop / invalidation</strong> — level where the thesis breaks</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="w-3.5 h-3.5 text-[#27B7C8]" />
-                  <span><strong className="text-[#F3EDE3]/50">Target &amp; R:R</strong> — projected move and risk-to-reward</span>
+                <div className="space-y-1.5">
+                  {movers.map((m) => (
+                    <motion.button
+                      key={m.symbol}
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => { haptic(); router.push(`/scanner/${m.symbol}`); }}
+                      className="w-full flex items-center gap-3 p-3 rounded-xl text-left active:bg-white/[0.02]"
+                      style={{ background: "rgba(18,24,33,0.8)", border: "1px solid rgba(255,255,255,0.05)" }}
+                    >
+                      <div className="flex-shrink-0">
+                        <Sparkline symbol={m.symbol} width={52} height={22} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-sm font-bold text-[#F3EDE3]">{m.symbol}</span>
+                          {m.volume >= 1_000_000 && (
+                            <span className="text-[8px] font-bold px-1 py-0.5 rounded" style={{ background: "rgba(39,183,200,0.12)", color: "#27B7C8" }}>
+                              HIGH VOL
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 mt-0.5 text-[10px] text-[#F3EDE3]/30">
+                          <span>${m.price.toFixed(2)}</span>
+                          <span>Vol {formatVolume(m.volume)}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        <div className="flex items-center gap-0.5 font-bold text-sm text-[#49B06E]">
+                          <ArrowUpRight className="w-3 h-3" />
+                          +{m.change.toFixed(1)}%
+                        </div>
+                        <ChevronRight className="w-3.5 h-3.5 text-[#F3EDE3]/15 ml-1" />
+                      </div>
+                    </motion.button>
+                  ))}
                 </div>
               </div>
-            </div>
-          </div>
+            )}
+          </>
         )}
 
         {/* Signal cards */}
