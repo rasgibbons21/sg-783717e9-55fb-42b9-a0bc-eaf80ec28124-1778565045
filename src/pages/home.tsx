@@ -95,6 +95,7 @@ export default function HomePage() {
   const [setupCount, setSetupCount] = useState(0);
   const [byStrategy, setByStrategy] = useState<Record<string, number>>({});
   const [topSetups, setTopSetups] = useState<TopSetup[]>([]);
+  const [topMovers, setTopMovers] = useState<Array<{ symbol: string; price: number; change: number }>>([]);
   const [setupsLoading, setSetupsLoading] = useState(true);
   const [news, setNews] = useState<NewsItem[]>([]);
   const [newsLoading, setNewsLoading] = useState(true);
@@ -160,6 +161,13 @@ export default function HomePage() {
         setSetupCount(tops.length);
         setByStrategy(strats);
         setTopSetups(tops.slice(0, 5));
+
+        const movers = (data.movers || []).slice(0, 5).map((m: any) => ({
+          symbol: m.symbol,
+          price: m.price,
+          change: m.change,
+        }));
+        setTopMovers(movers);
       }
     } catch {} finally {
       setSetupsLoading(false);
@@ -510,6 +518,27 @@ export default function HomePage() {
                     style={{ background: "rgba(39,183,200,0.1)", color: "#27B7C8", border: "1px solid rgba(39,183,200,0.2)" }}
                   >
                     {name}: {count}
+                  </span>
+                ))}
+              </div>
+            </>
+          ) : topMovers.length > 0 ? (
+            <>
+              <div className="flex items-center gap-2 mb-2">
+                <Flame className="w-3.5 h-3.5 text-[#F59E0B]" />
+                <p className="text-sm text-[#F3EDE3]/60">
+                  {topMovers.length} stock{topMovers.length !== 1 ? "s" : ""} moving today
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {topMovers.map((m) => (
+                  <span
+                    key={m.symbol}
+                    onClick={(e) => { e.stopPropagation(); haptic(); router.push(`/scanner/${m.symbol}`); }}
+                    className="text-[10px] px-2 py-1 rounded-lg font-medium cursor-pointer active:scale-95 transition-all"
+                    style={{ background: "rgba(73,176,110,0.1)", color: "#49B06E", border: "1px solid rgba(73,176,110,0.2)" }}
+                  >
+                    {m.symbol} +{m.change.toFixed(1)}%
                   </span>
                 ))}
               </div>

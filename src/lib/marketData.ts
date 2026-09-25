@@ -86,7 +86,7 @@ async function finnhubWatchlistScan(key: string): Promise<FMPQuote[]> {
       const change = price - prevClose;
       const changePct = prevClose > 0 ? (change / prevClose) * 100 : 0;
 
-      if (changePct < 3) return null; // only return meaningful gainers
+      if (changePct < 0.5) return null;
 
       return {
         symbol: sym,

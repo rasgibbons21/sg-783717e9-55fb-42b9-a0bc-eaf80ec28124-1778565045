@@ -26,6 +26,14 @@ export interface ScannerCandidate {
   topStrategy?: StrategyId | null;
 }
 
+export interface Mover {
+  symbol: string;
+  price: number;
+  change: number;
+  changeAbs: number;
+  volume: number;
+}
+
 export type CatalystQuality = "strong" | "moderate" | "weak" | "unverified" | "none";
 export type SetupType = "bull-flag" | "micro-pullback" | "hod-breakout" | "continuation";
 export type CandidateStatus = "qualified" | "watchlist" | "near-miss" | "rejected" | "data-unavailable";

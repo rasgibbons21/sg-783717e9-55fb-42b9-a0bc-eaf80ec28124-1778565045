@@ -7,7 +7,7 @@ import { Sparkline } from "@/components/Sparkline";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search, RefreshCw, Filter, ArrowUpRight, Target,
-  ShieldCheck, ChevronRight, X, TrendingUp,
+  ShieldCheck, ChevronRight, X, TrendingUp, Flame,
 } from "lucide-react";
 import { STRATEGY_LIST, type StrategyId } from "@/lib/strategies";
 import type { SignalResult } from "@/lib/strategies";
@@ -36,6 +36,14 @@ interface ScanCandidate {
   status: string;
   signals?: SignalResult[];
   topStrategy?: StrategyId | null;
+}
+
+interface Mover {
+  symbol: string;
+  price: number;
+  change: number;
+  changeAbs: number;
+  volume: number;
 }
 
 function formatVolume(v: number): string {
@@ -155,6 +163,7 @@ function ScannerCard({ c, i, onClick }: { c: ScanCandidate; i: number; onClick: 
 export default function ScannerIndex() {
   const router = useRouter();
   const [candidates, setCandidates] = useState<ScanCandidate[]>([]);
+  const [movers, setMovers] = useState<Mover[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeStrategies, setActiveStrategies] = useState<Set<StrategyId>>(new Set());
@@ -180,6 +189,7 @@ export default function ScannerIndex() {
       if (res.ok) {
         const data = await res.json();
         setCandidates(data.candidates || []);
+        setMovers(data.movers || []);
         setScanMeta({
           totalScanned: data.totalScanned ?? 0,
           eligible: data.eligible ?? data.candidates?.length ?? 0,
@@ -220,6 +230,10 @@ export default function ScannerIndex() {
     }
     return true;
   });
+
+  const filteredMovers = searchQuery
+    ? movers.filter(m => m.symbol.includes(searchQuery.toUpperCase()))
+    : movers;
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -395,8 +409,8 @@ export default function ScannerIndex() {
           </div>
         )}
 
-        {/* Empty state */}
-        {!loading && filtered.length === 0 && (
+        {/* Empty state — only when BOTH candidates and movers are empty */}
+        {!loading && filtered.length === 0 && filteredMovers.length === 0 && (
           <div
             className="rounded-2xl p-5 text-center"
             style={{ background: "linear-gradient(145deg, rgba(39,183,200,0.06), rgba(7,8,12,1))", border: "1px solid rgba(39,183,200,0.15)" }}
@@ -459,6 +473,42 @@ export default function ScannerIndex() {
                 onClick={() => router.push(`/scanner/${c.symbol}`)}
               />
             ))}
+          </div>
+        )}
+
+        {/* Top Movers — always populated with day's gainers */}
+        {!loading && filteredMovers.length > 0 && (
+          <div className={filtered.length > 0 ? "mt-5" : ""}>
+            <div className="flex items-center gap-2 mb-3">
+              <Flame className="w-4 h-4 text-[#F59E0B]" />
+              <span className="text-xs font-bold text-[#F3EDE3]/60 uppercase tracking-wider">Top Movers</span>
+            </div>
+            <div className="space-y-1.5">
+              {filteredMovers.map((m, i) => (
+                <motion.div
+                  key={m.symbol}
+                  initial={{ opacity: 0, x: -8 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.03 }}
+                  onClick={() => { haptic(); router.push(`/scanner/${m.symbol}`); }}
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer active:scale-[0.98] transition-all"
+                  style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)" }}
+                >
+                  <span className="text-sm font-bold text-[#F3EDE3] w-14">{m.symbol}</span>
+                  <Sparkline symbol={m.symbol} width={56} height={22} />
+                  <div className="flex-1" />
+                  <span className="text-[10px] text-[#F3EDE3]/35">{formatVolume(m.volume)}</span>
+                  <div className="text-right ml-2">
+                    <div className="text-sm font-bold text-[#F3EDE3]">${m.price.toFixed(2)}</div>
+                    <div className="flex items-center gap-0.5 justify-end" style={{ color: "#49B06E" }}>
+                      <ArrowUpRight className="w-3 h-3" />
+                      <span className="text-xs font-bold">+{m.change.toFixed(1)}%</span>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-3.5 h-3.5 text-[#F3EDE3]/15 ml-1" />
+                </motion.div>
+              ))}
+            </div>
           </div>
         )}
 

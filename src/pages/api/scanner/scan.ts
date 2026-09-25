@@ -4,6 +4,7 @@ import {
   type ScannerCandidate,
   type FMPQuote,
   type CatalystQuality,
+  type Mover,
   scoreCandidate,
   totalScore,
   classifyCandidate,
@@ -24,7 +25,7 @@ import {
   type NewsItem,
 } from "@/lib/marketData";
 
-let scanCache: { data: ScannerCandidate[]; ts: number } | null = null;
+let scanCache: { data: ScannerCandidate[]; movers: Mover[]; ts: number } | null = null;
 const CACHE_MS = 2 * 60 * 1000;
 const STALE_CACHE_MS = 4 * 60 * 60 * 1000;
 
@@ -49,6 +50,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (scanCache && Date.now() - scanCache.ts < CACHE_MS && req.query.fresh !== "1") {
     return res.status(200).json({
       candidates: applyQueryFilters(scanCache.data, req.query),
+      movers: scanCache.movers,
       cached: true,
       timestamp: scanCache.ts,
       dataMode: "delayed",
@@ -59,9 +61,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Step 1: Get top gainers (FMP → Finnhub fallback)
     const { gainers, source: gainersSource } = await fetchGainers(fmpKey, finnhubKey);
 
-    // Step 2: Filter to eligible price range
-    // Finnhub fallback uses a fixed watchlist (not pre-filtered gainers),
-    // so use looser thresholds to surface candidates
+    // Step 2: Filter to eligible price range (for strategy evaluation)
     const isFinnhub = gainersSource === "finnhub";
     const eligible = gainers.filter((g) =>
       g.price >= 1 && g.price <= 50 &&
@@ -69,12 +69,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       (isFinnhub || g.volume > 10_000)
     );
 
+    // Build Top Movers from ALL gainers (simple parameters — always populated)
+    const allMovers = gainers
+      .filter((g) => g.price >= 1 && g.changesPercentage > 0)
+      .sort((a, b) => b.changesPercentage - a.changesPercentage);
+
     // Step 3: Get detailed quotes
     const symbols = eligible.slice(0, 30).map((g) => g.symbol);
     if (symbols.length === 0) {
+      const movers = toMovers(allMovers, new Set());
       if (scanCache && Date.now() - scanCache.ts < STALE_CACHE_MS && req.query.fresh !== "1") {
         return res.status(200).json({
           candidates: applyQueryFilters(scanCache.data, req.query),
+          movers: movers.length > 0 ? movers : scanCache.movers,
           cached: true,
           stale: true,
           timestamp: scanCache.ts,
@@ -83,6 +90,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
       return res.status(200).json({
         candidates: [],
+        movers,
         cached: false,
         timestamp: Date.now(),
         dataMode: gainersSource === "fmp" ? "delayed" : "finnhub-fallback",
@@ -179,14 +187,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       })
       .sort((a, b) => b.score - a.score);
 
+    // Build movers excluding strategy candidates
+    const candidateSymbols = new Set(candidates.map((c) => c.symbol));
+    const movers = toMovers(allMovers, candidateSymbols);
+
     // Cache results
-    scanCache = { data: candidates, ts: Date.now() };
+    scanCache = { data: candidates, movers, ts: Date.now() };
 
     // Persist ACTIVE / NEAR_TRIGGER signals as alerts (fire-and-forget)
     persistAlerts(candidates).catch(() => {});
 
     return res.status(200).json({
       candidates: applyQueryFilters(candidates, req.query),
+      movers,
       cached: false,
       timestamp: Date.now(),
       dataMode: gainersSource === "fmp" ? "delayed" : "finnhub-fallback",
@@ -198,6 +211,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (scanCache && Date.now() - scanCache.ts < STALE_CACHE_MS && req.query.fresh !== "1") {
       return res.status(200).json({
         candidates: applyQueryFilters(scanCache.data, req.query),
+        movers: scanCache.movers,
         cached: true,
         stale: true,
         timestamp: scanCache.ts,
@@ -206,6 +220,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
     return res.status(200).json({
       candidates: [],
+      movers: [],
       cached: false,
       timestamp: Date.now(),
       dataMode: "error",
@@ -266,6 +281,19 @@ async function persistAlerts(candidates: ScannerCandidate[]) {
   if (fresh.length === 0) return;
 
   await sb.from("scanner_alerts").insert(fresh);
+}
+
+function toMovers(sorted: FMPQuote[], exclude: Set<string>): Mover[] {
+  return sorted
+    .filter((g) => !exclude.has(g.symbol))
+    .slice(0, 15)
+    .map((g) => ({
+      symbol: g.symbol,
+      price: g.price,
+      change: Math.round(g.changesPercentage * 100) / 100,
+      changeAbs: Math.round(g.change * 100) / 100,
+      volume: g.volume,
+    }));
 }
 
 function classifyCatalyst(news: NewsItem[] | undefined): CatalystQuality {
