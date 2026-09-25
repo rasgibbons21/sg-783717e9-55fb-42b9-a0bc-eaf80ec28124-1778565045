@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/router";
 import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
+import { supabase } from "@/integrations/supabase/client";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -270,6 +271,24 @@ export default function HomePage() {
       }
     } catch {}
   }, [streakLogged]);
+
+  useEffect(() => {
+    try {
+      const hasProfile = localStorage.getItem("radar_profile");
+      if (!hasProfile) {
+        supabase.auth.getSession().then(({ data: { session } }) => {
+          if (!session) {
+            router.push("/onboarding");
+            return;
+          }
+          supabase.from("profiles").select("onboarding_complete").eq("id", session.user.id).single().then(({ data }) => {
+            if (!data?.onboarding_complete) router.push("/onboarding");
+          });
+        });
+      }
+    } catch {}
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     loadIndices();
