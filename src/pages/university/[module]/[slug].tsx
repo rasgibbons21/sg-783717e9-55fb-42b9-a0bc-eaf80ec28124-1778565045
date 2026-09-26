@@ -450,8 +450,6 @@ export default function LessonPage({ moduleSlug, lessonSlug, requiresClientAuth 
   );
 }
 
-const TRIAL_ALLOWED_MODULES = new Set(["m1-chart-reading"]);
-
 export const getServerSideProps: GetServerSideProps = async ({ req, params }) => {
   const moduleSlug = params?.module as string;
   const lessonSlug = params?.slug as string;
@@ -467,10 +465,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, params }) =>
 
   if (result.status === "no-cookie") {
     return { props: { moduleSlug, lessonSlug, requiresClientAuth: true } };
-  }
-
-  if (result.isTrial && !TRIAL_ALLOWED_MODULES.has(moduleSlug)) {
-    return { redirect: { destination: "/subscription", permanent: false } };
   }
 
   return { props: { moduleSlug, lessonSlug } };

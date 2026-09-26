@@ -17,17 +17,15 @@ import { useSubscription } from "@/contexts/SubscriptionContext";
 
 export default function GooglePlaySubscription() {
   const router = useRouter();
-  const { isPro, refresh } = useSubscription();
+  const { isPaid, refresh } = useSubscription();
   const {
     state,
     error,
     monthlyOffer,
     yearlyOffer,
-    lifetimeOffer,
     purchase,
     restorePurchases,
     manageSubscriptionUrl,
-    hasFreeTrial,
   } = useGooglePlayBilling();
 
   const [showDebug, setShowDebug] = useState(false);
@@ -77,7 +75,7 @@ export default function GooglePlaySubscription() {
     );
   }
 
-  if (isPro) {
+  if (isPaid) {
     return (
       <div className="max-w-lg mx-auto p-4 space-y-6">
         <div className="text-center space-y-4 py-8">
@@ -172,7 +170,7 @@ export default function GooglePlaySubscription() {
       </Card>
 
       {/* Plan cards */}
-      {(monthlyOffer || yearlyOffer || lifetimeOffer) && (
+      {(monthlyOffer || yearlyOffer) && (
         <div className="space-y-3">
           {monthlyOffer && (
             <Card
@@ -221,28 +219,6 @@ export default function GooglePlaySubscription() {
             </Card>
           )}
 
-          {lifetimeOffer && (
-            <Card
-              className="p-5 relative transition-all cursor-pointer hover:shadow-md hover:shadow-accent/10"
-              style={{ border: "2px solid transparent", backgroundImage: "linear-gradient(hsl(var(--card)), hsl(var(--card))), linear-gradient(135deg, hsl(var(--accent)), #a855f7)", backgroundOrigin: "border-box", backgroundClip: "padding-box, border-box" }}
-              onClick={() => !isLoading && purchase(lifetimeOffer)}
-            >
-              <Badge className="absolute -top-2.5 right-4 text-[10px] px-2 py-0.5 gap-1 text-white" style={{ background: "linear-gradient(135deg, hsl(var(--accent)), #a855f7)" }}>
-                <Sparkles className="w-3 h-3" /> Best Value
-              </Badge>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-semibold text-foreground">Lifetime</p>
-                  <p className="text-2xl font-bold text-foreground mt-1">
-                    {lifetimeOffer.price?.replace(/(\.\d{2})\d*/, "$1") || lifetimeOffer.price}
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    One-time payment — forever access
-                  </p>
-                </div>
-              </div>
-            </Card>
-          )}
         </div>
       )}
 
@@ -257,7 +233,7 @@ export default function GooglePlaySubscription() {
       )}
 
       {/* Purchase button */}
-      {(monthlyOffer || yearlyOffer || lifetimeOffer) && (
+      {(monthlyOffer || yearlyOffer) && (
         <div className="space-y-3">
           {state === "purchasing" && (
             <div className="flex items-center justify-center gap-2 py-3">

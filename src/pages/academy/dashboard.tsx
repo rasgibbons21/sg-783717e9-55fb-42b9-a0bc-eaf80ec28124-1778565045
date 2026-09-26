@@ -43,7 +43,7 @@ const SECTIONS = [
 
 export default function AcademyDashboard() {
   const router = useRouter();
-  const { isLoggedIn, isLoading, isPro, userName } = useSubscription();
+  const { isLoggedIn, isLoading, isPaid, userName } = useSubscription();
 
   useEffect(() => {
     if (!isLoading && !isLoggedIn) {
@@ -81,7 +81,7 @@ export default function AcademyDashboard() {
             </div>
             <Sparkles className="w-8 h-8 text-[#27B7C8] opacity-50" />
           </div>
-          {!isPro && (
+          {!isPaid && (
             <Link href="/subscription">
               <motion.button
                 whileTap={{ scale: 0.95 }}
@@ -148,7 +148,7 @@ export default function AcademyDashboard() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {featuredTools.map((tool, i) => (
-              <AcademyToolCard key={tool.slug} tool={tool} isPro={isPro} index={i} />
+              <AcademyToolCard key={tool.slug} tool={tool} isPaid={isPaid} index={i} />
             ))}
           </div>
         </div>

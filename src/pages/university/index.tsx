@@ -30,13 +30,11 @@ const UNLOCKED_SLUGS = [
   "m5-strategies", "m6-entering", "m7-managing", "m8-exiting", "m10-candlestick-patterns",
 ];
 const UNLOCKED = new Set(UNLOCKED_SLUGS);
-const TRIAL_MODULE_LIMIT = 1;
-
 export default function UniversityIndex({ requiresClientAuth }: Props) {
   const [isVerifying, setIsVerifying] = useState(!!requiresClientAuth);
   const [isAuthorized, setIsAuthorized] = useState(!requiresClientAuth);
   const [progressMap, setProgressMap] = useState<Record<string, LessonProgress[]>>({});
-  const { isTrial, isPaidPro } = useSubscription();
+  const { isPaid } = useSubscription();
 
   useEffect(() => {
     if (!requiresClientAuth) {
@@ -200,8 +198,7 @@ export default function UniversityIndex({ requiresClientAuth }: Props) {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {UNIVERSITY_MODULES.map((mod, idx) => {
               const isContentLive = UNLOCKED.has(mod.slug);
-              const isTrialLocked = isTrial && !isPaidPro && idx >= TRIAL_MODULE_LIMIT;
-              const isUnlocked = isContentLive && !isTrialLocked;
+              const isUnlocked = isContentLive;
               const progress = progressMap[mod.slug] ?? [];
               const completed = progress.length;
               const pct = isUnlocked ? Math.round((completed / mod.lessonCount) * 100) : 0;
@@ -257,13 +254,7 @@ export default function UniversityIndex({ requiresClientAuth }: Props) {
                     </>
                   )}
 
-                  {isTrialLocked && (
-                    <div className="text-xs text-center py-1" style={{ color: '#D4AF37' }}>
-                      Subscribe to unlock
-                    </div>
-                  )}
-
-                  {!isContentLive && !isTrialLocked && (
+                  {!isContentLive && (
                     <div className="text-xs text-[#F3EDE3]/30 text-center py-1">Coming soon</div>
                   )}
                 </div>

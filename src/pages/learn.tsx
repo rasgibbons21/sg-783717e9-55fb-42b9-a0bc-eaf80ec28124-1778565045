@@ -53,7 +53,7 @@ interface Lesson {
 
 export default function Learn() {
   const router = useRouter();
-  const { isPro, isPaidPro, isTrial, isLoading: subscriptionLoading } = useSubscription();
+  const { isPaid, isLoading: subscriptionLoading } = useSubscription();
   const [user, setUser] = useState<any>(null);
   const [showLearnUpgradeModal, setShowLearnUpgradeModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -2933,9 +2933,7 @@ Radar is for educational purposes only and does not provide financial, tax, lega
               filteredLessons.map((lesson, idx) => {
                 const isCompleted = completedLessons.includes(lesson.id);
                 const isBookmarked = bookmarkedLessons.includes(lesson.id);
-                const TRIAL_LESSON_LIMIT = 5;
-                const isTrialLocked = isTrial && !isPaidPro && idx >= TRIAL_LESSON_LIMIT;
-                const isGated = (lesson.isPro === true && !isPro) || isTrialLocked;
+                const isGated = lesson.isPro === true && !isPaid;
                 return (
                   <motion.div
                     key={lesson.id}

@@ -52,7 +52,7 @@ const TIME_HORIZON_OPTIONS = [
 export default function Profile() {
   const router = useRouter();
   const { toast } = useToast();
-  const { isPro, isTrial, trialDaysLeft, isLoading: subscriptionLoading } = useSubscription();
+  const { isPaid, tier, isLoading: subscriptionLoading } = useSubscription();
   const [user, setUser] = useState<any>(null);
   const [authCreatedAt, setAuthCreatedAt] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -366,9 +366,9 @@ export default function Profile() {
                 <h2 className="text-xl font-bold text-foreground">
                   {user?.full_name || "Welcome"}
                 </h2>
-                {isPro && (
+                {isPaid && (
                   <Badge className="bg-accent text-accent-foreground">
-                    {isTrial ? `Trial — ${trialDaysLeft}d left` : "Pro"}
+                    {tier === "pro" ? "Pro" : "Desk"}
                   </Badge>
                 )}
               </div>
@@ -633,7 +633,7 @@ export default function Profile() {
                 <Skeleton className="h-24 w-full rounded-lg" />
                 <Skeleton className="h-10 w-full rounded-lg" />
               </div>
-            ) : isPro ? (
+            ) : isPaid ? (
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center">

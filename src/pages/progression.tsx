@@ -233,7 +233,7 @@ function ProGate() {
 
 // ── Main Page ──────────────────────────────────────────────────────────────
 export default function ProgressionPage(_props: PageProps) {
-  const { isPro, isLoading: authLoading } = useSubscription();
+  const { isPaid, isLoading: authLoading } = useSubscription();
   const [data, setData] = useState<ProgressionData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -255,11 +255,11 @@ export default function ProgressionPage(_props: PageProps) {
   }, []);
 
   useEffect(() => {
-    if (!authLoading && isPro) load();
-    else if (!authLoading && !isPro) setLoading(false);
-  }, [authLoading, isPro, load]);
+    if (!authLoading && isPaid) load();
+    else if (!authLoading && !isPaid) setLoading(false);
+  }, [authLoading, isPaid, load]);
 
-  const showProGate = !authLoading && !isPro;
+  const showProGate = !authLoading && !isPaid;
 
   return (
     <>
@@ -281,7 +281,7 @@ export default function ProgressionPage(_props: PageProps) {
             </div>
           </div>
 
-          {(authLoading || (loading && isPro)) && (
+          {(authLoading || (loading && isPaid)) && (
             <div className="flex items-center justify-center py-16 gap-3">
               <Loader2 className="w-5 h-5 text-[#27B7C8] animate-spin" />
               <span className="text-sm text-[#F3EDE3]/50">Loading your progression…</span>
@@ -290,13 +290,13 @@ export default function ProgressionPage(_props: PageProps) {
 
           {showProGate && <ProGate />}
 
-          {!loading && !authLoading && isPro && error && (
+          {!loading && !authLoading && isPaid && error && (
             <div className="rounded-xl bg-[#ef4444]/10 border border-[#ef4444]/20 px-4 py-3 text-sm text-[#ef4444] mb-4">
               {error} <button onClick={load} className="underline ml-2">Retry</button>
             </div>
           )}
 
-          {!authLoading && !loading && isPro && !error && data && (
+          {!authLoading && !loading && isPaid && !error && data && (
             <div className="space-y-6">
 
               {/* ── Level Card ──────────────────────────────────────────── */}

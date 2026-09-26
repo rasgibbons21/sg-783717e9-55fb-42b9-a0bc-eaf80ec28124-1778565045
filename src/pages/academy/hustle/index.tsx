@@ -60,7 +60,7 @@ const HUSTLE_IDEAS = [
 ];
 
 export default function HustleHub() {
-  const { isPro } = useSubscription();
+  const { isPaid } = useSubscription();
 
   return (
     <AcademyLayout title="Side Hustle">
@@ -133,7 +133,7 @@ export default function HustleHub() {
                     <p className="text-xs text-muted-foreground leading-relaxed">{item.desc}</p>
                     {!isComingSoon && (
                       <div className="mt-3 flex items-center gap-1 text-xs font-semibold" style={{ color: item.color }}>
-                        {item.isPro && !isPro ? "Pro Feature" : "Open"} <ArrowRight className="w-3 h-3" />
+                        {item.isPro && !isPaid ? "Pro Feature" : "Open"} <ArrowRight className="w-3 h-3" />
                       </div>
                     )}
                   </motion.div>

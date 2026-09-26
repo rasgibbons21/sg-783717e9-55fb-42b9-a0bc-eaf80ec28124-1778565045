@@ -7,8 +7,6 @@ const supabaseAdmin = createClient(
   { auth: { autoRefreshToken: false, persistSession: false } }
 );
 
-const REWARD_DAYS = 7;
-
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
@@ -26,7 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const { data: referrer } = await supabaseAdmin
     .from("profiles")
-    .select("id, referral_code, trial_ends_at")
+    .select("id, referral_code")
     .eq("referral_code", normalizedCode)
     .single();
 
@@ -48,43 +46,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     reward_applied: true,
   });
 
-  // Extend the new user's trial by REWARD_DAYS
-  const { data: newUserProfile } = await supabaseAdmin
-    .from("profiles")
-    .select("trial_ends_at")
-    .eq("id", user.id)
-    .single();
-
-  const baseDate = newUserProfile?.trial_ends_at ? new Date(newUserProfile.trial_ends_at) : new Date();
-  const newTrialEnd = new Date(baseDate);
-  newTrialEnd.setDate(newTrialEnd.getDate() + REWARD_DAYS);
-
+  // Record the referral on the new user's profile
   await supabaseAdmin
     .from("profiles")
-    .update({
-      referred_by: normalizedCode,
-      trial_ends_at: newTrialEnd.toISOString(),
-      is_pro: true,
-      subscription_status: "trialing",
-    })
+    .update({ referred_by: normalizedCode })
     .eq("id", user.id);
 
-  // Extend the referrer's trial by REWARD_DAYS
-  const referrerBase = referrer.trial_ends_at ? new Date(referrer.trial_ends_at) : new Date();
-  const referrerNewEnd = new Date(referrerBase);
-  referrerNewEnd.setDate(referrerNewEnd.getDate() + REWARD_DAYS);
-
-  await supabaseAdmin
-    .from("profiles")
-    .update({
-      trial_ends_at: referrerNewEnd.toISOString(),
-      is_pro: true,
-      subscription_status: "trialing",
-      referral_reward_days: (referrer as any).referral_reward_days
-        ? (referrer as any).referral_reward_days + REWARD_DAYS
-        : REWARD_DAYS,
-    })
-    .eq("id", referrer.id);
-
-  return res.status(200).json({ success: true, rewardDays: REWARD_DAYS });
+  return res.status(200).json({ success: true });
 }

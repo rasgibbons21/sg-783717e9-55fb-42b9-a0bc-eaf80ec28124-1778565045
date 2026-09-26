@@ -54,7 +54,7 @@ function extractCookies(req: IncomingMessage): Record<string, string> {
 }
 
 export type SSRProResult =
-  | { status: "ok";               userId: string; isTrial: boolean }
+  | { status: "ok";               userId: string }
   | { status: "not-pro" }
   | { status: "unauthenticated" }
   | { status: "no-cookie" };      // client must verify
@@ -72,15 +72,13 @@ export async function requireProUserSSR(
 
   const { data: profile } = await supabaseAdmin
     .from("profiles")
-    .select("is_pro, subscription_status, trial_ends_at")
+    .select("is_pro, subscription_status")
     .eq("id", user.id)
     .single();
 
-  const hasActiveSubscription = profile?.subscription_status === "active" || profile?.subscription_status === "lifetime";
-  const trialEnd = profile?.trial_ends_at ? new Date(profile.trial_ends_at as string) : null;
-  const onTrial = trialEnd !== null && trialEnd > new Date() && !hasActiveSubscription;
-  const hasPro = hasActiveSubscription || onTrial || (profile?.is_pro === true && !trialEnd);
+  const paidStatuses = new Set(["desk", "pro", "active", "lifetime"]);
+  const hasPaid = paidStatuses.has(profile?.subscription_status ?? "") || profile?.is_pro === true;
 
-  if (!hasPro) return { status: "not-pro" };
-  return { status: "ok", userId: user.id, isTrial: onTrial };
+  if (!hasPaid) return { status: "not-pro" };
+  return { status: "ok", userId: user.id };
 }

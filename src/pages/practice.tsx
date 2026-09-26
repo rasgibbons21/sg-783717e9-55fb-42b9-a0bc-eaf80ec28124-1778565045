@@ -816,8 +816,8 @@ function ProUpsellBanner() {
 // ── MAIN PAGE ─────────────────────────────────────────────────────────────
 // ══════════════════════════════════════════════════════════════════════════
 export default function PracticePage(_props: PageProps) {
-  const { isPro, isTrial, trialDaysLeft, isLoading: authLoading, isLoggedIn } = useSubscription();
-  const showAds = !isPro;
+  const { isPaid, isLoading: authLoading, isLoggedIn } = useSubscription();
+  const showAds = !isPaid;
 
   // ── Data state ──────────────────────────────────────────────────────────
   const [account, setAccount] = useState<Account | null>(null);
@@ -983,7 +983,7 @@ export default function PracticePage(_props: PageProps) {
     setTrades(prev => prev.map(t => t.id === trade.id ? data.trade : t));
   };
 
-  const showProUpsell = !authLoading && !isPro && isLoggedIn;
+  const showProUpsell = !authLoading && !isPaid && isLoggedIn;
   const metrics = computeMetrics(account, trades);
 
   // ════════════════════════════════════════════════════════════════════════
@@ -1077,25 +1077,6 @@ export default function PracticePage(_props: PageProps) {
                 </div>
               )}
 
-              {/* ── Trial Banner ──────────────────────────────────── */}
-              {isTrial && (
-                <div className="rounded-xl px-4 py-3 mb-4 flex items-center justify-between" style={{
-                  background: "linear-gradient(135deg, rgba(39,183,200,0.15), rgba(73,176,110,0.1))",
-                  border: "1px solid rgba(39,183,200,0.3)",
-                }}>
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="w-4 h-4" style={{ color: C.accent }} />
-                    <span className="text-sm" style={{ color: C.text }}>
-                      <span className="font-semibold">{trialDaysLeft} day{trialDaysLeft !== 1 ? "s" : ""}</span>
-                      <span style={{ color: C.textDim }}> left in your free trial</span>
-                    </span>
-                  </div>
-                  <Link href="/subscription" className="text-xs font-semibold px-3 py-1.5 rounded-lg transition-all hover:brightness-110"
-                    style={{ background: C.accent, color: C.bg }}>
-                    Subscribe
-                  </Link>
-                </div>
-              )}
 
               {/* ════════════════════════════════════════════════════ */}
               {/* DASHBOARD VIEW                                      */}

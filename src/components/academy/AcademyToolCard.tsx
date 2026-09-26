@@ -8,12 +8,12 @@ const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
 
 interface Props {
   tool: AcademyTool;
-  isPro: boolean;
+  isPaid: boolean;
   index?: number;
 }
 
-export function AcademyToolCard({ tool, isPro, index = 0 }: Props) {
-  const locked = tool.isPremium && !isPro;
+export function AcademyToolCard({ tool, isPaid, index = 0 }: Props) {
+  const locked = tool.isPremium && !isPaid;
 
   return (
     <Link href={`/academy/tools/${tool.slug}`}>

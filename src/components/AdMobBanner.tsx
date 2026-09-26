@@ -11,19 +11,19 @@ interface AdMobBannerProps {
 }
 
 export const AdMobBanner = ({ format = "banner" }: AdMobBannerProps) => {
-  const { isPro } = useSubscription();
+  const { isPaid } = useSubscription();
   const pushed = useRef(false);
 
   useEffect(() => {
-    if (isPro || pushed.current) return;
+    if (isPaid || pushed.current) return;
     try {
       ((window as unknown as Record<string, unknown[]>).adsbygoogle =
         (window as unknown as Record<string, unknown[]>).adsbygoogle || []).push({});
       pushed.current = true;
     } catch {}
-  }, [isPro]);
+  }, [isPaid]);
 
-  if (isPro) return null;
+  if (isPaid) return null;
 
   return (
     <div className="w-full flex justify-center my-3">

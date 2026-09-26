@@ -14,7 +14,7 @@ import {
   TrendingUp, AlertTriangle, Crown, Star,
 } from "lucide-react";
 import { STRATEGIES, type StrategyId } from "@/lib/strategies";
-import { CORE_PLAN } from "@/config/proPlan";
+import { DESK_PLAN, PRO_PLAN, FEATURE_MATRIX } from "@/config/proPlan";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -142,7 +142,7 @@ export default function Onboarding() {
   const [referralCode, setReferralCode] = useState("");
 
   // Pricing
-  const [selectedPlan, setSelectedPlan] = useState<"monthly" | "yearly" | "lifetime">("yearly");
+  const [selectedPlan, setSelectedPlan] = useState<"desk" | "pro">("desk");
 
   // Building progress
   const [buildingProgress, setBuildingProgress] = useState(0);
@@ -971,113 +971,67 @@ export default function Onboarding() {
 
               {/* ═══════════ PRICING ═══════════ */}
               {step === "pricing" && (
-                <div className={`space-y-6 ${animateIn ? "step-animate" : "opacity-0"}`}>
-                  <div className="text-center space-y-3">
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider" style={{ background: "rgba(212,168,83,0.12)", border: "1px solid rgba(212,168,83,0.25)", color: "#D4A853" }}>
-                      <Crown className="w-3.5 h-3.5" /> Unlock your full desk
+                <div className={`space-y-5 ${animateIn ? "step-animate" : "opacity-0"}`}>
+                  <div className="text-center space-y-2">
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider" style={{ background: "rgba(39,183,200,0.12)", border: "1px solid rgba(39,183,200,0.25)", color: "#27B7C8" }}>
+                      <Crown className="w-3.5 h-3.5" /> Upgrade your desk
                     </div>
                     <h2 className="font-serif text-3xl font-bold text-[#F3EDE3]">
-                      Start your free trial
+                      Pick your plan
                     </h2>
-                    <p className="text-[#F3EDE3]/40 text-base">7 days free. Cancel anytime. No card now.</p>
+                    <p className="text-[#F3EDE3]/40 text-sm">Free works forever. Upgrade when you need more.</p>
                   </div>
 
-                  {/* What you get */}
-                  <div className={`${glass} ${glassBg} p-4`}>
-                    <p className="text-[10px] font-semibold uppercase tracking-wider text-[#F3EDE3]/30 mb-3">Core includes</p>
-                    <div className="space-y-2.5">
-                      {[
-                        "All 7 strategies — scan across every pattern",
-                        "Pansy AI analyst — entry, stop, and target for each setup",
-                        "Price alerts — get notified when signals trigger",
-                        "Paper trading — practice risk-free with $10K virtual cash",
-                        "Market briefings — daily movers and catalysts",
-                      ].map((item, i) => (
-                        <div key={i} className="flex items-start gap-2.5" style={{ animation: animateIn ? `cardEntrance 0.4s ease-out ${i * 0.06}s both` : "none" }}>
-                          <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5" style={{ background: "linear-gradient(135deg, #49B06E, #27B7C8)" }}>
-                            <Check className="w-3 h-3 text-[#070B12]" />
-                          </div>
-                          <p className="text-sm text-[#F3EDE3]/70">{item}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Plan cards */}
-                  <div className="space-y-3">
+                  {/* Desk / Pro cards */}
+                  <div className="grid grid-cols-2 gap-3">
                     {([
-                      {
-                        id: "yearly" as const,
-                        label: "Yearly",
-                        price: `$${CORE_PLAN.yearlyPrice}`,
-                        period: "/yr",
-                        perMonth: `$${CORE_PLAN.yearlyMonthly}/mo`,
-                        tag: "Best Value",
-                        tagColor: "#49B06E",
-                        savings: `Save $${((CORE_PLAN.monthlyPrice * 12) - CORE_PLAN.yearlyPrice).toFixed(0)}/yr`,
-                      },
-                      {
-                        id: "monthly" as const,
-                        label: "Monthly",
-                        price: `$${CORE_PLAN.monthlyPrice}`,
-                        period: "/mo",
-                        perMonth: null,
-                        tag: null,
-                        tagColor: null,
-                        savings: null,
-                      },
-                      {
-                        id: "lifetime" as const,
-                        label: "Lifetime",
-                        price: `$${CORE_PLAN.lifetimePrice}`,
-                        period: "",
-                        perMonth: "One-time payment",
-                        tag: "One & Done",
-                        tagColor: "#27B7C8",
-                        savings: null,
-                      },
+                      { id: "desk" as const, label: "Desk", price: DESK_PLAN.yearlyPrice, mo: DESK_PLAN.monthlyPrice, color: "#27B7C8", tagline: DESK_PLAN.tagline, tag: "Recommended" },
+                      { id: "pro" as const, label: "Pro", price: PRO_PLAN.yearlyPrice, mo: PRO_PLAN.monthlyPrice, color: "#a855f7", tagline: PRO_PLAN.tagline, tag: "Pro" },
                     ]).map((plan, i) => {
                       const isSelected = selectedPlan === plan.id;
-                      const isBest = plan.id === "yearly";
                       return (
                         <div
                           key={plan.id}
                           onClick={() => setSelectedPlan(plan.id)}
-                          className={`option-card ${glass} ${isSelected ? "selected" : ""}`}
+                          className="rounded-2xl p-4 cursor-pointer transition-all relative"
                           style={{
-                            background: isSelected
-                              ? isBest ? "rgba(73,176,110,0.1)" : "rgba(39,183,200,0.08)"
-                              : "rgba(255,255,255,0.03)",
-                            borderColor: isSelected
-                              ? isBest ? "rgba(73,176,110,0.4)" : "rgba(39,183,200,0.35)"
-                              : "rgba(255,255,255,0.06)",
-                            padding: "16px",
-                            animation: animateIn ? `cardEntrance 0.5s ease-out ${i * 0.08}s both` : "none",
+                            background: isSelected ? `${plan.color}10` : "rgba(255,255,255,0.03)",
+                            border: isSelected ? `2px solid ${plan.color}` : "2px solid rgba(255,255,255,0.06)",
+                            animation: animateIn ? `cardEntrance 0.5s ease-out ${i * 0.1}s both` : "none",
                           }}
                         >
-                          <div className="flex items-center gap-3">
-                            <SingleDot selected={isSelected} color={isBest ? "#49B06E" : "#27B7C8"} />
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2">
-                                <p className="font-semibold text-[15px] text-[#F3EDE3]">{plan.label}</p>
-                                {plan.tag && (
-                                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: `${plan.tagColor}20`, color: plan.tagColor || "#27B7C8", border: `1px solid ${plan.tagColor}30` }}>
-                                    {plan.tag}
-                                  </span>
-                                )}
-                              </div>
-                              {plan.perMonth && (
-                                <p className="text-xs text-[#F3EDE3]/35 mt-0.5">{plan.perMonth}{plan.savings ? ` · ${plan.savings}` : ""}</p>
-                              )}
-                            </div>
-                            <div className="text-right">
-                              <span className="text-lg font-bold text-[#F3EDE3]">{plan.price}</span>
-                              <span className="text-xs text-[#F3EDE3]/30">{plan.period}</span>
-                            </div>
-                          </div>
+                          {plan.tag && (
+                            <span className="absolute -top-2 left-3 text-[8px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider"
+                              style={{ background: plan.color, color: plan.id === "pro" ? "#fff" : "#07080C" }}>
+                              {plan.tag}
+                            </span>
+                          )}
+                          <p className="font-bold text-[#F3EDE3] text-base mb-1">{plan.label}</p>
+                          <p className="text-xl font-bold text-[#F3EDE3]">${plan.price}<span className="text-xs font-normal text-[#F3EDE3]/30">/yr</span></p>
+                          <p className="text-[10px] text-[#F3EDE3]/30 mb-2">or ${plan.mo}/mo</p>
+                          <p className="text-[10px] text-[#F3EDE3]/40 leading-snug">{plan.tagline}</p>
                         </div>
                       );
                     })}
+                  </div>
+
+                  {/* Compact feature matrix */}
+                  <div className={`${glass} ${glassBg} rounded-xl overflow-hidden`}>
+                    <div className="grid grid-cols-4 text-[9px] font-bold uppercase tracking-wider px-3 py-2" style={{ background: "rgba(255,255,255,0.04)" }}>
+                      <span className="text-[#F3EDE3]/30">Feature</span>
+                      <span className="text-center text-[#F3EDE3]/30">Free</span>
+                      <span className="text-center text-[#27B7C8]">Desk</span>
+                      <span className="text-center text-[#a855f7]">Pro</span>
+                    </div>
+                    {FEATURE_MATRIX.map((row, i) => (
+                      <div key={row.label} className="grid grid-cols-4 px-3 py-2 text-xs items-center"
+                        style={{ background: i % 2 === 0 ? "transparent" : "rgba(255,255,255,0.02)" }}>
+                        <span className="text-[#F3EDE3]/70 text-[11px]">{row.label}</span>
+                        <span className="text-center text-[10px] text-[#F3EDE3]/35">{row.free === "Open" ? "✓" : row.free === "—" ? "—" : row.free}</span>
+                        <span className="text-center text-[10px] text-[#F3EDE3]/80">{row.desk === "Open" ? "✓" : row.desk}</span>
+                        <span className="text-center text-[10px] text-[#F3EDE3]/80">{row.pro === "Open" ? "✓" : row.pro}</span>
+                      </div>
+                    ))}
                   </div>
 
                   {/* CTA */}
@@ -1086,7 +1040,7 @@ export default function Onboarding() {
                     onClick={() => goToStep("auth")}
                     className="glass-btn flex items-center justify-center gap-2 text-lg"
                   >
-                    Start 7-day free trial <ChevronRight className="w-5 h-5" />
+                    {selectedPlan === "desk" ? "Subscribe to Desk" : "Subscribe to Pro"} <ChevronRight className="w-5 h-5" />
                   </button>
 
                   {/* Skip */}
@@ -1102,7 +1056,7 @@ export default function Onboarding() {
                   </button>
 
                   <p className="text-center text-[10px] text-[#F3EDE3]/20 leading-relaxed">
-                    You won&apos;t be charged during the trial. Cancel anytime in Settings.
+                    Cancel anytime in Settings. No hidden fees.
                   </p>
                 </div>
               )}

@@ -1,87 +1,54 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { Layout } from "@/components/Layout";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { authService } from "@/services/authService";
-import { userService } from "@/services/userService";
-import { Check, Loader2, AlertCircle, Lock, Share2, Clock } from "lucide-react";
+import { Check, Minus, Loader2, AlertCircle, Lock } from "lucide-react";
 import { SEO } from "@/components/SEO";
-import { CORE_PLAN, FOUNDERS_PLAN } from "@/config/proPlan";
+import { DESK_PLAN, PRO_PLAN, FEATURE_MATRIX } from "@/config/proPlan";
 import { usePaymentProvider } from "@/lib/payments";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 import GooglePlaySubscription from "@/components/GooglePlaySubscription";
-import { QRCodeSVG } from "qrcode.react";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
+type Billing = "monthly" | "yearly";
 
 export default function Subscription() {
   const router = useRouter();
   const { canShowExternalPayment, canShowInAppPayment } = usePaymentProvider();
-  const [currentPlan, setCurrentPlan] = useState<"free" | "pro">("free");
+  const { tier, isLoggedIn, userId } = useSubscription();
+  const [billing, setBilling] = useState<Billing>("yearly");
   const [isProcessing, setIsProcessing] = useState(false);
-  const [user, setUser] = useState<any>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const session = await authService.getCurrentSession();
-      if (session) {
-        const userData = await userService.getCurrentUser();
-        if (userData) {
-          setUser(userData);
-        }
-      }
-    };
-
-    checkAuth();
-
-    if (router.query.canceled) {
-      setErrorMsg("Checkout was canceled. You have not been charged.");
-    } else if (router.query.error) {
-      setErrorMsg("There was an issue processing your subscription. Please try again.");
-    }
+    if (router.query.canceled) setErrorMsg("Checkout was canceled. You have not been charged.");
+    else if (router.query.error) setErrorMsg("There was an issue processing your subscription. Please try again.");
   }, [router]);
 
-  const handleSubscribe = async (plan: "monthly" | "yearly" | "lifetime") => {
+  const handleSubscribe = async (planTier: "desk" | "pro", cycle: Billing) => {
     setIsProcessing(true);
     setErrorMsg(null);
     try {
       const priceIdMap: Record<string, string | undefined> = {
-        monthly: process.env.NEXT_PUBLIC_STRIPE_MONTHLY_PRICE_ID,
-        yearly: process.env.NEXT_PUBLIC_STRIPE_YEARLY_PRICE_ID,
-        lifetime: process.env.NEXT_PUBLIC_STRIPE_LIFETIME_PRICE_ID,
+        desk_monthly: process.env.NEXT_PUBLIC_STRIPE_DESK_MONTHLY_PRICE_ID,
+        desk_yearly: process.env.NEXT_PUBLIC_STRIPE_DESK_YEARLY_PRICE_ID,
+        pro_monthly: process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID,
+        pro_yearly: process.env.NEXT_PUBLIC_STRIPE_PRO_YEARLY_PRICE_ID,
       };
-      const priceId = priceIdMap[plan];
-
-      if (!priceId) {
-        throw new Error("Subscription pricing is not configured correctly.");
-      }
+      const priceId = priceIdMap[`${planTier}_${cycle}`];
+      if (!priceId) throw new Error("Subscription pricing is not configured correctly.");
 
       const response = await fetch("/api/stripe/create-checkout-session", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          priceId,
-          userId: user?.id,
-          email: user?.email,
-          isLifetime: plan === "lifetime",
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ priceId, userId, tier: planTier }),
       });
 
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to create checkout session");
-      }
-
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        throw new Error("No checkout URL returned");
-      }
+      if (!response.ok) throw new Error(data.error || "Failed to create checkout session");
+      if (data.url) window.location.href = data.url;
+      else throw new Error("No checkout URL returned");
     } catch (error: any) {
       console.error("Subscription error:", error);
       setErrorMsg(error.message || "Failed to start checkout. Please try again.");
@@ -89,15 +56,10 @@ export default function Subscription() {
     }
   };
 
-  const monthlyPrice = CORE_PLAN.monthlyPrice;
-  const yearlyPrice = CORE_PLAN.yearlyPrice;
-  const yearlyMonthly = CORE_PLAN.yearlyMonthly;
-  const lifetimePrice = CORE_PLAN.lifetimePrice;
-
   if (canShowInAppPayment) {
     return (
       <Layout>
-        <SEO title="Radar Core" description="Subscribe to Radar Core via Google Play" />
+        <SEO title="Radar Desk" description="Subscribe to Radar Desk via Google Play" />
         <GooglePlaySubscription />
       </Layout>
     );
@@ -106,307 +68,169 @@ export default function Subscription() {
   if (!canShowExternalPayment) {
     return (
       <Layout>
-        <SEO title="Subscription - Radar" description="Radar Core subscription" />
+        <SEO title="Subscription" description="Radar subscription" />
         <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center gap-6">
-          <div className="rounded-full bg-muted p-6">
-            <Lock className="w-10 h-10 text-muted-foreground" />
-          </div>
+          <div className="rounded-full bg-muted p-6"><Lock className="w-10 h-10 text-muted-foreground" /></div>
           <div>
             <h1 className="font-serif text-2xl font-bold text-foreground mb-2">Subscriptions</h1>
-            <p className="text-muted-foreground max-w-sm">
-              Subscriptions are not available in this version of the app.
-            </p>
+            <p className="text-muted-foreground max-w-sm">Subscriptions are not available in this version of the app.</p>
           </div>
         </div>
       </Layout>
     );
   }
 
+  const deskPrice = billing === "yearly" ? DESK_PLAN.yearlyPrice : DESK_PLAN.monthlyPrice;
+  const proPrice = billing === "yearly" ? PRO_PLAN.yearlyPrice : PRO_PLAN.monthlyPrice;
+  const deskPeriod = billing === "yearly" ? "/yr" : "/mo";
+
   return (
     <Layout>
-      <SEO
-        title="Subscription Plans - Radar"
-        description="Radar Core, Plus, Pro — stock screener, alerts, Pansy AI, and more"
-      />
-      <div className="max-w-lg mx-auto p-4">
-        <div className="space-y-6">
-          <div className="text-center space-y-2">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold mb-2" style={{ background: "rgba(245,158,11,0.15)", color: "#F59E0B" }}>
-              <Clock className="w-3 h-3" /> Founders Pricing — Limited Time
-            </div>
-            <h1 className="font-serif text-3xl font-bold text-foreground">
-              Choose Your Plan
-            </h1>
-            <p className="text-muted-foreground">
-              Stock screener, price alerts, Pansy AI chat &amp; TradingView charts
-            </p>
-          </div>
-          
-          {errorMsg && (
-            <Card className="p-4 bg-[#ef4444]/10 border-[#ef4444]/30 flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-[#ef4444] shrink-0 mt-0.5" />
-              <p className="text-sm text-[#ef4444]">{errorMsg}</p>
-            </Card>
-          )}
-
-          <div className="space-y-4">
-            {/* Free Plan */}
-            <Card className={`p-6 ${currentPlan === "free" ? "border-primary border-2" : ""}`}>
-              <div className="space-y-4">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h3 className="font-serif text-xl font-bold text-foreground">Free</h3>
-                    <p className="text-2xl font-bold text-foreground mt-1">$0</p>
-                  </div>
-                  {currentPlan === "free" && (
-                    <Badge variant="outline" className="border-primary text-primary">
-                      Current Plan
-                    </Badge>
-                  )}
-                </div>
-
-                <ul className="space-y-2">
-                  {[
-                    "Basic stock screener",
-                    "Paper trading simulator with $10K",
-                    "Market movers & watchlist",
-                    "36 core lessons",
-                  ].map((feature) => (
-                    <li key={feature} className="flex items-start gap-2">
-                      <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                      <span className="text-sm text-foreground">{feature}</span>
-                    </li>
-                  ))}
-                  <li className="flex items-start gap-2 opacity-50">
-                    <span className="text-sm text-muted-foreground line-through">Price alerts</span>
-                  </li>
-                  <li className="flex items-start gap-2 opacity-50">
-                    <span className="text-sm text-muted-foreground line-through">Pansy AI analyst — unlimited</span>
-                  </li>
-                  <li className="flex items-start gap-2 opacity-50">
-                    <span className="text-sm text-muted-foreground line-through">Morning Tape & Open Radar</span>
-                  </li>
-                </ul>
-
-                {currentPlan === "free" && (
-                  <Button variant="outline" className="w-full" disabled>
-                    Current Plan
-                  </Button>
-                )}
-              </div>
-            </Card>
-
-            {/* Monthly Plan */}
-            <Card className="p-6 border border-accent">
-              <div className="space-y-4">
-                <div>
-                  <h3 className="font-serif text-xl font-bold text-foreground">Monthly</h3>
-                  <div className="flex items-baseline gap-2 mt-1">
-                    <p className="text-2xl font-bold text-foreground">${monthlyPrice}<span className="text-sm font-normal text-muted-foreground">/mo</span></p>
-                    <span className="text-sm text-muted-foreground line-through">${FOUNDERS_PLAN.regularMonthlyPrice}</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground">Cancel anytime</p>
-                </div>
-
-                {currentPlan === "free" && (
-                  <div className="pt-2">
-                    {user ? (
-                      <Button
-                        className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
-                        onClick={() => handleSubscribe("monthly")}
-                        disabled={isProcessing}
-                      >
-                        {isProcessing ? (
-                          <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Redirecting...</>
-                        ) : (
-                          "Subscribe Monthly"
-                        )}
-                      </Button>
-                    ) : (
-                      <Button
-                        className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
-                        onClick={() => router.push("/onboarding")}
-                      >
-                        Sign Up Free, Then Upgrade
-                      </Button>
-                    )}
-                  </div>
-                )}
-
-                {currentPlan === "pro" && (
-                  <Button variant="outline" className="w-full border-accent text-accent" disabled>
-                    Active Plan
-                  </Button>
-                )}
-              </div>
-            </Card>
-
-            {/* Yearly Plan */}
-            <Card className="p-6 border-2 border-accent relative">
-              <Badge className="absolute -top-2.5 left-4 bg-accent text-accent-foreground">Founders Price</Badge>
-              <div className="space-y-4">
-                <div>
-                  <h3 className="font-serif text-xl font-bold text-foreground">Yearly</h3>
-                  <div className="flex items-baseline gap-2 mt-1">
-                    <p className="text-2xl font-bold text-foreground">${yearlyMonthly}<span className="text-sm font-normal text-muted-foreground">/mo</span></p>
-                    <span className="text-sm text-muted-foreground line-through">${FOUNDERS_PLAN.regularYearlyPrice}/yr</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground">Billed ${yearlyPrice}/year</p>
-                </div>
-
-                <ul className="space-y-2">
-                  {[
-                    "Everything in Free, plus:",
-                    "Stock screener — strategies scored 0–100",
-                    "Price alerts — levels & screen matches",
-                    "Pansy AI analyst — entries, stops & targets",
-                    "24/7 market briefings",
-                    "TradingView charts",
-                    "150+ lessons & 32 strategies",
-                    "Pansy unlimited — analysis anytime",
-                  ].map((feature) => (
-                    <li key={feature} className="flex items-start gap-2">
-                      <Check className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
-                      <span className="text-sm text-foreground">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                {currentPlan === "free" && (
-                  <div className="space-y-3 pt-2">
-                    {user ? (
-                      <Button
-                        className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
-                        onClick={() => handleSubscribe("yearly")}
-                        disabled={isProcessing}
-                      >
-                        {isProcessing ? (
-                          <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Redirecting...</>
-                        ) : (
-                          "Subscribe Yearly"
-                        )}
-                      </Button>
-                    ) : (
-                      <Button
-                        className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
-                        onClick={() => router.push("/onboarding")}
-                      >
-                        Sign Up Free, Then Upgrade
-                      </Button>
-                    )}
-                    <p className="text-xs text-center text-muted-foreground">
-                      Secure checkout powered by Stripe
-                    </p>
-                  </div>
-                )}
-
-                {currentPlan === "pro" && (
-                  <Button variant="outline" className="w-full border-accent text-accent" disabled>
-                    Active Plan
-                  </Button>
-                )}
-              </div>
-            </Card>
-
-            {/* Lifetime Plan */}
-            <Card className="p-6 border border-border relative overflow-hidden">
-              <div className="absolute top-0 right-0 px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-bl-lg"
-                style={{ background: "linear-gradient(135deg, #27B7C8, #49B06E)", color: "#07080C" }}>
-                Best Value
-              </div>
-              <div className="space-y-4">
-                <div>
-                  <h3 className="font-serif text-xl font-bold text-foreground">Lifetime</h3>
-                  <div className="flex items-baseline gap-2 mt-1">
-                    <p className="text-2xl font-bold text-foreground">${lifetimePrice}<span className="text-sm font-normal text-muted-foreground"> one-time</span></p>
-                    <span className="text-sm text-muted-foreground line-through">${FOUNDERS_PLAN.regularLifetimePrice}</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground">Pay once, yours forever</p>
-                </div>
-
-                <ul className="space-y-2">
-                  {[
-                    "Everything in Radar Core",
-                    "All future updates included",
-                    "No recurring payments ever",
-                  ].map((feature) => (
-                    <li key={feature} className="flex items-start gap-2">
-                      <Check className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
-                      <span className="text-sm text-foreground">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                {currentPlan === "free" && (
-                  <div className="pt-2">
-                    {user ? (
-                      <Button
-                        className="w-full text-[#07080C] font-bold"
-                        style={{ background: "linear-gradient(135deg, #27B7C8, #49B06E)" }}
-                        onClick={() => handleSubscribe("lifetime")}
-                        disabled={isProcessing}
-                      >
-                        {isProcessing ? (
-                          <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Redirecting...</>
-                        ) : (
-                          "Get Lifetime Access"
-                        )}
-                      </Button>
-                    ) : (
-                      <Button
-                        className="w-full text-[#07080C] font-bold"
-                        style={{ background: "linear-gradient(135deg, #27B7C8, #49B06E)" }}
-                        onClick={() => router.push("/onboarding")}
-                      >
-                        Sign Up Free, Then Upgrade
-                      </Button>
-                    )}
-                  </div>
-                )}
-
-                {currentPlan === "pro" && (
-                  <Button variant="outline" className="w-full border-accent text-accent" disabled>
-                    Active Plan
-                  </Button>
-                )}
-              </div>
-            </Card>
-          </div>
-
-          <Card className="p-3 bg-muted border-muted-foreground/20">
-            <p className="text-xs text-center text-muted-foreground leading-relaxed">
-              Educational content only. Not financial advice. Radar is not liable for any investment decisions or losses.
-            </p>
-          </Card>
-
-          {/* Share QR */}
-          <Card className="p-5 bg-card text-center">
-            <div className="flex items-center justify-center gap-1.5 mb-2">
-              <Share2 className="w-3.5 h-3.5 text-accent" />
-              <span className="text-xs font-semibold text-accent uppercase tracking-wide">Share Radar</span>
-            </div>
-            <p className="text-sm text-muted-foreground mb-3">
-              Know someone who needs this? Scan to share.
-            </p>
-            <div className="inline-block p-3 rounded-xl bg-white">
-              <QRCodeSVG
-                value="https://shebloomswealth.app"
-                size={120}
-                level="M"
-                fgColor="#07080C"
-                bgColor="white"
-                imageSettings={{
-                  src: "/icon-192.png",
-                  height: 24,
-                  width: 24,
-                  excavate: true,
-                }}
-              />
-            </div>
-            <p className="text-xs text-muted-foreground mt-2">shebloomswealth.app</p>
-          </Card>
+      <SEO title="Plans — Radar" description="Radar Desk and Pro plans" />
+      <div className="max-w-3xl mx-auto p-4 pb-24">
+        <div className="text-center space-y-2 mb-6">
+          <h1 className="font-serif text-3xl font-bold text-foreground">Choose Your Plan</h1>
+          <p className="text-muted-foreground">Everything starts with the free tier. Upgrade when you're ready.</p>
         </div>
+
+        {errorMsg && (
+          <div className="mb-4 p-4 rounded-xl flex items-start gap-3" style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)" }}>
+            <AlertCircle className="w-5 h-5 text-[#ef4444] shrink-0 mt-0.5" />
+            <p className="text-sm text-[#ef4444]">{errorMsg}</p>
+          </div>
+        )}
+
+        {/* Billing toggle */}
+        <div className="flex justify-center mb-6">
+          <div className="inline-flex rounded-full p-1" style={{ background: "rgba(255,255,255,0.06)" }}>
+            {(["monthly", "yearly"] as const).map((b) => (
+              <button
+                key={b}
+                onClick={() => setBilling(b)}
+                className="px-5 py-2 rounded-full text-sm font-medium transition-all"
+                style={{
+                  background: billing === b ? "rgba(39,183,200,0.15)" : "transparent",
+                  color: billing === b ? "#27B7C8" : "rgba(243,237,227,0.5)",
+                  border: billing === b ? "1px solid rgba(39,183,200,0.3)" : "1px solid transparent",
+                }}
+              >
+                {b === "yearly" ? "Yearly (save 2+ mo)" : "Monthly"}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Plan columns */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+          {/* Free column */}
+          <div className="rounded-2xl p-5 border" style={{ background: "rgba(255,255,255,0.02)", borderColor: "rgba(255,255,255,0.06)" }}>
+            <h3 className="text-lg font-bold text-foreground mb-1">Free</h3>
+            <p className="text-2xl font-bold text-foreground mb-1">$0</p>
+            <p className="text-xs text-muted-foreground mb-4">No card needed</p>
+            <Button variant="outline" className="w-full" disabled={tier === "free"}>
+              {tier === "free" ? "Current Plan" : "Downgrade"}
+            </Button>
+          </div>
+
+          {/* Desk column */}
+          <div className="rounded-2xl p-5 border-2 relative" style={{ background: "rgba(39,183,200,0.04)", borderColor: "#27B7C8" }}>
+            <div className="absolute -top-2.5 left-4 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider"
+              style={{ background: "#27B7C8", color: "#07080C" }}>
+              Recommended
+            </div>
+            <h3 className="text-lg font-bold text-foreground mb-1">Desk</h3>
+            <p className="text-2xl font-bold text-foreground mb-0.5">${deskPrice}<span className="text-sm font-normal text-muted-foreground">{deskPeriod}</span></p>
+            {billing === "yearly" && <p className="text-xs text-[#49B06E] mb-1">{DESK_PLAN.yearlySavings}</p>}
+            <p className="text-xs text-muted-foreground mb-4">{DESK_PLAN.tagline}</p>
+            {isLoggedIn ? (
+              <Button
+                className="w-full text-[#07080C] font-bold"
+                style={{ background: "linear-gradient(135deg, #27B7C8, #49B06E)" }}
+                onClick={() => handleSubscribe("desk", billing)}
+                disabled={isProcessing || tier === "desk"}
+              >
+                {isProcessing ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Redirecting...</> : tier === "desk" ? "Current Plan" : "Subscribe to Desk"}
+              </Button>
+            ) : (
+              <Button
+                className="w-full text-[#07080C] font-bold"
+                style={{ background: "linear-gradient(135deg, #27B7C8, #49B06E)" }}
+                onClick={() => router.push("/onboarding")}
+              >
+                Sign Up, Then Upgrade
+              </Button>
+            )}
+          </div>
+
+          {/* Pro column */}
+          <div className="rounded-2xl p-5 border relative" style={{ background: "rgba(168,85,247,0.04)", borderColor: "rgba(168,85,247,0.4)" }}>
+            <div className="absolute -top-2.5 left-4 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider"
+              style={{ background: "linear-gradient(135deg, #a855f7, #27B7C8)", color: "#fff" }}>
+              Pro
+            </div>
+            <h3 className="text-lg font-bold text-foreground mb-1">Pro</h3>
+            <p className="text-2xl font-bold text-foreground mb-0.5">${proPrice}<span className="text-sm font-normal text-muted-foreground">{deskPeriod}</span></p>
+            {billing === "yearly" && <p className="text-xs text-[#49B06E] mb-1">{PRO_PLAN.yearlySavings}</p>}
+            <p className="text-xs text-muted-foreground mb-4">{PRO_PLAN.tagline}</p>
+            {isLoggedIn ? (
+              <Button
+                className="w-full font-bold text-white"
+                style={{ background: "linear-gradient(135deg, #a855f7, #27B7C8)" }}
+                onClick={() => handleSubscribe("pro", billing)}
+                disabled={isProcessing || tier === "pro"}
+              >
+                {isProcessing ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Redirecting...</> : tier === "pro" ? "Current Plan" : "Subscribe to Pro"}
+              </Button>
+            ) : (
+              <Button
+                className="w-full font-bold text-white"
+                style={{ background: "linear-gradient(135deg, #a855f7, #27B7C8)" }}
+                onClick={() => router.push("/onboarding")}
+              >
+                Sign Up, Then Upgrade
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {/* Feature matrix */}
+        <div className="rounded-2xl overflow-hidden border" style={{ background: "rgba(255,255,255,0.02)", borderColor: "rgba(255,255,255,0.06)" }}>
+          <div className="grid grid-cols-4 text-xs font-bold uppercase tracking-wider px-4 py-3" style={{ background: "rgba(255,255,255,0.04)" }}>
+            <span className="text-muted-foreground">Feature</span>
+            <span className="text-center text-muted-foreground">Free</span>
+            <span className="text-center text-[#27B7C8]">Desk</span>
+            <span className="text-center text-[#a855f7]">Pro</span>
+          </div>
+          {FEATURE_MATRIX.map((row, i) => (
+            <div
+              key={row.label}
+              className="grid grid-cols-4 px-4 py-3 text-sm items-center"
+              style={{ background: i % 2 === 0 ? "transparent" : "rgba(255,255,255,0.02)" }}
+            >
+              <span className="text-foreground font-medium">{row.label}</span>
+              <FeatureCell value={row.free} />
+              <FeatureCell value={row.desk} accent />
+              <FeatureCell value={row.pro} accent />
+            </div>
+          ))}
+        </div>
+
+        {/* Fine print */}
+        <p className="text-[10px] text-center text-muted-foreground/50 mt-6 leading-relaxed max-w-md mx-auto">
+          Educational content only. Not financial advice. Radar is not liable for any investment decisions or losses.
+          Cancel anytime in Settings. Secure checkout powered by Stripe.
+        </p>
       </div>
     </Layout>
+  );
+}
+
+function FeatureCell({ value, accent }: { value: string; accent?: boolean }) {
+  if (value === "—") return <span className="text-center"><Minus className="w-4 h-4 text-muted-foreground/30 mx-auto" /></span>;
+  if (value === "Open") return <span className="text-center"><Check className="w-4 h-4 text-[#49B06E] mx-auto" /></span>;
+  return (
+    <span className={`text-center text-xs ${accent ? "text-foreground" : "text-muted-foreground"}`}>
+      {value}
+    </span>
   );
 }

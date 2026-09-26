@@ -3,7 +3,6 @@ import { supabase } from "@/integrations/supabase/client";
 
 const PLAY_BILLING_METHOD = "https://play.google.com/billing";
 const PRODUCT_ID = "bloom_premium";
-const LIFETIME_PRODUCT_ID = "bloom_lifetime";
 const MANAGE_SUBSCRIPTIONS_URL =
   "https://play.google.com/store/account/subscriptions?package=app.shebloomswealth.mobile";
 
@@ -32,11 +31,9 @@ interface UseBillingReturn {
   error: string | null;
   monthlyOffer: PlanOffer | null;
   yearlyOffer: PlanOffer | null;
-  lifetimeOffer: PlanOffer | null;
   purchase: (offer: PlanOffer) => Promise<void>;
   restorePurchases: () => Promise<boolean>;
   manageSubscriptionUrl: string;
-  hasFreeTrial: boolean;
 }
 
 async function obfuscateAccountId(userId: string): Promise<string> {
@@ -53,8 +50,6 @@ export function useGooglePlayBilling(): UseBillingReturn {
   const [error, setError] = useState<string | null>(null);
   const [monthlyOffer, setMonthlyOffer] = useState<PlanOffer | null>(null);
   const [yearlyOffer, setYearlyOffer] = useState<PlanOffer | null>(null);
-  const [lifetimeOffer, setLifetimeOffer] = useState<PlanOffer | null>(null);
-  const [hasFreeTrial, setHasFreeTrial] = useState(false);
   const serviceRef = useRef<DigitalGoodsService | null>(null);
   const purchasingRef = useRef(false);
 
@@ -83,21 +78,10 @@ export function useGooglePlayBilling(): UseBillingReturn {
         const service = await window.getDigitalGoodsService(PLAY_BILLING_METHOD);
         serviceRef.current = service;
 
-        const details = await service.getDetails([PRODUCT_ID, LIFETIME_PRODUCT_ID]);
+        const details = await service.getDetails([PRODUCT_ID]);
 
         if (details && details.length > 0) {
           for (const detail of details) {
-            if (detail.itemId === LIFETIME_PRODUCT_ID) {
-              setLifetimeOffer({
-                label: "Lifetime",
-                basePlanId: "lifetime",
-                price: `${detail.price.currency} ${detail.price.value}`,
-                priceCurrency: detail.price.currency,
-                period: "lifetime",
-              });
-              continue;
-            }
-
             if (!detail.subscriptionPeriod) continue;
             const period = detail.subscriptionPeriod;
             const isYearly = period.includes("Y") || period.includes("year");
@@ -115,7 +99,6 @@ export function useGooglePlayBilling(): UseBillingReturn {
 
             if (isMonthly) setMonthlyOffer(offer);
             if (isYearly) setYearlyOffer(offer);
-            if (detail.freeTrialPeriod) setHasFreeTrial(true);
           }
 
           setState("ready");
@@ -139,23 +122,16 @@ export function useGooglePlayBilling(): UseBillingReturn {
         setMonthlyOffer({
           label: "Monthly",
           basePlanId: "monthly",
-          price: "$4.99",
+          price: "$7.99",
           priceCurrency: "USD",
           period: "month",
         });
         setYearlyOffer({
           label: "Yearly",
           basePlanId: "yearly",
-          price: "$29.99",
+          price: "$69.00",
           priceCurrency: "USD",
           period: "year",
-        });
-        setLifetimeOffer({
-          label: "Lifetime",
-          basePlanId: "lifetime",
-          price: "$69.99",
-          priceCurrency: "USD",
-          period: "lifetime",
         });
         setState("ready");
       } else {
@@ -196,8 +172,7 @@ export function useGooglePlayBilling(): UseBillingReturn {
 
         const obfuscatedId = await obfuscateAccountId(user.id);
 
-        const isLifetime = offer.basePlanId === "lifetime";
-        const sku = isLifetime ? LIFETIME_PRODUCT_ID : PRODUCT_ID;
+        const sku = PRODUCT_ID;
         const methodData: any = { sku };
         if (offer.offerToken) {
           methodData.offerToken = offer.offerToken;
@@ -243,7 +218,6 @@ export function useGooglePlayBilling(): UseBillingReturn {
             purchaseToken,
             productId: sku,
             basePlanId: offer.basePlanId,
-            isLifetime,
           }),
         });
 
@@ -375,10 +349,8 @@ export function useGooglePlayBilling(): UseBillingReturn {
     error,
     monthlyOffer,
     yearlyOffer,
-    lifetimeOffer,
     purchase,
     restorePurchases,
     manageSubscriptionUrl: MANAGE_SUBSCRIPTIONS_URL,
-    hasFreeTrial,
   };
 }

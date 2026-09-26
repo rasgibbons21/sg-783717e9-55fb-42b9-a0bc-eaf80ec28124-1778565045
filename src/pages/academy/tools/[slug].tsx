@@ -15,7 +15,7 @@ const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
 export default function ToolPage() {
   const router = useRouter();
   const slug = router.query.slug as string;
-  const { isLoggedIn, isPro, isLoading } = useSubscription();
+  const { isLoggedIn, isPaid, isLoading } = useSubscription();
 
   const tool = slug ? getToolBySlug(slug) : undefined;
 
@@ -41,7 +41,7 @@ export default function ToolPage() {
     );
   }
 
-  const hasAccess = canAccessTool(slug, isPro);
+  const hasAccess = canAccessTool(slug, isPaid);
 
   if (!hasAccess) {
     return (

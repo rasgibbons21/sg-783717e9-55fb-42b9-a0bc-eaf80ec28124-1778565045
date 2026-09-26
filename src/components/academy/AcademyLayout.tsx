@@ -30,7 +30,7 @@ interface AcademyLayoutProps {
 
 export function AcademyLayout({ children, title, showBack }: AcademyLayoutProps) {
   const router = useRouter();
-  const { isLoggedIn, isPro } = useSubscription();
+  const { isLoggedIn, isPaid } = useSubscription();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const currentPath = router.pathname;
 
@@ -161,7 +161,7 @@ export function AcademyLayout({ children, title, showBack }: AcademyLayoutProps)
           })}
 
           <div className="mt-auto pt-4 border-t border-border">
-            {!isPro && (
+            {!isPaid && (
               <Link
                 href="/subscription"
                 className="block px-3 py-2.5 rounded-xl text-sm font-semibold text-center bg-gradient-to-r from-primary to-[#27B7C8] text-white hover:opacity-90 transition-opacity"

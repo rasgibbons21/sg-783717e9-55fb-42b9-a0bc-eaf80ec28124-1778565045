@@ -16,7 +16,7 @@ const EXP_OPTIONS = ["Complete beginner", "Some experience", "Experienced"];
 
 export default function NicheFinder() {
   const router = useRouter();
-  const { isLoggedIn, isPro, isLoading } = useSubscription();
+  const { isLoggedIn, isPaid, isLoading } = useSubscription();
   const [skills, setSkills] = useState("");
   const [interests, setInterests] = useState("");
   const [hoursPerWeek, setHoursPerWeek] = useState("10-15");
@@ -64,7 +64,7 @@ export default function NicheFinder() {
 
   if (isLoading || !isLoggedIn) return null;
 
-  if (!isPro) {
+  if (!isPaid) {
     return (
       <AcademyLayout showBack>
         <SEO title="AI Niche Finder — Radar Academy" />

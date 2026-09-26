@@ -127,8 +127,8 @@ const STRATEGY_TIPS = ALL_STRATEGIES
   }));
 
 export default function PaperTraderV2() {
-  const { isPro, isTrial, trialDaysLeft, userId: subUserId } = useSubscription();
-  const showAds = !isPro;
+  const { isPaid, userId: subUserId } = useSubscription();
+  const showAds = !isPaid;
   const [account, setAccount] = useState<Account | null>(null);
   const [trades, setTrades] = useState<Trade[]>([]);
   const [leaderboard, setLeaderboard] = useState<LeaderboardRow[]>([]);
@@ -310,20 +310,6 @@ export default function PaperTraderV2() {
       </Head>
       <Layout>
         <div className="min-h-screen pb-24" style={{ background: C.navy }}>
-
-          {/* Trial Banner */}
-          {isTrial && trialDaysLeft !== null && (
-            <motion.div
-              initial={{ y: -40, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              className="px-4 py-2.5 text-center text-xs font-medium flex items-center justify-center gap-2"
-              style={{ background: C.tealDim, color: C.teal }}
-            >
-              <Zap className="w-3.5 h-3.5" />
-              {trialDaysLeft} day{trialDaysLeft !== 1 ? "s" : ""} left in trial
-              <Link href="/subscription" className="underline font-bold ml-1">Go Pro</Link>
-            </motion.div>
-          )}
 
           {/* ══════ PORTFOLIO HEADER ══════ */}
           <motion.div

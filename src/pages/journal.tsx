@@ -1238,7 +1238,7 @@ function StatsView() {
 
 // ── Main Page ──────────────────────────────────────────────────────────────
 export default function JournalPage(_props: PageProps) {
-  const { isPro, isLoading: authLoading } = useSubscription();
+  const { isPaid, isLoading: authLoading } = useSubscription();
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -1271,15 +1271,15 @@ export default function JournalPage(_props: PageProps) {
   }, [ticker, grade, direction, range]);
 
   useEffect(() => {
-    if (!authLoading && isPro) loadEntries();
-    else if (!authLoading && !isPro) setLoading(false);
-  }, [authLoading, isPro, loadEntries]);
+    if (!authLoading && isPaid) loadEntries();
+    else if (!authLoading && !isPaid) setLoading(false);
+  }, [authLoading, isPaid, loadEntries]);
 
   const updateEntry = (updated: JournalEntry) => {
     setEntries(prev => prev.map(e => e.id === updated.id ? updated : e));
   };
 
-  const showProGate = !authLoading && !isPro;
+  const showProGate = !authLoading && !isPaid;
 
   // Stats
   const totalTrades = entries.length;
@@ -1318,7 +1318,7 @@ export default function JournalPage(_props: PageProps) {
           </div>
 
           {/* Tab bar */}
-          {!authLoading && isPro && (
+          {!authLoading && isPaid && (
             <div className="flex gap-1 mb-4 p-1 rounded-xl" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)" }}>
               {([
                 { key: "journal" as const, label: "Journal", icon: NotebookPen },
@@ -1341,7 +1341,7 @@ export default function JournalPage(_props: PageProps) {
             </div>
           )}
 
-          {(authLoading || (loading && isPro && tab === "journal")) && (
+          {(authLoading || (loading && isPaid && tab === "journal")) && (
             <div className="flex items-center justify-center py-16 gap-3">
               <Loader2 className="w-5 h-5 text-[#27B7C8] animate-spin" />
               <span className="text-sm text-[#F3EDE3]/50">Loading journal…</span>
@@ -1350,17 +1350,17 @@ export default function JournalPage(_props: PageProps) {
 
           {showProGate && <ProGate />}
 
-          {!loading && !authLoading && isPro && error && tab === "journal" && (
+          {!loading && !authLoading && isPaid && error && tab === "journal" && (
             <div className="rounded-xl bg-[#ef4444]/10 border border-[#ef4444]/20 px-4 py-3 text-sm text-[#ef4444] mb-4">
               {error} <button onClick={loadEntries} className="underline ml-2">Retry</button>
             </div>
           )}
 
           {/* Stats tab */}
-          {!authLoading && isPro && tab === "stats" && <StatsView />}
+          {!authLoading && isPaid && tab === "stats" && <StatsView />}
 
           {/* Journal tab */}
-          {!authLoading && !loading && isPro && !error && tab === "journal" && (
+          {!authLoading && !loading && isPaid && !error && tab === "journal" && (
             <>
               {/* Quick stats */}
               {totalTrades > 0 && (

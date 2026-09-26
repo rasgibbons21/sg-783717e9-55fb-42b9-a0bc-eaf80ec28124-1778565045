@@ -43,7 +43,7 @@ const PRICING_FEATURES = [
 ];
 
 export default function AcademyLanding() {
-  const { isPro, isLoggedIn } = useSubscription();
+  const { isPaid, isLoggedIn } = useSubscription();
 
   return (
     <>
@@ -190,7 +190,7 @@ export default function AcademyLanding() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {ACADEMY_TOOLS.map((tool, i) => (
-                <AcademyToolCard key={tool.slug} tool={tool} isPro={isPro} index={i} />
+                <AcademyToolCard key={tool.slug} tool={tool} isPaid={isPaid} index={i} />
               ))}
             </div>
           </div>
@@ -238,7 +238,7 @@ export default function AcademyLanding() {
                   onClick={() => haptic()}
                   className="w-full bg-gradient-to-r from-primary to-[#27B7C8] text-white py-3 rounded-full font-semibold text-sm hover:opacity-90 transition-opacity"
                 >
-                  {isLoggedIn ? (isPro ? "You're on Pro" : "Upgrade Now") : "Start 3-Day Free Trial"}
+                  {isLoggedIn ? (isPaid ? "You're Subscribed" : "Upgrade Now") : "Get Started"}
                 </motion.button>
               </Link>
             </motion.div>

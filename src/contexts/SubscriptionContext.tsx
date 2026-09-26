@@ -1,13 +1,14 @@
 import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from "react";
 import { useRouter } from "next/router";
 import { supabase } from "@/integrations/supabase/client";
+import { type SubscriptionTier, getEntitlements, type Entitlements } from "@/config/proPlan";
 
 interface SubscriptionContextType {
+  tier: SubscriptionTier;
+  entitlements: Entitlements;
   isPro: boolean;
-  isPaidPro: boolean;
-  isTrial: boolean;
-  trialDaysLeft: number;
-  trialEndsAt: Date | null;
+  isDesk: boolean;
+  isPaid: boolean;
   isLoggedIn: boolean;
   isLoading: boolean;
   userName: string | null;
@@ -17,13 +18,16 @@ interface SubscriptionContextType {
 
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
 
+function statusToTier(status: string | null | undefined, isPro: boolean): SubscriptionTier {
+  if (status === "pro" || status === "pro_active") return "pro";
+  if (status === "desk" || status === "active" || status === "lifetime") return "desk";
+  if (isPro) return "desk";
+  return "free";
+}
+
 export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
-  const [isPro, setIsPro] = useState(false);
-  const [isPaidPro, setIsPaidPro] = useState(false);
-  const [isTrial, setIsTrial] = useState(false);
-  const [trialDaysLeft, setTrialDaysLeft] = useState(0);
-  const [trialEndsAt, setTrialEndsAt] = useState<Date | null>(null);
+  const [tier, setTier] = useState<SubscriptionTier>("free");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [userName, setUserName] = useState<string | null>(null);
@@ -31,17 +35,11 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
 
   const loadAuthStatus = useCallback(async () => {
     try {
-      // getUser() hits the Supabase server and validates the token — not localStorage.
-      // This is the only source of truth for whether the session is actually live.
       const { data: { user }, error } = await supabase.auth.getUser();
 
       if (error || !user) {
         setIsLoggedIn(false);
-        setIsPro(false);
-        setIsPaidPro(false);
-        setIsTrial(false);
-        setTrialDaysLeft(0);
-        setTrialEndsAt(null);
+        setTier("free");
         setUserName(null);
         setUserId(null);
         return;
@@ -52,21 +50,15 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
 
       const { data: profile } = await supabase
         .from("profiles")
-        .select("is_pro, subscription_status, full_name, trial_ends_at")
+        .select("is_pro, subscription_status, full_name")
         .eq("id", user.id)
         .single();
 
-      const hasActiveSubscription = profile?.subscription_status === "active" || profile?.subscription_status === "lifetime";
-      const trialEnd = profile?.trial_ends_at ? new Date(profile.trial_ends_at as string) : null;
-      const now = new Date();
-      const onTrial = trialEnd !== null && trialEnd > now && !hasActiveSubscription;
-      const daysLeft = trialEnd ? Math.max(0, Math.ceil((trialEnd.getTime() - now.getTime()) / 86400000)) : 0;
-
-      setIsPro(hasActiveSubscription || onTrial || (profile?.is_pro === true && !trialEnd));
-      setIsPaidPro(hasActiveSubscription || (profile?.is_pro === true && !trialEnd));
-      setIsTrial(onTrial);
-      setTrialDaysLeft(daysLeft);
-      setTrialEndsAt(onTrial && trialEnd ? trialEnd : null);
+      const resolvedTier = statusToTier(
+        profile?.subscription_status as string | null,
+        profile?.is_pro === true
+      );
+      setTier(resolvedTier);
 
       const first = profile?.full_name
         ? (profile.full_name as string).trim().split(" ")[0]
@@ -74,11 +66,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
       setUserName(first);
     } catch {
       setIsLoggedIn(false);
-      setIsPro(false);
-      setIsPaidPro(false);
-      setIsTrial(false);
-      setTrialDaysLeft(0);
-      setTrialEndsAt(null);
+      setTier("free");
       setUserName(null);
       setUserId(null);
     } finally {
@@ -91,10 +79,9 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     await loadAuthStatus();
   }, [loadAuthStatus]);
 
-  // Dev-only: ?pro=1 overrides subscription state for previewing Pro features
   useEffect(() => {
     if (process.env.NODE_ENV === "development" && router.query.pro === "1") {
-      setIsPro(true);
+      setTier("pro");
       setIsLoggedIn(true);
       setUserName("Preview");
       setUserId("dev-preview");
@@ -103,17 +90,13 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   }, [router.query.pro]);
 
   useEffect(() => {
-    // Initial load
     if (process.env.NODE_ENV === "development" && router.query.pro === "1") return;
     loadAuthStatus();
 
-    // Supabase fires this on sign-in, sign-out, token refresh — re-validate immediately
     const { data: { subscription: authSub } } = supabase.auth.onAuthStateChange(() => {
       loadAuthStatus();
     });
 
-    // Re-validate when the tab regains focus (catches session expiry while backgrounded)
-    // In TWA context, also re-verify Google Play subscription status
     const handleFocus = async () => {
       loadAuthStatus();
       if ("getDigitalGoodsService" in window) {
@@ -130,7 +113,6 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     };
     window.addEventListener("focus", handleFocus);
 
-    // Re-validate after every client-side route transition
     const handleRoute = () => loadAuthStatus();
     router.events?.on("routeChangeComplete", handleRoute);
 
@@ -141,8 +123,21 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     };
   }, [loadAuthStatus, router.events]);
 
+  const entitlements = getEntitlements(tier);
+
   return (
-    <SubscriptionContext.Provider value={{ isPro, isPaidPro, isTrial, trialDaysLeft, trialEndsAt, isLoggedIn, isLoading, userName, userId, refresh }}>
+    <SubscriptionContext.Provider value={{
+      tier,
+      entitlements,
+      isPro: tier === "pro",
+      isDesk: tier === "desk",
+      isPaid: tier !== "free",
+      isLoggedIn,
+      isLoading,
+      userName,
+      userId,
+      refresh,
+    }}>
       {children}
     </SubscriptionContext.Provider>
   );

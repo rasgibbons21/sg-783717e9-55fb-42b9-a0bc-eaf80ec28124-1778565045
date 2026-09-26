@@ -10,7 +10,7 @@ import { useSubscription } from "@/contexts/SubscriptionContext";
 const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
 
 export default function ToolsIndex() {
-  const { isPro } = useSubscription();
+  const { isPaid } = useSubscription();
   const [category, setCategory] = useState("all");
 
   const filtered = category === "all"
@@ -62,7 +62,7 @@ export default function ToolsIndex() {
         {/* Tools Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map((tool, i) => (
-            <AcademyToolCard key={tool.slug} tool={tool} isPro={isPro} index={i} />
+            <AcademyToolCard key={tool.slug} tool={tool} isPaid={isPaid} index={i} />
           ))}
         </div>
 

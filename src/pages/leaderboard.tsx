@@ -36,7 +36,7 @@ async function getToken(): Promise<string | null> {
 }
 
 export default function LeaderboardPage() {
-  const { isPro, isLoggedIn, isLoading: authLoading, userId } = useSubscription();
+  const { isPaid, isLoggedIn, isLoading: authLoading, userId } = useSubscription();
   const [top, setTop] = useState<LeaderboardRow[]>([]);
   const [me, setMe] = useState<LeaderboardRow | null>(null);
   const [loading, setLoading] = useState(true);
@@ -67,7 +67,7 @@ export default function LeaderboardPage() {
     else if (!authLoading) setLoading(false);
   }, [authLoading, isLoggedIn, fetchLeaderboard]);
 
-  const showAds = !isPro;
+  const showAds = !isPaid;
 
   return (
     <>

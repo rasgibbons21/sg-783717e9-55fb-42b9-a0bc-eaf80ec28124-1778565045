@@ -154,7 +154,7 @@ function ProGate() {
 interface SymbolResult { symbol: string; name: string; }
 
 export default function ResearchPage() {
-  const { isPro, isLoading: authLoading } = useSubscription();
+  const { isPaid, isLoading: authLoading } = useSubscription();
 
   const [search, setSearch] = useState("");
   const [ticker, setTicker] = useState("");
@@ -289,7 +289,7 @@ export default function ResearchPage() {
 
   const isUp = (quote?.dp ?? 0) >= 0;
   const priceColor = isUp ? "text-primary" : "text-destructive";
-  const showProGate = !authLoading && !isPro;
+  const showProGate = !authLoading && !isPaid;
 
   return (
     <>
@@ -317,7 +317,7 @@ export default function ResearchPage() {
 
           {showProGate && <ProGate />}
 
-          {!authLoading && isPro && (
+          {!authLoading && isPaid && (
             <>
               {/* Search */}
               <form onSubmit={handleSubmit} className="relative mb-4">

@@ -58,7 +58,7 @@ const CONCEPTS = [
 ];
 
 export default function TradeHub() {
-  const { isPro } = useSubscription();
+  const { isPaid } = useSubscription();
   const tradeTools = ACADEMY_TOOLS.filter(
     (t) => ["stock-analyzer", "technical-charts", "smart-screener", "portfolio-xray"].includes(t.slug)
   );
@@ -150,7 +150,7 @@ export default function TradeHub() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {tradeTools.map((tool, i) => (
-              <AcademyToolCard key={tool.slug} tool={tool} isPro={isPro} index={i} />
+              <AcademyToolCard key={tool.slug} tool={tool} isPaid={isPaid} index={i} />
             ))}
           </div>
         </div>

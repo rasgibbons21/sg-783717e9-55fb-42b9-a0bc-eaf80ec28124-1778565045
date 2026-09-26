@@ -149,7 +149,7 @@ function CumPnlChart({ daily }: { daily: BacktestData["dailyPerformance"] }) {
 }
 
 export default function BacktestPage(_props: PageProps) {
-  const { isPro, isLoading: authLoading } = useSubscription();
+  const { isPaid, isLoading: authLoading } = useSubscription();
   const [data, setData] = useState<BacktestData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -173,9 +173,9 @@ export default function BacktestPage(_props: PageProps) {
   }, [days, strategy]);
 
   useEffect(() => {
-    if (!authLoading && isPro) load();
+    if (!authLoading && isPaid) load();
     else if (!authLoading) setLoading(false);
-  }, [authLoading, isPro, load]);
+  }, [authLoading, isPaid, load]);
 
   const s = data?.summary;
 

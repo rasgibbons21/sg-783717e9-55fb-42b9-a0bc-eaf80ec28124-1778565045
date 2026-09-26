@@ -634,7 +634,7 @@ const HUSTLES: HustleInfo[] = [
 // ─── Page Component ─────────────────────────────────────────────────────────
 
 export default function SideHustlePage() {
-  const { isPro, isLoggedIn, userId } = useSubscription();
+  const { isPaid, isLoggedIn, userId } = useSubscription();
   const [selectedHustle, setSelectedHustle] = useState<HustleType | null>(null);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [expandedStep, setExpandedStep] = useState<number>(1);
@@ -742,7 +742,7 @@ export default function SideHustlePage() {
         <div className="min-h-screen" style={{ background: C.bg }}>
           <div className="max-w-2xl mx-auto px-4 py-6 pb-32">
 
-            {!isPro && (
+            {!isPaid && (
               <div className="mb-4">
                 <AdMobBanner format="banner" />
               </div>
@@ -1062,7 +1062,7 @@ export default function SideHustlePage() {
                   </div>
                 )}
 
-                {!isPro && (
+                {!isPaid && (
                   <div className="mt-4">
                     <AdMobBanner format="rectangle" />
                   </div>

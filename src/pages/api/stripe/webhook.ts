@@ -6,24 +6,14 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
   apiVersion: "2025-02-24.acacia",
 });
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL || "",
+  process.env.SUPABASE_SERVICE_ROLE_KEY || "",
+  { auth: { autoRefreshToken: false, persistSession: false } },
+);
 
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false,
-  },
-});
+export const config = { api: { bodyParser: false } };
 
-// Disable body parser for webhook verification
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
-// Helper to read raw body
 async function buffer(req: NextApiRequest) {
   const chunks = [];
   for await (const chunk of req) {
@@ -32,29 +22,23 @@ async function buffer(req: NextApiRequest) {
   return Buffer.concat(chunks);
 }
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
+function tierFromMeta(metadata: Stripe.Metadata | null | undefined): string {
+  const t = metadata?.tier;
+  if (t === "pro" || t === "pro_active") return "pro";
+  return "desk";
+}
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
   const buf = await buffer(req);
   const sig = req.headers["stripe-signature"];
-
-  if (!sig) {
-    return res.status(400).json({ error: "Missing stripe-signature header" });
-  }
+  if (!sig) return res.status(400).json({ error: "Missing stripe-signature header" });
 
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-  if (!webhookSecret) {
-    console.error("STRIPE_WEBHOOK_SECRET not configured");
-    return res.status(500).json({ error: "Webhook secret not configured" });
-  }
+  if (!webhookSecret) return res.status(500).json({ error: "Webhook secret not configured" });
 
   let event: Stripe.Event;
-
   try {
     event = stripe.webhooks.constructEvent(buf, sig, webhookSecret);
   } catch (err: any) {
@@ -69,54 +53,27 @@ export default async function handler(
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
         const userId = session.client_reference_id || session.metadata?.userId;
+        if (!userId) return res.status(400).json({ error: "No user ID found" });
 
-        if (!userId) {
-          console.error("No user ID found in checkout session");
-          return res.status(400).json({ error: "No user ID found" });
+        const tier = tierFromMeta(session.metadata);
+        const subscriptionId = session.subscription as string;
+
+        const { error: updateError } = await supabaseAdmin
+          .from("profiles")
+          .update({
+            is_pro: true,
+            stripe_customer_id: session.customer as string,
+            stripe_subscription_id: subscriptionId,
+            subscription_status: tier,
+            current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+          })
+          .eq("id", userId);
+
+        if (updateError) {
+          console.error("Error updating profile:", updateError);
+          return res.status(500).json({ error: updateError.message });
         }
-
-        const isLifetime = session.metadata?.plan === "lifetime";
-
-        if (isLifetime) {
-          const { error: updateError } = await supabaseAdmin
-            .from("profiles")
-            .update({
-              is_pro: true,
-              stripe_customer_id: session.customer as string,
-              subscription_status: "lifetime",
-              current_period_end: null,
-            })
-            .eq("id", userId);
-
-          if (updateError) {
-            console.error("Error updating user profile:", updateError);
-            return res.status(500).json({ error: updateError.message });
-          }
-
-          console.log(`User ${userId} upgraded to Lifetime Pro`);
-        } else {
-          const subscriptionId = session.subscription as string;
-
-          const { error: updateError } = await supabaseAdmin
-            .from("profiles")
-            .update({
-              is_pro: true,
-              stripe_customer_id: session.customer as string,
-              stripe_subscription_id: subscriptionId,
-              subscription_status: "active",
-              current_period_end: new Date(
-                Date.now() + 30 * 24 * 60 * 60 * 1000
-              ).toISOString(),
-            })
-            .eq("id", userId);
-
-          if (updateError) {
-            console.error("Error updating user profile:", updateError);
-            return res.status(500).json({ error: updateError.message });
-          }
-
-          console.log(`User ${userId} upgraded to Pro`);
-        }
+        console.log(`User ${userId} subscribed to ${tier}`);
         break;
       }
 
@@ -124,27 +81,23 @@ export default async function handler(
         const subscription = event.data.object as Stripe.Subscription;
         const customerId = subscription.customer as string;
 
-        // Find user by stripe_customer_id
-        const { data: profile, error: fetchError } = await supabaseAdmin
+        const { data: profile } = await supabaseAdmin
           .from("profiles")
           .select("id")
           .eq("stripe_customer_id", customerId)
           .single();
 
-        if (fetchError || !profile) {
-          console.error("User not found for customer:", customerId);
-          return res.status(404).json({ error: "User not found" });
-        }
+        if (!profile) return res.status(404).json({ error: "User not found" });
 
-        // Update subscription status and period end
+        const tier = tierFromMeta(subscription.metadata);
+        const isActive = subscription.status === "active";
+
         const { error: updateError } = await supabaseAdmin
           .from("profiles")
           .update({
-            subscription_status: subscription.status,
-            current_period_end: new Date(
-              subscription.current_period_end * 1000
-            ).toISOString(),
-            is_pro: subscription.status === "active" || subscription.status === "trialing",
+            subscription_status: isActive ? tier : subscription.status,
+            current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+            is_pro: isActive,
           })
           .eq("id", profile.id);
 
@@ -152,10 +105,7 @@ export default async function handler(
           console.error("Error updating subscription:", updateError);
           return res.status(500).json({ error: updateError.message });
         }
-
-        console.log(
-          `Subscription updated for user ${profile.id}: ${subscription.status}`
-        );
+        console.log(`Subscription updated for ${profile.id}: ${isActive ? tier : subscription.status}`);
         break;
       }
 
@@ -163,27 +113,20 @@ export default async function handler(
         const subscription = event.data.object as Stripe.Subscription;
         const customerId = subscription.customer as string;
 
-        // Find user by stripe_customer_id
-        const { data: profile, error: fetchError } = await supabaseAdmin
+        const { data: profile } = await supabaseAdmin
           .from("profiles")
           .select("id")
           .eq("stripe_customer_id", customerId)
           .single();
 
-        if (fetchError || !profile) {
-          console.error("User not found for customer:", customerId);
-          return res.status(404).json({ error: "User not found" });
-        }
+        if (!profile) return res.status(404).json({ error: "User not found" });
 
-        // Downgrade user to free
         const { error: updateError } = await supabaseAdmin
           .from("profiles")
           .update({
             is_pro: false,
             subscription_status: "canceled",
-            current_period_end: new Date(
-              subscription.current_period_end * 1000
-            ).toISOString(),
+            current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
           })
           .eq("id", profile.id);
 
@@ -191,8 +134,7 @@ export default async function handler(
           console.error("Error canceling subscription:", updateError);
           return res.status(500).json({ error: updateError.message });
         }
-
-        console.log(`Subscription canceled for user ${profile.id}`);
+        console.log(`Subscription canceled for ${profile.id}`);
         break;
       }
 

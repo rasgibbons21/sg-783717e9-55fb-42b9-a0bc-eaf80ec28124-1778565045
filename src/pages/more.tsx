@@ -30,7 +30,7 @@ const LEGAL = [
 ];
 
 export default function MorePage() {
-  const { userName, isPro } = useSubscription();
+  const { userName, isPaid } = useSubscription();
 
   return (
     <Layout>
@@ -42,7 +42,7 @@ export default function MorePage() {
           <h1 className="text-2xl font-bold text-[#F3EDE3]">More</h1>
           {userName && (
             <p className="text-xs text-[#F3EDE3]/40 mt-0.5">
-              {userName}{isPro ? " · Pro" : ""}
+              {userName}{isPaid ? " · Pro" : ""}
             </p>
           )}
         </div>

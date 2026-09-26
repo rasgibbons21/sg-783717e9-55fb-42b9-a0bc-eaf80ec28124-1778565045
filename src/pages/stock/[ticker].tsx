@@ -41,7 +41,7 @@ interface PansyAnalysis {
 export default function StockPage() {
   const router = useRouter();
   const { ticker } = router.query;
-  const { isPro, isLoggedIn } = useSubscription();
+  const { isPaid, isLoggedIn } = useSubscription();
   
   const [stockData, setStockData] = useState<StockData | null>(null);
   const [pansyAnalysis, setPansyAnalysis] = useState<PansyAnalysis | null>(null);
@@ -229,7 +229,7 @@ export default function StockPage() {
                 onClick={() => loadPansyAnalysis(ticker as string, stockData)}
                 className="bg-[#27B7C8] hover:bg-[#27B7C8]/90 text-[#07080C] font-semibold px-6 py-3 text-base shadow-lg shrink-0"
               >
-                {isPro ? (
+                {isPaid ? (
                   <>✨ Get Pansy's Take</>
                 ) : (
                   <><Lock className="w-4 h-4 mr-2 inline" />Get Pansy's Take <Badge className="ml-2 bg-white/20 text-white text-xs">Pro</Badge></>
@@ -308,7 +308,7 @@ export default function StockPage() {
         ) : null}
 
         {/* Upgrade Banner for Free Users After Analysis */}
-        {pansyAnalysis && !isPro && isLoggedIn && (
+        {pansyAnalysis && !isPaid && isLoggedIn && (
           <UpgradeBanner message={`Loved Pansy's take? Get unlimited analysis with Radar Core — $${CORE_PLAN.monthlyPrice}/month`} />
         )}
 
