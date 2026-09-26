@@ -280,9 +280,7 @@ export default function AdminDashboard() {
                             <td className="py-2 px-2">
                               <Badge className={
                                 u.pro_status === "subscribed" ? "bg-accent text-accent-foreground" :
-                                u.pro_status?.startsWith("trial") ? "bg-amber-500/20 text-amber-400 border border-amber-500/30" :
                                 u.pro_status === "manual pro" ? "bg-purple-500/20 text-purple-400 border border-purple-500/30" :
-                                u.pro_status === "trial expired" ? "bg-red-500/20 text-red-400 border border-red-500/30" :
                                 "bg-muted text-muted-foreground"
                               }>
                                 {u.pro_status}

@@ -113,7 +113,7 @@ export default function AcademyLanding() {
                     onClick={() => haptic()}
                     className="bg-[#27B7C8] hover:bg-[#27B7C8]/90 text-white px-8 py-3 rounded-full text-base font-semibold transition-colors flex items-center gap-2"
                   >
-                    {isLoggedIn ? "Go to Dashboard" : "Start Free Trial"}
+                    {isLoggedIn ? "Go to Dashboard" : "Get Started"}
                     <ArrowRight className="w-4 h-4" />
                   </motion.button>
                 </Link>
@@ -204,7 +204,7 @@ export default function AcademyLanding() {
             <h2 className="text-2xl md:text-3xl font-serif font-bold text-foreground mb-3">
               Simple, Transparent Pricing
             </h2>
-            <p className="text-muted-foreground">Start with a 3-day free trial. Cancel anytime.</p>
+            <p className="text-muted-foreground">Start free. Upgrade anytime.</p>
           </div>
           <div className="max-w-md mx-auto">
             <motion.div
@@ -217,12 +217,12 @@ export default function AcademyLanding() {
                 Best Value
               </div>
               <div className="mb-6">
-                <h3 className="text-lg font-bold text-foreground mb-1">Radar Core</h3>
+                <h3 className="text-lg font-bold text-foreground mb-1">Radar Desk</h3>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-bold text-foreground">$4.99</span>
+                  <span className="text-4xl font-bold text-foreground">$7.99</span>
                   <span className="text-muted-foreground">/month</span>
                 </div>
-                <p className="text-sm text-muted-foreground mt-1">or $29.99/year (save 50%)</p>
+                <p className="text-sm text-muted-foreground mt-1">or $69/year (save 28%)</p>
               </div>
               <ul className="space-y-3 mb-8">
                 {PRICING_FEATURES.map((feature) => (

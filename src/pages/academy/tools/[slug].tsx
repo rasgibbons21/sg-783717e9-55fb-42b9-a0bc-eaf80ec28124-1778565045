@@ -83,7 +83,7 @@ export default function ToolPage() {
               onClick={() => haptic()}
               className="w-full bg-gradient-to-r from-primary to-[#27B7C8] text-white py-3 rounded-full font-semibold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
             >
-              Upgrade to Pro — $4.99/mo
+              Upgrade — $7.99/mo
               <ArrowRight className="w-4 h-4" />
             </motion.button>
           </Link>

@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SEO } from "@/components/SEO";
 import { ArrowRight, Share2, Smartphone, Plus, Check, Zap } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
-import { CORE_PLAN, FOUNDERS_PLAN } from "@/config/proPlan";
+import { DESK_PLAN, PRO_PLAN } from "@/config/proPlan";
 
 /* ─── Palette ─────────────────────────────────────────────────────────────── */
 const C = {
@@ -305,13 +305,13 @@ export default function LandingPage() {
           <div style={{ textAlign:"center", marginBottom:"2.5rem" }}>
             <div style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"6px 14px", borderRadius:20, marginBottom:"1rem", background:"rgba(39,183,200,0.1)", border:"1px solid rgba(39,183,200,0.2)" }}>
               <Zap size={13} style={{ color:C.teal }} />
-              <span style={{ fontSize:12, fontWeight:700, color:C.teal, letterSpacing:"0.04em" }}>Founders Pricing — Lock It In</span>
+              <span style={{ fontSize:12, fontWeight:700, color:C.teal, letterSpacing:"0.04em" }}>Pricing</span>
             </div>
             <h2 style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:"clamp(1.5rem, 3vw, 2.2rem)", fontWeight:700, color:C.ivory, marginBottom:8 }}>
               Simple pricing, no surprises
             </h2>
             <p style={{ fontSize:14, color:"rgba(244,247,250,0.55)", maxWidth:440, margin:"0 auto" }}>
-              Start free with a 7-day trial. Cancel anytime.
+              Start free. Upgrade when you&apos;re ready.
             </p>
           </div>
 
@@ -337,37 +337,62 @@ export default function LandingPage() {
               </Link>
             </div>
 
-            {/* CORE — highlighted */}
+            {/* DESK */}
             <div style={{ ...glass, borderRadius:20, padding:"1.75rem", display:"flex", flexDirection:"column", border:`1px solid ${C.teal}40`, boxShadow:`0 0 40px rgba(39,183,200,0.12)`, position:"relative" }}>
               <div style={{ position:"absolute", top:-12, left:"50%", transform:"translateX(-50%)", padding:"4px 16px", borderRadius:20, ...gradientBg, fontSize:11, fontWeight:800, color:C.deep, letterSpacing:"0.06em" }}>BEST VALUE</div>
-              <p style={{ fontSize:13, fontWeight:700, color:C.teal, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:12 }}>Radar Core</p>
+              <p style={{ fontSize:13, fontWeight:700, color:C.teal, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:12 }}>Radar Desk</p>
               <div style={{ marginBottom:4 }}>
-                <span style={{ fontSize:36, fontWeight:800, color:C.ivory }}>${FOUNDERS_PLAN.monthlyPrice}</span>
+                <span style={{ fontSize:36, fontWeight:800, color:C.ivory }}>${DESK_PLAN.monthlyPrice}</span>
                 <span style={{ fontSize:14, color:"rgba(244,247,250,0.45)", marginLeft:4 }}>/mo</span>
               </div>
               <p style={{ fontSize:12, color:"rgba(244,247,250,0.4)", marginBottom:16 }}>
-                or ${FOUNDERS_PLAN.yearlyPrice}/yr
-                <span style={{ marginLeft:6, color:C.green, fontWeight:600 }}>save {Math.round((1 - FOUNDERS_PLAN.yearlyPrice / (FOUNDERS_PLAN.monthlyPrice * 12)) * 100)}%</span>
-                {" · "}${FOUNDERS_PLAN.lifetimePrice} lifetime
+                or ${DESK_PLAN.yearlyPrice}/yr
+                <span style={{ marginLeft:6, color:C.green, fontWeight:600 }}>save {Math.round((1 - DESK_PLAN.yearlyPrice / (DESK_PLAN.monthlyPrice * 12)) * 100)}%</span>
               </p>
               <div style={{ flex:1, marginBottom:20 }}>
-                {CORE_PLAN.benefits.map(f => (
+                {["Full session scans", "15 price alerts", "Unlimited journal", "Preset backtests", "Paper trading — full"].map(f => (
                   <div key={f} style={{ display:"flex", alignItems:"flex-start", gap:8, marginBottom:10 }}>
                     <Check size={14} style={{ color:C.teal, flexShrink:0, marginTop:2 }} />
                     <span style={{ fontSize:13, color:"rgba(244,247,250,0.7)" }}>{f}</span>
                   </div>
                 ))}
               </div>
-              <Link href="/onboarding">
+              <Link href="/subscription">
                 <button style={{ width:"100%", padding:"12px 0", borderRadius:10, ...gradientBg, color:C.deep, fontSize:14, fontWeight:700, border:"none", cursor:"pointer", boxShadow:`0 4px 20px rgba(39,183,200,0.25)` }}>
-                  Start 7-Day Free Trial
+                  View Plans
+                </button>
+              </Link>
+            </div>
+
+            {/* PRO */}
+            <div style={{ ...glass, borderRadius:20, padding:"1.75rem", display:"flex", flexDirection:"column" }}>
+              <p style={{ fontSize:13, fontWeight:700, color:C.green, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:12 }}>Radar Pro</p>
+              <div style={{ marginBottom:4 }}>
+                <span style={{ fontSize:36, fontWeight:800, color:C.ivory }}>${PRO_PLAN.monthlyPrice}</span>
+                <span style={{ fontSize:14, color:"rgba(244,247,250,0.45)", marginLeft:4 }}>/mo</span>
+              </div>
+              <p style={{ fontSize:12, color:"rgba(244,247,250,0.4)", marginBottom:16 }}>
+                or ${PRO_PLAN.yearlyPrice}/yr
+                <span style={{ marginLeft:6, color:C.green, fontWeight:600 }}>save {Math.round((1 - PRO_PLAN.yearlyPrice / (PRO_PLAN.monthlyPrice * 12)) * 100)}%</span>
+              </p>
+              <div style={{ flex:1, marginBottom:20 }}>
+                {["75 price alerts", "Custom backtests", "Journal analytics & recap", "Faster scanner refresh", "Everything in Desk"].map(f => (
+                  <div key={f} style={{ display:"flex", alignItems:"flex-start", gap:8, marginBottom:10 }}>
+                    <Check size={14} style={{ color:C.green, flexShrink:0, marginTop:2 }} />
+                    <span style={{ fontSize:13, color:"rgba(244,247,250,0.7)" }}>{f}</span>
+                  </div>
+                ))}
+              </div>
+              <Link href="/subscription">
+                <button style={{ width:"100%", padding:"12px 0", borderRadius:10, background:"rgba(255,255,255,0.06)", color:C.ivory, fontSize:14, fontWeight:700, border:"1px solid rgba(255,255,255,0.1)", cursor:"pointer" }}>
+                  View Plans
                 </button>
               </Link>
             </div>
           </div>
 
           <p style={{ textAlign:"center", fontSize:11, color:"rgba(244,247,250,0.28)", marginTop:16, maxWidth:480, margin:"16px auto 0" }}>
-            Founders pricing locks in your rate. Prices go up as features ship. Educational decision support only. Not financial advice.
+            Educational decision support only. Not financial advice.
           </p>
         </section>
 

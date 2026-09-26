@@ -88,10 +88,8 @@ export const CORE_PLAN = {
   monthlyPrice: DESK_PLAN.monthlyPrice,
   yearlyPrice: DESK_PLAN.yearlyPrice,
   yearlyMonthly: DESK_PLAN.yearlyMonthly,
-  lifetimePrice: 69.99,
   monthlyLabel: `$${DESK_PLAN.monthlyPrice}/mo`,
   yearlyLabel: `$${DESK_PLAN.yearlyPrice}/yr`,
-  lifetimeLabel: "$69.99 one-time",
   yearlySavingsLabel: "Best Value",
   benefits: [] as string[],
 } as const;
@@ -99,8 +97,6 @@ export const CORE_PLAN = {
 export const FOUNDERS_PLAN = {
   monthlyPrice: DESK_PLAN.monthlyPrice,
   yearlyPrice: DESK_PLAN.yearlyPrice,
-  lifetimePrice: 69.99,
   regularMonthlyPrice: 9.99,
   regularYearlyPrice: 79.99,
-  regularLifetimePrice: 149.99,
 } as const;
