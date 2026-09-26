@@ -130,8 +130,7 @@ export const STRATEGIES: Record<StrategyId, Strategy> = {
       { key: "orMinutes", label: "OR Period", type: "select", default: "15", options: ["5", "15", "30"] },
       { key: "minVolMultiple", label: "Min Volume Multiple", type: "number", default: 1.5, min: 1, max: 5, step: 0.5, unit: "x" },
     ],
-    available: false,
-    unavailableReason: "Requires intraday candle data — needs feed",
+    available: true,
   },
 
   "first-pullback": {
@@ -157,8 +156,7 @@ export const STRATEGIES: Record<StrategyId, Strategy> = {
     userParams: [
       { key: "minImpulsePct", label: "Min Impulse %", type: "number", default: 5, min: 2, max: 20, step: 1, unit: "%" },
     ],
-    available: false,
-    unavailableReason: "Requires intraday candle data — needs feed",
+    available: true,
   },
 
   "vwap-reclaim": {
@@ -184,8 +182,7 @@ export const STRATEGIES: Record<StrategyId, Strategy> = {
     userParams: [
       { key: "holdCandles", label: "Min Hold Candles", type: "number", default: 2, min: 1, max: 5, step: 1 },
     ],
-    available: false,
-    unavailableReason: "Requires intraday VWAP data — needs feed",
+    available: true,
   },
 
   "vwap-bounce": {
@@ -209,8 +206,7 @@ export const STRATEGIES: Record<StrategyId, Strategy> = {
     regimeFit: "Trend days with clear directional bias. Avoid in chop.",
     alertRule: "Alert when VWAP touch + bounce detected",
     userParams: [],
-    available: false,
-    unavailableReason: "Requires intraday VWAP data — needs feed",
+    available: true,
   },
 
   "hod-breakout": {
@@ -262,8 +258,7 @@ export const STRATEGIES: Record<StrategyId, Strategy> = {
     userParams: [
       { key: "minPolePct", label: "Min Pole %", type: "number", default: 5, min: 3, max: 20, step: 1, unit: "%" },
     ],
-    available: false,
-    unavailableReason: "Requires intraday candle data — needs feed",
+    available: true,
   },
 
   "red-to-green": {
@@ -293,8 +288,6 @@ export const STRATEGIES: Record<StrategyId, Strategy> = {
 };
 
 export const STRATEGY_LIST = Object.values(STRATEGIES);
-export const AVAILABLE_STRATEGIES = STRATEGY_LIST.filter(s => s.available);
-export const UNAVAILABLE_STRATEGIES = STRATEGY_LIST.filter(s => !s.available);
 
 export const FUTURE_STRATEGIES: Array<{ id: FutureStrategyId; name: string }> = [
   { id: "abcd", name: "ABCD Pattern" },
@@ -500,6 +493,301 @@ export function evaluateRedToGreen(
     conditionsFailed: failed,
     conditionsMissing: [],
     reason: passed.length > 0 ? `${openedRed ? "Opened red" : ""}${reclaimedClose ? ", reclaimed close" : ""}${rvol >= minVolMultiple ? `, RVOL ${rvol.toFixed(1)}x` : ""}`.replace(/^, /, "") : "Did not open red",
+    timestamp: Date.now(),
+  };
+}
+
+export function evaluateOpeningRangeBreakout(
+  quote: { price: number; open: number; dayHigh: number; dayLow: number; volume: number; avgVolume: number; changesPercentage: number },
+  params: Record<string, number | string | boolean> = {},
+): SignalResult {
+  const minVolMultiple = Number(params.minVolMultiple ?? 1.5);
+  const rvol = quote.avgVolume > 0 ? quote.volume / quote.avgVolume : 0;
+  const trendUp = quote.price > quote.open;
+  const breakFromOpen = quote.open > 0 ? Math.abs(quote.price - quote.open) / quote.open * 100 : 0;
+
+  const passed: string[] = [];
+  const failed: string[] = [];
+  const missing: string[] = [];
+
+  missing.push("or-defined");
+  missing.push("or-break");
+
+  if (rvol >= minVolMultiple) passed.push("volume-confirm");
+  else failed.push("volume-confirm");
+
+  missing.push("vwap-align");
+
+  if (Math.abs(quote.changesPercentage) >= 2) passed.push("market-direction");
+  else failed.push("market-direction");
+
+  const computableTotal = passed.length + failed.length;
+  const passRate = computableTotal > 0 ? passed.length / computableTotal : 0;
+
+  let state: SignalState;
+  if (passRate >= 1 && breakFromOpen >= 3) state = "NEAR_TRIGGER";
+  else if (passRate >= 0.5 && breakFromOpen >= 1) state = "WATCH";
+  else state = "INVALIDATED";
+
+  const score = Math.round(passRate * 60 + (rvol >= 3 ? 20 : 10) + (breakFromOpen >= 5 ? 20 : breakFromOpen >= 2 ? 10 : 0));
+
+  const dir = trendUp ? "long" : "short";
+  return {
+    symbol: "",
+    strategyId: "opening-range-breakout",
+    strategyName: "ORB",
+    state,
+    score: Math.min(100, Math.max(0, score)),
+    entryZone: state !== "INVALIDATED"
+      ? trendUp ? `Above $${quote.dayHigh.toFixed(2)}` : `Below $${quote.dayLow.toFixed(2)}`
+      : null,
+    invalidationLevel: state !== "INVALIDATED" ? `$${quote.open.toFixed(2)} (back inside OR)` : null,
+    target1: state !== "INVALIDATED"
+      ? trendUp ? `$${(quote.dayHigh * 1.03).toFixed(2)}` : `$${(quote.dayLow * 0.97).toFixed(2)}`
+      : null,
+    target2: state !== "INVALIDATED"
+      ? trendUp ? `$${(quote.dayHigh * 1.06).toFixed(2)}` : `$${(quote.dayLow * 0.94).toFixed(2)}`
+      : null,
+    rr: state !== "INVALIDATED" ? "2:1" : null,
+    conditionsPassed: passed,
+    conditionsFailed: failed,
+    conditionsMissing: missing,
+    reason: state !== "INVALIDATED"
+      ? `${dir} bias, RVOL ${rvol.toFixed(1)}x, ${breakFromOpen.toFixed(1)}% from open`
+      : "Insufficient momentum for ORB",
+    timestamp: Date.now(),
+  };
+}
+
+export function evaluateFirstPullback(
+  quote: { price: number; open: number; dayHigh: number; dayLow: number; volume: number; avgVolume: number; changesPercentage: number },
+  params: Record<string, number | string | boolean> = {},
+): SignalResult {
+  const minImpulsePct = Number(params.minImpulsePct ?? 5);
+  const rvol = quote.avgVolume > 0 ? quote.volume / quote.avgVolume : 0;
+  const impulseDetected = quote.changesPercentage >= minImpulsePct;
+  const dayRange = quote.dayHigh - quote.dayLow;
+  const pullbackFromHod = dayRange > 0 ? (quote.dayHigh - quote.price) / dayRange : 0;
+  const hasPulledBack = pullbackFromHod >= 0.15 && pullbackFromHod <= 0.6;
+  const stillTrending = quote.price > quote.open && quote.changesPercentage > 0;
+
+  const passed: string[] = [];
+  const failed: string[] = [];
+  const missing: string[] = [];
+
+  if (impulseDetected) passed.push("impulse");
+  else failed.push("impulse");
+
+  if (hasPulledBack) passed.push("pullback");
+  else failed.push("pullback");
+
+  if (stillTrending && hasPulledBack) passed.push("hl-pattern");
+  else missing.push("hl-pattern");
+
+  missing.push("continuation");
+
+  const computableTotal = passed.length + failed.length;
+  const passRate = computableTotal > 0 ? passed.length / computableTotal : 0;
+
+  let state: SignalState;
+  if (passed.includes("impulse") && passed.includes("pullback") && stillTrending) state = "NEAR_TRIGGER";
+  else if (impulseDetected && passRate >= 0.5) state = "WATCH";
+  else state = "INVALIDATED";
+
+  const pullbackLevel = quote.dayHigh > 0 ? quote.price : 0;
+  const score = Math.round(passRate * 60 + (impulseDetected ? 20 : 0) + (rvol >= 3 ? 20 : rvol >= 1.5 ? 10 : 0));
+
+  return {
+    symbol: "",
+    strategyId: "first-pullback",
+    strategyName: "First Pullback",
+    state,
+    score: Math.min(100, Math.max(0, score)),
+    entryZone: state !== "INVALIDATED" ? `Above $${pullbackLevel.toFixed(2)} (pullback high)` : null,
+    invalidationLevel: state !== "INVALIDATED" ? `Below $${(quote.price * 0.97).toFixed(2)} (HL break)` : null,
+    target1: state !== "INVALIDATED" ? `$${quote.dayHigh.toFixed(2)} (retest HOD)` : null,
+    target2: state !== "INVALIDATED" ? `$${(quote.dayHigh * 1.05).toFixed(2)} (measured move)` : null,
+    rr: state !== "INVALIDATED" ? "2:1–4:1" : null,
+    conditionsPassed: passed,
+    conditionsFailed: failed,
+    conditionsMissing: missing,
+    reason: state !== "INVALIDATED"
+      ? `+${quote.changesPercentage.toFixed(1)}% impulse, ${(pullbackFromHod * 100).toFixed(0)}% pullback from HOD`
+      : "No impulse or pullback pattern",
+    timestamp: Date.now(),
+  };
+}
+
+export function evaluateVwapReclaim(
+  quote: { price: number; open: number; previousClose: number; dayHigh: number; dayLow: number; volume: number; avgVolume: number },
+  hasCatalyst: boolean,
+  params: Record<string, number | string | boolean> = {},
+): SignalResult {
+  const rvol = quote.avgVolume > 0 ? quote.volume / quote.avgVolume : 0;
+  const openedWeak = quote.open < quote.previousClose;
+  const reclaimedAboveOpen = quote.price > quote.open;
+  const dayMidpoint = (quote.dayHigh + quote.dayLow) / 2;
+  const aboveMidpoint = quote.price > dayMidpoint;
+
+  const passed: string[] = [];
+  const failed: string[] = [];
+  const missing: string[] = [];
+
+  if (openedWeak) passed.push("below-vwap");
+  else failed.push("below-vwap");
+
+  if (openedWeak && reclaimedAboveOpen && aboveMidpoint) passed.push("reclaim");
+  else if (openedWeak) missing.push("reclaim");
+  else failed.push("reclaim");
+
+  if (rvol >= (Number(params.holdCandles) || 1.5)) passed.push("volume-surge");
+  else failed.push("volume-surge");
+
+  if (hasCatalyst) passed.push("context");
+  else failed.push("context");
+
+  const computableTotal = passed.length + failed.length;
+  const passRate = computableTotal > 0 ? passed.length / computableTotal : 0;
+
+  let state: SignalState;
+  if (passed.includes("below-vwap") && passed.includes("reclaim") && passRate >= 0.75) state = "NEAR_TRIGGER";
+  else if (openedWeak && passRate >= 0.5) state = "WATCH";
+  else state = "INVALIDATED";
+
+  const score = Math.round(passRate * 70 + (hasCatalyst ? 15 : 0) + (rvol >= 3 ? 15 : 5));
+
+  return {
+    symbol: "",
+    strategyId: "vwap-reclaim",
+    strategyName: "VWAP Reclaim",
+    state,
+    score: Math.min(100, Math.max(0, score)),
+    entryZone: state !== "INVALIDATED" ? `Above $${quote.open.toFixed(2)} (hold above open)` : null,
+    invalidationLevel: state !== "INVALIDATED" ? `Below $${quote.open.toFixed(2)}` : null,
+    target1: state !== "INVALIDATED" ? `$${quote.dayHigh.toFixed(2)} (HOD)` : null,
+    target2: state !== "INVALIDATED" ? `$${(quote.dayHigh * 1.03).toFixed(2)}` : null,
+    rr: state !== "INVALIDATED" ? "2:1" : null,
+    conditionsPassed: passed,
+    conditionsFailed: failed,
+    conditionsMissing: missing,
+    reason: state !== "INVALIDATED"
+      ? `Opened weak, ${reclaimedAboveOpen ? "reclaimed" : "reclaiming"}, RVOL ${rvol.toFixed(1)}x`
+      : "Did not open below value area",
+    timestamp: Date.now(),
+  };
+}
+
+export function evaluateVwapBounce(
+  quote: { price: number; open: number; dayHigh: number; dayLow: number; volume: number; avgVolume: number; changesPercentage: number },
+  params: Record<string, number | string | boolean> = {},
+): SignalResult {
+  const rvol = quote.avgVolume > 0 ? quote.volume / quote.avgVolume : 0;
+  const dayRange = quote.dayHigh - quote.dayLow;
+  const dayMidpoint = (quote.dayHigh + quote.dayLow) / 2;
+  const positionInRange = dayRange > 0 ? (quote.price - quote.dayLow) / dayRange : 0.5;
+  const trendingUp = quote.changesPercentage > 0 && quote.price > quote.open;
+  const nearMidpoint = Math.abs(quote.price - dayMidpoint) / (dayMidpoint || 1) < 0.03;
+  const aboveMidpoint = quote.price >= dayMidpoint;
+
+  const passed: string[] = [];
+  const failed: string[] = [];
+  const missing: string[] = [];
+
+  if (trendingUp && aboveMidpoint) passed.push("above-vwap");
+  else failed.push("above-vwap");
+
+  if (positionInRange >= 0.3 && positionInRange <= 0.7) passed.push("approach");
+  else failed.push("approach");
+
+  missing.push("hold");
+
+  if (trendingUp && rvol >= 1.5) passed.push("bounce");
+  else if (trendingUp) missing.push("bounce");
+  else failed.push("bounce");
+
+  const computableTotal = passed.length + failed.length;
+  const passRate = computableTotal > 0 ? passed.length / computableTotal : 0;
+
+  let state: SignalState;
+  if (passed.includes("above-vwap") && passed.includes("approach") && passRate >= 0.7) state = "NEAR_TRIGGER";
+  else if (trendingUp && passRate >= 0.5) state = "WATCH";
+  else state = "INVALIDATED";
+
+  const score = Math.round(passRate * 60 + (trendingUp ? 20 : 0) + (rvol >= 3 ? 20 : rvol >= 1.5 ? 10 : 0));
+
+  return {
+    symbol: "",
+    strategyId: "vwap-bounce",
+    strategyName: "VWAP Bounce",
+    state,
+    score: Math.min(100, Math.max(0, score)),
+    entryZone: state !== "INVALIDATED" ? `Above $${dayMidpoint.toFixed(2)} (mid-range bounce)` : null,
+    invalidationLevel: state !== "INVALIDATED" ? `Below $${dayMidpoint.toFixed(2)}` : null,
+    target1: state !== "INVALIDATED" ? `$${quote.dayHigh.toFixed(2)} (HOD)` : null,
+    target2: state !== "INVALIDATED" ? `$${(quote.dayHigh * 1.03).toFixed(2)}` : null,
+    rr: state !== "INVALIDATED" ? "2:1–3:1" : null,
+    conditionsPassed: passed,
+    conditionsFailed: failed,
+    conditionsMissing: missing,
+    reason: state !== "INVALIDATED"
+      ? `${positionInRange >= 0.5 ? "Above" : "Near"} mid-range, RVOL ${rvol.toFixed(1)}x`
+      : "Not trending above value area",
+    timestamp: Date.now(),
+  };
+}
+
+export function evaluateBullFlag(
+  quote: { price: number; open: number; dayHigh: number; dayLow: number; volume: number; avgVolume: number; changesPercentage: number },
+  params: Record<string, number | string | boolean> = {},
+): SignalResult {
+  const minPolePct = Number(params.minPolePct ?? 5);
+  const rvol = quote.avgVolume > 0 ? quote.volume / quote.avgVolume : 0;
+  const hasStrongPole = quote.changesPercentage >= minPolePct;
+  const dayRange = quote.dayHigh - quote.dayLow;
+  const distFromHod = dayRange > 0 ? (quote.dayHigh - quote.price) / dayRange : 1;
+  const tightAtTop = distFromHod <= 0.25;
+
+  const passed: string[] = [];
+  const failed: string[] = [];
+  const missing: string[] = [];
+
+  if (hasStrongPole) passed.push("pole");
+  else failed.push("pole");
+
+  if (tightAtTop && hasStrongPole) passed.push("coil");
+  else if (hasStrongPole) failed.push("coil");
+  else missing.push("coil");
+
+  missing.push("vol-dryup");
+  missing.push("break-vol");
+
+  const computableTotal = passed.length + failed.length;
+  const passRate = computableTotal > 0 ? passed.length / computableTotal : 0;
+
+  let state: SignalState;
+  if (passed.includes("pole") && passed.includes("coil")) state = "NEAR_TRIGGER";
+  else if (hasStrongPole) state = "WATCH";
+  else state = "INVALIDATED";
+
+  const score = Math.round(passRate * 60 + (hasStrongPole ? 20 : 0) + (rvol >= 3 ? 20 : rvol >= 1.5 ? 10 : 0));
+
+  return {
+    symbol: "",
+    strategyId: "bull-flag",
+    strategyName: "Bull Flag",
+    state,
+    score: Math.min(100, Math.max(0, score)),
+    entryZone: state !== "INVALIDATED" ? `Above $${quote.dayHigh.toFixed(2)} (flag break)` : null,
+    invalidationLevel: state !== "INVALIDATED" ? `Below $${(quote.price * 0.97).toFixed(2)} (flag low)` : null,
+    target1: state !== "INVALIDATED" ? `$${(quote.dayHigh * 1.05).toFixed(2)} (measured move)` : null,
+    target2: state !== "INVALIDATED" ? `$${(quote.dayHigh * 1.10).toFixed(2)} (1.5× measured)` : null,
+    rr: state !== "INVALIDATED" ? "2:1–3:1" : null,
+    conditionsPassed: passed,
+    conditionsFailed: failed,
+    conditionsMissing: missing,
+    reason: state !== "INVALIDATED"
+      ? `+${quote.changesPercentage.toFixed(1)}% pole, ${(distFromHod * 100).toFixed(0)}% from HOD, RVOL ${rvol.toFixed(1)}x`
+      : "No strong impulse detected",
     timestamp: Date.now(),
   };
 }

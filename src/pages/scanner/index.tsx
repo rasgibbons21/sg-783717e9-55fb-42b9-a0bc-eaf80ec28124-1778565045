@@ -323,12 +323,10 @@ export default function ScannerIndex() {
                   background: active ? `${s.color}20` : "rgba(255,255,255,0.05)",
                   color: active ? s.color : "#F3EDE3",
                   border: `1px solid ${active ? `${s.color}40` : "rgba(255,255,255,0.08)"}`,
-                  opacity: s.available ? 1 : 0.5,
                 }}
               >
                 <span>{s.icon}</span>
                 <span>{s.shortName}</span>
-                {!s.available && <span className="text-[8px] opacity-60">*</span>}
               </motion.button>
             );
           })}
@@ -512,15 +510,6 @@ export default function ScannerIndex() {
           </div>
         )}
 
-        {/* Unavailable strategies note */}
-        {STRATEGY_LIST.some(s => !s.available) && (
-          <div className="mt-6 rounded-xl p-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
-            <p className="text-[10px] text-[#F3EDE3]/30 leading-relaxed">
-              <strong className="text-[#F3EDE3]/40">* Strategies marked with * require intraday candle data.</strong>{" "}
-              ORB, First Pullback, VWAP Reclaim/Bounce, and Bull Flag will activate when the real-time data feed is connected.
-            </p>
-          </div>
-        )}
       </div>
     </Layout>
   );

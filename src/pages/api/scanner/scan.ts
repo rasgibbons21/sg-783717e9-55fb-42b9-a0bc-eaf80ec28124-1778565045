@@ -15,6 +15,11 @@ import {
   evaluateGapAndGo,
   evaluateHodBreakout,
   evaluateRedToGreen,
+  evaluateOpeningRangeBreakout,
+  evaluateFirstPullback,
+  evaluateVwapReclaim,
+  evaluateVwapBounce,
+  evaluateBullFlag,
   type SignalResult,
 } from "@/lib/strategies";
 import {
@@ -157,6 +162,37 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         );
         r2gResult.symbol = q.symbol;
         if (r2gResult.state !== "INVALIDATED") signals.push(r2gResult);
+
+        const orbResult = evaluateOpeningRangeBreakout(
+          { price: q.price, open: q.open, dayHigh: q.dayHigh, dayLow: q.dayLow, volume: q.volume, avgVolume: q.avgVolume, changesPercentage: q.changesPercentage },
+        );
+        orbResult.symbol = q.symbol;
+        if (orbResult.state !== "INVALIDATED") signals.push(orbResult);
+
+        const fpbResult = evaluateFirstPullback(
+          { price: q.price, open: q.open, dayHigh: q.dayHigh, dayLow: q.dayLow, volume: q.volume, avgVolume: q.avgVolume, changesPercentage: q.changesPercentage },
+        );
+        fpbResult.symbol = q.symbol;
+        if (fpbResult.state !== "INVALIDATED") signals.push(fpbResult);
+
+        const vrcResult = evaluateVwapReclaim(
+          { price: q.price, open: q.open, previousClose: q.previousClose, dayHigh: q.dayHigh, dayLow: q.dayLow, volume: q.volume, avgVolume: q.avgVolume },
+          hasCatalyst,
+        );
+        vrcResult.symbol = q.symbol;
+        if (vrcResult.state !== "INVALIDATED") signals.push(vrcResult);
+
+        const vwbResult = evaluateVwapBounce(
+          { price: q.price, open: q.open, dayHigh: q.dayHigh, dayLow: q.dayLow, volume: q.volume, avgVolume: q.avgVolume, changesPercentage: q.changesPercentage },
+        );
+        vwbResult.symbol = q.symbol;
+        if (vwbResult.state !== "INVALIDATED") signals.push(vwbResult);
+
+        const flagResult = evaluateBullFlag(
+          { price: q.price, open: q.open, dayHigh: q.dayHigh, dayLow: q.dayLow, volume: q.volume, avgVolume: q.avgVolume, changesPercentage: q.changesPercentage },
+        );
+        flagResult.symbol = q.symbol;
+        if (flagResult.state !== "INVALIDATED") signals.push(flagResult);
 
         signals.sort((a, b) => b.score - a.score);
         const topStrategy = signals.length > 0 ? signals[0].strategyId : null;
