@@ -30,7 +30,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         },
       ],
       subscription_data: {
-        trial_period_days: 0,
         metadata: {
           tier: resolvedTier,
         },
