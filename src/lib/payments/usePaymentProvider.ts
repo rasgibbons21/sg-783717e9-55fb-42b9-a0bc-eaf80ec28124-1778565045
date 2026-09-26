@@ -1,25 +1,14 @@
-import { useState, useEffect } from "react";
 import {
-  paymentProvider as defaultProvider,
+  paymentProvider,
   type PaymentProvider,
 } from "./config";
 
 export function usePaymentProvider() {
-  const [provider, setProvider] = useState<PaymentProvider>(defaultProvider);
-  const [isReady, setIsReady] = useState(false);
-
-  useEffect(() => {
-    if ("getDigitalGoodsService" in window) {
-      setProvider("google_play");
-    }
-    setIsReady(true);
-  }, []);
-
   return {
-    provider,
-    isReady,
-    canShowExternalPayment: provider === "stripe",
-    canShowInAppPayment: provider === "google_play",
+    provider: paymentProvider,
+    isReady: true,
+    canShowExternalPayment: paymentProvider === "stripe",
+    canShowInAppPayment: paymentProvider === "google_play",
   } as const;
 }
 
