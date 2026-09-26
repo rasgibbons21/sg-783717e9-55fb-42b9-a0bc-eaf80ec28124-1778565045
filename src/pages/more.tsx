@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   MessageCircle, NotebookPen, GraduationCap, TrendingUp,
-  Building2, User, FileText, ChevronRight, Activity,
+  Building2, User, FileText, ChevronRight, Activity, CreditCard,
 } from "lucide-react";
 
 const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
@@ -17,7 +17,8 @@ const LINKS = [
   { href: "/backtest", icon: Activity, label: "Backtest", desc: "Strategy performance tracker", color: "#EC4899" },
   { href: "/paper-trader-v2", icon: TrendingUp, label: "Paper Trade", desc: "$10K virtual simulator", color: "#49B06E" },
   { href: "/brokers", icon: Building2, label: "Brokers", desc: "Brokerage comparison", color: "#06B6D4" },
-  { href: "/profile", icon: User, label: "Settings", desc: "Account & preferences", color: "#F3EDE3" },
+  { href: "/subscription", icon: CreditCard, label: "Subscription", desc: "Plans & billing", color: "#49B06E" },
+  { href: "/profile", icon: User, label: "Profile", desc: "Account & notifications", color: "#F3EDE3" },
 ];
 
 const LEGAL = [

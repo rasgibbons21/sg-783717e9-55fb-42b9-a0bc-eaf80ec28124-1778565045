@@ -15,11 +15,10 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
-import { Checkbox } from "@/components/ui/checkbox";
 import { authService } from "@/services/authService";
 import { userService } from "@/services/userService";
 import { supabase } from "@/integrations/supabase/client";
-import { User, Mail, Calendar, Crown, Settings, LogOut, Camera, Share, CreditCard, Bell, Shield, CheckCircle2, BellOff, Target, TrendingUp, Clock, DollarSign, Save, Trash2, Gift, Copy, Users } from "lucide-react";
+import { User, LogOut, Share, CreditCard, Bell, Shield, BellOff, Save, Trash2, Gift, Copy, Users, Crown } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { useSubscription } from "@/contexts/SubscriptionContext";
@@ -28,26 +27,6 @@ import { canShowExternalPayment } from "@/lib/payments";
 const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
 const stagger = (i: number) => ({ initial: { opacity: 0, y: 14 }, animate: { opacity: 1, y: 0 }, transition: { delay: i * 0.08, type: "spring" as const, stiffness: 400, damping: 30 } });
 
-const RISK_TOLERANCE_OPTIONS = [
-  { value: "Conservative", label: "Conservative", description: "Prioritize stability and capital preservation" },
-  { value: "Moderate", label: "Moderate", description: "Balance between growth and stability" },
-  { value: "Aggressive", label: "Aggressive", description: "Maximize growth potential, accept higher volatility" },
-];
-
-const INVESTMENT_GOALS = [
-  "Grow My Wealth",
-  "Save for Retirement",
-  "Generate Passive Income",
-  "Build an Emergency Fund",
-  "Save for a Major Purchase",
-  "Financial Independence",
-];
-
-const TIME_HORIZON_OPTIONS = [
-  { value: "Short-term (0-3 years)", label: "Short-term", description: "0-3 years" },
-  { value: "Medium-term (3-10 years)", label: "Medium-term", description: "3-10 years" },
-  { value: "Long-term (10+ years)", label: "Long-term", description: "10+ years" },
-];
 
 export default function Profile() {
   const router = useRouter();
@@ -56,7 +35,6 @@ export default function Profile() {
   const [user, setUser] = useState<any>(null);
   const [authCreatedAt, setAuthCreatedAt] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>("default");
 
@@ -71,16 +49,8 @@ export default function Profile() {
   const [referralStats, setReferralStats] = useState<{ totalReferrals: number; rewardDays: number }>({ totalReferrals: 0, rewardDays: 0 });
   const [referralLoading, setReferralLoading] = useState(false);
 
-  // Form state
   const [fullName, setFullName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
-  const [riskTolerance, setRiskTolerance] = useState<string>("");
-  const [selectedGoals, setSelectedGoals] = useState<string[]>([]);
-  const [investmentGoals, setInvestmentGoals] = useState<string[]>([]);
-  const [timeHorizon, setTimeHorizon] = useState<string>("");
-  const [monthlyContribution, setMonthlyContribution] = useState<string>("");
-  const [currentAge, setCurrentAge] = useState<string>("");
-  const [retirementAge, setRetirementAge] = useState<string>("");
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -107,14 +77,6 @@ export default function Profile() {
             .then((d) => { if (d) setGems(d.gems); })
             .catch(() => {});
         }
-        // Set default values since these fields don't exist in profiles table
-        setRiskTolerance("moderate");
-        setInvestmentGoals(["growth"]);
-        setTimeHorizon("5-10");
-        setMonthlyContribution("500");
-        setCurrentAge("30");
-        setRetirementAge("65");
-
         // Load referral stats
         if (session) {
           fetch("/api/referral/stats", { headers: { Authorization: `Bearer ${session.access_token}` } })
@@ -176,51 +138,6 @@ export default function Profile() {
     }
 
     setNotificationsEnabled(enabled);
-  };
-
-  const handleGoalToggle = (goal: string) => {
-    setSelectedGoals((prev) =>
-      prev.includes(goal)
-        ? prev.filter((g) => g !== goal)
-        : [...prev, goal]
-    );
-  };
-
-  const handleSavePreferences = async () => {
-    if (!user) return;
-
-    setIsSaving(true);
-    try {
-      const updates: any = {
-        risk_tolerance: riskTolerance || null,
-        investment_goals: selectedGoals.length > 0 ? selectedGoals : null,
-        time_horizon: timeHorizon || null,
-        monthly_contribution: monthlyContribution ? parseFloat(monthlyContribution) : null,
-        current_age: currentAge ? parseInt(currentAge) : null,
-        retirement_age: retirementAge ? parseInt(retirementAge) : null,
-      };
-
-      const updatedUser = await userService.updateUser(user.id, updates);
-
-      if (updatedUser) {
-        setUser(updatedUser);
-        toast({
-          title: "Preferences saved! 🌸",
-          description: "Pansy will personalize your recommendations based on your profile.",
-        });
-      } else {
-        throw new Error("Failed to save preferences");
-      }
-    } catch (error: any) {
-      console.error("Error saving preferences:", error);
-      toast({
-        title: "Error saving preferences",
-        description: error.message || "Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSaving(false);
-    }
   };
 
   // Isolated save for the leaderboard name — writes ONLY challenge_name (a real
@@ -286,7 +203,7 @@ export default function Profile() {
     const link = `https://shebloomswealth.app/onboarding?ref=${referralCode}`;
     try {
       await navigator.clipboard.writeText(link);
-      toast({ title: "Referral link copied!", description: "Share it with friends to earn 7 bonus trial days each." });
+      toast({ title: "Referral link copied!", description: "Share it with friends to earn rewards." });
     } catch {
       toast({ title: "Could not copy", description: "Please try again.", variant: "destructive" });
     }
@@ -297,7 +214,7 @@ export default function Profile() {
       ? `https://shebloomswealth.app/onboarding?ref=${referralCode}`
       : "https://shebloomswealth.app";
     const shareText = referralCode
-      ? "Join me on Radar and we both get 7 extra days of Core! Stock screener & alerts made simple."
+      ? "Join me on Radar! Stock screener & alerts made simple."
       : "Check out Radar — stock screener & alerts.";
 
     if (navigator.share) {
@@ -350,7 +267,7 @@ export default function Profile() {
             Profile
           </h1>
           <p className="text-muted-foreground">
-            Manage your account settings and investment preferences
+            Manage your account and subscription
           </p>
         </div>
 
@@ -418,204 +335,8 @@ export default function Profile() {
         </Card>
         </motion.div>
 
-        {/* Investment Preferences */}
-        <motion.div {...stagger(1)}>
-        <Card className="p-6 bg-card border-border rounded-2xl space-y-6">
-          <div className="flex items-start gap-4">
-            <Target className="w-6 h-6 text-foreground mt-1" />
-            <div className="flex-1 space-y-4">
-              <div>
-                <h3 className="font-semibold text-foreground text-lg mb-1">
-                  Investment Preferences
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  Help Pansy personalize your recommendations and analysis
-                </p>
-              </div>
-
-              {/* Risk Tolerance */}
-              <div className="space-y-3">
-                <Label className="text-base text-foreground">Risk Tolerance</Label>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  {RISK_TOLERANCE_OPTIONS.map((option) => (
-                    <Card
-                      key={option.value}
-                      className={`p-4 cursor-pointer transition-all ${
-                        riskTolerance === option.value
-                          ? "border-primary bg-primary/10"
-                          : "border-border hover:bg-muted/50"
-                      }`}
-                      onClick={() => setRiskTolerance(option.value)}
-                    >
-                      <div className="space-y-1">
-                        <p className="font-semibold text-foreground">{option.label}</p>
-                        <p className="text-xs text-muted-foreground">{option.description}</p>
-                      </div>
-                    </Card>
-                  ))}
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Investment Goals */}
-              <div className="space-y-3">
-                <Label className="text-base text-foreground">Investment Goals</Label>
-                <p className="text-sm text-muted-foreground">Select all that apply</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {INVESTMENT_GOALS.map((goal) => (
-                    <div
-                      key={goal}
-                      className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer"
-                      onClick={() => handleGoalToggle(goal)}
-                    >
-                      <Checkbox
-                        id={goal}
-                        checked={selectedGoals.includes(goal)}
-                        onCheckedChange={() => handleGoalToggle(goal)}
-                      />
-                      <label
-                        htmlFor={goal}
-                        className="text-sm font-medium text-foreground cursor-pointer flex-1"
-                      >
-                        {goal}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Time Horizon */}
-              <div className="space-y-3">
-                <Label className="text-base text-foreground">Time Horizon</Label>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  {TIME_HORIZON_OPTIONS.map((option) => (
-                    <Card
-                      key={option.value}
-                      className={`p-4 cursor-pointer transition-all ${
-                        timeHorizon === option.value
-                          ? "border-primary bg-primary/10"
-                          : "border-border hover:bg-muted/50"
-                      }`}
-                      onClick={() => setTimeHorizon(option.value)}
-                    >
-                      <div className="space-y-1">
-                        <p className="font-semibold text-foreground">{option.label}</p>
-                        <p className="text-xs text-muted-foreground">{option.description}</p>
-                      </div>
-                    </Card>
-                  ))}
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Financial Details */}
-              <div className="space-y-4">
-                <Label className="text-base text-foreground">Financial Planning Details</Label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="monthlyContribution" className="text-sm text-foreground">
-                      Monthly Contribution ($)
-                    </Label>
-                    <Input
-                      id="monthlyContribution"
-                      type="number"
-                      placeholder="500"
-                      value={monthlyContribution}
-                      onChange={(e) => setMonthlyContribution(e.target.value)}
-                      className="bg-background border-border"
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      How much you plan to invest monthly
-                    </p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="currentAge" className="text-sm text-foreground">
-                      Current Age
-                    </Label>
-                    <Input
-                      id="currentAge"
-                      type="number"
-                      placeholder="28"
-                      value={currentAge}
-                      onChange={(e) => setCurrentAge(e.target.value)}
-                      className="bg-background border-border"
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      For retirement planning calculations
-                    </p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="retirementAge" className="text-sm text-foreground">
-                      Target Retirement Age
-                    </Label>
-                    <Input
-                      id="retirementAge"
-                      type="number"
-                      placeholder="65"
-                      value={retirementAge}
-                      onChange={(e) => setRetirementAge(e.target.value)}
-                      className="bg-background border-border"
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      When you plan to retire
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <Button
-                onClick={handleSavePreferences}
-                disabled={isSaving}
-                className="w-full bg-primary hover:bg-primary/90 mt-4"
-              >
-                {isSaving ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground mr-2" />
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <Save className="w-4 h-4 mr-2" />
-                    Save Preferences
-                  </>
-                )}
-              </Button>
-            </div>
-          </div>
-        </Card>
-        </motion.div>
-
-        {/* Pansy's Personalization Tip */}
-        <motion.div {...stagger(2)}>
-        <Card className="p-6 bg-accent/5 border-accent/20 rounded-2xl">
-          <div className="flex items-start gap-4">
-            <img
-              src="/icon-192.png"
-              alt="Pansy"
-              className="w-12 h-12 rounded-full object-cover"
-            />
-            <div className="space-y-2 flex-1">
-              <div className="flex items-center gap-2">
-                <p className="font-semibold text-foreground">Pansy's Personalization Tip</p>
-                <TrendingUp className="w-4 h-4 text-accent" />
-              </div>
-              <p className="text-sm text-foreground leading-relaxed">
-                The more I know about your goals, the better I can help! Your risk tolerance, time horizon, and monthly contribution help me find investments that actually fit your life. No one-size-fits-all recommendations here 💛
-              </p>
-              <p className="text-sm font-medium text-accent">— Pansy 🌺</p>
-            </div>
-          </div>
-        </Card>
-        </motion.div>
-
         {/* Subscription Section */}
-        <motion.div {...stagger(3)}>
+        <motion.div {...stagger(1)}>
         <Card className="border-border">
           <CardHeader>
             <CardTitle className="text-xl text-foreground">Subscription</CardTitle>
@@ -640,8 +361,8 @@ export default function Profile() {
                     <span className="text-2xl">✨</span>
                   </div>
                   <div>
-                    <p className="font-semibold text-foreground text-lg">Radar Core Member</p>
-                    <p className="text-sm text-muted-foreground">Unlimited access to all features</p>
+                    <p className="font-semibold text-foreground text-lg">{tier === "pro" ? "Radar Pro" : "Radar Desk"}</p>
+                    <p className="text-sm text-muted-foreground">{tier === "pro" ? "Full access to all features" : "Core tools & daily analyses"}</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4 p-4 bg-gradient-to-br from-accent/10 to-primary/10 rounded-lg border border-accent/20">
@@ -697,7 +418,7 @@ export default function Profile() {
         </motion.div>
 
         {/* Referral & Share */}
-        <motion.div {...stagger(4)} whileTap={{ scale: 0.99 }}>
+        <motion.div {...stagger(2)} whileTap={{ scale: 0.99 }}>
         <Card className="border-accent bg-gradient-to-br from-accent/10 to-primary/10">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -705,7 +426,7 @@ export default function Profile() {
               Refer Friends, Earn Rewards
             </CardTitle>
             <CardDescription>
-              Share your referral link — you both get 7 extra days of Pro!
+              Share your referral link and earn rewards!
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -756,7 +477,7 @@ export default function Profile() {
         </motion.div>
 
         {/* Notification Settings */}
-        <motion.div {...stagger(5)}>
+        <motion.div {...stagger(3)}>
         <Card className="p-6 bg-card border-border rounded-2xl">
           <div className="flex items-start gap-4">
             <Bell className="w-6 h-6 text-foreground mt-1" />
@@ -818,27 +539,6 @@ export default function Profile() {
           </div>
         </Card>
         </motion.div>
-
-        {/* Pansy's Privacy Tip */}
-        <Card className="p-6 bg-accent/5 border-accent/20 rounded-2xl">
-          <div className="flex items-start gap-4">
-            <img
-              src="/icon-192.png"
-              alt="Pansy"
-              className="w-12 h-12 rounded-full object-cover"
-            />
-            <div className="space-y-2 flex-1">
-              <div className="flex items-center gap-2">
-                <p className="font-semibold text-foreground">Pansy's Privacy Tip</p>
-                <Shield className="w-4 h-4 text-accent" />
-              </div>
-              <p className="text-sm text-foreground leading-relaxed">
-                Your data is always yours, babe. We never share your info with third parties, and you can delete your account anytime. Push notifications only go to your device — nobody else sees them 💛
-              </p>
-              <p className="text-sm font-medium text-accent">— Pansy 🌺</p>
-            </div>
-          </div>
-        </Card>
 
         {/* Sign Out */}
         <motion.div whileTap={{ scale: 0.96 }} transition={{ type: "spring", stiffness: 400, damping: 25 }}>
