@@ -127,8 +127,10 @@ export default function Subscription() {
             <h3 className="text-lg font-bold text-foreground mb-1">Free</h3>
             <p className="text-2xl font-bold text-foreground mb-1">$0</p>
             <p className="text-xs text-muted-foreground mb-4">No card needed</p>
-            <Button variant="outline" className="w-full" disabled={tier === "free"}>
-              {tier === "free" ? "Current Plan" : "Downgrade"}
+            <Button variant="outline" className="w-full" disabled={tier === "free"}
+              onClick={tier !== "free" ? () => router.push("/profile") : undefined}
+            >
+              {tier === "free" ? "Current Plan" : "Manage in Profile"}
             </Button>
           </div>
 
