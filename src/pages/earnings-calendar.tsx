@@ -8,6 +8,7 @@ import { CalendarDays, Sun, Moon, Clock, Loader2, ChevronRight } from "lucide-re
 import Link from "next/link";
 import type { EarningsEntry } from "./api/earnings-calendar";
 import { trackEarningsView } from "@/lib/analytics";
+import { TickerMark } from "@/components/TickerMark";
 
 const haptic = (ms = 8) => {
   try { navigator?.vibrate?.(ms); } catch {}
@@ -184,6 +185,8 @@ export default function EarningsCalendarPage() {
                             <Clock className="w-4 h-4 text-[#F3EDE3]/30" />
                           )}
                         </div>
+
+                        <TickerMark ticker={entry.symbol} />
 
                         {/* Ticker + timing */}
                         <div className="flex-1 min-w-0">

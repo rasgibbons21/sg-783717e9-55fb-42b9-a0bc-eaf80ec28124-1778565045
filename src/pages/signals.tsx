@@ -11,6 +11,7 @@ import {
   ChevronDown, ChevronUp, Info, Flame, ChevronRight,
 } from "lucide-react";
 import type { SignalResult } from "@/lib/strategies";
+import { TickerMark } from "@/components/TickerMark";
 
 const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
 
@@ -93,6 +94,8 @@ function SignalCard({ candidate: c, signal: sig, onTap }: {
           >
             {sig.score}
           </div>
+
+          <TickerMark ticker={c.symbol} />
 
           {/* Ticker + state */}
           <div className="flex-1 min-w-0">
@@ -415,6 +418,7 @@ export default function SignalsPage() {
                       className="w-full flex items-center gap-3 p-3 rounded-xl text-left active:bg-white/[0.02]"
                       style={{ background: "rgba(18,24,33,0.8)", border: "1px solid rgba(255,255,255,0.05)" }}
                     >
+                      <TickerMark ticker={m.symbol} size="sm" />
                       <div className="flex-shrink-0">
                         <Sparkline symbol={m.symbol} width={52} height={22} />
                       </div>

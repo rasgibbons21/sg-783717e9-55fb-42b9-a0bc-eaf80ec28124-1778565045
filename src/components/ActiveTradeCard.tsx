@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import DynamicChart, { type OHLCBar } from "@/components/DynamicChart";
 import { fetchOHLC } from "@/lib/fetchOHLC";
+import { TickerMark } from "@/components/TickerMark";
 
 // ── Shared types ───────────────────────────────────────────────────────────
 export interface Trade {
@@ -511,6 +512,8 @@ export function ActiveTradeCard({
         >
           {/* Direction dot */}
           <span className={`w-2 h-2 rounded-full flex-shrink-0 ${trade.direction === "long" ? "bg-primary" : "bg-destructive"}`} />
+
+          <TickerMark ticker={trade.ticker} size="sm" />
 
           {/* Ticker + direction */}
           <div className="flex items-center gap-1.5 min-w-0">

@@ -12,6 +12,7 @@ import {
 import { STRATEGY_LIST, type StrategyId } from "@/lib/strategies";
 import type { SignalResult } from "@/lib/strategies";
 import { trackScannerView } from "@/lib/analytics";
+import { TickerMark } from "@/components/TickerMark";
 
 const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
 
@@ -83,6 +84,8 @@ function ScannerCard({ c, i, onClick }: { c: ScanCandidate; i: number; onClick: 
           >
             {bestSignal ? bestSignal.score : c.score}
           </div>
+
+          <TickerMark ticker={c.symbol} />
 
           {/* Ticker + state */}
           <div className="flex-1 min-w-0">
@@ -494,6 +497,7 @@ export default function ScannerIndex() {
                   className="flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer active:scale-[0.98] transition-all"
                   style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)" }}
                 >
+                  <TickerMark ticker={m.symbol} size="sm" />
                   <span className="text-sm font-bold text-[#F3EDE3] w-14">{m.symbol}</span>
                   <Sparkline symbol={m.symbol} width={56} height={22} />
                   <div className="flex-1" />

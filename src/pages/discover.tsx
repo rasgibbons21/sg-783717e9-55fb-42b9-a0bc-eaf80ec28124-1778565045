@@ -3,6 +3,7 @@ import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
 import { motion } from "framer-motion";
 import { Search, TrendingUp, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { TickerMark } from "@/components/TickerMark";
 
 const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
 
@@ -242,7 +243,10 @@ export default function Discover() {
                   }}
                 >
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-bold text-[#F3EDE3]">{item.symbol}</span>
+                    <div className="flex items-center gap-2">
+                      <TickerMark ticker={item.symbol} size="sm" />
+                      <span className="text-sm font-bold text-[#F3EDE3]">{item.symbol}</span>
+                    </div>
                     <div className="flex items-center gap-0.5">
                       {item.changePercent >= 0
                         ? <ArrowUpRight className="w-3 h-3 text-[#49B06E]" />

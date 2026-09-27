@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { X, RefreshCw, ChevronDown, ChevronUp, Sparkles, Search } from "lucide-react";
+import { TickerMark } from "@/components/TickerMark";
 import { supabase } from "@/integrations/supabase/client";
 
 interface SearchResult {
@@ -244,6 +245,7 @@ export function OrderTicket({ buyingPower, onClose, onPlaced }: Props) {
                       onClick={() => selectSymbol(r)}
                       className="w-full flex items-center gap-3 px-3 py-2.5 text-left hover:bg-accent/10 transition-colors border-b border-accent/5 last:border-0"
                     >
+                      <TickerMark ticker={r.symbol} size="sm" />
                       <span className="font-mono font-bold text-sm text-accent w-14 shrink-0">{r.symbol}</span>
                       <span className="text-xs text-foreground/60 truncate">{r.name}</span>
                     </button>

@@ -7,6 +7,7 @@ import confetti from "canvas-confetti";
 import { supabase } from "@/integrations/supabase/client";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { trackPaperTrade } from "@/lib/analytics";
+import { TickerMark } from "@/components/TickerMark";
 import { AdMobBanner } from "@/components/AdMobBanner";
 import Link from "next/link";
 import { ALL_STRATEGIES } from "@/data/strategy-lab";
@@ -456,10 +457,7 @@ export default function PaperTraderV2() {
                             border: `1px solid ${ticker === item.ticker ? C.teal : C.border}`,
                           }}
                         >
-                          <div className="w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-bold"
-                            style={{ background: C.tealDim, color: C.teal }}>
-                            {item.ticker.slice(0, 2)}
-                          </div>
+                          <TickerMark ticker={item.ticker} size="sm" />
                           <div className="text-left">
                             <p className="text-xs font-mono font-bold" style={{ color: C.textPrimary }}>{item.ticker}</p>
                             <p className="text-[9px] capitalize" style={{ color: C.textMuted }}>{item.asset_type}</p>
@@ -603,6 +601,7 @@ export default function PaperTraderV2() {
                   {openTrades.slice(0, 3).map(t => (
                     <div key={t.id} className="flex items-center gap-3 px-4 py-2.5"
                       style={{ borderBottom: `1px solid rgba(39, 183, 200, 0.06)` }}>
+                      <TickerMark ticker={t.ticker} size="sm" />
                       <span className="text-xs font-mono font-bold" style={{ color: C.textPrimary }}>{t.ticker}</span>
                       <span className="text-[10px]" style={{ color: C.textMuted }}>
                         {t.shares} @ {fmt(t.entry_price)}
@@ -657,10 +656,7 @@ export default function PaperTraderV2() {
                         style={{ borderBottom: `1px solid rgba(39, 183, 200, 0.08)` }}
                       >
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
-                            style={{ background: C.emeraldDim }}>
-                            <TrendingUp className="w-4 h-4" style={{ color: C.emerald }} />
-                          </div>
+                          <TickerMark ticker={t.ticker} />
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
                               <span className="text-sm font-mono font-semibold" style={{ color: C.textPrimary }}>{t.ticker}</span>
@@ -706,12 +702,7 @@ export default function PaperTraderV2() {
                       className="flex items-center gap-3 px-4 py-3"
                       style={{ borderBottom: `1px solid rgba(39, 183, 200, 0.08)` }}
                     >
-                      <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                        style={{ background: (t.pnl ?? 0) >= 0 ? C.emeraldDim : C.redDim }}>
-                        {(t.pnl ?? 0) >= 0
-                          ? <TrendingUp className="w-4 h-4" style={{ color: C.emerald }} />
-                          : <TrendingDown className="w-4 h-4" style={{ color: C.red }} />}
-                      </div>
+                      <TickerMark ticker={t.ticker} />
                       <div className="flex-1 min-w-0">
                         <span className="text-sm font-mono font-semibold" style={{ color: C.textPrimary }}>{t.ticker}</span>
                         <p className="text-[10px]" style={{ color: C.textMuted }}>

@@ -13,6 +13,7 @@ import {
   Loader2, Eye,
 } from "lucide-react";
 import { trackWatchlistAdd } from "@/lib/analytics";
+import { TickerMark } from "@/components/TickerMark";
 
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const result = await requireProUserSSR(req as Parameters<typeof requireProUserSSR>[0]);
@@ -222,6 +223,8 @@ function WatchlistRow({ item, quote, alerts, onRemove, onOpenAlert, onDeleteAler
         className="flex items-center gap-3 p-3 cursor-pointer"
         onClick={() => { haptic(); setExpanded(!expanded); }}
       >
+        <TickerMark ticker={item.ticker} />
+
         {/* Ticker + Change indicator */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">

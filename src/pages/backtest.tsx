@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { trackBacktestRun } from "@/lib/analytics";
+import { TickerMark } from "@/components/TickerMark";
 
 interface PageProps { requiresClientAuth?: boolean }
 
@@ -374,6 +375,7 @@ export default function BacktestPage(_props: PageProps) {
                                   <div key={i} className="px-3 py-2.5 flex items-center gap-3">
                                     <div className="flex-1 min-w-0">
                                       <div className="flex items-center gap-2">
+                                        <TickerMark ticker={t.symbol} size="sm" />
                                         <span className="text-xs font-bold text-[#F3EDE3]">{t.symbol}</span>
                                         <span className="text-[9px] font-medium" style={{ color }}>{t.strategyName}</span>
                                         <OutcomeBadge outcome={t.outcome} />

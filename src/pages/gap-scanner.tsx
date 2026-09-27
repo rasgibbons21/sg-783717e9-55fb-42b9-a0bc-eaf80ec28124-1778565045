@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import type { SignalResult } from "@/lib/strategies";
 import { trackGapScannerView } from "@/lib/analytics";
+import { TickerMark } from "@/components/TickerMark";
 
 const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
 
@@ -89,6 +90,8 @@ function GapCard({ c, i, onClick }: { c: GapCandidate; i: number; onClick: () =>
               score
             </span>
           </div>
+
+          <TickerMark ticker={c.symbol} />
 
           {/* Ticker + state */}
           <div className="flex-1 min-w-0">

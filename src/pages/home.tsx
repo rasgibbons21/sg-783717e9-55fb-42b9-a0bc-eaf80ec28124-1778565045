@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { MarketTicker } from "@/components/MarketTicker";
+import { TickerMark } from "@/components/TickerMark";
 
 const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
 
@@ -621,6 +622,7 @@ export default function HomePage() {
                       >
                         {s.score}
                       </div>
+                      <TickerMark ticker={s.symbol} />
                       <div>
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-bold text-[#F3EDE3]">{s.symbol}</span>
@@ -725,6 +727,7 @@ export default function HomePage() {
                     style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${stColor}15` }}
                   >
                     <div className="flex items-center justify-between mb-1">
+                      <TickerMark ticker={a.symbol} size="sm" />
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-bold text-[#F3EDE3]">{a.symbol}</span>
                         <span
@@ -920,9 +923,7 @@ export default function HomePage() {
                                 className="flex items-center gap-3 px-2.5 py-2 rounded-lg cursor-pointer active:scale-[0.98] transition-all"
                                 style={{ background: isUp ? "rgba(73,176,110,0.06)" : "rgba(239,68,68,0.06)" }}
                               >
-                                <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: isUp ? "rgba(73,176,110,0.15)" : "rgba(239,68,68,0.15)" }}>
-                                  {isUp ? <TrendingUp className="w-3 h-3 text-[#49B06E]" /> : <TrendingDown className="w-3 h-3 text-[#EF4444]" />}
-                                </div>
+                                <TickerMark ticker={stock.symbol} size="sm" />
                                 <div className="flex-1 min-w-0">
                                   <p className="text-[11px] font-bold text-[#F3EDE3]">{stock.symbol}</p>
                                   <p className="text-[9px] text-[#F3EDE3]/40 truncate">{stock.name}</p>

@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { TickerMark } from "@/components/TickerMark";
 import { canShowExternalPayment } from "@/lib/payments";
 import { ShareCardModal } from "@/components/ShareTradeCard";
 
@@ -275,6 +276,8 @@ function EntryCard({ entry, onUpdate, onShare }: { entry: JournalEntry; onUpdate
         >
           {entry.overall_grade ?? "—"}
         </div>
+
+        <TickerMark ticker={entry.ticker} />
 
         {/* Ticker + meta */}
         <div className="flex-1 min-w-0">
@@ -1178,7 +1181,8 @@ function StatsView({ onShareStats }: { onShareStats?: (data: { winRate: number; 
               <div className="space-y-1.5">
                 {s.bestTrades.map((t, i) => (
                   <div key={i} className="flex items-center justify-between">
-                    <div>
+                    <div className="flex items-center gap-1.5">
+                      <TickerMark ticker={t.ticker} size="sm" />
                       <span className="text-xs font-mono font-bold text-[#F3EDE3]">{t.ticker}</span>
                       <span className="text-[9px] text-[#F3EDE3]/25 ml-1.5">{t.date.slice(5)}</span>
                     </div>
@@ -1197,7 +1201,8 @@ function StatsView({ onShareStats }: { onShareStats?: (data: { winRate: number; 
               <div className="space-y-1.5">
                 {s.worstTrades.map((t, i) => (
                   <div key={i} className="flex items-center justify-between">
-                    <div>
+                    <div className="flex items-center gap-1.5">
+                      <TickerMark ticker={t.ticker} size="sm" />
                       <span className="text-xs font-mono font-bold text-[#F3EDE3]">{t.ticker}</span>
                       <span className="text-[9px] text-[#F3EDE3]/25 ml-1.5">{t.date.slice(5)}</span>
                     </div>
@@ -1217,6 +1222,7 @@ function StatsView({ onShareStats }: { onShareStats?: (data: { winRate: number; 
           <div className="space-y-1.5">
             {s.topTickers.map(t => (
               <div key={t.ticker} className="flex items-center gap-3">
+                <TickerMark ticker={t.ticker} size="sm" />
                 <span className="text-xs font-mono font-bold text-[#F3EDE3] w-14">{t.ticker}</span>
                 <div className="flex-1 h-1.5 rounded-full bg-white/5 overflow-hidden">
                   <div
