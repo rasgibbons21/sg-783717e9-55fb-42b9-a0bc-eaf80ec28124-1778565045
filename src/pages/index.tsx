@@ -172,7 +172,7 @@ export default function LandingPage() {
             {
               "@type": "Organization",
               "@id": "https://shebloomswealth.app/#organization",
-              name: "She Blooms Wealth",
+              name: "Radar by Cinder Vault Enterprises LLC",
               url: "https://shebloomswealth.app",
               logo: "https://shebloomswealth.app/icon-512.png",
               description: "Stock screener, trade alerts, and AI market analysis platform.",
@@ -557,10 +557,20 @@ export default function LandingPage() {
                 </div>
               </div>
               <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-wide" style={{ color:"rgba(244,247,250,0.35)" }}>Tools</p>
+                <div className="flex flex-col gap-1.5">
+                  <Link href="/free-stock-screener" className="text-xs transition-colors hover:text-white" style={{ color:"rgba(244,247,250,0.40)" }}>Free Stock Screener</Link>
+                  <Link href="/gap-and-go-scanner" className="text-xs transition-colors hover:text-white" style={{ color:"rgba(244,247,250,0.40)" }}>Gap & Go Scanner</Link>
+                  <Link href="/stock-alerts" className="text-xs transition-colors hover:text-white" style={{ color:"rgba(244,247,250,0.40)" }}>Stock Alerts</Link>
+                  <Link href="/earnings-calendar" className="text-xs transition-colors hover:text-white" style={{ color:"rgba(244,247,250,0.40)" }}>Earnings Calendar</Link>
+                </div>
+              </div>
+              <div className="space-y-2">
                 <p className="text-xs font-semibold uppercase tracking-wide" style={{ color:"rgba(244,247,250,0.35)" }}>Account</p>
                 <div className="flex flex-col gap-1.5">
                   <Link href="/onboarding" className="text-xs transition-colors hover:text-white" style={{ color:"rgba(244,247,250,0.40)" }}>Get started free</Link>
                   <Link href="/onboarding" className="text-xs transition-colors hover:text-white" style={{ color:"rgba(244,247,250,0.40)" }}>Sign in</Link>
+                  <Link href="/refer" className="text-xs transition-colors hover:text-white" style={{ color:"rgba(244,247,250,0.40)" }}>Invite Friends</Link>
                 </div>
               </div>
               <div className="space-y-2">

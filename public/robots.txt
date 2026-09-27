@@ -3,6 +3,17 @@ Allow: /
 Disallow: /admin/
 Disallow: /api/
 Disallow: /_next/
+Disallow: /home
+Disallow: /profile
+Disallow: /portfolio
+Disallow: /journal
+Disallow: /ask-pansy
+Disallow: /signals
+Disallow: /scanner
+Disallow: /paper-trader-v2
+Disallow: /backtest
+Disallow: /delete-account
+Disallow: /reset-password
 
 Sitemap: https://shebloomswealth.app/sitemap.xml
 
