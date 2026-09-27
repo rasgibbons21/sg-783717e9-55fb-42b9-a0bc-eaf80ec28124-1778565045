@@ -975,8 +975,8 @@ export default function HomePage() {
             <Gift className="w-4 h-4 text-[#49B06E]" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-semibold text-[#F3EDE3]">Invite friends, get 7 free days</p>
-            <p className="text-[10px] text-[#F3EDE3]/35">You both earn a week of Pro</p>
+            <p className="text-xs font-semibold text-[#F3EDE3]">Invite friends to Radar</p>
+            <p className="text-[10px] text-[#F3EDE3]/35">Share your referral link</p>
           </div>
           <ChevronRight className="w-3.5 h-3.5 text-[#49B06E]/50 shrink-0" />
         </motion.div>

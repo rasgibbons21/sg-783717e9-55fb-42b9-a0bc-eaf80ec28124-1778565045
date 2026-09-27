@@ -8,6 +8,7 @@ import {
   BarChart3,
   Newspaper,
   Bookmark,
+  GraduationCap,
   MoreHorizontal,
   Search,
   ChevronLeft,
@@ -39,7 +40,7 @@ const NAV_ITEMS: ReadonlyArray<{
   { href: "/signals", icon: Zap, label: "Signals" },
   { href: "/discover", icon: BarChart3, label: "Charts" },
   { href: "/news", icon: Newspaper, label: "News" },
-  { href: "/portfolio", icon: Bookmark, label: "Watchlist" },
+  { href: "/learn", icon: GraduationCap, label: "Academy" },
   { href: "/more", icon: MoreHorizontal, label: "More" },
 ];
 

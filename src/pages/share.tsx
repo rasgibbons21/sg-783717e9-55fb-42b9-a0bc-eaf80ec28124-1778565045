@@ -9,8 +9,8 @@ export default function SharePage() {
   return (
     <>
       <SEO
-        title="Radar - Invest in Yourself First 🌸"
-        description="Investment analysis designed for women. Learn from Pansy, get personalized analyses, and build wealth with confidence."
+        title="Radar — Stock Screener & Alerts"
+        description="Stock screener, price alerts, and Pansy AI market chat. Watchlist, market movers, paper trading, and options tape."
         image="/bloom-share.png"
       />
       
@@ -33,11 +33,11 @@ export default function SharePage() {
 
             {/* Tagline */}
             <h1 className="mb-6 font-serif text-4xl font-bold text-white sm:text-5xl md:text-6xl">
-              Invest in Yourself First 🌸
+              Screen stocks, set alerts, trade smarter.
             </h1>
-            
+
             <p className="mb-12 text-lg text-zinc-300 sm:text-xl">
-              Investment analysis designed for women. Learn from Pansy, get personalized analyses, and build wealth with confidence.
+              Stock screener, price alerts, and Pansy AI market chat. Watchlist, market movers, paper trading, and options tape.
             </p>
 
             {/* CTA Buttons */}
@@ -47,7 +47,7 @@ export default function SharePage() {
                   size="lg"
                   className="w-full bg-gradient-to-r from-accent to-primary text-lg font-semibold hover:from-accent/90 hover:to-primary/90 sm:w-auto"
                 >
-                  Start Your Journey
+                  Get Started Free
                 </Button>
               </Link>
               <Link href="/">

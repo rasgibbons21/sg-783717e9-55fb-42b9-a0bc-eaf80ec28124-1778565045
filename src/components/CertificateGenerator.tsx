@@ -135,10 +135,10 @@ export const CertificateGenerator = ({
           <div className="mb-4">
             <div style={{ fontSize: '48px', marginBottom: '8px' }}>&#127800;</div>
             <p style={{ fontSize: '24px', fontWeight: 'bold', color: '#07080C', letterSpacing: '2px' }}>
-              BLOOM
+              RADAR
             </p>
             <p style={{ fontSize: '12px', color: accentColor, letterSpacing: '1px', marginTop: '2px' }}>
-              SHE BLOOMS WEALTH
+              STOCK SCREENER & ALERTS
             </p>
           </div>
 

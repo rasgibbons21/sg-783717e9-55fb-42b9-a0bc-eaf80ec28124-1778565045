@@ -187,8 +187,10 @@ export default function LandingPage() {
               operatingSystem: "Android, Web",
               offers: [
                 { "@type": "Offer", price: "0", priceCurrency: "USD", description: "Free screener, paper trading, and education" },
-                { "@type": "Offer", price: "4.99", priceCurrency: "USD", billingIncrement: "P1M", description: "Radar Core monthly" },
-                { "@type": "Offer", price: "39.99", priceCurrency: "USD", billingIncrement: "P1Y", description: "Radar Core yearly" },
+                { "@type": "Offer", price: String(DESK_PLAN.monthlyPrice), priceCurrency: "USD", billingIncrement: "P1M", description: "Radar Desk monthly" },
+                { "@type": "Offer", price: String(DESK_PLAN.yearlyPrice), priceCurrency: "USD", billingIncrement: "P1Y", description: "Radar Desk yearly" },
+                { "@type": "Offer", price: String(PRO_PLAN.monthlyPrice), priceCurrency: "USD", billingIncrement: "P1M", description: "Radar Pro monthly" },
+                { "@type": "Offer", price: String(PRO_PLAN.yearlyPrice), priceCurrency: "USD", billingIncrement: "P1Y", description: "Radar Pro yearly" },
               ],
               description: "Stock screener, price alerts, and Pansy AI market chat. Watchlist, market movers, paper trading. Education optional.",
               url: "https://shebloomswealth.app",
@@ -542,9 +544,9 @@ export default function LandingPage() {
               <div className="flex-1 space-y-2">
                 <div className="flex items-center gap-2">
                   <Image src="/icon-192.png" alt="Radar" width={24} height={24} className="rounded-lg" />
-                  <p className="text-sm font-semibold" style={{ color:"rgba(244,247,250,0.60)" }}>She Blooms Wealth</p>
+                  <p className="text-sm font-semibold" style={{ color:"rgba(244,247,250,0.60)" }}>Radar</p>
                 </div>
-                <p className="text-xs" style={{ color:"rgba(244,247,250,0.35)" }}>Invest in yourself first 🌸</p>
+                <p className="text-xs" style={{ color:"rgba(244,247,250,0.35)" }}>Stock Screener & Alerts</p>
               </div>
               <div className="space-y-2">
                 <p className="text-xs font-semibold uppercase tracking-wide" style={{ color:"rgba(244,247,250,0.35)" }}>Legal</p>
