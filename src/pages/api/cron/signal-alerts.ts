@@ -259,6 +259,140 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     console.error("Scanner signal check failed:", err?.message);
   }
 
+  // ── PART A2: Watchlist signal + big-move alerts (targeted per-user) ──
+
+  let watchlistAlertsSent = 0;
+
+  try {
+    const { data: watchlistRows } = await supabaseAdmin
+      .from("watchlist")
+      .select("user_id, ticker");
+
+    if (watchlistRows && watchlistRows.length > 0) {
+      // Build user -> tickers map
+      const userTickers = new Map<string, Set<string>>();
+      for (const row of watchlistRows) {
+        if (!userTickers.has(row.user_id)) userTickers.set(row.user_id, new Set());
+        userTickers.get(row.user_id)!.add(row.ticker);
+      }
+
+      // Collect all unique watchlisted tickers
+      const allWatchedTickers = new Set<string>();
+      for (const tickers of userTickers.values()) {
+        for (const t of tickers) allWatchedTickers.add(t);
+      }
+
+      // Check scanner results for watchlisted stocks
+      const scanRes2 = await fetch(`${SITE_URL}/api/scanner/scan?fresh=0`, {
+        signal: AbortSignal.timeout(15_000),
+      }).catch(() => null);
+      const scanData = scanRes2 ? await scanRes2.json().catch(() => ({})) : {};
+      const candidates2 = scanData.candidates || [];
+
+      // Map of symbol -> active signals from scanner
+      const symbolSignals = new Map<string, Array<{ strategyName: string; entryZone: string | null }>>();
+      for (const c of candidates2) {
+        if (!allWatchedTickers.has(c.symbol)) continue;
+        for (const sig of c.signals ?? []) {
+          if (sig.state !== "ACTIVE") continue;
+          if (!symbolSignals.has(c.symbol)) symbolSignals.set(c.symbol, []);
+          symbolSignals.get(c.symbol)!.push({
+            strategyName: sig.strategyName || sig.strategyId,
+            entryZone: sig.entryZone ?? null,
+          });
+        }
+      }
+
+      // Fetch quotes for all watchlisted tickers to detect big moves
+      const finnhubKey = process.env.FINNHUB_API_KEY;
+      const tickerQuotes = new Map<string, { price: number; changePct: number }>();
+      if (finnhubKey) {
+        const tickerBatch = [...allWatchedTickers].slice(0, 40);
+        await Promise.all(
+          tickerBatch.map(async (sym) => {
+            try {
+              const r = await fetch(
+                `https://finnhub.io/api/v1/quote?symbol=${sym}&token=${finnhubKey}`,
+                { signal: AbortSignal.timeout(6000) }
+              );
+              if (!r.ok) return;
+              const d = await r.json();
+              if (d?.c && d.c > 0 && d.pc && d.pc > 0) {
+                const changePct = ((d.c - d.pc) / d.pc) * 100;
+                tickerQuotes.set(sym, { price: d.c, changePct });
+              }
+            } catch {}
+          })
+        );
+      }
+
+      // Deduplicate: check what we already notified recently
+      const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
+      const { data: recentWatchlistNotifs } = await supabaseAdmin
+        .from("notification_log")
+        .select("user_id, metadata")
+        .eq("notification_type", "watchlist_alert")
+        .gte("created_at", twoHoursAgo);
+
+      const notifiedWatchlist = new Set(
+        (recentWatchlistNotifs ?? []).map((n: any) => `${n.user_id}:${n.metadata?.symbol}`)
+      );
+
+      // Send targeted notifications per user
+      for (const [uid, tickers] of userTickers) {
+        const userSubs = subMap.get(uid) ?? [];
+        if (userSubs.length === 0) continue;
+
+        for (const ticker of tickers) {
+          if (notifiedWatchlist.has(`${uid}:${ticker}`)) continue;
+
+          const signals = symbolSignals.get(ticker);
+          const quote = tickerQuotes.get(ticker);
+          const bigMove = quote && Math.abs(quote.changePct) >= 5;
+
+          if (!signals && !bigMove) continue;
+
+          let title: string;
+          let body: string;
+
+          if (signals && signals.length > 0) {
+            const strat = signals[0].strategyName;
+            const entry = signals[0].entryZone ? ` · Entry ${signals[0].entryZone}` : "";
+            title = `${ticker} — ${strat} Signal`;
+            body = `Your watchlisted stock triggered a setup${entry}`;
+          } else if (quote && bigMove) {
+            const dir = quote.changePct > 0 ? "up" : "down";
+            title = `${ticker} ${dir} ${Math.abs(quote.changePct).toFixed(1)}%`;
+            body = `Big move on your watchlisted stock — now $${quote.price.toFixed(2)}`;
+          } else {
+            continue;
+          }
+
+          const payload = JSON.stringify({ title, body, url: `/stock/${ticker}` });
+          const r = await sendPush(userSubs, payload);
+          totalSent += r.s;
+          totalFailed += r.f;
+          watchlistAlertsSent++;
+
+          try {
+            await supabaseAdmin.from("notification_log").insert({
+              user_id: uid,
+              notification_type: "watchlist_alert",
+              metadata: {
+                symbol: ticker,
+                hasSignal: !!signals,
+                bigMove: !!bigMove,
+                changePct: quote?.changePct ?? null,
+              },
+            });
+          } catch {}
+        }
+      }
+    }
+  } catch (err: any) {
+    console.error("Watchlist alert check failed:", err?.message);
+  }
+
   // ── PART B: Price alerts (targeted per-user) ─────────────────────────
 
   let priceAlertsSent = 0;
@@ -344,6 +478,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     failed: totalFailed,
     signals: signalCount,
     priceAlerts: priceAlertsSent,
+    watchlistAlerts: watchlistAlertsSent,
     outcomesChecked,
     subscribers: allSubs.length,
   });
