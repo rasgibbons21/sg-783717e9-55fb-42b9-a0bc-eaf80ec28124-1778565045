@@ -15,6 +15,7 @@ import { UpgradeModal, UpgradeBanner, useViewTracker } from "@/components/Upgrad
 import { LockedFeatureModal } from "@/components/LockedFeatureModal";
 import { CORE_PLAN } from "@/config/proPlan";
 import { marketService } from "@/services/marketService";
+import { PriceAlerts } from "@/components/PriceAlerts";
 import { ExternalLink, BarChart3, Lock, Loader2 } from "lucide-react";
 import Link from "next/link";
 
@@ -259,6 +260,11 @@ export default function StockPage() {
             )}
           </div>
         </Card>
+
+        {/* Price Alerts */}
+        {ticker && stockData && (
+          <PriceAlerts ticker={ticker as string} currentPrice={stockData.c} />
+        )}
 
         {/* Pansy's Analysis */}
         {isAnalyzing ? (
