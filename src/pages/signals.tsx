@@ -47,7 +47,8 @@ const TABS: Array<{ id: Tab; label: string; icon: typeof Zap; color: string }> =
   { id: "recent", label: "Recent", icon: Clock, color: "#A855F7" },
 ];
 
-function formatVolume(v: number): string {
+function formatVolume(v: number | undefined): string {
+  if (v == null) return "";
   if (v >= 1_000_000) return `${(v / 1_000_000).toFixed(1)}M`;
   if (v >= 1_000) return `${(v / 1_000).toFixed(0)}K`;
   return String(v);
