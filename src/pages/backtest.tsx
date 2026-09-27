@@ -10,6 +10,7 @@ import {
   Loader2, AlertTriangle, ChevronDown, Clock, Zap,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { trackBacktestRun } from "@/lib/analytics";
 
 interface PageProps { requiresClientAuth?: boolean }
 
@@ -164,6 +165,7 @@ export default function BacktestPage(_props: PageProps) {
       const res = await apiFetch(`/api/scanner/backtest?days=${days}&strategy=${strategy}`);
       const d = await res.json();
       if (!res.ok) throw new Error(d.error || "Failed to load");
+      trackBacktestRun(strategy, days);
       setData(d);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Error loading backtest data");

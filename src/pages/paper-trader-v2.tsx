@@ -6,6 +6,7 @@ import { motion, AnimatePresence, useSpring, useTransform } from "framer-motion"
 import confetti from "canvas-confetti";
 import { supabase } from "@/integrations/supabase/client";
 import { useSubscription } from "@/contexts/SubscriptionContext";
+import { trackPaperTrade } from "@/lib/analytics";
 import { AdMobBanner } from "@/components/AdMobBanner";
 import Link from "next/link";
 import { ALL_STRATEGIES } from "@/data/strategy-lab";
@@ -239,6 +240,7 @@ export default function PaperTraderV2() {
       const d = await res.json();
       if (!res.ok) { setFormError(d.error || "Trade failed"); return; }
 
+      trackPaperTrade("open", sym);
       haptic("heavy");
       confetti({ particleCount: 60, spread: 50, origin: { y: 0.7 }, colors: [C.emerald, C.teal, C.ivory] });
 

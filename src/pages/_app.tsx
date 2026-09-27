@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { InstallPrompt } from "@/components/InstallPrompt";
 import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
+import { Analytics } from "@vercel/analytics/react";
 
 export default function App({ Component, pageProps }: AppProps) {
   useEffect(() => {
@@ -17,6 +18,7 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <ThemeProvider>
       <GoogleAnalytics />
+      <Analytics />
       <SubscriptionProvider>
         <Component {...pageProps} />
       </SubscriptionProvider>

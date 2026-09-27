@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { CalendarDays, Sun, Moon, Clock, Loader2, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import type { EarningsEntry } from "./api/earnings-calendar";
+import { trackEarningsView } from "@/lib/analytics";
 
 const haptic = (ms = 8) => {
   try { navigator?.vibrate?.(ms); } catch {}
@@ -39,6 +40,8 @@ export default function EarningsCalendarPage() {
   const [entries, setEntries] = useState<EarningsEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  useEffect(() => { trackEarningsView(); }, []);
 
   useEffect(() => {
     (async () => {

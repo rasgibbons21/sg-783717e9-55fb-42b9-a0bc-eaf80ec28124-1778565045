@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { STRATEGY_LIST, type StrategyId } from "@/lib/strategies";
 import type { SignalResult } from "@/lib/strategies";
+import { trackScannerView } from "@/lib/analytics";
 
 const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
 
@@ -201,6 +202,7 @@ export default function ScannerIndex() {
     }
   }, [filters]);
 
+  useEffect(() => { trackScannerView(); }, []);
   useEffect(() => { loadScan(); }, [loadScan]);
 
   useEffect(() => {

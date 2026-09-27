@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { STRATEGIES, type StrategyId } from "@/lib/strategies";
 import { DESK_PLAN, PRO_PLAN, FEATURE_MATRIX } from "@/config/proPlan";
+import { trackSignup, trackLogin, trackOnboardingStep, trackOnboardingComplete } from "@/lib/analytics";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -210,6 +211,7 @@ export default function Onboarding() {
   const goToStep = (next: Step) => {
     setError("");
     setStep(next);
+    trackOnboardingStep(next);
     if (QUIZ_STEPS.includes(next)) {
       saveProgress(next, currentProfile());
     }
@@ -240,6 +242,7 @@ export default function Onboarding() {
       completedOnboardingAt: new Date().toISOString(),
     };
 
+    trackOnboardingComplete();
     try { localStorage.setItem(PROFILE_KEY, JSON.stringify(profile)); } catch {}
     clearProgress();
 
@@ -318,6 +321,7 @@ export default function Onboarding() {
         const { user, error: signupError } = await authService.signUp(email, password, fullName);
         if (signupError) { setError(signupError.message); submitLock.current = false; setIsSubmitting(false); return; }
         if (user) {
+          trackSignup("email");
           await userService.updateUser(user.id, { full_name: fullName });
           let { data: { session } } = await supabase.auth.getSession();
           if (!session) {
@@ -341,6 +345,7 @@ export default function Onboarding() {
         const { user, error: loginError } = await authService.signIn(email, password);
         if (loginError) { setError(loginError.message); submitLock.current = false; setIsSubmitting(false); return; }
         if (user) {
+          trackLogin("email");
           await completeOnboarding();
           window.location.href = "/home";
         }

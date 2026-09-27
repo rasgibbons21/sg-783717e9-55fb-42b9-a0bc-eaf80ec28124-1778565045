@@ -9,6 +9,7 @@ import {
   TrendingUp, ChevronDown, ChevronUp, Loader2, Info,
 } from "lucide-react";
 import type { SignalResult } from "@/lib/strategies";
+import { trackGapScannerView } from "@/lib/analytics";
 
 const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
 
@@ -237,6 +238,8 @@ export default function GapScannerPage() {
   const [loading, setLoading] = useState(true);
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+
+  useEffect(() => { trackGapScannerView(); }, []);
 
   const loadGaps = useCallback(async (fresh = false) => {
     if (fresh) setRefreshing(true);

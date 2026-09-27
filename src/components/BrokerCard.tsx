@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
+import { trackBrokerClick } from "@/lib/analytics";
 import type { BrokerConfig } from "@/config/brokers";
 
 interface BrokerCardProps {
@@ -46,6 +47,7 @@ export default function BrokerCard({
   };
 
   const trackClick = () => {
+    trackBrokerClick(broker.name);
     try {
       supabase.auth.getSession().then(({ data: { session } }) => {
         supabase.from("broker_clicks").insert({

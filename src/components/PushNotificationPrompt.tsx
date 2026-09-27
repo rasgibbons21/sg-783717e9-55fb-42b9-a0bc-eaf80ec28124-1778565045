@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Bell, X } from "lucide-react";
 import { authService } from "@/services/authService";
+import { trackNotificationOptIn } from "@/lib/analytics";
 
 const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
 
@@ -24,6 +25,7 @@ export function PushNotificationPrompt() {
     try {
       const permission = await Notification.requestPermission();
       if (permission !== "granted") { setShow(false); return; }
+      trackNotificationOptIn();
       const registration = await navigator.serviceWorker.ready;
 
       const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;

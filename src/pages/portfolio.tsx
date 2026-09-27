@@ -12,6 +12,7 @@ import {
   Plus, X, Search, Bell, BellOff, Trash2, TrendingUp, TrendingDown,
   Loader2, Eye,
 } from "lucide-react";
+import { trackWatchlistAdd } from "@/lib/analytics";
 
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const result = await requireProUserSSR(req as Parameters<typeof requireProUserSSR>[0]);
@@ -415,6 +416,7 @@ export default function WatchlistPage() {
 
     if (!error && data) {
       setItems(prev => [data, ...prev]);
+      trackWatchlistAdd(ticker);
       haptic(15);
     }
   };

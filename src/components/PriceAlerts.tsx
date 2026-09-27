@@ -7,6 +7,7 @@ import { useSubscription } from "@/contexts/SubscriptionContext";
 import { notificationService } from "@/services/notificationService";
 import { motion, AnimatePresence } from "framer-motion";
 import { Bell, BellOff, Trash2, ChevronDown, ChevronUp, Plus } from "lucide-react";
+import { trackAlertSet } from "@/lib/analytics";
 
 interface PriceAlert {
   id: string;
@@ -52,6 +53,7 @@ export function PriceAlerts({ ticker, currentPrice }: PriceAlertsProps) {
     setIsAdding(true);
     const threshold = direction === "above" ? price : -price;
     await notificationService.createPriceAlert(userId, ticker, "target_price", threshold);
+    trackAlertSet(ticker);
     setTargetPrice("");
     await loadAlerts();
     setIsAdding(false);

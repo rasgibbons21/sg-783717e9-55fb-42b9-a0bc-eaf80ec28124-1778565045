@@ -6,6 +6,7 @@ import { Layout } from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
 import { Share2, Copy, Check, Gift, Users, ArrowRight } from "lucide-react";
+import { trackReferralShare, trackReferralCopy } from "@/lib/analytics";
 
 const C = {
   teal: "#27B7C8",
@@ -66,6 +67,7 @@ export default function ReferPage() {
   const copyLink = async () => {
     if (!link) return;
     haptic();
+    trackReferralCopy();
     await navigator.clipboard.writeText(link);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -74,6 +76,7 @@ export default function ReferPage() {
   const shareLink = async () => {
     if (!link) return;
     haptic(12);
+    trackReferralShare();
     try {
       await navigator.share({
         title: "Join Radar — Free Stock Screener",

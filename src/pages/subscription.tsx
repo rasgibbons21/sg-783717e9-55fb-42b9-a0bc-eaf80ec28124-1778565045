@@ -7,6 +7,7 @@ import { SEO } from "@/components/SEO";
 import { DESK_PLAN, PRO_PLAN, FEATURE_MATRIX } from "@/config/proPlan";
 import { usePaymentProvider } from "@/lib/payments";
 import { useSubscription } from "@/contexts/SubscriptionContext";
+import { trackViewPricing, trackBeginCheckout } from "@/lib/analytics";
 import GooglePlaySubscription from "@/components/GooglePlaySubscription";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -26,7 +27,10 @@ export default function Subscription() {
     else if (router.query.error) setErrorMsg("There was an issue processing your subscription. Please try again.");
   }, [router]);
 
+  useEffect(() => { trackViewPricing(); }, []);
+
   const handleSubscribe = async (planTier: "desk" | "pro", cycle: Billing) => {
+    trackBeginCheckout(planTier, cycle);
     setIsProcessing(true);
     setErrorMsg(null);
     try {

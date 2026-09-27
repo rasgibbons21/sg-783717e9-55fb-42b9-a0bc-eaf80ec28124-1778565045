@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Send } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { trackPansyChat } from "@/lib/analytics";
 
 interface Message {
   role: "user" | "assistant";
@@ -35,6 +36,7 @@ export default function AskPansyPage() {
 
   const sendMessage = async (messageText: string) => {
     if (!messageText.trim() || isLoading) return;
+    trackPansyChat();
 
     const userMessage: Message = { role: "user", content: messageText, timestamp: Date.now() };
     const history = messages.map((m) => ({ role: m.role, content: m.content }));

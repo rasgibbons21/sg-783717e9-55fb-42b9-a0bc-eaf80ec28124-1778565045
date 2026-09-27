@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
 import { Card } from "@/components/ui/card";
@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
 import { Calculator, Info } from "lucide-react";
+import { trackPositionCalcUse } from "@/lib/analytics";
 
 const RISK_PRESETS = [0.5, 1, 2, 3];
 
@@ -15,6 +16,8 @@ export default function PositionCalculatorPage() {
   const [entryPrice, setEntryPrice] = useState("");
   const [stopPrice, setStopPrice] = useState("");
   const [targetPrice, setTargetPrice] = useState("");
+
+  useEffect(() => { trackPositionCalcUse(); }, []);
 
   const result = useMemo(() => {
     const account = parseFloat(accountSize);

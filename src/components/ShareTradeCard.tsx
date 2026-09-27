@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { Share2, Download, X, TrendingUp, TrendingDown } from "lucide-react";
+import { trackShareCard } from "@/lib/analytics";
 import { motion, AnimatePresence } from "framer-motion";
 
 const C = {
@@ -266,6 +267,7 @@ export function ShareCardModal({ mode, onClose }: { mode: ShareMode; onClose: ()
 
   const handleShare = async () => {
     setBusy(true);
+    trackShareCard(mode.type);
     try {
       const canvas = await doCapture();
       if (!canvas) return;
