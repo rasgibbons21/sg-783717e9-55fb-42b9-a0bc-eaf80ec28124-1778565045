@@ -19,7 +19,7 @@ function monogram(ticker: string): string {
   return letters.slice(0, 2) || ticker.slice(0, 2).toUpperCase();
 }
 
-const logoDevKey = process.env.NEXT_PUBLIC_LOGO_DEV_KEY;
+const logoDevKey = process.env.NEXT_PUBLIC_LOGO_DEV_KEY?.trim();
 
 function buildUrl(ticker: string): string | null {
   if (logoDevKey) {
@@ -28,7 +28,8 @@ function buildUrl(ticker: string): string | null {
   return `https://financialmodelingprep.com/image-stock/${ticker}.png`;
 }
 
-type CacheEntry = { ok: boolean; fetchedAt: number };
+type CacheEntry = { ok: boolean; fetchedAt: number; v?: number };
+const CACHE_VERSION = 2;
 const memCache = new Map<string, CacheEntry>();
 
 function readCache(ticker: string): CacheEntry | null {
@@ -38,6 +39,7 @@ function readCache(ticker: string): CacheEntry | null {
     const raw = localStorage.getItem(`tl:${ticker}`);
     if (raw) {
       const parsed = JSON.parse(raw) as CacheEntry;
+      if (parsed.v !== CACHE_VERSION) return null;
       memCache.set(ticker, parsed);
       return parsed;
     }
@@ -46,7 +48,7 @@ function readCache(ticker: string): CacheEntry | null {
 }
 
 function writeCache(ticker: string, ok: boolean) {
-  const entry: CacheEntry = { ok, fetchedAt: Date.now() };
+  const entry: CacheEntry = { ok, fetchedAt: Date.now(), v: CACHE_VERSION };
   memCache.set(ticker, entry);
   try { localStorage.setItem(`tl:${ticker}`, JSON.stringify(entry)); } catch {}
 }
