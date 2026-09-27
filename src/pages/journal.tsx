@@ -9,11 +9,12 @@ import {
   NotebookPen, Search, Filter, ChevronDown, ChevronUp,
   AlertTriangle, Loader2, X, Check, TrendingUp, TrendingDown, Lock,
   Target, ShieldCheck, Clock, Brain, Heart, Scale, Award, BarChart3, Sparkles,
-  Trophy, Flame, Zap, ArrowUpRight, ArrowDownRight,
+  Trophy, Flame, Zap, ArrowUpRight, ArrowDownRight, Share2,
 } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { canShowExternalPayment } from "@/lib/payments";
+import { ShareCardModal } from "@/components/ShareTradeCard";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 interface JournalEntry {
@@ -229,7 +230,7 @@ function EmotionField({ label, value, onSave }: { label: string; value: string |
 }
 
 // ── Journal Entry Card ─────────────────────────────────────────────────────
-function EntryCard({ entry, onUpdate }: { entry: JournalEntry; onUpdate: (updated: JournalEntry) => void }) {
+function EntryCard({ entry, onUpdate, onShare }: { entry: JournalEntry; onUpdate: (updated: JournalEntry) => void; onShare: (entry: JournalEntry) => void }) {
   const [expanded, setExpanded] = useState(false);
   const win = (entry.pnl ?? 0) >= 0;
   const gc = gradeColor(entry.overall_grade);
@@ -428,6 +429,16 @@ function EntryCard({ entry, onUpdate }: { entry: JournalEntry; onUpdate: (update
                 onSave={v => saveField("personal_notes", v)}
                 multiline
               />
+
+              {/* ── Share ── */}
+              <button
+                onClick={() => { haptic(); onShare(entry); }}
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-semibold transition-all active:scale-95"
+                style={{ background: "rgba(39,183,200,0.1)", color: "#27B7C8", border: "1px solid rgba(39,183,200,0.2)" }}
+              >
+                <Share2 className="w-3.5 h-3.5" />
+                Share Trade Card
+              </button>
             </div>
           </motion.div>
         )}
@@ -958,7 +969,7 @@ function GradeBar({ grades }: { grades: Record<string, number> }) {
   );
 }
 
-function StatsView() {
+function StatsView({ onShareStats }: { onShareStats?: (data: { winRate: number; totalPnl: number; totalTrades: number; profitFactor: number; bestStreak: number; avgWin: number; avgLoss: number }) => void }) {
   const [stats, setStats] = useState<StatsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -1051,6 +1062,29 @@ function StatsView() {
         <StatTile label="Avg Win" value={`+$${Math.abs(s.avgWin).toFixed(2)}`} color="#49B06E" />
         <StatTile label="Avg Loss" value={`-$${Math.abs(s.avgLoss).toFixed(2)}`} color="#EF4444" />
       </div>
+
+      {/* Share stats */}
+      {onShareStats && (
+        <button
+          onClick={() => {
+            haptic();
+            onShareStats({
+              winRate: s.winRate,
+              totalPnl: s.totalPnl,
+              totalTrades: s.totalTrades,
+              profitFactor: s.profitFactor,
+              bestStreak: s.bestWinStreak,
+              avgWin: s.avgWin,
+              avgLoss: s.avgLoss,
+            });
+          }}
+          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-semibold transition-all active:scale-95"
+          style={{ background: "rgba(39,183,200,0.1)", color: "#27B7C8", border: "1px solid rgba(39,183,200,0.2)" }}
+        >
+          <Share2 className="w-3.5 h-3.5" />
+          Share Performance Card
+        </button>
+      )}
 
       {/* Duration & Discipline */}
       <div className="grid grid-cols-2 gap-2">
@@ -1243,6 +1277,7 @@ export default function JournalPage(_props: PageProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [tab, setTab] = useState<"journal" | "stats">("journal");
+  const [shareMode, setShareMode] = useState<Parameters<typeof ShareCardModal>[0]["mode"] | null>(null);
 
   const [ticker, setTicker] = useState("");
   const [grade, setGrade] = useState("all");
@@ -1357,7 +1392,7 @@ export default function JournalPage(_props: PageProps) {
           )}
 
           {/* Stats tab */}
-          {!authLoading && isPaid && tab === "stats" && <StatsView />}
+          {!authLoading && isPaid && tab === "stats" && <StatsView onShareStats={(data) => setShareMode({ type: "stats", data })} />}
 
           {/* Journal tab */}
           {!authLoading && !loading && isPaid && !error && tab === "journal" && (
@@ -1446,7 +1481,24 @@ export default function JournalPage(_props: PageProps) {
               ) : (
                 <div className="space-y-3">
                   {entries.map(e => (
-                    <EntryCard key={e.id} entry={e} onUpdate={updateEntry} />
+                    <EntryCard key={e.id} entry={e} onUpdate={updateEntry} onShare={(entry) => {
+                      const closedDate = entry.closed_at
+                        ? new Date(entry.closed_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+                        : new Date(entry.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+                      setShareMode({
+                        type: "trade",
+                        data: {
+                          ticker: entry.ticker,
+                          direction: entry.direction,
+                          pnl: entry.pnl,
+                          pnlPct: entry.pnl_pct,
+                          entryPrice: entry.entry_price,
+                          exitPrice: entry.exit_price,
+                          grade: entry.overall_grade,
+                          date: closedDate,
+                        },
+                      });
+                    }} />
                   ))}
                 </div>
               )}
@@ -1459,6 +1511,10 @@ export default function JournalPage(_props: PageProps) {
             </>
           )}
         </div>
+
+        {shareMode && (
+          <ShareCardModal mode={shareMode} onClose={() => setShareMode(null)} />
+        )}
       </Layout>
     </>
   );
