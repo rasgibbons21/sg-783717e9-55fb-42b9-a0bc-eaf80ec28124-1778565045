@@ -20,6 +20,10 @@ import {
   evaluateVwapReclaim,
   evaluateVwapBounce,
   evaluateBullFlag,
+  evaluateEarningsGap,
+  evaluateRangeBreakout,
+  evaluateOversoldBounce,
+  evaluateShortSqueeze,
   type SignalResult,
 } from "@/lib/strategies";
 import {
@@ -27,6 +31,8 @@ import {
   fetchQuotes,
   fetchProfiles,
   fetchNews,
+  fetchEarningsToday,
+  fetchDailyCandles,
   type NewsItem,
 } from "@/lib/marketData";
 
@@ -119,8 +125,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Step 4: Get float data (FMP → Finnhub fallback)
     const floatMap = await fetchProfiles(symbols, fmpKey, finnhubKey);
 
-    // Step 5: Get news for catalyst verification (FMP → Finnhub fallback)
-    const newsResults = await fetchNews(symbols.slice(0, 15), fmpKey, finnhubKey);
+    // Step 5: Get news, earnings calendar, and daily candles (parallel)
+    const [newsResults, earningsToday, dailyCandles] = await Promise.all([
+      fetchNews(symbols.slice(0, 15), fmpKey, finnhubKey),
+      fetchEarningsToday(fmpKey),
+      fetchDailyCandles(symbols.slice(0, 15), fmpKey, finnhubKey),
+    ]);
 
     // Step 6: Score each candidate
     const candidates: ScannerCandidate[] = quotes
@@ -193,6 +203,37 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         );
         flagResult.symbol = q.symbol;
         if (flagResult.state !== "INVALIDATED") signals.push(flagResult);
+
+        const hasEarnings = earningsToday.has(q.symbol);
+        const ernResult = evaluateEarningsGap(
+          { price: q.price, open: q.open, previousClose: q.previousClose, dayHigh: q.dayHigh, dayLow: q.dayLow, volume: q.volume, avgVolume: q.avgVolume, changesPercentage: q.changesPercentage },
+          hasEarnings, hasCatalyst,
+        );
+        ernResult.symbol = q.symbol;
+        if (ernResult.state !== "INVALIDATED") signals.push(ernResult);
+
+        const candles = dailyCandles.get(q.symbol) ?? [];
+
+        const rngResult = evaluateRangeBreakout(
+          { price: q.price, volume: q.volume, avgVolume: q.avgVolume, dayHigh: q.dayHigh, dayLow: q.dayLow, changesPercentage: q.changesPercentage },
+          candles,
+        );
+        rngResult.symbol = q.symbol;
+        if (rngResult.state !== "INVALIDATED") signals.push(rngResult);
+
+        const osbResult = evaluateOversoldBounce(
+          { price: q.price, open: q.open, previousClose: q.previousClose, volume: q.volume, avgVolume: q.avgVolume, changesPercentage: q.changesPercentage },
+          candles,
+        );
+        osbResult.symbol = q.symbol;
+        if (osbResult.state !== "INVALIDATED") signals.push(osbResult);
+
+        const sqzResult = evaluateShortSqueeze(
+          { price: q.price, open: q.open, dayHigh: q.dayHigh, dayLow: q.dayLow, volume: q.volume, avgVolume: q.avgVolume, changesPercentage: q.changesPercentage },
+          floatShares,
+        );
+        sqzResult.symbol = q.symbol;
+        if (sqzResult.state !== "INVALIDATED") signals.push(sqzResult);
 
         signals.sort((a, b) => b.score - a.score);
         const topStrategy = signals.length > 0 ? signals[0].strategyId : null;

@@ -300,3 +300,90 @@ export async function fetchNews(
 
   return newsMap;
 }
+
+// ── Earnings Calendar ─────────────────────────────────────────────
+
+export async function fetchEarningsToday(fmpKey?: string): Promise<Set<string>> {
+  if (!fmpKey) return new Set();
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+    const url = `https://financialmodelingprep.com/stable/earning-calendar?from=${yesterday}&to=${today}&apikey=${fmpKey}`;
+    const res = await fetch(url, { signal: abortAfter(TIMEOUT) });
+    if (!res.ok) return new Set();
+    const data: Array<{ symbol?: string }> = await res.json();
+    if (!Array.isArray(data)) return new Set();
+    return new Set(data.map(d => d.symbol?.toUpperCase()).filter(Boolean) as string[]);
+  } catch {
+    return new Set();
+  }
+}
+
+// ── Daily Candles (for RSI / Range Breakout) ──────────────────────
+
+export interface DailyCandle {
+  date: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+}
+
+export async function fetchDailyCandles(
+  symbols: string[],
+  fmpKey?: string,
+  finnhubKey?: string,
+): Promise<Map<string, DailyCandle[]>> {
+  const candleMap = new Map<string, DailyCandle[]>();
+  const batch = symbols.slice(0, 15);
+
+  if (fmpKey) {
+    const promises = batch.map(async (sym) => {
+      try {
+        const url = `https://financialmodelingprep.com/stable/historical-price-eod/light?symbol=${sym}&from=${twentyDaysAgo()}&apikey=${fmpKey}`;
+        const res = await fetch(url, { signal: abortAfter(TIMEOUT) });
+        if (!res.ok) return;
+        const data: Array<{ date: string; open: number; high: number; low: number; close: number; volume: number }> = await res.json();
+        if (!Array.isArray(data) || data.length === 0) return;
+        const sorted = data
+          .map(d => ({ date: d.date, open: d.open, high: d.high, low: d.low, close: d.close, volume: d.volume }))
+          .sort((a, b) => a.date.localeCompare(b.date));
+        candleMap.set(sym, sorted);
+      } catch {}
+    });
+    await Promise.all(promises);
+    if (candleMap.size > 0) return candleMap;
+  }
+
+  if (finnhubKey) {
+    const now = Math.floor(Date.now() / 1000);
+    const from = now - 30 * 24 * 60 * 60;
+    const smallBatch = batch.slice(0, 10);
+    const promises = smallBatch.map(async (sym) => {
+      try {
+        const url = `https://finnhub.io/api/v1/stock/candle?symbol=${sym}&resolution=D&from=${from}&to=${now}&token=${finnhubKey}`;
+        const res = await fetch(url, { signal: abortAfter(6000) });
+        if (!res.ok) return;
+        const d = await res.json();
+        if (d.s !== "ok" || !d.c) return;
+        const candles: DailyCandle[] = d.t.map((t: number, i: number) => ({
+          date: new Date(t * 1000).toISOString().slice(0, 10),
+          open: d.o[i],
+          high: d.h[i],
+          low: d.l[i],
+          close: d.c[i],
+          volume: d.v[i],
+        }));
+        candleMap.set(sym, candles);
+      } catch {}
+    });
+    await Promise.all(promises);
+  }
+
+  return candleMap;
+}
+
+function twentyDaysAgo(): string {
+  return new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+}

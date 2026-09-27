@@ -18,7 +18,11 @@ export type StrategyId =
   | "vwap-bounce"
   | "hod-breakout"
   | "bull-flag"
-  | "red-to-green";
+  | "red-to-green"
+  | "earnings-gap"
+  | "range-breakout"
+  | "oversold-bounce"
+  | "short-squeeze";
 
 export type FutureStrategyId =
   | "abcd"
@@ -282,6 +286,116 @@ export const STRATEGIES: Record<StrategyId, Strategy> = {
     alertRule: "Alert when red open reclaims prior close on volume",
     userParams: [
       { key: "minVolMultiple", label: "Min Vol Multiple", type: "number", default: 1.5, min: 1, max: 5, step: 0.5, unit: "x" },
+    ],
+    available: true,
+  },
+
+  "earnings-gap": {
+    id: "earnings-gap",
+    name: "Earnings Gap",
+    shortName: "ERN",
+    description: "Stock gaps on earnings report with volume. High-conviction catalyst play.",
+    icon: "📊",
+    color: "#F97316",
+    conditions: [
+      { id: "has-earnings", label: "Earnings reported", description: "Earnings released today or yesterday", dataRequired: "earnings", computable: true },
+      { id: "gap-pct", label: "Gap ≥ threshold", description: "Pre-market gap ≥ 5% from prior close", dataRequired: "quote", computable: true },
+      { id: "volume-surge", label: "Volume surge", description: "Relative volume ≥ 3x", dataRequired: "quote", computable: true },
+      { id: "direction", label: "Clear direction", description: "Gap and price momentum align", dataRequired: "quote", computable: true },
+      { id: "pmh-hold", label: "Holds above gap level", description: "Price sustains above gap open", dataRequired: "intraday", computable: false },
+    ],
+    dataRequired: ["quote", "earnings", "intraday"],
+    entry: "Break above first 5-min high on volume (gap up) or break below first 5-min low (gap down)",
+    invalidation: "Fills more than 50% of the gap",
+    targets: "T1: Measured move equal to gap size. T2: Next resistance/support level.",
+    rrDescription: "Stop at 50% gap fill. Typical 2:1–3:1.",
+    regimeFit: "Any regime — earnings override market conditions. Strongest in first 30 min.",
+    alertRule: "Alert when stock gaps on earnings with volume ≥ 3x",
+    userParams: [
+      { key: "minGapPct", label: "Min Gap %", type: "number", default: 5, min: 2, max: 30, step: 1, unit: "%" },
+      { key: "minRvol", label: "Min RVOL", type: "number", default: 3, min: 1, max: 20, step: 1, unit: "x" },
+    ],
+    available: true,
+  },
+
+  "range-breakout": {
+    id: "range-breakout",
+    name: "Range Breakout",
+    shortName: "RNG",
+    description: "Stock breaks out of multi-day consolidation range on volume. Trend-start signal.",
+    icon: "💥",
+    color: "#14B8A6",
+    conditions: [
+      { id: "range-defined", label: "Tight range detected", description: "5–20 day consolidation with ≤ 10% range", dataRequired: "daily", computable: true },
+      { id: "break-above", label: "Breaks range high", description: "Current price above the range high", dataRequired: "daily", computable: true },
+      { id: "volume-confirm", label: "Breakout volume", description: "Volume ≥ 2x average on breakout day", dataRequired: "quote", computable: true },
+      { id: "close-strong", label: "Closes near highs", description: "Close in upper 25% of day range", dataRequired: "intraday", computable: false },
+    ],
+    dataRequired: ["daily", "quote", "intraday"],
+    entry: "Hold above range high for 15+ minutes with volume",
+    invalidation: "Close back inside the range",
+    targets: "T1: Measured move (range height added to breakout). T2: 1.5× measured move.",
+    rrDescription: "Stop at range midpoint. Typical 2:1–4:1.",
+    regimeFit: "Works in all regimes. Often precedes multi-day trend moves.",
+    alertRule: "Alert when price breaks multi-day range high on volume",
+    userParams: [
+      { key: "minDays", label: "Min Range Days", type: "number", default: 5, min: 3, max: 20, step: 1 },
+      { key: "maxRangePct", label: "Max Range %", type: "number", default: 10, min: 3, max: 25, step: 1, unit: "%" },
+    ],
+    available: true,
+  },
+
+  "oversold-bounce": {
+    id: "oversold-bounce",
+    name: "Oversold Bounce",
+    shortName: "OSB",
+    description: "RSI drops below 30, then curls up on increasing volume. Mean reversion play.",
+    icon: "📈",
+    color: "#22C55E",
+    conditions: [
+      { id: "rsi-oversold", label: "RSI was oversold", description: "14-day RSI dropped below 30 recently", dataRequired: "daily", computable: true },
+      { id: "rsi-curling", label: "RSI curling up", description: "RSI rising from oversold territory", dataRequired: "daily", computable: true },
+      { id: "price-reversal", label: "Price reversal", description: "Price now green after multi-day decline", dataRequired: "quote", computable: true },
+      { id: "volume-increase", label: "Volume pickup", description: "Volume increasing on bounce day", dataRequired: "quote", computable: true },
+    ],
+    dataRequired: ["daily", "quote"],
+    entry: "First green candle after RSI crosses back above 30",
+    invalidation: "New low below the oversold low",
+    targets: "T1: 20-day moving average. T2: Prior swing high.",
+    rrDescription: "Stop below the oversold low. Typical 2:1–3:1.",
+    regimeFit: "Range-bound or recovery markets. Avoid in strong downtrends.",
+    alertRule: "Alert when RSI crosses above 30 from below with volume",
+    userParams: [
+      { key: "rsiThreshold", label: "RSI Threshold", type: "number", default: 30, min: 15, max: 40, step: 5 },
+    ],
+    available: true,
+  },
+
+  "short-squeeze": {
+    id: "short-squeeze",
+    name: "Short Squeeze",
+    shortName: "SQZ",
+    description: "Low-float stock with extremely high daily volume relative to float. Squeeze potential.",
+    icon: "🔥",
+    color: "#EF4444",
+    conditions: [
+      { id: "low-float", label: "Low float", description: "Float ≤ 20M shares", dataRequired: "profile", computable: true },
+      { id: "vol-to-float", label: "Volume vs float", description: "Daily volume ≥ 30% of float", dataRequired: "profile", computable: true },
+      { id: "strong-move", label: "Strong move", description: "Price up ≥ 10% today", dataRequired: "quote", computable: true },
+      { id: "rvol-extreme", label: "Extreme RVOL", description: "Relative volume ≥ 5x", dataRequired: "quote", computable: true },
+      { id: "continuation", label: "Continuation building", description: "Price holding near highs of day", dataRequired: "intraday", computable: false },
+    ],
+    dataRequired: ["quote", "profile", "intraday"],
+    entry: "New HOD break after consolidation with volume",
+    invalidation: "Break below the prior consolidation low",
+    targets: "T1: Next whole-dollar level. T2: 2× the move from today's open.",
+    rrDescription: "Tight stop below consolidation. Typical 3:1+ (high R:R but volatile).",
+    regimeFit: "Momentum/speculative days. Very volatile — small size only.",
+    alertRule: "Alert when low-float stock has volume ≥ 30% of float with 10%+ gain",
+    userParams: [
+      { key: "maxFloat", label: "Max Float (M)", type: "number", default: 20, min: 1, max: 100, step: 5, unit: "M" },
+      { key: "minChangePct", label: "Min Move %", type: "number", default: 10, min: 5, max: 50, step: 5, unit: "%" },
+      { key: "minVolToFloat", label: "Min Vol/Float %", type: "number", default: 30, min: 10, max: 100, step: 10, unit: "%" },
     ],
     available: true,
   },
@@ -788,6 +902,347 @@ export function evaluateBullFlag(
     reason: state !== "INVALIDATED"
       ? `+${quote.changesPercentage.toFixed(1)}% pole, ${(distFromHod * 100).toFixed(0)}% from HOD, RVOL ${rvol.toFixed(1)}x`
       : "No strong impulse detected",
+    timestamp: Date.now(),
+  };
+}
+
+// ── RSI helper ──────────────────────────────────────────────────────
+
+export interface DailyCandle {
+  date: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+}
+
+function computeRSI(closes: number[], period = 14): number | null {
+  if (closes.length < period + 1) return null;
+  let avgGain = 0;
+  let avgLoss = 0;
+  for (let i = 1; i <= period; i++) {
+    const change = closes[i] - closes[i - 1];
+    if (change >= 0) avgGain += change;
+    else avgLoss += Math.abs(change);
+  }
+  avgGain /= period;
+  avgLoss /= period;
+  if (avgLoss === 0) return 100;
+  const rs = avgGain / avgLoss;
+  return 100 - 100 / (1 + rs);
+}
+
+// ── Earnings Gap ────────────────────────────────────────────────────
+
+export function evaluateEarningsGap(
+  quote: { price: number; open: number; previousClose: number; dayHigh: number; dayLow: number; volume: number; avgVolume: number; changesPercentage: number },
+  hasEarnings: boolean,
+  hasCatalyst: boolean,
+  params: Record<string, number | string | boolean> = {},
+): SignalResult {
+  const minGapPct = Number(params.minGapPct ?? 5);
+  const minRvol = Number(params.minRvol ?? 3);
+  const rvol = quote.avgVolume > 0 ? quote.volume / quote.avgVolume : 0;
+  const gapPct = quote.previousClose > 0
+    ? ((quote.open - quote.previousClose) / quote.previousClose) * 100
+    : quote.changesPercentage;
+  const gapUp = gapPct >= minGapPct;
+  const gapDown = gapPct <= -minGapPct;
+  const hasGap = gapUp || gapDown;
+  const dirAligned = gapUp ? quote.price >= quote.open : quote.price <= quote.open;
+
+  const passed: string[] = [];
+  const failed: string[] = [];
+  const missing: string[] = [];
+
+  if (hasEarnings) passed.push("has-earnings");
+  else failed.push("has-earnings");
+
+  if (hasGap) passed.push("gap-pct");
+  else failed.push("gap-pct");
+
+  if (rvol >= minRvol) passed.push("volume-surge");
+  else failed.push("volume-surge");
+
+  if (hasGap && dirAligned) passed.push("direction");
+  else if (hasGap) failed.push("direction");
+  else missing.push("direction");
+
+  missing.push("pmh-hold");
+
+  const computableTotal = passed.length + failed.length;
+  const passRate = computableTotal > 0 ? passed.length / computableTotal : 0;
+
+  let state: SignalState;
+  if (hasEarnings && hasGap && passRate >= 0.75) state = "NEAR_TRIGGER";
+  else if (hasEarnings && passRate >= 0.5) state = "WATCH";
+  else if (hasGap && hasCatalyst && passRate >= 0.5) state = "WATCH";
+  else state = "INVALIDATED";
+
+  const score = Math.round(passRate * 70 + (hasEarnings ? 15 : 0) + (rvol >= 5 ? 15 : rvol >= 3 ? 10 : 0));
+
+  const dir = gapUp ? "Gap up" : gapDown ? "Gap down" : "No gap";
+  return {
+    symbol: "",
+    strategyId: "earnings-gap",
+    strategyName: "Earnings Gap",
+    state,
+    score: Math.min(100, Math.max(0, score)),
+    entryZone: state !== "INVALIDATED"
+      ? gapUp ? `Above $${quote.open.toFixed(2)} (gap open)` : `Below $${quote.open.toFixed(2)} (gap open)`
+      : null,
+    invalidationLevel: state !== "INVALIDATED"
+      ? `$${((quote.open + quote.previousClose) / 2).toFixed(2)} (50% gap fill)`
+      : null,
+    target1: state !== "INVALIDATED"
+      ? gapUp ? `$${(quote.open * 1.05).toFixed(2)}` : `$${(quote.open * 0.95).toFixed(2)}`
+      : null,
+    target2: state !== "INVALIDATED"
+      ? gapUp ? `$${(quote.open * 1.10).toFixed(2)}` : `$${(quote.open * 0.90).toFixed(2)}`
+      : null,
+    rr: state !== "INVALIDATED" ? "2:1–3:1" : null,
+    conditionsPassed: passed,
+    conditionsFailed: failed,
+    conditionsMissing: missing,
+    reason: state !== "INVALIDATED"
+      ? `${dir} ${Math.abs(gapPct).toFixed(1)}%${hasEarnings ? " on earnings" : ""}, RVOL ${rvol.toFixed(1)}x`
+      : "No earnings gap detected",
+    timestamp: Date.now(),
+  };
+}
+
+// ── Range Breakout ──────────────────────────────────────────────────
+
+export function evaluateRangeBreakout(
+  quote: { price: number; volume: number; avgVolume: number; dayHigh: number; dayLow: number; changesPercentage: number },
+  candles: DailyCandle[],
+  params: Record<string, number | string | boolean> = {},
+): SignalResult {
+  const minDays = Number(params.minDays ?? 5);
+  const maxRangePct = Number(params.maxRangePct ?? 10);
+  const rvol = quote.avgVolume > 0 ? quote.volume / quote.avgVolume : 0;
+
+  const passed: string[] = [];
+  const failed: string[] = [];
+  const missing: string[] = [];
+
+  let rangeHigh = 0;
+  let rangeLow = Infinity;
+  let consolidationDays = 0;
+  let hasRange = false;
+
+  if (candles.length >= minDays) {
+    const lookback = candles.slice(-minDays);
+    rangeHigh = Math.max(...lookback.map(c => c.high));
+    rangeLow = Math.min(...lookback.map(c => c.low));
+    const rangePct = rangeLow > 0 ? ((rangeHigh - rangeLow) / rangeLow) * 100 : 100;
+    consolidationDays = lookback.length;
+    hasRange = rangePct <= maxRangePct && consolidationDays >= minDays;
+
+    if (hasRange) passed.push("range-defined");
+    else failed.push("range-defined");
+
+    if (hasRange && quote.price > rangeHigh) passed.push("break-above");
+    else if (hasRange) failed.push("break-above");
+    else missing.push("break-above");
+  } else {
+    missing.push("range-defined");
+    missing.push("break-above");
+  }
+
+  if (rvol >= 2) passed.push("volume-confirm");
+  else failed.push("volume-confirm");
+
+  missing.push("close-strong");
+
+  const computableTotal = passed.length + failed.length;
+  const passRate = computableTotal > 0 ? passed.length / computableTotal : 0;
+
+  let state: SignalState;
+  if (passed.includes("range-defined") && passed.includes("break-above") && rvol >= 2) state = "ACTIVE";
+  else if (passed.includes("range-defined") && passRate >= 0.5) state = "WATCH";
+  else if (hasRange) state = "WATCH";
+  else state = "INVALIDATED";
+
+  const measuredMove = rangeHigh - rangeLow;
+  const score = Math.round(passRate * 60 + (hasRange ? 20 : 0) + (rvol >= 3 ? 20 : rvol >= 2 ? 10 : 0));
+
+  return {
+    symbol: "",
+    strategyId: "range-breakout",
+    strategyName: "Range Breakout",
+    state,
+    score: Math.min(100, Math.max(0, score)),
+    entryZone: state !== "INVALIDATED" && rangeHigh > 0 ? `Above $${rangeHigh.toFixed(2)} (range high)` : null,
+    invalidationLevel: state !== "INVALIDATED" && rangeHigh > 0
+      ? `$${((rangeHigh + rangeLow) / 2).toFixed(2)} (range mid)`
+      : null,
+    target1: state !== "INVALIDATED" && rangeHigh > 0
+      ? `$${(rangeHigh + measuredMove).toFixed(2)} (measured move)`
+      : null,
+    target2: state !== "INVALIDATED" && rangeHigh > 0
+      ? `$${(rangeHigh + measuredMove * 1.5).toFixed(2)} (1.5× measured)`
+      : null,
+    rr: state !== "INVALIDATED" ? "2:1–4:1" : null,
+    conditionsPassed: passed,
+    conditionsFailed: failed,
+    conditionsMissing: missing,
+    reason: state !== "INVALIDATED"
+      ? `${consolidationDays}-day range, ${quote.price > rangeHigh ? "breaking out" : "near range high"}, RVOL ${rvol.toFixed(1)}x`
+      : candles.length < minDays ? "Insufficient daily data" : "No consolidation range detected",
+    timestamp: Date.now(),
+  };
+}
+
+// ── Oversold Bounce ─────────────────────────────────────────────────
+
+export function evaluateOversoldBounce(
+  quote: { price: number; open: number; previousClose: number; volume: number; avgVolume: number; changesPercentage: number },
+  candles: DailyCandle[],
+  params: Record<string, number | string | boolean> = {},
+): SignalResult {
+  const rsiThreshold = Number(params.rsiThreshold ?? 30);
+  const rvol = quote.avgVolume > 0 ? quote.volume / quote.avgVolume : 0;
+
+  const passed: string[] = [];
+  const failed: string[] = [];
+  const missing: string[] = [];
+
+  const closes = candles.map(c => c.close);
+  const rsi = computeRSI(closes);
+  const prevCloses = closes.slice(0, -1);
+  const prevRsi = computeRSI(prevCloses);
+
+  if (rsi !== null && prevRsi !== null) {
+    const wasOversold = prevRsi <= rsiThreshold;
+    const isCurling = rsi > prevRsi;
+    const stillLow = rsi <= 50;
+
+    if (wasOversold || rsi <= rsiThreshold) passed.push("rsi-oversold");
+    else failed.push("rsi-oversold");
+
+    if (wasOversold && isCurling && stillLow) passed.push("rsi-curling");
+    else if (wasOversold) failed.push("rsi-curling");
+    else missing.push("rsi-curling");
+  } else {
+    missing.push("rsi-oversold");
+    missing.push("rsi-curling");
+  }
+
+  if (quote.changesPercentage > 0 && quote.price > quote.open) passed.push("price-reversal");
+  else failed.push("price-reversal");
+
+  if (rvol >= 1.5) passed.push("volume-increase");
+  else failed.push("volume-increase");
+
+  const computableTotal = passed.length + failed.length;
+  const passRate = computableTotal > 0 ? passed.length / computableTotal : 0;
+
+  let state: SignalState;
+  if (passed.includes("rsi-oversold") && passed.includes("rsi-curling") && passRate >= 0.75) state = "ACTIVE";
+  else if (passed.includes("rsi-oversold") && passRate >= 0.5) state = "NEAR_TRIGGER";
+  else if (passed.includes("rsi-oversold")) state = "WATCH";
+  else state = "INVALIDATED";
+
+  const recentLow = candles.length > 0 ? Math.min(...candles.slice(-5).map(c => c.low)) : quote.price * 0.95;
+  const sma20 = closes.length >= 20 ? closes.slice(-20).reduce((a, b) => a + b, 0) / 20 : null;
+  const score = Math.round(passRate * 60 + (rsi !== null && rsi <= 30 ? 20 : 10) + (rvol >= 2 ? 20 : rvol >= 1.5 ? 10 : 0));
+
+  return {
+    symbol: "",
+    strategyId: "oversold-bounce",
+    strategyName: "Oversold Bounce",
+    state,
+    score: Math.min(100, Math.max(0, score)),
+    entryZone: state !== "INVALIDATED" ? `Above $${quote.price.toFixed(2)} (bounce confirmation)` : null,
+    invalidationLevel: state !== "INVALIDATED" ? `Below $${recentLow.toFixed(2)} (new low)` : null,
+    target1: sma20 && state !== "INVALIDATED" ? `$${sma20.toFixed(2)} (20-day MA)` : null,
+    target2: state !== "INVALIDATED" && candles.length >= 5
+      ? `$${Math.max(...candles.slice(-10).map(c => c.high)).toFixed(2)} (prior swing high)`
+      : null,
+    rr: state !== "INVALIDATED" ? "2:1–3:1" : null,
+    conditionsPassed: passed,
+    conditionsFailed: failed,
+    conditionsMissing: missing,
+    reason: state !== "INVALIDATED"
+      ? `RSI ${rsi?.toFixed(0) ?? "?"}, ${quote.changesPercentage > 0 ? "bouncing" : "still declining"}, RVOL ${rvol.toFixed(1)}x`
+      : rsi !== null ? `RSI ${rsi.toFixed(0)} — not oversold` : "Insufficient data for RSI",
+    timestamp: Date.now(),
+  };
+}
+
+// ── Short Squeeze ───────────────────────────────────────────────────
+
+export function evaluateShortSqueeze(
+  quote: { price: number; open: number; dayHigh: number; dayLow: number; volume: number; avgVolume: number; changesPercentage: number },
+  floatShares: number | null,
+  params: Record<string, number | string | boolean> = {},
+): SignalResult {
+  const maxFloat = Number(params.maxFloat ?? 20);
+  const minChangePct = Number(params.minChangePct ?? 10);
+  const minVolToFloat = Number(params.minVolToFloat ?? 30);
+  const rvol = quote.avgVolume > 0 ? quote.volume / quote.avgVolume : 0;
+  const floatM = floatShares ? floatShares / 1_000_000 : null;
+  const volToFloat = floatShares && floatShares > 0 ? (quote.volume / floatShares) * 100 : null;
+
+  const passed: string[] = [];
+  const failed: string[] = [];
+  const missing: string[] = [];
+
+  if (floatM !== null) {
+    if (floatM <= maxFloat) passed.push("low-float");
+    else failed.push("low-float");
+  } else {
+    missing.push("low-float");
+  }
+
+  if (volToFloat !== null) {
+    if (volToFloat >= minVolToFloat) passed.push("vol-to-float");
+    else failed.push("vol-to-float");
+  } else {
+    missing.push("vol-to-float");
+  }
+
+  if (quote.changesPercentage >= minChangePct) passed.push("strong-move");
+  else failed.push("strong-move");
+
+  if (rvol >= 5) passed.push("rvol-extreme");
+  else failed.push("rvol-extreme");
+
+  missing.push("continuation");
+
+  const computableTotal = passed.length + failed.length;
+  const passRate = computableTotal > 0 ? passed.length / computableTotal : 0;
+
+  let state: SignalState;
+  if (passRate >= 0.75 && passed.includes("strong-move")) state = "NEAR_TRIGGER";
+  else if (passRate >= 0.5 && passed.includes("strong-move")) state = "WATCH";
+  else state = "INVALIDATED";
+
+  const score = Math.round(passRate * 60 + (volToFloat !== null && volToFloat >= 50 ? 20 : 10) + (rvol >= 10 ? 20 : rvol >= 5 ? 10 : 0));
+
+  const reasons: string[] = [];
+  if (floatM !== null) reasons.push(`Float ${floatM.toFixed(1)}M`);
+  if (volToFloat !== null) reasons.push(`Vol/Float ${volToFloat.toFixed(0)}%`);
+  reasons.push(`+${quote.changesPercentage.toFixed(1)}%`);
+  reasons.push(`RVOL ${rvol.toFixed(1)}x`);
+
+  return {
+    symbol: "",
+    strategyId: "short-squeeze",
+    strategyName: "Short Squeeze",
+    state,
+    score: Math.min(100, Math.max(0, score)),
+    entryZone: state !== "INVALIDATED" ? `Above $${quote.dayHigh.toFixed(2)} (new HOD)` : null,
+    invalidationLevel: state !== "INVALIDATED" ? `Below $${(quote.price * 0.93).toFixed(2)}` : null,
+    target1: state !== "INVALIDATED" ? `$${(quote.dayHigh * 1.10).toFixed(2)}` : null,
+    target2: state !== "INVALIDATED" ? `$${(quote.dayHigh * 1.20).toFixed(2)}` : null,
+    rr: state !== "INVALIDATED" ? "3:1+" : null,
+    conditionsPassed: passed,
+    conditionsFailed: failed,
+    conditionsMissing: missing,
+    reason: state !== "INVALIDATED" ? reasons.join(" · ") : "Does not meet squeeze criteria",
     timestamp: Date.now(),
   };
 }
