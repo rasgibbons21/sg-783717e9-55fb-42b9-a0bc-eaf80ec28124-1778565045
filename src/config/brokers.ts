@@ -15,6 +15,7 @@ export interface BrokerConfig {
   name: string;
   slug: string;
   logoPath: string;
+  logoDomain?: string;
 
   // Relationship
   relationshipType: RelationshipType;
@@ -77,6 +78,7 @@ export const brokers: BrokerConfig[] = [
     name: "Webull",
     slug: "webull",
     logoPath: "/logos/webull-logo.svg",
+    logoDomain: "webull.com",
     relationshipType: "affiliate",
     affiliateUrl: "https://www.webull.com/s/3KhusTF68dPXmGVxdq",
     disclosureRequired: true,
@@ -131,6 +133,7 @@ export const brokers: BrokerConfig[] = [
     name: "Deriv",
     slug: "deriv",
     logoPath: "/logos/deriv-logo.svg",
+    logoDomain: "deriv.com",
     relationshipType: "affiliate",
     affiliateUrl: "https://deriv.com",
     disclosureRequired: true,
@@ -185,6 +188,7 @@ export const brokers: BrokerConfig[] = [
     name: "XM",
     slug: "xm",
     logoPath: "/logos/xm-logo.svg",
+    logoDomain: "xm.com",
     relationshipType: "affiliate",
     affiliateUrl: "https://clicks.pipaffiliates.com/c?c=1269286&l=en&p=3022",
     disclosureRequired: true,
@@ -248,6 +252,7 @@ export const brokers: BrokerConfig[] = [
     name: "Exness",
     slug: "exness",
     logoPath: "/logos/exness-logo.svg",
+    logoDomain: "exness.com",
     relationshipType: "affiliate",
     affiliateUrl: "https://one.exnessonelink.com/a/t13zv0dpdi",
     disclosureRequired: true,
@@ -301,6 +306,7 @@ export const brokers: BrokerConfig[] = [
     name: "Vantage",
     slug: "vantage",
     logoPath: "/logos/vantage-logo.svg",
+    logoDomain: "vantagemarkets.com",
     relationshipType: "affiliate",
     affiliateUrl:
       "https://www.vantagemarkets.com/open-live-account?cpaAffid=MjAzMTQwMDM",
@@ -355,6 +361,7 @@ export const brokers: BrokerConfig[] = [
     name: "AvaTrade",
     slug: "avatrade",
     logoPath: "/logos/avatrade-logo.svg",
+    logoDomain: "avatrade.com",
     relationshipType: "affiliate",
     affiliateUrl: "https://www.avatrade.com?tag=222519",
     disclosureRequired: true,
@@ -416,6 +423,7 @@ export const brokers: BrokerConfig[] = [
     name: "TradingView",
     slug: "tradingview",
     logoPath: "/logos/tradingview-logo.svg",
+    logoDomain: "tradingview.com",
     relationshipType: "affiliate",
     affiliateUrl: "https://www.tradingview.com/?aff_id=169003",
     disclosureRequired: true,

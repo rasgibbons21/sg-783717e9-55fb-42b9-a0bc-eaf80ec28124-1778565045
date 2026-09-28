@@ -17,6 +17,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { trackBrokerClick } from "@/lib/analytics";
 import type { BrokerConfig } from "@/config/brokers";
 
+const logoDevKey = process.env.NEXT_PUBLIC_LOGO_DEV_KEY?.trim();
+
+function brokerLogoUrl(broker: BrokerConfig): string {
+  if (logoDevKey && broker.logoDomain) {
+    return `https://img.logo.dev/${broker.logoDomain}?token=${logoDevKey}&size=64&format=png`;
+  }
+  return broker.logoPath;
+}
+
 interface BrokerCardProps {
   broker: BrokerConfig;
   isSaved?: boolean;
@@ -84,11 +93,16 @@ export default function BrokerCard({
           <div className="flex items-center gap-3 min-w-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={broker.logoPath}
+              src={brokerLogoUrl(broker)}
               alt={broker.name}
-              className="h-10 w-10 object-contain shrink-0"
+              className="h-10 w-10 object-contain shrink-0 rounded-lg"
               onError={(e) => {
-                e.currentTarget.style.display = "none";
+                const el = e.currentTarget;
+                if (el.src !== broker.logoPath) {
+                  el.src = broker.logoPath;
+                } else {
+                  el.style.display = "none";
+                }
               }}
             />
             <div className="min-w-0">
