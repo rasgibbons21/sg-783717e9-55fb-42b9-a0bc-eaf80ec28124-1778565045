@@ -34,7 +34,7 @@
     },
     {
       "path": "/api/cron/signal-alerts",
-      "schedule": "0 13-20 * * 1-5"
+      "schedule": "*/5 13-20 * * 1-5"
     }
   ]
 }
