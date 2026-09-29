@@ -24,7 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const toStr = to.toISOString().slice(0, 10);
 
   try {
-    const url = `https://financialmodelingprep.com/stable/earning-calendar?from=${from}&to=${toStr}&apikey=${fmpKey}`;
+    const url = `https://financialmodelingprep.com/stable/earnings-calendar?from=${from}&to=${toStr}&apikey=${fmpKey}`;
     const r = await fetch(url, { signal: AbortSignal.timeout(10_000) });
     if (!r.ok) return res.status(502).json({ error: `FMP returned ${r.status}` });
 

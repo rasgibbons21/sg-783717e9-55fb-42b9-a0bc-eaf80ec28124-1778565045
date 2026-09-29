@@ -308,7 +308,7 @@ export async function fetchEarningsToday(fmpKey?: string): Promise<Set<string>> 
   try {
     const today = new Date().toISOString().slice(0, 10);
     const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
-    const url = `https://financialmodelingprep.com/stable/earning-calendar?from=${yesterday}&to=${today}&apikey=${fmpKey}`;
+    const url = `https://financialmodelingprep.com/stable/earnings-calendar?from=${yesterday}&to=${today}&apikey=${fmpKey}`;
     const res = await fetch(url, { signal: abortAfter(TIMEOUT) });
     if (!res.ok) return new Set();
     const data: Array<{ symbol?: string }> = await res.json();
