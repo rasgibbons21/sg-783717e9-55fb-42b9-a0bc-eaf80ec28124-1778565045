@@ -17,6 +17,9 @@ interface Article {
   publishedAt: string;
   category: string;
   symbols: string[];
+  sentiment?: "Bullish" | "Bearish" | "Neutral";
+  sentimentScore?: number;
+  topics?: string[];
 }
 
 function timeAgo(ts: string): string {
@@ -49,6 +52,26 @@ function categorizeSector(a: Article): string {
   return "general";
 }
 
+const SENTIMENT_STYLE: Record<string, { bg: string; color: string; label: string }> = {
+  Bullish: { bg: "rgba(73,176,110,0.15)", color: "#49B06E", label: "Bullish" },
+  Bearish: { bg: "rgba(239,68,68,0.15)", color: "#EF4444", label: "Bearish" },
+  Neutral: { bg: "rgba(255,255,255,0.06)", color: "rgba(243,237,227,0.45)", label: "Neutral" },
+};
+
+function SentimentBadge({ sentiment }: { sentiment?: string }) {
+  if (!sentiment || sentiment === "Neutral") return null;
+  const s = SENTIMENT_STYLE[sentiment];
+  if (!s) return null;
+  return (
+    <span
+      className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
+      style={{ background: s.bg, color: s.color }}
+    >
+      {s.label}
+    </span>
+  );
+}
+
 function NewsCard({ article, featured }: { article: Article; featured?: boolean }) {
   if (featured) {
     return (
@@ -77,6 +100,7 @@ function NewsCard({ article, featured }: { article: Article; featured?: boolean 
             <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full" style={{ background: "rgba(39,183,200,0.15)", color: "#27B7C8" }}>
               {article.source}
             </span>
+            <SentimentBadge sentiment={article.sentiment} />
             <span className="text-[10px] text-[#F3EDE3]/30">{timeAgo(article.publishedAt)}</span>
           </div>
           <h3 className="text-base font-bold text-[#F3EDE3] leading-snug mb-2 line-clamp-2">
@@ -130,6 +154,14 @@ function NewsCard({ article, featured }: { article: Article; featured?: boolean 
             <span className="font-medium">{article.source}</span>
             <span>&middot;</span>
             <span>{timeAgo(article.publishedAt)}</span>
+            {article.sentiment && article.sentiment !== "Neutral" && (
+              <>
+                <span>&middot;</span>
+                <span style={{ color: article.sentiment === "Bullish" ? "#49B06E" : "#EF4444", fontWeight: 700 }}>
+                  {article.sentiment}
+                </span>
+              </>
+            )}
           </div>
           <ExternalLink className="w-3 h-3" />
         </div>
@@ -274,7 +306,7 @@ export default function NewsPage() {
         {/* Disclaimer */}
         <div className="rounded-xl p-3 mt-6" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
           <p className="text-[10px] text-[#F3EDE3]/30 leading-relaxed">
-            News sourced from licensed APIs (Finnhub, FMP). Headlines and summaries are provided as-is. Not investment advice.
+            News sourced from licensed APIs (Finnhub, FMP, Alpha Vantage). Sentiment labels are AI-generated and may not reflect actual market conditions. Not investment advice.
           </p>
         </div>
       </div>
