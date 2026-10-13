@@ -215,11 +215,11 @@ function ProGate() {
       {canShowExternalPayment ? (
         <>
           <p className="text-sm text-[#F4F7FA]/50 mb-6 max-w-xs">
-            Progression, missions, and discipline tracking are available to Pro subscribers.
+            Sign up free to access progression, missions, and discipline tracking.
           </p>
-          <Link href="/subscription-offer"
+          <Link href="/onboarding"
             className="px-6 py-3 rounded-xl bg-[#27B7C8] text-[#0E1B30] font-semibold text-sm hover:bg-[#27B7C8]/90 transition-colors">
-            Upgrade to Pro
+            Start Free
           </Link>
         </>
       ) : (

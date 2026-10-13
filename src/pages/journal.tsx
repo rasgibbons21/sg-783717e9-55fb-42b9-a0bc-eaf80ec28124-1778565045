@@ -293,15 +293,15 @@ function ProGate() {
   return (
     <div className="flex flex-col items-center justify-center py-20 text-center">
       <Lock className="w-10 h-10 text-[#27B7C8]/40 mb-4" />
-      <h2 className="font-serif text-xl font-bold text-[#F4F7FA] mb-2">Pro Feature</h2>
+      <h2 className="font-serif text-xl font-bold text-[#F4F7FA] mb-2">Trade Journal</h2>
       {canShowExternalPayment ? (
         <>
           <p className="text-sm text-[#F4F7FA]/50 mb-6 max-w-xs">
-            The Trade Journal is available to Pro subscribers. Upgrade to track your process and build better habits.
+            Sign up free to access the Trade Journal — track your process and build better habits.
           </p>
-          <Link href="/subscription-offer"
+          <Link href="/onboarding"
             className="px-6 py-3 rounded-xl bg-[#27B7C8] text-[#0E1B30] font-semibold text-sm hover:bg-[#27B7C8]/90 transition-colors">
-            Upgrade to Pro
+            Start Free
           </Link>
         </>
       ) : (

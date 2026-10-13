@@ -85,7 +85,7 @@ export default function DailyBloom({ briefing, briefingDate, featuredLesson }: P
         <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet" />
       </Head>
 
-      <SEO title="Daily Bloom — Daily Market Briefing & Investing Lesson" description="Get your daily market summary, investing lesson, and wealth-building habit from Pansy. Stay on top of stocks, sectors, and economic news in plain English. Free daily financial education for women." />
+      <SEO title="Daily Bloom — Daily Market Briefing & Investing Lesson" description="Get your daily market summary, investing lesson, and wealth-building habit from Pansy. Stay on top of stocks, sectors, and economic news in plain English. Free daily financial education." />
 
       <div style={{ fontFamily: "'DM Sans', sans-serif", background: C.deep, color: C.ivory, minHeight: "100vh", display: "flex", flexDirection: "column" }}>
 

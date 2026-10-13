@@ -233,7 +233,7 @@ export const pansyAnalysisService = {
       else if (nearLow) priceContext = "It's near its 30 day low, which could be a discount opportunity if you believe in the company.";
       else priceContext = "It's trading right in the middle of its recent range.";
 
-      const prompt = `You are Pansy, Bloom's investing expert. Write a 3 paragraph analysis in your warm girlfriend tone about ${ticker}.
+      const prompt = `You are Pansy, Bloom's investing expert. Write a 3 paragraph analysis in your warm, friendly tone about ${ticker}.
 
 Use this REAL market data in your analysis. You MUST reference these numbers naturally like a friend talking:
 - The stock has been ${trendText} over the last 30 days.
@@ -348,7 +348,7 @@ FUNDAMENTALS: ${fundamentalsContext}
 CHART PATTERN: ${chartContext}
 ${sectorContext ? `SECTOR DATA: ${sectorContext}` : ''}
 
-Write a 3 paragraph analysis in your warm girlfriend tone. 
+Write a 3 paragraph analysis in your warm, friendly tone.
 Paragraph 1 — what is happening with this stock right now in plain language.
 Paragraph 2 — what the data and news are suggesting without using any financial jargon.
 Paragraph 3 — what makes sense here based on everything you are seeing (never say buy/sell/hold).
@@ -383,7 +383,7 @@ End with: "This is just educational info — not financial advice. Always invest
     etfTicker: string
   ): Promise<string> => {
     try {
-      const prompt = `You are Pansy, Bloom's investing expert with a warm girlfriend tone. A news headline just came out related to the ${sector} sector, which is one of the main sectors in the ${etfTicker} ETF.
+      const prompt = `You are Pansy, Bloom's investing expert with a warm, friendly tone. A news headline just came out related to the ${sector} sector, which is one of the main sectors in the ${etfTicker} ETF.
 Headline: "${headline}"
 Write ONE casual sentence (15-25 words max) explaining how this news might affect the ${sector} companies inside this ETF. Keep it conversational, honest, and use light emojis naturally. Never use jargon. Just one sentence.`;
 
@@ -470,10 +470,10 @@ ${userContext}
 
 Please provide:
 1. **Why This ETF / Investment** (1-2 sentences on what's happening with this investment right now based on your web search)
-2. **Portfolio Role** — Is this a good area to start a position, how does it fit with other investments, and should she wait? Use web search to check current market conditions.
+2. **Portfolio Role** — Is this a good area to start a position, how does it fit with other investments, and should you wait? Use web search to check current market conditions.
 3. **Risks to Know** — What's the main risk to watch?
 
-Use web search to get the latest data and performance metrics. Sound like a knowledgeable girlfriend giving real talk, not a robot reading data.`;
+Use web search to get the latest data and performance metrics. Sound like a knowledgeable friend giving real talk, not a robot reading data.`;
 
       const response = await fetch("/api/analyze", {
         method: "POST",

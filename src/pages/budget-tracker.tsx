@@ -321,7 +321,7 @@ export default function BudgetTracker() {
 
   return (
     <Layout>
-      <SEO title="Free Budget Tracker for Women — Track Spending | Bloom" description="Track your income and expenses by category with Pansy's smart insights. See monthly spending breakdowns, set budget goals, and find hidden savings. Free budgeting tool designed for women." />
+      <SEO title="Free Budget Tracker — Track Spending | Bloom" description="Track your income and expenses by category with Pansy's smart insights. See monthly spending breakdowns, set budget goals, and find hidden savings. Free budgeting tool." />
 
       <div className="max-w-lg mx-auto px-4 py-6 space-y-5">
 
@@ -334,7 +334,7 @@ export default function BudgetTracker() {
           <div className="flex items-start gap-3">
             <div className="text-2xl shrink-0">🌺</div>
             <div>
-              <p className="text-sm font-bold text-foreground mb-1">Hey sis,</p>
+              <p className="text-sm font-bold text-foreground mb-1">Hey there,</p>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 Money comes in, money goes out. But do you <em>know</em> where it&apos;s going?
                 That&apos;s where this starts. Not fancy strategies. Just the truth.

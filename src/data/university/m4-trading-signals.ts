@@ -21,7 +21,7 @@ export interface UniversityLesson {
   sections: LessonSection[];
   diagram: string;
   quiz: QuizQuestion[];
-  girlToGirlTip: string;
+  pansyTip: string;
   videoSlot: null;
 }
 
@@ -98,7 +98,7 @@ export const M4_LESSONS: UniversityLesson[] = [
         explanation: "The EMA applies greater weighting to more recent prices, so it reacts faster to recent price changes than a simple moving average, which weights all periods equally."
       }
     ],
-    girlToGirlTip: "EMA crossovers are one of the first signals most traders learn — and then spend years learning not to over-rely on. The real skill is in recognizing which crossovers have context behind them: trending markets, expanding volume, and clean price structure. The crossovers that happen in the middle of noise are the ones that burn people. Patience with setups beats frequency every time. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
+    pansyTip: "EMA crossovers are one of the first signals most traders learn — and then spend years learning not to over-rely on. The real skill is in recognizing which crossovers have context behind them: trending markets, expanding volume, and clean price structure. The crossovers that happen in the middle of noise are the ones that burn people. Patience with setups beats frequency every time. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
   },
   {
     module: "m4-trading-signals",
@@ -172,7 +172,7 @@ export const M4_LESSONS: UniversityLesson[] = [
         explanation: "When price reclaims VWAP and then pulls back to retest it from above, a bounce off that retest suggests the level has flipped from resistance to support — a sign of genuine buying interest and a more reliable continuation signal."
       }
     ],
-    girlToGirlTip: "VWAP is one of those signals that separates day traders from swing traders — it is really at its best as an intraday tool. When traders talk about 'holding VWAP' or 'losing VWAP,' they are describing the session's tug-of-war in real time. Learning to watch how price reacts at VWAP — not just whether it touches it — is one of the more useful habits in reading intraday momentum. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
+    pansyTip: "VWAP is one of those signals that separates day traders from swing traders — it is really at its best as an intraday tool. When traders talk about 'holding VWAP' or 'losing VWAP,' they are describing the session's tug-of-war in real time. Learning to watch how price reacts at VWAP — not just whether it touches it — is one of the more useful habits in reading intraday momentum. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
   },
   {
     module: "m4-trading-signals",
@@ -246,7 +246,7 @@ export const M4_LESSONS: UniversityLesson[] = [
         explanation: "The invalidation level — where the idea is proven wrong — is when price makes a new high AND RSI also makes a new high at that point, which eliminates the divergence entirely and suggests the prior divergence was a temporary pause rather than a reversal signal."
       }
     ],
-    girlToGirlTip: "RSI divergence is one of those signals that sounds simple but takes real practice to use well. The trap most people fall into is seeing divergence and immediately thinking 'reversal incoming' — but momentum can be wrong for a long time during strong trends. The real skill is treating divergence as a heads-up, not a signal, and waiting for price to actually confirm the story before doing anything with that information. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
+    pansyTip: "RSI divergence is one of those signals that sounds simple but takes real practice to use well. The trap most people fall into is seeing divergence and immediately thinking 'reversal incoming' — but momentum can be wrong for a long time during strong trends. The real skill is treating divergence as a heads-up, not a signal, and waiting for price to actually confirm the story before doing anything with that information. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
   },
   {
     module: "m4-trading-signals",
@@ -320,7 +320,7 @@ export const M4_LESSONS: UniversityLesson[] = [
         explanation: "A bullish MACD crossover carries more weight when it occurs above the zero line (confirming overall positive momentum) and aligns with bullish price structure — such as price trading above key moving averages or breaking through resistance — rather than occurring in isolation."
       }
     ],
-    girlToGirlTip: "MACD is one of those indicators that looks incredibly useful until you realize it is just a lagged momentum tool that tells you what already happened. That is not a knock on it — it is a reminder of how to use it. The real value of a MACD crossover is as a confirmation tool, not a prediction tool. It is most helpful when it confirms something you are already seeing in price structure. On its own, it will generate signals that go nowhere more often than you'd expect. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
+    pansyTip: "MACD is one of those indicators that looks incredibly useful until you realize it is just a lagged momentum tool that tells you what already happened. That is not a knock on it — it is a reminder of how to use it. The real value of a MACD crossover is as a confirmation tool, not a prediction tool. It is most helpful when it confirms something you are already seeing in price structure. On its own, it will generate signals that go nowhere more often than you'd expect. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
   },
   {
     module: "m4-trading-signals",
@@ -394,7 +394,7 @@ export const M4_LESSONS: UniversityLesson[] = [
         explanation: "Buying on the retest of prior resistance (now flipped to support) typically offers a closer invalidation level — a close back below the retest level invalidates the trade — and avoids the risk of chasing price that is already extended above resistance with no logical stopping point nearby."
       }
     ],
-    girlToGirlTip: "The breakout trap is real, and it gets a lot of people. You see price punch through a level you've been watching, the chart looks exciting, volume is there — and by the time you're in, the move has already happened and a pullback is coming. The best lesson here is that patience on a retest, if it comes, tends to give a much cleaner risk structure than buying the surge. Not every breakout retests, but the ones that do and hold tell a really clear story. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
+    pansyTip: "The breakout trap is real, and it gets a lot of people. You see price punch through a level you've been watching, the chart looks exciting, volume is there — and by the time you're in, the move has already happened and a pullback is coming. The best lesson here is that patience on a retest, if it comes, tends to give a much cleaner risk structure than buying the surge. Not every breakout retests, but the ones that do and hold tell a really clear story. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
   },
   {
     module: "m4-trading-signals",
@@ -468,7 +468,7 @@ export const M4_LESSONS: UniversityLesson[] = [
         explanation: "Dow Theory treats a break below the prior higher low as a warning that the uptrend's defining structure has been compromised. It signals the need to reassess whether the trend is still intact — not necessarily a confirmed reversal, but a meaningful change in the structural picture."
       }
     ],
-    girlToGirlTip: "Higher highs and higher lows sounds almost too simple to be useful — but this is honestly one of the most overlooked skills in reading charts. Before any other indicator, ask: is this asset still making higher highs and higher lows? If yes, you're looking at trend-aligned setups. If no, you need to ask why. A lot of pain comes from holding through the first violated higher low because 'the trend should continue.' The structure is the signal. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
+    pansyTip: "Higher highs and higher lows sounds almost too simple to be useful — but this is honestly one of the most overlooked skills in reading charts. Before any other indicator, ask: is this asset still making higher highs and higher lows? If yes, you're looking at trend-aligned setups. If no, you need to ask why. A lot of pain comes from holding through the first violated higher low because 'the trend should continue.' The structure is the signal. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
   },
   {
     module: "m4-trading-signals",
@@ -542,7 +542,7 @@ export const M4_LESSONS: UniversityLesson[] = [
         explanation: "The invalidation level — where the trend continuation idea is proven wrong — is a decisive close below the support level being tested. This would indicate the pullback has become a deeper move that breaks the trend's support structure, suggesting the reversal possibility is more likely than continuation."
       }
     ],
-    girlToGirlTip: "The best entries in a trend often feel the most uncomfortable — the pullback looks scary, doubts creep in, and it seems like the trend might be done. That is often where the continuation setup is forming. The traders who can stay calm and wait for confirmation at those levels, rather than chasing the trend at its peak or panicking at the pullback, tend to get much better positioning. Patience during the pullback is an underrated skill. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
+    pansyTip: "The best entries in a trend often feel the most uncomfortable — the pullback looks scary, doubts creep in, and it seems like the trend might be done. That is often where the continuation setup is forming. The traders who can stay calm and wait for confirmation at those levels, rather than chasing the trend at its peak or panicking at the pullback, tend to get much better positioning. Patience during the pullback is an underrated skill. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
   },
   {
     module: "m4-trading-signals",
@@ -616,7 +616,7 @@ export const M4_LESSONS: UniversityLesson[] = [
         explanation: "The invalidation level — where the reversal idea is proven wrong — is a close back below the structural level that was supposed to mark the turn. This would suggest the signal was a failed reversal (sometimes called a bear trap) rather than a genuine change in trend."
       }
     ],
-    girlToGirlTip: "The instinct to call a bottom is strong — everyone wants to be the person who bought at the low. But the traders who consistently try to do this tend to accumulate losses buying into downtrends that have more to go. The more sustainable approach is letting the structure tell you when it has actually changed, and accepting that you will always miss the very bottom. Missing the first 10–20% of a reversal move is a completely acceptable trade-off for having structural confirmation. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
+    pansyTip: "The instinct to call a bottom is strong — everyone wants to be the person who bought at the low. But the traders who consistently try to do this tend to accumulate losses buying into downtrends that have more to go. The more sustainable approach is letting the structure tell you when it has actually changed, and accepting that you will always miss the very bottom. Missing the first 10–20% of a reversal move is a completely acceptable trade-off for having structural confirmation. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
   },
   {
     module: "m4-trading-signals",
@@ -690,7 +690,7 @@ export const M4_LESSONS: UniversityLesson[] = [
         explanation: "The invalidation level for a false breakout reversal trade is when price reclaims the resistance level convincingly on a close and sustains it — this would suggest the apparent false breakout was actually a genuine shakeout before a real breakout, not a trap."
       }
     ],
-    girlToGirlTip: "False breakouts are honestly one of the most common ways people get burned — and the frustrating part is that they are often designed to look exactly like the real thing at first glance. The discipline to wait for candle closes instead of chasing the in-progress spike is something that takes real practice to build. When a breakout reverses quickly and with volume, that reversal is often its own setup. The people who got trapped become your tailwind. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
+    pansyTip: "False breakouts are honestly one of the most common ways people get burned — and the frustrating part is that they are often designed to look exactly like the real thing at first glance. The discipline to wait for candle closes instead of chasing the in-progress spike is something that takes real practice to build. When a breakout reverses quickly and with volume, that reversal is often its own setup. The people who got trapped become your tailwind. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
   }
 ];
 

@@ -89,7 +89,7 @@ export const M10_LESSONS: UniversityLesson[] = [
         explanation: "The most common mistake is reacting to the engulfing shape alone without considering location or waiting for confirmation. A bullish engulfing mid-downtrend with no support nearby and no follow-through candle is just a strong day in a continuing downtrend."
       }
     ],
-    girlToGirlTip: "One strong candle is buyers raising their hand, not winning the vote. Let the next candle second the motion before you believe it. Educational only. Not financial advice. No candlestick guarantees a move — they fail constantly and only matter in context."
+    pansyTip: "One strong candle is buyers raising their hand, not winning the vote. Let the next candle second the motion before you believe it. Educational only. Not financial advice. No candlestick guarantees a move — they fail constantly and only matter in context."
   },
 
   // ─── 2. Bearish Engulfing ─────────────────────────────────────────────────
@@ -180,7 +180,7 @@ export const M10_LESSONS: UniversityLesson[] = [
         explanation: "Two criteria must both be met: the body must completely engulf the prior candle, and it must appear somewhere meaningful (top of trend, resistance). A large red candle in a random location or one that doesn't fully cover the prior body is not the pattern."
       }
     ],
-    girlToGirlTip: "Engulfing candles are loud, and loud isn't always right. Context (where it happens) decides whether it's a real warning or just noise. Educational only. Not financial advice. No candlestick guarantees a move — they fail constantly and only matter in context."
+    pansyTip: "Engulfing candles are loud, and loud isn't always right. Context (where it happens) decides whether it's a real warning or just noise. Educational only. Not financial advice. No candlestick guarantees a move — they fail constantly and only matter in context."
   },
 
   // ─── 3. Hammer ───────────────────────────────────────────────────────────
@@ -271,7 +271,7 @@ export const M10_LESSONS: UniversityLesson[] = [
         explanation: "A hammer is a clue, not a confirmed signal. Traders look for the next candle to show upside follow-through — closing higher, confirming that buyers didn't just create a one-session spike but are actually taking control."
       }
     ],
-    girlToGirlTip: "That long lower wick is the candle saying \"we tried to go lower and got shoved back.\" Listen to where it's saying it. Educational only. Not financial advice. No candlestick guarantees a move — they fail constantly and only matter in context."
+    pansyTip: "That long lower wick is the candle saying \"we tried to go lower and got shoved back.\" Listen to where it's saying it. Educational only. Not financial advice. No candlestick guarantees a move — they fail constantly and only matter in context."
   },
 
   // ─── 4. Hanging Man ───────────────────────────────────────────────────────
@@ -362,7 +362,7 @@ export const M10_LESSONS: UniversityLesson[] = [
         explanation: "The hanging man is the clearest example of why context is everything in candlestick analysis. The identical shape — same body size, same wick — means opposite things depending purely on where in the trend it appears."
       }
     ],
-    girlToGirlTip: "This is the candle that proves context is king. The exact same shape means \"bounce\" at a bottom and \"be careful\" at a top. Educational only. Not financial advice. No candlestick guarantees a move — they fail constantly and only matter in context."
+    pansyTip: "This is the candle that proves context is king. The exact same shape means \"bounce\" at a bottom and \"be careful\" at a top. Educational only. Not financial advice. No candlestick guarantees a move — they fail constantly and only matter in context."
   },
 
   // ─── 5. Shooting Star ────────────────────────────────────────────────────
@@ -453,7 +453,7 @@ export const M10_LESSONS: UniversityLesson[] = [
         explanation: "Context is essential. A shooting star is a potential reversal signal — you need an uptrend to reverse. The same candle shape mid-downtrend or in a sideways market is not a shooting star; it's just a candle with a long upper wick."
       }
     ],
-    girlToGirlTip: "Hammer = long wick down at a bottom. Shooting star = long wick up at a top. Same idea (rejection), flipped. Educational only. Not financial advice. No candlestick guarantees a move — they fail constantly and only matter in context."
+    pansyTip: "Hammer = long wick down at a bottom. Shooting star = long wick up at a top. Same idea (rejection), flipped. Educational only. Not financial advice. No candlestick guarantees a move — they fail constantly and only matter in context."
   },
 
   // ─── 6. Doji ─────────────────────────────────────────────────────────────
@@ -544,7 +544,7 @@ export const M10_LESSONS: UniversityLesson[] = [
         explanation: "Most doji candles are just quiet sessions — a breather with no special meaning. Treating every one as a reversal leads to reacting to noise. The rare meaningful doji appears at a trend extreme with context to support the interpretation."
       }
     ],
-    girlToGirlTip: "A doji after a long strong run is the market catching its breath. Worth a glance — not worth a panic. Educational only. Not financial advice. No candlestick guarantees a move — they fail constantly and only matter in context."
+    pansyTip: "A doji after a long strong run is the market catching its breath. Worth a glance — not worth a panic. Educational only. Not financial advice. No candlestick guarantees a move — they fail constantly and only matter in context."
   },
 
   // ─── 7. Morning Star ──────────────────────────────────────────────────────
@@ -635,7 +635,7 @@ export const M10_LESSONS: UniversityLesson[] = [
         explanation: "The third candle — the large green one — is the confirmation that makes the pattern. Calling a morning star after just the red candle and the star is premature; the market could continue lower. The green candle's appearance and strength is what confirms the potential turn."
       }
     ],
-    girlToGirlTip: "Three candles telling one story is more trustworthy than one candle shouting. Patterns that take their time tend to mean more. Educational only. Not financial advice. No candlestick guarantees a move — they fail constantly and only matter in context."
+    pansyTip: "Three candles telling one story is more trustworthy than one candle shouting. Patterns that take their time tend to mean more. Educational only. Not financial advice. No candlestick guarantees a move — they fail constantly and only matter in context."
   },
 
   // ─── 8. Evening Star ─────────────────────────────────────────────────────
@@ -726,7 +726,7 @@ export const M10_LESSONS: UniversityLesson[] = [
         explanation: "The pattern is not complete until the third red candle forms and confirms seller control. Acting after just the green candle and the star is premature — the market has only paused, not confirmed a reversal."
       }
     ],
-    girlToGirlTip: "Morning star at the bottom, evening star at the top — like sunrise and sunset for a trend. Same structure, opposite ends. Educational only. Not financial advice. No candlestick guarantees a move — they fail constantly and only matter in context."
+    pansyTip: "Morning star at the bottom, evening star at the top — like sunrise and sunset for a trend. Same structure, opposite ends. Educational only. Not financial advice. No candlestick guarantees a move — they fail constantly and only matter in context."
   },
 
   // ─── 9. Marubozu ─────────────────────────────────────────────────────────
@@ -817,7 +817,7 @@ export const M10_LESSONS: UniversityLesson[] = [
         explanation: "Strong conviction can look identical to emotional exhaustion at the extremes. A giant green marubozu after a long run might represent the last wave of buyers piling in — climactic buying that exhausts demand. Conviction and overextension can look the same on the candle."
       }
     ],
-    girlToGirlTip: "A wickless candle is the market with zero hesitation. Powerful — but even confident moves run out of road. Educational only. Not financial advice. No candlestick guarantees a move — they fail constantly and only matter in context."
+    pansyTip: "A wickless candle is the market with zero hesitation. Powerful — but even confident moves run out of road. Educational only. Not financial advice. No candlestick guarantees a move — they fail constantly and only matter in context."
   },
 
   // ─── 10. Spinning Top ────────────────────────────────────────────────────
@@ -908,7 +908,7 @@ export const M10_LESSONS: UniversityLesson[] = [
         explanation: "After a run of strong directional candles, a spinning top signals that the one-sided force has at least paused. Both sides showed up and neither dominated — this can hint at fading momentum, though by itself it's just a clue, not a conclusion."
       }
     ],
-    girlToGirlTip: "Doji and spinning top are both \"the market can't decide.\" When indecision shows up after a big run, that's when you lean in and watch. Educational only. Not financial advice. No candlestick guarantees a move — they fail constantly and only matter in context."
+    pansyTip: "Doji and spinning top are both \"the market can't decide.\" When indecision shows up after a big run, that's when you lean in and watch. Educational only. Not financial advice. No candlestick guarantees a move — they fail constantly and only matter in context."
   },
 
   // ─── 11. Three White Soldiers ─────────────────────────────────────────────
@@ -999,7 +999,7 @@ export const M10_LESSONS: UniversityLesson[] = [
         explanation: "By the third candle, the pattern is already visible to everyone watching — which means many traders are simultaneously reacting. The easiest part of the move happened in candles one and two. Entering the third candle means paying up for confirmation and accepting more risk."
       }
     ],
-    girlToGirlTip: "Strength is beautiful until it's too much too fast. Three strong candles is conviction; five or six straight is often the crowd arriving late. Educational only. Not financial advice. No candlestick guarantees a move — they fail constantly and only matter in context."
+    pansyTip: "Strength is beautiful until it's too much too fast. Three strong candles is conviction; five or six straight is often the crowd arriving late. Educational only. Not financial advice. No candlestick guarantees a move — they fail constantly and only matter in context."
   },
 
   // ─── 12. Three Black Crows ────────────────────────────────────────────────
@@ -1090,7 +1090,7 @@ export const M10_LESSONS: UniversityLesson[] = [
         explanation: "Three black crows after an uptrend is a potential reversal signal — sustained selling across three sessions where buyers offered little resistance can indicate a shift in control. Like all patterns, context, volume, and what comes next determine how seriously to take it."
       }
     ],
-    girlToGirlTip: "Whether it's soldiers or crows, three-in-a-row is a strong story — just remember the strongest part of a move is often the part everyone can already see. Educational only. Not financial advice. No candlestick guarantees a move — they fail constantly and only matter in context."
+    pansyTip: "Whether it's soldiers or crows, three-in-a-row is a strong story — just remember the strongest part of a move is often the part everyone can already see. Educational only. Not financial advice. No candlestick guarantees a move — they fail constantly and only matter in context."
   },
 ];
 

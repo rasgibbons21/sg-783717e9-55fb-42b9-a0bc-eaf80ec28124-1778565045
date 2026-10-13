@@ -93,7 +93,7 @@ export default function AskPansyPage() {
 
   return (
     <Layout>
-      <SEO title="Ask Pansy — Free AI Financial Guide for Women | Bloom" description="Ask Pansy anything about investing, budgeting, stocks, side hustles, or personal finance. She explains complex money topics in plain language — like a smart friend who happens to know about money." />
+      <SEO title="Ask Pansy — Free AI Financial Guide | Bloom" description="Ask Pansy anything about investing, budgeting, stocks, side hustles, or personal finance. Complex money topics explained in plain language — like a smart friend who happens to know about money." />
 
       <div className="mx-auto flex h-[calc(100vh-8rem)] max-w-3xl flex-col px-4 py-6">
         {/* Header */}
@@ -117,7 +117,7 @@ export default function AskPansyPage() {
                 </div>
                 <Card className="flex-1 border-primary/20 bg-primary/5 p-3">
                   <p className="text-sm text-foreground">
-                    Hey love 🌸 Ask me anything. If it&apos;s about money or the markets, I&apos;ll point you to exactly where to learn it across the She Blooms Wealth family. Pick a starter below or type your own.
+                    Hey 🌿 Ask me anything. If it&apos;s about money or the markets, I&apos;ll point you to exactly where to learn it across Bloom. Pick a starter below or type your own.
                   </p>
                 </Card>
               </div>

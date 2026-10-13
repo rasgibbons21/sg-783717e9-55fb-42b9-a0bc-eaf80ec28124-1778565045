@@ -14,9 +14,9 @@ const SITE_URL = "https://shebloomswealth.app";
 const SITE_NAME = "She Blooms Wealth";
 
 const defaultSEO = {
-  title: "She Blooms Wealth — Free Financial Education for Women",
+  title: "Bloom — Learn Money and Investing from Zero. Free.",
   description:
-    "Learn investing, budgeting, and side hustles with Pansy, your friendly AI guide. 150+ plain-language lessons, paper trading simulator, budget tracker, and certificate. Built for women. No jargon.",
+    "Learn investing, budgeting, and side hustles with Pansy, your friendly guide. 150+ plain-language lessons, paper trading simulator, budget tracker, and certificate. No jargon.",
   image: `${SITE_URL}/og-image.jpg`,
   url: SITE_URL,
 };

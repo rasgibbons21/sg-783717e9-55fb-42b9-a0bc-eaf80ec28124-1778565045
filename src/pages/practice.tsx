@@ -4,12 +4,13 @@ import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import type { GetServerSideProps } from "next";
 import Head from "next/head";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { Layout } from "@/components/Layout";
 import { OrderTicket } from "@/components/OrderTicket";
 import { ActiveTradeCard } from "@/components/ActiveTradeCard";
+import { TickerMark } from "@/components/TickerMark";
 import { RiskRewardCalculator } from "@/components/RiskRewardCalculator";
 import { PositionSizeCalculator } from "@/components/PositionSizeCalculator";
-import { requireProUserSSR } from "@/lib/requireProUserSSR";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { supabase } from "@/integrations/supabase/client";
 import { marketService } from "@/services/marketService";
@@ -472,10 +473,7 @@ function MarketsPanel({ quotes }: { quotes: MarketQuote[] }) {
           quotes.map(q => (
             <Link key={q.ticker} href={`/stock/${q.ticker}`}
               className="flex items-center gap-3 py-2.5 px-2 rounded-lg transition-colors hover:bg-white/[0.03] cursor-pointer">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0"
-                style={{ background: C.accentDim, color: C.accent }}>
-                {q.ticker.slice(0, 2)}
-              </div>
+              <TickerMark ticker={q.ticker} size="md" />
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-medium truncate" style={{ color: C.text }}>{q.ticker}</p>
                 <p className="text-[10px] truncate" style={{ color: C.textMuted }}>{q.name}</p>
@@ -816,6 +814,7 @@ function ProUpsellBanner() {
 // ── MAIN PAGE ─────────────────────────────────────────────────────────────
 // ══════════════════════════════════════════════════════════════════════════
 export default function PracticePage(_props: PageProps) {
+  const router = useRouter();
   const { isPro, isTrial, trialDaysLeft, isLoading: authLoading, isLoggedIn } = useSubscription();
   const showAds = !isPro;
 
@@ -908,7 +907,12 @@ export default function PracticePage(_props: PageProps) {
 
   useEffect(() => {
     if (!authLoading && isLoggedIn) { loadData(); loadMarketQuotes(); loadLeaderboard(); }
-    else if (!authLoading && !isLoggedIn) setLoading(false);
+    else if (!authLoading && !isLoggedIn) {
+      setAccount({ id: "demo", cash_balance: 100000, initial_balance: 100000, created_at: new Date().toISOString() });
+      setTrades([]);
+      setLoading(false);
+      loadMarketQuotes();
+    }
   }, [authLoading, isLoggedIn, loadData, loadMarketQuotes, loadLeaderboard]);
 
   useEffect(() => {
@@ -983,6 +987,8 @@ export default function PracticePage(_props: PageProps) {
     setTrades(prev => prev.map(t => t.id === trade.id ? data.trade : t));
   };
 
+  const isDemo = !isLoggedIn && account?.id === "demo";
+  const hasAccess = isLoggedIn || isDemo;
   const showProUpsell = !authLoading && !isPro && isLoggedIn;
   const metrics = computeMetrics(account, trades);
 
@@ -1032,7 +1038,7 @@ export default function PracticePage(_props: PageProps) {
 
             {/* Right actions */}
             <div className="flex items-center gap-2 flex-shrink-0 ml-auto">
-              <button onClick={() => { setView("trades"); setShowOpenModal(true); }}
+              <button onClick={() => { if (isDemo) { router.push("/auth"); } else { setView("trades"); setShowOpenModal(true); } }}
                 className="hidden sm:flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold transition-all hover:brightness-110 active:scale-[0.98]"
                 style={{ background: C.accent, color: C.bg }}>
                 <Plus className="w-3.5 h-3.5" />
@@ -1051,7 +1057,7 @@ export default function PracticePage(_props: PageProps) {
             <main className="flex-1 min-w-0 p-4 lg:p-6 pb-24">
 
               {/* Loading */}
-              {(authLoading || (loading && isLoggedIn)) && (
+              {(authLoading || (loading && hasAccess)) && (
                 <div className="flex flex-col items-center justify-center py-20 gap-4">
                   <Loader2 className="w-8 h-8 animate-spin" style={{ color: C.accent }} />
                   <p className="text-sm" style={{ color: C.textDim }}>Loading your portfolio...</p>
@@ -1077,8 +1083,13 @@ export default function PracticePage(_props: PageProps) {
                 </div>
               )}
 
-              {/* ── Trial Banner ──────────────────────────────────── */}
-              {isTrial && (
+              {/* Trial banner removed — app is 100% free */}
+
+              {/* ════════════════════════════════════════════════════ */}
+              {/* DASHBOARD VIEW                                      */}
+              {/* ════════════════════════════════════════════════════ */}
+              {/* Demo banner for logged-out users */}
+              {isDemo && (
                 <div className="rounded-xl px-4 py-3 mb-4 flex items-center justify-between" style={{
                   background: "linear-gradient(135deg, rgba(39,183,200,0.15), rgba(73,176,110,0.1))",
                   border: "1px solid rgba(39,183,200,0.3)",
@@ -1086,21 +1097,18 @@ export default function PracticePage(_props: PageProps) {
                   <div className="flex items-center gap-2">
                     <Sparkles className="w-4 h-4" style={{ color: C.accent }} />
                     <span className="text-sm" style={{ color: C.text }}>
-                      <span className="font-semibold">{trialDaysLeft} day{trialDaysLeft !== 1 ? "s" : ""}</span>
-                      <span style={{ color: C.textDim }}> left in your free trial</span>
+                      <span className="font-semibold">Demo mode</span>
+                      <span style={{ color: C.textDim }}> — sign up free to save your trades</span>
                     </span>
                   </div>
-                  <Link href="/subscription" className="text-xs font-semibold px-3 py-1.5 rounded-lg transition-all hover:brightness-110"
+                  <Link href="/auth" className="text-xs font-semibold px-3 py-1.5 rounded-lg transition-all hover:brightness-110"
                     style={{ background: C.accent, color: C.bg }}>
-                    Subscribe
+                    Sign Up Free
                   </Link>
                 </div>
               )}
 
-              {/* ════════════════════════════════════════════════════ */}
-              {/* DASHBOARD VIEW                                      */}
-              {/* ════════════════════════════════════════════════════ */}
-              {!authLoading && !loading && isLoggedIn && !error && view === "dashboard" && (
+              {!authLoading && !loading && hasAccess && !error && view === "dashboard" && (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
                   {/* ── Left Column ─────────────────────────────────── */}
@@ -1232,14 +1240,14 @@ export default function PracticePage(_props: PageProps) {
               {/* ════════════════════════════════════════════════════ */}
               {/* TRADES VIEW                                         */}
               {/* ════════════════════════════════════════════════════ */}
-              {!authLoading && !loading && isLoggedIn && !error && view === "trades" && (
+              {!authLoading && !loading && hasAccess && !error && view === "trades" && (
                 <div className="max-w-2xl">
                   {/* Open Position CTA */}
-                  <button onClick={() => setShowOpenModal(true)}
+                  <button onClick={() => { if (isDemo) { router.push("/auth"); } else { setShowOpenModal(true); } }}
                     className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-semibold mb-6 transition-all hover:brightness-110 active:scale-[0.98]"
                     style={{ background: C.accent, color: C.bg }}>
                     <Plus className="w-5 h-5" />
-                    Open New Position
+                    {isDemo ? "Sign Up to Start Trading" : "Open New Position"}
                   </button>
 
                   {/* Tabs */}
@@ -1311,7 +1319,7 @@ export default function PracticePage(_props: PageProps) {
               {/* ════════════════════════════════════════════════════ */}
               {/* LEADERBOARD VIEW                                     */}
               {/* ════════════════════════════════════════════════════ */}
-              {!authLoading && isLoggedIn && !error && view === "leaderboard" && (
+              {!authLoading && hasAccess && !error && view === "leaderboard" && (
                 <div className="max-w-2xl">
                   <div className="flex items-center gap-3 mb-6">
                     <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: C.accentDim }}>
@@ -1405,7 +1413,7 @@ export default function PracticePage(_props: PageProps) {
               )}
 
               {/* ── Trading Tools ─────────────────────────────────────── */}
-              {!authLoading && !loading && isLoggedIn && !error && view === "trades" && (
+              {!authLoading && !loading && hasAccess && !error && view === "trades" && (
                 <div className="max-w-2xl mt-8 space-y-6">
                   <RiskRewardCalculator />
                   <PositionSizeCalculator />
@@ -1413,14 +1421,14 @@ export default function PracticePage(_props: PageProps) {
               )}
 
               {/* ── Mobile FAB ──────────────────────────────────────── */}
-              <button onClick={() => { setView("trades"); setShowOpenModal(true); }}
+              <button onClick={() => { if (isDemo) { router.push("/auth"); } else { setView("trades"); setShowOpenModal(true); } }}
                 className="fixed bottom-24 right-5 z-30 w-14 h-14 rounded-full flex items-center justify-center shadow-xl sm:hidden transition-all hover:scale-105 active:scale-95"
                 style={{ background: C.accent, color: "#0a1e1e", boxShadow: `0 4px 20px rgba(39,183,200,0.3)` }}>
                 <Plus className="w-6 h-6" />
               </button>
 
               {/* Footer disclaimer */}
-              {!authLoading && !loading && isLoggedIn && !error && (
+              {!authLoading && !loading && hasAccess && !error && (
                 <div className="mt-10 text-center">
                   <p className="text-[10px] leading-relaxed max-w-md mx-auto" style={{ color: C.textMuted }}>
                     Bloom Practice Trader is an educational simulator. It does not execute real trades, connect to any broker, or involve real money. Past simulated performance does not predict real market results. Not financial advice.
@@ -1465,9 +1473,6 @@ export default function PracticePage(_props: PageProps) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-  const result = await requireProUserSSR(req as Parameters<typeof requireProUserSSR>[0]);
-  if (result.status === "not-pro") return { props: {} };
-  if (result.status === "unauthenticated") return { redirect: { destination: "/auth", permanent: false } };
-  return { props: { requiresClientAuth: result.status === "no-cookie" } };
+export const getServerSideProps: GetServerSideProps = async () => {
+  return { props: {} };
 };

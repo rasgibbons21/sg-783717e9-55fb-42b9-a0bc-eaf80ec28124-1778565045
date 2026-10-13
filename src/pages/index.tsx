@@ -5,7 +5,7 @@ import Image from "next/image";
 import Head from "next/head";
 import { supabase } from "@/integrations/supabase/client";
 import { SEO } from "@/components/SEO";
-import { ArrowRight, Share2, Smartphone, Plus } from "lucide-react";
+import { ArrowRight, Share2, Smartphone, Plus, BookOpen, DollarSign, BarChart3 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 
 /* ─── Palette ─────────────────────────────────────────────────────────────── */
@@ -130,6 +130,8 @@ function CandleBg() {
 export default function LandingPage() {
   const router = useRouter();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [platform, setPlatform] = useState<"ios" | "android" | "desktop">("desktop");
 
   useEffect(() => {
     (async () => {
@@ -141,6 +143,19 @@ export default function LandingPage() {
       setIsCheckingAuth(false);
     })();
   // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const ua = navigator.userAgent;
+    if (/iPad|iPhone|iPod/.test(ua)) setPlatform("ios");
+    else if (/Android/i.test(ua)) setPlatform("android");
+
+    const handler = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    window.addEventListener("beforeinstallprompt", handler);
+    return () => window.removeEventListener("beforeinstallprompt", handler);
   }, []);
 
   if (isCheckingAuth) {
@@ -163,8 +178,8 @@ export default function LandingPage() {
       <style>{KEYFRAMES}</style>
 
       <SEO
-        title="She Blooms Wealth — Free Financial Education for Women"
-        description="Learn investing, budgeting, side hustles, and trading strategies with Pansy, your friendly guide. 150+ plain-language lessons, paper trading simulator, budget tracker, and more. Built for women. No jargon."
+        title="Bloom — Learn Money and Investing from Zero. Free."
+        description="Learn investing, budgeting, side hustles, and trading strategies with Pansy, your friendly guide. Bite-size lessons, a budget tracker, and a practice trader with fake money. No jargon."
         jsonLd={{
           "@context": "https://schema.org",
           "@graph": [
@@ -174,7 +189,7 @@ export default function LandingPage() {
               name: "She Blooms Wealth",
               url: "https://shebloomswealth.app",
               logo: "https://shebloomswealth.app/bloom-logo.png",
-              description: "Financial education platform built for women — teaching investing, budgeting, and side hustles in plain language.",
+              description: "Financial education platform teaching investing, budgeting, and side hustles in plain language.",
               foundingDate: "2026",
               founder: { "@type": "Organization", name: "Cinder Vault Enterprises LLC" },
             },
@@ -185,11 +200,9 @@ export default function LandingPage() {
               applicationCategory: "FinanceApplication",
               operatingSystem: "Android, Web",
               offers: [
-                { "@type": "Offer", price: "0", priceCurrency: "USD", description: "Free tier with lessons, paper trading, and budget tracker" },
-                { "@type": "Offer", price: "7.99", priceCurrency: "USD", billingIncrement: "P1M", description: "Bloom Pro monthly" },
-                { "@type": "Offer", price: "49.99", priceCurrency: "USD", billingIncrement: "P1Y", description: "Bloom Pro yearly" },
+                { "@type": "Offer", price: "0", priceCurrency: "USD", description: "100% free — lessons, paper trading, and budget tracker" },
               ],
-              description: "Free financial education app for women. 150+ lessons on investing, budgeting, and side hustles. Paper trading simulator with $10K virtual money.",
+              description: "Free financial education app. 150+ lessons on investing, budgeting, and side hustles. Paper trading simulator with $10K virtual money.",
               url: "https://shebloomswealth.app",
               publisher: { "@id": "https://shebloomswealth.app/#organization" },
             },
@@ -246,16 +259,14 @@ export default function LandingPage() {
 
               <div style={{ marginBottom:"1.25rem", animation:"fade-up 0.55s ease-out 0.2s both" }}>
                 <h1 style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:"clamp(2.3rem, 5vw, 3.6rem)", fontWeight:700, lineHeight:1.12, letterSpacing:"-0.01em", color:C.ivory, margin:0 }}>
-                  Learn to build wealth
+                  Learn money and investing
                   <br />
-                  <span style={{ ...gradientText }}>from scratch.</span>
+                  <span style={{ ...gradientText }}>from zero. Free.</span>
                 </h1>
               </div>
 
               <p style={{ fontSize:"clamp(1rem, 1.9vw, 1.12rem)", lineHeight:1.72, color:"rgba(244,247,250,0.72)", maxWidth:480, marginBottom:"1.8rem", animation:"fade-up 0.55s ease-out 0.28s both" }}>
-                Bloom is a <strong style={{ color:C.ivory }}>free financial education app</strong> that teaches you investing,
-                budgeting, side hustles, and how money actually works. 150+ lessons from beginner to advanced.
-                Built for women. No jargon.
+                Bite-size lessons, a budget tracker, and a practice trader with fake money. No jargon.
               </p>
 
               <div style={{ display:"flex", gap:12, animation:"fade-up 0.55s ease-out 0.44s both" }}>
@@ -300,45 +311,96 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ── SHARE WITH QR CODE ──────────────────────────────────────────── */}
-        <section style={{ background:"rgba(22,38,74,0.45)", borderTop:"1px solid rgba(255,255,255,0.06)", borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
-          <div style={{ maxWidth:720, margin:"0 auto", padding:"3rem 1.5rem", textAlign:"center" }}>
-            <div style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"6px 14px", borderRadius:20, marginBottom:"1rem", background:`${C.teal}12`, border:`1px solid ${C.teal}25` }}>
-              <Share2 size={13} style={{ color:C.teal }} />
-              <span style={{ fontSize:12, fontWeight:700, color:C.teal, letterSpacing:"0.04em" }}>Share Bloom</span>
-            </div>
-
-            <h2 style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:"clamp(1.5rem, 3vw, 2rem)", fontWeight:700, color:C.ivory, marginBottom:"0.75rem" }}>
-              Know someone who needs this?
+        {/* ── WHAT'S INSIDE ────────────────────────────────────────────── */}
+        <section style={{ maxWidth:1200, margin:"0 auto", padding:"4rem 1.5rem 2rem" }}>
+          <div style={{ textAlign:"center", marginBottom:"3rem" }}>
+            <h2 style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:"clamp(1.8rem, 4vw, 2.5rem)", fontWeight:700, color:C.ivory, marginBottom:"0.75rem" }}>
+              What&apos;s inside <span style={gradientText}>Bloom</span>
             </h2>
-            <p style={{ fontSize:14, color:"rgba(244,247,250,0.55)", marginBottom:"2rem", maxWidth:420, margin:"0 auto 2rem" }}>
-              Scan the QR code or share the link to help a friend start their financial education journey.
+            <p style={{ fontSize:15, color:"rgba(244,247,250,0.55)", maxWidth:500, margin:"0 auto" }}>
+              Everything you need to go from zero to confident — free, no jargon, at your pace.
             </p>
+          </div>
 
-            <div style={{ display:"inline-block", padding:20, borderRadius:20, background:"white", boxShadow:"0 8px 40px rgba(0,0,0,0.3)" }}>
-              <QRCodeSVG
-                value="https://shebloomswealth.app"
-                size={180}
-                level="M"
-                fgColor={C.deep}
-                bgColor="white"
-                imageSettings={{
-                  src: "/bloom-logo.png",
-                  height: 36,
-                  width: 36,
-                  excavate: true,
-                }}
-              />
-            </div>
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(280px, 1fr))", gap:24 }}>
+            {[
+              {
+                title: "150+ Bite-size Lessons",
+                desc: "Stocks, ETFs, budgeting, side hustles, and more — each one takes 5 minutes.",
+                Icon: BookOpen,
+                color: C.teal,
+                rows: [
+                  { emoji:"📈", label:"What Is a Stock?", tag:"Beginner" },
+                  { emoji:"💰", label:"Your First Budget", tag:"Budgeting" },
+                  { emoji:"📊", label:"Reading a Chart", tag:"Trading" },
+                ],
+              },
+              {
+                title: "Paper Trading Simulator",
+                desc: "Practice buying and selling real stocks with $100K in fake money. Zero risk.",
+                Icon: BarChart3,
+                color: C.green,
+                rows: [
+                  { emoji:"🟢", label:"AAPL  +2.4%", tag:"$187.50" },
+                  { emoji:"🔴", label:"TSLA  −1.1%", tag:"$248.30" },
+                  { emoji:"🟢", label:"NVDA  +3.8%", tag:"$892.60" },
+                ],
+              },
+              {
+                title: "Budget Tracker",
+                desc: "Track where your money goes. Pansy walks you through every category.",
+                Icon: DollarSign,
+                color: "#D4A853",
+                rows: [
+                  { emoji:"🏠", label:"Housing", tag:"$1,200" },
+                  { emoji:"🛒", label:"Groceries", tag:"$340" },
+                  { emoji:"💳", label:"Subscriptions", tag:"$85" },
+                ],
+              },
+            ].map((feature) => (
+              <div key={feature.title} style={{ ...glass, borderRadius:24, overflow:"hidden", transition:"transform 0.2s, box-shadow 0.2s" }}
+                onMouseEnter={e => { e.currentTarget.style.transform="translateY(-4px)"; e.currentTarget.style.boxShadow=`0 12px 40px rgba(0,0,0,0.3)`; }}
+                onMouseLeave={e => { e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="none"; }}
+              >
+                {/* Phone screen mockup */}
+                <div style={{ background:`${feature.color}10`, padding:"1.5rem 1.25rem 1rem", borderBottom:`1px solid ${feature.color}20` }}>
+                  <div style={{ width:48, height:6, borderRadius:3, background:"rgba(255,255,255,0.12)", margin:"0 auto 1.25rem" }} />
+                  <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+                    {feature.rows.map((row) => (
+                      <div key={row.label} style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 12px", borderRadius:10, background:"rgba(14,27,48,0.55)", border:"1px solid rgba(255,255,255,0.06)" }}>
+                        <span style={{ fontSize:16 }}>{row.emoji}</span>
+                        <span style={{ flex:1, fontSize:12.5, fontWeight:600, color:C.ivory }}>{row.label}</span>
+                        <span style={{ fontSize:11, color:feature.color, fontWeight:700 }}>{row.tag}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                {/* Label */}
+                <div style={{ padding:"1.25rem 1.5rem 1.5rem" }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:6 }}>
+                    <feature.Icon size={16} style={{ color:feature.color }} />
+                    <h3 style={{ fontSize:16, fontWeight:700, color:C.ivory, margin:0 }}>{feature.title}</h3>
+                  </div>
+                  <p style={{ fontSize:13, lineHeight:1.6, color:"rgba(244,247,250,0.55)", margin:0 }}>{feature.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
 
-            <p style={{ fontSize:12, color:"rgba(244,247,250,0.35)", marginTop:"1.25rem" }}>
-              shebloomswealth.app
-            </p>
+          <div style={{ textAlign:"center", marginTop:"2.5rem" }}>
+            <Link href="/learn">
+              <button style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"12px 24px", borderRadius:10, background:"transparent", color:C.teal, fontSize:14, fontWeight:600, border:`1px solid ${C.teal}40`, cursor:"pointer", transition:"background 0.2s, border-color 0.2s" }}
+                onMouseEnter={e => { e.currentTarget.style.background=`${C.teal}12`; e.currentTarget.style.borderColor=`${C.teal}`; }}
+                onMouseLeave={e => { e.currentTarget.style.background="transparent"; e.currentTarget.style.borderColor=`${C.teal}40`; }}
+              >
+                Browse Lessons Free <ArrowRight size={14} />
+              </button>
+            </Link>
           </div>
         </section>
 
         {/* ── FREE EBOOK PROMO ─────────────────────────────────────────── */}
-        <section style={{ maxWidth:720, margin:"0 auto", padding:"3rem 1.5rem 0" }}>
+        <section style={{ maxWidth:720, margin:"0 auto", padding:"2rem 1.5rem 0" }}>
           <Link href="/ebook" style={{ textDecoration:"none", display:"block" }}>
             <div style={{
               ...glass,
@@ -376,71 +438,121 @@ export default function LandingPage() {
           </Link>
         </section>
 
-        {/* ── ADD TO HOME SCREEN TUTORIAL ─────────────────────────────────── */}
+        {/* ── SHARE WITH QR CODE ──────────────────────────────────────────── */}
+        <section style={{ background:"rgba(22,38,74,0.45)", borderTop:"1px solid rgba(255,255,255,0.06)", borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
+          <div style={{ maxWidth:720, margin:"0 auto", padding:"3rem 1.5rem", textAlign:"center" }}>
+            <div style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"6px 14px", borderRadius:20, marginBottom:"1rem", background:`${C.teal}12`, border:`1px solid ${C.teal}25` }}>
+              <Share2 size={13} style={{ color:C.teal }} />
+              <span style={{ fontSize:12, fontWeight:700, color:C.teal, letterSpacing:"0.04em" }}>Share Bloom</span>
+            </div>
+
+            <h2 style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:"clamp(1.5rem, 3vw, 2rem)", fontWeight:700, color:C.ivory, marginBottom:"0.75rem" }}>
+              Know someone who needs this?
+            </h2>
+            <p style={{ fontSize:14, color:"rgba(244,247,250,0.55)", marginBottom:"2rem", maxWidth:420, margin:"0 auto 2rem" }}>
+              Scan the QR code or share the link to help a friend start their financial education journey.
+            </p>
+
+            <div style={{ display:"inline-block", padding:20, borderRadius:20, background:"white", boxShadow:"0 8px 40px rgba(0,0,0,0.3)" }}>
+              <QRCodeSVG
+                value="https://shebloomswealth.app"
+                size={180}
+                level="M"
+                fgColor={C.deep}
+                bgColor="white"
+                imageSettings={{
+                  src: "/bloom-logo.png",
+                  height: 36,
+                  width: 36,
+                  excavate: true,
+                }}
+              />
+            </div>
+
+            <p style={{ fontSize:12, color:"rgba(244,247,250,0.35)", marginTop:"1.25rem" }}>
+              shebloomswealth.app
+            </p>
+          </div>
+        </section>
+
+        {/* ── SMART INSTALL ─────────────────────────────────────────────── */}
         <section style={{ maxWidth:800, margin:"0 auto", padding:"3.5rem 1.5rem" }}>
           <div style={{ textAlign:"center", marginBottom:"2.5rem" }}>
             <div style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"6px 14px", borderRadius:20, marginBottom:"1rem", background:`${C.green}12`, border:`1px solid ${C.green}25` }}>
               <Smartphone size={13} style={{ color:C.green }} />
-              <span style={{ fontSize:12, fontWeight:700, color:C.green, letterSpacing:"0.04em" }}>Install the App</span>
+              <span style={{ fontSize:12, fontWeight:700, color:C.green, letterSpacing:"0.04em" }}>Get the App</span>
             </div>
 
             <h2 style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:"clamp(1.5rem, 3vw, 2rem)", fontWeight:700, color:C.ivory, marginBottom:"0.5rem" }}>
-              Add Bloom to your home screen
+              Take Bloom with you
             </h2>
             <p style={{ fontSize:14, color:"rgba(244,247,250,0.55)", maxWidth:440, margin:"0 auto" }}>
-              Get the full app experience in 3 quick taps — no app store needed.
+              Add Bloom to your home screen for the full app experience — no app store needed.
             </p>
           </div>
 
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(200px, 1fr))", gap:20 }}>
-            {[
-              {
-                step: "1",
-                icon: "globe",
-                title: "Open in your browser",
-                desc: "Visit shebloomswealth.app in Chrome (Android) or Safari (iPhone).",
-              },
-              {
-                step: "2",
-                icon: "menu",
-                title: "Tap the menu",
-                desc: "Tap the three dots (Chrome) or the share icon (Safari) at the top or bottom of your screen.",
-              },
-              {
-                step: "3",
-                icon: "plus",
-                title: "Add to Home Screen",
-                desc: "Select \"Add to Home Screen\" and tap Add. Bloom now opens like a real app!",
-              },
-            ].map((item) => (
-              <div key={item.step} style={{ ...glass, borderRadius:16, padding:"1.5rem", textAlign:"center", boxShadow:"0 4px 24px rgba(0,0,0,0.24)", position:"relative" }}>
-                <div style={{ position:"absolute", top:-12, left:"50%", transform:"translateX(-50%)", width:28, height:28, borderRadius:"50%", ...gradientBg, display:"flex", alignItems:"center", justifyContent:"center", fontSize:13, fontWeight:800, color:C.deep }}>
-                  {item.step}
-                </div>
+          {deferredPrompt ? (
+            <div style={{ textAlign:"center" }}>
+              <button
+                onClick={async () => {
+                  deferredPrompt.prompt();
+                  const { outcome } = await deferredPrompt.userChoice;
+                  if (outcome === "accepted") setDeferredPrompt(null);
+                }}
+                style={{ display:"inline-flex", alignItems:"center", gap:10, padding:"16px 32px", borderRadius:12, ...gradientBg, color:C.deep, fontSize:16, fontWeight:700, border:"none", cursor:"pointer", boxShadow:`0 8px 30px rgba(39,183,200,0.28)`, transition:"transform 0.2s, box-shadow 0.2s" }}
+                onMouseEnter={e => { e.currentTarget.style.transform="translateY(-2px)"; e.currentTarget.style.boxShadow=`0 14px 40px rgba(39,183,200,0.44)`; }}
+                onMouseLeave={e => { e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow=`0 8px 30px rgba(39,183,200,0.28)`; }}
+              >
+                <Smartphone size={18} /> Install Bloom
+              </button>
+              <p style={{ fontSize:12, color:"rgba(244,247,250,0.35)", marginTop:"1rem" }}>
+                One tap — installs instantly, no app store required
+              </p>
+            </div>
+          ) : (
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(200px, 1fr))", gap:20 }}>
+              {(platform === "ios" ? [
+                { step:"1", icon:"globe" as const, title:"Open in Safari", desc:"Visit shebloomswealth.app in Safari on your iPhone or iPad." },
+                { step:"2", icon:"menu" as const, title:"Tap the share button", desc:"Tap the share icon (square with arrow) at the bottom of Safari." },
+                { step:"3", icon:"plus" as const, title:"Add to Home Screen", desc:"Scroll down, tap \"Add to Home Screen\", then tap Add." },
+              ] : platform === "android" ? [
+                { step:"1", icon:"globe" as const, title:"Open in Chrome", desc:"Visit shebloomswealth.app in Chrome on your Android phone." },
+                { step:"2", icon:"menu" as const, title:"Tap the menu", desc:"Tap the three dots ⋮ at the top-right corner of Chrome." },
+                { step:"3", icon:"plus" as const, title:"Install app", desc:"Tap \"Install app\" or \"Add to Home Screen\", then confirm." },
+              ] : [
+                { step:"1", icon:"globe" as const, title:"Open in your browser", desc:"Visit shebloomswealth.app in Chrome, Edge, or Safari." },
+                { step:"2", icon:"menu" as const, title:"Look for the install icon", desc:"Click the install icon in the address bar, or open the browser menu." },
+                { step:"3", icon:"plus" as const, title:"Add to Home Screen", desc:"Select \"Install\" or \"Add to Home Screen\" and confirm." },
+              ]).map((item) => (
+                <div key={item.step} style={{ ...glass, borderRadius:16, padding:"1.5rem", textAlign:"center", boxShadow:"0 4px 24px rgba(0,0,0,0.24)", position:"relative" }}>
+                  <div style={{ position:"absolute", top:-12, left:"50%", transform:"translateX(-50%)", width:28, height:28, borderRadius:"50%", ...gradientBg, display:"flex", alignItems:"center", justifyContent:"center", fontSize:13, fontWeight:800, color:C.deep }}>
+                    {item.step}
+                  </div>
 
-                <div style={{ width:48, height:48, borderRadius:12, background:"rgba(39,183,200,0.1)", border:`1px solid ${C.teal}20`, display:"flex", alignItems:"center", justifyContent:"center", margin:"0.75rem auto 1rem" }}>
-                  {item.icon === "globe" && (
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={C.teal} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="12" cy="12" r="10" />
-                      <line x1="2" y1="12" x2="22" y2="12" />
-                      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-                    </svg>
-                  )}
-                  {item.icon === "menu" && (
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill={C.teal}>
-                      <circle cx="12" cy="5" r="2" />
-                      <circle cx="12" cy="12" r="2" />
-                      <circle cx="12" cy="19" r="2" />
-                    </svg>
-                  )}
-                  {item.icon === "plus" && <Plus size={22} style={{ color:C.teal }} />}
-                </div>
+                  <div style={{ width:48, height:48, borderRadius:12, background:"rgba(39,183,200,0.1)", border:`1px solid ${C.teal}20`, display:"flex", alignItems:"center", justifyContent:"center", margin:"0.75rem auto 1rem" }}>
+                    {item.icon === "globe" && (
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={C.teal} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="2" y1="12" x2="22" y2="12" />
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                      </svg>
+                    )}
+                    {item.icon === "menu" && (
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill={C.teal}>
+                        <circle cx="12" cy="5" r="2" />
+                        <circle cx="12" cy="12" r="2" />
+                        <circle cx="12" cy="19" r="2" />
+                      </svg>
+                    )}
+                    {item.icon === "plus" && <Plus size={22} style={{ color:C.teal }} />}
+                  </div>
 
-                <p style={{ fontSize:14, fontWeight:700, color:C.ivory, marginBottom:6 }}>{item.title}</p>
-                <p style={{ fontSize:12.5, lineHeight:1.6, color:"rgba(244,247,250,0.55)", margin:0 }}>{item.desc}</p>
-              </div>
-            ))}
-          </div>
+                  <p style={{ fontSize:14, fontWeight:700, color:C.ivory, marginBottom:6 }}>{item.title}</p>
+                  <p style={{ fontSize:12.5, lineHeight:1.6, color:"rgba(244,247,250,0.55)", margin:0 }}>{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          )}
 
           <div style={{ textAlign:"center", marginTop:"2rem" }}>
             <Link href="/onboarding">
@@ -463,7 +575,7 @@ export default function LandingPage() {
                   <Image src="/bloom-logo.png" alt="Bloom" width={24} height={24} className="rounded-full bg-[#F4F7FA]" />
                   <p className="text-sm font-semibold" style={{ color:"rgba(244,247,250,0.60)" }}>She Blooms Wealth</p>
                 </div>
-                <p className="text-xs" style={{ color:"rgba(244,247,250,0.35)" }}>Invest in yourself first 🌸</p>
+                <p className="text-xs" style={{ color:"rgba(244,247,250,0.35)" }}>Invest in yourself first 🌱</p>
               </div>
               <div className="space-y-2">
                 <p className="text-xs font-semibold uppercase tracking-wide" style={{ color:"rgba(244,247,250,0.35)" }}>Legal</p>
@@ -485,6 +597,14 @@ export default function LandingPage() {
                 <div className="flex flex-col gap-1.5">
                   <Link href="/contact" className="text-xs transition-colors hover:text-white" style={{ color:"rgba(244,247,250,0.40)" }}>Contact Us</Link>
                   <a href="mailto:cindervaultenterprisesllc@gmail.com" className="text-xs transition-colors hover:text-white" style={{ color:"rgba(244,247,250,0.40)" }}>cindervaultenterprisesllc@gmail.com</a>
+                  <a href="https://instagram.com/shebloomswealth" target="_blank" rel="noopener noreferrer" className="text-xs transition-colors hover:text-white flex items-center gap-1.5" style={{ color:"rgba(244,247,250,0.40)" }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="2" y="2" width="20" height="20" rx="5" />
+                      <circle cx="12" cy="12" r="5" />
+                      <circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none" />
+                    </svg>
+                    Instagram
+                  </a>
                 </div>
               </div>
             </div>

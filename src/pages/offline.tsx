@@ -14,7 +14,7 @@ export default function Offline() {
             You're Offline
           </h1>
           <p className="text-muted-foreground leading-relaxed">
-            Looks like you lost your internet connection girl. Don't worry, 
+            Looks like you lost your internet connection. Don't worry, 
             your saved data is still here. Just reconnect and you'll be 
             back to building wealth in no time 💛
           </p>

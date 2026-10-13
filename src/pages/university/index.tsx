@@ -119,7 +119,7 @@ export default function UniversityIndex({ requiresClientAuth }: Props) {
     <Layout>
       <SEO
         title="Bloom University — Chart Reading, Indicators & Trading Education"
-        description="Master chart reading, candlestick patterns, RSI, MACD, Bollinger Bands, moving averages, and trading signals. 9 structured modules covering chart patterns, indicators, entry/exit strategies, and position management. Advanced investing education for women."
+        description="Master chart reading, candlestick patterns, RSI, MACD, Bollinger Bands, moving averages, and trading signals. 9 structured modules covering chart patterns, indicators, entry/exit strategies, and position management. Advanced investing education."
       />
 
       {/* Hero */}
@@ -127,10 +127,10 @@ export default function UniversityIndex({ requiresClientAuth }: Props) {
         <div className="max-w-5xl mx-auto px-4 py-16 text-center">
           <div className="inline-flex items-center gap-2 bg-[#27B7C8]/10 text-[#27B7C8] rounded-full px-4 py-1.5 text-sm font-medium mb-6">
             <GraduationCap className="w-4 h-4" />
-            Pro Members Only
+            Free for Everyone
           </div>
           <h1 className="text-4xl md:text-5xl font-serif font-bold text-[#F4F7FA] mb-4">
-            🌸 Bloom University
+            🌿 Bloom University
           </h1>
           <p className="text-[#F4F7FA]/70 text-lg max-w-2xl mx-auto">
             Structured trading education built the right way — no hype, no directives, just the real patterns and frameworks that experienced traders use to make sense of price action.

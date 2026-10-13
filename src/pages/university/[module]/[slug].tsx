@@ -374,13 +374,13 @@ export default function LessonPage({ moduleSlug, lessonSlug, requiresClientAuth 
             ))}
           </div>
 
-          {/* Girl to Girl Tip */}
+          {/* Pansy Tip */}
           <div className="mt-10 p-6 rounded-2xl border border-[#27B7C8]/30 bg-[#27B7C8]/5">
             <div className="flex items-start gap-3">
-              <span className="text-2xl flex-shrink-0">🌸</span>
+              <span className="text-2xl flex-shrink-0">🌿</span>
               <div>
-                <p className="text-xs font-semibold text-[#27B7C8] mb-2">Pansy&apos;s Girl-to-Girl Tip</p>
-                <p className="text-[#F4F7FA]/80 text-sm leading-relaxed italic">{lesson.girlToGirlTip}</p>
+                <p className="text-xs font-semibold text-[#27B7C8] mb-2">Pansy&apos;s Tip</p>
+                <p className="text-[#F4F7FA]/80 text-sm leading-relaxed italic">{lesson.pansyTip}</p>
               </div>
             </div>
           </div>

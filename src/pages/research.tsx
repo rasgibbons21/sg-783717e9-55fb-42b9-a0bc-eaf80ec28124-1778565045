@@ -133,19 +133,15 @@ function ProGate() {
       <div>
         <h2 className="font-serif text-2xl font-bold text-foreground mb-2">Stock Research</h2>
         <p className="text-foreground/60 max-w-sm">
-          {canShowExternalPayment
-            ? "Search any stock, ETF, or index — live quotes, interactive charts, news, and Pansy's educational analysis. Upgrade to unlock."
-            : "This feature isn't available in this version."}
+          Search any stock, ETF, or index — live quotes, interactive charts, news, and Pansy&apos;s educational analysis. Sign up free to start.
         </p>
       </div>
-      {canShowExternalPayment && (
-        <Link
-          href="/subscription"
-          className="px-8 py-3 rounded-xl bg-primary text-white font-semibold hover:bg-primary/90 transition-colors"
-        >
-          Upgrade to Pro
-        </Link>
-      )}
+      <Link
+        href="/onboarding"
+        className="px-8 py-3 rounded-xl bg-primary text-white font-semibold hover:bg-primary/90 transition-colors"
+      >
+        Start Free
+      </Link>
     </div>
   );
 }
@@ -295,7 +291,7 @@ export default function ResearchPage() {
     <>
       <Head>
         <title>Stock Research — Deep Dive Into Any Ticker | Bloom</title>
-        <meta name="description" content="Research any stock with real-time price data, interactive charts, and Pansy's plain-language analysis. Compare companies, discover trends, and build conviction before you invest. Free stock research tool for women." />
+        <meta name="description" content="Research any stock with real-time price data, interactive charts, and Pansy's plain-language analysis. Compare companies, discover trends, and build conviction before you invest. Free stock research tool." />
       </Head>
       <Layout>
         <div className="min-h-screen bg-background px-4 py-6 max-w-2xl mx-auto">

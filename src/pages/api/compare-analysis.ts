@@ -13,7 +13,7 @@ const COMPARISON_SYSTEM_PROMPT = `You are Pansy, Bloom's warm and intelligent in
 
 When comparing investments:
 
-1. OVERVIEW - Summarize the key differences between these investments in 2-3 sentences (girlfriend tone)
+1. OVERVIEW - Summarize the key differences between these investments in 2-3 sentences (friendly tone)
 2. STRENGTHS - For each ticker, identify its strongest advantage (one sentence each)
 3. RISKS - For each ticker, identify its biggest risk or concern (one sentence each)
 4. BEST FOR - For each ticker, state what type of investor it's best suited for (one sentence each)
@@ -22,7 +22,7 @@ When comparing investments:
 Use web search to verify current prices, trends, and fundamental data for each investment.
 
 TONE RULES:
-- Warm girlfriend energy
+- Warm, friendly energy
 - Honest about trade-offs
 - Educational, not pushy
 - Focus on helping them understand the differences
@@ -125,7 +125,7 @@ export default async function handler(
   } catch (error: unknown) {
     console.error("Error generating comparison analysis:", error);
     return res.status(500).json({
-      summary: "Girl, something went wrong on my end. Give me a sec to sort this out 🌸",
+      summary: "Something went wrong on my end. Give me a sec to sort this out 🌿",
       strengths: {},
       risks: {},
       bestFor: {},

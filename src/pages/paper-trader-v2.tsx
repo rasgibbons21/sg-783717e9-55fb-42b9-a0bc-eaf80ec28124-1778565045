@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { AdMobBanner } from "@/components/AdMobBanner";
 import Link from "next/link";
+import { TickerMark } from "@/components/TickerMark";
 import { ALL_STRATEGIES } from "@/data/strategy-lab";
 import {
   TrendingUp, TrendingDown, Trophy, Flame, X, ChevronRight,
@@ -306,24 +307,12 @@ export default function PaperTraderV2() {
     <>
       <Head>
         <title>Paper Trading Simulator — Practice Stock Trading Free | Bloom</title>
-        <meta name="description" content="Practice buying and selling real stocks with $10,000 in virtual money. Real-time prices, interactive candlestick charts, trade journal, and P&amp;L tracking. Zero risk stock trading simulator for women learning to invest." />
+        <meta name="description" content="Practice buying and selling real stocks with $10,000 in virtual money. Real-time prices, interactive candlestick charts, trade journal, and P&amp;L tracking. Zero risk stock trading simulator." />
       </Head>
       <Layout>
         <div className="min-h-screen pb-24" style={{ background: C.navy }}>
 
-          {/* Trial Banner */}
-          {isTrial && trialDaysLeft !== null && (
-            <motion.div
-              initial={{ y: -40, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              className="px-4 py-2.5 text-center text-xs font-medium flex items-center justify-center gap-2"
-              style={{ background: C.tealDim, color: C.teal }}
-            >
-              <Zap className="w-3.5 h-3.5" />
-              {trialDaysLeft} day{trialDaysLeft !== 1 ? "s" : ""} left in trial
-              <Link href="/subscription" className="underline font-bold ml-1">Go Pro</Link>
-            </motion.div>
-          )}
+          {/* Trial banner removed — app is 100% free */}
 
           {/* ══════ PORTFOLIO HEADER ══════ */}
           <motion.div
@@ -468,10 +457,7 @@ export default function PaperTraderV2() {
                             border: `1px solid ${ticker === item.ticker ? C.teal : C.border}`,
                           }}
                         >
-                          <div className="w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-bold"
-                            style={{ background: C.tealDim, color: C.teal }}>
-                            {item.ticker.slice(0, 2)}
-                          </div>
+                          <TickerMark ticker={item.ticker} size="sm" />
                           <div className="text-left">
                             <p className="text-xs font-mono font-bold" style={{ color: C.textPrimary }}>{item.ticker}</p>
                             <p className="text-[9px] capitalize" style={{ color: C.textMuted }}>{item.asset_type}</p>

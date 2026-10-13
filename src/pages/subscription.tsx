@@ -221,7 +221,7 @@ export default function Subscription() {
                         className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
                         onClick={() => router.push("/onboarding")}
                       >
-                        Sign Up Free, Then Upgrade
+                        Sign Up Free
                       </Button>
                     )}
                   </div>
@@ -282,7 +282,7 @@ export default function Subscription() {
                         className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
                         onClick={() => router.push("/onboarding")}
                       >
-                        Sign Up Free, Then Upgrade
+                        Sign Up Free
                       </Button>
                     )}
                     <p className="text-xs text-center text-muted-foreground">
@@ -346,7 +346,7 @@ export default function Subscription() {
                         style={{ background: "linear-gradient(135deg, #27B7C8, #49B06E)" }}
                         onClick={() => router.push("/onboarding")}
                       >
-                        Sign Up Free, Then Upgrade
+                        Sign Up Free
                       </Button>
                     )}
                   </div>

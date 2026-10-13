@@ -133,7 +133,7 @@ export default function Ebook() {
     { num: "02", title: "Budget Like Your Life Depends On It", desc: "Why budgeting is your foundation, not trading" },
     { num: "03", title: "Build Multiple Income Streams", desc: "How to earn $2-5K/month extra while working" },
     { num: "04", title: "Invest With Real Capital", desc: "Now you have money to grow" },
-    { num: "05", title: "5 Mistakes Women Make", desc: "And how to avoid them" },
+    { num: "05", title: "5 Mistakes Beginners Make", desc: "And how to avoid them" },
     { num: "06", title: "Your First 7 Days", desc: "Actionable steps to get started today" },
   ];
 

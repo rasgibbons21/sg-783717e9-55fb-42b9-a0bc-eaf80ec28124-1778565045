@@ -286,7 +286,7 @@ export default function Profile() {
     const link = `https://shebloomswealth.app/onboarding?ref=${referralCode}`;
     try {
       await navigator.clipboard.writeText(link);
-      toast({ title: "Referral link copied!", description: "Share it with friends to earn 7 bonus trial days each." });
+      toast({ title: "Referral link copied!", description: "Share it with friends so they can start learning too." });
     } catch {
       toast({ title: "Could not copy", description: "Please try again.", variant: "destructive" });
     }
@@ -368,7 +368,7 @@ export default function Profile() {
                 </h2>
                 {isPro && (
                   <Badge className="bg-accent text-accent-foreground">
-                    {isTrial ? `Trial — ${trialDaysLeft}d left` : "Pro"}
+                    Member
                   </Badge>
                 )}
               </div>
@@ -640,8 +640,8 @@ export default function Profile() {
                     <span className="text-2xl">✨</span>
                   </div>
                   <div>
-                    <p className="font-semibold text-foreground text-lg">Bloom Pro Member</p>
-                    <p className="text-sm text-muted-foreground">Unlimited access to all features</p>
+                    <p className="font-semibold text-foreground text-lg">Bloom Member</p>
+                    <p className="text-sm text-muted-foreground">Full access to all features — free</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4 p-4 bg-gradient-to-br from-accent/10 to-primary/10 rounded-lg border border-accent/20">
@@ -683,13 +683,7 @@ export default function Profile() {
                     <p className="text-sm text-muted-foreground">3 analyses per week, basic features</p>
                   </div>
                 </div>
-                {canShowExternalPayment && (
-                  <Link href="/subscription">
-                    <Button className="w-full bg-gradient-to-r from-accent to-primary hover:from-accent/90 hover:to-primary/90">
-                      Upgrade to Pro
-                    </Button>
-                  </Link>
-                )}
+                {/* Upgrade button removed — app is 100% free */}
               </div>
             )}
           </CardContent>
@@ -833,7 +827,7 @@ export default function Profile() {
                 <Shield className="w-4 h-4 text-accent" />
               </div>
               <p className="text-sm text-foreground leading-relaxed">
-                Your data is always yours, babe. We never share your info with third parties, and you can delete your account anytime. Push notifications only go to your device — nobody else sees them 💛
+                Your data is always yours. We never share your info with third parties, and you can delete your account anytime. Push notifications only go to your device — nobody else sees them 💛
               </p>
               <p className="text-sm font-medium text-accent">— Pansy 🌺</p>
             </div>

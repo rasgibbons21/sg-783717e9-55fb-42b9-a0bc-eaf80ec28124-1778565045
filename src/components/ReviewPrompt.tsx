@@ -60,7 +60,7 @@ export function ReviewPrompt({ onClose, trigger }: ReviewPromptProps) {
             <p className="text-sm text-[#F4F7FA]/50 mb-5 leading-relaxed">
               {trigger
                 ? `Nice work completing ${trigger}! How are you enjoying the app so far?`
-                : 'Your opinion helps other women find Bloom. How would you rate us?'}
+                : 'Your opinion helps others find Bloom. How would you rate us?'}
             </p>
 
             <div className="flex justify-center gap-2 mb-4">
@@ -96,7 +96,7 @@ export function ReviewPrompt({ onClose, trigger }: ReviewPromptProps) {
               Thank you!
             </h3>
             <p className="text-sm text-[#F4F7FA]/50 mb-5 leading-relaxed">
-              Would you mind leaving a quick review? It helps so much — other women find Bloom because of reviews like yours.
+              Would you mind leaving a quick review? It helps so much — others find Bloom because of reviews like yours.
             </p>
             <a
               href={getReviewUrl()}

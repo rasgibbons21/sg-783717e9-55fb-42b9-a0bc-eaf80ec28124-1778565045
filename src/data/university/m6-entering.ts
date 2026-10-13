@@ -118,7 +118,7 @@ export const M6_LESSONS: UniversityLesson[] = [
           "Sizing based on emotion or intuition — rather than a defined risk percentage and the chart's invalidation level — is the most common mistake. It leads to inconsistent, often oversized losses.",
       },
     ],
-    girlToGirlTip:
+    pansyTip:
       "Protecting your money comes before growing it. You can't win the game if you get knocked out of it — size so no single trade can end you.",
     videoSlot: null,
   },
@@ -240,7 +240,7 @@ export const M6_LESSONS: UniversityLesson[] = [
           "Risking 2 to make 1 means that at a 50% win rate, losses outweigh gains. The trader needs to be right more than 66% of the time just to break even — a very difficult standard to meet consistently.",
       },
     ],
-    girlToGirlTip:
+    pansyTip:
       "'How much can I make?' is the fun question. 'How much can I lose?' keeps you in business. Ask the second one first.",
     videoSlot: null,
   },
@@ -361,7 +361,7 @@ export const M6_LESSONS: UniversityLesson[] = [
           "Not being able to clearly define where the idea is wrong means there's no real trade thesis — just a hope. A genuine entry always has a clear invalidation level built into the reasoning before the trade is taken.",
       },
     ],
-    girlToGirlTip:
+    pansyTip:
       "If you can't say exactly where you'd be wrong, you don't have an entry — you have a wish. Clarity before courage.",
     videoSlot: null,
   },
@@ -482,7 +482,7 @@ export const M6_LESSONS: UniversityLesson[] = [
           "Decisions made before entering are calm and analytical. Decisions made while watching a position move against you are emotional. The pre-entry stop is rational-you protecting emotional-you.",
       },
     ],
-    girlToGirlTip:
+    pansyTip:
       "Decide where you're wrong before you're emotionally in it. The stop is calm-you protecting panicked-you.",
     videoSlot: null,
   },
@@ -604,7 +604,7 @@ export const M6_LESSONS: UniversityLesson[] = [
           "Waiting for confirmation typically means entering a little later than the absolute best price — but that small cost is exchanged for a large reduction in fakeout losses. The entry is slightly less optimal; the trade quality is significantly higher.",
       },
     ],
-    girlToGirlTip:
+    pansyTip:
       "The trades you don't take protect the account as much as the ones you do. Missing a move is annoying; forcing one is expensive.",
     videoSlot: null,
   },
@@ -727,7 +727,7 @@ export const M6_LESSONS: UniversityLesson[] = [
           "Scaling in should follow a pre-defined plan: what conditions trigger each add, how large each add is, and what the total risk across all adds equals. Unplanned adds are guessing, not strategy.",
       },
     ],
-    girlToGirlTip:
+    pansyTip:
       "Scaling in is 'prove it to me' in action — commit a little, add as it earns trust. Never an excuse to bet bigger than your rules.",
     videoSlot: null,
   },
@@ -849,7 +849,7 @@ export const M6_LESSONS: UniversityLesson[] = [
           "Cutting winners short means panic-exiting an entire winning position at the first small adverse move — long before the original thesis has had time to develop. It's the opposite error to round-tripping.",
       },
     ],
-    girlToGirlTip:
+    pansyTip:
       "Taking a little off the table can be the difference between a calm trade and a stressful one. No shame in paying yourself along the way.",
     videoSlot: null,
   },
@@ -969,7 +969,7 @@ export const M6_LESSONS: UniversityLesson[] = [
           "The antidote to FOMO is perspective: missing one move is free. Chasing it poorly is expensive. Disciplined traders anchor to their plan and accept that passing on a FOMO moment protects the account for the next setup.",
       },
     ],
-    girlToGirlTip:
+    pansyTip:
       "The market is designed to make you feel like you're missing out — that's the trap. Calm money makes better decisions than panicked money, every time.",
     videoSlot: null,
   },

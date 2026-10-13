@@ -33,14 +33,14 @@ export default function About() {
       </Head>
 
       <SEO
-        title="About She Blooms Wealth — Financial Education for Women"
-        description="Bloom is a free financial education app built for women. Learn investing, budgeting, side hustles, and trading strategies with Pansy, your AI guide. 150+ lessons, paper trading, broker comparison, 6 side hustle journeys, and a certificate. By Cinder Vault Enterprises LLC."
+        title="About Bloom — Free Financial Education for Everyone"
+        description="Bloom is a free financial education app. Learn investing, budgeting, side hustles, and trading strategies with Pansy, your guide. 150+ lessons, paper trading, broker comparison, 6 side hustle journeys, and a certificate. By Cinder Vault Enterprises LLC."
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "FAQPage",
           mainEntity: [
-            { "@type": "Question", name: "What is Bloom by She Blooms Wealth?", acceptedAnswer: { "@type": "Answer", text: "Bloom is a free financial education app built specifically for women. It teaches investing, budgeting, and side hustles through 150+ plain-language lessons with an AI guide named Pansy." } },
-            { "@type": "Question", name: "Is Bloom free?", acceptedAnswer: { "@type": "Answer", text: "Yes! Bloom offers a free tier with access to all 36 core lessons, paper trading simulator, and budget tracker. Bloom Pro ($4.99/month, $29.99/year, or $69.99 lifetime) unlocks advanced features like Bloom University, Strategy Lab, and unlimited access." } },
+            { "@type": "Question", name: "What is Bloom by She Blooms Wealth?", acceptedAnswer: { "@type": "Answer", text: "Bloom is a free financial education app. It teaches investing, budgeting, and side hustles through 150+ plain-language lessons with a guide named Pansy." } },
+            { "@type": "Question", name: "Is Bloom free?", acceptedAnswer: { "@type": "Answer", text: "Yes! Bloom is 100% free. You get full access to 150+ lessons, paper trading simulator, budget tracker, Bloom University, Strategy Lab, and Pansy coaching — no subscriptions, no hidden costs." } },
             { "@type": "Question", name: "What side hustles does Bloom teach?", acceptedAnswer: { "@type": "Answer", text: "Bloom offers 6 guided side hustle journeys: Dropshipping, TikTok Shop, Content Creation, Digital Products, Freelancing, and UGC (User Generated Content). Each journey has 12 steps from zero to earning." } },
             { "@type": "Question", name: "What is paper trading in Bloom?", acceptedAnswer: { "@type": "Answer", text: "Paper trading lets you practice buying and selling real stocks with $10,000 in virtual money. You get real-time prices, interactive charts, a trade journal, and P&L tracking — all with zero financial risk." } },
             { "@type": "Question", name: "Who is Pansy?", acceptedAnswer: { "@type": "Answer", text: "Pansy is Bloom's friendly AI guide. She was a single mom who taught herself budgeting, side hustles, and investing — and eventually fired her boss. Everything she learned is inside Bloom. She explains complex financial topics in plain language, like a smart friend who happens to know about money." } },
@@ -87,11 +87,11 @@ export default function About() {
           {/* Hero text */}
           <div style={{ textAlign:"center", marginBottom:"4rem" }}>
             <h1 style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:"clamp(2.6rem, 5.5vw, 4rem)", fontWeight:700, lineHeight:1.1, color:C.ivory, marginBottom:"1.5rem" }}>
-              Built for women who want to{" "}
+              Built for anyone who wants to{" "}
               <span style={gradientText}>understand money.</span>
             </h1>
             <p style={{ fontSize:"1.1rem", lineHeight:1.72, color:"rgba(244,247,250,0.65)", maxWidth:580, margin:"0 auto" }}>
-              Bloom is a financial education platform. We teach women how markets work, how to think about investing, and how to build wealth with confidence — one clear lesson at a time.
+              Bloom is a financial education platform. We teach you how markets work, how to think about investing, and how to build wealth with confidence — one clear lesson at a time.
             </p>
           </div>
 
@@ -101,7 +101,7 @@ export default function About() {
               Our mission
             </h2>
             <p style={{ fontSize:"1rem", lineHeight:1.72, color:"rgba(244,247,250,0.68)" }}>
-              The gender wealth gap is real. Women outlive men by an average of five years, yet consistently hold less invested wealth. That gap isn&apos;t about ability — it&apos;s about access to clear, non-condescending, jargon-free financial education that actually fits women&apos;s lives.
+              Too many people never learn how money actually works. That gap isn&apos;t about ability — it&apos;s about access to clear, non-condescending, jargon-free financial education that fits real life.
             </p>
             <p style={{ fontSize:"1rem", lineHeight:1.72, color:"rgba(244,247,250,0.68)", marginTop:"1rem" }}>
               Bloom exists to close that gap — not by picking stocks for you, but by giving you the understanding to build your own judgment. The goal is always your independence, not your dependency on us.

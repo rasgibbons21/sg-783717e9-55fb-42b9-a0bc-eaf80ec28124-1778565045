@@ -5,6 +5,7 @@ import {
   SplitSquareVertical, StopCircle, Target, StickyNote, Sparkles,
 } from "lucide-react";
 import DynamicChart, { type OHLCBar } from "@/components/DynamicChart";
+import { TickerMark } from "@/components/TickerMark";
 import { fetchOHLC } from "@/lib/fetchOHLC";
 
 // ── Shared types ───────────────────────────────────────────────────────────
@@ -509,8 +510,8 @@ export function ActiveTradeCard({
           className="flex items-center gap-3 p-3 cursor-pointer select-none"
           onClick={() => setExpanded(e => !e)}
         >
-          {/* Direction dot */}
-          <span className={`w-2 h-2 rounded-full flex-shrink-0 ${trade.direction === "long" ? "bg-primary" : "bg-destructive"}`} />
+          {/* Logo */}
+          <TickerMark ticker={trade.ticker} size="sm" />
 
           {/* Ticker + direction */}
           <div className="flex items-center gap-1.5 min-w-0">

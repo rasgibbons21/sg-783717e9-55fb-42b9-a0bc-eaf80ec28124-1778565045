@@ -281,7 +281,7 @@ export default function Onboarding() {
     <>
       <OnboardingStyles />
 
-      <div className="fixed inset-0 overflow-y-auto" style={{ background: "linear-gradient(135deg, #0E1B30 0%, #0a1525 40%, #0d1f35 70%, #0E1B30 100%)" }}>
+      <div className="fixed inset-0 overflow-y-auto overflow-x-hidden" style={{ background: "linear-gradient(135deg, #0E1B30 0%, #0a1525 40%, #0d1f35 70%, #0E1B30 100%)" }}>
         <FloatingOrbs />
 
         <div className="relative z-10 flex flex-col min-h-screen">
@@ -368,7 +368,7 @@ export default function Onboarding() {
                   <div className="text-center space-y-2" style={{ animation: animateIn ? "fadeSlideUp 0.6s ease-out 0.6s both" : "none" }}>
                     <p className="text-xl font-serif font-bold text-[#F4F7FA]">You&apos;re not broken.</p>
                     <p className="text-lg text-[#27B7C8] font-medium">You just weren&apos;t taught this.</p>
-                    <p className="text-sm text-[#F4F7FA]/40 mt-1">78% of women say the same thing.</p>
+                    <p className="text-sm text-[#F4F7FA]/40 mt-1">Most people feel the same way.</p>
                   </div>
 
                   {/* Pansy intro — shorter, trust-focused */}
@@ -381,7 +381,7 @@ export default function Onboarding() {
                       <div className="flex-1 space-y-1">
                         <h3 className="font-serif text-base font-semibold text-[#27B7C8]">Meet Pansy, your guide</h3>
                         <p className="text-sm leading-relaxed text-[#F4F7FA]/50">
-                          I built Bloom for women exactly like you. No jargon, no judgment — just clear steps to take control of your money.
+                          I built Bloom for people exactly like you. No jargon, no judgment — just clear steps to take control of your money.
                         </p>
                       </div>
                     </div>
@@ -389,7 +389,7 @@ export default function Onboarding() {
 
                   {/* Social proof */}
                   <p className="text-center text-sm text-[#F4F7FA]/30" style={{ animation: animateIn ? "fadeSlideUp 0.5s ease-out 0.9s both" : "none" }}>
-                    Join 10,000+ women already on their journey
+                    Join thousands already on their journey
                   </p>
 
                   {/* CTAs */}
@@ -679,7 +679,7 @@ export default function Onboarding() {
                       <Shield className="w-3.5 h-3.5" /> You&apos;re safe here
                     </div>
                     <h2 className="font-serif text-3xl font-bold text-[#F4F7FA]">What keeps you up<br />at night about money?</h2>
-                    <p className="text-[#F4F7FA]/40 text-base">Most women feel this — naming it is the first step</p>
+                    <p className="text-[#F4F7FA]/40 text-base">Most people feel this — naming it is the first step</p>
                   </div>
 
                   <div className="space-y-3">
@@ -827,7 +827,7 @@ export default function Onboarding() {
 
                   <div className="text-center pt-2">
                     <p className="text-sm text-[#F4F7FA]/30 italic">
-                      &quot;Women with a financial plan save 3x more than those without one.&quot;
+                      &quot;People with a financial plan save 3x more than those without one.&quot;
                     </p>
                   </div>
                 </div>
@@ -850,7 +850,7 @@ export default function Onboarding() {
                   side_hustle: {
                     emoji: "🚀",
                     title: "Your plan is ready!",
-                    message: "Girl, before we talk investing, let’s build your income first. I’ve got step-by-step guides for dropshipping, TikTok Shop, UGC, and more. Pick one, follow the steps, and watch your money grow.",
+                    message: "Before we talk investing, let’s build your income first. I’ve got step-by-step guides for dropshipping, TikTok Shop, UGC, and more. Pick one, follow the steps, and watch your money grow.",
                     cta: "Start My Side Hustle",
                     route: "/side-hustle",
                     firstStep: "Pick Your First Side Hustle",
@@ -860,7 +860,7 @@ export default function Onboarding() {
                   budgeting: {
                     emoji: "💰",
                     title: "Your plan is ready!",
-                    message: "No judgment, love — most people don’t know where their money goes. I set up a Budget Tracker where you can see every dollar. Once you know the truth, you can change it.",
+                    message: "No judgment — most people don’t know where their money goes. I set up a Budget Tracker where you can see every dollar. Once you know the truth, you can change it.",
                     cta: "Start Tracking My Money",
                     route: "/budget-tracker",
                     firstStep: "Where Does Your Money Go?",
@@ -950,7 +950,7 @@ export default function Onboarding() {
 
                   {/* Social proof */}
                   <p className="text-center text-xs text-[#F4F7FA]/30">
-                    10,000+ women started their journey with Bloom
+                    Thousands have started their journey with Bloom
                   </p>
 
                   <button

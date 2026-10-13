@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { useToast } from "@/hooks/use-toast";
 
 const PSYCHOLOGY_MESSAGES = [
-  "The market will always be there sis.\nNo rush. No FOMO 🌸 — Pansy",
+  "The market will always be there.\nNo rush. No FOMO 🌿 — Pansy",
   "Missing a trade is okay.\nChasing one from emotion is not 💅 — Pansy",
   "Discipline over intelligence.\nEvery single time 🏆 — Pansy",
   "No revenge trades.\nThe market owes you nothing ⚠️ — Pansy",

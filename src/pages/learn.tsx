@@ -87,7 +87,7 @@ Not enough to boss Tim Cook around or anything 😂 but you're officially a part
 
 Here's the cool part: some companies share their profits with you through dividends (we'll talk about those later). And if the company grows over time your tiny slice becomes more valuable.
 
-That's literally how people build wealth through the stock market girl. You're not just gambling — you're owning real businesses that make real products and real money.
+That's literally how people build wealth through the stock market. You're not just gambling — you're owning real businesses that make real products and real money.
 
 The key is thinking long term. Day to day the price bounces around like crazy but over years and decades stocks have historically gone up. That's why we invest instead of just saving cash 💪`,
       keyTakeaway: "A stock = tiny piece of a real company. You make money when the company grows. Think long term not day to day.",
@@ -97,13 +97,13 @@ The key is thinking long term. Day to day the price bounces around like crazy bu
           question: "When you buy a stock, what are you actually buying?",
           options: ["A loan to the company", "A tiny piece of ownership in the company", "A guaranteed return on investment", "The company's debt"],
           correctAnswer: 1,
-          explanation: "Exactly girl! You're buying actual ownership in the company. You become a part owner even if it's just a tiny piece 💪"
+          explanation: "Exactly! You're buying actual ownership in the company. You become a part owner even if it's just a tiny piece 💪"
         },
         {
           question: "What's the best way to approach stock investing according to Pansy?",
           options: ["Day trade for quick profits", "Sell immediately when prices drop", "Think long term and hold for years", "Only buy when prices are at their highest"],
           correctAnswer: 2,
-          explanation: "Yes! Long term thinking is key. Day to day the market is crazy but over years it historically goes up. Patience wins sis 🌱"
+          explanation: "Yes! Long term thinking is key. Day to day the market is crazy but over years it historically goes up. Patience wins 🌱"
         },
         {
           question: "What happens to your stock's value when the company does well?",
@@ -129,7 +129,7 @@ The genius of this is risk reduction. If one company has a terrible day but the 
 
 ETFs also have super low fees compared to mutual funds. We're talking like 0.03% per year for VOO. That's basically free. The stock market historically returns about 10% per year so you're keeping almost all of it.
 
-Bottom line: ETFs are perfect for beginners because you get instant diversification without having to pick individual winners. You're betting on the market as a whole not on your ability to find the next Tesla. Instant diversification sis 💪`,
+Bottom line: ETFs are perfect for beginners because you get instant diversification without having to pick individual winners. You're betting on the market as a whole not on your ability to find the next Tesla. Instant diversification 💪`,
       keyTakeaway: "ETFs = bundle of many stocks in one. Less risk than single stocks. Perfect for beginners who want diversification.",
       relatedTopics: ["what-is-mutual-fund", "index-funds", "active-vs-passive"],
       quiz: [
@@ -143,7 +143,7 @@ Bottom line: ETFs are perfect for beginners because you get instant diversificat
           question: "How many companies does VOO (an S&P 500 ETF) hold?",
           options: ["50 companies", "100 companies", "500 companies", "1000 companies"],
           correctAnswer: 2,
-          explanation: "Yes girl! VOO holds 500 of the biggest US companies. That's Apple Microsoft Amazon Google Tesla and 495 others all in one 🧺"
+          explanation: "Yes! VOO holds 500 of the biggest US companies. That's Apple Microsoft Amazon Google Tesla and 495 others all in one 🧺"
         },
         {
           question: "What are typical ETF fees compared to mutual funds?",
@@ -169,7 +169,7 @@ Here's the catch: they charge way more in fees. Where an ETF might cost 0.03% pe
 
 And here's the kicker — most actively managed funds don't even beat the market after fees. Like 80% of them underperform a basic index fund. So you're paying extra for worse results most of the time 😬
 
-That said some women prefer having a professional manage their money especially when starting out. It feels safer. And there are some legit good mutual funds out there. Just know what you're paying for and whether it's worth it to you 🛍️`,
+That said some people prefer having a professional manage their money especially when starting out. It feels safer. And there are some legit good mutual funds out there. Just know what you're paying for and whether it's worth it to you 🛍️`,
       keyTakeaway: "Mutual funds = professional manager picking stocks for you. Higher fees than ETFs. Most don't beat the market.",
       relatedTopics: ["what-is-etf", "index-funds", "active-vs-passive"],
       quiz: [
@@ -183,7 +183,7 @@ That said some women prefer having a professional manage their money especially 
           question: "What percentage of actively managed mutual funds underperform the S&P 500?",
           options: ["About 20%", "About 50%", "About 80%", "About 100%"],
           correctAnswer: 2,
-          explanation: "Yep about 80%! Most actively managed funds lose to a simple S&P 500 index fund after fees. The data doesn't lie girl 📉"
+          explanation: "Yep about 80%! Most actively managed funds lose to a simple S&P 500 index fund after fees. The data doesn't lie 📉"
         },
         {
           question: "Why do mutual funds typically charge higher fees than ETFs?",
@@ -201,7 +201,7 @@ That said some women prefer having a professional manage their money especially 
       readTime: 4,
       difficulty: "Beginner",
       summary: "Getting paid just for holding stocks",
-      content: `Girl dividends are literally getting paid just for owning a stock. Companies share their profits with shareholders every quarter and that money shows up in your account 💰
+      content: `Dividends are literally getting paid just for owning a stock. Companies share their profits with shareholders every quarter and that money shows up in your account 💰
 
 Here's how it works: If you own 100 shares of a company that pays $1 per share in dividends you get $100 deposited four times a year. Just for holding the stock. You don't have to do anything.
 
@@ -249,7 +249,7 @@ Bear market = prices going down. A bear swipes down with its paws. When the mark
 
 Here's what's important: both are completely normal and temporary. The stock market has had like 26 bear markets since 1928 and every single one ended eventually. The longest bull market lasted 11 years. The average bear market lasts about 9 months.
 
-So when you see red don't panic and sell everything. That's literally when stocks are on sale. The best investors keep buying during bear markets because they know historically the market always recovers and reaches new highs. Stay calm and think long term girl 💪`,
+So when you see red don't panic and sell everything. That's literally when stocks are on sale. The best investors keep buying during bear markets because they know historically the market always recovers and reaches new highs. Stay calm and think long term 💪`,
       keyTakeaway: "Bull = up 20%+ (good). Bear = down 20%+ (scary but temporary). Both are normal. Don't panic sell during bear markets.",
       relatedTopics: ["what-is-stock", "dollar-cost-averaging", "index-funds"],
       quiz: [
@@ -263,13 +263,13 @@ So when you see red don't panic and sell everything. That's literally when stock
           question: "How long does the average bear market last?",
           options: ["About 9 months", "About 5 years", "About 1 month", "They never end"],
           correctAnswer: 0,
-          explanation: "That's right! Average bear market is about 9 months. They're temporary girl. Every single one has ended eventually 💪"
+          explanation: "That's right! Average bear market is about 9 months. They're temporary. Every single one has ended eventually 💪"
         },
         {
           question: "What should you do during a bear market according to Pansy?",
           options: ["Panic and sell everything", "Stop investing completely", "Stay calm and keep buying (stocks are on sale)", "Move all money to cash"],
           correctAnswer: 2,
-          explanation: "Exactly! Bear markets = stocks on sale. The best investors keep buying because they know the market always recovers. Stay calm sis 🌱"
+          explanation: "Exactly! Bear markets = stocks on sale. The best investors keep buying because they know the market always recovers. Stay calm 🌱"
         }
       ]
     },
@@ -336,7 +336,7 @@ Average PE for the S&P 500 is usually around 15-20. If you see a PE of 50 that s
 
 High PE isn't always bad. Tech companies like Tesla or Netflix have high PEs because investors believe they'll grow like crazy. Low PE isn't always good — sometimes there's a reason nobody wants the stock 🤔
 
-Use PE to compare companies in the same industry. Comparing Apple's PE to a utility company's PE is pointless — they're in totally different businesses with different growth expectations. Stay in your lane when comparing girl 💪`,
+Use PE to compare companies in the same industry. Comparing Apple's PE to a utility company's PE is pointless — they're in totally different businesses with different growth expectations. Stay in your lane when comparing 💪`,
       keyTakeaway: "PE ratio = stock price ÷ earnings. Low = cheap. High = expensive (or high growth expected). Compare within same industry only.",
       relatedTopics: ["what-is-stock", "market-cap", "active-vs-passive"],
       quiz: [
@@ -356,7 +356,7 @@ Use PE to compare companies in the same industry. Comparing Apple's PE to a util
           question: "Is a high PE ratio always bad?",
           options: ["Yes, high PE always means overpriced", "No, it can mean investors expect high growth", "PE ratio doesn't matter", "Only for tech companies"],
           correctAnswer: 1,
-          explanation: "Exactly! High PE can mean investors believe the company will grow like crazy (like Tesla). It's not automatically bad girl 💪"
+          explanation: "Exactly! High PE can mean investors believe the company will grow like crazy (like Tesla). It's not automatically bad 💪"
         }
       ]
     },
@@ -380,7 +380,7 @@ Here's why this strategy crushes most active investing:
 
 The math is wild: if you invest $500 a month in an S&P 500 index fund for 30 years at 10% returns you end up with over $1 million. That's from just $180k of your own money. The rest is compound growth doing the work 🚀
 
-Index funds are my #1 recommendation for beginners. They're boring they're simple and they work. You don't need to watch the market or pick stocks. Just buy and hold and let time do its thing. Boring wins sis 💰`,
+Index funds are my #1 recommendation for beginners. They're boring they're simple and they work. You don't need to watch the market or pick stocks. Just buy and hold and let time do its thing. Boring wins 💰`,
       keyTakeaway: "Index funds = tracks the whole market (like S&P 500). Boring simple and historically beats 90% of active investors. Start here.",
       relatedTopics: ["what-is-etf", "dollar-cost-averaging", "active-vs-passive"],
       quiz: [
@@ -422,7 +422,7 @@ Compare this to trying to time the market perfectly — which is literally impos
 
 This works especially well with 401k contributions. You're automatically investing every paycheck regardless of what the market is doing. You're buying the highs the lows and everything in between. And historically that strategy beats trying to be clever.
 
-Set it and forget it girl. That's the secret to building wealth without the stress. Consistency beats timing every single time 💪`,
+Set it and forget it. That's the secret to building wealth without the stress. Consistency beats timing every single time 💪`,
       keyTakeaway: "DCA = invest same amount regularly (like $200/month). Removes timing stress. You buy more when prices are low. Set and forget.",
       relatedTopics: ["index-funds", "roth-ira", "bull-vs-bear"],
       quiz: [
@@ -466,7 +466,7 @@ Rules to know:
 - You can withdraw your contributions anytime penalty free
 - Income limits apply but there are workarounds
 
-Start a Roth IRA as early as possible. Time is your biggest advantage here. Even small contributions in your 20s become massive amounts by retirement because of compound growth. Future you will thank present you so much girl 💛`,
+Start a Roth IRA as early as possible. Time is your biggest advantage here. Even small contributions in your 20s become massive amounts by retirement because of compound growth. Future you will thank present you so much 💛`,
       keyTakeaway: "Roth IRA = tax-free growth forever. Contribute early for maximum compound growth. One of the best retirement accounts period.",
       relatedTopics: ["dollar-cost-averaging", "index-funds", "what-are-dividends"],
       quiz: [
@@ -508,7 +508,7 @@ Why is this powerful? Let's say you invest $10,000 in a dividend stock with a 4%
 
 Most brokerages offer automatic DRIP enrollment. Just turn it on and forget about it. You won't see the dividend cash hit your account but your share count will slowly grow every quarter.
 
-When you're young and don't need the income DRIP is the move. When you retire you can turn it off and take the dividends as cash for living expenses. It's like planting a money tree and watching it grow sis 🌱`,
+When you're young and don't need the income DRIP is the move. When you retire you can turn it off and take the dividends as cash for living expenses. It's like planting a money tree and watching it grow 🌱`,
       keyTakeaway: "DRIP = automatically reinvest dividends to buy more shares. Compound growth on autopilot. Turn it on and forget it.",
       relatedTopics: ["what-are-dividends", "dollar-cost-averaging", "index-funds"],
       quiz: [
@@ -550,7 +550,7 @@ Here's what the data shows: Over 15 years about 90% of active fund managers unde
 
 So why doesn't everyone just do passive? Because it's not exciting. Humans want to feel smart and in control. Buying an index fund and forgetting about it doesn't feel like investing — it feels like giving up.
 
-My take: If you're new go passive with index funds. Put 80-90% of your portfolio there. If you want to scratch the active itch use 10-20% to pick individual stocks. That way you get the stability of passive plus the fun of active without risking everything. Best of both worlds girl 💪`,
+My take: If you're new go passive with index funds. Put 80-90% of your portfolio there. If you want to scratch the active itch use 10-20% to pick individual stocks. That way you get the stability of passive plus the fun of active without risking everything. Best of both worlds 💪`,
       keyTakeaway: "Active = pick stocks (exciting but usually loses). Passive = index funds (boring but wins). Go 80% passive 20% active to balance.",
       relatedTopics: ["index-funds", "what-is-etf", "what-is-mutual-fund"],
       quiz: [
@@ -574,7 +574,7 @@ My take: If you're new go passive with index funds. Put 80-90% of your portfolio
             "About 100%"
           ],
           correctAnswer: 2,
-          explanation: "That's right! About 90% of professionals lose to a simple S&P 500 index fund. The data is wild girl 📊"
+          explanation: "That's right! About 90% of professionals lose to a simple S&P 500 index fund. The data is wild 📊"
         },
         {
           question: "What's Pansy's recommendation for beginners?",
@@ -597,7 +597,7 @@ My take: If you're new go passive with index funds. Put 80-90% of your portfolio
       readTime: 4,
       difficulty: "Intermediate",
       summary: "Win rate matters less than you think",
-      content: `Girl let me blow your mind with some math that changes everything about how you think about investing 🤯
+      content: `Let me blow your mind with some math that changes everything about how you think about investing 🤯
 
 Make 10 trades: 5 winners and 5 losers. You were literally wrong half the time. Sounds bad right? Watch this:
 
@@ -621,7 +621,7 @@ The discipline part is the hard part: taking that $100 loss and not holding on h
 - Take the loss when it hits your stop
 - Let winners run until they hit your target
 
-This isn't about being smart or picking perfectly. It's about math and discipline. Risk to reward matters way more than win rate sis 💪`,
+This isn't about being smart or picking perfectly. It's about math and discipline. Risk to reward matters way more than win rate 💪`,
       keyTakeaway: "You can be wrong 50% of the time and still profit big. Risk small, win big. 3:1 minimum risk to reward ratio.",
       relatedTopics: ["investment-rules", "dollar-cost-averaging", "bull-vs-bear"],
       quiz: [
@@ -634,7 +634,7 @@ This isn't about being smart or picking perfectly. It's about math and disciplin
             "30%"
           ],
           correctAnswer: 2,
-          explanation: "Exactly! You were right only 50% of the time but still made $1,000 profit. Win rate isn't everything girl 💪"
+          explanation: "Exactly! You were right only 50% of the time but still made $1,000 profit. Win rate isn't everything 💪"
         },
         {
           question: "If you risk $100 per trade, what should your minimum profit target be?",
@@ -679,7 +679,7 @@ This isn't about being smart or picking perfectly. It's about math and disciplin
 
 **When Your Stock Rises:**
 - Rise 30%? Sell 10%. Lock in some gains.
-- Rise 50%? Sell 30%. Take profits girl.
+- Rise 50%? Sell 30%. Take profits.
 - Rise 100%? Sell 60%. You doubled your money — secure it.
 
 Why does this work? Because it forces you to buy low and sell high which is literally what everyone says to do but nobody actually does when emotions kick in 😂
@@ -700,7 +700,7 @@ No thinking. No emotion. Just execute the plan. The decision was already made be
 
 This isn't about being clever or timing perfectly. It's about having a disciplined framework that takes emotion out of it. Most people fail at investing not because they're dumb but because they let feelings override logic.
 
-Set your rules before you invest. Write them down. Follow them no matter how you feel. Discipline over intelligence every time girl 🏆`,
+Set your rules before you invest. Write them down. Follow them no matter how you feel. Discipline over intelligence every time 🏆`,
       keyTakeaway: "Systematic buy/sell rules eliminate emotional decisions. Follow the framework regardless of feelings. Discipline beats intelligence.",
       relatedTopics: ["risk-reward-rule", "dollar-cost-averaging", "bull-vs-bear"],
       quiz: [
@@ -724,7 +724,7 @@ Set your rules before you invest. Write them down. Follow them no matter how you
             "Sell 60%"
           ],
           correctAnswer: 3,
-          explanation: "That's right! Rise 100% = sell 60%. You doubled your money — secure most of it and let some ride. Lock in wins sis 🏆"
+          explanation: "That's right! Rise 100% = sell 60%. You doubled your money — secure most of it and let some ride. Lock in wins 🏆"
         },
         {
           question: "What's the main advantage of having investment rules?",
@@ -747,7 +747,7 @@ Set your rules before you invest. Write them down. Follow them no matter how you
       readTime: 4,
       difficulty: "Beginner",
       summary: "Fear of missing out destroys portfolios",
-      content: `FOMO (Fear Of Missing Out) is literally the #1 way people lose money in the stock market girl. Let me paint you a picture 🎨
+      content: `FOMO (Fear Of Missing Out) is literally the #1 way people lose money in the stock market. Let me paint you a picture 🎨
 
 You're scrolling Twitter or watching YouTube and everyone's talking about this stock that's up 40% in a week. Green candles everywhere. People posting screenshots of their gains. Your timeline is full of "I told you so" posts.
 
@@ -757,7 +757,7 @@ So you buy at $150. It feels good for 30 minutes. Then the stock drops to $105. 
 
 **Here's the truth:**
 
-The market will ALWAYS be there sis. There will always be another opportunity. Another stock. Another rally. Another chance. You're not missing out on your last opportunity ever — you're just missing THIS particular move that already happened.
+The market will ALWAYS be there. There will always be another opportunity. Another stock. Another rally. Another chance. You're not missing out on your last opportunity ever — you're just missing THIS particular move that already happened.
 
 **The FOMO Rule:**
 
@@ -775,7 +775,7 @@ The stocks that everyone's talking about? You're late. The gains already happene
 - Plan your entries when emotions are low
 - If you missed the move accept it and move on
 
-Missing a move feels bad but losing money feels worse. Protect your capital sis. The market will give you another chance 🌸`,
+Missing a move feels bad but losing money feels worse. Protect your capital. The market will give you another chance 🌿`,
       keyTakeaway: "FOMO makes you buy at tops after moves already happened. If you didn't plan it before market open, don't take it that day. Market will always be there.",
       relatedTopics: ["investment-rules", "revenge-trading", "risk-reward-rule"],
       quiz: [
@@ -788,7 +788,7 @@ Missing a move feels bad but losing money feels worse. Protect your capital sis.
             "Based on fundamental analysis"
           ],
           correctAnswer: 1,
-          explanation: "Exactly! FOMO hits when everyone's posting gains and you feel left out. That's when you buy at the top girl 📈"
+          explanation: "Exactly! FOMO hits when everyone's posting gains and you feel left out. That's when you buy at the top 📈"
         },
         {
           question: "What's Pansy's FOMO rule?",
@@ -810,7 +810,7 @@ Missing a move feels bad but losing money feels worse. Protect your capital sis.
             "Chasing moves always works out"
           ],
           correctAnswer: 2,
-          explanation: "That's right! Missing a move feels bad but losing money feels worse. The market will give you another chance sis 💪"
+          explanation: "That's right! Missing a move feels bad but losing money feels worse. The market will give you another chance 💪"
         }
       ]
     },
@@ -822,7 +822,7 @@ Missing a move feels bad but losing money feels worse. Protect your capital sis.
       readTime: 4,
       difficulty: "Intermediate",
       summary: "The fastest way to blow up your account",
-      content: `Girl this is the emotional trap that destroys accounts. Let me show you how it happens step by step 💥
+      content: `This is the emotional trap that destroys accounts. Let me show you how it happens step by step 💥
 
 **The Revenge Trading Spiral:**
 
@@ -855,7 +855,7 @@ Not in 10 minutes. Not after lunch. TOMORROW. Give your emotions time to reset.
 
 **Why this is so hard:**
 
-Your ego gets involved. Losing money makes you feel stupid. You want to prove you're not stupid by winning it back. But that's ego talking not logic. Capital preservation is more important than ego sis 💅
+Your ego gets involved. Losing money makes you feel stupid. You want to prove you're not stupid by winning it back. But that's ego talking not logic. Capital preservation is more important than ego 💅
 
 **The Pro Move:**
 
@@ -887,7 +887,7 @@ Protect your capital. Your ego can recover but your account might not 🛡️`,
             "Keep trading but with smaller sizes"
           ],
           correctAnswer: 2,
-          explanation: "Exactly! Stop. Close everything. Walk away. Come back TOMORROW not in 10 minutes. Let emotions reset sis 🌸"
+          explanation: "Exactly! Stop. Close everything. Walk away. Come back TOMORROW not in 10 minutes. Let emotions reset 🌿"
         },
         {
           question: "Why is revenge trading so dangerous according to Pansy?",
@@ -898,7 +898,7 @@ Protect your capital. Your ego can recover but your account might not 🛡️`,
             "It requires complex math"
           ],
           correctAnswer: 1,
-          explanation: "That's right! Ego makes you risk bigger to 'prove' you're not stupid. One $200 loss becomes $2,000. Capital > ego girl 💅"
+          explanation: "That's right! Ego makes you risk bigger to 'prove' you're not stupid. One $200 loss becomes $2,000. Capital > ego 💅"
         }
       ]
     },
@@ -944,7 +944,7 @@ That's it. That's the system. It sounds simple but most people skip this because
 - Emotional decisions (fails question 1)
 - Undefined risk (fails questions 3 and 4)
 
-Print these six questions out. Put them on your screen. Make yourself answer them every single time. It takes 30 seconds and it will save your account sis 💪`,
+Print these six questions out. Put them on your screen. Make yourself answer them every single time. It takes 30 seconds and it will save your account 💪`,
       keyTakeaway: "Six questions before every trade: calm, planned, defined risk, risk/reward, making money (not proving something), can afford loss. No trade if you can't answer honestly.",
       relatedTopics: ["risk-management", "what-is-fomo", "revenge-trading"],
       quiz: [
@@ -979,7 +979,7 @@ Print these six questions out. Put them on your screen. Make yourself answer the
             "Ask someone else what to do"
           ],
           correctAnswer: 2,
-          explanation: "Exactly! If all 6 answers aren't clear and honest, walk away. The best trades are ones you DON'T take when answers are wrong sis 💪"
+          explanation: "Exactly! If all 6 answers aren't clear and honest, walk away. The best trades are ones you DON'T take when answers are wrong 💪"
         }
       ]
     },
@@ -1041,7 +1041,7 @@ Think about it: If you make 2% per week for a year that's 104% return. You've do
 - Survive to thrive
 - Consistency over excitement
 
-That's it. Risk 3% max per trade. It's boring. It's not exciting. It won't make you rich overnight. But it will keep you in the game long enough to actually build wealth sis 💛`,
+That's it. Risk 3% max per trade. It's boring. It's not exciting. It won't make you rich overnight. But it will keep you in the game long enough to actually build wealth 💛`,
       keyTakeaway: "Never risk more than 3% per trade. $10k account = $300 max risk. Ten losses in a row still keeps 70% capital. Protect capital first, profits second.",
       relatedTopics: ["self-assessment", "risk-reward-rule", "investment-rules"],
       quiz: [
@@ -1054,7 +1054,7 @@ That's it. Risk 3% max per trade. It's boring. It's not exciting. It won't make 
             "Whatever feels right"
           ],
           correctAnswer: 1,
-          explanation: "Yes! Maximum 3% per trade. It's the pro standard. Keeps you alive through losing streaks sis 🛡️"
+          explanation: "Yes! Maximum 3% per trade. It's the pro standard. Keeps you alive through losing streaks 🛡️"
         },
         {
           question: "If your account is $10,000, what's your max risk per trade?",
@@ -1076,7 +1076,7 @@ That's it. Risk 3% max per trade. It's boring. It's not exciting. It won't make 
             "Impressing other traders"
           ],
           correctAnswer: 1,
-          explanation: "Exactly! Protect capital FIRST. Profits come AFTER. Survive to thrive. Boring but effective girl 💛"
+          explanation: "Exactly! Protect capital FIRST. Profits come AFTER. Survive to thrive. Boring but effective 💛"
         }
       ]
     },
@@ -1088,7 +1088,7 @@ That's it. Risk 3% max per trade. It's boring. It's not exciting. It won't make 
       readTime: 3,
       difficulty: "Beginner",
       summary: "Your pre-trade, during-trade, and post-trade system",
-      content: `This is your complete trading checklist girl. Print this out. Pin it to your screen. Follow it EVERY SINGLE TIME and you'll automatically be in the top 10% of traders. Why? Because most people skip steps. You won't 🌸
+      content: `This is your complete trading checklist. Print this out. Pin it to your screen. Follow it EVERY SINGLE TIME and you'll automatically be in the top 10% of traders. Why? Because most people skip steps. You won't 🌿
 
 **BEFORE YOU TRADE:**
 
@@ -1128,7 +1128,7 @@ After = Builds your edge through reflection and prevents spiraling
 
 You don't need a complicated strategy. You don't need insider information. You don't need expensive software. You need THIS checklist and the discipline to follow it.
 
-Follow this and you're automatically in the top 10% of traders. Most people skip steps. Be the one who doesn't sis 🌸`,
+Follow this and you're automatically in the top 10% of traders. Most people skip steps. Be the one who doesn't 🌿`,
       keyTakeaway: "Three-phase checklist: BEFORE (5 checks), DURING (2 rules), AFTER (2 actions). Follow religiously = top 10% of traders. Most skip steps — don't be most.",
       relatedTopics: ["self-assessment", "risk-management", "revenge-trading"],
       quiz: [
@@ -1141,7 +1141,7 @@ Follow this and you're automatically in the top 10% of traders. Most people skip
             "Whatever feels right"
           ],
           correctAnswer: 2,
-          explanation: "Yes! ALL FIVE must be checked. If even ONE is unchecked, walk away. No exceptions sis 🌸"
+          explanation: "Yes! ALL FIVE must be checked. If even ONE is unchecked, walk away. No exceptions 🌿"
         },
         {
           question: "What should you NEVER do during a trade?",
@@ -1163,7 +1163,7 @@ Follow this and you're automatically in the top 10% of traders. Most people skip
             "Tell everyone on Twitter"
           ],
           correctAnswer: 2,
-          explanation: "Exactly! Journal every trade (win or lose) and absolutely NO revenge trading after losses. Reflection builds edge sis 💪"
+          explanation: "Exactly! Journal every trade (win or lose) and absolutely NO revenge trading after losses. Reflection builds edge 💪"
         }
       ]
     },
@@ -1177,7 +1177,7 @@ Follow this and you're automatically in the top 10% of traders. Most people skip
       difficulty: "Beginner",
       summary: "How rental property makes money explained simply",
       isPro: false,
-      content: `Okay girl let's talk about making money from real estate — and I don't mean flipping houses or being a landlord with 50 properties. I mean simple rental income that pays you every month 🏡
+      content: `Okay let's talk about making money from real estate — and I don't mean flipping houses or being a landlord with 50 properties. I mean simple rental income that pays you every month 🏡
 
 Cash flow = rent minus expenses. That's it. If you rent out a property for $1,800 a month and your mortgage + insurance + taxes + maintenance costs $1,400 you're cash flowing $400 per month. That's $4,800 a year just for owning that property.
 
@@ -1224,7 +1224,7 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
     },
     {
       id: "income-ways-into-real-estate",
-      title: "Ways Women Get Into Real Estate",
+      title: "Ways to Get Into Real Estate",
       category: "Income Streams",
       readTime: 4,
       difficulty: "Beginner",
@@ -1361,7 +1361,7 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
       difficulty: "Intermediate",
       summary: "Owner-occupied loans and how to prepare",
       isPro: true,
-      content: `If you're buying your first property and plan to live in it (or house hack it) you have way better loan options than DSCR. Let me show you the conventional and first-property paths that most women use 🏠
+      content: `If you're buying your first property and plan to live in it (or house hack it) you have way better loan options than DSCR. Let me show you the conventional and first-property paths that most people use 🏠
 
 **Conventional Owner-Occupied Loans:**
 
@@ -1387,7 +1387,7 @@ FHA is government-backed which means lower down payment and more flexible credit
 
 **The House Hacking Strategy:**
 
-Here's how savvy women combine these loans with house hacking:
+Here's how savvy investors combine these loans with house hacking:
 
 1. Buy a duplex or triplex with FHA (3.5% down)
 2. Live in one unit rent the others
@@ -1410,7 +1410,7 @@ Here's how savvy women combine these loans with house hacking:
 - [Better](#) — Low fees, conventional and FHA, competitive rates
 - [Navy Federal](#) — For military/veterans, excellent rates and VA loans
 
-The beauty of owner-occupied loans is you get the best rates and lowest down payment options. Then after you live there for a year you can turn it into a rental. That's how you build a real estate portfolio without needing huge cash upfront sis 💪
+The beauty of owner-occupied loans is you get the best rates and lowest down payment options. Then after you live there for a year you can turn it into a rental. That's how you build a real estate portfolio without needing huge cash upfront 💪
 
 Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
       keyTakeaway: "Conventional owner-occupied: 10-15% down, 620+ credit, must live 1 year. FHA: 3.5% down, 580+ credit. House hack strategy = live in one unit, rent others, then move out after 1 year.",
@@ -1467,7 +1467,7 @@ Key word: AFTER. You put in significant work upfront (or money) to build the inc
 
 **The passive income lie:**
 
-"Make $10,000/month working 2 hours/week!" That's not how it works girl. Either:
+"Make $10,000/month working 2 hours/week!" That's not how it works. Either:
 1. They're lying about the income
 2. They're lying about the time
 3. They put in YEARS of work upfront to get there
@@ -1586,7 +1586,7 @@ To generate $1,000/month in dividends at 4% yield you need $300,000 invested. So
 
 But if you invest $500/month for 20 years at 8% total return (4% dividend + 4% growth) you'll have $300,000. That $300k then generates $1,000/month passive income forever.
 
-Dividends are patient wealth-building. You're not getting rich overnight. But you're getting paid every quarter just for owning shares. That's real passive income girl 💛
+Dividends are patient wealth-building. You're not getting rich overnight. But you're getting paid every quarter just for owning shares. That's real passive income 💛
 
 Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
       keyTakeaway: "Dividends = quarterly cash from stocks. 4% yield on $300k = $1k/month income. DRIP = reinvest dividends to buy more shares automatically. Use DRIP when building, turn off when you need income.",
@@ -1788,7 +1788,7 @@ That's $840,000 kept vs given to IRS. Same contributions different account massi
 - [Schwab](#)
 - [Betterment](#) (automated)
 
-Tax-advantaged accounts + dividend/REIT income = wealth-building machine sis 💛
+Tax-advantaged accounts + dividend/REIT income = wealth-building machine 💛
 
 Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
       keyTakeaway: "REITs = real estate income without owning property, yield 3-7%, taxed as ordinary income (hold in IRA). Tax-advantaged: Roth IRA = tax-free growth, Traditional IRA/401k = tax-deferred. Max accounts for wealth building.",
@@ -1815,7 +1815,7 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
           question: "What's the 2024 Roth IRA contribution limit?",
           options: ["$3,000", "$6,500", "$22,500", "Unlimited"],
           correctAnswer: 1,
-          explanation: "Exactly! $6,500/year ($7,000 if 50+). Max it out for tax-free growth forever sis 💛"
+          explanation: "Exactly! $6,500/year ($7,000 if 50+). Max it out for tax-free growth forever 💛"
         }
       ]
     },
@@ -1859,17 +1859,17 @@ LLC or other business entity if you're earning income outside a W-2 job. Separat
 **Level 4: Asset Protection**
 Trusts, proper titling, umbrella insurance. This is advanced but matters when you have real wealth to protect.
 
-**Why women skip protection:**
+**Why people skip protection:**
 
-We're taught to be nice, to trust people, to not think about worst-case scenarios. "That won't happen to me." Until it does.
+We're taught to be optimistic, to trust things will work out, to not think about worst-case scenarios. "That won't happen to me." Until it does.
 
-The women who build lasting wealth? They protect their downside FIRST then focus on upside. They're not paranoid — they're prepared.
+The people who build lasting wealth? They protect their downside FIRST then focus on upside. They're not paranoid — they're prepared.
 
 **The real cost of no protection:**
 
-I've seen women lose rental properties because they didn't have an LLC. Lose everything because they skipped disability insurance and got sick. Watch businesses collapse because they had no legal protection.
+I've seen people lose rental properties because they didn't have an LLC. Lose everything because they skipped disability insurance and got sick. Watch businesses collapse because they had no legal protection.
 
-Don't let that be you sis. Build income AND protect it. Both matter equally 💛
+Don't let that be you. Build income AND protect it. Both matter equally 💛
 
 Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
       keyTakeaway: "Protection = emergency fund + insurance (life, disability, health) + legal structure (LLC) + asset protection. Protect downside first then focus on upside. Both matter equally.",
@@ -1901,7 +1901,7 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
             "Only buy insurance"
           ],
           correctAnswer: 1,
-          explanation: "Exactly! Protect downside first then build upside. Women who build lasting wealth think this way 💛"
+          explanation: "Exactly! Protect downside first then build upside. People who build lasting wealth think this way 💛"
         }
       ]
     },
@@ -1967,7 +1967,7 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
 
 Buy term life if people depend on your income. Buy disability insurance if your income depends on your ability to work. Buy health insurance because medical bills are insane. That's the protection trifecta.
 
-Don't let insurance salespeople scare you into expensive policies you don't need. Stick to the basics and invest the rest sis 💛
+Don't let insurance salespeople scare you into expensive policies you don't need. Stick to the basics and invest the rest 💛
 
 Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
       keyTakeaway: "Protection trifecta: Term life (if dependents rely on your income), Disability (1 in 4 need it), Health (medical bankruptcy is real). Skip expensive whole life and redundant policies. Basics only.",
@@ -1999,7 +1999,7 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
             "No insurance needed"
           ],
           correctAnswer: 1,
-          explanation: "Exactly! Term life (if dependents), disability (income protection), health (medical bills). That's the basics sis 💛"
+          explanation: "Exactly! Term life (if dependents), disability (income protection), health (medical bills). That's the basics 💛"
         }
       ]
     },
@@ -2072,7 +2072,7 @@ By default LLCs are "pass-through" — profits pass through to your personal tax
 
 Form an LLC when your side income is consistent ($10k+/year) and you want professional protection. Don't rush to form on day 1 of your idea.
 
-LLC = legal protection + professional credibility. It's not magic but it matters when your income grows sis 💪
+LLC = legal protection + professional credibility. It's not magic but it matters when your income grows 💪
 
 Bloom is for educational purposes only and does not provide financial, tax, legal, or investment advice. All investing and borrowing involves risk. Always consult a licensed professional before making financial decisions.`,
       keyTakeaway: "LLC = liability protection. File Articles of Organization with state ($50-500). Get EIN from IRS (free). Open business bank. File annual reports ($50-300/year). Form when income is $10k+/year consistent.",
@@ -2109,7 +2109,7 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
             "Only after making $1 million"
           ],
           correctAnswer: 1,
-          explanation: "Exactly! Form when income is steady $10k+/year. Don't rush on day 1 — test your idea first sis 💪"
+          explanation: "Exactly! Form when income is steady $10k+/year. Don't rush on day 1 — test your idea first 💪"
         }
       ]
     },
@@ -2750,7 +2750,7 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
   return (
     <Layout>
       <SEO
-        title="Learn Investing — 150+ Free Lessons for Women | Bloom"
+        title="Learn Investing — 150+ Free Lessons | Bloom"
         description="Free investing lessons covering stocks, ETFs, mutual funds, dividends, retirement, trading psychology, side hustles, and passive income. Each lesson includes a quiz. Earn XP and a certificate of completion. No jargon — Pansy explains it all in plain language."
       />
       <div className="min-h-screen bg-background pb-20">
@@ -2760,7 +2760,7 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
               Bloom Basics 🌱
             </h1>
             <p className="text-muted-foreground">
-              Your foundation — investing explained by Pansy in girlfriend language
+              Your foundation — investing explained by Pansy in plain language
             </p>
           </div>
 
@@ -3045,7 +3045,7 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
               />
               <div className="flex-1">
                 <p className="font-semibold text-foreground mb-2">
-                  Keep learning girl! 💛
+                  Keep learning! 💛
                 </p>
                 <p className="text-sm text-foreground/80 leading-relaxed">
                   Every lesson you complete gets you one step closer to

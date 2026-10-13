@@ -328,7 +328,7 @@ export default function EbookPremium() {
                 <div>
                   <h3 className="text-2xl font-bold text-slate-900 mb-2">You&apos;re Not Alone</h3>
                   <p className="text-lg text-slate-700">
-                    Hundreds of women are walking this path. Late Bloomers isn&apos;t just stock analysis — it&apos;s a community of people doing the same hard work.
+                    Hundreds of people are walking this path. Late Bloomers isn&apos;t just stock analysis — it&apos;s a community of people doing the same hard work.
                   </p>
                 </div>
               </div>
@@ -462,13 +462,13 @@ export default function EbookPremium() {
 
               <div className="p-8 rounded-xl bg-white/10 backdrop-blur border border-white/20">
                 <p className="text-emerald-300 font-bold text-sm mb-2">STEP 3</p>
-                <p className="text-2xl font-bold mb-2">Start Your 7-Day Trial</p>
-                <p className="text-white/80">Full access to Budget Tracker, Paper Trader, Lessons. No credit card needed.</p>
+                <p className="text-2xl font-bold mb-2">Start Learning — It's Free</p>
+                <p className="text-white/80">Full access to Budget Tracker, Paper Trader, and 150+ Lessons. No credit card needed.</p>
               </div>
             </div>
 
             <div className="text-center pt-8 border-t border-white/20">
-              <p className="text-lg font-semibold mb-4">Download She Blooms Wealth</p>
+              <p className="text-lg font-semibold mb-4">Download Bloom</p>
               <div className="space-y-2 text-white/90 mb-12">
                 <p className="text-sm">Android: play.google.com/store/apps/details?id=app.shebloomswealth.mobile</p>
                 <p className="text-sm">Web: shebloomswealth.app</p>

@@ -307,10 +307,7 @@ export default function StockPage() {
           </Card>
         ) : null}
 
-        {/* Upgrade Banner for Free Users After Analysis */}
-        {pansyAnalysis && !isPro && isLoggedIn && (
-          <UpgradeBanner message={`Loved Pansy's take? Get unlimited analysis with Bloom Pro — $${PRO_PLAN.monthlyPrice}/month`} />
-        )}
+        {/* Upgrade banner removed — app is 100% free */}
 
         {/* Sign-Up CTA for Logged-Out Users */}
         {pansyAnalysis && !isLoggedIn && (
@@ -345,7 +342,7 @@ export default function StockPage() {
           </Card>
         )}
 
-        {/* Upgrade Modal */}
+        {/* UpgradeModal (no-op — app is 100% free) */}
         <UpgradeModal 
           isOpen={showUpgradeModal} 
           onClose={() => setShowUpgradeModal(false)}

@@ -47,7 +47,7 @@ export default function EbookPreview() {
             { n: "2", t: "Phase 1: Budget Like Your Life Depends On It", d: "Why budgeting is your foundation, not trading" },
             { n: "3", t: "Phase 2: Build Multiple Income Streams", d: "How to earn $2-5K/month extra while working" },
             { n: "4", t: "Phase 3: Invest With Real Capital", d: "Now you have money to grow" },
-            { n: "5", t: "5 Mistakes Women Make", d: "And how to avoid them" },
+            { n: "5", t: "5 Mistakes Beginners Make", d: "And how to avoid them" },
             { n: "6", t: "Your First 7 Days", d: "Actionable steps to get started today" },
           ].map((ch) => (
             <div key={ch.n} style={{ display: "flex", gap: 20, marginBottom: 28 }}>
@@ -207,7 +207,7 @@ export default function EbookPreview() {
 
         {/* CH 5: 5 MISTAKES */}
         <div className="page-break" style={{ padding: "80px 48px", minHeight: "100vh" }}>
-          <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 36, fontWeight: 700, color: C.deep, marginBottom: 32 }}>5 Mistakes Women Make (And How to Avoid Them)</h2>
+          <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 36, fontWeight: 700, color: C.deep, marginBottom: 32 }}>5 Mistakes Beginners Make (And How to Avoid Them)</h2>
 
           <div style={{ maxWidth: 640, display: "flex", flexDirection: "column", gap: 16 }}>
             {[
@@ -259,9 +259,9 @@ export default function EbookPreview() {
             </p>
 
             {[
-              { step: "Next Step 1", title: "Download the She Blooms Wealth App", desc: "Track your spending. Start Phase 1 today." },
+              { step: "Next Step 1", title: "Download the Bloom App", desc: "Track your spending. Start Phase 1 today." },
               { step: "Next Step 2", title: "Join Late Bloomers (Free)", desc: "Every Friday, I share 3 stocks I'm researching. Learn from my research process." },
-              { step: "Next Step 3", title: "Start Your Free Trial", desc: "Full access to Budget Tracker + Paper Trader + Lessons." },
+              { step: "Next Step 3", title: "Start Learning — It's Free", desc: "Full access to Budget Tracker + Paper Trader + 150+ Lessons." },
             ].map((s) => (
               <div key={s.step} style={{ background: "rgba(255,255,255,0.08)", padding: 24, borderRadius: 12, marginBottom: 16 }}>
                 <p style={{ fontSize: 13, opacity: 0.55, marginBottom: 4 }}>{s.step}:</p>

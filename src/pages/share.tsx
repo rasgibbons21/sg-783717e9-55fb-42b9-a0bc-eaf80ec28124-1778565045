@@ -10,7 +10,7 @@ export default function SharePage() {
     <>
       <SEO
         title="Bloom - Invest in Yourself First 🌸"
-        description="Investment analysis designed for women. Learn from Pansy, get personalized analyses, and build wealth with confidence."
+        description="Learn investing, budgeting, and side hustles with Pansy. Bite-size lessons, a practice trader, and a budget tracker. Free."
         image="/bloom-share.png"
       />
       
@@ -37,7 +37,7 @@ export default function SharePage() {
             </h1>
             
             <p className="mb-12 text-lg text-zinc-300 sm:text-xl">
-              Investment analysis designed for women. Learn from Pansy, get personalized analyses, and build wealth with confidence.
+              Learn investing, budgeting, and side hustles with Pansy. Bite-size lessons, a practice trader, and a budget tracker. Free.
             </p>
 
             {/* CTA Buttons */}
@@ -76,9 +76,9 @@ export default function SharePage() {
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-accent/20 to-primary/20">
                   <Heart className="h-6 w-6 text-accent" />
                 </div>
-                <h3 className="mb-2 font-semibold text-white">Made for Women</h3>
+                <h3 className="mb-2 font-semibold text-white">No Jargon</h3>
                 <p className="text-sm text-zinc-400">
-                  Investment education without the intimidation. Pansy explains everything in plain language.
+                  Financial education without the intimidation. Pansy explains everything in plain language.
                 </p>
               </Card>
 

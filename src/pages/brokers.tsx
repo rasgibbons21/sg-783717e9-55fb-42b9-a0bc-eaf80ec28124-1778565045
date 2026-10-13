@@ -139,7 +139,7 @@ export default function Brokers() {
     <Layout>
       <SEO
         title="Best Brokers for Beginners — Compare Brokerages | Bloom"
-        description="Compare the best online brokers and trading platforms for beginner investors. Take the Find My Broker quiz to match with the right brokerage. See pros, cons, fees, and features side by side. Designed for women starting their investing journey."
+        description="Compare the best online brokers and trading platforms for beginner investors. Take the Find My Broker quiz to match with the right brokerage. See pros, cons, fees, and features side by side."
       />
       <div className="container-full py-8 space-y-6 pb-24">
         {/* ─── Section 1: Header ─── */}

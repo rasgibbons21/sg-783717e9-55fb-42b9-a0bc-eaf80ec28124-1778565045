@@ -62,11 +62,12 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
       const onTrial = trialEnd !== null && trialEnd > now && !hasActiveSubscription;
       const daysLeft = trialEnd ? Math.max(0, Math.ceil((trialEnd.getTime() - now.getTime()) / 86400000)) : 0;
 
-      setIsPro(hasActiveSubscription || onTrial || (profile?.is_pro === true && !trialEnd));
-      setIsPaidPro(hasActiveSubscription || (profile?.is_pro === true && !trialEnd));
-      setIsTrial(onTrial);
-      setTrialDaysLeft(daysLeft);
-      setTrialEndsAt(onTrial && trialEnd ? trialEnd : null);
+      // App is 100% free — everyone gets full access
+      setIsPro(true);
+      setIsPaidPro(true);
+      setIsTrial(false);
+      setTrialDaysLeft(0);
+      setTrialEndsAt(null);
 
       const first = profile?.full_name
         ? (profile.full_name as string).trim().split(" ")[0]
