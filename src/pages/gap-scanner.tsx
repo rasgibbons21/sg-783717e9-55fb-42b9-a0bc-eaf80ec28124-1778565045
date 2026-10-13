@@ -315,7 +315,7 @@ export default function GapScannerPage() {
   return (
     <Layout>
       <SEO
-        title="Radar | Gap Scanner"
+        title="Bloom | Gap Scanner"
         description="Pre-market gap-and-go scanner — find gapping stocks with volume and catalysts."
       />
       <div className="max-w-lg mx-auto px-4 pt-4 pb-32">

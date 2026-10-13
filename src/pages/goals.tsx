@@ -231,13 +231,13 @@ export default function Goals() {
 
   const getPansyMessage = (progress: number) => {
     if (progress === 0) {
-      return "Every journey starts with a single step girl! Let's get this money 💰";
+      return "Every journey starts with a single step! Let's get this money 💰";
     } else if (progress < 25) {
-      return "You're off to a great start! Keep that momentum going sis 🌱";
+      return "You're off to a great start! Keep that momentum going 🌱";
     } else if (progress < 50) {
       return "Look at you go! Almost halfway there and killing it 💪";
     } else if (progress < 75) {
-      return "Over halfway! The finish line is in sight babe 🎯";
+      return "Over halfway! The finish line is in sight 🎯";
     } else if (progress < 100) {
       return "SO CLOSE! You're literally almost there, don't stop now 🔥";
     } else {
@@ -256,7 +256,7 @@ export default function Goals() {
   return (
     <Layout>
       <SEO
-        title="Savings Goals - Radar"
+        title="Savings Goals - Bloom"
         description="Track your financial goals with visual progress"
       />
       <div className="container-full py-6 pb-24 space-y-6">
@@ -424,7 +424,7 @@ export default function Goals() {
                 </Badge>
               </div>
               <p className="text-sm text-muted-foreground italic leading-relaxed">
-                "Having clear financial goals isn't just about the numbers girl — it's about creating the life you want. Break down big dreams into smaller milestones and celebrate each one 🌸"
+                "Having clear financial goals isn't just about the numbers — it's about creating the life you want. Break down big dreams into smaller milestones and celebrate each one 🌸"
               </p>
             </div>
           </div>
@@ -585,7 +585,7 @@ export default function Goals() {
         <Card className="p-3 bg-muted border-muted-foreground/20 rounded-2xl">
           <p className="text-xs text-center text-muted-foreground leading-relaxed">
             This is educational content only and does not constitute financial
-            advice. Radar is not liable for any investment decisions or losses.
+            advice. Bloom is not liable for any investment decisions or losses.
           </p>
         </Card>
       </div>

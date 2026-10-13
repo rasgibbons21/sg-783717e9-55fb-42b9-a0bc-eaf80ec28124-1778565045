@@ -97,7 +97,7 @@ function buildEmailHTML(data: {
     </div>
 
     <p style="text-align:center;font-size:10px;color:#999;margin-top:32px;line-height:1.5;">
-      Radar — Educational content only, not financial advice.<br>
+      Bloom — Educational content only, not financial advice.<br>
       <a href="https://shebloomswealth.app/profile" style="color:#999;">Manage preferences</a>
     </p>
   </div>
@@ -241,7 +241,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          from: "Radar <hello@shebloomswealth.app>",
+          from: "Bloom <hello@shebloomswealth.app>",
           to: email,
           subject: `Your Week in Review — ${streak > 0 ? `${streak}-day streak!` : "Here's your recap"}`,
           html,

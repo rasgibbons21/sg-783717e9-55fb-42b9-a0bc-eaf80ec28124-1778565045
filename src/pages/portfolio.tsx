@@ -456,7 +456,7 @@ export default function WatchlistPage() {
 
   return (
     <Layout>
-      <SEO title="Watchlist | Radar" description="Track stocks and set price alerts." />
+      <SEO title="Watchlist | Bloom" description="Track stocks and set price alerts." />
       <div className="max-w-lg mx-auto px-4 pt-4 pb-32">
 
         {/* Header */}

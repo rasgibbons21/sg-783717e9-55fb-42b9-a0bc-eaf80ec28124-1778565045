@@ -9,7 +9,7 @@ export default function SharePage() {
   return (
     <>
       <SEO
-        title="Radar — Stock Screener & Alerts"
+        title="Bloom — Stock Screener & Alerts"
         description="Stock screener, price alerts, and Pansy AI market chat. Watchlist, market movers, paper trading, and options tape."
         image="/bloom-share.png"
       />
@@ -26,7 +26,7 @@ export default function SharePage() {
             <div className="mb-8 flex justify-center">
               <img
                 src="/bloom-share.png"
-                alt="Radar"
+                alt="Bloom"
                 className="h-auto w-full max-w-md drop-shadow-2xl"
               />
             </div>
@@ -76,7 +76,7 @@ export default function SharePage() {
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-accent/20 to-primary/20">
                   <Heart className="h-6 w-6 text-accent" />
                 </div>
-                <h3 className="mb-2 font-semibold text-white">Made for Women</h3>
+                <h3 className="mb-2 font-semibold text-white">Made for Everyone</h3>
                 <p className="text-sm text-zinc-400">
                   Investment education without the intimidation. Pansy explains everything in plain language.
                 </p>
@@ -125,7 +125,7 @@ export default function SharePage() {
               © 2026 Cinder Vault Enterprises LLC. All rights reserved.
             </p>
             <p className="mt-2 text-xs text-zinc-600">
-              Radar is for educational purposes only and does not constitute financial advice.
+              Bloom is for educational purposes only and does not constitute financial advice.
             </p>
             <div className="mt-4 flex flex-wrap justify-center gap-4 text-xs">
               <Link href="/privacy" className="text-zinc-500 hover:text-accent">

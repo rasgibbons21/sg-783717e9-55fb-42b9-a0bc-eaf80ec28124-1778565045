@@ -63,7 +63,7 @@ export default function PositionCalculatorPage() {
   return (
     <Layout>
       <SEO
-        title="Radar | Position Calculator"
+        title="Bloom | Position Calculator"
         description="Calculate your position size based on account size and risk tolerance."
       />
       <div className="max-w-lg mx-auto px-4 pt-4 pb-32">

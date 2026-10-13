@@ -206,7 +206,7 @@ export default function NewsPage() {
 
   return (
     <Layout>
-      <SEO title="Radar | News" description="Market news and headlines from licensed sources." />
+      <SEO title="Bloom | News" description="Market news and headlines from licensed sources." />
       <div className="max-w-2xl mx-auto px-4 pt-4 pb-32">
 
         {/* Header */}

@@ -59,7 +59,7 @@ export default function GooglePlaySubscription() {
             <ShieldCheck className="w-8 h-8 text-accent" />
           </div>
           <h1 className="text-3xl font-bold text-foreground">
-            Welcome to Radar Core!
+            Welcome to Bloom Core!
           </h1>
           <p className="text-muted-foreground">
             Your subscription is active. Enjoy unlimited access.
@@ -83,7 +83,7 @@ export default function GooglePlaySubscription() {
             <ShieldCheck className="w-8 h-8 text-accent" />
           </div>
           <h1 className="text-3xl font-bold text-foreground">
-            You&apos;re a Radar Core member
+            You&apos;re a Bloom Core member
           </h1>
           <p className="text-muted-foreground">
             You have full access to all premium features.
@@ -108,10 +108,10 @@ export default function GooglePlaySubscription() {
     <div className="max-w-lg mx-auto p-4 space-y-6">
       <div className="text-center space-y-2">
         <h1 className="text-3xl font-bold text-foreground">
-          Radar Core
+          Bloom Core
         </h1>
         <p className="text-muted-foreground">
-          Unlock everything Radar has to offer
+          Unlock everything Bloom has to offer
         </p>
       </div>
 
@@ -142,7 +142,7 @@ export default function GooglePlaySubscription() {
           <AlertCircle className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" />
           <p className="text-sm text-muted-foreground">
             Google Play Billing is not available. Please make sure you&apos;re
-            using the Radar app from the Google Play Store.
+            using the Bloom app from the Google Play Store.
           </p>
         </Card>
       )}
@@ -150,7 +150,7 @@ export default function GooglePlaySubscription() {
       {/* Features */}
       <Card className="p-5 border-accent/20 bg-accent/5">
         <h3 className="text-lg font-semibold text-foreground mb-3">
-          Everything in Radar Core
+          Everything in Bloom Core
         </h3>
         <ul className="space-y-2.5">
           {[
@@ -310,7 +310,7 @@ export default function GooglePlaySubscription() {
 
       {/* Disclaimer */}
       <p className="text-[10px] text-center text-muted-foreground/60 leading-relaxed">
-        Educational content only. Not financial advice. Radar is not liable for
+        Educational content only. Not financial advice. Bloom is not liable for
         any investment decisions or losses.
       </p>
 

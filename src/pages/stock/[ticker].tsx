@@ -315,7 +315,7 @@ export default function StockPage() {
 
         {/* Upgrade Banner for Free Users After Analysis */}
         {pansyAnalysis && !isPaid && isLoggedIn && (
-          <UpgradeBanner message={`Loved Pansy's take? Get unlimited analysis with Radar Core — $${CORE_PLAN.monthlyPrice}/month`} />
+          <UpgradeBanner message={`Loved Pansy's take? Get unlimited analysis with Bloom Core — $${CORE_PLAN.monthlyPrice}/month`} />
         )}
 
         {/* Sign-Up CTA for Logged-Out Users */}

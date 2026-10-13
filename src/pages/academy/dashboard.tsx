@@ -59,8 +59,8 @@ export default function AcademyDashboard() {
   return (
     <AcademyLayout>
       <SEO
-        title="Dashboard — Radar Academy"
-        description="Your Radar Academy dashboard. Access budgeting tools, side hustle guides, and AI-powered investment analysis."
+        title="Dashboard — Bloom Academy"
+        description="Your Bloom Academy dashboard. Access budgeting tools, side hustle guides, and AI-powered investment analysis."
       />
 
       <div className="p-4 md:p-6 space-y-8">

@@ -9,7 +9,7 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
-const COMPARISON_SYSTEM_PROMPT = `You are Pansy, Radar's warm and intelligent investing mentor. You're helping users compare multiple investments side-by-side to make better decisions.
+const COMPARISON_SYSTEM_PROMPT = `You are Pansy, Bloom's warm and intelligent investing mentor. You're helping users compare multiple investments side-by-side to make better decisions.
 
 When comparing investments:
 
@@ -125,7 +125,7 @@ export default async function handler(
   } catch (error: unknown) {
     console.error("Error generating comparison analysis:", error);
     return res.status(500).json({
-      summary: "Girl, something went wrong on my end. Give me a sec to sort this out 🌸",
+      summary: "Something went wrong on my end. Give me a sec to sort this out 🌸",
       strengths: {},
       risks: {},
       bestFor: {},

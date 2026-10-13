@@ -118,7 +118,7 @@ export const M7_LESSONS: UniversityLesson[] = [
           "As price moves favorably and creates new swing lows, pattern boundaries, or structure, the original stop may be far from current price and represent outdated logic. New structure gives closer, more relevant invalidation points.",
       },
     ],
-    girlToGirlTip:
+    pansyTip:
       "A stop only ever moves toward safety. The second you move it the other way, that's panicked-you talking. Don't let her drive.",
     videoSlot: null,
   },
@@ -242,7 +242,7 @@ export const M7_LESSONS: UniversityLesson[] = [
           "Anxiety about an open position drives premature break-even moves. The discomfort of having money at risk makes traders want to remove that risk before the trade has genuinely earned a safe cushion.",
       },
     ],
-    girlToGirlTip:
+    pansyTip:
       "'Now this can't hurt me' is one of the best feelings in the game. Just don't rush it — too soon strangles your winners in the crib.",
     videoSlot: null,
   },
@@ -361,7 +361,7 @@ export const M7_LESSONS: UniversityLesson[] = [
           "By design, a trailing stop must sit below current price to survive normal pullbacks. When the trend eventually reverses, the stop is triggered below the peak — capturing a portion, not the whole move. That's the expected outcome, not a failure.",
       },
     ],
-    girlToGirlTip:
+    pansyTip:
       "You'll never catch the exact top, and chasing it makes you crazy. A trailing stop is how you make peace with 'a great chunk.'",
     videoSlot: null,
   },
@@ -484,7 +484,7 @@ export const M7_LESSONS: UniversityLesson[] = [
           "Fear-driven full exits at the first profitable tick cut potential winners short before the thesis has had time to work. This pattern — done repeatedly — means the win rate may be fine but the average winner is too small to cover the average loser.",
       },
     ],
-    girlToGirlTip:
+    pansyTip:
       "There's real peace in paying yourself along the way. Banking a little takes the desperation out of the rest of the trade.",
     videoSlot: null,
   },
@@ -606,7 +606,7 @@ export const M7_LESSONS: UniversityLesson[] = [
           "The right question is whether the chart reason for the trade is still valid — not whether the profit feels good. If the thesis is intact, the impulse to exit is emotional, not analytical.",
       },
     ],
-    girlToGirlTip:
+    pansyTip:
       "Loss aversion makes a small win feel safer than a big one. But trading only works if winners are allowed to be winners. Let the good ones breathe.",
     videoSlot: null,
   },
@@ -731,7 +731,7 @@ export const M7_LESSONS: UniversityLesson[] = [
           "When price reaches the invalidation level, the decision is already made — exit. Reassessing in the moment introduces emotion and hope into a decision that should be mechanical. The analysis happened before the trade.",
       },
     ],
-    girlToGirlTip:
+    pansyTip:
       "A small loss is just the cost of doing business — totally normal. It only becomes dangerous when you refuse to take it. Take the small one, every time.",
     videoSlot: null,
   },
@@ -853,7 +853,7 @@ export const M7_LESSONS: UniversityLesson[] = [
           "The desire to capture every last cent of a move — refusing to exit while price might still go higher — is what keeps traders in past the point of good risk management. Greed for the top is how real profits become round-trips.",
       },
     ],
-    girlToGirlTip:
+    pansyTip:
       "Greed for the very last dollar is how people turn winners into losers. A banked gain beats a bigger one you never actually kept.",
     videoSlot: null,
   },
@@ -981,7 +981,7 @@ export const M7_LESSONS: UniversityLesson[] = [
           "When emotional intensity rises — heart racing, urge to act immediately — the right move is to pause and return to the pre-made plan. The plan was made by calm, analytical thinking. The spike of emotion is not new information.",
       },
     ],
-    girlToGirlTip:
+    pansyTip:
       "The plan you make before the trade is calm and smart. The you inside the trade is not. When they disagree, trust the calm one — that's the whole game.",
     videoSlot: null,
   },

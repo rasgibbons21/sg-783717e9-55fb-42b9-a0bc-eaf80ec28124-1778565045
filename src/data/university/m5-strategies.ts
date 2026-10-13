@@ -121,7 +121,7 @@ export const M5_LESSONS: UniversityLesson[] = [
           "Trend following accepts a higher number of small losses (especially in choppy markets) in exchange for the potential to capture a large move when a genuine trend develops.",
       },
     ],
-    girlToGirlTip:
+    pansyTip:
       "You don't have to call the bottom to do well. Catching the fat middle of a trend is plenty — and a lot less stressful than playing hero.",
     videoSlot: null,
   },
@@ -248,7 +248,7 @@ export const M5_LESSONS: UniversityLesson[] = [
           "FOMO-chasing the very first candle that breaks a level — before confirmation — is the classic error. That first candle is where fakeouts most often happen.",
       },
     ],
-    girlToGirlTip:
+    pansyTip:
       "The market sets fakeouts because it knows you're excited. Letting a breakout prove itself costs a little upside and saves a lot of pain.",
     videoSlot: null,
   },
@@ -370,7 +370,7 @@ export const M5_LESSONS: UniversityLesson[] = [
           "Buying into a steep decline and labeling it a 'pullback' without checking trend health or having an invalidation level is the classic error — some dips keep falling.",
       },
     ],
-    girlToGirlTip:
+    pansyTip:
       "'Buy the dip' isn't a strategy by itself — some dips keep dipping. The art is knowing which pause is healthy.",
     videoSlot: null,
   },
@@ -494,7 +494,7 @@ export const M5_LESSONS: UniversityLesson[] = [
           "Swing trading needs markets with identifiable swings — enough directional movement over days to make a multi-day hold worthwhile. It struggles in slow, range-bound, low-volatility markets.",
       },
     ],
-    girlToGirlTip:
+    pansyTip:
       "Swing trading suits real life — but that means trusting your plan when you're not watching. Set it up well, then let it breathe.",
     videoSlot: null,
   },
@@ -621,7 +621,7 @@ export const M5_LESSONS: UniversityLesson[] = [
           "'Too far too fast' means price has moved so quickly in a short time that the move may be exhausted and overextended — making late arrivals especially vulnerable to a quick reversal.",
       },
     ],
-    girlToGirlTip:
+    pansyTip:
       "The most adrenaline-heavy style, so the most dangerous for your discipline. If it makes your heart race, slow down, don't speed up.",
     videoSlot: null,
   },
@@ -746,7 +746,7 @@ export const M5_LESSONS: UniversityLesson[] = [
           "Panic-selling on a scary daily headline or a normal pullback — when the major trend is actually still intact — is the classic position trading mistake. Daily noise is part of the deal.",
       },
     ],
-    girlToGirlTip:
+    pansyTip:
       "Fewer decisions often means better results. Position trading wins by not fiddling — sometimes the best move is to leave it alone.",
     videoSlot: null,
   },
@@ -870,7 +870,7 @@ export const M5_LESSONS: UniversityLesson[] = [
           "By owning a broad basket, the investor doesn't need to correctly identify one winning company. They capture the group's growth — which historically has been far easier than picking individual winners.",
       },
     ],
-    girlToGirlTip:
+    pansyTip:
       "Boring and spread-out has quietly built more wealth than almost any hot tip. No shame in the steady path.",
     videoSlot: null,
   },
@@ -996,7 +996,7 @@ export const M5_LESSONS: UniversityLesson[] = [
           "Yield-chasing without checking sustainability is the classic mistake. A high number attracts attention, but if the company can't maintain it, the dividend gets cut — and the stock often falls sharply when that happens.",
       },
     ],
-    girlToGirlTip:
+    pansyTip:
       "A dividend is getting paid to be patient — but only if the company can keep paying it. A yield too good to be true usually is.",
     videoSlot: null,
   },
@@ -1125,7 +1125,7 @@ export const M5_LESSONS: UniversityLesson[] = [
           "Stopping DCA when markets are falling is the most damaging mistake — those are the periods when shares are cheaper and the schedule does its most effective work. Fear breaks the schedule at exactly the wrong moment.",
       },
     ],
-    girlToGirlTip:
+    pansyTip:
       "The magic of DCA is it protects you from yourself. No agonizing over timing — just show up, again and again. Discipline beats brilliance.",
     videoSlot: null,
   },

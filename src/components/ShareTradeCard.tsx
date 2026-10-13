@@ -155,7 +155,7 @@ function TradeCardContent({ data }: { data: TradeData }) {
           <div className="flex items-center gap-1.5">
             <span style={{ fontSize: 14 }}>&#127800;</span>
             <span className="text-xs font-semibold" style={{ color: C.dim }}>
-              Radar
+              Bloom
             </span>
           </div>
         </div>
@@ -235,7 +235,7 @@ function StatsCardContent({ data }: { data: StatsData }) {
         >
           <span style={{ fontSize: 14 }}>&#127800;</span>
           <span className="text-xs font-semibold" style={{ color: C.dim }}>
-            Radar
+            Bloom
           </span>
         </div>
 
@@ -275,10 +275,10 @@ export function ShareCardModal({ mode, onClose }: { mode: ShareMode; onClose: ()
       if (!blob) return;
 
       if (navigator.share) {
-        const file = new File([blob], "radar-trade.png", { type: "image/png" });
+        const file = new File([blob], "bloom-trade.png", { type: "image/png" });
         await navigator.share({
-          title: "My trade on Radar",
-          text: "Check out my trade on Radar! shebloomswealth.app",
+          title: "My trade on Bloom",
+          text: "Check out my trade on Bloom! shebloomswealth.app",
           files: [file],
         });
       } else {

@@ -26,7 +26,7 @@ type Step =
 
 type AuthMode = "signup" | "login" | "forgot";
 
-interface RadarProfile {
+interface BloomProfile {
   ageBand: string;
   experience: string;
   session: string[];
@@ -236,7 +236,7 @@ export default function Onboarding() {
 
   // Complete onboarding — save to localStorage + Supabase if logged in
   const completeOnboarding = async () => {
-    const profile: RadarProfile = {
+    const profile: BloomProfile = {
       ageBand, experience, session: sessions, problem, struggles,
       desired, help, strategiesOn,
       completedOnboardingAt: new Date().toISOString(),
@@ -368,7 +368,7 @@ export default function Onboarding() {
   return (
     <>
       <OnboardingStyles />
-      <div className="fixed inset-0 overflow-y-auto" style={{ background: "linear-gradient(160deg, #070B12 0%, #0a1525 45%, #0d1f35 75%, #070B12 100%)" }}>
+      <div className="fixed inset-0 overflow-y-auto overflow-x-hidden" style={{ background: "linear-gradient(160deg, #070B12 0%, #0a1525 45%, #0d1f35 75%, #070B12 100%)" }}>
         <FloatingOrbs />
         <div className="relative z-10 flex flex-col min-h-screen">
 
@@ -410,13 +410,13 @@ export default function Onboarding() {
                 <div className={`space-y-8 ${animateIn ? "step-animate" : "opacity-0"}`}>
                   <div className="text-center space-y-5">
                     <div className="relative inline-block">
-                      <img src="/icon-192.png" alt="Radar" className="w-20 h-20 mx-auto rounded-3xl object-cover" style={{ boxShadow: "0 0 50px rgba(39,183,200,0.25)" }} />
+                      <img src="/icon-192.png" alt="Bloom" className="w-20 h-20 mx-auto rounded-3xl object-cover" style={{ boxShadow: "0 0 50px rgba(39,183,200,0.25)" }} />
                     </div>
                     <h1 className="font-serif text-4xl font-bold text-[#F3EDE3] leading-tight">
                       Most traders lose<br />because they scan blind.
                     </h1>
                     <p className="text-[#F3EDE3]/50 text-lg leading-relaxed">
-                      Radar watches the entire market and tells you<br />
+                      Bloom watches the entire market and tells you<br />
                       <span className="text-[#27B7C8] font-semibold">exactly where to look.</span>
                     </p>
                   </div>
@@ -527,7 +527,7 @@ export default function Onboarding() {
                         <AlertTriangle className="w-5 h-5 text-[#B86A6A] shrink-0 mt-0.5" />
                         <div>
                           <p className="text-sm font-semibold text-[#B86A6A]">You must be 18+ to trade</p>
-                          <p className="text-xs text-[#F3EDE3]/40 mt-1">You can still explore Radar&apos;s educational content and paper trading to learn before you turn 18.</p>
+                          <p className="text-xs text-[#F3EDE3]/40 mt-1">You can still explore Bloom&apos;s educational content and paper trading to learn before you turn 18.</p>
                         </div>
                       </div>
                     </div>
@@ -551,7 +551,7 @@ export default function Onboarding() {
                     <h2 className="font-serif text-3xl font-bold text-[#F3EDE3]">
                       Trading experience?
                     </h2>
-                    <p className="text-[#F3EDE3]/40 text-base">Radar adapts to your level.</p>
+                    <p className="text-[#F3EDE3]/40 text-base">Bloom adapts to your level.</p>
                   </div>
 
                   <div className="space-y-3">
@@ -757,7 +757,7 @@ export default function Onboarding() {
                 <div className={`space-y-6 ${animateIn ? "step-animate" : "opacity-0"}`}>
                   <div className="text-center space-y-3">
                     <h2 className="font-serif text-3xl font-bold text-[#F3EDE3]">
-                      How should Radar<br />help you most?
+                      How should Bloom<br />help you most?
                     </h2>
                     <p className="text-[#F3EDE3]/40 text-base">Pick all that apply.</p>
                   </div>
@@ -1071,7 +1071,7 @@ export default function Onboarding() {
                 <div className={`space-y-6 ${animateIn ? "step-animate" : "opacity-0"}`}>
                   <div className="text-center space-y-2">
 
-                    <img src="/icon-192.png" alt="Radar" className="w-14 h-14 mx-auto rounded-2xl object-cover" style={{ boxShadow: "0 0 30px rgba(39,183,200,0.15)" }} />
+                    <img src="/icon-192.png" alt="Bloom" className="w-14 h-14 mx-auto rounded-2xl object-cover" style={{ boxShadow: "0 0 30px rgba(39,183,200,0.15)" }} />
                     <h2 className="font-serif text-3xl font-bold text-[#F3EDE3]">
                       {authMode === "signup" ? "Create your account" : authMode === "login" ? "Welcome back" : "Reset password"}
                     </h2>

@@ -72,7 +72,7 @@ export default function EarningsCalendarPage() {
   return (
     <Layout>
       <SEO
-        title="Radar | Earnings Calendar"
+        title="Bloom | Earnings Calendar"
         description="Upcoming earnings reports — know what's reporting before you trade."
       />
       <div className="max-w-lg mx-auto px-4 pt-4 pb-32">

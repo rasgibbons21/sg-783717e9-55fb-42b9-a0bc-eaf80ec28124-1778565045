@@ -33,17 +33,17 @@ export default function About() {
       </Head>
 
       <SEO
-        title="About Radar — Stock Screener & Alerts"
-        description="Radar is a stock screener and alerts platform with Pansy AI analyst, TradingView charts, paper trading, and 150+ trading lessons. By Cinder Vault Enterprises LLC."
+        title="About Bloom — Stock Screener & Alerts"
+        description="Bloom is a stock screener and alerts platform with Pansy AI analyst, TradingView charts, paper trading, and 150+ trading lessons. By Cinder Vault Enterprises LLC."
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "FAQPage",
           mainEntity: [
-            { "@type": "Question", name: "What is Radar?", acceptedAnswer: { "@type": "Answer", text: "Radar is a stock screener and alerts platform. It scans stocks using high-probability strategies, sends price alerts, and includes Pansy — an AI trading analyst who provides entries, stops, and targets." } },
-            { "@type": "Question", name: "Is Radar free?", acceptedAnswer: { "@type": "Answer", text: "Yes! Radar offers a free tier with a basic stock screener, paper trading simulator, market movers, and 36 core lessons. Radar Desk ($7.99/month or $69/year) unlocks price alerts, full scans, and paper trading. Radar Pro ($24.99/month or $199/year) adds custom backtests, journal analytics, and more alerts." } },
-            { "@type": "Question", name: "What is paper trading in Radar?", acceptedAnswer: { "@type": "Answer", text: "Paper trading lets you practice buying and selling real stocks with $10,000 in virtual money. You get real-time prices, interactive charts, a trade journal, and P&L tracking — all with zero financial risk." } },
-            { "@type": "Question", name: "Who is Pansy?", acceptedAnswer: { "@type": "Answer", text: "Pansy is Radar's AI trading analyst. She scans the markets, identifies setups, and gives traders specific entries, stop losses, and take profit targets. She explains charts in plain language and never places trades on your behalf." } },
-            { "@type": "Question", name: "What trading strategies does Radar cover?", acceptedAnswer: { "@type": "Answer", text: "Radar's screener scores stocks using 32 strategies across day trading, swing trading, and long-term investing. Topics include Gap-and-Go, VWAP reclaim, momentum breakouts, support/resistance, and moving average plays." } },
+            { "@type": "Question", name: "What is Bloom?", acceptedAnswer: { "@type": "Answer", text: "Bloom is a stock screener and alerts platform. It scans stocks using high-probability strategies, sends price alerts, and includes Pansy — an AI trading analyst who provides entries, stops, and targets." } },
+            { "@type": "Question", name: "Is Bloom free?", acceptedAnswer: { "@type": "Answer", text: "Yes! Bloom offers a free tier with a basic stock screener, paper trading simulator, market movers, and 36 core lessons. Bloom Desk ($7.99/month or $69/year) unlocks price alerts, full scans, and paper trading. Bloom Pro ($24.99/month or $199/year) adds custom backtests, journal analytics, and more alerts." } },
+            { "@type": "Question", name: "What is paper trading in Bloom?", acceptedAnswer: { "@type": "Answer", text: "Paper trading lets you practice buying and selling real stocks with $10,000 in virtual money. You get real-time prices, interactive charts, a trade journal, and P&L tracking — all with zero financial risk." } },
+            { "@type": "Question", name: "Who is Pansy?", acceptedAnswer: { "@type": "Answer", text: "Pansy is Bloom's AI trading analyst. She scans the markets, identifies setups, and gives traders specific entries, stop losses, and take profit targets. She explains charts in plain language and never places trades on your behalf." } },
+            { "@type": "Question", name: "What trading strategies does Bloom cover?", acceptedAnswer: { "@type": "Answer", text: "Bloom's screener scores stocks using 32 strategies across day trading, swing trading, and long-term investing. Topics include Gap-and-Go, VWAP reclaim, momentum breakouts, support/resistance, and moving average plays." } },
           ],
         }}
       />
@@ -54,8 +54,8 @@ export default function About() {
         <nav style={{ borderBottom:"1px solid rgba(255,255,255,0.06)", background:"rgba(14,27,48,0.95)", backdropFilter:"blur(16px)" }}>
           <div style={{ maxWidth:1200, margin:"0 auto", padding:"0 1.5rem", height:60, display:"flex", alignItems:"center", justifyContent:"space-between" }}>
             <Link href="/" style={{ display:"flex", alignItems:"center", gap:9, textDecoration:"none" }}>
-              <Image src="/icon-192.png" alt="Radar" width={32} height={32} style={{ borderRadius:10 }} />
-              <span style={{ fontFamily:"'Cormorant Garamond', serif", fontWeight:700, fontSize:17, color:C.ivory }}>Radar</span>
+              <Image src="/icon-192.png" alt="Bloom" width={32} height={32} style={{ borderRadius:10 }} />
+              <span style={{ fontFamily:"'Cormorant Garamond', serif", fontWeight:700, fontSize:17, color:C.ivory }}>Bloom</span>
             </Link>
             <div style={{ display:"flex", gap:20, alignItems:"center" }}>
               {([
@@ -89,7 +89,7 @@ export default function About() {
               <span style={gradientText}>Trade smarter.</span>
             </h1>
             <p style={{ fontSize:"1.1rem", lineHeight:1.72, color:"rgba(244,247,250,0.65)", maxWidth:580, margin:"0 auto" }}>
-              Radar is a stock screener and alerts platform. We help traders find setups, set alerts, and make smarter decisions — with Pansy, your AI trading analyst, by your side.
+              Bloom is a stock screener and alerts platform. We help traders find setups, set alerts, and make smarter decisions — with Pansy, your AI trading analyst, by your side.
             </p>
           </div>
 
@@ -102,7 +102,7 @@ export default function About() {
               The gender wealth gap is real. Women outlive men by an average of five years, yet consistently hold less invested wealth. That gap isn&apos;t about ability — it&apos;s about access to clear, non-condescending, jargon-free financial education that actually fits women&apos;s lives.
             </p>
             <p style={{ fontSize:"1rem", lineHeight:1.72, color:"rgba(244,247,250,0.68)", marginTop:"1rem" }}>
-              Radar exists to close that gap — not by picking stocks for you, but by giving you the understanding to build your own judgment. The goal is always your independence, not your dependency on us.
+              Bloom exists to close that gap — not by picking stocks for you, but by giving you the understanding to build your own judgment. The goal is always your independence, not your dependency on us.
             </p>
           </div>
 
@@ -125,7 +125,7 @@ export default function About() {
           {/* What's inside */}
           <div style={{ background:`rgba(22,38,74,0.5)`, border:`1px solid rgba(255,255,255,0.07)`, borderRadius:18, padding:"2rem 2.25rem", marginBottom:"2rem" }}>
             <h2 style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:"1.75rem", fontWeight:700, color:C.ivory, marginBottom:"1.25rem" }}>
-              What&apos;s inside Radar
+              What&apos;s inside Bloom
             </h2>
             <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(200px, 1fr))", gap:14 }}>
               {[
@@ -153,7 +153,7 @@ export default function About() {
               The company
             </h2>
             <p style={{ fontSize:"1rem", lineHeight:1.72, color:"rgba(244,247,250,0.68)" }}>
-              Radar is a product of Cinder Vault Enterprises LLC. We are a financial education company, not a broker, investment adviser, or financial planner. We hold no licences to provide investment advice and we do not do so.
+              Bloom is a product of Cinder Vault Enterprises LLC. We are a financial education company, not a broker, investment adviser, or financial planner. We hold no licences to provide investment advice and we do not do so.
             </p>
             <p style={{ fontSize:"1rem", lineHeight:1.72, color:"rgba(244,247,250,0.68)", marginTop:"1rem" }}>
               Questions? Reach us at <a href="mailto:cindervaultenterprisesllc@gmail.com" style={{ color:C.teal, textDecoration:"none" }}>cindervaultenterprisesllc@gmail.com</a> or visit our <Link href="/contact" style={{ color:C.teal, textDecoration:"none" }}>contact page</Link>.

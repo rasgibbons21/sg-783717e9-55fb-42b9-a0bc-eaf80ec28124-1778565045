@@ -79,8 +79,8 @@ export default function ReferPage() {
     trackReferralShare();
     try {
       await navigator.share({
-        title: "Join Radar — Free Stock Screener",
-        text: "I use Radar for stock screening and alerts. Try it free:",
+        title: "Join Bloom — Free Stock Screener",
+        text: "I use Bloom for stock screening and alerts. Try it free:",
         url: link,
       });
       setShared(true);
@@ -91,8 +91,8 @@ export default function ReferPage() {
   return (
     <Layout>
       <SEO
-        title="Radar | Invite Friends & Earn Rewards"
-        description="Share Radar with friends. When they sign up, you both get rewarded with extra days of access."
+        title="Bloom | Invite Friends & Earn Rewards"
+        description="Share Bloom with friends. When they sign up, you both get rewarded with extra days of access."
       />
       <div className="max-w-lg mx-auto px-4 pt-6 pb-32">
         {/* Header */}
@@ -191,7 +191,7 @@ export default function ReferPage() {
           <div className="space-y-3">
             {[
               { num: "1", text: "Share your unique referral link with a friend" },
-              { num: "2", text: "They sign up for Radar using your link" },
+              { num: "2", text: "They sign up for Bloom using your link" },
               { num: "3", text: "You both get +7 days of access added to your accounts" },
             ].map(({ num, text }) => (
               <div

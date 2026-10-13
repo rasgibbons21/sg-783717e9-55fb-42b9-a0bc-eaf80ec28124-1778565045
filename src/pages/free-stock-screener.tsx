@@ -43,13 +43,13 @@ export default function FreeStockScreenerPage() {
   return (
     <div style={{ fontFamily: "'Inter', sans-serif", background: C.deep, color: C.ivory, minHeight: "100vh" }}>
       <SEO
-        title="Free Stock Screener — Radar | Real-Time Scanner & Alerts"
+        title="Free Stock Screener — Bloom | Real-Time Scanner & Alerts"
         description="Free stock screener with 12 built-in strategies, price alerts, paper trading, and AI market chat. No credit card required. Scan pre-market gaps, momentum plays, and breakouts."
         image="/api/og?title=Free+Stock+Screener&subtitle=12+strategies.+Price+alerts.+Paper+trading.+No+credit+card."
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "SoftwareApplication",
-          name: "Radar Stock Screener",
+          name: "Bloom Stock Screener",
           applicationCategory: "FinanceApplication",
           operatingSystem: "Web, Android",
           offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
@@ -62,7 +62,7 @@ export default function FreeStockScreenerPage() {
       <nav style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(14,27,48,0.92)", backdropFilter: "blur(18px)", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 1.5rem", height: 64, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-            <span style={{ fontSize: 18, fontWeight: 700, color: C.ivory }}>Radar</span>
+            <span style={{ fontSize: 18, fontWeight: 700, color: C.ivory }}>Bloom</span>
             <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(244,247,250,0.35)" }}>Stock Screener</span>
           </Link>
           <Link href="/onboarding">
@@ -87,7 +87,7 @@ export default function FreeStockScreenerPage() {
         </h1>
 
         <p style={{ fontSize: "clamp(1rem,1.8vw,1.12rem)", lineHeight: 1.72, color: "rgba(244,247,250,0.65)", maxWidth: 600, margin: "0 auto 2rem" }}>
-          Radar scans the market daily across momentum, breakout, gap-and-go, VWAP, and 8 more strategies.
+          Bloom scans the market daily across momentum, breakout, gap-and-go, VWAP, and 8 more strategies.
           Price alerts, paper trading, and Pansy AI market chat included. No paywall to start.
         </p>
 
@@ -119,12 +119,12 @@ export default function FreeStockScreenerPage() {
       {/* Comparison table */}
       <section style={{ maxWidth: 700, margin: "0 auto", padding: "2rem 1.5rem 3rem" }}>
         <h2 style={{ fontSize: "clamp(1.3rem,3vw,1.8rem)", fontWeight: 700, textAlign: "center", marginBottom: "2rem" }}>
-          Radar vs. Paid Screeners
+          Bloom vs. Paid Screeners
         </h2>
         <div style={{ ...glass, borderRadius: 16, overflow: "hidden" }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", padding: "12px 16px", background: "rgba(39,183,200,0.08)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
             <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(244,247,250,0.45)", textTransform: "uppercase" }}>Feature</span>
-            <span style={{ fontSize: 11, fontWeight: 700, color: C.teal, textTransform: "uppercase" }}>Radar</span>
+            <span style={{ fontSize: 11, fontWeight: 700, color: C.teal, textTransform: "uppercase" }}>Bloom</span>
             <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(244,247,250,0.45)", textTransform: "uppercase" }}>Others</span>
           </div>
           {COMPARE.map(({ feature, radar, others }, i) => (
@@ -145,7 +145,7 @@ export default function FreeStockScreenerPage() {
           Ready to scan the market?
         </h2>
         <p style={{ fontSize: 14, color: "rgba(244,247,250,0.55)", marginBottom: "1.5rem" }}>
-          Join Radar free. No credit card, no paywall, no spam.
+          Join Bloom free. No credit card, no paywall, no spam.
         </p>
         <Link href="/onboarding">
           <button style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "14px 28px", borderRadius: 10, ...gradientBg, color: C.deep, fontSize: 15, fontWeight: 700, border: "none", cursor: "pointer", boxShadow: `0 8px 30px rgba(39,183,200,0.28)` }}>
@@ -157,7 +157,7 @@ export default function FreeStockScreenerPage() {
       {/* Footer */}
       <footer style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "2rem 1.5rem", textAlign: "center" }}>
         <p style={{ fontSize: 11, color: "rgba(244,247,250,0.25)" }}>
-          © 2026 Cinder Vault Enterprises LLC. Radar is for educational purposes only and does not constitute financial advice.
+          © 2026 Cinder Vault Enterprises LLC. Bloom is for educational purposes only and does not constitute financial advice.
         </p>
       </footer>
     </div>

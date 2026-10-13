@@ -58,17 +58,17 @@ export function PositionSizeCalculator() {
       };
     } else if (riskPercent > 2 && riskPercent <= 3) {
       return {
-        text: "Acceptable risk level. Stay disciplined and this can work sis 👍",
+        text: "Acceptable risk level. Stay disciplined and this can work 👍",
         color: "text-accent",
       };
     } else if (riskPercent > 3 && riskPercent <= 5) {
       return {
-        text: "Getting aggressive girl. Make sure you can emotionally handle these losses 😬",
+        text: "Getting aggressive. Make sure you can emotionally handle these losses 😬",
         color: "text-[#F3EDE3]/70",
       };
     } else {
       return {
-        text: "Way too risky sis! One bad streak and your account is toast. Lower this 🚫",
+        text: "Way too risky! One bad streak and your account is toast. Lower this 🚫",
         color: "text-destructive",
       };
     }

@@ -5,9 +5,8 @@ import Image from "next/image";
 import Head from "next/head";
 import { supabase } from "@/integrations/supabase/client";
 import { SEO } from "@/components/SEO";
-import { ArrowRight, Share2, Smartphone, Plus, Check, Zap } from "lucide-react";
+import { ArrowRight, Share2, Smartphone, Plus, BookOpen, DollarSign, BarChart3 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
-import { DESK_PLAN, PRO_PLAN } from "@/config/proPlan";
 
 /* ─── Palette ─────────────────────────────────────────────────────────────── */
 const C = {
@@ -131,6 +130,8 @@ function CandleBg() {
 export default function LandingPage() {
   const router = useRouter();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [deferredPrompt, setDeferredPrompt] = useState<Event | null>(null);
+  const [platform, setPlatform] = useState<"ios" | "android" | "desktop">("desktop");
 
   useEffect(() => {
     (async () => {
@@ -143,6 +144,26 @@ export default function LandingPage() {
     })();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    const ua = navigator.userAgent || "";
+    if (/iPhone|iPad|iPod/.test(ua)) setPlatform("ios");
+    else if (/Android/.test(ua)) setPlatform("android");
+
+    const handler = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    window.addEventListener("beforeinstallprompt", handler);
+    return () => window.removeEventListener("beforeinstallprompt", handler);
+  }, []);
+
+  const handleInstall = async () => {
+    if (!deferredPrompt) return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (deferredPrompt as any).prompt();
+    setDeferredPrompt(null);
+  };
 
   if (isCheckingAuth) {
     return (
@@ -164,35 +185,29 @@ export default function LandingPage() {
       <style>{KEYFRAMES}</style>
 
       <SEO
-        title="Radar — Stock Screener & Trade Alerts"
-        description="Stock screener, price alerts, and Pansy AI market chat. Watchlist, market movers, paper trading, and options tape. Education optional."
+        title="Bloom — Learn Money & Investing From Zero. Free."
+        description="Free investing education, paper trading, stock screener, and AI market chat. Learn at your own pace — no jargon, no paywall."
         jsonLd={{
           "@context": "https://schema.org",
           "@graph": [
             {
               "@type": "Organization",
               "@id": "https://shebloomswealth.app/#organization",
-              name: "Radar by Cinder Vault Enterprises LLC",
+              name: "Bloom by Cinder Vault Enterprises LLC",
               url: "https://shebloomswealth.app",
               logo: "https://shebloomswealth.app/icon-512.png",
-              description: "Stock screener, trade alerts, and AI market analysis platform.",
+              description: "Free investing education, paper trading, and market tools.",
               foundingDate: "2026",
               founder: { "@type": "Organization", name: "Cinder Vault Enterprises LLC" },
             },
             {
               "@type": "SoftwareApplication",
               "@id": "https://shebloomswealth.app/#app",
-              name: "Radar",
+              name: "Bloom",
               applicationCategory: "FinanceApplication",
               operatingSystem: "Android, Web",
-              offers: [
-                { "@type": "Offer", price: "0", priceCurrency: "USD", description: "Free screener, paper trading, and education" },
-                { "@type": "Offer", price: String(DESK_PLAN.monthlyPrice), priceCurrency: "USD", billingIncrement: "P1M", description: "Radar Desk monthly" },
-                { "@type": "Offer", price: String(DESK_PLAN.yearlyPrice), priceCurrency: "USD", billingIncrement: "P1Y", description: "Radar Desk yearly" },
-                { "@type": "Offer", price: String(PRO_PLAN.monthlyPrice), priceCurrency: "USD", billingIncrement: "P1M", description: "Radar Pro monthly" },
-                { "@type": "Offer", price: String(PRO_PLAN.yearlyPrice), priceCurrency: "USD", billingIncrement: "P1Y", description: "Radar Pro yearly" },
-              ],
-              description: "Stock screener, price alerts, and Pansy AI market chat. Watchlist, market movers, paper trading. Education optional.",
+              offers: { "@type": "Offer", price: "0", priceCurrency: "USD", description: "100% free education, paper trading, and market tools" },
+              description: "Free investing education, paper trading, stock screener, and AI market chat. Learn at your own pace.",
               url: "https://shebloomswealth.app",
               publisher: { "@id": "https://shebloomswealth.app/#organization" },
             },
@@ -200,7 +215,7 @@ export default function LandingPage() {
               "@type": "WebSite",
               "@id": "https://shebloomswealth.app/#website",
               url: "https://shebloomswealth.app",
-              name: "Radar",
+              name: "Bloom",
               publisher: { "@id": "https://shebloomswealth.app/#organization" },
             },
           ],
@@ -214,12 +229,12 @@ export default function LandingPage() {
           <div style={{ maxWidth:1200, margin:"0 auto", padding:"0 1.5rem", height:64, display:"flex", alignItems:"center", justifyContent:"space-between" }}>
             <div style={{ display:"flex", alignItems:"center", gap:10 }}>
               <div style={{ animation:"breathe 8s ease-in-out infinite" }}>
-                <Image src="/icon-192.png" alt="Radar" width={36} height={36}
+                <Image src="/icon-192.png" alt="Bloom" width={36} height={36}
                   style={{ borderRadius:10, animation:"glow-pulse 7s ease-in-out infinite", display:"block" }} />
               </div>
               <div style={{ lineHeight:1.15 }}>
-                <div style={{ fontFamily:"'Cormorant Garamond', serif", fontWeight:700, fontSize:18, letterSpacing:"0.01em", color:C.ivory }}>Radar</div>
-                <div style={{ fontSize:9, fontWeight:600, letterSpacing:"0.14em", textTransform:"uppercase", color:"rgba(244,247,250,0.35)" }}>Stock Screener & Alerts</div>
+                <div style={{ fontFamily:"'Cormorant Garamond', serif", fontWeight:700, fontSize:18, letterSpacing:"0.01em", color:C.ivory }}>Bloom</div>
+                <div style={{ fontSize:9, fontWeight:600, letterSpacing:"0.14em", textTransform:"uppercase", color:"rgba(244,247,250,0.35)" }}>Learn &amp; Invest</div>
               </div>
             </div>
             <Link href="/onboarding">
@@ -243,21 +258,22 @@ export default function LandingPage() {
             {/* ── LEFT COLUMN ─────────────────────────────────────────────── */}
             <div style={{ flex:"0 0 54%" }}>
               <div style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"6px 14px", borderRadius:20, marginBottom:"1.25rem", animation:"fade-up 0.55s ease-out 0.1s both", background:"rgba(73, 176, 110, 0.12)", border:"1px solid rgba(73, 176, 110, 0.25)" }}>
-                <span style={{ fontSize:13 }}>📡</span>
-                <span style={{ fontSize:12, fontWeight:700, color:C.green, letterSpacing:"0.04em" }}>Free Stock Screener — No Credit Card</span>
+                <span style={{ fontSize:13 }}>🌱</span>
+                <span style={{ fontSize:12, fontWeight:700, color:C.green, letterSpacing:"0.04em" }}>100% Free — No Credit Card</span>
               </div>
 
               <div style={{ marginBottom:"1.25rem", animation:"fade-up 0.55s ease-out 0.2s both" }}>
                 <h1 style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:"clamp(2.3rem, 5vw, 3.6rem)", fontWeight:700, lineHeight:1.12, letterSpacing:"-0.01em", color:C.ivory, margin:0 }}>
-                  Screen stocks, set alerts,
+                  Learn money and investing
                   <br />
-                  <span style={{ ...gradientText }}>trade smarter.</span>
+                  <span style={{ ...gradientText }}>from zero. Free.</span>
                 </h1>
               </div>
 
               <p style={{ fontSize:"clamp(1rem, 1.9vw, 1.12rem)", lineHeight:1.72, color:"rgba(244,247,250,0.72)", maxWidth:480, marginBottom:"1.8rem", animation:"fade-up 0.55s ease-out 0.28s both" }}>
-                Radar is a <strong style={{ color:C.ivory }}>stock screener and alerts platform</strong> with Pansy AI market chat,
-                watchlist, market movers, paper trading, and options tape. Education built in.
+                Bloom is a <strong style={{ color:C.ivory }}>free investing education platform</strong> with
+                lessons, paper trading, a stock screener, and Pansy — your AI market guide.
+                No jargon, no paywall.
               </p>
 
               <div style={{ display:"flex", gap:12, animation:"fade-up 0.55s ease-out 0.44s both" }}>
@@ -266,7 +282,7 @@ export default function LandingPage() {
                     onMouseEnter={e => { e.currentTarget.style.transform="translateY(-2px)"; e.currentTarget.style.boxShadow=`0 14px 40px rgba(39,183,200,0.44)`; }}
                     onMouseLeave={e => { e.currentTarget.style.transform="translateY(0)";    e.currentTarget.style.boxShadow=`0 8px 30px rgba(39,183,200,0.28)`; }}
                   >
-                    Get Started Free <ArrowRight size={16} />
+                    Start Learning Free <ArrowRight size={16} />
                   </button>
                 </Link>
               </div>
@@ -292,8 +308,8 @@ export default function LandingPage() {
                       style={{ borderRadius:6, flexShrink:0, marginTop:2, display:"block" }} />
                     <p style={{ margin:0, fontSize:12.5, lineHeight:1.62, color:"rgba(244,247,250,0.88)" }}>
                       Hi, I&apos;m Pansy 🌿<br />
-                      I screen, I explain the alert, I do not place the trade.{" "}
-                      <span style={{ color:C.teal, fontWeight:600 }}>Let&apos;s find your next setup.</span>
+                      I explain markets in plain English — no jargon, no pressure.{" "}
+                      <span style={{ color:C.teal, fontWeight:600 }}>Ready to learn?</span>
                     </p>
                   </div>
                 </div>
@@ -302,115 +318,83 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ── PRICING ─────────────────────────────────────────────────────── */}
-        <section style={{ maxWidth:900, margin:"0 auto", padding:"3.5rem 1.5rem 2rem" }}>
+        {/* ── WHAT'S INSIDE BLOOM ─────────────────────────────────────────── */}
+        <section style={{ maxWidth:1000, margin:"0 auto", padding:"3.5rem 1.5rem 2rem" }}>
           <div style={{ textAlign:"center", marginBottom:"2.5rem" }}>
-            <div style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"6px 14px", borderRadius:20, marginBottom:"1rem", background:"rgba(39,183,200,0.1)", border:"1px solid rgba(39,183,200,0.2)" }}>
-              <Zap size={13} style={{ color:C.teal }} />
-              <span style={{ fontSize:12, fontWeight:700, color:C.teal, letterSpacing:"0.04em" }}>Pricing</span>
-            </div>
             <h2 style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:"clamp(1.5rem, 3vw, 2.2rem)", fontWeight:700, color:C.ivory, marginBottom:8 }}>
-              Simple pricing, no surprises
+              What&apos;s inside Bloom
             </h2>
             <p style={{ fontSize:14, color:"rgba(244,247,250,0.55)", maxWidth:440, margin:"0 auto" }}>
-              Start free. Upgrade when you&apos;re ready.
+              Everything you need to go from zero to confident — all free.
             </p>
           </div>
 
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(240px, 1fr))", gap:16 }}>
-            {/* FREE */}
-            <div style={{ ...glass, borderRadius:20, padding:"1.75rem", display:"flex", flexDirection:"column" }}>
-              <p style={{ fontSize:13, fontWeight:700, color:"rgba(244,247,250,0.45)", textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:12 }}>Free</p>
-              <div style={{ marginBottom:16 }}>
-                <span style={{ fontSize:36, fontWeight:800, color:C.ivory }}>$0</span>
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(260px, 1fr))", gap:20 }}>
+            {[
+              {
+                icon: BookOpen,
+                title: "Lessons & Academy",
+                desc: "36+ bite-sized lessons, trading patterns, strategy guides, and candlestick patterns. Learn at your own pace.",
+                color: C.teal,
+              },
+              {
+                icon: BarChart3,
+                title: "Paper Trading & Scanner",
+                desc: "Practice with a simulated portfolio. Scan for gap-ups, breakouts, and setups — all with real market data.",
+                color: C.green,
+              },
+              {
+                icon: DollarSign,
+                title: "Budget Tracker & Tools",
+                desc: "Track your budget, set price alerts, use the position size calculator, and get Pansy's AI market chat.",
+                color: "#D4AF37",
+              },
+            ].map(({ icon: Icon, title, desc, color }) => (
+              <div key={title} style={{ ...glass, borderRadius:20, padding:"2rem 1.5rem", transition:"transform 0.2s, box-shadow 0.2s", cursor:"default" }}
+                onMouseEnter={e => { e.currentTarget.style.transform="translateY(-4px)"; e.currentTarget.style.boxShadow=`0 12px 40px rgba(0,0,0,0.3)`; }}
+                onMouseLeave={e => { e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="none"; }}
+              >
+                <div style={{ width:48, height:48, borderRadius:12, background:`${color}15`, border:`1px solid ${color}30`, display:"flex", alignItems:"center", justifyContent:"center", marginBottom:16 }}>
+                  <Icon size={22} style={{ color }} />
+                </div>
+                <h3 style={{ fontSize:16, fontWeight:700, color:C.ivory, marginBottom:8 }}>{title}</h3>
+                <p style={{ fontSize:13, lineHeight:1.65, color:"rgba(244,247,250,0.6)", margin:0 }}>{desc}</p>
               </div>
-              <div style={{ flex:1, marginBottom:20 }}>
-                {["Basic stock screener", "Paper trading simulator", "Market movers & heatmap", "36 core lessons"].map(f => (
-                  <div key={f} style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10 }}>
-                    <Check size={14} style={{ color:C.green, flexShrink:0 }} />
-                    <span style={{ fontSize:13, color:"rgba(244,247,250,0.7)" }}>{f}</span>
-                  </div>
-                ))}
-              </div>
-              <Link href="/onboarding">
-                <button style={{ width:"100%", padding:"12px 0", borderRadius:10, background:"rgba(255,255,255,0.06)", color:C.ivory, fontSize:14, fontWeight:700, border:"1px solid rgba(255,255,255,0.1)", cursor:"pointer" }}>
-                  Get Started
-                </button>
-              </Link>
-            </div>
-
-            {/* DESK */}
-            <div style={{ ...glass, borderRadius:20, padding:"1.75rem", display:"flex", flexDirection:"column", border:`1px solid ${C.teal}40`, boxShadow:`0 0 40px rgba(39,183,200,0.12)`, position:"relative" }}>
-              <div style={{ position:"absolute", top:-12, left:"50%", transform:"translateX(-50%)", padding:"4px 16px", borderRadius:20, ...gradientBg, fontSize:11, fontWeight:800, color:C.deep, letterSpacing:"0.06em" }}>BEST VALUE</div>
-              <p style={{ fontSize:13, fontWeight:700, color:C.teal, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:12 }}>Radar Desk</p>
-              <div style={{ marginBottom:4 }}>
-                <span style={{ fontSize:36, fontWeight:800, color:C.ivory }}>${DESK_PLAN.monthlyPrice}</span>
-                <span style={{ fontSize:14, color:"rgba(244,247,250,0.45)", marginLeft:4 }}>/mo</span>
-              </div>
-              <p style={{ fontSize:12, color:"rgba(244,247,250,0.4)", marginBottom:16 }}>
-                or ${DESK_PLAN.yearlyPrice}/yr
-                <span style={{ marginLeft:6, color:C.green, fontWeight:600 }}>save {Math.round((1 - DESK_PLAN.yearlyPrice / (DESK_PLAN.monthlyPrice * 12)) * 100)}%</span>
-              </p>
-              <div style={{ flex:1, marginBottom:20 }}>
-                {["Full session scans", "15 price alerts", "Unlimited journal", "Preset backtests", "Paper trading — full"].map(f => (
-                  <div key={f} style={{ display:"flex", alignItems:"flex-start", gap:8, marginBottom:10 }}>
-                    <Check size={14} style={{ color:C.teal, flexShrink:0, marginTop:2 }} />
-                    <span style={{ fontSize:13, color:"rgba(244,247,250,0.7)" }}>{f}</span>
-                  </div>
-                ))}
-              </div>
-              <Link href="/subscription">
-                <button style={{ width:"100%", padding:"12px 0", borderRadius:10, ...gradientBg, color:C.deep, fontSize:14, fontWeight:700, border:"none", cursor:"pointer", boxShadow:`0 4px 20px rgba(39,183,200,0.25)` }}>
-                  View Plans
-                </button>
-              </Link>
-            </div>
-
-            {/* PRO */}
-            <div style={{ ...glass, borderRadius:20, padding:"1.75rem", display:"flex", flexDirection:"column" }}>
-              <p style={{ fontSize:13, fontWeight:700, color:C.green, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:12 }}>Radar Pro</p>
-              <div style={{ marginBottom:4 }}>
-                <span style={{ fontSize:36, fontWeight:800, color:C.ivory }}>${PRO_PLAN.monthlyPrice}</span>
-                <span style={{ fontSize:14, color:"rgba(244,247,250,0.45)", marginLeft:4 }}>/mo</span>
-              </div>
-              <p style={{ fontSize:12, color:"rgba(244,247,250,0.4)", marginBottom:16 }}>
-                or ${PRO_PLAN.yearlyPrice}/yr
-                <span style={{ marginLeft:6, color:C.green, fontWeight:600 }}>save {Math.round((1 - PRO_PLAN.yearlyPrice / (PRO_PLAN.monthlyPrice * 12)) * 100)}%</span>
-              </p>
-              <div style={{ flex:1, marginBottom:20 }}>
-                {["75 price alerts", "Custom backtests", "Journal analytics & recap", "Faster scanner refresh", "Everything in Desk"].map(f => (
-                  <div key={f} style={{ display:"flex", alignItems:"flex-start", gap:8, marginBottom:10 }}>
-                    <Check size={14} style={{ color:C.green, flexShrink:0, marginTop:2 }} />
-                    <span style={{ fontSize:13, color:"rgba(244,247,250,0.7)" }}>{f}</span>
-                  </div>
-                ))}
-              </div>
-              <Link href="/subscription">
-                <button style={{ width:"100%", padding:"12px 0", borderRadius:10, background:"rgba(255,255,255,0.06)", color:C.ivory, fontSize:14, fontWeight:700, border:"1px solid rgba(255,255,255,0.1)", cursor:"pointer" }}>
-                  View Plans
-                </button>
-              </Link>
-            </div>
+            ))}
           </div>
+        </section>
 
-          <p style={{ textAlign:"center", fontSize:11, color:"rgba(244,247,250,0.28)", marginTop:16, maxWidth:480, margin:"16px auto 0" }}>
-            Educational decision support only. Not financial advice.
-          </p>
+        {/* ── EBOOK PROMO ─────────────────────────────────────────────────── */}
+        <section style={{ maxWidth:720, margin:"0 auto", padding:"2rem 1.5rem 0" }}>
+          <div style={{ ...glass, borderRadius:20, padding:"2rem 1.75rem", display:"flex", flexDirection:"column", alignItems:"center", gap:16, textAlign:"center" }}>
+            <span style={{ fontSize:36 }}>📖</span>
+            <h2 style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:"clamp(1.3rem, 3vw, 1.7rem)", fontWeight:700, color:C.ivory, margin:0 }}>
+              Free eBook: Start Investing From Zero
+            </h2>
+            <p style={{ fontSize:13, color:"rgba(244,247,250,0.55)", lineHeight:1.65, maxWidth:420, margin:0 }}>
+              A plain-English guide to opening your first brokerage account, reading a chart, and placing your first trade.
+            </p>
+            <Link href="/ebook">
+              <button style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"10px 22px", borderRadius:10, ...gradientBg, color:C.deep, fontSize:13, fontWeight:700, border:"none", cursor:"pointer" }}>
+                Read Free <ArrowRight size={14} />
+              </button>
+            </Link>
+          </div>
         </section>
 
         {/* ── SHARE WITH QR CODE ──────────────────────────────────────────── */}
-        <section style={{ background:"rgba(22,38,74,0.45)", borderTop:"1px solid rgba(255,255,255,0.06)", borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
+        <section style={{ background:"rgba(22,38,74,0.45)", borderTop:"1px solid rgba(255,255,255,0.06)", borderBottom:"1px solid rgba(255,255,255,0.06)", marginTop:"3rem" }}>
           <div style={{ maxWidth:720, margin:"0 auto", padding:"3rem 1.5rem", textAlign:"center" }}>
             <div style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"6px 14px", borderRadius:20, marginBottom:"1rem", background:`${C.teal}12`, border:`1px solid ${C.teal}25` }}>
               <Share2 size={13} style={{ color:C.teal }} />
-              <span style={{ fontSize:12, fontWeight:700, color:C.teal, letterSpacing:"0.04em" }}>Share Radar</span>
+              <span style={{ fontSize:12, fontWeight:700, color:C.teal, letterSpacing:"0.04em" }}>Share Bloom</span>
             </div>
 
             <h2 style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:"clamp(1.5rem, 3vw, 2rem)", fontWeight:700, color:C.ivory, marginBottom:"0.75rem" }}>
-              Know someone who needs this?
+              Know someone who wants to learn?
             </h2>
             <p style={{ fontSize:14, color:"rgba(244,247,250,0.55)", marginBottom:"2rem", maxWidth:420, margin:"0 auto 2rem" }}>
-              Scan the QR code or share the link so someone else can screen smarter too.
+              Scan the QR code or share the link so they can start learning too.
             </p>
 
             <div style={{ display:"inline-block", padding:20, borderRadius:20, background:"white", boxShadow:"0 8px 40px rgba(0,0,0,0.3)" }}>
@@ -435,31 +419,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ── PLAY REVIEWS ──────────────────────────────────────────── */}
-        <section style={{ maxWidth:720, margin:"0 auto", padding:"3rem 1.5rem 0" }}>
-          <div style={{ ...glass, borderRadius:20, padding:"2rem 1.75rem", textAlign:"center" }}>
-            <div style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"6px 14px", borderRadius:20, marginBottom:"1rem", background:"rgba(212,175,55,0.1)", border:"1px solid rgba(212,175,55,0.2)" }}>
-              <span style={{ fontSize:13 }}>⭐</span>
-              <span style={{ fontSize:12, fontWeight:700, color:"#D4AF37", letterSpacing:"0.04em" }}>Reviews</span>
-            </div>
-            <h2 style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:"clamp(1.3rem, 3vw, 1.7rem)", fontWeight:700, color:C.ivory, marginBottom:8 }}>
-              Be the first to review Radar on Play
-            </h2>
-            <p style={{ fontSize:13, color:"rgba(244,247,250,0.5)", lineHeight:1.6, marginBottom:16 }}>
-              Help other traders find Radar — your review makes a difference.
-            </p>
-            <a
-              href={`https://play.google.com/store/apps/details?id=app.shebloomswealth.mobile`}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"10px 20px", borderRadius:10, background:"rgba(39,183,200,0.1)", color:C.teal, fontSize:13, fontWeight:700, border:`1px solid ${C.teal}30`, textDecoration:"none" }}
-            >
-              Open on Google Play
-            </a>
-          </div>
-        </section>
-
-        {/* ── ADD TO HOME SCREEN TUTORIAL ─────────────────────────────────── */}
+        {/* ── SMART INSTALL ──────────────────────────────────────────────── */}
         <section style={{ maxWidth:800, margin:"0 auto", padding:"3.5rem 1.5rem" }}>
           <div style={{ textAlign:"center", marginBottom:"2.5rem" }}>
             <div style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"6px 14px", borderRadius:20, marginBottom:"1rem", background:`${C.green}12`, border:`1px solid ${C.green}25` }}>
@@ -468,62 +428,47 @@ export default function LandingPage() {
             </div>
 
             <h2 style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:"clamp(1.5rem, 3vw, 2rem)", fontWeight:700, color:C.ivory, marginBottom:"0.5rem" }}>
-              Add Radar to your home screen
+              Add Bloom to your home screen
             </h2>
             <p style={{ fontSize:14, color:"rgba(244,247,250,0.55)", maxWidth:440, margin:"0 auto" }}>
-              Get the full app experience in 3 quick taps — no app store needed.
+              Get the full app experience — no app store needed.
             </p>
           </div>
 
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(200px, 1fr))", gap:20 }}>
-            {[
-              {
-                step: "1",
-                icon: "globe",
-                title: "Open in your browser",
-                desc: "Visit shebloomswealth.app in Chrome (Android) or Safari (iPhone).",
-              },
-              {
-                step: "2",
-                icon: "menu",
-                title: "Tap the menu",
-                desc: "Tap the three dots (Chrome) or the share icon (Safari) at the top or bottom of your screen.",
-              },
-              {
-                step: "3",
-                icon: "plus",
-                title: "Add to Home Screen",
-                desc: "Select \"Add to Home Screen\" and tap Add. Radar now opens like a real app!",
-              },
-            ].map((item) => (
-              <div key={item.step} style={{ ...glass, borderRadius:16, padding:"1.5rem", textAlign:"center", boxShadow:"0 4px 24px rgba(0,0,0,0.24)", position:"relative" }}>
-                <div style={{ position:"absolute", top:-12, left:"50%", transform:"translateX(-50%)", width:28, height:28, borderRadius:"50%", ...gradientBg, display:"flex", alignItems:"center", justifyContent:"center", fontSize:13, fontWeight:800, color:C.deep }}>
-                  {item.step}
+          {deferredPrompt ? (
+            <div style={{ textAlign:"center" }}>
+              <button
+                onClick={handleInstall}
+                style={{ display:"inline-flex", alignItems:"center", gap:10, padding:"16px 32px", borderRadius:12, ...gradientBg, color:C.deep, fontSize:16, fontWeight:700, border:"none", cursor:"pointer", boxShadow:`0 8px 30px rgba(39,183,200,0.28)` }}
+              >
+                <Plus size={18} /> Install Bloom
+              </button>
+            </div>
+          ) : (
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(200px, 1fr))", gap:20 }}>
+              {(platform === "ios" ? [
+                { step:"1", title:"Open in Safari", desc:"Visit shebloomswealth.app in Safari on your iPhone or iPad." },
+                { step:"2", title:"Tap the share icon", desc:"Tap the share button (square with arrow) at the bottom of the screen." },
+                { step:"3", title:"Add to Home Screen", desc:"Scroll down and tap \"Add to Home Screen\", then tap Add." },
+              ] : platform === "android" ? [
+                { step:"1", title:"Open in Chrome", desc:"Visit shebloomswealth.app in Chrome on your Android device." },
+                { step:"2", title:"Tap the menu", desc:"Tap the three dots at the top-right corner of Chrome." },
+                { step:"3", title:"Add to Home Screen", desc:"Select \"Add to Home screen\" and tap Add. Bloom opens like a real app!" },
+              ] : [
+                { step:"1", title:"Open in your browser", desc:"Visit shebloomswealth.app in Chrome (Android) or Safari (iPhone)." },
+                { step:"2", title:"Tap the menu", desc:"Tap the three dots (Chrome) or the share icon (Safari)." },
+                { step:"3", title:"Add to Home Screen", desc:"Select \"Add to Home Screen\" and tap Add. Bloom opens like a real app!" },
+              ]).map((item) => (
+                <div key={item.step} style={{ ...glass, borderRadius:16, padding:"1.5rem", textAlign:"center", boxShadow:"0 4px 24px rgba(0,0,0,0.24)", position:"relative" }}>
+                  <div style={{ position:"absolute", top:-12, left:"50%", transform:"translateX(-50%)", width:28, height:28, borderRadius:"50%", ...gradientBg, display:"flex", alignItems:"center", justifyContent:"center", fontSize:13, fontWeight:800, color:C.deep }}>
+                    {item.step}
+                  </div>
+                  <p style={{ fontSize:14, fontWeight:700, color:C.ivory, marginBottom:6, marginTop:8 }}>{item.title}</p>
+                  <p style={{ fontSize:12.5, lineHeight:1.6, color:"rgba(244,247,250,0.55)", margin:0 }}>{item.desc}</p>
                 </div>
-
-                <div style={{ width:48, height:48, borderRadius:12, background:"rgba(39,183,200,0.1)", border:`1px solid ${C.teal}20`, display:"flex", alignItems:"center", justifyContent:"center", margin:"0.75rem auto 1rem" }}>
-                  {item.icon === "globe" && (
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={C.teal} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="12" cy="12" r="10" />
-                      <line x1="2" y1="12" x2="22" y2="12" />
-                      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-                    </svg>
-                  )}
-                  {item.icon === "menu" && (
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill={C.teal}>
-                      <circle cx="12" cy="5" r="2" />
-                      <circle cx="12" cy="12" r="2" />
-                      <circle cx="12" cy="19" r="2" />
-                    </svg>
-                  )}
-                  {item.icon === "plus" && <Plus size={22} style={{ color:C.teal }} />}
-                </div>
-
-                <p style={{ fontSize:14, fontWeight:700, color:C.ivory, marginBottom:6 }}>{item.title}</p>
-                <p style={{ fontSize:12.5, lineHeight:1.6, color:"rgba(244,247,250,0.55)", margin:0 }}>{item.desc}</p>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
 
           <div style={{ textAlign:"center", marginTop:"2rem" }}>
             <Link href="/onboarding">
@@ -543,10 +488,10 @@ export default function LandingPage() {
             <div className="flex flex-col md:flex-row md:items-start gap-8 md:gap-12 mb-8">
               <div className="flex-1 space-y-2">
                 <div className="flex items-center gap-2">
-                  <Image src="/icon-192.png" alt="Radar" width={24} height={24} className="rounded-lg" />
-                  <p className="text-sm font-semibold" style={{ color:"rgba(244,247,250,0.60)" }}>Radar</p>
+                  <Image src="/icon-192.png" alt="Bloom" width={24} height={24} className="rounded-lg" />
+                  <p className="text-sm font-semibold" style={{ color:"rgba(244,247,250,0.60)" }}>Bloom</p>
                 </div>
-                <p className="text-xs" style={{ color:"rgba(244,247,250,0.35)" }}>Stock Screener & Alerts</p>
+                <p className="text-xs" style={{ color:"rgba(244,247,250,0.35)" }}>Learn money &amp; investing from zero</p>
               </div>
               <div className="space-y-2">
                 <p className="text-xs font-semibold uppercase tracking-wide" style={{ color:"rgba(244,247,250,0.35)" }}>Legal</p>
@@ -557,12 +502,12 @@ export default function LandingPage() {
                 </div>
               </div>
               <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-wide" style={{ color:"rgba(244,247,250,0.35)" }}>Tools</p>
+                <p className="text-xs font-semibold uppercase tracking-wide" style={{ color:"rgba(244,247,250,0.35)" }}>Learn</p>
                 <div className="flex flex-col gap-1.5">
-                  <Link href="/free-stock-screener" className="text-xs transition-colors hover:text-white" style={{ color:"rgba(244,247,250,0.40)" }}>Free Stock Screener</Link>
-                  <Link href="/gap-and-go-scanner" className="text-xs transition-colors hover:text-white" style={{ color:"rgba(244,247,250,0.40)" }}>Gap & Go Scanner</Link>
-                  <Link href="/stock-alerts" className="text-xs transition-colors hover:text-white" style={{ color:"rgba(244,247,250,0.40)" }}>Stock Alerts</Link>
-                  <Link href="/earnings-calendar" className="text-xs transition-colors hover:text-white" style={{ color:"rgba(244,247,250,0.40)" }}>Earnings Calendar</Link>
+                  <Link href="/learn" className="text-xs transition-colors hover:text-white" style={{ color:"rgba(244,247,250,0.40)" }}>Academy</Link>
+                  <Link href="/ebook" className="text-xs transition-colors hover:text-white" style={{ color:"rgba(244,247,250,0.40)" }}>Free eBook</Link>
+                  <Link href="/practice" className="text-xs transition-colors hover:text-white" style={{ color:"rgba(244,247,250,0.40)" }}>Paper Trading</Link>
+                  <Link href="/scanner" className="text-xs transition-colors hover:text-white" style={{ color:"rgba(244,247,250,0.40)" }}>Stock Scanner</Link>
                 </div>
               </div>
               <div className="space-y-2">
@@ -578,15 +523,20 @@ export default function LandingPage() {
                 <div className="flex flex-col gap-1.5">
                   <Link href="/contact" className="text-xs transition-colors hover:text-white" style={{ color:"rgba(244,247,250,0.40)" }}>Contact Us</Link>
                   <a href="mailto:cindervaultenterprisesllc@gmail.com" className="text-xs transition-colors hover:text-white" style={{ color:"rgba(244,247,250,0.40)" }}>cindervaultenterprisesllc@gmail.com</a>
+                  <a href="https://instagram.com/shebloomswealth" target="_blank" rel="noopener noreferrer"
+                    className="text-xs transition-colors hover:text-white inline-flex items-center gap-1.5" style={{ color:"rgba(244,247,250,0.40)" }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+                    @shebloomswealth
+                  </a>
                 </div>
               </div>
             </div>
             <div style={{ borderTop:"1px solid rgba(255,255,255,0.06)" }} className="pt-6 space-y-2">
               <p className="text-xs" style={{ color:"rgba(244,247,250,0.28)" }}>
-                © 2026 Cinder Vault Enterprises LLC. All rights reserved. Radar is a product of Cinder Vault Enterprises LLC.
+                © 2026 Cinder Vault Enterprises LLC. All rights reserved. Bloom is a product of Cinder Vault Enterprises LLC.
               </p>
               <p className="text-xs" style={{ color:"rgba(244,247,250,0.22)" }}>
-                Radar is for educational purposes only and does not constitute financial advice. Alerts are price/level/screen-match notifications, not trade recommendations. All investing involves risk of loss, including possible loss of principal. Past performance does not guarantee future results.
+                Bloom is for educational purposes only and does not constitute financial advice. All investing involves risk of loss, including possible loss of principal. Past performance does not guarantee future results.
               </p>
             </div>
           </div>

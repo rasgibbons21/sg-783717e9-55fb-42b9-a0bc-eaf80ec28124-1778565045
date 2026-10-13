@@ -214,13 +214,13 @@ export default function Profile() {
       ? `https://shebloomswealth.app/onboarding?ref=${referralCode}`
       : "https://shebloomswealth.app";
     const shareText = referralCode
-      ? "Join me on Radar! Stock screener & alerts made simple."
-      : "Check out Radar — stock screener & alerts.";
+      ? "Join me on Bloom! Stock screener & alerts made simple."
+      : "Check out Bloom — stock screener & alerts.";
 
     if (navigator.share) {
       try {
         await navigator.share({
-          title: "Radar",
+          title: "Bloom",
           text: shareText,
           url: shareUrl,
         });
@@ -259,7 +259,7 @@ export default function Profile() {
 
   return (
     <Layout>
-      <SEO title="Profile — Radar" />
+      <SEO title="Profile — Bloom" />
       <div className="container-full py-8 space-y-6 pb-24">
         {/* Header */}
         <div className="space-y-2">
@@ -361,7 +361,7 @@ export default function Profile() {
                     <span className="text-2xl">✨</span>
                   </div>
                   <div>
-                    <p className="font-semibold text-foreground text-lg">{tier === "pro" ? "Radar Pro" : "Radar Desk"}</p>
+                    <p className="font-semibold text-foreground text-lg">{tier === "pro" ? "Bloom Pro" : "Bloom Desk"}</p>
                     <p className="text-sm text-muted-foreground">{tier === "pro" ? "Full access to all features" : "Core tools & daily analyses"}</p>
                   </div>
                 </div>
@@ -566,7 +566,7 @@ export default function Profile() {
         {/* Disclaimer */}
         <Card className="p-4 bg-muted/50 border-muted-foreground/20 rounded-2xl">
           <p className="text-xs text-muted-foreground text-center leading-relaxed">
-            This is educational content only and does not constitute financial advice. Radar is not liable for any investment decisions or losses.<br/>
+            This is educational content only and does not constitute financial advice. Bloom is not liable for any investment decisions or losses.<br/>
             Contact us at cindervaultenterprisesllc@gmail.com
           </p>
         </Card>

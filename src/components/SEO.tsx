@@ -11,12 +11,12 @@ export interface SEOProps {
 }
 
 const SITE_URL = "https://shebloomswealth.app";
-const SITE_NAME = "Radar";
+const SITE_NAME = "Bloom";
 
 const defaultSEO = {
-  title: "Radar — Stock Screener & Trade Alerts",
+  title: "Bloom — Learn Money & Investing From Zero",
   description:
-    "Stock screener, price alerts, and Pansy AI market chat. Watchlist, market movers, paper trading, and options tape. Education optional.",
+    "Free investing education, paper trading, stock screener, and AI market chat. Learn at your own pace — no jargon, no paywall.",
   image: `${SITE_URL}/og-image.jpg`,
   url: SITE_URL,
 };

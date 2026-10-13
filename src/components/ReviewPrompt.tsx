@@ -55,12 +55,12 @@ export function ReviewPrompt({ onClose, trigger }: ReviewPromptProps) {
           <div className="text-center">
             <div style={{ fontSize: 48 }} className="mb-3">&#127800;</div>
             <h3 className="text-lg font-bold text-[#F3EDE3] mb-1">
-              Enjoying Radar?
+              Enjoying Bloom?
             </h3>
             <p className="text-sm text-[#F3EDE3]/50 mb-5 leading-relaxed">
               {trigger
                 ? `Nice work completing ${trigger}! How are you enjoying the app so far?`
-                : 'Your feedback helps other traders find Radar. How would you rate us?'}
+                : 'Your feedback helps other traders find Bloom. How would you rate us?'}
             </p>
 
             <div className="flex justify-center gap-2 mb-4">
@@ -96,7 +96,7 @@ export function ReviewPrompt({ onClose, trigger }: ReviewPromptProps) {
               Thank you!
             </h3>
             <p className="text-sm text-[#F3EDE3]/50 mb-5 leading-relaxed">
-              Would you mind leaving a quick review? It helps so much — other traders find Radar because of reviews like yours.
+              Would you mind leaving a quick review? It helps so much — other traders find Bloom because of reviews like yours.
             </p>
             <a
               href={getReviewUrl()}
@@ -124,7 +124,7 @@ export function ReviewPrompt({ onClose, trigger }: ReviewPromptProps) {
               We hear you
             </h3>
             <p className="text-sm text-[#F3EDE3]/50 mb-5 leading-relaxed">
-              We&apos;re always improving Radar. Thanks for your honest feedback — it helps us build a better app for you.
+              We&apos;re always improving Bloom. Thanks for your honest feedback — it helps us build a better app for you.
             </p>
             <button
               onClick={onClose}

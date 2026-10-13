@@ -313,7 +313,7 @@ export default function SignalsPage() {
 
   return (
     <Layout>
-      <SEO title="Radar | Signals" description="Active setups matched by your trading strategies." />
+      <SEO title="Bloom | Signals" description="Active setups matched by your trading strategies." />
       <div className="max-w-lg mx-auto px-4 pt-4 pb-32">
 
         {/* Header */}

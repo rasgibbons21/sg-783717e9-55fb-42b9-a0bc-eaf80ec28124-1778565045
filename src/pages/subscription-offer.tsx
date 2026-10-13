@@ -12,7 +12,7 @@ export default function SubscriptionOffer() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <SEO title="Radar — Plans" description="View Radar subscription plans." />
+      <SEO title="Bloom — Plans" description="View Bloom subscription plans." />
       <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
     </div>
   );

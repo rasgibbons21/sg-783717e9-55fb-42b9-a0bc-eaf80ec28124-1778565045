@@ -63,7 +63,7 @@ export default function Subscription() {
   if (canShowInAppPayment) {
     return (
       <Layout>
-        <SEO title="Radar Desk" description="Subscribe to Radar Desk via Google Play" />
+        <SEO title="Bloom Desk" description="Subscribe to Bloom Desk via Google Play" />
         <GooglePlaySubscription />
       </Layout>
     );
@@ -72,7 +72,7 @@ export default function Subscription() {
   if (!canShowExternalPayment) {
     return (
       <Layout>
-        <SEO title="Subscription" description="Radar subscription" />
+        <SEO title="Subscription" description="Bloom subscription" />
         <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center gap-6">
           <div className="rounded-full bg-muted p-6"><Lock className="w-10 h-10 text-muted-foreground" /></div>
           <div>
@@ -90,7 +90,7 @@ export default function Subscription() {
 
   return (
     <Layout>
-      <SEO title="Plans — Radar" description="Radar Desk and Pro plans" />
+      <SEO title="Plans — Bloom" description="Bloom Desk and Pro plans" />
       <div className="max-w-3xl mx-auto p-4 pb-24">
         <div className="text-center space-y-2 mb-6">
           <h1 className="font-serif text-3xl font-bold text-foreground">Choose Your Plan</h1>
@@ -223,7 +223,7 @@ export default function Subscription() {
 
         {/* Fine print */}
         <p className="text-[10px] text-center text-muted-foreground/50 mt-6 leading-relaxed max-w-md mx-auto">
-          Educational content only. Not financial advice. Radar is not liable for any investment decisions or losses.
+          Educational content only. Not financial advice. Bloom is not liable for any investment decisions or losses.
           Cancel anytime in Settings. Secure checkout powered by Stripe.
         </p>
       </div>

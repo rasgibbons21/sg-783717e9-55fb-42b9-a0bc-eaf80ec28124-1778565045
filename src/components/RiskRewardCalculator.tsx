@@ -29,7 +29,7 @@ export function RiskRewardCalculator() {
     const r = parseFloat(ratio);
     if (r < 1) {
       return {
-        message: "This trade is not worth it sis. Loss potential bigger than gain. Skip it 🚫",
+        message: "This trade is not worth it. Loss potential bigger than gain. Skip it 🚫",
         color: "destructive" as const,
       };
     } else if (r >= 1 && r < 2) {

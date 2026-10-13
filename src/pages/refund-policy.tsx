@@ -8,7 +8,7 @@ export default function RefundPolicy() {
   if (!canShowExternalPayment) {
     return (
       <Layout>
-        <SEO title="Refund Policy - Radar" description="Refund policy for Radar" />
+        <SEO title="Refund Policy - Bloom" description="Refund policy for Bloom" />
         <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center gap-6">
           <div className="rounded-full bg-muted p-6">
             <Lock className="w-10 h-10 text-muted-foreground" />
@@ -27,13 +27,13 @@ export default function RefundPolicy() {
   return (
     <Layout>
       <SEO
-        title="Refund & Cancellation Policy - Radar"
-        description="Refund and cancellation policy for Radar by Cinder Vault Enterprises LLC"
+        title="Refund & Cancellation Policy - Bloom"
+        description="Refund and cancellation policy for Bloom by Cinder Vault Enterprises LLC"
       />
       <div className="mx-auto max-w-4xl space-y-8 px-4 py-8">
         <div>
           <h1 className="mb-2 font-serif text-4xl font-bold text-primary">Refund &amp; Cancellation Policy</h1>
-          <p className="text-muted-foreground">Cinder Vault Enterprises LLC — Radar</p>
+          <p className="text-muted-foreground">Cinder Vault Enterprises LLC — Bloom</p>
           <p className="text-sm text-muted-foreground">Last updated: June 2026</p>
         </div>
 
@@ -43,8 +43,8 @@ export default function RefundPolicy() {
             {/* ── Subscriptions ── */}
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Subscriptions &amp; Billing</h2>
             <p className="mb-4 text-foreground">
-              Radar Core is a paid subscription that gives you access to premium educational content,
-              the Practice Trader, Radar University, and AI-powered features. Subscriptions are
+              Bloom Core is a paid subscription that gives you access to premium educational content,
+              the Practice Trader, Bloom University, and AI-powered features. Subscriptions are
               billed through Stripe, our secure payment processor.
             </p>
             <ul className="mb-6 space-y-2 text-foreground">
@@ -68,7 +68,7 @@ export default function RefundPolicy() {
             {/* ── How to Cancel ── */}
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">How to Cancel</h2>
             <p className="mb-4 text-foreground">
-              You can cancel your Radar Core subscription at any time — no questions asked.
+              You can cancel your Bloom Core subscription at any time — no questions asked.
             </p>
             <ul className="mb-6 space-y-2 text-foreground">
               <li>
@@ -93,7 +93,7 @@ export default function RefundPolicy() {
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Refunds</h2>
 
             <p className="mb-4 text-foreground">
-              We want you to feel confident starting your journey. If Radar Core isn&apos;t
+              We want you to feel confident starting your journey. If Bloom Core isn&apos;t
               the right fit, you may request a full refund within 7 days of your initial purchase.
             </p>
             <ul className="mb-6 space-y-2 text-foreground">
@@ -140,13 +140,13 @@ export default function RefundPolicy() {
             {/* ── Educational Disclaimer ── */}
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Educational Platform Disclaimer</h2>
             <p className="mb-4 text-foreground">
-              Radar is an educational platform operated by Cinder Vault Enterprises LLC. Your
+              Bloom is an educational platform operated by Cinder Vault Enterprises LLC. Your
               subscription provides access to educational content — including lessons, the Practice
               Trader simulator, and AI-powered learning tools — and does not constitute financial
               advice, investment advice, or brokerage services.
             </p>
             <p className="mb-6 text-foreground">
-              The Practice Trader uses virtual money only. No real trades are executed. Radar does
+              The Practice Trader uses virtual money only. No real trades are executed. Bloom does
               not manage money, execute orders, or hold securities on behalf of any user.
               Subscriptions are purchased for access to educational content, not for financial
               outcomes. All investing involves risk of loss.

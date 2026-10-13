@@ -116,8 +116,8 @@ export default function UniversityIndex({ requiresClientAuth }: Props) {
   return (
     <Layout>
       <SEO
-        title="Radar University — Chart Reading, Indicators & Trading Education"
-        description="Master chart reading, candlestick patterns, RSI, MACD, Bollinger Bands, moving averages, and trading signals. 9 structured modules covering chart patterns, indicators, entry/exit strategies, and position management. Advanced investing education for women."
+        title="Bloom University — Chart Reading, Indicators & Trading Education"
+        description="Master chart reading, candlestick patterns, RSI, MACD, Bollinger Bands, moving averages, and trading signals. 9 structured modules covering chart patterns, indicators, entry/exit strategies, and position management. Free advanced investing education."
       />
 
       {/* Hero */}
@@ -125,10 +125,10 @@ export default function UniversityIndex({ requiresClientAuth }: Props) {
         <div className="max-w-5xl mx-auto px-4 py-16 text-center">
           <div className="inline-flex items-center gap-2 bg-[#27B7C8]/10 text-[#27B7C8] rounded-full px-4 py-1.5 text-sm font-medium mb-6">
             <GraduationCap className="w-4 h-4" />
-            Pro Members Only
+            Free for Everyone
           </div>
           <h1 className="text-4xl md:text-5xl font-serif font-bold text-[#F3EDE3] mb-4">
-            🌸 Radar University
+            🌸 Bloom University
           </h1>
           <p className="text-[#F3EDE3]/70 text-lg max-w-2xl mx-auto">
             Structured trading education built the right way — no hype, no directives, just the real patterns and frameworks that experienced traders use to make sense of price action.
@@ -267,7 +267,7 @@ export default function UniversityIndex({ requiresClientAuth }: Props) {
           <div className="mt-16 p-6 rounded-2xl border border-white/10 bg-white/5">
             <p className="text-xs text-[#F3EDE3]/40 leading-relaxed">
               <strong className="text-[#F3EDE3]/60">Educational purposes only.</strong>{" "}
-              Radar University is designed to teach chart reading, technical analysis concepts, and market frameworks. Nothing in these lessons constitutes financial advice or a recommendation to buy or sell any security. All patterns discussed can and do fail regularly. Trading involves significant risk of loss, and past patterns are not predictive of future results. Always conduct your own research.
+              Bloom University is designed to teach chart reading, technical analysis concepts, and market frameworks. Nothing in these lessons constitutes financial advice or a recommendation to buy or sell any security. All patterns discussed can and do fail regularly. Trading involves significant risk of loss, and past patterns are not predictive of future results. Always conduct your own research.
             </p>
           </div>
         </div>

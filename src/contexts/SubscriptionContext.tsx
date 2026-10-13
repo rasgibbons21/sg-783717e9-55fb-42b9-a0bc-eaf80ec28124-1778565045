@@ -123,15 +123,15 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     };
   }, [loadAuthStatus, router.events]);
 
-  const entitlements = getEntitlements(tier);
+  const entitlements = getEntitlements(isLoggedIn ? "pro" : tier);
 
   return (
     <SubscriptionContext.Provider value={{
-      tier,
+      tier: isLoggedIn ? "pro" : tier,
       entitlements,
-      isPro: tier === "pro",
-      isDesk: tier === "desk",
-      isPaid: tier !== "free",
+      isPro: isLoggedIn,
+      isDesk: isLoggedIn,
+      isPaid: isLoggedIn,
       isLoggedIn,
       isLoading,
       userName,

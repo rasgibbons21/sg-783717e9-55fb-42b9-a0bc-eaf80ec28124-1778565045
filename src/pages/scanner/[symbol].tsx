@@ -125,7 +125,7 @@ export default function SymbolDetail() {
     haptic();
     const text = quote
       ? `${sym} $${quote.price.toFixed(2)} (${changePct >= 0 ? "+" : ""}${changePct.toFixed(1)}%) — Entry $${entry.toFixed(2)} / Stop $${stop.toFixed(2)} / Target $${target1.toFixed(2)} (${rr}:1 R:R)`
-      : `Check out ${sym} on Radar`;
+      : `Check out ${sym} on Bloom`;
     if (navigator.share) {
       try { await navigator.share({ title: `${sym} Signal`, text }); } catch {}
     } else {
@@ -207,7 +207,7 @@ export default function SymbolDetail() {
 
   return (
     <Layout>
-      <SEO title={`${sym} Signal | Radar`} description={`Trading analysis for ${sym}`} />
+      <SEO title={`${sym} Signal | Bloom`} description={`Trading analysis for ${sym}`} />
 
       <div className="max-w-lg mx-auto px-4 pt-4 pb-32">
         {/* Back button */}

@@ -263,7 +263,7 @@ export default function ProgressionPage(_props: PageProps) {
 
   return (
     <>
-      <Head><title>My Progression — Radar</title></Head>
+      <Head><title>My Progression — Bloom</title></Head>
       <Layout>
         <div className="min-h-screen bg-[#07080C] px-4 py-6 max-w-2xl mx-auto">
 
@@ -335,7 +335,7 @@ export default function ProgressionPage(_props: PageProps) {
                   onClick={() => share({
                     type: 'achievement',
                     title: `Level ${data.level.current.level} — ${data.level.current.name}`,
-                    subtitle: `${data.xp.toLocaleString()} XP earned on Radar`,
+                    subtitle: `${data.xp.toLocaleString()} XP earned on Bloom`,
                     emoji: data.level.current.badge,
                     stats: [
                       { label: 'Level', value: String(data.level.current.level) },
@@ -424,7 +424,7 @@ export default function ProgressionPage(_props: PageProps) {
                   </div>
                 </div>
                 <p className="text-xs text-[#F3EDE3]/40 mb-3 leading-relaxed">
-                  Each mission is unlocked by completing its paired lesson in Radar University. Then apply what you learned in the Practice Trader to complete it.
+                  Each mission is unlocked by completing its paired lesson in Bloom University. Then apply what you learned in the Practice Trader to complete it.
                 </p>
                 <div className="space-y-3">
                   {/* Completed first, then unlocked, then locked */}

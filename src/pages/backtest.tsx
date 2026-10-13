@@ -184,7 +184,7 @@ export default function BacktestPage(_props: PageProps) {
 
   return (
     <>
-      <Head><title>Strategy Performance — Radar</title></Head>
+      <Head><title>Strategy Performance — Bloom</title></Head>
       <Layout>
         <div className="min-h-screen bg-[#07080C] px-4 py-4 max-w-lg mx-auto pb-32">
 

@@ -39,13 +39,13 @@ export default function StockAlertsPage() {
   return (
     <div style={{ fontFamily: "'Inter', sans-serif", background: C.deep, color: C.ivory, minHeight: "100vh" }}>
       <SEO
-        title="Stock Price Alerts — Radar | Push Notifications for Traders"
+        title="Stock Price Alerts — Bloom | Push Notifications for Traders"
         description="Set stock price alerts with instant push notifications. Free tier includes 3 alerts. Get notified when strategies trigger, watchlist stocks move, or earnings report. No credit card."
         image="/api/og?title=Stock+Price+Alerts&subtitle=Push+notifications.+Scanner+signals.+Earnings+reminders."
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "WebApplication",
-          name: "Radar Stock Alerts",
+          name: "Bloom Stock Alerts",
           applicationCategory: "FinanceApplication",
           operatingSystem: "Web, Android",
           offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
@@ -58,7 +58,7 @@ export default function StockAlertsPage() {
       <nav style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(14,27,48,0.92)", backdropFilter: "blur(18px)", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 1.5rem", height: 64, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-            <span style={{ fontSize: 18, fontWeight: 700, color: C.ivory }}>Radar</span>
+            <span style={{ fontSize: 18, fontWeight: 700, color: C.ivory }}>Bloom</span>
             <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(244,247,250,0.35)" }}>Alerts</span>
           </Link>
           <Link href="/onboarding">
@@ -179,7 +179,7 @@ export default function StockAlertsPage() {
       {/* Footer */}
       <footer style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "2rem 1.5rem", textAlign: "center" }}>
         <p style={{ fontSize: 11, color: "rgba(244,247,250,0.25)" }}>
-          © 2026 Cinder Vault Enterprises LLC. Radar is for educational purposes only and does not constitute financial advice. Alerts are price/level notifications, not trade recommendations.
+          © 2026 Cinder Vault Enterprises LLC. Bloom is for educational purposes only and does not constitute financial advice. Alerts are price/level notifications, not trade recommendations.
         </p>
       </footer>
     </div>

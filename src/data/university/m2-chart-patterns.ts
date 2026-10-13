@@ -21,7 +21,7 @@ export interface UniversityLesson {
   sections: LessonSection[];
   diagram: string;
   quiz: QuizQuestion[];
-  girlToGirlTip: string;
+  pansyTip: string;
   videoSlot: null;
 }
 
@@ -94,7 +94,7 @@ export const M2_LESSONS: UniversityLesson[] = [
         explanation: "The textbook measured-move logic projects the distance from the peaks down to the neckline, then applies that same distance below the neckline. This is an estimate, not a guarantee — targets are measured-move logic, not a promise."
       }
     ],
-    girlToGirlTip: "Girl, the biggest trap with double tops is calling them too early. Two equal highs does NOT equal a double top until that neckline cracks — the market has a way of faking everyone out and then ripping higher just to mess with people. Wait for the breakdown, and even then, watch for a retest of the broken neckline before getting excited. Patience is your edge here. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
+    pansyTip: "Girl, the biggest trap with double tops is calling them too early. Two equal highs does NOT equal a double top until that neckline cracks — the market has a way of faking everyone out and then ripping higher just to mess with people. Wait for the breakdown, and even then, watch for a retest of the broken neckline before getting excited. Patience is your edge here. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
   },
 
   // ─── Lesson 2: Double Bottom ─────────────────────────────────────────────
@@ -165,7 +165,7 @@ export const M2_LESSONS: UniversityLesson[] = [
         explanation: "Traders who were short (betting on continued decline) face increasing losses as price rises above the neckline. Many will cover (buy back) their short positions, which adds upward pressure to the move — this is a short squeeze."
       }
     ],
-    girlToGirlTip: "The double bottom is one of the prettiest patterns on a chart, but don't fall in love with it before it actually confirms. So many traders see those two similar lows and get excited — then price makes a new low and the whole thing falls apart. The neckline break is everything. Also, pay attention to whether the second low is slightly higher than the first — that tiny detail often means buyers are quietly stepping in at higher and higher prices, which is a beautiful sign. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
+    pansyTip: "The double bottom is one of the prettiest patterns on a chart, but don't fall in love with it before it actually confirms. So many traders see those two similar lows and get excited — then price makes a new low and the whole thing falls apart. The neckline break is everything. Also, pay attention to whether the second low is slightly higher than the first — that tiny detail often means buyers are quietly stepping in at higher and higher prices, which is a beautiful sign. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
   },
 
   // ─── Lesson 3: Head & Shoulders ──────────────────────────────────────────
@@ -236,7 +236,7 @@ export const M2_LESSONS: UniversityLesson[] = [
         explanation: "If price closes back above the right shoulder level (or especially the head), the bearish thesis is invalidated. The idea is proven wrong — the uptrend may be resuming."
       }
     ],
-    girlToGirlTip: "The head and shoulders is one of those patterns that feels so textbook-clean when you see it forming — but girl, the amount of fake-outs on this one is real. The pattern isn't complete until that neckline breaks with conviction. And here's a pro tip: watch for the \"right shoulder retest\" after the neckline cracks — price often bounces back up to test it from below before continuing lower. That retest can be a key moment in the pattern's story. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
+    pansyTip: "The head and shoulders is one of those patterns that feels so textbook-clean when you see it forming — but girl, the amount of fake-outs on this one is real. The pattern isn't complete until that neckline breaks with conviction. And here's a pro tip: watch for the \"right shoulder retest\" after the neckline cracks — price often bounces back up to test it from below before continuing lower. That retest can be a key moment in the pattern's story. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
   },
 
   // ─── Lesson 4: Inverse Head & Shoulders ──────────────────────────────────
@@ -307,7 +307,7 @@ export const M2_LESSONS: UniversityLesson[] = [
         explanation: "The textbook measured-move logic measures the distance from the head (deepest trough) up to the neckline, then projects that same distance upward from the breakout point. This is educational logic, not a guaranteed price target."
       }
     ],
-    girlToGirlTip: "When you spot an inverse head and shoulders, the right shoulder is everything to watch. If it holds well above the head's low, that's the sign buyers are stepping in at higher and higher prices — which is exactly what you want to see before a real reversal. Volume on the neckline break is your confirmation bestie here. No volume? Be skeptical. Big volume surge? That's the market speaking louder. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
+    pansyTip: "When you spot an inverse head and shoulders, the right shoulder is everything to watch. If it holds well above the head's low, that's the sign buyers are stepping in at higher and higher prices — which is exactly what you want to see before a real reversal. Volume on the neckline break is your confirmation bestie here. No volume? Be skeptical. Big volume surge? That's the market speaking louder. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
   },
 
   // ─── Lesson 5: Bull Flag ──────────────────────────────────────────────────
@@ -378,7 +378,7 @@ export const M2_LESSONS: UniversityLesson[] = [
         explanation: "A close below the lower boundary of the flag channel means the orderly consolidation has broken down — the pattern is no longer intact and the bullish thesis is no longer valid."
       }
     ],
-    girlToGirlTip: "Bull flags are one of the most reliable continuation patterns out there, but the pole quality is everything. A gradual, slow drift up followed by a pullback is just price going sideways — it's not a bull flag. The real thing has a sharp, almost violent upward move first. That energy tells you there's serious momentum behind the stock. And always watch volume during the flag: if volume dries up while price consolidates, that's the market taking a breath before possibly running again. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
+    pansyTip: "Bull flags are one of the most reliable continuation patterns out there, but the pole quality is everything. A gradual, slow drift up followed by a pullback is just price going sideways — it's not a bull flag. The real thing has a sharp, almost violent upward move first. That energy tells you there's serious momentum behind the stock. And always watch volume during the flag: if volume dries up while price consolidates, that's the market taking a breath before possibly running again. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
   },
 
   // ─── Lesson 6: Bear Flag ──────────────────────────────────────────────────
@@ -449,7 +449,7 @@ export const M2_LESSONS: UniversityLesson[] = [
         explanation: "A close above the upper flag boundary (especially on elevated volume) suggests buyers have taken control and the 'bear flag' may be turning into a bullish reversal — invalidating the bearish thesis."
       }
     ],
-    girlToGirlTip: "The bear flag is sneaky because the bounce inside the flag can look really enticing — price starts moving up and people think the bottom is in. But if the bounce is slow, low-volume, and corrects less than half the prior drop, that's often just sellers catching their breath. The quality of that initial drop (the pole) tells the real story. A sharp, high-volume drop says momentum is serious. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
+    pansyTip: "The bear flag is sneaky because the bounce inside the flag can look really enticing — price starts moving up and people think the bottom is in. But if the bounce is slow, low-volume, and corrects less than half the prior drop, that's often just sellers catching their breath. The quality of that initial drop (the pole) tells the real story. A sharp, high-volume drop says momentum is serious. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
   },
 
   // ─── Lesson 7: Cup & Handle ───────────────────────────────────────────────
@@ -520,7 +520,7 @@ export const M2_LESSONS: UniversityLesson[] = [
         explanation: "A cup depth of roughly 15–33% from the rim to the base is considered constructive. Deeper cups (40%+) mean there is more overhead selling pressure from trapped buyers, which makes the eventual breakout harder to sustain."
       }
     ],
-    girlToGirlTip: "Cup and handle is one of Pansy's favorite patterns because it tells a beautiful story of patient buyers winning out over time. But honestly? The pattern is only as good as the stock behind it. A perfect cup and handle on a weak company in a terrible sector is far less meaningful than a slightly imperfect one on a market leader. Always look at the context — what's the stock been doing before the cup? Is the broader market in a healthy uptrend? Context beats pattern purity every time. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
+    pansyTip: "Cup and handle is one of Pansy's favorite patterns because it tells a beautiful story of patient buyers winning out over time. But honestly? The pattern is only as good as the stock behind it. A perfect cup and handle on a weak company in a terrible sector is far less meaningful than a slightly imperfect one on a market leader. Always look at the context — what's the stock been doing before the cup? Is the broader market in a healthy uptrend? Context beats pattern purity every time. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
   },
 
   // ─── Lesson 8: Ascending Triangle ────────────────────────────────────────
@@ -591,7 +591,7 @@ export const M2_LESSONS: UniversityLesson[] = [
         explanation: "While ascending triangles are considered bullish-biased, roughly 25–30% break to the downside — especially in bearish market environments. This is why treating any pattern as guaranteed is a mistake."
       }
     ],
-    girlToGirlTip: "Ascending triangles are satisfying to spot, but don't get so attached to the bullish outcome that you miss it when it breaks down. The flat resistance line is a real battleground — and sometimes the sellers win. Watch for how each approach to resistance looks: is volume picking up? Are the bounces getting weaker? Those tiny details inside the triangle tell you who's winning the fight before the actual breakout. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
+    pansyTip: "Ascending triangles are satisfying to spot, but don't get so attached to the bullish outcome that you miss it when it breaks down. The flat resistance line is a real battleground — and sometimes the sellers win. Watch for how each approach to resistance looks: is volume picking up? Are the bounces getting weaker? Those tiny details inside the triangle tell you who's winning the fight before the actual breakout. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
   },
 
   // ─── Lesson 9: Descending Triangle ───────────────────────────────────────
@@ -662,7 +662,7 @@ export const M2_LESSONS: UniversityLesson[] = [
         explanation: "If price closes above the declining upper resistance line (especially with strong volume), the bearish thesis is invalidated — buyers have overcome sellers and the pattern's bearish structure is broken."
       }
     ],
-    girlToGirlTip: "The descending triangle feels straightforward — \"lower highs plus flat support equals breakdown incoming\" — but fake breakdowns are one of the sneakiest traps in all of charting. Price dips just below support, everyone who was watching the pattern panics or goes short, and then price rockets back up and runs the whole triangle. The key is watching for volume and how price behaves in the hours after a support break. Does it hold below? Does volume confirm? One day's close isn't always the whole story. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
+    pansyTip: "The descending triangle feels straightforward — \"lower highs plus flat support equals breakdown incoming\" — but fake breakdowns are one of the sneakiest traps in all of charting. Price dips just below support, everyone who was watching the pattern panics or goes short, and then price rockets back up and runs the whole triangle. The key is watching for volume and how price behaves in the hours after a support break. Does it hold below? Does volume confirm? One day's close isn't always the whole story. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
   },
 
   // ─── Lesson 10: Symmetrical Triangle ─────────────────────────────────────
@@ -733,7 +733,7 @@ export const M2_LESSONS: UniversityLesson[] = [
         explanation: "A fake breakout occurs when price briefly closes outside one of the triangle's boundaries, traps traders who acted on the signal, and then reverses back into the triangle (and often through the opposite boundary). Waiting for sustained confirmation helps filter these traps."
       }
     ],
-    girlToGirlTip: "Symmetrical triangles are fascinating because they're the most honest pattern — they just say 'I don't know yet, wait and see.' The best approach is to let the market tell you which way. Don't predict; observe. And watch out for the fake breakout — it's almost a ritual with this pattern. Price pops above one boundary, people pile in, and then it reverses completely. The second move, the real one, often catches everyone off guard. Patience and confirmation are your best friends here. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
+    pansyTip: "Symmetrical triangles are fascinating because they're the most honest pattern — they just say 'I don't know yet, wait and see.' The best approach is to let the market tell you which way. Don't predict; observe. And watch out for the fake breakout — it's almost a ritual with this pattern. Price pops above one boundary, people pile in, and then it reverses completely. The second move, the real one, often catches everyone off guard. Patience and confirmation are your best friends here. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
   },
 
   // ─── Lesson 11: Rising & Falling Wedge ───────────────────────────────────
@@ -804,7 +804,7 @@ export const M2_LESSONS: UniversityLesson[] = [
         explanation: "The price range compressing within the wedge signals that the force driving the wedge's direction is running out. In a rising wedge, buyers can't maintain the same rate of advance — their power is diminishing even as price moves higher."
       }
     ],
-    girlToGirlTip: "Wedges trick people constantly because our brains say 'price going up = bullish' and 'price going down = bearish.' But chart patterns have their own logic. The rising wedge is quietly warning that the uptrend is getting tired — the range is shrinking, the momentum is slowing. And the falling wedge is often building a coiled spring for a reversal. The most beautiful thing about learning this is you start to see what the market is feeling, not just where price is. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
+    pansyTip: "Wedges trick people constantly because our brains say 'price going up = bullish' and 'price going down = bearish.' But chart patterns have their own logic. The rising wedge is quietly warning that the uptrend is getting tired — the range is shrinking, the momentum is slowing. And the falling wedge is often building a coiled spring for a reversal. The most beautiful thing about learning this is you start to see what the market is feeling, not just where price is. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
   },
 
   // ─── Lesson 12: Rectangle & Channel ──────────────────────────────────────
@@ -875,7 +875,7 @@ export const M2_LESSONS: UniversityLesson[] = [
         explanation: "Context matters enormously with rectangles. A rectangle that forms after a clear downtrend has a higher probability of breaking to the downside as a continuation pattern. Prior trend direction provides a probabilistic bias."
       }
     ],
-    girlToGirlTip: "Rectangles feel like easy money — 'buy support, sell resistance, repeat.' But the fake breakouts in these patterns are brutal. Price will pop above resistance just enough to get everyone excited, then crash back into the range and then below it. That's why context is so important: is this a rectangle in an uptrend (more likely to break up) or a downtrend (more likely to break down)? The broader environment is always the most important filter. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
+    pansyTip: "Rectangles feel like easy money — 'buy support, sell resistance, repeat.' But the fake breakouts in these patterns are brutal. Price will pop above resistance just enough to get everyone excited, then crash back into the range and then below it. That's why context is so important: is this a rectangle in an uptrend (more likely to break up) or a downtrend (more likely to break down)? The broader environment is always the most important filter. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
   },
 
   // ─── Lesson 13: Pennant ───────────────────────────────────────────────────
@@ -946,7 +946,7 @@ export const M2_LESSONS: UniversityLesson[] = [
         explanation: "The classic pennant volume signature is: elevated volume driving the pole, declining volume during the quiet consolidation, and then a volume surge confirming the breakout. This pattern reflects strong momentum pausing before reasserting."
       }
     ],
-    girlToGirlTip: "Pennants are so satisfying because everything makes logical sense: there was a strong move, then a quick breather, and then potentially more of the same. But the key word is 'quickly.' If the consolidation drags on and on, the momentum is gone and you're looking at a completely different situation. Also, please learn to tell the difference between a pennant and a flag — they look similar but the converging lines versus parallel lines matter for how you read the boundaries. Details like this make you sharper. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
+    pansyTip: "Pennants are so satisfying because everything makes logical sense: there was a strong move, then a quick breather, and then potentially more of the same. But the key word is 'quickly.' If the consolidation drags on and on, the momentum is gone and you're looking at a completely different situation. Also, please learn to tell the difference between a pennant and a flag — they look similar but the converging lines versus parallel lines matter for how you read the boundaries. Details like this make you sharper. Educational only. Not financial advice. No pattern or signal guarantees profits — they fail constantly and risk management is essential."
   },
 ];
 

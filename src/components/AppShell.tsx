@@ -98,7 +98,7 @@ export function AppShell({ children }: AppShellProps) {
                 className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold"
                 style={{ background: "var(--r-card)", color: "var(--r-teal)" }}
               >
-                R
+                B
               </div>
             </Link>
           )}

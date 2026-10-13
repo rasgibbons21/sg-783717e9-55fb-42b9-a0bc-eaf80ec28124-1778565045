@@ -1332,7 +1332,7 @@ export default function JournalPage(_props: PageProps) {
   return (
     <>
       <Head>
-        <title>Trade Journal — Radar</title>
+        <title>Trade Journal — Bloom</title>
       </Head>
       <Layout>
         <div className="min-h-screen bg-[#07080C] px-4 py-4 max-w-lg mx-auto pb-32">

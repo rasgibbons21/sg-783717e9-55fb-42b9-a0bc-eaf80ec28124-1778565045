@@ -313,7 +313,7 @@ export default function HomePage() {
 
   return (
     <Layout>
-      <SEO title="Radar | Home" description="Your radar dashboard — setups, market status, and alerts at a glance." />
+      <SEO title="Bloom | Home" description="Your Bloom dashboard — setups, market status, and alerts at a glance." />
       <div className="max-w-lg mx-auto px-4 pt-4 pb-32">
 
         {/* Greeting */}
@@ -518,7 +518,7 @@ export default function HomePage() {
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <Radar className="w-4 h-4 text-[#27B7C8]" />
-              <h2 className="text-sm font-bold text-[#F3EDE3]">Your Radar</h2>
+              <h2 className="text-sm font-bold text-[#F3EDE3]">Your Bloom</h2>
             </div>
             <motion.button
               whileTap={{ scale: 0.85, rotate: 180 }}
@@ -962,9 +962,9 @@ export default function HomePage() {
           onClick={() => {
             haptic();
             const url = "https://shebloomswealth.app";
-            const text = "Check out Radar — AI stock screener & trade alerts. Free to start.";
+            const text = "Check out Bloom — AI stock screener & trade alerts. Free to start.";
             if (navigator.share) {
-              navigator.share({ title: "Radar", text, url }).catch(() => {});
+              navigator.share({ title: "Bloom", text, url }).catch(() => {});
             } else {
               navigator.clipboard.writeText(url).catch(() => {});
             }
@@ -976,7 +976,7 @@ export default function HomePage() {
             <Gift className="w-4 h-4 text-[#49B06E]" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-semibold text-[#F3EDE3]">Invite friends to Radar</p>
+            <p className="text-xs font-semibold text-[#F3EDE3]">Invite friends to Bloom</p>
             <p className="text-[10px] text-[#F3EDE3]/35">Share your referral link</p>
           </div>
           <ChevronRight className="w-3.5 h-3.5 text-[#49B06E]/50 shrink-0" />

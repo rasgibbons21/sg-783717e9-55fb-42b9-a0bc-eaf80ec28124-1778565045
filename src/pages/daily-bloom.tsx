@@ -85,7 +85,7 @@ export default function DailyBloom({ briefing, briefingDate, featuredLesson }: P
         <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet" />
       </Head>
 
-      <SEO title="Daily Briefing — Daily Market Briefing & Investing Lesson" description="Get your daily market summary, investing lesson, and wealth-building habit from Pansy. Stay on top of stocks, sectors, and economic news in plain English. Free daily financial education for women." />
+      <SEO title="Daily Briefing — Daily Market Briefing & Investing Lesson" description="Get your daily market summary, investing lesson, and wealth-building habit from Pansy. Stay on top of stocks, sectors, and economic news in plain English. Free daily financial education for everyone." />
 
       <div style={{ fontFamily: "'Inter', sans-serif", background: C.deep, color: C.ivory, minHeight: "100vh", display: "flex", flexDirection: "column" }}>
 
@@ -93,8 +93,8 @@ export default function DailyBloom({ briefing, briefingDate, featuredLesson }: P
         <nav style={{ borderBottom: "1px solid rgba(255,255,255,0.06)", background: "rgba(14,27,48,0.95)", backdropFilter: "blur(16px)" }}>
           <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 1.5rem", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <Link href="/" style={{ display: "flex", alignItems: "center", gap: 9, textDecoration: "none" }}>
-              <Image src="/icon-192.png" alt="Radar" width={32} height={32} style={{ borderRadius: 10 }} />
-              <span style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 700, fontSize: 17, color: C.ivory }}>Radar</span>
+              <Image src="/icon-192.png" alt="Bloom" width={32} height={32} style={{ borderRadius: 10 }} />
+              <span style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 700, fontSize: 17, color: C.ivory }}>Bloom</span>
             </Link>
             <div style={{ display: "flex", gap: 20, alignItems: "center" }}>
               {([

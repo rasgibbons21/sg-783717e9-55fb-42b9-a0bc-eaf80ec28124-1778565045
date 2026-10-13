@@ -21,7 +21,7 @@ export interface UniversityLesson {
   sections: LessonSection[];
   diagram: string;
   quiz: QuizQuestion[];
-  girlToGirlTip: string;
+  pansyTip: string;
   videoSlot: null;
 }
 
@@ -109,7 +109,7 @@ export const M1_LESSONS: UniversityLesson[] = [
         explanation: "A single candle shows one moment in time. Its meaning changes entirely depending on what came before and after it. Reading candles in context — as part of a sequence — is what produces useful information."
       }
     ],
-    girlToGirlTip: "Don't memorize a hundred candle names yet. Just learn to feel a candle — strong, weak, or undecided. That instinct beats the vocabulary every time. Educational only. Not financial advice. Reading a chart is about understanding probability, never certainty."
+    pansyTip: "Don't memorize a hundred candle names yet. Just learn to feel a candle — strong, weak, or undecided. That instinct beats the vocabulary every time. Educational only. Not financial advice. Reading a chart is about understanding probability, never certainty."
   },
 
   // ─── Lesson 2: Support ────────────────────────────────────────────────────
@@ -195,7 +195,7 @@ export const M1_LESSONS: UniversityLesson[] = [
         explanation: "A support level that has been tested multiple times and held each time is considered well-established. Traders also watch the reaction at the level — a strong, energetic bounce is more convincing than a weak, hesitant one."
       }
     ],
-    girlToGirlTip: "\"It always bounces here\" is how people get caught the one time it doesn't. Levels are probabilities, not promises. Educational only. Not financial advice. Reading a chart is about understanding probability, never certainty."
+    pansyTip: "\"It always bounces here\" is how people get caught the one time it doesn't. Levels are probabilities, not promises. Educational only. Not financial advice. Reading a chart is about understanding probability, never certainty."
   },
 
   // ─── Lesson 3: Resistance ─────────────────────────────────────────────────
@@ -281,7 +281,7 @@ export const M1_LESSONS: UniversityLesson[] = [
         explanation: "Multiple failed tests establish that the level is meaningful — sellers have consistently stepped in there. However, repeated tests also mean the resistance is absorbing selling; eventually those sellers can be exhausted. The level is information, not a guarantee."
       }
     ],
-    girlToGirlTip: "Support and resistance aren't opposites — they're the same idea (a level that matters) seen from above or below. Once that clicks, charts get a lot quieter. Educational only. Not financial advice. Reading a chart is about understanding probability, never certainty."
+    pansyTip: "Support and resistance aren't opposites — they're the same idea (a level that matters) seen from above or below. Once that clicks, charts get a lot quieter. Educational only. Not financial advice. Reading a chart is about understanding probability, never certainty."
   },
 
   // ─── Lesson 4: Trendlines ────────────────────────────────────────────────
@@ -367,7 +367,7 @@ export const M1_LESSONS: UniversityLesson[] = [
         explanation: "In a downtrend, the trendline connects the lower highs — the sequence of declining swing highs that define the descending structure. This makes the slope of the downtrend visible."
       }
     ],
-    girlToGirlTip: "If you're squinting and bending the line to make it work, the market is telling you the trend isn't as clean as you hoped. Listen. Educational only. Not financial advice. Reading a chart is about understanding probability, never certainty."
+    pansyTip: "If you're squinting and bending the line to make it work, the market is telling you the trend isn't as clean as you hoped. Listen. Educational only. Not financial advice. Reading a chart is about understanding probability, never certainty."
   },
 
   // ─── Lesson 5: Volume ────────────────────────────────────────────────────
@@ -453,7 +453,7 @@ export const M1_LESSONS: UniversityLesson[] = [
         explanation: "A climax volume spike at the end of a trend can mark exhaustion — where the last wave of participants enters and the move runs out of fuel. This pattern (high volume reversal) is watched as a potential turning point, not a continuation signal."
       }
     ],
-    girlToGirlTip: "When something makes a big move on tiny volume, raise an eyebrow. Real moves usually bring a crowd. Educational only. Not financial advice. Reading a chart is about understanding probability, never certainty."
+    pansyTip: "When something makes a big move on tiny volume, raise an eyebrow. Real moves usually bring a crowd. Educational only. Not financial advice. Reading a chart is about understanding probability, never certainty."
   },
 
   // ─── Lesson 6: Timeframes ────────────────────────────────────────────────
@@ -539,7 +539,7 @@ export const M1_LESSONS: UniversityLesson[] = [
         explanation: "Low timeframes are full of noise — random fluctuations that have no significance on a higher timeframe. Beginners who live on 1-minute or 5-minute charts often react to movements that experienced traders would dismiss as meaningless on the daily chart."
       }
     ],
-    girlToGirlTip: "Feeling anxious about a chart? Zoom out. Half the panic on a 5-minute chart disappears the second you see the daily. Educational only. Not financial advice. Reading a chart is about understanding probability, never certainty."
+    pansyTip: "Feeling anxious about a chart? Zoom out. Half the panic on a 5-minute chart disappears the second you see the daily. Educational only. Not financial advice. Reading a chart is about understanding probability, never certainty."
   },
 
   // ─── Lesson 7: Breakouts ─────────────────────────────────────────────────
@@ -625,7 +625,7 @@ export const M1_LESSONS: UniversityLesson[] = [
         explanation: "A fakeout reveals that the level was too strong to break — sellers were powerful enough to push price back down (in the case of a failed upside breakout). This can actually be more informative than a successful breakout, showing where real supply or demand is concentrated."
       }
     ],
-    girlToGirlTip: "The market loves a fakeout because it loves your FOMO. Letting a breakout prove itself costs you a little upside and saves you a lot of pain. Educational only. Not financial advice. Reading a chart is about understanding probability, never certainty."
+    pansyTip: "The market loves a fakeout because it loves your FOMO. Letting a breakout prove itself costs you a little upside and saves you a lot of pain. Educational only. Not financial advice. Reading a chart is about understanding probability, never certainty."
   },
 
   // ─── Lesson 8: Pullbacks ─────────────────────────────────────────────────
@@ -711,7 +711,7 @@ export const M1_LESSONS: UniversityLesson[] = [
         explanation: "\"Buy the dip\" is not a strategy by itself — it's an idea that requires context. Some pullbacks are healthy pauses; others are the early stages of a deeper correction or full reversal. Reading the depth, energy, and structural context of the dip is what makes the difference."
       }
     ],
-    girlToGirlTip: "\"Buy the dip\" isn't a strategy by itself — some dips keep dipping. The skill is knowing which pauses are healthy and which are warnings. Educational only. Not financial advice. Reading a chart is about understanding probability, never certainty."
+    pansyTip: "\"Buy the dip\" isn't a strategy by itself — some dips keep dipping. The skill is knowing which pauses are healthy and which are warnings. Educational only. Not financial advice. Reading a chart is about understanding probability, never certainty."
   },
 
   // ─── Lesson 9: Consolidation ─────────────────────────────────────────────
@@ -797,7 +797,7 @@ export const M1_LESSONS: UniversityLesson[] = [
         explanation: "Trading inside the chop is low-probability — neither side has the edge. Assuming a breakout direction before the range actually resolves is also a mistake. Ranges can persist far longer than expected, and the direction of the eventual break is not known until it happens."
       }
     ],
-    girlToGirlTip: "Quiet isn't nothing — it's often the market loading up. Patience during the boring part is where discipline is built. Educational only. Not financial advice. Reading a chart is about understanding probability, never certainty."
+    pansyTip: "Quiet isn't nothing — it's often the market loading up. Patience during the boring part is where discipline is built. Educational only. Not financial advice. Reading a chart is about understanding probability, never certainty."
   },
 
   // ─── Lesson 10: Market Structure ─────────────────────────────────────────
@@ -888,7 +888,7 @@ export const M1_LESSONS: UniversityLesson[] = [
         explanation: "Structure is the context for everything else. Knowing whether the overall structure is up, down, or sideways determines how to interpret every other piece of information on the chart. This single question is often enough to filter out many low-quality setups."
       }
     ],
-    girlToGirlTip: "Before any pattern or indicator, ask one question: what's the structure? Up, down, or sideways. Answer that and you're already ahead of most people staring at the same chart. Educational only. Not financial advice. Reading a chart is about understanding probability, never certainty."
+    pansyTip: "Before any pattern or indicator, ask one question: what's the structure? Up, down, or sideways. Answer that and you're already ahead of most people staring at the same chart. Educational only. Not financial advice. Reading a chart is about understanding probability, never certainty."
   },
 ];
 

@@ -43,7 +43,7 @@ export function PlayReviewsRail() {
           <h3 className="text-sm font-bold text-[#F3EDE3]">Reviews</h3>
         </div>
         <p className="text-xs text-[#F3EDE3]/40 mb-3">
-          Be the first to review Radar on Play.
+          Be the first to review Bloom on Play.
         </p>
         {isAndroid && (
           <a
@@ -51,7 +51,7 @@ export function PlayReviewsRail() {
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
             style={{ background: "rgba(39,183,200,0.1)", color: "#27B7C8", border: "1px solid rgba(39,183,200,0.2)" }}
           >
-            Rate Radar on Play
+            Rate Bloom on Play
           </a>
         )}
       </div>
@@ -100,7 +100,7 @@ export function PlayReviewsRail() {
             className="text-[11px] font-semibold transition-colors hover:text-[#49B06E]"
             style={{ color: "rgba(73,176,110,0.7)" }}
           >
-            Rate Radar on Play
+            Rate Bloom on Play
           </a>
         )}
       </div>

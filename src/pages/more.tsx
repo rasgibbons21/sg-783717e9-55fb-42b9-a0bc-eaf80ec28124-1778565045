@@ -39,7 +39,7 @@ export default function MorePage() {
 
   return (
     <Layout>
-      <SEO title="Radar | More" description="Pansy, Journal, Academy, Paper Trade, Brokers, Settings, and Legal." />
+      <SEO title="Bloom | More" description="Pansy, Journal, Academy, Paper Trade, Brokers, Settings, and Legal." />
       <div className="max-w-lg mx-auto px-4 pt-4 pb-32">
 
         {/* Header */}
@@ -107,7 +107,7 @@ export default function MorePage() {
 
         {/* Brand */}
         <div className="mt-8 text-center">
-          <p className="text-[10px] text-[#F3EDE3]/20">Radar</p>
+          <p className="text-[10px] text-[#F3EDE3]/20">Bloom</p>
           <p className="text-[9px] text-[#F3EDE3]/15 mt-1">© 2026 Cinder Vault Enterprises LLC</p>
         </div>
       </div>

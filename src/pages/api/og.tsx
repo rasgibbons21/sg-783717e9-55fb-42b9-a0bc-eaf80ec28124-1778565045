@@ -5,7 +5,7 @@ export const config = { runtime: "edge" };
 
 export default async function handler(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const title = searchParams.get("title") || "Radar";
+  const title = searchParams.get("title") || "Bloom";
   const subtitle = searchParams.get("subtitle") || "Stock Screener & Trade Alerts";
 
   return new ImageResponse(
@@ -109,7 +109,7 @@ export default async function handler(req: NextRequest) {
               letterSpacing: "0.05em",
             }}
           >
-            Radar
+            Bloom
           </div>
           <div
             style={{

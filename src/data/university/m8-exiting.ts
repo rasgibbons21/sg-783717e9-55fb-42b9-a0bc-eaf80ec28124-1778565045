@@ -92,7 +92,7 @@ export const M8_LESSONS: UniversityLesson[] = [
         explanation: "The most common error is spending significant time on the entry and almost none on the exit. The missing half of the plan — getting out — is the half that ultimately determines the outcome."
       }
     ],
-    girlToGirlTip: "Anyone can get into a trade. Getting out well is the skill that separates a plan from a prayer. Decide your exit while you're calm — future-you, in the heat of a moving position, will thank you."
+    pansyTip: "Anyone can get into a trade. Getting out well is the skill that separates a plan from a prayer. Decide your exit while you're calm — future-you, in the heat of a moving position, will thank you."
   },
 
   // ─── Lesson 2: Profit Targets ────────────────────────────────────────────────
@@ -183,7 +183,7 @@ export const M8_LESSONS: UniversityLesson[] = [
         explanation: "A target should make the risk-to-reward ratio worthwhile — meaning the potential gain should justify the risk being taken. A target too close to the entry makes the ratio unattractive regardless of how good the setup looks."
       }
     ],
-    girlToGirlTip: "'I'll take profit when it feels right' is how good trades become round-trips. Give the trade a destination before you set off — then trust the plan you made when you were calm."
+    pansyTip: "'I'll take profit when it feels right' is how good trades become round-trips. Give the trade a destination before you set off — then trust the plan you made when you were calm."
   },
 
   // ─── Lesson 3: Technical Exits ───────────────────────────────────────────────
@@ -274,7 +274,7 @@ export const M8_LESSONS: UniversityLesson[] = [
         explanation: "The power of a technical exit is that the trigger is defined in advance: 'I'll step aside if X happens.' Without defining what X is before the trade opens, the exit becomes a real-time emotional judgement — the opposite of a plan."
       }
     ],
-    girlToGirlTip: "Sometimes the best signal isn't a target — it's the chart quietly telling you the party's over. Learn to hear it. A lower low where higher lows used to be is the market's way of clearing its throat."
+    pansyTip: "Sometimes the best signal isn't a target — it's the chart quietly telling you the party's over. Learn to hear it. A lower low where higher lows used to be is the market's way of clearing its throat."
   },
 
   // ─── Lesson 4: Indicator-Based Exits ─────────────────────────────────────────
@@ -365,7 +365,7 @@ export const M8_LESSONS: UniversityLesson[] = [
         explanation: "Consistency requires that the exit logic matches the entry logic. If an entry was based on a daily chart trend, an exit triggered by a five-minute indicator fires on a completely different timeframe and introduces noise rather than clarity."
       }
     ],
-    girlToGirlTip: "An indicator exit takes your feelings out of it — that's its gift. Just know it'll get you out a little late. That's the trade-off for consistency, and it's usually a good deal."
+    pansyTip: "An indicator exit takes your feelings out of it — that's its gift. Just know it'll get you out a little late. That's the trade-off for consistency, and it's usually a good deal."
   },
 
   // ─── Lesson 5: Support & Resistance Exits ────────────────────────────────────
@@ -456,7 +456,7 @@ export const M8_LESSONS: UniversityLesson[] = [
         explanation: "Stepping out while price is still moving toward the objective — into strength — means there's liquidity and the move hasn't stalled yet. Waiting for confirmation of the rejection means stepping out into weakness and potentially worse positioning."
       }
     ],
-    girlToGirlTip: "Stepping out near a known level feels counterintuitive — you're still winning and the move looks good. But it beats waiting for a rejection to force the decision in a panic. Consider banking into strength."
+    pansyTip: "Stepping out near a known level feels counterintuitive — you're still winning and the move looks good. But it beats waiting for a rejection to force the decision in a panic. Consider banking into strength."
   },
 
   // ─── Lesson 6: Time-Based Exits ──────────────────────────────────────────────
@@ -547,7 +547,7 @@ export const M8_LESSONS: UniversityLesson[] = [
         explanation: "Defining the time window before the trade opens means the threshold is set objectively — when thinking is clear. Without it, 'how long do I give this?' becomes an emotional real-time question that gets answered with hope rather than logic."
       }
     ],
-    girlToGirlTip: "A trade that just sits there isn't neutral — it's quietly costing you the better trades you can't take. 'Flat' is not free. Give the setup a fair amount of time, and if nothing's happened, moving on is not giving up — it's good capital management."
+    pansyTip: "A trade that just sits there isn't neutral — it's quietly costing you the better trades you can't take. 'Flat' is not free. Give the setup a fair amount of time, and if nothing's happened, moving on is not giving up — it's good capital management."
   },
 
   // ─── Lesson 7: Scaling Out of a Position ─────────────────────────────────────
@@ -638,7 +638,7 @@ export const M8_LESSONS: UniversityLesson[] = [
         explanation: "Like all exit planning, the value is in the timing: decisions made before a position is open are made calmly and objectively. Decisions made while the position is live — especially while it's moving favourably — are made under the influence of emotion and greed."
       }
     ],
-    girlToGirlTip: "Since nobody can call the exact top, scaling out lets you stop trying. Take some, let some ride, and stop torturing yourself over the one perfect exit that doesn't exist. Being partly right every time beats being completely right never."
+    pansyTip: "Since nobody can call the exact top, scaling out lets you stop trying. Take some, let some ride, and stop torturing yourself over the one perfect exit that doesn't exist. Being partly right every time beats being completely right never."
   },
 
   // ─── Lesson 8: Reviewing the Trade Afterwards ────────────────────────────────
@@ -729,7 +729,7 @@ export const M8_LESSONS: UniversityLesson[] = [
         explanation: "A journal turns the raw experience of each trade into a lesson — extracting what went well in the process, what to change, and whether the outcome matched the quality of the thinking. Without this step, the same mistakes repeat indefinitely."
       }
     ],
-    girlToGirlTip: "Judge yourself on whether you followed your plan, not just whether you made money. A disciplined loss is a win for your future, and a reckless win is a trap. Keep a journal — it's where you actually grow."
+    pansyTip: "Judge yourself on whether you followed your plan, not just whether you made money. A disciplined loss is a win for your future, and a reckless win is a trap. Keep a journal — it's where you actually grow."
   },
 ];
 

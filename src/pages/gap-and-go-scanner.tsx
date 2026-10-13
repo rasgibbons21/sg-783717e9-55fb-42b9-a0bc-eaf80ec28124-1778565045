@@ -23,9 +23,9 @@ const glass: React.CSSProperties = {
 };
 
 const STEPS = [
-  { num: "1", icon: Clock, title: "Pre-Market Scan (4:00 AM ET)", desc: "Radar scans hundreds of tickers for overnight gaps. Stocks gapping 4%+ with elevated volume and a catalyst get flagged." },
+  { num: "1", icon: Clock, title: "Pre-Market Scan (4:00 AM ET)", desc: "Bloom scans hundreds of tickers for overnight gaps. Stocks gapping 4%+ with elevated volume and a catalyst get flagged." },
   { num: "2", icon: BarChart3, title: "Score & Rank", desc: "Each gap is scored across conditions: gap %, pre-market volume, relative volume (RVOL), float, and catalyst presence." },
-  { num: "3", icon: Target, title: "Entry / Stop / Target", desc: "Radar calculates an entry zone, stop-loss (invalidation level), and two profit targets with a risk-reward ratio." },
+  { num: "3", icon: Target, title: "Entry / Stop / Target", desc: "Bloom calculates an entry zone, stop-loss (invalidation level), and two profit targets with a risk-reward ratio." },
   { num: "4", icon: AlertTriangle, title: "Checklist Verification", desc: "An expandable checklist shows which conditions passed, failed, or are missing — so you know exactly why a setup scored the way it did." },
   { num: "5", icon: TrendingUp, title: "Monitor & Execute", desc: "Watch the state badge (WATCH → NEAR_TRIGGER → ACTIVE → INVALIDATED) update as the market moves. Act when your plan confirms." },
 ];
@@ -45,13 +45,13 @@ export default function GapAndGoScannerPage() {
   return (
     <div style={{ fontFamily: "'Inter', sans-serif", background: C.deep, color: C.ivory, minHeight: "100vh" }}>
       <SEO
-        title="Gap and Go Scanner — Radar | Pre-Market Gap Scanner"
+        title="Gap and Go Scanner — Bloom | Pre-Market Gap Scanner"
         description="Free pre-market gap scanner for day traders. Scan gaps from 4:00 AM ET with RVOL, float, catalyst detection, and automatic entry/stop/target levels. Checklist-verified setups."
         image="/api/og?title=Gap+%26+Go+Scanner&subtitle=Pre-market+gaps.+RVOL.+Catalyst.+Entry%2Fstop%2Ftarget+levels."
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "WebApplication",
-          name: "Radar Gap and Go Scanner",
+          name: "Bloom Gap and Go Scanner",
           applicationCategory: "FinanceApplication",
           operatingSystem: "Web, Android",
           offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
@@ -64,7 +64,7 @@ export default function GapAndGoScannerPage() {
       <nav style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(14,27,48,0.92)", backdropFilter: "blur(18px)", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 1.5rem", height: 64, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-            <span style={{ fontSize: 18, fontWeight: 700, color: C.ivory }}>Radar</span>
+            <span style={{ fontSize: 18, fontWeight: 700, color: C.ivory }}>Bloom</span>
             <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(244,247,250,0.35)" }}>Gap Scanner</span>
           </Link>
           <Link href="/onboarding">
@@ -90,7 +90,7 @@ export default function GapAndGoScannerPage() {
         </h1>
 
         <p style={{ fontSize: "clamp(1rem,1.8vw,1.12rem)", lineHeight: 1.72, color: "rgba(244,247,250,0.65)", maxWidth: 620, margin: "0 auto 2rem" }}>
-          Radar finds pre-market gaps with volume, scores them across key conditions, and gives you entry, stop,
+          Bloom finds pre-market gaps with volume, scores them across key conditions, and gives you entry, stop,
           and target levels — before the opening bell. No spreadsheets, no guesswork.
         </p>
 
@@ -124,11 +124,11 @@ export default function GapAndGoScannerPage() {
         </div>
       </section>
 
-      {/* Why Radar */}
+      {/* Why Bloom */}
       <section style={{ maxWidth: 600, margin: "0 auto", padding: "2rem 1.5rem 3rem" }}>
         <div style={{ ...glass, borderRadius: 20, padding: "2rem" }}>
           <h2 style={{ fontSize: 18, fontWeight: 700, textAlign: "center", marginBottom: "1.5rem" }}>
-            Why Traders Choose Radar
+            Why Traders Choose Bloom
           </h2>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {WHY.map((item) => (
@@ -159,7 +159,7 @@ export default function GapAndGoScannerPage() {
       {/* Footer */}
       <footer style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "2rem 1.5rem", textAlign: "center" }}>
         <p style={{ fontSize: 11, color: "rgba(244,247,250,0.25)" }}>
-          © 2026 Cinder Vault Enterprises LLC. Radar is for educational purposes only and does not constitute financial advice. Alerts are price/level notifications, not trade recommendations.
+          © 2026 Cinder Vault Enterprises LLC. Bloom is for educational purposes only and does not constitute financial advice. Alerts are price/level notifications, not trade recommendations.
         </p>
       </footer>
     </div>

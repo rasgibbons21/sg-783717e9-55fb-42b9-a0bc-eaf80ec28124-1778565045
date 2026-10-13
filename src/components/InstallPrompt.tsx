@@ -131,7 +131,7 @@ export function InstallPrompt() {
                 <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center animate-pulse">
                   <img
                     src="/icon-192.png"
-                    alt="Radar"
+                    alt="Bloom"
                     className="w-10 h-10 rounded-full object-cover"
                   />
                 </div>
@@ -139,7 +139,7 @@ export function InstallPrompt() {
 
               <div className="flex-1 min-w-0">
                 <h3 className="font-semibold text-foreground text-lg mb-1">
-                  Add Radar to your home screen
+                  Add Bloom to your home screen
                 </h3>
                 <p className="text-sm text-muted-foreground mb-4">
                   Quick access to your screener 🌸
@@ -182,14 +182,14 @@ export function InstallPrompt() {
                 <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
                   <img
                     src="/icon-192.png"
-                    alt="Radar"
+                    alt="Bloom"
                     className="w-12 h-12 rounded-full object-cover"
                   />
                 </div>
               </div>
               <div>
                 <h2 className="text-2xl font-bold text-foreground mb-2">
-                  Add Radar to Your Home Screen
+                  Add Bloom to Your Home Screen
                 </h2>
                 <p className="text-sm text-muted-foreground">
                   Follow these 3 quick steps in Safari

@@ -57,8 +57,8 @@ export function Layout({ children }: LayoutProps) {
       >
         <div className="flex items-center h-14 px-4">
           <Link href="/home" className="flex items-center gap-3">
-            <img src="/icon-192.png" alt="Radar" className="h-8 w-auto rounded-md" />
-            <span className="text-xl font-bold" style={{ color: "var(--r-ivory)" }}>Radar</span>
+            <img src="/icon-192.png" alt="Bloom" className="h-8 w-auto rounded-md" />
+            <span className="text-xl font-bold" style={{ color: "var(--r-ivory)" }}>Bloom</span>
           </Link>
         </div>
       </header>
@@ -69,8 +69,8 @@ export function Layout({ children }: LayoutProps) {
         <div className="mx-auto max-w-7xl px-4">
           <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
             <div>
-              <h3 className="mb-4 text-lg font-semibold" style={{ color: "var(--r-teal)" }}>Radar</h3>
-              <p className="text-sm" style={{ color: "var(--r-meta)" }}>Stock screener & alerts</p>
+              <h3 className="mb-4 text-lg font-semibold" style={{ color: "var(--r-teal)" }}>Bloom</h3>
+              <p className="text-sm" style={{ color: "var(--r-meta)" }}>Learn money & investing from zero</p>
             </div>
             <div>
               <h4 className="mb-4 text-sm font-semibold" style={{ color: "var(--r-ivory)" }}>Legal</h4>
@@ -98,10 +98,10 @@ export function Layout({ children }: LayoutProps) {
           </div>
           <div className="mt-8 pt-8" style={{ borderTop: "1px solid var(--r-hairline)" }}>
             <p className="text-xs" style={{ color: "var(--r-meta)" }}>
-              &copy; 2026 Cinder Vault Enterprises LLC. All rights reserved. Radar is a product of Cinder Vault Enterprises LLC.
+              &copy; 2026 Cinder Vault Enterprises LLC. All rights reserved. Bloom is a product of Cinder Vault Enterprises LLC.
             </p>
             <p className="mt-2 text-xs" style={{ color: "var(--r-meta)" }}>
-              Radar is for educational purposes only and does not constitute financial advice. All investing involves risk of loss.
+              Bloom is for educational purposes only and does not constitute financial advice. All investing involves risk of loss.
             </p>
           </div>
         </div>

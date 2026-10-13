@@ -121,7 +121,7 @@ export const M3_LESSONS: UniversityLesson[] = [
           "The 200 SMA is a reference line, not a force field. Price respects it sometimes and ignores it others. Treating every touch as an automatic bounce is one of the most common and costly SMA misreadings.",
       },
     ],
-    girlToGirlTip:
+    pansyTip:
       "A moving average is a trend summary, not a crystal ball — where price has been leaning, not where it's going.",
     videoSlot: null,
   },
@@ -250,7 +250,7 @@ export const M3_LESSONS: UniversityLesson[] = [
           "The search for the 'perfect' EMA setting is usually procrastination dressed as research. Standard lengths (9, 21, 50) are used by enough participants to matter. Optimization rarely adds meaningful edge.",
       },
     ],
-    girlToGirlTip:
+    pansyTip:
       "SMA is the calm friend, EMA is the reactive one. Neither is 'better' — different speeds answering 'what's the trend.'",
     videoSlot: null,
   },
@@ -379,7 +379,7 @@ export const M3_LESSONS: UniversityLesson[] = [
           "When price dips below VWAP and then reclaims it — closing back above — it suggests buyers stepped back in and retook the 'fair value' level. This is one of the most watched intraday patterns.",
       },
     ],
-    girlToGirlTip:
+    pansyTip:
       "VWAP is where the big money keeps score during the day — just remember it clocks out at the close.",
     videoSlot: null,
   },
@@ -513,7 +513,7 @@ export const M3_LESSONS: UniversityLesson[] = [
           "The 70 and 30 levels are context clues, not buttons. Automatically selling every time RSI hits 70 ignores trend strength and leads to exiting positions far too early in a genuine trend.",
       },
     ],
-    girlToGirlTip:
+    pansyTip:
       "RSI is one voice in the room — listen, don't obey. Anyone selling it as a magic button is selling you something.",
     videoSlot: null,
   },
@@ -655,7 +655,7 @@ export const M3_LESSONS: UniversityLesson[] = [
           "MACD is a lagging confirmer. When it agrees with RSI momentum and price structure — multiple independent tools pointing the same way — that confluence carries much more weight than a MACD crossover alone.",
       },
     ],
-    girlToGirlTip:
+    pansyTip:
       "MACD, EMA, RSI all read momentum from different angles. All agree = confluence. Cherry-picking one = bias.",
     videoSlot: null,
   },
@@ -785,7 +785,7 @@ export const M3_LESSONS: UniversityLesson[] = [
           "A band-touch alone is ambiguous. Volume showing up at the touch — or a price structure reversal — distinguishes a genuine exhaustion signal from price simply hugging a band in a strong trend.",
       },
     ],
-    girlToGirlTip:
+    pansyTip:
       "The squeeze is the interesting part — the market loading up. Boring tight bands often come right before the action.",
     videoSlot: null,
   },
@@ -916,7 +916,7 @@ export const M3_LESSONS: UniversityLesson[] = [
           "Ignoring volume when evaluating a price move is the most common mistake. A large candle with no volume behind it is a hollow signal — the crowd didn't show up, making the move far less trustworthy.",
       },
     ],
-    girlToGirlTip:
+    pansyTip:
       "A big move on tiny volume is a whisper pretending to be a shout. Real moves bring a crowd.",
     videoSlot: null,
   },
@@ -1045,7 +1045,7 @@ export const M3_LESSONS: UniversityLesson[] = [
           "ATR is directionally blind — it measures magnitude, not direction. Using it to predict whether price will go up or down is a fundamental misread of what the tool does.",
       },
     ],
-    girlToGirlTip:
+    pansyTip:
       "ATR is the difference between giving a trade room to breathe and getting shaken out by normal noise. A volatility ruler, nothing more.",
     videoSlot: null,
   },
@@ -1175,7 +1175,7 @@ export const M3_LESSONS: UniversityLesson[] = [
           "ADX is entirely direction-neutral. A reading of 35 means a strong trend exists — but whether it's up or down requires looking at the +DI/-DI lines or price structure separately.",
       },
     ],
-    girlToGirlTip:
+    pansyTip:
       "ADX is your 'is it worth using trend tools right now?' check. Low ADX? The market's just chopping.",
     videoSlot: null,
   },
@@ -1309,7 +1309,7 @@ export const M3_LESSONS: UniversityLesson[] = [
           "A Stoch RSI cross gains meaning when it agrees with the higher-timeframe trend and happens near a meaningful structure level. Used alone on a short timeframe, most crosses are noise.",
       },
     ],
-    girlToGirlTip:
+    pansyTip:
       "Stoch RSI is RSI with too much coffee. Helpful for early hints, but it cries wolf — always filter it.",
     videoSlot: null,
   },
@@ -1437,7 +1437,7 @@ export const M3_LESSONS: UniversityLesson[] = [
           "Ichimoku has five components and can look overwhelming. Beginners who try to interpret all lines at once often end up confused and paralyzed. Starting with just 'above the cloud / below the cloud / inside the cloud' captures most of the practical value.",
       },
     ],
-    girlToGirlTip:
+    pansyTip:
       "Don't let the cloud overwhelm you. 'Above or below the cloud?' gets you 80% of the value with none of the headache.",
     videoSlot: null,
   },
@@ -1567,7 +1567,7 @@ export const M3_LESSONS: UniversityLesson[] = [
           "A Fibonacci level that coincides with a real price structure level — prior support, a swing low, or a consolidation zone — carries far more weight than a Fibonacci level floating alone with no other evidence behind it.",
       },
     ],
-    girlToGirlTip:
+    pansyTip:
       "Fibs work best when they agree with something real. On actual support? Now you're talking. Floating alone? Take it lightly.",
     videoSlot: null,
   },

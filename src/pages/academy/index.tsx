@@ -48,7 +48,7 @@ export default function AcademyLanding() {
   return (
     <>
       <SEO
-        title="Radar Academy — Financial Education & AI Tools"
+        title="Bloom Academy — Financial Education & AI Tools"
         description="Master budgeting, side hustles, and investing with 13 AI-powered tools. Your complete financial education platform."
         url="https://academy.shebloomswealth.app"
       />
@@ -58,9 +58,9 @@ export default function AcademyLanding() {
         <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <div className="flex h-14 items-center justify-between px-4 max-w-7xl mx-auto">
             <Link href="/academy" className="flex items-center gap-2">
-              <img src="/icon-192.png" alt="Radar" className="h-7 w-auto rounded-md" />
+              <img src="/icon-192.png" alt="Bloom" className="h-7 w-auto rounded-md" />
               <span className="font-serif text-lg font-bold text-foreground">
-                Radar <span className="text-[#27B7C8]">Academy</span>
+                Bloom <span className="text-[#27B7C8]">Academy</span>
               </span>
             </Link>
             <div className="flex items-center gap-3">
@@ -104,7 +104,7 @@ export default function AcademyLanding() {
                 <span className="text-[#27B7C8]">Education Platform</span>
               </h1>
               <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 leading-relaxed">
-                Learn to trade with confidence &mdash; structured lessons, 24 pattern guides, and AI-powered tools built for women who want financial freedom.
+                Learn to trade with confidence &mdash; structured lessons, 24 pattern guides, and AI-powered tools built for anyone who wants financial freedom.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                 <Link href={isLoggedIn ? "/academy/dashboard" : "/onboarding"}>
@@ -217,7 +217,7 @@ export default function AcademyLanding() {
                 Best Value
               </div>
               <div className="mb-6">
-                <h3 className="text-lg font-bold text-foreground mb-1">Radar Desk</h3>
+                <h3 className="text-lg font-bold text-foreground mb-1">Bloom Desk</h3>
                 <div className="flex items-baseline gap-1">
                   <span className="text-4xl font-bold text-foreground">$7.99</span>
                   <span className="text-muted-foreground">/month</span>
@@ -256,7 +256,7 @@ export default function AcademyLanding() {
               </div>
               <div>
                 <Star className="w-8 h-8 text-[#27B7C8] mx-auto mb-3" />
-                <h4 className="text-sm font-bold text-foreground mb-1">Built for Women</h4>
+                <h4 className="text-sm font-bold text-foreground mb-1">Built for Everyone</h4>
                 <p className="text-xs text-muted-foreground">Plain language, no jargon, judgment-free learning.</p>
               </div>
               <div>
@@ -273,7 +273,7 @@ export default function AcademyLanding() {
           <div className="mx-auto max-w-7xl px-4">
             <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
               <div>
-                <h3 className="mb-3 font-serif text-lg font-semibold text-[#27B7C8]">Radar Academy</h3>
+                <h3 className="mb-3 font-serif text-lg font-semibold text-[#27B7C8]">Bloom Academy</h3>
                 <p className="text-sm text-muted-foreground">
                   Your complete trading education platform. Learn patterns, master setups, trade confidently.
                 </p>
@@ -297,7 +297,7 @@ export default function AcademyLanding() {
             </div>
             <div className="mt-6 border-t border-border pt-6">
               <p className="text-xs text-muted-foreground">
-                &copy; 2026 Cinder Vault Enterprises LLC. All rights reserved. Radar Academy is for educational purposes only.
+                &copy; 2026 Cinder Vault Enterprises LLC. All rights reserved. Bloom Academy is for educational purposes only.
               </p>
             </div>
           </div>
