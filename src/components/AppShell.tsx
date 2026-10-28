@@ -60,6 +60,7 @@ export function AppShell({ children }: AppShellProps) {
     if (href === "/discover") return path === "/discover" || path.startsWith("/stock/");
     if (href === "/news") return path === "/news";
     if (href === "/portfolio") return path === "/portfolio" || path === "/goals";
+    if (href === "/learn") return path === "/learn" || path.startsWith("/university") || path.startsWith("/forex");
     if (href === "/more") return path === "/more";
     return false;
   };

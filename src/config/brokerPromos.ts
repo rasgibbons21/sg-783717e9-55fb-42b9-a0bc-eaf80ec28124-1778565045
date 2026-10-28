@@ -48,6 +48,22 @@ export const brokerPromos: BrokerPromo[] = [
     affiliateUrl: "https://www.tradingview.com/?aff_id=169003",
     active: true,
   },
+  {
+    id: "deriv",
+    name: "Deriv",
+    logoDomain: "deriv.com",
+    tagline: "Trade forex, indices, and synthetic markets with a free demo account.",
+    affiliateUrl: "https://deriv.com",
+    active: true,
+  },
+  {
+    id: "vantage",
+    name: "Vantage",
+    logoDomain: "vantagemarkets.com",
+    tagline: "Forex & CFD trading with raw ECN spreads and fast execution.",
+    affiliateUrl: "https://www.vantagemarkets.com/open-live-account?cpaAffid=MjAzMTQwMDM",
+    active: true,
+  },
 ];
 
 export function getActivePromos(): BrokerPromo[] {

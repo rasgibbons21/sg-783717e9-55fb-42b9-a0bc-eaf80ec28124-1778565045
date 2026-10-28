@@ -2870,6 +2870,7 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
           <div className="grid grid-cols-2 gap-3">
             {[
               { href: "/university", icon: <BookOpen className="w-5 h-5 text-accent shrink-0" />, title: "Bloom University", sub: "Advanced modules" },
+              { href: "/forex", icon: <Sparkles className="w-5 h-5 text-accent shrink-0" />, title: "Forex Trading", sub: "20 free lessons" },
               { href: "/brokers", icon: <Building2 className="w-5 h-5 text-accent shrink-0" />, title: "Find a Broker", sub: "Compare platforms" },
             ].map((item, i) => (
               <Link key={item.href} href={item.href}>
