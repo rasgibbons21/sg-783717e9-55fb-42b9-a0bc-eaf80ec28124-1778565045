@@ -2,7 +2,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   Layers, TrendingUp, ArrowRight,
-  CheckCircle, Star, Zap, Shield,
+  Star, Zap, Shield,
 } from "lucide-react";
 import { SEO } from "@/components/SEO";
 import { AdMobBanner } from "@/components/AdMobBanner";
@@ -30,17 +30,6 @@ const PILLARS = [
   },
 ];
 
-const PRICING_FEATURES = [
-  "All 13 AI-powered tools",
-  "Unlimited stock analysis",
-  "Portfolio X-Ray & risk assessment",
-  "Smart alerts & earnings tracker",
-  "AI research reports",
-  "24 pattern library guides",
-  "Strategy condition breakdowns",
-  "Paper trading simulator",
-  "No ads",
-];
 
 export default function AcademyLanding() {
   const { isPaid, isLoggedIn } = useSubscription();
@@ -198,50 +187,21 @@ export default function AcademyLanding() {
 
         <AdMobBanner format="rectangle" />
 
-        {/* Pricing */}
+        {/* Get Started CTA */}
         <section className="max-w-7xl mx-auto px-4 py-16 md:py-20">
-          <div className="text-center mb-12">
+          <div className="text-center">
             <h2 className="text-2xl md:text-3xl font-serif font-bold text-foreground mb-3">
-              Simple, Transparent Pricing
+              100% Free. No Catch.
             </h2>
-            <p className="text-muted-foreground">Start free. Upgrade anytime.</p>
-          </div>
-          <div className="max-w-md mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="bg-card border-2 border-[#27B7C8]/30 rounded-2xl p-8 relative overflow-hidden"
-            >
-              <div className="absolute top-0 right-0 bg-[#27B7C8] text-white text-xs font-bold px-4 py-1 rounded-bl-xl">
-                Best Value
-              </div>
-              <div className="mb-6">
-                <h3 className="text-lg font-bold text-foreground mb-1">Bloom Desk</h3>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-bold text-foreground">$7.99</span>
-                  <span className="text-muted-foreground">/month</span>
-                </div>
-                <p className="text-sm text-muted-foreground mt-1">or $69/year (save 28%)</p>
-              </div>
-              <ul className="space-y-3 mb-8">
-                {PRICING_FEATURES.map((feature) => (
-                  <li key={feature} className="flex items-center gap-2.5 text-sm text-foreground">
-                    <CheckCircle className="w-4 h-4 text-primary shrink-0" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-              <Link href={isLoggedIn ? "/subscription" : "/onboarding"}>
-                <motion.button
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => haptic()}
-                  className="w-full bg-gradient-to-r from-primary to-[#27B7C8] text-white py-3 rounded-full font-semibold text-sm hover:opacity-90 transition-opacity"
-                >
-                  {isLoggedIn ? (isPaid ? "You're Subscribed" : "Upgrade Now") : "Get Started"}
-                </motion.button>
-              </Link>
-            </motion.div>
+            <p className="text-muted-foreground mb-8">All lessons, tools, and features — completely free.</p>
+            <Link href={isLoggedIn ? "/home" : "/onboarding"}>
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                className="bg-gradient-to-r from-primary to-[#27B7C8] text-white py-3 px-8 rounded-full font-semibold text-sm hover:opacity-90 transition-opacity"
+              >
+                {isLoggedIn ? "Go to Dashboard" : "Get Started Free"}
+              </motion.button>
+            </Link>
           </div>
         </section>
 

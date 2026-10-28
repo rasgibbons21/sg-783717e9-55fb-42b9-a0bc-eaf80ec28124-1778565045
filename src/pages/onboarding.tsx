@@ -11,10 +11,10 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   Loader2, Eye, EyeOff, ChevronRight, Sparkles, Shield,
   ArrowLeft, Check, Bell, Clock, Zap, Brain, Target,
-  TrendingUp, AlertTriangle, Crown, Star,
+  TrendingUp, AlertTriangle, Star,
 } from "lucide-react";
 import { STRATEGIES, type StrategyId } from "@/lib/strategies";
-import { DESK_PLAN, PRO_PLAN, FEATURE_MATRIX } from "@/config/proPlan";
+import { DESK_PLAN } from "@/config/proPlan";
 import { trackSignup, trackLogin, trackOnboardingStep, trackOnboardingComplete } from "@/lib/analytics";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -22,7 +22,7 @@ import { trackSignup, trackLogin, trackOnboardingStep, trackOnboardingComplete }
 type Step =
   | "splash" | "problem" | "age" | "experience" | "session"
   | "struggle" | "goal" | "help" | "strategy" | "reveal"
-  | "pricing" | "auth" | "building";
+  | "auth" | "building";
 
 type AuthMode = "signup" | "login" | "forgot";
 
@@ -141,9 +141,6 @@ export default function Onboarding() {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [referralCode, setReferralCode] = useState("");
-
-  // Pricing
-  const [selectedPlan, setSelectedPlan] = useState<"desk" | "pro">("desk");
 
   // Building progress
   const [buildingProgress, setBuildingProgress] = useState(0);
@@ -963,106 +960,14 @@ export default function Onboarding() {
                   {/* Notification opt-in */}
                   <NotificationOptIn />
 
-                  {/* CTA — go to pricing */}
-                  <button
-                    type="button"
-                    onClick={() => goToStep("pricing")}
-                    className="glass-btn flex items-center justify-center gap-2 text-lg"
-                  >
-                    Continue <ChevronRight className="w-5 h-5" />
-                  </button>
-                </div>
-              )}
-
-              {/* ═══════════ PRICING ═══════════ */}
-              {step === "pricing" && (
-                <div className={`space-y-5 ${animateIn ? "step-animate" : "opacity-0"}`}>
-                  <div className="text-center space-y-2">
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider" style={{ background: "rgba(39,183,200,0.12)", border: "1px solid rgba(39,183,200,0.25)", color: "#27B7C8" }}>
-                      <Crown className="w-3.5 h-3.5" /> Upgrade your desk
-                    </div>
-                    <h2 className="font-serif text-3xl font-bold text-[#F3EDE3]">
-                      Pick your plan
-                    </h2>
-                    <p className="text-[#F3EDE3]/40 text-sm">Free works forever. Upgrade when you need more.</p>
-                  </div>
-
-                  {/* Desk / Pro cards */}
-                  <div className="grid grid-cols-2 gap-3">
-                    {([
-                      { id: "desk" as const, label: "Desk", price: DESK_PLAN.yearlyPrice, mo: DESK_PLAN.monthlyPrice, color: "#27B7C8", tagline: DESK_PLAN.tagline, tag: "Recommended" },
-                      { id: "pro" as const, label: "Pro", price: PRO_PLAN.yearlyPrice, mo: PRO_PLAN.monthlyPrice, color: "#a855f7", tagline: PRO_PLAN.tagline, tag: "Pro" },
-                    ]).map((plan, i) => {
-                      const isSelected = selectedPlan === plan.id;
-                      return (
-                        <div
-                          key={plan.id}
-                          onClick={() => setSelectedPlan(plan.id)}
-                          className="rounded-2xl p-4 cursor-pointer transition-all relative"
-                          style={{
-                            background: isSelected ? `${plan.color}10` : "rgba(255,255,255,0.03)",
-                            border: isSelected ? `2px solid ${plan.color}` : "2px solid rgba(255,255,255,0.06)",
-                            animation: animateIn ? `cardEntrance 0.5s ease-out ${i * 0.1}s both` : "none",
-                          }}
-                        >
-                          {plan.tag && (
-                            <span className="absolute -top-2 left-3 text-[8px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider"
-                              style={{ background: plan.color, color: plan.id === "pro" ? "#fff" : "#07080C" }}>
-                              {plan.tag}
-                            </span>
-                          )}
-                          <p className="font-bold text-[#F3EDE3] text-base mb-1">{plan.label}</p>
-                          <p className="text-xl font-bold text-[#F3EDE3]">${plan.price}<span className="text-xs font-normal text-[#F3EDE3]/30">/yr</span></p>
-                          <p className="text-[10px] text-[#F3EDE3]/30 mb-2">or ${plan.mo}/mo</p>
-                          <p className="text-[10px] text-[#F3EDE3]/40 leading-snug">{plan.tagline}</p>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  {/* Compact feature matrix */}
-                  <div className={`${glass} ${glassBg} rounded-xl overflow-hidden`}>
-                    <div className="grid grid-cols-4 text-[9px] font-bold uppercase tracking-wider px-3 py-2" style={{ background: "rgba(255,255,255,0.04)" }}>
-                      <span className="text-[#F3EDE3]/30">Feature</span>
-                      <span className="text-center text-[#F3EDE3]/30">Free</span>
-                      <span className="text-center text-[#27B7C8]">Desk</span>
-                      <span className="text-center text-[#a855f7]">Pro</span>
-                    </div>
-                    {FEATURE_MATRIX.map((row, i) => (
-                      <div key={row.label} className="grid grid-cols-4 px-3 py-2 text-xs items-center"
-                        style={{ background: i % 2 === 0 ? "transparent" : "rgba(255,255,255,0.02)" }}>
-                        <span className="text-[#F3EDE3]/70 text-[11px]">{row.label}</span>
-                        <span className="text-center text-[10px] text-[#F3EDE3]/35">{row.free === "Open" ? "✓" : row.free === "—" ? "—" : row.free}</span>
-                        <span className="text-center text-[10px] text-[#F3EDE3]/80">{row.desk === "Open" ? "✓" : row.desk}</span>
-                        <span className="text-center text-[10px] text-[#F3EDE3]/80">{row.pro === "Open" ? "✓" : row.pro}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* CTA */}
+                  {/* CTA — go to signup */}
                   <button
                     type="button"
                     onClick={() => goToStep("auth")}
                     className="glass-btn flex items-center justify-center gap-2 text-lg"
                   >
-                    {selectedPlan === "desk" ? "Subscribe to Desk" : "Subscribe to Pro"} <ChevronRight className="w-5 h-5" />
+                    Create your free account <ChevronRight className="w-5 h-5" />
                   </button>
-
-                  {/* Skip */}
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      await completeOnboarding();
-                      window.location.href = "/home";
-                    }}
-                    className="w-full text-center text-sm text-[#F3EDE3]/30 hover:text-[#F3EDE3]/60 transition-colors py-2"
-                  >
-                    Continue with free plan
-                  </button>
-
-                  <p className="text-center text-[10px] text-[#F3EDE3]/20 leading-relaxed">
-                    Cancel anytime in Settings. No hidden fees.
-                  </p>
                 </div>
               )}
 
@@ -1217,7 +1122,7 @@ export default function Onboarding() {
                     </div>
                   )}
 
-                  <button type="button" onClick={() => goToStep("pricing")} className="w-full text-center text-sm text-[#F3EDE3]/30 hover:text-[#F3EDE3]/60 transition-colors py-2">
+                  <button type="button" onClick={() => goToStep("reveal")} className="w-full text-center text-sm text-[#F3EDE3]/30 hover:text-[#F3EDE3]/60 transition-colors py-2">
                     <ArrowLeft className="w-3.5 h-3.5 inline mr-1" /> Back
                   </button>
                 </div>

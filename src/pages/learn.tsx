@@ -19,7 +19,6 @@ import confetti from "canvas-confetti";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { AdMobBanner } from "@/components/AdMobBanner";
-import { UpgradeModal } from "@/components/UpgradeModal";
 import { BloomGarden } from "@/components/BloomGarden";
 import { PansyContextCard } from "@/components/PansyContextCard";
 import { ReviewPrompt, shouldShowReviewPrompt } from "@/components/ReviewPrompt";
@@ -57,7 +56,6 @@ export default function Learn() {
   const router = useRouter();
   const { isPaid, isLoading: subscriptionLoading } = useSubscription();
   const [user, setUser] = useState<any>(null);
-  const [showLearnUpgradeModal, setShowLearnUpgradeModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<Category>("All");
   const [completedLessons, setCompletedLessons] = useState<string[]>([]);
@@ -2953,11 +2951,7 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
                     className={`p-4 bg-card border-border rounded-xl hover:border-accent/50 transition-all cursor-pointer group ${isGated ? "opacity-50" : ""}`}
                     onClick={() => {
                       haptic();
-                      if (isGated) {
-                        setShowLearnUpgradeModal(true);
-                      } else {
-                        setSelectedLesson(lesson.id);
-                      }
+                      setSelectedLesson(lesson.id);
                     }}
                   >
                     <div className="flex items-center gap-4">
@@ -3076,12 +3070,6 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
           </Card>
         </div>
       </div>
-
-      <UpgradeModal
-        isOpen={showLearnUpgradeModal}
-        onClose={() => setShowLearnUpgradeModal(false)}
-        trigger="view_limit"
-      />
 
       {showReviewPrompt && (
         <ReviewPrompt
