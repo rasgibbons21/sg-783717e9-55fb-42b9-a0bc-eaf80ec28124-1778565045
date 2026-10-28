@@ -2939,7 +2939,7 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
               filteredLessons.map((lesson, idx) => {
                 const isCompleted = completedLessons.includes(lesson.id);
                 const isBookmarked = bookmarkedLessons.includes(lesson.id);
-                const isGated = lesson.isPro === true && !isPaid;
+                const isGated = false;
                 return (
                   <motion.div
                     key={lesson.id}

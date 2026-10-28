@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 import { useSubscription } from "@/contexts/SubscriptionContext";
-import { FoundersPricingModal } from "./FoundersPricingModal";
 import { SignUpBanner } from "./SignUpBanner";
 import { AppShell } from "./AppShell";
 
@@ -42,7 +41,6 @@ export function Layout({ children }: LayoutProps) {
           {children}
         </AppShell>
         <Toaster />
-        <FoundersPricingModal />
       </>
     );
   }
@@ -108,7 +106,6 @@ export function Layout({ children }: LayoutProps) {
       </footer>
 
       <Toaster />
-      <FoundersPricingModal />
     </div>
   );
 }
