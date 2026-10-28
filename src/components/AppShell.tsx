@@ -6,9 +6,9 @@ import {
   Radar,
   Zap,
   BarChart3,
-  Newspaper,
   Bookmark,
   GraduationCap,
+  TrendingUp,
   MoreHorizontal,
   Search,
   ChevronLeft,
@@ -39,7 +39,7 @@ const NAV_ITEMS: ReadonlyArray<{
   { href: "/scanner", icon: Radar, label: "Scanner" },
   { href: "/signals", icon: Zap, label: "Signals" },
   { href: "/discover", icon: BarChart3, label: "Charts" },
-  { href: "/news", icon: Newspaper, label: "News" },
+  { href: "/forex", icon: TrendingUp, label: "Forex" },
   { href: "/learn", icon: GraduationCap, label: "Academy" },
   { href: "/more", icon: MoreHorizontal, label: "More" },
 ];
@@ -58,14 +58,14 @@ export function AppShell({ children }: AppShellProps) {
     if (href === "/scanner") return path === "/scanner" || path.startsWith("/scanner/");
     if (href === "/signals") return path === "/signals";
     if (href === "/discover") return path === "/discover" || path.startsWith("/stock/");
-    if (href === "/news") return path === "/news";
+    if (href === "/forex") return path === "/forex" || path.startsWith("/forex/");
     if (href === "/portfolio") return path === "/portfolio" || path === "/goals";
-    if (href === "/learn") return path === "/learn" || path.startsWith("/university") || path.startsWith("/forex");
+    if (href === "/learn") return path === "/learn" || path.startsWith("/university");
     if (href === "/more") return path === "/more";
     return false;
   };
 
-  const mainPaths = ["/home", "/scanner", "/signals", "/discover", "/news", "/portfolio", "/more", "/profile", "/onboarding"];
+  const mainPaths = ["/home", "/scanner", "/signals", "/discover", "/forex", "/portfolio", "/more", "/profile", "/onboarding"];
   const isInner = !mainPaths.some(p => path === p || path.startsWith(p + "/"));
 
   const promptIdx = typeof window !== "undefined"
