@@ -23,6 +23,8 @@ import { UpgradeModal } from "@/components/UpgradeModal";
 import { BloomGarden } from "@/components/BloomGarden";
 import { PansyContextCard } from "@/components/PansyContextCard";
 import { ReviewPrompt, shouldShowReviewPrompt } from "@/components/ReviewPrompt";
+import BrokerPromoCard from "@/components/BrokerPromoCard";
+import BrokerSignupModal from "@/components/BrokerSignupModal";
 import { useShareAchievement } from "@/components/ShareAchievement";
 
 const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
@@ -70,6 +72,7 @@ export default function Learn() {
   const [confettiFired, setConfettiFired] = useState(false);
   const [showReviewPrompt, setShowReviewPrompt] = useState(false);
   const [reviewTrigger, setReviewTrigger] = useState('');
+  const [showBrokerModal, setShowBrokerModal] = useState(false);
   const { share, ShareModal } = useShareAchievement();
 
   const lessons: Lesson[] = [
@@ -2260,6 +2263,7 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
 
     setQuizScore(score);
     setQuizSubmitted(true);
+    setTimeout(() => setShowBrokerModal(true), 1500);
 
     try {
       const { error } = await supabase
@@ -2685,6 +2689,7 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
                   >
                     Retake Quiz
                   </Button>
+                  <BrokerPromoCard />
                   <style jsx global>{`
                     @keyframes gardenBloom {
                       from { opacity: 0; transform: scale(0.3) rotate(-20deg); }
@@ -3086,6 +3091,7 @@ Bloom is for educational purposes only and does not provide financial, tax, lega
       )}
 
       {ShareModal}
+      <BrokerSignupModal open={showBrokerModal} onClose={() => setShowBrokerModal(false)} />
     </Layout>
   );
 }

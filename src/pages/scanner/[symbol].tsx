@@ -16,6 +16,7 @@ import {
 import type { SignalResult } from "@/lib/strategies";
 import { supabase } from "@/integrations/supabase/client";
 import { useSubscription } from "@/contexts/SubscriptionContext";
+import BrokerStrip from "@/components/BrokerStrip";
 
 const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
 
@@ -627,6 +628,9 @@ export default function SymbolDetail() {
                 </div>
               </div>
             )}
+
+            {/* Broker strip */}
+            <BrokerStrip context="scanner_detail" />
 
             {/* Disclaimer */}
             <div className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>

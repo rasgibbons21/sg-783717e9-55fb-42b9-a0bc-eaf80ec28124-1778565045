@@ -18,6 +18,7 @@ import { marketService } from "@/services/marketService";
 import { PriceAlerts } from "@/components/PriceAlerts";
 import { ExternalLink, BarChart3, Lock, Loader2 } from "lucide-react";
 import Link from "next/link";
+import BrokerStrip from "@/components/BrokerStrip";
 
 interface StockData {
   c: number;
@@ -405,6 +406,9 @@ export default function StockPage() {
             ))}
           </div>
         )}
+
+        {/* Broker CTA */}
+        <BrokerStrip context="stock_detail" />
 
         {/* Floating Pansy Chat */}
         {ticker && stockData && (

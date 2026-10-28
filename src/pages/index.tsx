@@ -5,8 +5,10 @@ import Image from "next/image";
 import Head from "next/head";
 import { supabase } from "@/integrations/supabase/client";
 import { SEO } from "@/components/SEO";
-import { ArrowRight, Share2, Smartphone, Plus, BookOpen, DollarSign, BarChart3 } from "lucide-react";
+import { ArrowRight, Share2, Smartphone, Plus, BookOpen, DollarSign, BarChart3, ExternalLink } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
+import { getActivePromos, getFeaturedPromo } from "@/config/brokerPromos";
+import { trackBrokerClick } from "@/lib/analytics";
 
 /* ─── Palette ─────────────────────────────────────────────────────────────── */
 const C = {
@@ -479,6 +481,58 @@ export default function LandingPage() {
                 Get Started Free <ArrowRight size={16} />
               </button>
             </Link>
+          </div>
+        </section>
+
+        {/* ── TRUSTED BROKERS ───────────────────────────────────────────── */}
+        <section style={{ background: C.deep, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+          <div className="max-w-5xl mx-auto px-4 py-14 md:px-12">
+            <h2 className="text-2xl md:text-3xl font-bold text-center mb-2" style={{ color: C.ivory }}>Trusted Brokers</h2>
+            <p className="text-center text-sm mb-8" style={{ color: "rgba(243,237,227,0.5)" }}>Open a free account and start practicing what you learn</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {getActivePromos().slice(0, 6).map((broker) => {
+                const isFeatured = broker.id === getFeaturedPromo().id;
+                const logoDevKey = process.env.NEXT_PUBLIC_LOGO_DEV_KEY?.trim();
+                const logoUrl = logoDevKey && broker.logoDomain
+                  ? `https://img.logo.dev/${broker.logoDomain}?token=${logoDevKey}&size=64&format=png`
+                  : `/logos/${broker.id}-logo.svg`;
+                return (
+                  <a
+                    key={broker.id}
+                    href={broker.affiliateUrl}
+                    target="_blank"
+                    rel="noopener noreferrer sponsored"
+                    onClick={() => {
+                      trackBrokerClick(broker.name);
+                      try {
+                        supabase.auth.getSession().then(({ data: { session } }) => {
+                          supabase.from("broker_clicks").insert({ broker_name: broker.name, user_id: session?.user?.id ?? null });
+                        });
+                      } catch {}
+                    }}
+                    className="rounded-2xl p-4 flex items-center gap-3 transition-all hover:scale-[1.02]"
+                    style={{
+                      background: isFeatured ? "linear-gradient(135deg, rgba(39,183,200,0.12), rgba(73,176,110,0.08))" : "rgba(255,255,255,0.03)",
+                      border: isFeatured ? "1px solid rgba(39,183,200,0.25)" : "1px solid rgba(255,255,255,0.06)",
+                    }}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={logoUrl} alt={broker.name} className="h-10 w-10 rounded-lg object-contain flex-shrink-0" onError={(e) => { e.currentTarget.style.display = "none"; }} />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-sm font-bold" style={{ color: C.ivory }}>{broker.name}</span>
+                        {isFeatured && <span className="text-[9px] font-bold px-1.5 py-0.5 rounded" style={{ background: "rgba(39,183,200,0.15)", color: C.teal }}>FEATURED</span>}
+                      </div>
+                      <p className="text-[11px] leading-snug" style={{ color: "rgba(243,237,227,0.45)" }}>{broker.tagline}</p>
+                    </div>
+                    <ExternalLink className="h-4 w-4 flex-shrink-0" style={{ color: "rgba(243,237,227,0.3)" }} />
+                  </a>
+                );
+              })}
+            </div>
+            <p className="text-center text-[10px] mt-6" style={{ color: "rgba(243,237,227,0.2)" }}>
+              Trading CFDs and forex carries a high risk of losing money. Not financial advice. We may earn a commission if you sign up.
+            </p>
           </div>
         </section>
 

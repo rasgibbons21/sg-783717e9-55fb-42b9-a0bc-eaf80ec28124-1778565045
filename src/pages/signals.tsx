@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import type { SignalResult } from "@/lib/strategies";
 import { TickerMark } from "@/components/TickerMark";
+import BrokerStrip from "@/components/BrokerStrip";
 
 const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
 
@@ -465,6 +466,9 @@ export default function SignalsPage() {
             ))}
           </div>
         )}
+
+        {/* Broker strip */}
+        <BrokerStrip context="signals_page" />
 
         {/* Disclaimer */}
         <div className="rounded-xl p-3 mt-6" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>

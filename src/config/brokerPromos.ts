@@ -70,6 +70,10 @@ export function getActivePromos(): BrokerPromo[] {
   return brokerPromos.filter((b) => b.active);
 }
 
+export function getFeaturedPromo(): BrokerPromo {
+  return brokerPromos.find((b) => b.id === "xm") || brokerPromos[0];
+}
+
 let _promoIndex = Math.floor(Math.random() * brokerPromos.filter((b) => b.active).length);
 
 export function getNextPromo(): BrokerPromo {

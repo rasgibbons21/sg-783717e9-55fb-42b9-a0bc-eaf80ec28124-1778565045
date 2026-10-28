@@ -14,6 +14,7 @@ import {
 import Link from "next/link";
 import { MarketTicker } from "@/components/MarketTicker";
 import { TickerMark } from "@/components/TickerMark";
+import FeaturedBrokerCard from "@/components/FeaturedBrokerCard";
 
 const haptic = (ms = 8) => { try { navigator?.vibrate?.(ms); } catch {} };
 
@@ -648,6 +649,9 @@ export default function HomePage() {
             </div>
           </div>
         )}
+
+        {/* FEATURED BROKER */}
+        <FeaturedBrokerCard context="home_feed" />
 
         {/* NEWS strip */}
         <div className="mb-5">
