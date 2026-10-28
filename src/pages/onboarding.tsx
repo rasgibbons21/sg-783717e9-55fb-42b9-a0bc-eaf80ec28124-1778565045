@@ -90,13 +90,13 @@ const QUIZ_STEPS: Step[] = [
 const PROFILE_KEY = "radar_profile";
 const ONBOARDING_PROGRESS_KEY = "radar_onboarding_progress";
 
-function saveProgress(step: Step, profile: Partial<RadarProfile>) {
+function saveProgress(step: Step, profile: Partial<BloomProfile>) {
   try {
     localStorage.setItem(ONBOARDING_PROGRESS_KEY, JSON.stringify({ step, profile }));
   } catch {}
 }
 
-function loadProgress(): { step: Step; profile: Partial<RadarProfile> } | null {
+function loadProgress(): { step: Step; profile: Partial<BloomProfile> } | null {
   try {
     const raw = localStorage.getItem(ONBOARDING_PROGRESS_KEY);
     if (!raw) return null;
@@ -204,7 +204,7 @@ export default function Onboarding() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step]);
 
-  const currentProfile = useCallback((): Partial<RadarProfile> => ({
+  const currentProfile = useCallback((): Partial<BloomProfile> => ({
     problem, ageBand, experience, session: sessions, struggles, desired, help, strategiesOn,
   }), [problem, ageBand, experience, sessions, struggles, desired, help, strategiesOn]);
 

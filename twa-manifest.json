@@ -40,9 +40,9 @@
     "alias": "my-key-alias"
   },
   "splashScreenFadeOutDuration": 300,
-  "appVersionCode": 32,
-  "appVersionName": "1.0.31",
-  "appVersion": "1.0.31",
+  "appVersionCode": 34,
+  "appVersionName": "1.0.33",
+  "appVersion": "1.0.33",
   "signingMode": "releaseKey",
   "isChromeOSOnly": false,
   "fallbackType": "customtabs",

@@ -1,23 +1,25 @@
 import type { GetServerSideProps } from "next";
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { requireProUserSSR } from "@/lib/requireProUserSSR";
 import { UNIVERSITY_MODULES, getModuleBySlug } from "@/data/university/modules";
-import { getM1LessonBySlug, UniversityLesson } from "@/data/university/m1-chart-reading";
-import { getM2LessonBySlug } from "@/data/university/m2-chart-patterns";
-import { getM3LessonBySlug } from "@/data/university/m3-indicators";
-import { getM4LessonBySlug } from "@/data/university/m4-trading-signals";
-import { getM5LessonBySlug } from "@/data/university/m5-strategies";
-import { getM6LessonBySlug } from "@/data/university/m6-entering";
-import { getM7LessonBySlug } from "@/data/university/m7-managing";
-import { getM8LessonBySlug } from "@/data/university/m8-exiting";
-import { getM10LessonBySlug } from "@/data/university/m10-candlestick-patterns";
+import { M1_LESSONS, getM1LessonBySlug, UniversityLesson } from "@/data/university/m1-chart-reading";
+import { M2_LESSONS, getM2LessonBySlug } from "@/data/university/m2-chart-patterns";
+import { M3_LESSONS, getM3LessonBySlug } from "@/data/university/m3-indicators";
+import { M4_LESSONS, getM4LessonBySlug } from "@/data/university/m4-trading-signals";
+import { M5_LESSONS, getM5LessonBySlug } from "@/data/university/m5-strategies";
+import { M6_LESSONS, getM6LessonBySlug } from "@/data/university/m6-entering";
+import { M7_LESSONS, getM7LessonBySlug } from "@/data/university/m7-managing";
+import { M8_LESSONS, getM8LessonBySlug } from "@/data/university/m8-exiting";
+import { M10_LESSONS, getM10LessonBySlug } from "@/data/university/m10-candlestick-patterns";
 import { supabase } from "@/integrations/supabase/client";
 import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
 import { ArrowLeft, Bookmark, BookmarkCheck, CheckCircle, Clock, Sparkles } from "lucide-react";
 import { ReviewPrompt, shouldShowReviewPrompt } from "@/components/ReviewPrompt";
 import { useShareAchievement } from "@/components/ShareAchievement";
+import BrokerPromoCard from "@/components/BrokerPromoCard";
 
 interface Props {
   moduleSlug: string;
@@ -176,6 +178,7 @@ function QuizSection({
 }
 
 export default function LessonPage({ moduleSlug, lessonSlug, requiresClientAuth }: Props) {
+  const router = useRouter();
   const mod = getModuleBySlug(moduleSlug);
   const [isVerifying, setIsVerifying] = useState(!!requiresClientAuth);
   const [isAuthorized, setIsAuthorized] = useState(!requiresClientAuth);
@@ -198,6 +201,22 @@ export default function LessonPage({ moduleSlug, lessonSlug, requiresClientAuth 
     : moduleSlug === "m8-exiting" ? getM8LessonBySlug(lessonSlug)
     : moduleSlug === "m10-candlestick-patterns" ? getM10LessonBySlug(lessonSlug)
     : undefined;
+
+  const allLessons =
+    moduleSlug === "m1-chart-reading" ? M1_LESSONS
+    : moduleSlug === "m2-chart-patterns" ? M2_LESSONS
+    : moduleSlug === "m3-indicators" ? M3_LESSONS
+    : moduleSlug === "m4-trading-signals" ? M4_LESSONS
+    : moduleSlug === "m5-strategies" ? M5_LESSONS
+    : moduleSlug === "m6-entering" ? M6_LESSONS
+    : moduleSlug === "m7-managing" ? M7_LESSONS
+    : moduleSlug === "m8-exiting" ? M8_LESSONS
+    : moduleSlug === "m10-candlestick-patterns" ? M10_LESSONS
+    : [];
+  const currentIdx = allLessons.findIndex((l) => l.slug === lessonSlug);
+  const nextLesson = currentIdx >= 0 && currentIdx < allLessons.length - 1
+    ? allLessons[currentIdx + 1]
+    : null;
 
   const markProgress = useCallback(
     async (tok: string) => {
@@ -421,6 +440,13 @@ export default function LessonPage({ moduleSlug, lessonSlug, requiresClientAuth 
             </div>
           )}
 
+          {/* Broker promo — shown after lesson completion */}
+          {progressMarked && (
+            <BrokerPromoCard
+              onContinue={nextLesson ? () => router.push(`/university/${moduleSlug}/${nextLesson.slug}`) : undefined}
+            />
+          )}
+
           {/* Navigation */}
           <div className="mt-10 flex justify-between">
             <Link href={`/university/${moduleSlug}`}>
@@ -429,6 +455,14 @@ export default function LessonPage({ moduleSlug, lessonSlug, requiresClientAuth 
                 Back to {mod.title}
               </button>
             </Link>
+            {nextLesson && progressMarked && (
+              <Link href={`/university/${moduleSlug}/${nextLesson.slug}`}>
+                <button className="flex items-center gap-2 text-sm font-medium text-[#27B7C8] hover:text-[#27B7C8]/80 transition-colors">
+                  Next: {nextLesson.title}
+                  <span>→</span>
+                </button>
+              </Link>
+            )}
           </div>
 
           {/* Disclaimer */}
