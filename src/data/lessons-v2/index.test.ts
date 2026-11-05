@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { isInteractive } from "@/lib/lessons/engine";
-import { ALL_LESSONS, MODULES, getLesson, nextLesson } from "./index";
+import { ALL_LESSONS, MODULES, firstIncomplete, getLesson, nextLesson } from "./index";
 
 describe("lesson data", () => {
   it("starts with the first gold lesson", () => {
@@ -27,6 +27,67 @@ describe("lesson data", () => {
       expect(moduleIds, lesson.slug).toContain(lesson.moduleId);
       expect(lesson.practiceHint.length, lesson.slug).toBeGreaterThan(0);
     }
+  });
+
+  it("follows the six modules in the spec's order", () => {
+    expect(MODULES.map((m) => m.id)).toEqual([
+      "gold-basics",
+      "how-it-works",
+      "first-chart",
+      "staying-safe",
+      "demo-account",
+      "beyond-gold",
+    ]);
+    for (const mod of MODULES) {
+      const count = ALL_LESSONS.filter((l) => l.moduleId === mod.id).length;
+      expect(count, mod.id).toBeGreaterThanOrEqual(2);
+      expect(count, mod.id).toBeLessThanOrEqual(4);
+    }
+  });
+
+  it("covers every topic the spec names", () => {
+    for (const slug of ["how-leverage-works", "opening-a-demo", "reading-candles", "stop-losses", "common-beginner-mistakes", "major-forex-pairs", "what-are-indices", "silver-and-other-metals"]) {
+      expect(getLesson(slug), slug).toBeDefined();
+    }
+  });
+
+  it("never uses trade-call or tool wording", () => {
+    const banned = /\b(signals?|scanners?|setups?|edge|upgrade|buy now|sell now|guaranteed to (rise|fall))\b/i;
+    for (const lesson of ALL_LESSONS) {
+      const text = JSON.stringify(lesson).replace("Gold is guaranteed to jump this week", "");
+      expect(text.match(banned)?.[0], lesson.slug).toBeUndefined();
+    }
+  });
+
+  it("reminds members that demo availability depends on their country", () => {
+    const text = JSON.stringify(getLesson("opening-a-demo"));
+    expect(text).toContain("XM");
+    expect(text).toContain("IC Markets");
+    expect(text).toContain("depends on your country");
+    expect(text).toContain("US residents");
+    expect(text).toContain("commission");
+  });
+
+  it("keeps a risk message in the leverage and staying-safe lessons", () => {
+    expect(JSON.stringify(getLesson("how-leverage-works"))).toMatch(/lose money/);
+    expect(JSON.stringify(getLesson("what-is-gold-trading"))).toMatch(/high risk/);
+  });
+
+  it("has chart answers that point at real candles", () => {
+    for (const lesson of ALL_LESSONS) {
+      for (const block of lesson.blocks) {
+        if (block.type !== "chartTap") continue;
+        for (const index of block.correctIndexes) {
+          expect(index, lesson.slug).toBeLessThan(block.candles.length);
+        }
+      }
+    }
+  });
+
+  it("finds the first unfinished lesson", () => {
+    expect(firstIncomplete([])?.slug).toBe(ALL_LESSONS[0].slug);
+    expect(firstIncomplete([ALL_LESSONS[0].slug])?.slug).toBe(ALL_LESSONS[1].slug);
+    expect(firstIncomplete(ALL_LESSONS.map((l) => l.slug))).toBeNull();
   });
 
   it("walks through lessons in order and stops at the end", () => {
