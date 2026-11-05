@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { displayName, gapToNext, rankRows } from "@/lib/leaderboard/rank";
 
 // Gems are DERIVED, never stored. This module is the single source of truth for
 // the earn rule: a passed lesson quiz = one gem-award.
@@ -32,8 +33,6 @@ const supabaseAdmin = createClient(
   { auth: { autoRefreshToken: false, persistSession: false } }
 );
 
-const FALLBACK_NAME = "Member";
-
 /** (a) One user's gem total + breakdown. */
 export async function getUserGems(userId: string): Promise<GemBreakdown> {
   const [uniRes, learnRes] = await Promise.all([
@@ -53,13 +52,16 @@ export async function getUserGems(userId: string): Promise<GemBreakdown> {
   return { universityLessons, learnLessons, gems: computeGems(universityLessons, learnLessons) };
 }
 
-/** Compute + rank every user by gems (descending). Ranks are assigned across
- *  the full population, so a slice keeps true ranks. */
-async function rankAllUsers(): Promise<GemLeaderboardRow[]> {
+interface GemTotals {
+  rows: GemLeaderboardRow[];
+  hiddenIds: Set<string>;
+}
+
+async function computeAllUsers(): Promise<GemTotals> {
   const [uniRes, learnRes, profilesRes] = await Promise.all([
     supabaseAdmin.from("university_lesson_progress").select("user_id"),
     supabaseAdmin.from("lesson_progress").select("user_id").eq("quiz_completed", true),
-    supabaseAdmin.from("profiles").select("id, challenge_name, is_review_account"),
+    supabaseAdmin.from("profiles").select("id, challenge_name, full_name, is_review_account, show_on_leaderboard"),
   ]);
 
   const uni = new Map<string, number>();
@@ -74,10 +76,11 @@ async function rankAllUsers(): Promise<GemLeaderboardRow[]> {
 
   const names = new Map<string, string>();
   const reviewIds = new Set<string>();
-  for (const p of (profilesRes.data ?? []) as { id: string; challenge_name: string | null; is_review_account: boolean | null }[]) {
+  const hiddenIds = new Set<string>();
+  for (const p of profilesRes.data ?? []) {
     if (p.is_review_account) reviewIds.add(p.id);
-    const name = (p.challenge_name ?? "").trim();
-    if (name) names.set(p.id, name);
+    if (p.show_on_leaderboard === false) hiddenIds.add(p.id);
+    names.set(p.id, displayName(p));
   }
 
   const userIds = new Set<string>([...uni.keys(), ...learn.keys()]);
@@ -87,31 +90,30 @@ async function rankAllUsers(): Promise<GemLeaderboardRow[]> {
     const learnLessons = learn.get(user_id) ?? 0;
     return {
       user_id,
-      challenge_name: names.get(user_id) ?? FALLBACK_NAME,
+      challenge_name: names.get(user_id) ?? "Member",
       universityLessons,
       learnLessons,
       gems: computeGems(universityLessons, learnLessons),
+      rank: 0,
     };
   });
 
-  rows.sort((a, b) => b.gems - a.gems || a.challenge_name.localeCompare(b.challenge_name));
-  return rows.map((r, i) => ({ ...r, rank: i + 1 }));
+  return { rows, hiddenIds };
 }
 
-/** (b) Compute + rank gems across all users, for the leaderboard. */
-export async function getGemsLeaderboard(limit = 50): Promise<GemLeaderboardRow[]> {
-  return (await rankAllUsers()).slice(0, limit);
-}
+const byGems = (row: GemLeaderboardRow) => row.gems;
 
-/** (c) Viewer-aware board: the top `limit`, plus the viewer's own ranked row
- *  (null if they have no gems yet) so they always see where they stand. */
-export async function getLeaderboardView(
-  viewerId: string,
-  limit = 10
-): Promise<{ top: GemLeaderboardRow[]; me: GemLeaderboardRow | null }> {
-  const all = await rankAllUsers();
+/** Viewer-aware board: the top members, plus the viewer's own row and how far it is
+ *  to the next place. A hidden viewer still sees their own totals, unranked. */
+export async function getLeaderboardView(viewerId: string, limit = 10) {
+  const { rows, hiddenIds } = await computeAllUsers();
+  const ranked = rankRows(rows, byGems, hiddenIds, (row) => row.user_id);
+  const hidden = hiddenIds.has(viewerId);
+  const me = hidden ? rows.find((row) => row.user_id === viewerId) ?? null : ranked.find((row) => row.user_id === viewerId) ?? null;
   return {
-    top: all.slice(0, limit),
-    me: all.find((r) => r.user_id === viewerId) ?? null,
+    top: ranked.slice(0, limit),
+    me,
+    hidden,
+    gap_to_next: gapToNext(ranked, viewerId, byGems),
   };
 }

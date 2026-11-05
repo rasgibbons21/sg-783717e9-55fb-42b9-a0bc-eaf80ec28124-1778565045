@@ -4,25 +4,23 @@ import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 import { useSubscription } from "@/contexts/SubscriptionContext";
+import { BloomMark } from "@/components/brand/BloomMark";
+import { RiskNote } from "@/components/RiskNote";
 import { SignUpBanner } from "./SignUpBanner";
 import { AppShell } from "./AppShell";
 
-interface LayoutProps {
-  children: React.ReactNode;
-}
+const PUBLIC_PAGES = ["/", "/about", "/privacy", "/terms", "/disclaimer", "/refund-policy", "/contact", "/delete-account"];
 
-export function Layout({ children }: LayoutProps) {
+export function Layout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { toast } = useToast();
-  const currentPath = router.pathname;
   const { isLoggedIn, isLoading } = useSubscription();
 
   useEffect(() => {
     const handleRateLimit = () => {
       toast({
-        title: "API Limit Reached",
-        description: "Rate limit hit. Please wait a moment before fetching more data.",
-        variant: "destructive",
+        title: "Just a moment",
+        description: "Prices are busy right now. Please try again shortly.",
       });
     };
 
@@ -30,14 +28,11 @@ export function Layout({ children }: LayoutProps) {
     return () => window.removeEventListener("fmp-rate-limit", handleRateLimit);
   }, [toast]);
 
-  const publicPages = ["/", "/about", "/privacy", "/terms", "/disclaimer", "/refund-policy", "/contact", "/delete-account"];
-  const isPublic = publicPages.includes(currentPath);
-
-  if (!isPublic && !isLoading) {
+  if (!PUBLIC_PAGES.includes(router.pathname)) {
     return (
       <>
         <AppShell>
-          {!isLoggedIn && <SignUpBanner />}
+          {!isLoading && !isLoggedIn && <SignUpBanner />}
           {children}
         </AppShell>
         <Toaster />
@@ -46,65 +41,27 @@ export function Layout({ children }: LayoutProps) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: "var(--r-bg)" }}>
-      {!isLoading && !isLoggedIn && <SignUpBanner />}
-
-      <header
-        className="sticky top-0 z-50 w-full"
-        style={{ background: "var(--r-elevated)", borderBottom: "1px solid var(--r-hairline)" }}
-      >
-        <div className="flex items-center h-14 px-4">
-          <Link href="/home" className="flex items-center gap-3">
-            <img src="/icon-192.png" alt="Bloom" className="h-8 w-auto rounded-md" />
-            <span className="text-xl font-bold" style={{ color: "var(--r-ivory)" }}>Bloom</span>
+    <div className="flex min-h-screen flex-col bg-background">
+      <header className="sticky top-0 z-50 border-b border-border bg-card/95 backdrop-blur">
+        <div className="mx-auto flex h-16 max-w-5xl items-center gap-2 px-4">
+          <Link href="/" className="flex items-center gap-2">
+            <BloomMark size={32} />
+            <span className="font-serif text-xl font-semibold text-foreground">Bloom</span>
           </Link>
+          <div className="ml-auto">
+            {!isLoading && (
+              <Link
+                href={isLoggedIn ? "/home" : "/onboarding"}
+                className="inline-flex h-10 items-center rounded-full bg-primary px-4 text-sm font-semibold text-primary-foreground transition-transform active:scale-95"
+              >
+                {isLoggedIn ? "Open Bloom" : "Start free"}
+              </Link>
+            )}
+          </div>
         </div>
       </header>
-
-      <main className="flex-1 w-full">{children}</main>
-
-      <footer className="mt-auto py-8" style={{ borderTop: "1px solid var(--r-hairline)" }}>
-        <div className="mx-auto max-w-7xl px-4">
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-            <div>
-              <h3 className="mb-4 text-lg font-semibold" style={{ color: "var(--r-teal)" }}>Bloom</h3>
-              <p className="text-sm" style={{ color: "var(--r-meta)" }}>Learn money & investing from zero</p>
-            </div>
-            <div>
-              <h4 className="mb-4 text-sm font-semibold" style={{ color: "var(--r-ivory)" }}>Legal</h4>
-              <ul className="space-y-2 text-sm">
-                {[
-                  { href: "/privacy", label: "Privacy Policy" },
-                  { href: "/terms", label: "Terms of Service" },
-                  { href: "/disclaimer", label: "Disclaimer" },
-                  { href: "/refund-policy", label: "Refund Policy" },
-                  { href: "/delete-account", label: "Delete Account" },
-                ].map(({ href, label }) => (
-                  <li key={href}>
-                    <Link href={href} className="hover:underline" style={{ color: "var(--r-meta)" }}>{label}</Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h4 className="mb-4 text-sm font-semibold" style={{ color: "var(--r-ivory)" }}>Contact</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="/contact" className="hover:underline" style={{ color: "var(--r-meta)" }}>Contact Us</Link></li>
-                <li><a href="mailto:cindervaultenterprisesllc@gmail.com" className="hover:underline" style={{ color: "var(--r-meta)" }}>cindervaultenterprisesllc@gmail.com</a></li>
-              </ul>
-            </div>
-          </div>
-          <div className="mt-8 pt-8" style={{ borderTop: "1px solid var(--r-hairline)" }}>
-            <p className="text-xs" style={{ color: "var(--r-meta)" }}>
-              &copy; 2026 Cinder Vault Enterprises LLC. All rights reserved. Bloom is a product of Cinder Vault Enterprises LLC.
-            </p>
-            <p className="mt-2 text-xs" style={{ color: "var(--r-meta)" }}>
-              Bloom is for educational purposes only and does not constitute financial advice. All investing involves risk of loss.
-            </p>
-          </div>
-        </div>
-      </footer>
-
+      <main className="w-full flex-1">{children}</main>
+      <RiskNote variant="footer" />
       <Toaster />
     </div>
   );

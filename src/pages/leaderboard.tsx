@@ -1,284 +1,260 @@
-import { useEffect, useState, useCallback } from "react";
-import Head from "next/head";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
+import { EyeOff, Loader2, Share2 } from "lucide-react";
 import { Layout } from "@/components/Layout";
-import { useSubscription } from "@/contexts/SubscriptionContext";
-import { supabase } from "@/integrations/supabase/client";
-import { Trophy, Loader2, ArrowLeft, Share2 } from "lucide-react";
+import { SEO } from "@/components/SEO";
+import { RiskNote } from "@/components/RiskNote";
 import { useShareAchievement } from "@/components/ShareAchievement";
+import { Botanical } from "@/components/brand/Botanical";
+import { useSubscription } from "@/contexts/SubscriptionContext";
+import { money, practiceFetch } from "@/lib/practice/api";
+import { cn } from "@/lib/utils";
 
-interface LeaderboardRow {
-  user_id: string;
-  display_name: string;
-  total_pnl: number;
-  total_trades: number;
-  win_rate: number;
+type Tab = "learning" | "practice";
+
+interface BoardRow {
+  id: string;
+  name: string;
   rank: number;
+  value: number;
 }
 
-const C = {
-  bg: "#07080C",
-  card: "#121821",
-  cardBorder: "rgba(39, 183, 200, 0.15)",
-  accent: "#27B7C8",
-  accentDim: "rgba(39, 183, 200, 0.12)",
-  text: "#F3EDE3",
-  textDim: "rgba(244, 247, 250, 0.6)",
-  textMuted: "rgba(244, 247, 250, 0.35)",
-  green: "#49B06E",
-  red: "#E5484D",
-};
+interface Board {
+  rows: BoardRow[];
+  me: BoardRow | null;
+  hidden: boolean;
+  gap: number | null;
+}
 
-async function getToken(): Promise<string | null> {
-  const { data: { session } } = await supabase.auth.getSession();
-  return session?.access_token ?? null;
+const EMPTY_BOARD: Board = { rows: [], me: null, hidden: false, gap: null };
+
+interface LearningRow {
+  user_id: string;
+  challenge_name: string;
+  rank: number;
+  gems: number;
+}
+
+interface PracticeRow {
+  user_id: string;
+  display_name: string;
+  rank: number;
+  total_pnl: number;
+}
+
+interface View<T> {
+  top: T[];
+  me: T | null;
+  hidden?: boolean;
+  gap_to_next?: number | null;
+}
+
+const fromLearning = (row: LearningRow): BoardRow => ({ id: row.user_id, name: row.challenge_name, rank: row.rank, value: row.gems });
+const fromPractice = (row: PracticeRow): BoardRow => ({ id: row.user_id, name: row.display_name, rank: row.rank, value: row.total_pnl });
+
+function toBoard<T>(view: View<T>, convert: (row: T) => BoardRow): Board {
+  return {
+    rows: (view.top ?? []).map(convert),
+    me: view.me ? convert(view.me) : null,
+    hidden: view.hidden === true,
+    gap: view.gap_to_next ?? null,
+  };
+}
+
+const signedMoney = (value: number) => `${value >= 0 ? "+" : "-"}${money(Math.abs(value))}`;
+
+function BoardRows({ board, tab, userId }: { board: Board; tab: Tab; userId: string | null }) {
+  const format = (value: number) => (tab === "learning" ? `${value} blooms` : signedMoney(value));
+
+  if (board.rows.length === 0) {
+    return (
+      <div className="rounded-3xl bg-card p-6 text-center shadow-[var(--bloom-shadow)]">
+        <Botanical variant="bloom" className="mx-auto h-20 w-20" />
+        <h2 className="mt-2 text-xl font-semibold text-foreground">Be the first to bloom here</h2>
+        <p className="mt-1 text-base text-muted-foreground">
+          {tab === "learning" ? "Finish a lesson and you'll appear on this board." : "Close a practice trade and you'll appear on this board."}
+        </p>
+        <Link
+          href={tab === "learning" ? "/lessons" : "/practice"}
+          className="mt-4 inline-flex h-11 items-center rounded-full bg-primary px-6 font-semibold text-primary-foreground"
+        >
+          {tab === "learning" ? "Go to lessons" : "Go to Practice"}
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <ol className="divide-y divide-border rounded-3xl bg-card px-4 shadow-[var(--bloom-shadow)]">
+      {board.rows.map((row) => (
+        <li key={row.id} className={cn("flex items-center gap-3 py-3", row.id === userId && "font-semibold")}>
+          <span
+            className={cn(
+              "flex h-9 w-9 shrink-0 items-center justify-center rounded-full font-serif text-sm font-semibold",
+              row.rank <= 3 ? "bg-[var(--bloom-gold)] text-[var(--bloom-ink)]" : "bg-secondary text-foreground",
+            )}
+          >
+            {row.rank}
+          </span>
+          <span className="min-w-0 flex-1 truncate text-foreground">
+            {row.name}
+            {row.id === userId && <span className="ml-1 text-sm font-normal text-muted-foreground">(you)</span>}
+          </span>
+          <span className={cn("shrink-0 font-medium", tab === "practice" && row.value < 0 ? "text-[#8A5B44]" : "text-primary")}>{format(row.value)}</span>
+        </li>
+      ))}
+    </ol>
+  );
 }
 
 export default function LeaderboardPage() {
   const { isLoggedIn, isLoading: authLoading, userId } = useSubscription();
-  const [top, setTop] = useState<LeaderboardRow[]>([]);
-  const [me, setMe] = useState<LeaderboardRow | null>(null);
-  const [loading, setLoading] = useState(true);
   const { share, ShareModal } = useShareAchievement();
+  const [tab, setTab] = useState<Tab>("learning");
+  const [learning, setLearning] = useState<Board>(EMPTY_BOARD);
+  const [practice, setPractice] = useState<Board>(EMPTY_BOARD);
+  const [loading, setLoading] = useState(true);
+  const [failed, setFailed] = useState(false);
 
-  const fetchLeaderboard = useCallback(async () => {
+  const load = useCallback(async () => {
     setLoading(true);
-    try {
-      const token = await getToken();
-      if (!token) return;
-
-      const res = await fetch("/api/practice/leaderboard", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) return;
-
-      const data = await res.json();
-      setTop(data.top ?? []);
-      setMe(data.me ?? null);
-    } catch {
-    } finally {
-      setLoading(false);
-    }
+    setFailed(false);
+    const [learningRes, practiceRes] = await Promise.all([
+      practiceFetch<View<LearningRow>>("/api/gems/leaderboard"),
+      practiceFetch<View<PracticeRow>>("/api/practice/leaderboard"),
+    ]);
+    if (learningRes.ok) setLearning(toBoard(learningRes.data, fromLearning));
+    if (practiceRes.ok) setPractice(toBoard(practiceRes.data, fromPractice));
+    setFailed(!learningRes.ok || !practiceRes.ok);
+    setLoading(false);
   }, []);
 
   useEffect(() => {
-    if (!authLoading && isLoggedIn) fetchLeaderboard();
+    if (isLoggedIn) load();
     else if (!authLoading) setLoading(false);
-  }, [authLoading, isLoggedIn, fetchLeaderboard]);
+  }, [authLoading, isLoggedIn, load]);
 
+  const board = tab === "learning" ? learning : practice;
+  const me = board.me;
+
+  const shareMyPlace = () => {
+    if (!me) return;
+    share({
+      type: "leaderboard",
+      title: `Number ${me.rank} on Bloom`,
+      subtitle: tab === "learning" ? "Learning gold, one lesson at a time" : "Practising with simulated money",
+      emoji: "🌸",
+      stats: [
+        { label: "Place", value: `${me.rank}` },
+        tab === "learning" ? { label: "Blooms", value: `${me.value}` } : { label: "Simulated gains", value: signedMoney(me.value) },
+      ],
+    });
+  };
 
   return (
     <>
-      <Head>
-        <title>Leaderboard | Bloom</title>
-      </Head>
+      <SEO title="Leaderboard - Bloom" description="See who's learning and practising alongside you on Bloom." />
       <Layout>
-        <div className="min-h-screen" style={{ background: C.bg }}>
-          <div className="max-w-2xl mx-auto px-4 py-6">
-            <Link
-              href="/practice"
-              className="inline-flex items-center gap-1.5 text-xs mb-4 transition-colors hover:brightness-125"
-              style={{ color: C.accent }}
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              Back to Practice Trader
-            </Link>
+        <div className="mx-auto max-w-2xl space-y-4 px-4 py-6">
+          <header className="relative overflow-hidden rounded-3xl bg-secondary p-6">
+            <Botanical variant="corner" className="pointer-events-none absolute -right-6 -top-4 h-36 w-28" />
+            <h1 className="max-w-[80%] text-3xl font-semibold leading-tight text-foreground">Growing together</h1>
+            <p className="mt-2 max-w-[85%] text-base text-muted-foreground">Every lesson and every practice trade counts. Cheer each other on.</p>
+          </header>
 
-            <div className="flex items-center gap-3 mb-6">
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center"
-                style={{ background: C.accentDim }}
-              >
-                <Trophy className="w-5 h-5" style={{ color: C.accent }} />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold" style={{ color: C.text }}>
-                  Trading Leaderboard
-                </h1>
-                <p className="text-xs" style={{ color: C.textDim }}>
-                  Ranked by total P&L from closed trades
-                </p>
-              </div>
+          {!authLoading && !isLoggedIn ? (
+            <div className="rounded-3xl bg-card p-6 text-center shadow-[var(--bloom-shadow)]">
+              <h2 className="text-xl font-semibold text-foreground">Join us on the leaderboards</h2>
+              <p className="mt-1 text-base text-muted-foreground">Start free and your first lesson puts you on the board.</p>
+              <Link href="/onboarding" className="mt-4 inline-flex h-11 items-center rounded-full bg-primary px-6 font-semibold text-primary-foreground">
+                Start free
+              </Link>
             </div>
-
-            {(authLoading || loading) && (
-              <div className="flex justify-center py-16">
-                <Loader2 className="w-6 h-6 animate-spin" style={{ color: C.accent }} />
-              </div>
-            )}
-
-            {!authLoading && !isLoggedIn && (
-              <div className="flex flex-col items-center py-16 text-center">
-                <p className="text-sm mb-4" style={{ color: C.textDim }}>
-                  Sign in to view the leaderboard
-                </p>
-                <Link
-                  href="/auth"
-                  className="px-6 py-2.5 rounded-xl font-semibold text-sm transition-all hover:brightness-110"
-                  style={{ background: C.accent, color: C.bg }}
-                >
-                  Sign In
-                </Link>
-              </div>
-            )}
-
-            {!authLoading && !loading && isLoggedIn && top.length === 0 && (
-              <div className="flex flex-col items-center py-16 text-center">
-                <div
-                  className="w-14 h-14 rounded-full flex items-center justify-center mb-4"
-                  style={{ background: C.accentDim }}
-                >
-                  <Trophy className="w-6 h-6" style={{ color: C.accent }} />
-                </div>
-                <p className="text-sm font-medium mb-1" style={{ color: C.textDim }}>
-                  No traders yet
-                </p>
-                <p className="text-xs max-w-[220px]" style={{ color: C.textMuted }}>
-                  Close your first trade to appear on the leaderboard
-                </p>
-              </div>
-            )}
-
-            {!authLoading && !loading && isLoggedIn && top.length > 0 && (
-              <div className="space-y-2">
-                {top.map((row) => {
-                  const isMe = userId === row.user_id;
-                  const medal =
-                    row.rank === 1 ? "🥇" : row.rank === 2 ? "🥈" : row.rank === 3 ? "🥉" : null;
-                  return (
-                    <div
-                      key={row.user_id}
-                      className="flex items-center gap-3 p-3.5 rounded-xl transition-colors"
-                      style={{
-                        background: isMe ? "rgba(39,183,200,0.08)" : "rgba(255,255,255,0.02)",
-                        border: `1px solid ${isMe ? "rgba(39,183,200,0.3)" : C.cardBorder}`,
-                      }}
-                    >
-                      <span
-                        className="w-8 text-center text-sm font-bold"
-                        style={{ color: C.textDim }}
-                      >
-                        {medal ?? `#${row.rank}`}
-                      </span>
-                      <div className="flex-1 min-w-0">
-                        <p
-                          className="text-sm font-semibold truncate"
-                          style={{ color: isMe ? C.accent : C.text }}
-                        >
-                          {row.display_name}
-                          {isMe && " (you)"}
-                        </p>
-                        <p className="text-[10px]" style={{ color: C.textMuted }}>
-                          {row.total_trades} trades &middot; {row.win_rate}% win rate
-                        </p>
-                      </div>
-                      <span
-                        className="text-sm font-mono font-bold"
-                        style={{ color: row.total_pnl >= 0 ? C.green : C.red }}
-                      >
-                        {row.total_pnl >= 0 ? "+" : ""}$
-                        {Math.abs(row.total_pnl).toFixed(2)}
-                      </span>
-                    </div>
-                  );
-                })}
-
-                {me && !top.find((r) => r.user_id === me.user_id) && (
-                  <>
-                    <div className="flex items-center gap-2 py-2">
-                      <div className="flex-1 border-t" style={{ borderColor: C.cardBorder }} />
-                      <span className="text-[10px]" style={{ color: C.textMuted }}>
-                        Your rank
-                      </span>
-                      <div className="flex-1 border-t" style={{ borderColor: C.cardBorder }} />
-                    </div>
-                    <div
-                      className="flex items-center gap-3 p-3.5 rounded-xl"
-                      style={{
-                        background: "rgba(39,183,200,0.08)",
-                        border: "1px solid rgba(39,183,200,0.3)",
-                      }}
-                    >
-                      <span
-                        className="w-8 text-center text-sm font-bold"
-                        style={{ color: C.textDim }}
-                      >
-                        #{me.rank}
-                      </span>
-                      <div className="flex-1 min-w-0">
-                        <p
-                          className="text-sm font-semibold truncate"
-                          style={{ color: C.accent }}
-                        >
-                          {me.display_name} (you)
-                        </p>
-                        <p className="text-[10px]" style={{ color: C.textMuted }}>
-                          {me.total_trades} trades &middot; {me.win_rate}% win rate
-                        </p>
-                      </div>
-                      <span
-                        className="text-sm font-mono font-bold"
-                        style={{ color: me.total_pnl >= 0 ? C.green : C.red }}
-                      >
-                        {me.total_pnl >= 0 ? "+" : ""}$
-                        {Math.abs(me.total_pnl).toFixed(2)}
-                      </span>
-                    </div>
-                  </>
-                )}
-              </div>
-            )}
-
-            {!authLoading && !loading && isLoggedIn && (
-              <div className="flex gap-2 mt-4">
-                <button
-                  onClick={fetchLeaderboard}
-                  className="flex-1 py-2.5 rounded-xl text-xs font-medium transition-colors"
-                  style={{
-                    color: C.textDim,
-                    background: "rgba(255,255,255,0.03)",
-                    border: `1px solid ${C.cardBorder}`,
-                  }}
-                >
-                  Refresh
-                </button>
-                {me && (
-                  <button
-                    onClick={() => share({
-                      type: 'leaderboard',
-                      title: `#${me.rank} on Bloom`,
-                      subtitle: `${me.total_trades} trades · ${me.win_rate}% win rate`,
-                      emoji: me.rank === 1 ? '🥇' : me.rank === 2 ? '🥈' : me.rank === 3 ? '🥉' : '🏆',
-                      stats: [
-                        { label: 'Rank', value: `#${me.rank}` },
-                        { label: 'P&L', value: `${me.total_pnl >= 0 ? '+' : ''}$${Math.abs(me.total_pnl).toFixed(2)}` },
-                        { label: 'Win Rate', value: `${me.win_rate}%` },
-                      ],
-                      accentColor: '#D4AF37',
-                    })}
-                    className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-medium transition-all hover:scale-105"
-                    style={{
-                      color: C.accent,
-                      background: "rgba(39,183,200,0.08)",
-                      border: `1px solid rgba(39,183,200,0.2)`,
-                    }}
+          ) : (
+            <>
+              <div className="grid grid-cols-2 gap-1 rounded-full bg-secondary p-1" role="tablist" aria-label="Leaderboards">
+                {(
+                  [
+                    ["learning", "Learning"],
+                    ["practice", "Practice gains"],
+                  ] as const
+                ).map(([value, label]) => (
+                  <motion.button
+                    key={value}
+                    whileTap={{ scale: 0.97 }}
+                    role="tab"
+                    aria-selected={tab === value}
+                    onClick={() => setTab(value)}
+                    className={cn("h-11 rounded-full text-sm font-semibold", tab === value ? "bg-primary text-primary-foreground" : "text-muted-foreground")}
                   >
-                    <Share2 className="w-3.5 h-3.5" />
-                    Share
-                  </button>
-                )}
+                    {label}
+                  </motion.button>
+                ))}
               </div>
-            )}
 
-            {ShareModal}
-
-            <div className="mt-8 text-center">
-              <p className="text-[10px]" style={{ color: C.textMuted }}>
-                Educational simulator — not a brokerage, not financial advice.
+              <p className="text-center text-sm text-muted-foreground">
+                {tab === "learning" ? "Earn blooms by finishing lessons." : "Simulated money, real practice. Ranked by results from closed practice trades."}
               </p>
-            </div>
-          </div>
+
+              {failed && (
+                <div role="alert" className="rounded-2xl bg-accent/70 p-4 text-base text-foreground">
+                  We couldn&apos;t load everything just now.{" "}
+                  <button onClick={load} className="font-semibold underline underline-offset-2">
+                    Try again
+                  </button>
+                </div>
+              )}
+
+              {loading ? (
+                <div className="flex min-h-[30vh] items-center justify-center">
+                  <Loader2 className="h-6 w-6 animate-spin text-primary" aria-label="Loading" />
+                </div>
+              ) : (
+                <>
+                  {me && (
+                    <section className="flex items-center justify-between gap-3 rounded-3xl bg-accent/60 p-5">
+                      <div>
+                        {board.hidden ? (
+                          <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <EyeOff className="h-4 w-4" /> Only you can see this.
+                          </p>
+                        ) : (
+                          <p className="font-serif text-2xl font-semibold text-foreground">You&apos;re number {me.rank}</p>
+                        )}
+                        <p className="text-base text-foreground">{tab === "learning" ? `${me.value} blooms` : `${signedMoney(me.value)} simulated`}</p>
+                        {board.gap != null && !board.hidden && (
+                          <p className="mt-1 text-sm text-muted-foreground">
+                            {tab === "learning" ? `${board.gap} more blooms to reach the next place.` : `${money(board.gap)} of simulated gains to reach the next place.`}
+                          </p>
+                        )}
+                        {board.gap == null && !board.hidden && <p className="mt-1 text-sm text-muted-foreground">You&apos;re at the top. How lovely.</p>}
+                      </div>
+                      {!board.hidden && (
+                        <button
+                          onClick={shareMyPlace}
+                          aria-label="Share my place"
+                          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-transform active:scale-90"
+                        >
+                          <Share2 className="h-5 w-5" />
+                        </button>
+                      )}
+                    </section>
+                  )}
+                  <BoardRows board={board} tab={tab} userId={userId} />
+                </>
+              )}
+
+              <p className="text-center text-sm text-muted-foreground">
+                Prefer to keep things private? You can hide yourself in your{" "}
+                <Link href="/profile" className="underline underline-offset-2">profile</Link>.
+              </p>
+            </>
+          )}
+
+          <RiskNote />
         </div>
+        {ShareModal}
       </Layout>
     </>
   );
