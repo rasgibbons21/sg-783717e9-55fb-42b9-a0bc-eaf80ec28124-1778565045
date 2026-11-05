@@ -1,208 +1,162 @@
-import { useState, useRef, useEffect } from "react";
+import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/router";
+import { motion } from "framer-motion";
+import { Loader2, Send } from "lucide-react";
 import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Send } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { BloomMark } from "@/components/brand/BloomMark";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 import { trackPansyChat } from "@/lib/analytics";
+import { practiceFetch } from "@/lib/practice/api";
+import { cn } from "@/lib/utils";
 
 interface Message {
   role: "user" | "assistant";
   content: string;
-  timestamp: number;
 }
 
 const SUGGESTED = [
-  "What setups should I watch for today?",
-  "How do I find a good entry on a gap-and-go?",
-  "Where should I set my stop loss on a breakout trade?",
-  "Which stocks are gapping up pre-market?",
+  "What does XAUUSD actually mean?",
+  "Can you explain leverage like I'm brand new?",
+  "What's a demo account, and do I need one?",
+  "Which lesson should I do next?",
 ];
+
+const TROUBLE = "I'm having a little trouble answering just now. Please try again in a moment.";
 
 export default function AskPansyPage() {
   const router = useRouter();
+  const { isLoggedIn, isLoading: authLoading } = useSubscription();
   const [messages, setMessages] = useState<Message[]>([]);
-  const [inputValue, setInputValue] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [autoSent, setAutoSent] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [input, setInput] = useState("");
+  const [sending, setSending] = useState(false);
+  const endRef = useRef<HTMLDivElement>(null);
+  const autoSent = useRef(false);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, isLoading]);
+    if (messages.length > 0) endRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, sending]);
 
-  const sendMessage = async (messageText: string) => {
-    if (!messageText.trim() || isLoading) return;
-    trackPansyChat();
-
-    const userMessage: Message = { role: "user", content: messageText, timestamp: Date.now() };
-    const history = messages.map((m) => ({ role: m.role, content: m.content }));
-    setMessages((prev) => [...prev, userMessage]);
-    setIsLoading(true);
-
-    try {
-      let { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        ({ data: { session } } = await supabase.auth.refreshSession());
-      }
-      if (!session) {
-        window.location.href = "/subscription";
-        return;
-      }
-
-      const response = await fetch("/api/ask-pansy", {
+  const send = useCallback(
+    async (text: string) => {
+      const message = text.trim();
+      if (!message || sending) return;
+      trackPansyChat();
+      const history = messages.map(({ role, content }) => ({ role, content }));
+      setMessages((current) => [...current, { role: "user", content: message }]);
+      setInput("");
+      setSending(true);
+      const { ok, data } = await practiceFetch<{ reply: string }>("/api/ask-pansy", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify({ message: messageText, history }),
+        body: JSON.stringify({ message, history }),
       });
-
-      const data = await response.json().catch(() => ({}));
-
-      const assistantMessage: Message = {
-        role: "assistant",
-        content: response.ok
-          ? data.reply
-          : `${data.error || "I'm having trouble connecting right now."}`,
-        timestamp: Date.now(),
-      };
-      setMessages((prev) => [...prev, assistantMessage]);
-    } catch {
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: "Network error: Could not reach the server.", timestamp: Date.now() },
-      ]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+      setMessages((current) => [...current, { role: "assistant", content: ok && data.reply ? data.reply : TROUBLE }]);
+      setSending(false);
+    },
+    [messages, sending],
+  );
 
   useEffect(() => {
-    const q = typeof router.query.q === "string" ? router.query.q.trim() : "";
-    if (q && !autoSent && messages.length === 0) {
-      setAutoSent(true);
-      sendMessage(q);
+    const question = typeof router.query.q === "string" ? router.query.q : "";
+    if (question && isLoggedIn && !autoSent.current) {
+      autoSent.current = true;
+      send(question);
     }
-  }, [router.query.q, autoSent, messages.length]);
+  }, [isLoggedIn, router.query.q, send]);
 
-  const handleSend = async () => {
-    if (!inputValue.trim()) return;
-    const text = inputValue;
-    setInputValue("");
-    await sendMessage(text);
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
+  const submit = (event: FormEvent) => {
+    event.preventDefault();
+    send(input);
   };
 
   return (
-    <Layout>
-      <SEO title="Ask Pansy — AI Trading Analyst | Bloom" description="Ask Pansy about setups, entries, stop losses, market conditions, and trading strategies. Your AI trading analyst that watches the markets 24/7." />
+    <>
+      <SEO title="Ask Pansy - Bloom" description="Ask Pansy anything about gold, lessons, brokers or where to learn next, in your own words." />
+      <Layout>
+        <div className="mx-auto flex max-w-2xl flex-col px-4 py-6">
+          <header className="flex items-center gap-3">
+            <BloomMark size={48} />
+            <div>
+              <h1 className="text-3xl font-semibold leading-tight text-foreground">Ask Pansy</h1>
+              <p className="text-base text-muted-foreground">Your learning companion. No question is too small.</p>
+            </div>
+          </header>
 
-      <div className="mx-auto flex h-[calc(100vh-8rem)] max-w-3xl flex-col px-4 py-6">
-        {/* Header */}
-        <div className="mb-4 flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-accent to-primary text-2xl">
-            🌺
-          </div>
-          <div>
-            <h1 className="font-serif text-2xl font-bold text-primary">Ask Pansy</h1>
-            <p className="text-sm text-muted-foreground">Your AI trading analyst — setups, entries, stops &amp; targets.</p>
-          </div>
-        </div>
-
-        {/* Messages */}
-        <div className="flex-1 space-y-4 overflow-y-auto rounded-2xl border border-border bg-[#07080C] p-4">
-          {messages.length === 0 && !isLoading ? (
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-accent to-primary text-sm">
-                  🌺
-                </div>
-                <Card className="flex-1 border-primary/20 bg-primary/5 p-3">
-                  <p className="text-sm text-foreground">
-                    Hey 🌸 I&apos;m watching the markets right now. Ask me about any setup, ticker, or strategy — I&apos;ll give you the entry, stop, and targets. Pick a question below or type your own.
-                  </p>
-                </Card>
-              </div>
-              <div className="space-y-2 pt-2">
-                {SUGGESTED.map((q, i) => (
-                  <Button
-                    key={i}
-                    variant="outline"
-                    size="sm"
-                    className="h-auto w-full justify-start px-3 py-2 text-left hover:border-primary/50 hover:bg-primary/5"
-                    onClick={() => sendMessage(q)}
-                  >
-                    <span className="text-sm text-foreground">{q}</span>
-                  </Button>
-                ))}
-              </div>
+          {!authLoading && !isLoggedIn ? (
+            <div className="mt-6 rounded-3xl bg-card p-6 text-center shadow-[var(--bloom-shadow)]">
+              <h2 className="text-xl font-semibold text-foreground">Pansy would love to meet you</h2>
+              <p className="mt-1 text-base text-muted-foreground">Join free and ask as many questions as you like.</p>
+              <Link href="/onboarding" className="mt-4 inline-flex h-11 items-center rounded-full bg-primary px-6 font-semibold text-primary-foreground">
+                Start free
+              </Link>
             </div>
           ) : (
-            messages.map((message, index) => (
-              <div key={index} className={`flex items-start gap-3 ${message.role === "user" ? "flex-row-reverse" : ""}`}>
-                {message.role === "assistant" && (
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-accent to-primary text-sm">
-                    🌺
+            <>
+              <div className="mt-5 space-y-3" aria-live="polite">
+                {messages.length === 0 && (
+                  <div className="rounded-3xl bg-accent/60 p-5">
+                    <p className="text-base leading-relaxed text-foreground">
+                      Hello, I&apos;m Pansy. Ask me about gold, your lessons, brokers or what to learn next. I&apos;ll explain things in plain language. I don&apos;t give trade calls, but I&apos;ll happily teach you how to think things through.
+                    </p>
+                    <div className="mt-4 flex flex-col gap-2">
+                      {SUGGESTED.map((suggestion) => (
+                        <motion.button
+                          key={suggestion}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => send(suggestion)}
+                          className="rounded-2xl border border-border bg-card p-3 text-left text-base text-foreground"
+                        >
+                          {suggestion}
+                        </motion.button>
+                      ))}
+                    </div>
                   </div>
                 )}
-                <Card
-                  className={`max-w-[85%] p-3 ${
-                    message.role === "user" ? "border-primary/30 bg-primary/20" : "border-border bg-muted/50"
-                  }`}
-                >
-                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">{message.content}</p>
-                </Card>
-              </div>
-            ))
-          )}
-          {isLoading && (
-            <div className="flex items-start gap-3">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-accent to-primary text-sm">
-                🌺
-              </div>
-              <Card className="border-border bg-muted/50 p-3">
-                <div className="flex gap-1">
-                  <div className="h-2 w-2 animate-bounce rounded-full bg-primary"></div>
-                  <div className="h-2 w-2 animate-bounce rounded-full bg-primary" style={{ animationDelay: "0.1s" }}></div>
-                  <div className="h-2 w-2 animate-bounce rounded-full bg-primary" style={{ animationDelay: "0.2s" }}></div>
-                </div>
-              </Card>
-            </div>
-          )}
-          <div ref={messagesEndRef} />
-        </div>
 
-        {/* Input */}
-        <div className="mt-4">
-          <div className="flex gap-2">
-            <Input
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Ask Pansy anything..."
-              className="flex-1 border-border bg-background text-foreground"
-              disabled={isLoading}
-            />
-            <Button onClick={handleSend} disabled={!inputValue.trim() || isLoading} size="icon" className="shrink-0 bg-primary hover:bg-primary/90">
-              <Send className="h-4 w-4" />
-            </Button>
-          </div>
-          <p className="mt-2 text-xs text-muted-foreground">
-            Educational only. Not financial advice. Pansy never recommends specific investments.
-          </p>
+                {messages.map((message, index) => (
+                  <div
+                    key={index}
+                    className={cn(
+                      "max-w-[88%] whitespace-pre-wrap rounded-3xl p-4 text-base leading-relaxed",
+                      message.role === "user" ? "ml-auto bg-primary text-primary-foreground" : "bg-card text-foreground shadow-[var(--bloom-shadow)]",
+                    )}
+                  >
+                    {message.content}
+                  </div>
+                ))}
+
+                {sending && (
+                  <div className="flex w-fit items-center gap-2 rounded-3xl bg-card p-4 text-sm text-muted-foreground shadow-[var(--bloom-shadow)]">
+                    <Loader2 className="h-4 w-4 animate-spin" /> Pansy is thinking...
+                  </div>
+                )}
+                <div ref={endRef} />
+              </div>
+
+              <form onSubmit={submit} className="sticky bottom-20 mt-4 flex items-center gap-2 rounded-full border border-border bg-card p-1.5 shadow-[var(--bloom-shadow)] md:bottom-4">
+                <input
+                  value={input}
+                  onChange={(event) => setInput(event.target.value)}
+                  placeholder="Ask anything, in your own words"
+                  aria-label="Your question for Pansy"
+                  className="h-11 min-w-0 flex-1 bg-transparent px-4 text-base text-foreground outline-none"
+                />
+                <motion.button
+                  whileTap={{ scale: 0.9 }}
+                  type="submit"
+                  disabled={!input.trim() || sending}
+                  aria-label="Send"
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground disabled:opacity-40"
+                >
+                  <Send className="h-5 w-5" />
+                </motion.button>
+              </form>
+              <p className="mt-3 text-center text-xs text-muted-foreground">Pansy is an AI, can make mistakes, and doesn&apos;t give financial advice.</p>
+            </>
+          )}
         </div>
-      </div>
-    </Layout>
+      </Layout>
+    </>
   );
 }
