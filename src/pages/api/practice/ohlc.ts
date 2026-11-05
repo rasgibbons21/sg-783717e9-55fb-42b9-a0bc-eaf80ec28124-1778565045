@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { getInstrument } from "@/config/instruments";
 import { requireLoggedInUser, sendAuthError } from "@/lib/requireProUser";
 
 // In-memory cache keyed by symbol+timeframe
@@ -22,7 +23,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { ticker, timeframe = "daily" } = req.query as Record<string, string>;
   if (!ticker) return res.status(400).json({ error: "ticker required" });
 
-  const sym = ticker.toUpperCase().trim();
+  const sym = encodeURIComponent(getInstrument(ticker)?.feedSymbol ?? ticker.toUpperCase().trim());
   const apiKey = process.env.FMP_API_KEY;
   if (!apiKey) return res.status(500).json({ error: "FMP_API_KEY not configured" });
 

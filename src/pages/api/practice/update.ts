@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { pnlFor } from "@/lib/practice/maths";
 import { requireLoggedInUser, sendAuthError } from "@/lib/requireProUser";
 import { createClient } from "@supabase/supabase-js";
 
@@ -21,7 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   // Verify the trade belongs to this user and is open
   const { data: trade, error: fetchErr } = await supabaseAdmin
     .from("practice_trades")
-    .select("id, thesis, stop_price, target_price, status, entry_price, shares")
+    .select("id, ticker, direction, thesis, stop_price, target_price, status, entry_price, shares")
     .eq("id", trade_id)
     .eq("user_id", userId)
     .eq("status", "open")
@@ -36,7 +37,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     patch.risk_amount =
       stop_price === null
         ? null
-        : Math.abs((Number(trade.entry_price) - Number(stop_price)) * Number(trade.shares));
+        : Math.abs(pnlFor(trade.ticker, trade.direction, Number(trade.entry_price), Number(stop_price), Number(trade.shares)));
   }
   if (target_price !== undefined) patch.target_price = target_price === null ? null : Number(target_price);
   if (note) {

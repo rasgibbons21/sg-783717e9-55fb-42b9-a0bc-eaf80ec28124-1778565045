@@ -2,6 +2,8 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { requireLoggedInUser, sendAuthError } from "@/lib/requireProUser";
 import { createClient } from "@supabase/supabase-js";
 import { getServerQuote } from "@/lib/serverQuote";
+import { marginFor, pnlFor } from "@/lib/practice/maths";
+import { MARKET_RESTING_MESSAGE, isMarketOpen } from "@/lib/practice/marketHours";
 import { checkTradeAchievements } from "@/lib/achievementChecker";
 
 const supabaseAdmin = createClient(
@@ -31,16 +33,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (tradeErr || !trade) return res.status(404).json({ error: "Open trade not found" });
 
+  if (!isMarketOpen(trade.ticker, new Date())) return res.status(409).json({ error: MARKET_RESTING_MESSAGE });
+
   // Fresh server-side market fill for the exit — honest close, no client price.
   const quote = await getServerQuote(trade.ticker);
   if (!quote)
-    return res.status(502).json({ error: "Couldn't get a live price to close right now — try again in a moment." });
+    return res.status(502).json({ error: "We can't get a price to close this just now. Your trade is safe, so please try again in a moment." });
   const exitP = quote.price;
 
-  const rawPnl =
-    trade.direction === "long"
-      ? (exitP - Number(trade.entry_price)) * Number(trade.shares)
-      : (Number(trade.entry_price) - exitP) * Number(trade.shares);
+  const rawPnl = pnlFor(trade.ticker, trade.direction, Number(trade.entry_price), exitP, Number(trade.shares));
 
   const pnl = Math.round(rawPnl * 100) / 100;
   const pnl_pct =
@@ -101,10 +102,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
   }
 
-  // Release the reserved cost (entry × shares) + realized P&L back to buying power.
-  // This is direction-correct: for a long it equals exit×shares (unchanged), and
-  // for a short it credits the true result (the old exit×shares INVERTED shorts).
-  const credit = Number(trade.entry_price) * Number(trade.shares) + pnl;
+  // Release the simulated money set aside when the trade opened, plus the result.
+  const credit = marginFor(trade.ticker, Number(trade.entry_price), Number(trade.shares)) + pnl;
 
   const { data: account } = await supabaseAdmin
     .from("practice_account")

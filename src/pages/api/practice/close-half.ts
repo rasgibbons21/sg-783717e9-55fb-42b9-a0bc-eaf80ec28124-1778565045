@@ -2,6 +2,8 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { requireLoggedInUser, sendAuthError } from "@/lib/requireProUser";
 import { createClient } from "@supabase/supabase-js";
 import { getServerQuote } from "@/lib/serverQuote";
+import { marginFor, pnlFor } from "@/lib/practice/maths";
+import { MARKET_RESTING_MESSAGE, isMarketOpen } from "@/lib/practice/marketHours";
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -29,10 +31,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (tradeErr || !trade) return res.status(404).json({ error: "Open trade not found" });
 
+  if (!isMarketOpen(trade.ticker, new Date())) return res.status(409).json({ error: MARKET_RESTING_MESSAGE });
+
   // Fresh server-side market fill for the partial exit — consistent with close.ts.
   const quote = await getServerQuote(trade.ticker);
   if (!quote)
-    return res.status(502).json({ error: "Couldn't get a live price to close right now — try again in a moment." });
+    return res.status(502).json({ error: "We can't get a price to close this just now. Your trade is safe, so please try again in a moment." });
   const exitP = quote.price;
   const fullShares = Number(trade.shares);
   if (fullShares < 0.0002) return res.status(400).json({ error: "Position too small to halve" });
@@ -40,9 +44,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const halfShares = fullShares / 2;
   const remainingShares = fullShares - halfShares; // avoids float drift
 
-  const rawPnl = trade.direction === "long"
-    ? (exitP - Number(trade.entry_price)) * halfShares
-    : (Number(trade.entry_price) - exitP) * halfShares;
+  const rawPnl = pnlFor(trade.ticker, trade.direction, Number(trade.entry_price), exitP, halfShares);
   const pnl = Math.round(rawPnl * 100) / 100;
   const pnl_pct = Math.round(
     ((exitP - Number(trade.entry_price)) / Number(trade.entry_price)) *
@@ -95,10 +97,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (updateErr) return res.status(500).json({ error: updateErr.message });
 
-  // Release the reserved cost (entry × halfShares) + realized P&L for the half.
-  // Direction-correct: longs unchanged (= exit × halfShares); shorts were
-  // previously inverted by crediting exit × halfShares.
-  const credit = Number(trade.entry_price) * halfShares + pnl;
+  // Release the simulated money set aside for this half, plus its result.
+  const credit = marginFor(trade.ticker, Number(trade.entry_price), halfShares) + pnl;
 
   const { data: account } = await supabaseAdmin
     .from("practice_account")
