@@ -1,6 +1,5 @@
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
-import { ThemeProvider } from "@/contexts/ThemeProvider";
 import { Toaster } from "@/components/ui/toaster";
 import { useEffect } from "react";
 import { InstallPrompt } from "@/components/InstallPrompt";
@@ -16,7 +15,7 @@ export default function App({ Component, pageProps }: AppProps) {
   }, []);
 
   return (
-    <ThemeProvider>
+    <>
       <GoogleAnalytics />
       <Analytics />
       <SubscriptionProvider>
@@ -24,6 +23,6 @@ export default function App({ Component, pageProps }: AppProps) {
       </SubscriptionProvider>
       <Toaster />
       <InstallPrompt />
-    </ThemeProvider>
+    </>
   );
 }

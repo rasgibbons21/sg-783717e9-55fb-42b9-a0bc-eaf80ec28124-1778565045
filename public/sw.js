@@ -3,7 +3,7 @@
 // v1: only caches the offline fallback page and immutable Next.js
 // static assets (/_next/static/*). Everything else is network-first.
 
-const CACHE_VERSION = 'bloom-v1';
+const CACHE_VERSION = 'bloom-v2';
 const OFFLINE_URL = '/offline.html';
 
 self.addEventListener('install', (event) => {

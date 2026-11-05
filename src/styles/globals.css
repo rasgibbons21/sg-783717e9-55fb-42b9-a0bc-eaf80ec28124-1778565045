@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -14,59 +14,71 @@
   :root {
     --radius: 0.75rem;
 
-    /* Radar Desk Palette */
-    --background: 220 20% 4%;        /* #07080C - App bg */
-    --foreground: 36 25% 92%;        /* #F3EDE3 - Ivory */
+    /* Bloom palette: warm paper, soft ink, sage. Teal is decorative only. */
+    --bloom-paper: #FBF8F2;
+    --bloom-paper-warm: #F6F1E8;
+    --bloom-card: #FFFDF8;
+    --bloom-ink: #2A241C;
+    --bloom-stone: #6F6860;
+    --bloom-sage: #3F4F3E;
+    --bloom-teal: #27B7C8;
+    --bloom-blush: #EFD9D3;
+    --bloom-clay: #B98A72;
+    --bloom-gold: #C2A15A;
+    --bloom-shadow: 0 10px 30px rgba(63, 79, 62, 0.08);
 
-    --card: 216 22% 10%;             /* #121821 - Card */
-    --card-foreground: 36 25% 92%;
+    --background: 40 54% 97%;
+    --foreground: 35 20% 14%;
 
-    --popover: 216 22% 10%;          /* #121821 */
-    --popover-foreground: 36 25% 92%;
+    --card: 45 100% 99%;
+    --card-foreground: 35 20% 14%;
 
-    --primary: 186 67% 47%;          /* #27B7C8 - Teal */
-    --primary-foreground: 220 20% 4%;
+    --popover: 45 100% 99%;
+    --popover-foreground: 35 20% 14%;
 
-    --secondary: 215 20% 12%;        /* #171E28 - Card 2 */
-    --secondary-foreground: 36 25% 92%;
+    --primary: 116 12% 28%;
+    --primary-foreground: 45 100% 99%;
 
-    --muted: 215 20% 12%;            /* #171E28 */
-    --muted-foreground: 33 7% 53%;   /* #8F8A7E - Meta */
+    --secondary: 39 41% 94%;
+    --secondary-foreground: 35 20% 14%;
 
-    --accent: 186 67% 47%;           /* #27B7C8 - Teal */
-    --accent-foreground: 220 20% 4%;
+    --muted: 39 41% 94%;
+    --muted-foreground: 30 6% 41%;
 
-    --rose: 0 50% 48%;               /* #B86A6A - Muted red */
-    --rose-foreground: 220 20% 4%;
+    --accent: 12 44% 88%;
+    --accent-foreground: 35 20% 14%;
 
-    --destructive: 0 50% 48%;        /* #B86A6A */
-    --destructive-foreground: 36 25% 92%;
+    --rose: 12 44% 88%;
+    --rose-foreground: 35 20% 14%;
 
-    --border: 0 0% 100% / 0.06;      /* rgba(255,255,255,0.06) hairline */
-    --input: 215 20% 12%;
-    --ring: 186 67% 47%;
+    --destructive: 10 45% 42%;
+    --destructive-foreground: 45 100% 99%;
 
-    --chart-1: 142 30% 54%;          /* muted green */
-    --chart-2: 186 67% 47%;          /* teal */
-    --chart-3: 0 50% 48%;            /* muted red */
-    --chart-4: 36 25% 75%;
-    --chart-5: 216 22% 25%;
+    --border: 35 20% 14% / 0.08;
+    --input: 39 41% 94%;
+    --ring: 116 12% 28%;
 
-    /* Radar-specific tokens */
-    --r-bg: #07080C;
-    --r-elevated: #0C1016;
-    --r-card: #121821;
-    --r-card2: #171E28;
-    --r-hairline: rgba(255,255,255,0.06);
-    --r-ivory: #F3EDE3;
-    --r-body: #C8C2B8;
-    --r-meta: #8F8A7E;
-    --r-inactive: #6F6860;
-    --r-teal: #27B7C8;
-    --r-up-bg: #1C3A2A;
-    --r-up-text: #7A9B7A;
-    --r-down-bg: #3A1C1C;
-    --r-down-text: #B86A6A;
+    --chart-1: 116 12% 28%;
+    --chart-2: 42 44% 56%;
+    --chart-3: 21 32% 59%;
+    --chart-4: 12 44% 88%;
+    --chart-5: 30 6% 41%;
+
+    /* Legacy tokens, remapped by role so retained screens turn light at once */
+    --r-bg: var(--bloom-paper);
+    --r-elevated: var(--bloom-card);
+    --r-card: var(--bloom-card);
+    --r-card2: var(--bloom-paper-warm);
+    --r-hairline: rgba(42, 36, 28, 0.08);
+    --r-ivory: var(--bloom-ink);
+    --r-body: var(--bloom-ink);
+    --r-meta: var(--bloom-stone);
+    --r-inactive: var(--bloom-stone);
+    --r-teal: var(--bloom-sage);
+    --r-up-bg: #E6ECE3;
+    --r-up-text: var(--bloom-sage);
+    --r-down-bg: #F3E4DC;
+    --r-down-text: #8A5B44;
   }
 }
 
@@ -74,9 +86,14 @@
   * {
     @apply border-border;
   }
+  h1, h2, h3 {
+    font-family: 'Fraunces', Georgia, serif;
+    letter-spacing: -0.01em;
+  }
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+    font-size: 16px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -106,4 +123,13 @@
 
 * {
   border-color: var(--r-hairline);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

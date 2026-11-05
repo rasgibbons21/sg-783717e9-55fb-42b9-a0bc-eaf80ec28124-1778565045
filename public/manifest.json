@@ -1,14 +1,14 @@
 {
-  "name": "Radar — Stock Screener & Trade Alerts",
-  "short_name": "Radar",
-  "description": "Stock screener, price alerts, and Pansy chat. Watchlist, movers, paper trade.",
+  "name": "Bloom: Learn Gold & Markets",
+  "short_name": "Bloom",
+  "description": "Learn gold and markets from zero. Free interactive lessons, safe paper practice and Pansy, your learning companion.",
   "id": "/",
   "scope": "/",
   "start_url": "/home",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#07080C",
-  "theme_color": "#27B7C8",
+  "background_color": "#FBF8F2",
+  "theme_color": "#FBF8F2",
   "icons": [
     { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
     { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }

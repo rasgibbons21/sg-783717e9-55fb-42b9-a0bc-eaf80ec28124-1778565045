@@ -10,7 +10,7 @@ const config: CapacitorConfig = {
   },
   ios: {
     scheme: "Bloom",
-    backgroundColor: "#0E1B30",
+    backgroundColor: "#FBF8F2",
     contentInset: "automatic",
     preferredContentMode: "mobile",
     scrollEnabled: true,
