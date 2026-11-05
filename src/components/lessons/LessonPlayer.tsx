@@ -103,9 +103,9 @@ export function LessonPlayer({ lesson }: { lesson: Lesson }) {
       </div>
       <p className="mt-4 text-sm font-medium text-muted-foreground">{lesson.title}</p>
 
-      <motion.div key={index} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }} className="mt-4 min-h-[320px]">
+      <div key={index} className="bloom-rise mt-4 min-h-[320px]" style={{ animationDuration: "250ms" }}>
         <Block block={block} onAnswered={onAnswered} />
-      </motion.div>
+      </div>
 
       <motion.button
         whileTap={ready ? { scale: 0.97 } : undefined}
