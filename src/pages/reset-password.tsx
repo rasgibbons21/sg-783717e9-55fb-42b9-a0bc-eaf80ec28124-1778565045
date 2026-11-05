@@ -62,7 +62,7 @@ export default function ResetPassword() {
         setError(error.message);
       } else {
         // Success - redirect to home
-        router.push("/signals");
+        router.push("/home");
       }
     } catch (err: any) {
       setError(err.message || "Something went wrong. Please try again.");

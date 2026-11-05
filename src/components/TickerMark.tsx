@@ -120,7 +120,7 @@ export const TickerMark = memo(function TickerMark({ ticker, size = "md", classN
           style={{
             fontSize: s.text,
             fontWeight: 600,
-            color: "#27B7C8",
+            color: "#3F4F3E",
             lineHeight: 1,
             letterSpacing: "0.02em",
           }}

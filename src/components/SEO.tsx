@@ -14,9 +14,9 @@ const SITE_URL = "https://shebloomswealth.app";
 const SITE_NAME = "Bloom";
 
 const defaultSEO = {
-  title: "Bloom — Learn Money & Investing From Zero",
+  title: "Bloom - Learn gold & markets from zero. Free.",
   description:
-    "Free investing education, paper trading, stock screener, and AI market chat. Learn at your own pace — no jargon, no paywall.",
+    "A warm, free place for women to learn gold trading and other markets, with interactive lessons, safe practice and Pansy. No card, no upgrades.",
   image: `${SITE_URL}/og-image.jpg`,
   url: SITE_URL,
 };

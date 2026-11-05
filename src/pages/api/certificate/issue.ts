@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { hasFinishedCourse } from "@/data/lessons-v2";
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseAdmin = createClient(
@@ -16,6 +17,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
   if (error || !user) return res.status(401).json({ error: "Unauthorized" });
+
+  const { data: progress } = await supabaseAdmin
+    .from("lesson_progress")
+    .select("lesson_id")
+    .eq("user_id", user.id)
+    .eq("completed", true);
+  if (!hasFinishedCourse((progress ?? []).map((row) => row.lesson_id))) {
+    return res.status(403).json({ error: "Finish every lesson to earn your certificate." });
+  }
 
   const { course_id, level } = req.body;
   if (!course_id || !level) return res.status(400).json({ error: "Missing course_id or level" });

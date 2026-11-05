@@ -29,7 +29,7 @@ export default function Privacy() {
               <li>Risk tolerance and investment preferences</li>
               <li>App usage data and browsing behavior within Bloom</li>
               <li>Device information and IP address</li>
-              <li>Watchlist and portfolio tracking data</li>
+              <li>Lesson progress, practice trades and leaderboard preferences</li>
             </ul>
 
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">How We Use Your Information</h2>

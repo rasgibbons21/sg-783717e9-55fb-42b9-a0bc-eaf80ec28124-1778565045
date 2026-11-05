@@ -38,29 +38,29 @@ export function ReviewPrompt({ onClose, trigger }: ReviewPromptProps) {
       <div
         className="w-full max-w-sm rounded-2xl p-6 relative"
         style={{
-          background: 'linear-gradient(145deg, #07080C, #121821)',
-          border: '1px solid rgba(39,183,200,0.2)',
+          background: 'linear-gradient(145deg, #FBF8F2, #FFFDF8)',
+          border: '1px solid rgba(63,79,62,0.2)',
           boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
         }}
       >
         <button
           onClick={onClose}
           className="absolute top-3 right-3 w-7 h-7 rounded-full flex items-center justify-center"
-          style={{ background: 'rgba(255,255,255,0.05)' }}
+          style={{ background: 'rgba(42,36,28,0.05)' }}
         >
-          <X className="w-4 h-4" style={{ color: 'rgba(244,247,250,0.4)' }} />
+          <X className="w-4 h-4" style={{ color: 'rgba(42,36,28,0.4)' }} />
         </button>
 
         {step === 'rate' && (
           <div className="text-center">
             <div style={{ fontSize: 48 }} className="mb-3">&#127800;</div>
-            <h3 className="text-lg font-bold text-[#F3EDE3] mb-1">
+            <h3 className="text-lg font-bold text-foreground mb-1">
               Enjoying Bloom?
             </h3>
-            <p className="text-sm text-[#F3EDE3]/50 mb-5 leading-relaxed">
+            <p className="text-sm text-muted-foreground mb-5 leading-relaxed">
               {trigger
                 ? `Nice work completing ${trigger}! How are you enjoying the app so far?`
-                : 'Your feedback helps other traders find Bloom. How would you rate us?'}
+                : 'Your feedback helps other women find Bloom. How would you rate us?'}
             </p>
 
             <div className="flex justify-center gap-2 mb-4">
@@ -72,8 +72,8 @@ export function ReviewPrompt({ onClose, trigger }: ReviewPromptProps) {
                 >
                   <Star
                     className="w-10 h-10"
-                    fill={s <= rating ? '#D4AF37' : 'none'}
-                    stroke={s <= rating ? '#D4AF37' : 'rgba(244,247,250,0.2)'}
+                    fill={s <= rating ? '#C2A15A' : 'none'}
+                    stroke={s <= rating ? '#C2A15A' : 'rgba(42,36,28,0.2)'}
                     strokeWidth={1.5}
                   />
                 </button>
@@ -82,7 +82,7 @@ export function ReviewPrompt({ onClose, trigger }: ReviewPromptProps) {
 
             <button
               onClick={onClose}
-              className="text-xs text-[#F3EDE3]/30"
+              className="text-xs text-muted-foreground"
             >
               Not now
             </button>
@@ -92,11 +92,11 @@ export function ReviewPrompt({ onClose, trigger }: ReviewPromptProps) {
         {step === 'thanks' && (
           <div className="text-center">
             <div style={{ fontSize: 48 }} className="mb-3">&#128150;</div>
-            <h3 className="text-lg font-bold text-[#F3EDE3] mb-1">
+            <h3 className="text-lg font-bold text-foreground mb-1">
               Thank you!
             </h3>
-            <p className="text-sm text-[#F3EDE3]/50 mb-5 leading-relaxed">
-              Would you mind leaving a quick review? It helps so much — other traders find Bloom because of reviews like yours.
+            <p className="text-sm text-muted-foreground mb-5 leading-relaxed">
+              Would you mind leaving a quick review? It helps so much — other women find Bloom because of reviews like yours.
             </p>
             <a
               href={getReviewUrl()}
@@ -104,13 +104,13 @@ export function ReviewPrompt({ onClose, trigger }: ReviewPromptProps) {
               rel="noopener noreferrer"
               onClick={onClose}
               className="inline-block px-8 py-3 rounded-xl font-bold text-sm transition-all hover:scale-105"
-              style={{ background: 'linear-gradient(135deg, #C9A84C, #D4AF37)', color: '#07080C' }}
+              style={{ background: 'linear-gradient(135deg, #C9A84C, #C2A15A)', color: '#FBF8F2' }}
             >
               Leave a Review
             </a>
             <button
               onClick={onClose}
-              className="block mx-auto mt-3 text-xs text-[#F3EDE3]/30"
+              className="block mx-auto mt-3 text-xs text-muted-foreground"
             >
               Maybe later
             </button>
@@ -120,16 +120,16 @@ export function ReviewPrompt({ onClose, trigger }: ReviewPromptProps) {
         {step === 'feedback' && (
           <div className="text-center">
             <div style={{ fontSize: 48 }} className="mb-3">&#128172;</div>
-            <h3 className="text-lg font-bold text-[#F3EDE3] mb-1">
+            <h3 className="text-lg font-bold text-foreground mb-1">
               We hear you
             </h3>
-            <p className="text-sm text-[#F3EDE3]/50 mb-5 leading-relaxed">
+            <p className="text-sm text-muted-foreground mb-5 leading-relaxed">
               We&apos;re always improving Bloom. Thanks for your honest feedback — it helps us build a better app for you.
             </p>
             <button
               onClick={onClose}
               className="px-8 py-3 rounded-xl font-bold text-sm transition-all hover:scale-105"
-              style={{ background: 'rgba(39,183,200,0.15)', color: '#27B7C8', border: '1px solid rgba(39,183,200,0.3)' }}
+              style={{ background: 'rgba(63,79,62,0.15)', color: '#3F4F3E', border: '1px solid rgba(63,79,62,0.3)' }}
             >
               Got it
             </button>

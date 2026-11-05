@@ -42,3 +42,7 @@ export function firstIncomplete(completedSlugs: string[]): Lesson | null {
   const completed = new Set(completedSlugs);
   return ALL_LESSONS.find((lesson) => !completed.has(lesson.slug)) ?? null;
 }
+
+export function hasFinishedCourse(completedSlugs: string[]): boolean {
+  return firstIncomplete(completedSlugs) === null;
+}

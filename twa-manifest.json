@@ -4,26 +4,26 @@
   "name": "Bloom",
   "launcherName": "Bloom",
   "display": "standalone",
-  "themeColor": "#27B7C8",
-  "themeColorDark": "#0E1B30",
-  "navigationColor": "#0E1B30",
-  "navigationColorDark": "#0E1B30",
+  "themeColor": "#FBF8F2",
+  "themeColorDark": "#FBF8F2",
+  "navigationColor": "#FBF8F2",
+  "navigationColorDark": "#FBF8F2",
   "navigationDividerColor": "#0E1B30",
   "navigationDividerColorDark": "#0E1B30",
-  "backgroundColor": "#0E1B30",
+  "backgroundColor": "#FBF8F2",
   "enableNotifications": true,
   "startUrl": "/",
   "iconUrl": "https://shebloomswealth.app/icon-512.png",
   "maskableIconUrl": "https://shebloomswealth.app/icon-512.png",
   "shortcuts": [
     {
-      "name": "Investing Basics",
+      "name": "Lessons",
       "shortName": "Learn",
       "url": "/learn",
       "chosenIconUrl": "https://shebloomswealth.app/icon-192.png"
     },
     {
-      "name": "Practice Trader",
+      "name": "Practice",
       "shortName": "Practice",
       "url": "/practice",
       "chosenIconUrl": "https://shebloomswealth.app/icon-192.png"

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { isInteractive } from "@/lib/lessons/engine";
-import { ALL_LESSONS, MODULES, firstIncomplete, getLesson, nextLesson } from "./index";
+import { ALL_LESSONS, MODULES, firstIncomplete, getLesson, hasFinishedCourse, nextLesson } from "./index";
 
 describe("lesson data", () => {
   it("starts with the first gold lesson", () => {
@@ -82,6 +82,13 @@ describe("lesson data", () => {
         }
       }
     }
+  });
+
+  it("counts the course as finished only when every lesson is done", () => {
+    const every = ALL_LESSONS.map((l) => l.slug);
+    expect(hasFinishedCourse(every)).toBe(true);
+    expect(hasFinishedCourse(every.slice(1))).toBe(false);
+    expect(hasFinishedCourse([...every.slice(1), "an-old-lesson"])).toBe(false);
   });
 
   it("finds the first unfinished lesson", () => {

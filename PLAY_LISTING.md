@@ -1,43 +1,34 @@
-# Bloom Radar — Google Play Listing
+# Bloom: Google Play Listing
 
 ## Title
-Bloom Radar: Stock Screener & Alerts
+Bloom: Learn Gold & Markets
 
 ## Short Description
-Stock screener, price alerts, and Pansy chat. Watchlist, movers, paper trade.
+Learn gold and markets from zero. Free lessons, safe practice and Pansy.
 
 ## Tagline
-Screen the market. Get the alert. Decide if it's a trade.
+Learn gold & markets from zero. Free.
 
 ## Full Description
 
-Bloom Radar is a stock screener and alerts desk for U.S. stocks.
+Bloom is a warm, free place for women to learn gold trading and other markets from zero. There's no card, no paywall and nothing to upgrade.
 
-It keeps scanning for Gap & Go, Opening Range Breakout, VWAP reclaim/bounce, first pullback, HOD break, bull flag, and red-to-green — then surfaces only names that match your rules.
+**Interactive lessons**
+Short, friendly lessons that start with what gold trading even is. Tap a chart, put steps in order, try a slider and choose what you'd do. Then move on to forex pairs, indices and other metals.
 
-Pansy explains the setup. Paper trade it. Journal it. Academy stays under More if you want the lesson.
+**Safe practice**
+Try what you've learned with simulated money, on gold and other instruments. A mistake here costs nothing.
 
-**What you get:**
-- Configurable strategy scanner — set price, gap %, RVOL, float, and session filters per strategy
-- Signal states — WATCH → NEAR TRIGGER → ACTIVE → INVALIDATED / TARGET HIT / STOP HIT
-- Score 0–100 measuring how many conditions passed — not win probability
-- Entry zone, invalidation level, targets, and R:R on every setup card
-- Pansy AI analyst — explains the setup, does not place the trade
-- Paper trading simulator — practice risk-free with $10K virtual capital
-- Trade journal — grade every trade, track what works
-- Market news from licensed feeds
-- Academy with 150+ lessons and strategy lab under More
+**Friendly leaderboards**
+Grow your garden as you learn, and share your progress on our learning and practice leaderboards. You can hide yourself at any time.
 
-**Keywords:** stock screener, stock alerts, price alerts, day trading, gap and go, VWAP, paper trading, AI stock chat
+**Pansy, your learning companion**
+Ask anything in your own words. Pansy explains things in plain language and helps you decide what to learn next.
 
-**Category:** Finance
+**Free demo accounts, when you're ready**
+Learn what a demo account is and what brokers such as XM and IC Markets offer. Availability depends on your country, and these brokers generally don't accept US residents. Bloom may earn a commission from some broker links.
 
-**Content Rating:** Everyone
+**Please note**
+Bloom is for education only and isn't financial advice. Bloom doesn't provide trade calls and isn't a broker. Trading gold, forex and other CFDs is high risk, and you can lose money quickly. Practice results use simulated money and don't predict real results.
 
-**Application ID:** app.shebloomswealth.mobile
-
----
-
-Not financial advice. Information and simulation only.
-
-Educational decision support only. Alerts are price/level/screen-match notifications, not trade recommendations. All investing involves risk of loss.
+Pansy is an AI and can make mistakes.

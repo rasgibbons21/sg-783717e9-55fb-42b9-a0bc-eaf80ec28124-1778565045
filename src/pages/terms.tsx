@@ -25,18 +25,18 @@ export default function Terms() {
 
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">The Service</h2>
             <p className="mb-6 text-foreground">
-              Bloom is an educational investing platform operated by Cinder Vault Enterprises LLC. Bloom provides educational content about stocks, ETFs, mutual funds, and investing through Pansy, our AI guide. Bloom is NOT a registered investment advisor, broker-dealer, or financial institution.
+              Bloom is a free education platform operated by Cinder Vault Enterprises LLC. Bloom provides lessons about gold, forex, indices and other markets, a practice area using simulated money, leaderboards, and Pansy, our AI learning companion. Bloom is NOT a registered investment advisor, broker-dealer, or financial institution, and it does not hold money or place real trades.
             </p>
 
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Educational Purpose Only</h2>
             <p className="mb-2 text-foreground">
-              All content on Bloom, including Pansy's analysis, market commentary, ETF suggestions, and stock information, is for EDUCATIONAL PURPOSES ONLY.
+              All content on Bloom, including lessons, practice results, leaderboards and Pansy's replies, is for EDUCATIONAL PURPOSES ONLY. Pansy is an AI and can make mistakes.
             </p>
             <p className="mb-2 text-foreground">Nothing on Bloom constitutes:</p>
             <ul className="mb-6 space-y-2 text-foreground">
               <li>Financial advice</li>
               <li>Investment recommendations</li>
-              <li>Trading signals or calls to action</li>
+              <li>Trade calls or calls to action</li>
               <li>Guarantees of any investment returns</li>
             </ul>
             <p className="mb-6 text-foreground">
@@ -55,7 +55,7 @@ export default function Terms() {
 
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Affiliate Disclosure</h2>
             <p className="mb-6 text-foreground">
-              Bloom participates in broker affiliate programs. We may earn a commission when you sign up with a recommended broker through our platform. This never affects the independence of our educational content or Pansy's analysis.
+              Bloom is free because it participates in broker affiliate programs. We may earn a commission if you open an account with a broker through a link on Bloom, at no extra cost to you. This never affects what we teach or what Pansy says. Listing a broker isn't a recommendation, and availability depends on your country.
             </p>
 
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Intellectual Property</h2>

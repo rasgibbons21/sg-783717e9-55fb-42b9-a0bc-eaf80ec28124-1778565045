@@ -7,12 +7,12 @@ export default function Disclaimer() {
   return (
     <Layout>
       <SEO
-        title="Investment Disclaimer - Bloom"
-        description="Investment Disclaimer for Bloom by Cinder Vault Enterprises LLC"
+        title="Risk & Education Disclaimer - Bloom"
+        description="Risk & Education Disclaimer for Bloom by Cinder Vault Enterprises LLC"
       />
       <div className="mx-auto max-w-4xl space-y-8 px-4 py-8">
         <div>
-          <h1 className="mb-2 font-serif text-4xl font-bold text-primary">Investment Disclaimer</h1>
+          <h1 className="mb-2 font-serif text-4xl font-bold text-primary">Risk &amp; Education Disclaimer</h1>
           <p className="text-muted-foreground">Cinder Vault Enterprises LLC</p>
         </div>
 
@@ -41,6 +41,16 @@ export default function Disclaimer() {
               <li>An endorsement of any particular investment strategy</li>
               <li>A guarantee of any investment outcome</li>
             </ul>
+
+            <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">High Risk of Loss</h2>
+            <p className="mb-6 text-foreground">
+              Trading gold, forex, indices and other CFDs is high risk. Leverage can magnify losses, and you can lose money quickly. Many beginners lose money. Only ever trade with money you can afford to lose, and consider seeking independent advice.
+            </p>
+
+            <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Simulated Results</h2>
+            <p className="mb-6 text-foreground">
+              Practice trades and the leaderboards use simulated money. Simulated results don't include all real-world costs and pressures, and they don't predict real results.
+            </p>
 
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">No Registered Status</h2>
             <p className="mb-2 text-foreground">Cinder Vault Enterprises LLC and Bloom are NOT:</p>

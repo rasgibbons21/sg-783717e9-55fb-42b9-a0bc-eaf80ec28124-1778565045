@@ -126,7 +126,7 @@ export default function SignUpPage() {
               </h1>
               <p className="mt-2 text-base text-muted-foreground">
                 {mode === "signup"
-                  ? "No card and nothing to upgrade. Your first gold lesson starts right after this."
+                  ? "No card and nothing to pay. Your first gold lesson starts right after this."
                   : "Sign in and pick up where you left off."}
               </p>
 

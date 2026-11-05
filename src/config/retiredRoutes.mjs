@@ -29,7 +29,7 @@ const toLessons = [
   "/app/debug-scanner",
 ];
 
-const toHome = ["/subscription/:path*", "/subscription-offer", "/ebook-premium", "/refer"];
+const toHome = ["/subscription/:path*", "/subscription-offer", "/ebook-premium", "/ebook", "/ebook-preview", "/share", "/refer"];
 
 const toPractice = ["/paper-trader-v2"];
 const toProfile = ["/certificate", "/more"];
