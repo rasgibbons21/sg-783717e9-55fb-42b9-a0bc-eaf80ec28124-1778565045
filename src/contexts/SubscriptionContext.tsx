@@ -34,6 +34,14 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const [userId, setUserId] = useState<string | null>(null);
 
   const loadAuthStatus = useCallback(async () => {
+    // Development-only preview: ?pro=1 stands in for a signed-in member.
+    if (process.env.NODE_ENV === "development" && new URLSearchParams(window.location.search).get("pro") === "1") {
+      setIsLoggedIn(true);
+      setUserName("Preview");
+      setUserId("dev-preview");
+      setIsLoading(false);
+      return;
+    }
     try {
       const { data: { user }, error } = await supabase.auth.getUser();
 
