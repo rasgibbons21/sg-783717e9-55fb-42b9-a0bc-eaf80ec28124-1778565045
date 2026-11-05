@@ -3,7 +3,12 @@
   "redirects": [
     {
       "source": "/:path(.*)",
-      "has": [{ "type": "host", "value": "www.shebloomswealth.app" }],
+      "has": [
+        {
+          "type": "host",
+          "value": "www.shebloomswealth.app"
+        }
+      ],
       "destination": "https://shebloomswealth.app/:path",
       "permanent": true
     }
@@ -26,15 +31,5 @@
     }
   ],
   "cleanUrls": true,
-  "trailingSlash": false,
-  "crons": [
-    {
-      "path": "/api/cron/send-weekly-stocks",
-      "schedule": "0 18 * * 5"
-    },
-    {
-      "path": "/api/cron/signal-alerts",
-      "schedule": "*/5 13-20 * * 1-5"
-    }
-  ]
+  "trailingSlash": false
 }

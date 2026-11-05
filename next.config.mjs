@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 import { createRequire } from "module";
+import { RETIRED_ROUTES } from "./src/config/retiredRoutes.mjs";
 
 // Check if element-tagger is available
 function isElementTaggerAvailable() {
@@ -43,6 +44,9 @@ const nextConfig = {
     ],
   },
   allowedDevOrigins: ["*.daytona.work", "*.softgen.dev"],
+  async redirects() {
+    return RETIRED_ROUTES;
+  },
   async headers() {
     return [
       {
