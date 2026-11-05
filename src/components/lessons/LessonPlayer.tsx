@@ -2,8 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import type { Lesson, LessonBlock } from "@/data/lessons-v2/types";
 import { canAdvance, isInteractive, loadResume, saveResume } from "@/lib/lessons/engine";
-import { completeLesson } from "@/lib/lessons/saveProgress";
-import { supabase } from "@/integrations/supabase/client";
+import { clearCompletion, completeLesson, queueCompletion } from "@/lib/lessons/saveProgress";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { TextBlock } from "./blocks/TextBlock";
 import { PansyBlock } from "./blocks/PansyBlock";
@@ -41,6 +40,7 @@ export function LessonPlayer({ lesson }: { lesson: Lesson }) {
   const [answered, setAnswered] = useState(false);
   const [finished, setFinished] = useState(false);
   const [saveState, setSaveState] = useState<SaveState>("saving");
+  const [isNew, setIsNew] = useState(true);
   const firstTryScore = useRef(0);
 
   useEffect(() => {
@@ -54,9 +54,19 @@ export function LessonPlayer({ lesson }: { lesson: Lesson }) {
 
   const save = useCallback(async () => {
     setSaveState("saving");
-    const isDevPreview = process.env.NODE_ENV === "development" && userId === "dev-preview";
-    const saved = isDevPreview || (userId ? await completeLesson(supabase, userId, lesson.slug, firstTryScore.current) : false);
-    setSaveState(saved ? "saved" : "failed");
+    if (process.env.NODE_ENV === "development" && userId === "dev-preview") {
+      setSaveState("saved");
+      return;
+    }
+    // Kept on this device until the server confirms, so a lost connection can't lose the lesson.
+    queueCompletion(lesson.slug, firstTryScore.current);
+    const result = await completeLesson(lesson.slug, firstTryScore.current);
+    if (result.saved) {
+      clearCompletion(lesson.slug);
+      saveResume(lesson.slug, 0);
+      setIsNew(result.isNew);
+    }
+    setSaveState(result.saved ? "saved" : "failed");
   }, [lesson.slug, userId]);
 
   const block = lesson.blocks[index];
@@ -74,7 +84,6 @@ export function LessonPlayer({ lesson }: { lesson: Lesson }) {
 
   const advance = () => {
     if (index + 1 >= total) {
-      saveResume(lesson.slug, 0);
       setFinished(true);
       save();
       window.scrollTo({ top: 0 });
@@ -86,7 +95,7 @@ export function LessonPlayer({ lesson }: { lesson: Lesson }) {
     window.scrollTo({ top: 0 });
   };
 
-  if (finished) return <LessonComplete lesson={lesson} saveState={saveState} onRetrySave={save} />;
+  if (finished) return <LessonComplete lesson={lesson} saveState={saveState} isNew={isNew} onRetrySave={save} />;
   if (!block) return null;
 
   const ready = canAdvance(block, answered);

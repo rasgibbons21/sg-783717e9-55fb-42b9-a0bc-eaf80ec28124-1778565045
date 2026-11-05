@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getInstrument } from "@/config/instruments";
+import { parseDailyBars } from "@/lib/practice/bars";
 import { requireLoggedInUser, sendAuthError } from "@/lib/requireProUser";
 
 // In-memory cache keyed by symbol+timeframe
@@ -53,19 +54,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     let bars: { time: string | number; open: number; high: number; low: number; close: number; volume: number }[] = [];
 
     if (timeframe === "daily") {
-      // FMP returns newest-first; lightweight-charts needs oldest-first
-      const hist = (raw as { historical?: { date: string; open: number; high: number; low: number; close: number; volume: number }[] }).historical ?? [];
-      bars = hist
-        .slice()
-        .reverse()
-        .map(r => ({
-          time: r.date as string,
-          open: r.open,
-          high: r.high,
-          low: r.low,
-          close: r.close,
-          volume: r.volume,
-        }));
+      bars = parseDailyBars(raw);
     } else {
       // Intraday: [{date: "2024-01-02 09:30:00", ...}], also newest-first
       const intraday = (Array.isArray(raw) ? raw : []) as {

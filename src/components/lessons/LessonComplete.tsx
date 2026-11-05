@@ -14,10 +14,11 @@ export const BLOOMS_PER_LESSON = 5;
 interface Props {
   lesson: Lesson;
   saveState: "saving" | "saved" | "failed";
+  isNew: boolean;
   onRetrySave: () => void;
 }
 
-export function LessonComplete({ lesson, saveState, onRetrySave }: Props) {
+export function LessonComplete({ lesson, saveState, isNew, onRetrySave }: Props) {
   const notice = useBrokerNotice();
   const next = nextLesson(lesson.slug);
   const moduleLessons = lessonsInModule(lesson.moduleId);
@@ -49,7 +50,7 @@ export function LessonComplete({ lesson, saveState, onRetrySave }: Props) {
         You finished <strong className="text-foreground">{lesson.title}</strong>
       </p>
 
-      {saveState === "saved" && (
+      {saveState === "saved" && isNew && (
         <p className="mt-3 inline-block rounded-full bg-accent px-4 py-1.5 text-sm font-semibold text-foreground">
           A new bloom in your garden, worth {BLOOMS_PER_LESSON} points
         </p>
@@ -92,7 +93,7 @@ export function LessonComplete({ lesson, saveState, onRetrySave }: Props) {
           <span className="mt-1 block text-base text-muted-foreground">Every lesson moves you up the learning leaderboard.</span>
         </Link>
 
-        {notice !== "us" && (
+        {notice === "general" && (
           <Link
             href="/brokers"
             className={`block rounded-3xl p-5 transition-transform active:scale-[0.98] ${finishedModule ? "bg-accent/70" : "border border-border"}`}

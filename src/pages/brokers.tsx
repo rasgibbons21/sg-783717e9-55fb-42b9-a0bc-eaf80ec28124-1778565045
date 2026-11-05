@@ -69,7 +69,7 @@ function BrokerEntry({ broker, notice }: { broker: BrokerConfig; notice: BrokerN
           {broker.disclosureRequired && <p className="mt-2 text-xs text-muted-foreground">Bloom may earn a commission if you open an account through this link.</p>}
         </>
       ) : (
-        notice !== "us" && <p className="mt-3 text-sm text-muted-foreground">For information only, so there&apos;s no link here for now.</p>
+        notice === "general" && <p className="mt-3 text-sm text-muted-foreground">For information only, so there&apos;s no link here for now.</p>
       )}
     </article>
   );

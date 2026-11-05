@@ -3,7 +3,8 @@ import { requireLoggedInUser, sendAuthError } from "@/lib/requireProUser";
 import { createClient } from "@supabase/supabase-js";
 import { getServerQuote } from "@/lib/serverQuote";
 import { marginFor, pnlFor } from "@/lib/practice/maths";
-import { MARKET_RESTING_MESSAGE, isMarketOpen } from "@/lib/practice/marketHours";
+import { isMarketOpen, marketRestingMessage } from "@/lib/practice/marketHours";
+import { releaseCash } from "@/lib/practice/cash";
 import { checkTradeAchievements } from "@/lib/achievementChecker";
 
 const supabaseAdmin = createClient(
@@ -33,7 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (tradeErr || !trade) return res.status(404).json({ error: "Open trade not found" });
 
-  if (!isMarketOpen(trade.ticker, new Date())) return res.status(409).json({ error: MARKET_RESTING_MESSAGE });
+  if (!isMarketOpen(trade.ticker, new Date())) return res.status(409).json({ error: marketRestingMessage(trade.ticker) });
 
   // Fresh server-side market fill for the exit — honest close, no client price.
   const quote = await getServerQuote(trade.ticker);
@@ -60,10 +61,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       exit_at: new Date().toISOString(),
     })
     .eq("id", trade_id)
+    .eq("status", "open")
     .select()
-    .single();
+    .maybeSingle();
 
   if (updateErr) return res.status(500).json({ error: updateErr.message });
+  // Another device closed this first, and that close has already paid out.
+  if (!updated) return res.status(200).json({ alreadyClosed: true });
 
   // Auto-journal the closed trade (basic entry — user can enrich via review later)
   const durationMs = new Date(updated.exit_at).getTime() - new Date(trade.created_at).getTime();
@@ -107,19 +111,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const { data: account } = await supabaseAdmin
     .from("practice_account")
-    .select("id, cash_balance")
+    .select("id")
     .eq("user_id", userId)
     .single();
 
-  if (account) {
-    await supabaseAdmin
-      .from("practice_account")
-      .update({
-        cash_balance: Number(account.cash_balance) + credit,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", account.id);
-  }
+  if (account) await releaseCash(supabaseAdmin, account.id, credit);
 
   // Check trade achievements in the background
   const { data: allClosed } = await supabaseAdmin

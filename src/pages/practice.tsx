@@ -11,7 +11,7 @@ import { RiskNote } from "@/components/RiskNote";
 import { Botanical } from "@/components/brand/Botanical";
 import { INSTRUMENTS, getInstrument, type Instrument } from "@/config/instruments";
 import { useSubscription } from "@/contexts/SubscriptionContext";
-import { MARKET_RESTING_MESSAGE } from "@/lib/practice/marketHours";
+import { marketRestingMessage } from "@/lib/practice/marketHours";
 import { marginFor } from "@/lib/practice/maths";
 import { exitReasonAt } from "@/lib/practice/stops";
 import { money, practiceFetch, type PracticeAccount, type PracticeTrade } from "@/lib/practice/api";
@@ -42,6 +42,7 @@ function PracticeDesk() {
   const [bars, setBars] = useState<OHLCBar[]>([]);
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState<string | null>(null);
+  const [confirmingRestart, setConfirmingRestart] = useState(false);
   const closingIds = useRef(new Set<string>());
 
   const open = trades.filter((trade) => trade.status === "open");
@@ -74,7 +75,7 @@ function PracticeDesk() {
         setNotice(reason === "Stopped out" ? "Your stop closed a trade. That's your plan doing its job." : "Your trade is closed and added to your results.");
         await loadAccount();
       } else {
-        setNotice(status === 409 ? MARKET_RESTING_MESSAGE : (data.error ?? "We couldn't close that just now. Your trade is safe, so please try again."));
+        setNotice(status === 409 ? marketRestingMessage(trade.ticker) : (data.error ?? "We couldn't close that just now. Your trade is safe, so please try again."));
       }
     },
     [loadAccount],
@@ -126,6 +127,13 @@ function PracticeDesk() {
       active = false;
     };
   }, [instrument.symbol]);
+
+  const startAgain = async () => {
+    const { ok, data } = await practiceFetch("/api/practice/account", { method: "POST" });
+    setConfirmingRestart(false);
+    setNotice(ok ? "You're starting afresh with your full simulated balance. Past results stay on your record." : (data.error ?? "We couldn't start again just now. Please try again."));
+    if (ok) await loadAccount();
+  };
 
   if (loading) {
     return (
@@ -196,7 +204,7 @@ function PracticeDesk() {
           <p className="font-serif text-2xl font-semibold text-foreground">{price != null ? price.toFixed(instrument.decimals) : "..."}</p>
         </div>
         {priceProblem && <p className="mt-2 text-sm text-foreground">We can&apos;t get a price just now. We&apos;ll keep trying, and nothing can be charged in the meantime.</p>}
-        {!marketOpen && <p className="mt-2 text-sm text-foreground">{MARKET_RESTING_MESSAGE}</p>}
+        {!marketOpen && <p className="mt-2 text-sm text-foreground">{marketRestingMessage(instrument.symbol)}</p>}
         <div className="mt-3 overflow-hidden rounded-2xl">
           {bars.length > 0 ? (
             <DynamicChart data={bars} height={220} />
@@ -252,6 +260,25 @@ function PracticeDesk() {
               );
             })}
           </ul>
+        )}
+      </section>
+
+      <section className="rounded-3xl border border-border p-5" aria-label="Start again">
+        <h2 className="text-lg font-semibold text-foreground">Want a fresh start?</h2>
+        <p className="mt-1 text-base text-muted-foreground">You can restore your simulated balance at any time. Open trades will close with no result, and past results stay on your record.</p>
+        {confirmingRestart ? (
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button onClick={startAgain} className="h-11 rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground transition-transform active:scale-95">
+              Yes, start again
+            </button>
+            <button onClick={() => setConfirmingRestart(false)} className="h-11 rounded-full border border-border px-5 text-sm font-medium text-foreground">
+              Keep going
+            </button>
+          </div>
+        ) : (
+          <button onClick={() => setConfirmingRestart(true)} className="mt-3 h-11 rounded-full border border-primary px-5 text-sm font-semibold text-primary transition-transform active:scale-95">
+            Start again
+          </button>
         )}
       </section>
 

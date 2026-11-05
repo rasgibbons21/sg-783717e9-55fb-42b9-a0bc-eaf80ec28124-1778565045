@@ -2,8 +2,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 let openTrade: Record<string, unknown>;
+let closeWins = true;
 const tradeUpdates: Record<string, unknown>[] = [];
-const accountUpdates: Record<string, unknown>[] = [];
+const statusFilters: unknown[] = [];
+const rpcCalls: { name: string; args: Record<string, unknown> }[] = [];
 const quote = vi.fn();
 const marketOpen = vi.fn();
 
@@ -19,18 +21,29 @@ vi.mock("@/lib/practice/marketHours", async (original) => ({
 }));
 vi.mock("@supabase/supabase-js", () => ({
   createClient: () => ({
+    rpc: async (name: string, args: Record<string, unknown>) => {
+      rpcCalls.push({ name, args });
+      return { data: 0, error: null };
+    },
     from: (table: string) => {
-      const result = () =>
-        table === "practice_account"
-          ? { data: { id: "acct-1", cash_balance: 5000 }, error: null }
-          : { data: { ...openTrade, status: "closed" }, error: null };
+      let updating = false;
       const chain: Record<string, unknown> = {
         select: () => chain,
-        eq: () => chain,
-        maybeSingle: async () => result(),
-        single: async () => (table === "practice_trades" ? { data: openTrade, error: null } : result()),
+        eq: (column: string, value: unknown) => {
+          if (updating && column === "status") statusFilters.push(value);
+          return chain;
+        },
+        maybeSingle: async () =>
+          updating
+            ? { data: closeWins ? { ...openTrade, status: "closed", exit_at: new Date().toISOString() } : null, error: null }
+            : { data: null, error: null },
+        single: async () => {
+          if (table === "practice_trades") return { data: openTrade, error: null };
+          return { data: { id: "acct-1", cash_balance: 5000 }, error: null };
+        },
         update: (row: Record<string, unknown>) => {
-          (table === "practice_account" ? accountUpdates : tradeUpdates).push(row);
+          updating = true;
+          if (table === "practice_trades") tradeUpdates.push(row);
           return chain;
         },
         insert: () => chain,
@@ -65,7 +78,9 @@ function call() {
 describe("closing a practice trade", () => {
   beforeEach(() => {
     tradeUpdates.length = 0;
-    accountUpdates.length = 0;
+    statusFilters.length = 0;
+    rpcCalls.length = 0;
+    closeWins = true;
     marketOpen.mockReset().mockReturnValue(true);
     quote.mockReset();
   });
@@ -76,7 +91,7 @@ describe("closing a practice trade", () => {
     const res = await call();
     expect(res.statusCode).toBe(200);
     expect(tradeUpdates[0]).toMatchObject({ pnl: 50, exit_price: 210 });
-    expect(accountUpdates[0]).toMatchObject({ cash_balance: 6050 });
+    expect(rpcCalls).toEqual([{ name: "practice_release_cash", args: { p_account_id: "acct-1", p_delta: 1050 } }]);
   });
 
   it("releases only the margin on gold, plus the result", async () => {
@@ -84,7 +99,18 @@ describe("closing a practice trade", () => {
     quote.mockResolvedValue({ price: 3990, ts: 1 });
     await call();
     expect(tradeUpdates[0]).toMatchObject({ pnl: 10 });
-    expect(accountUpdates[0]).toMatchObject({ cash_balance: 5210 });
+    expect(rpcCalls[0].args).toEqual({ p_account_id: "acct-1", p_delta: 210 });
+  });
+
+  it("pays out only once when two devices close the same trade", async () => {
+    openTrade = { id: "trade-1", ticker: "XAUUSD", direction: "long", shares: 1, entry_price: 4000, status: "open" };
+    quote.mockResolvedValue({ price: 3950, ts: 1 });
+    closeWins = false;
+    const res = await call();
+    expect(statusFilters).toContain("open");
+    expect(res.statusCode).toBe(200);
+    expect((res.body as { alreadyClosed: boolean }).alreadyClosed).toBe(true);
+    expect(rpcCalls).toHaveLength(0);
   });
 
   it("leaves the trade open and unchanged when no price is available", async () => {
@@ -93,7 +119,7 @@ describe("closing a practice trade", () => {
     const res = await call();
     expect(res.statusCode).toBe(502);
     expect(tradeUpdates).toHaveLength(0);
-    expect(accountUpdates).toHaveLength(0);
+    expect(rpcCalls).toHaveLength(0);
   });
 
   it("waits while the market is resting", async () => {

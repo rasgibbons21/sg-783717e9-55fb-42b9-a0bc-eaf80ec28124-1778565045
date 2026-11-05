@@ -4,7 +4,11 @@ import { createClient } from "@supabase/supabase-js";
 import { getServerQuote } from "@/lib/serverQuote";
 import { getInstrument } from "@/config/instruments";
 import { lotsToUnits, marginFor, pnlFor } from "@/lib/practice/maths";
-import { MARKET_RESTING_MESSAGE, isMarketOpen } from "@/lib/practice/marketHours";
+import { isMarketOpen, marketRestingMessage } from "@/lib/practice/marketHours";
+import { releaseCash, reserveCash } from "@/lib/practice/cash";
+
+const SMALLEST_LOT = 0.01;
+const MOST_RISK_PER_TRADE = 0.2;
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -44,10 +48,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const lotSize = Number(lots);
     const stop = Number(stop_price);
-    if (!(lotSize > 0)) return res.status(400).json({ error: "Please choose a lot size above zero." });
+    if (!(lotSize >= SMALLEST_LOT)) return res.status(400).json({ error: "The smallest size is 0.01 lot." });
     if (!(stop > 0)) return res.status(400).json({ error: "Please choose a stop above zero." });
 
-    if (!isMarketOpen(instrument.symbol, new Date())) return res.status(409).json({ error: MARKET_RESTING_MESSAGE });
+    if (!isMarketOpen(instrument.symbol, new Date())) return res.status(409).json({ error: marketRestingMessage(instrument.symbol) });
 
     const sh = lotsToUnits(instrument.symbol, lotSize);
 
@@ -76,16 +80,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (accErr || !account) return res.status(404).json({ error: "Account not found" });
 
-    // Structured 400 so the ticket can re-quote inline instead of showing a generic error.
-    if (Number(account.cash_balance) < cost)
+    const riskAmount = Math.abs(pnlFor(instrument.symbol, direction, fill, stop, sh));
+    if (riskAmount > Number(account.cash_balance) * MOST_RISK_PER_TRADE)
+      return res.status(400).json({
+        error: "That could lose more than a fifth of your simulated balance on one trade. Try a smaller size or a closer stop.",
+        fill_price: fill,
+      });
+
+    if (!(await reserveCash(supabaseAdmin, account.id, cost)))
       return res.status(400).json({
         error: "That trade needs more simulated money than you have available. Try a smaller size.",
         fill_price: fill,
         cost,
         buying_power: Number(account.cash_balance),
       });
-
-    const riskAmount = Math.abs(pnlFor(instrument.symbol, direction, fill, stop, sh));
 
     const { data: trade, error: tradeErr } = await supabaseAdmin
       .from("practice_trades")
@@ -105,12 +113,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       .select()
       .single();
 
-    if (tradeErr) return res.status(500).json({ error: tradeErr.message });
-
-    await supabaseAdmin
-      .from("practice_account")
-      .update({ cash_balance: Number(account.cash_balance) - cost, updated_at: new Date().toISOString() })
-      .eq("id", account.id);
+    if (tradeErr) {
+      await releaseCash(supabaseAdmin, account.id, cost);
+      return res.status(500).json({ error: "That didn't go through, and nothing has been charged. Please try again." });
+    }
 
     return res.status(201).json({ trade, fill_price: fill, quote_ts: quote.ts });
   }

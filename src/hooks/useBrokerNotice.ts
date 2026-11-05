@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { brokerNotice, type BrokerNotice } from "@/lib/brokers/region";
 
-/** Which availability notice to show. Stays general if the country can't be determined. */
+/** Which availability notice to show. Stays unknown, with no CFD links, if the country can't be determined. */
 export function useBrokerNotice(): BrokerNotice {
-  const [notice, setNotice] = useState<BrokerNotice>("general");
+  const [notice, setNotice] = useState<BrokerNotice>("unknown");
 
   useEffect(() => {
     let active = true;

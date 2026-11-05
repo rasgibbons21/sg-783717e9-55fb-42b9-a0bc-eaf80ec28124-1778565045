@@ -11,20 +11,27 @@ describe("brokerNotice", () => {
     expect(brokerNotice("us")).toBe("us");
   });
 
-  it("gives everyone else the general notice, including when the country is unknown", () => {
+  it("gives other known countries the general notice", () => {
     expect(brokerNotice("GB")).toBe("general");
-    expect(brokerNotice(null)).toBe("general");
-    expect(brokerNotice("")).toBe("general");
+  });
+
+  it("stays unknown when the country can't be determined", () => {
+    expect(brokerNotice(null)).toBe("unknown");
+    expect(brokerNotice("")).toBe("unknown");
   });
 });
 
 describe("canShowOpenButton", () => {
-  it("shows a CFD broker's button outside the US", () => {
+  it("shows a CFD broker's button in a known non-US country", () => {
     expect(canShowOpenButton(broker({}), "general")).toBe(true);
   });
 
   it("hides CFD broker buttons from US visitors", () => {
     expect(canShowOpenButton(broker({}), "us")).toBe(false);
+  });
+
+  it("hides CFD broker buttons until the country is known", () => {
+    expect(canShowOpenButton(broker({}), "unknown")).toBe(false);
   });
 
   it("keeps a US-available stock broker's button for US visitors", () => {

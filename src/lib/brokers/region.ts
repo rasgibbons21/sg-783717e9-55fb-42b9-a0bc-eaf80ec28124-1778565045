@@ -1,14 +1,15 @@
 import type { BrokerConfig } from "@/config/brokers";
 
-export type BrokerNotice = "us" | "general";
+export type BrokerNotice = "us" | "general" | "unknown";
 
 export function brokerNotice(country: string | null): BrokerNotice {
-  return country?.toUpperCase() === "US" ? "us" : "general";
+  if (!country) return "unknown";
+  return country.toUpperCase() === "US" ? "us" : "general";
 }
 
-/** CFD brokers don't generally accept US residents, and a broker with no link has nothing to open. */
+/** CFD brokers don't generally accept US residents, so their links wait until we know the country isn't the US. */
 export function canShowOpenButton(broker: BrokerConfig, notice: BrokerNotice): boolean {
   if (!broker.affiliateUrl) return false;
-  if (notice === "us") return broker.regions?.includes("US") === true;
-  return true;
+  if (notice === "general") return true;
+  return notice === "us" && broker.regions?.includes("US") === true;
 }

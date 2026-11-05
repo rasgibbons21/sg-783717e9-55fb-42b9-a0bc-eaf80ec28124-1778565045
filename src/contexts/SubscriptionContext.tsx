@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from "react";
 import { useRouter } from "next/router";
 import { supabase } from "@/integrations/supabase/client";
+import { isDefinitelySignedOut } from "./authState";
 import { type SubscriptionTier, getEntitlements, type Entitlements } from "@/config/proPlan";
 
 interface SubscriptionContextType {
@@ -44,6 +45,14 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     }
     try {
       const { data: { user }, error } = await supabase.auth.getUser();
+
+      if (error && !isDefinitelySignedOut(error)) {
+        // A network problem isn't a sign-out. Use the session saved on this device.
+        const { data: { session } } = await supabase.auth.getSession();
+        setIsLoggedIn(Boolean(session));
+        setUserId(session?.user.id ?? null);
+        return;
+      }
 
       if (error || !user) {
         setIsLoggedIn(false);

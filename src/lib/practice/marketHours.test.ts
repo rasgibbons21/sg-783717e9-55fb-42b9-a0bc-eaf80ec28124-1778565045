@@ -1,33 +1,60 @@
 import { describe, expect, it } from "vitest";
-import { MARKET_RESTING_MESSAGE, isMarketOpen } from "./marketHours";
+import { isMarketOpen, marketRestingMessage } from "./marketHours";
 
-// 6 November 2026 is a Friday.
 const at = (iso: string) => new Date(iso);
 
-describe("isMarketOpen", () => {
+describe("metals and forex hours", () => {
   it("is open midweek", () => {
     expect(isMarketOpen("XAUUSD", at("2026-11-04T12:00:00Z"))).toBe(true);
   });
 
-  it("closes on Friday evening UTC", () => {
+  it("closes at 5pm New York on Friday, in winter", () => {
     expect(isMarketOpen("XAUUSD", at("2026-11-06T21:59:00Z"))).toBe(true);
     expect(isMarketOpen("XAUUSD", at("2026-11-06T22:30:00Z"))).toBe(false);
+  });
+
+  it("closes an hour earlier in UTC during US daylight saving", () => {
+    expect(isMarketOpen("XAUUSD", at("2026-07-10T20:59:00Z"))).toBe(true);
+    expect(isMarketOpen("XAUUSD", at("2026-07-10T21:30:00Z"))).toBe(false);
   });
 
   it("stays closed on Saturday", () => {
     expect(isMarketOpen("EURUSD", at("2026-11-07T12:00:00Z"))).toBe(false);
   });
 
-  it("reopens on Sunday evening UTC", () => {
+  it("reopens at 5pm New York on Sunday, in winter and in summer", () => {
     expect(isMarketOpen("XAUUSD", at("2026-11-08T21:59:00Z"))).toBe(false);
     expect(isMarketOpen("XAUUSD", at("2026-11-08T22:30:00Z"))).toBe(true);
+    expect(isMarketOpen("XAUUSD", at("2026-07-12T21:30:00Z"))).toBe(true);
+  });
+});
+
+describe("index hours", () => {
+  it("is open during the US trading day", () => {
+    expect(isMarketOpen("US500", at("2026-11-04T15:00:00Z"))).toBe(true);
   });
 
-  it("never blocks closing an older stock position", () => {
+  it("rests before 9:30am and after 4pm New York", () => {
+    expect(isMarketOpen("US500", at("2026-11-04T14:00:00Z"))).toBe(false);
+    expect(isMarketOpen("US30", at("2026-11-04T21:30:00Z"))).toBe(false);
+  });
+
+  it("rests at the weekend", () => {
+    expect(isMarketOpen("US500", at("2026-11-07T15:00:00Z"))).toBe(false);
+  });
+});
+
+describe("older stock positions", () => {
+  it("are never blocked from closing", () => {
     expect(isMarketOpen("AAPL", at("2026-11-07T12:00:00Z"))).toBe(true);
   });
+});
 
-  it("explains the closure kindly", () => {
-    expect(MARKET_RESTING_MESSAGE).toContain("resting");
+describe("marketRestingMessage", () => {
+  it("explains each market's hours kindly", () => {
+    expect(marketRestingMessage("XAUUSD")).toContain("resting");
+    expect(marketRestingMessage("XAUUSD")).toContain("Sunday");
+    expect(marketRestingMessage("US500")).toContain("resting");
+    expect(marketRestingMessage("US500")).toContain("New York");
   });
 });

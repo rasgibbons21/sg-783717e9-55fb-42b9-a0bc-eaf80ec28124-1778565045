@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { fetchAllRows } from "@/lib/fetchAllRows";
 import { displayName, gapToNext, rankRows } from "@/lib/leaderboard/rank";
 
 // Gems are DERIVED, never stored. This module is the single source of truth for
@@ -58,26 +59,28 @@ interface GemTotals {
 }
 
 async function computeAllUsers(): Promise<GemTotals> {
-  const [uniRes, learnRes, profilesRes] = await Promise.all([
-    supabaseAdmin.from("university_lesson_progress").select("user_id"),
-    supabaseAdmin.from("lesson_progress").select("user_id").eq("quiz_completed", true),
-    supabaseAdmin.from("profiles").select("id, challenge_name, full_name, is_review_account, show_on_leaderboard"),
+  const [uniRows, learnRows, profiles] = await Promise.all([
+    fetchAllRows<{ user_id: string }>((from, to) => supabaseAdmin.from("university_lesson_progress").select("user_id").order("id").range(from, to)),
+    fetchAllRows<{ user_id: string }>((from, to) => supabaseAdmin.from("lesson_progress").select("user_id").eq("quiz_completed", true).order("id").range(from, to)),
+    fetchAllRows<{ id: string; challenge_name: string | null; full_name: string | null; is_review_account: boolean | null; show_on_leaderboard: boolean | null }>((from, to) =>
+      supabaseAdmin.from("profiles").select("id, challenge_name, full_name, is_review_account, show_on_leaderboard").order("id").range(from, to),
+    ),
   ]);
 
   const uni = new Map<string, number>();
-  for (const row of uniRes.data ?? []) {
+  for (const row of uniRows) {
     uni.set(row.user_id, (uni.get(row.user_id) ?? 0) + 1);
   }
 
   const learn = new Map<string, number>();
-  for (const row of learnRes.data ?? []) {
+  for (const row of learnRows) {
     learn.set(row.user_id, (learn.get(row.user_id) ?? 0) + 1);
   }
 
   const names = new Map<string, string>();
   const reviewIds = new Set<string>();
   const hiddenIds = new Set<string>();
-  for (const p of profilesRes.data ?? []) {
+  for (const p of profiles) {
     if (p.is_review_account) reviewIds.add(p.id);
     if (p.show_on_leaderboard === false) hiddenIds.add(p.id);
     names.set(p.id, displayName(p));

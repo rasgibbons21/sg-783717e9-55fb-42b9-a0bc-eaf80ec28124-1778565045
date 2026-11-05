@@ -1,37 +1,75 @@
-import { describe, expect, it, vi } from "vitest";
-import { completeLesson } from "./saveProgress";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { completeLesson, flushPendingCompletions, queueCompletion } from "./saveProgress";
 
-function fakeClient(results: { error: unknown }[]) {
-  const upsert = vi.fn(async () => results.shift() ?? { error: null });
-  return { client: { from: vi.fn(() => ({ upsert })) }, upsert };
-}
+vi.mock("@/lib/practice/api", () => ({ practiceFetch: vi.fn() }));
+
+const store = new Map<string, string>();
+
+beforeEach(() => {
+  store.clear();
+  vi.stubGlobal("localStorage", {
+    getItem: (key: string) => store.get(key) ?? null,
+    setItem: (key: string, value: string) => store.set(key, value),
+    removeItem: (key: string) => store.delete(key),
+  });
+});
+
+afterEach(() => vi.unstubAllGlobals());
+
+const ok = () => vi.fn(async () => ({ ok: true, status: 200, data: { isNew: true } }));
+const down = () => vi.fn(async () => ({ ok: false, status: 0, data: { error: "offline" } }));
 
 describe("completeLesson", () => {
-  it("saves once per member and lesson, so repeats can't earn extra blooms", async () => {
-    const { client, upsert } = fakeClient([{ error: null }]);
-    await expect(completeLesson(client as never, "user-1", "what-is-gold-trading", 3)).resolves.toBe(true);
-    expect(client.from).toHaveBeenCalledWith("lesson_progress");
-    const [row, options] = upsert.mock.calls[0] as unknown as [Record<string, unknown>, Record<string, unknown>];
-    expect(row).toMatchObject({
-      user_id: "user-1",
-      lesson_id: "what-is-gold-trading",
-      completed: true,
-      quiz_completed: true,
-      quiz_score: 3,
-    });
-    expect(options).toEqual({ onConflict: "user_id,lesson_id" });
+  it("records the lesson through the server", async () => {
+    const post = ok();
+    await expect(completeLesson("what-is-gold-trading", 3, post)).resolves.toEqual({ saved: true, isNew: true });
+    const [path, options] = post.mock.calls[0] as unknown as [string, { method: string; body: string }];
+    expect(path).toBe("/api/lessons/complete");
+    expect(options.method).toBe("POST");
+    expect(JSON.parse(options.body)).toEqual({ slug: "what-is-gold-trading", score: 3 });
   });
 
   it("retries after a failed save", async () => {
-    const { client, upsert } = fakeClient([{ error: new Error("offline") }, { error: null }]);
-    await expect(completeLesson(client as never, "user-1", "x", 1, 2, 0)).resolves.toBe(true);
-    expect(upsert).toHaveBeenCalledTimes(2);
+    const post = vi.fn().mockResolvedValueOnce({ ok: false, status: 0, data: {} }).mockResolvedValueOnce({ ok: true, status: 200, data: { isNew: false } });
+    await expect(completeLesson("x", 1, post, 2, 0)).resolves.toEqual({ saved: true, isNew: false });
+    expect(post).toHaveBeenCalledTimes(2);
   });
 
   it("reports failure when every retry fails", async () => {
-    const failure = { error: new Error("offline") };
-    const { client, upsert } = fakeClient([failure, failure, failure]);
-    await expect(completeLesson(client as never, "user-1", "x", 1, 2, 0)).resolves.toBe(false);
-    expect(upsert).toHaveBeenCalledTimes(3);
+    const post = down();
+    await expect(completeLesson("x", 1, post, 2, 0)).resolves.toEqual({ saved: false, isNew: false });
+    expect(post).toHaveBeenCalledTimes(3);
+  });
+});
+
+describe("pending completions", () => {
+  it("saves a queued lesson the next time Bloom loads", async () => {
+    queueCompletion("why-gold-moves", 2);
+    const post = ok();
+    await expect(flushPendingCompletions(post, 0, 0)).resolves.toEqual(["why-gold-moves"]);
+    expect(store.size === 0 || store.values().next().value === "{}").toBe(true);
+  });
+
+  it("keeps a lesson queued while the server can't be reached", async () => {
+    queueCompletion("why-gold-moves", 2);
+    await expect(flushPendingCompletions(down(), 0, 0)).resolves.toEqual([]);
+    const post = ok();
+    await expect(flushPendingCompletions(post, 0, 0)).resolves.toEqual(["why-gold-moves"]);
+  });
+
+  it("carries on when storage is unavailable", async () => {
+    vi.stubGlobal("localStorage", {
+      getItem: () => {
+        throw new Error("blocked");
+      },
+      setItem: () => {
+        throw new Error("blocked");
+      },
+      removeItem: () => {
+        throw new Error("blocked");
+      },
+    });
+    expect(() => queueCompletion("x", 1)).not.toThrow();
+    await expect(flushPendingCompletions(ok(), 0, 0)).resolves.toEqual([]);
   });
 });
