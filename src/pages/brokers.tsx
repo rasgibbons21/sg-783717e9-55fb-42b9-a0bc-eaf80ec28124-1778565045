@@ -1,431 +1,170 @@
-import { useState, useCallback } from "react";
+import { ExternalLink, Info } from "lucide-react";
+import Link from "next/link";
 import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
-import { Card } from "@/components/ui/card";
-import {
-  CATEGORIES,
-  getEnabledBrokers,
-  getBrokersByCategory,
-  type BrokerConfig,
-} from "@/config/brokers";
-import BrokerCard from "@/components/BrokerCard";
-import BrokerDetailModal from "@/components/BrokerDetailModal";
-import BrokerComparisonTable from "@/components/BrokerComparisonTable";
-import BrokerHubDisclaimer from "@/components/BrokerHubDisclaimer";
-import BrokerEducationCards from "@/components/BrokerEducationCards";
-import OpenBrokerageGuide from "@/components/OpenBrokerageGuide";
-import FindMyBrokerWizard from "@/components/FindMyBrokerWizard";
-import { useSavedBrokers } from "@/hooks/useSavedBrokers";
+import { RiskNote } from "@/components/RiskNote";
+import { Botanical } from "@/components/brand/Botanical";
+import { brokers, type BrokerConfig } from "@/config/brokers";
+import { useBrokerNotice } from "@/hooks/useBrokerNotice";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  Compass,
-  LayoutGrid,
-  Search,
-  BarChart3,
-  X,
-  Bookmark,
-} from "lucide-react";
+import { trackBrokerClick } from "@/lib/analytics";
+import { canShowOpenButton, type BrokerNotice } from "@/lib/brokers/region";
 
-type ViewMode = "all" | "wizard" | "saved";
-type SortOption = "default" | "name" | "beginner";
+const LOOK_FOR = [
+  { title: "Regulation", body: "Check who regulates the broker for people in your country, and look it up on that regulator's own website." },
+  { title: "A free demo", body: "You should be able to practise with pretend money first, with no deposit." },
+  { title: "Clear costs", body: "Spreads, overnight fees and any commissions should be easy to find." },
+  { title: "Small trade sizes", body: "Being able to trade 0.01 lot keeps your learning gentle." },
+];
 
-const FILTER_CHIPS = [
-  { key: "beginner", label: "Beginner Friendly" },
-  { key: "demo", label: "Demo Available" },
-  { key: "stocks", label: "Stocks" },
-  { key: "forex", label: "Forex" },
-  { key: "crypto", label: "Crypto" },
-  { key: "cfds", label: "CFDs" },
-] as const;
+const GOLD_NOTES: Record<string, { offers: string; note: string }> = {
+  xm: {
+    offers: "Gold, major forex pairs and indices such as the US500, on MetaTrader and its own web and mobile platforms.",
+    note: "Offers a demo account and free educational material, which can suit beginners.",
+  },
+  icmarkets: {
+    offers: "Gold, silver, platinum and palladium, plus forex and indices, on MetaTrader, cTrader and TradingView.",
+    note: "Built more for experienced traders, so its pricing and tools may feel like a lot at first. It now also goes by the name IC.",
+  },
+};
 
-type FilterKey = (typeof FILTER_CHIPS)[number]["key"];
+function recordClick(broker: BrokerConfig) {
+  trackBrokerClick(broker.name);
+  supabase.auth
+    .getSession()
+    .then(({ data: { session } }) => supabase.from("broker_clicks").insert({ broker_name: broker.name, user_id: session?.user?.id ?? null }))
+    .then(undefined, () => undefined);
+}
 
-export default function Brokers() {
-  const [viewMode, setViewMode] = useState<ViewMode>("all");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [activeFilters, setActiveFilters] = useState<Set<FilterKey>>(new Set());
-  const [sortBy, setSortBy] = useState<SortOption>("default");
-  const [detailBroker, setDetailBroker] = useState<BrokerConfig | null>(null);
-  const [compareList, setCompareList] = useState<BrokerConfig[]>([]);
-  const [showComparison, setShowComparison] = useState(false);
-
-  const { savedIds, toggleSave, isSignedIn } = useSavedBrokers();
-  const allBrokers = getEnabledBrokers();
-
-  const toggleFilter = (key: FilterKey) => {
-    setActiveFilters((prev) => {
-      const next = new Set(prev);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
-      return next;
-    });
-  };
-
-  const matchesFilters = useCallback(
-    (broker: BrokerConfig) => {
-      if (searchQuery) {
-        const q = searchQuery.toLowerCase();
-        const haystack = [
-          broker.name,
-          broker.shortDescription,
-          ...broker.bestFor,
-          ...broker.markets,
-          broker.category,
-        ]
-          .join(" ")
-          .toLowerCase();
-        if (!haystack.includes(q)) return false;
-      }
-
-      for (const f of activeFilters) {
-        if (f === "beginner" && !broker.beginnerFriendly) return false;
-        if (f === "demo" && !broker.paperTrading) return false;
-        if (f === "stocks" && !broker.supportedAssets.stocks) return false;
-        if (f === "forex" && !broker.supportedAssets.forex) return false;
-        if (f === "crypto" && !broker.supportedAssets.crypto) return false;
-        if (f === "cfds" && !broker.supportedAssets.cfds) return false;
-      }
-
-      return true;
-    },
-    [searchQuery, activeFilters]
-  );
-
-  const sortBrokers = useCallback(
-    (list: BrokerConfig[]) => {
-      const sorted = [...list];
-      switch (sortBy) {
-        case "name":
-          sorted.sort((a, b) => a.name.localeCompare(b.name));
-          break;
-        case "beginner":
-          sorted.sort((a, b) => (b.beginnerFriendly ? 1 : 0) - (a.beginnerFriendly ? 1 : 0));
-          break;
-        default:
-          break;
-      }
-      return sorted;
-    },
-    [sortBy]
-  );
-
-  const handleCompare = useCallback((broker: BrokerConfig) => {
-    setCompareList((prev) => {
-      if (prev.find((b) => b.id === broker.id)) {
-        return prev.filter((b) => b.id !== broker.id);
-      }
-      if (prev.length >= 3) return prev;
-      return [...prev, broker];
-    });
-  }, []);
-
-  const compareIds = new Set(compareList.map((b) => b.id));
-
-  const trackClick = () => {
-    if (!detailBroker) return;
-    try {
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        supabase.from("broker_clicks").insert({
-          broker_name: detailBroker.name,
-          user_id: session?.user?.id ?? null,
-        });
-      });
-    } catch {}
-  };
-
-  const savedBrokers = allBrokers.filter((b) => savedIds.has(b.id));
+function BrokerEntry({ broker, notice }: { broker: BrokerConfig; notice: BrokerNotice }) {
+  const gold = GOLD_NOTES[broker.id];
+  const showButton = canShowOpenButton(broker, notice);
 
   return (
-    <Layout>
-      <SEO
-        title="Best Brokers for Beginners — Compare Brokerages | Bloom"
-        description="Compare the best online brokers and trading platforms for beginner investors. Take the Find My Broker quiz to match with the right brokerage. See pros, cons, fees, and features side by side. Designed for beginners starting their investing journey."
-      />
-      <div className="container-full py-8 space-y-6 pb-24">
-        {/* ─── Section 1: Header ─── */}
-        <div className="space-y-3">
-          <h1 className="font-serif text-3xl md:text-4xl font-bold text-foreground">
-            Find Your Right Broker
-          </h1>
-          <p className="text-muted-foreground max-w-2xl">
-            Compare brokers and platforms to find the right fit for your goals.
-            Every provider listed here has a confirmed partnership with Bloom.
-          </p>
-        </div>
+    <article className="rounded-3xl bg-card p-5 shadow-[var(--bloom-shadow)]">
+      <h3 className="text-2xl font-semibold text-foreground">{broker.name}</h3>
+      {gold ? (
+        <>
+          <p className="mt-2 text-base leading-relaxed text-foreground">{gold.offers}</p>
+          <p className="mt-2 text-base leading-relaxed text-muted-foreground">{gold.note}</p>
+        </>
+      ) : (
+        <>
+          <p className="mt-2 text-base leading-relaxed text-foreground">{broker.shortDescription}</p>
+          {broker.markets?.length > 0 && <p className="mt-2 text-sm text-muted-foreground">Includes: {broker.markets.join(", ")}</p>}
+        </>
+      )}
 
-        {/* Pansy guidance */}
-        <Card className="p-6 bg-primary/5 border-primary/20 rounded-2xl">
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-xl shrink-0">
-              🌺
-            </div>
-            <div className="space-y-2 flex-1">
-              <p className="font-semibold text-foreground">
-                How to think about choosing a platform
-              </p>
-              <p className="text-sm text-foreground leading-relaxed">
-                The right platform depends on where you are in your journey and
-                what you need. If you&apos;re just starting, look for
-                educational resources and demo accounts. If you&apos;re more
-                experienced, focus on execution speed, available markets, and
-                the tools that fit your strategy. Always check terms, fees, and
-                regional availability on the provider&apos;s website before
-                opening an account.
-              </p>
-              <p className="text-sm font-medium text-primary">— Pansy 🌺</p>
-            </div>
-          </div>
-        </Card>
+      {showButton ? (
+        <>
+          <a
+            href={broker.affiliateUrl}
+            target="_blank"
+            rel="sponsored noopener noreferrer"
+            onClick={() => recordClick(broker)}
+            className="mt-4 inline-flex h-11 items-center gap-2 rounded-full border border-primary px-5 text-sm font-semibold text-primary transition-transform active:scale-95"
+          >
+            Visit {broker.name} <ExternalLink className="h-4 w-4" aria-hidden="true" />
+          </a>
+          {broker.disclosureRequired && <p className="mt-2 text-xs text-muted-foreground">Bloom may earn a commission if you open an account through this link.</p>}
+        </>
+      ) : (
+        notice !== "us" && <p className="mt-3 text-sm text-muted-foreground">For information only, so there&apos;s no link here for now.</p>
+      )}
+    </article>
+  );
+}
 
-        {/* ─── Section 2: Mode toggle ─── */}
-        <div className="flex flex-wrap items-center gap-3">
-          <button
-            onClick={() => setViewMode("all")}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-              viewMode === "all"
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "bg-muted/30 text-muted-foreground hover:bg-muted/50 hover:text-foreground border border-border/50"
-            }`}
-          >
-            <LayoutGrid className="w-4 h-4" />
-            All Platforms
-          </button>
-          <button
-            onClick={() => setViewMode("wizard")}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-              viewMode === "wizard"
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "bg-muted/30 text-muted-foreground hover:bg-muted/50 hover:text-foreground border border-border/50"
-            }`}
-          >
-            <Compass className="w-4 h-4" />
-            Find My Platform
-          </button>
-          {isSignedIn && (
-            <button
-              onClick={() => setViewMode("saved")}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-                viewMode === "saved"
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "bg-muted/30 text-muted-foreground hover:bg-muted/50 hover:text-foreground border border-border/50"
-              }`}
-            >
-              <Bookmark className="w-4 h-4" />
-              Saved ({savedIds.size})
-            </button>
+export default function BrokersPage() {
+  const notice = useBrokerNotice();
+  const byId = (id: string) => brokers.find((broker) => broker.id === id);
+  const featured = [byId("xm"), byId("icmarkets")].filter(Boolean) as BrokerConfig[];
+  const others = brokers.filter((b) => b.active && b.category === "Forex & CFDs" && !featured.includes(b));
+  const tradingView = byId("tradingview");
+  const stocksOnly = brokers.filter((b) => b.active && b.category === "Stocks & ETFs");
+
+  return (
+    <>
+      <SEO title="Free demo accounts - Bloom" description="Learn what a demo account is and what brokers such as XM and IC Markets offer for gold and other markets." />
+      <Layout>
+        <div className="mx-auto max-w-2xl space-y-8 px-4 py-6">
+          <header className="relative overflow-hidden rounded-3xl bg-secondary p-6">
+            <Botanical variant="corner" className="pointer-events-none absolute -right-6 -top-4 h-36 w-28" />
+            <h1 className="max-w-[80%] text-3xl font-semibold leading-tight text-foreground">When you feel ready, try a free demo</h1>
+            <p className="mt-2 max-w-[90%] text-base leading-relaxed text-muted-foreground">
+              A demo account lets you practise on a real broker&apos;s platform with pretend money. There&apos;s no rush, and staying with Bloom&apos;s practice area is always fine.
+            </p>
+          </header>
+
+          {notice === "us" ? (
+            <section role="note" className="flex gap-3 rounded-3xl bg-accent/70 p-5">
+              <Info className="mt-1 h-5 w-5 shrink-0 text-primary" />
+              <div>
+                <h2 className="text-lg font-semibold text-foreground">A note for visitors in the US</h2>
+                <p className="mt-1 text-base leading-relaxed text-foreground">
+                  The gold and CFD brokers below don&apos;t generally accept US residents, so we haven&apos;t included links for you. You can still use all of Bloom&apos;s lessons, Pansy and our practice area, which are free.
+                </p>
+                <Link href="/practice" className="mt-3 inline-flex h-11 items-center rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground">
+                  Go to Practice
+                </Link>
+              </div>
+            </section>
+          ) : (
+            <p className="rounded-2xl bg-accent/60 p-4 text-base text-foreground">Availability depends on your country, so please check that a broker accepts people from where you live.</p>
           )}
-        </div>
 
-        {/* ─── Section 3: Wizard ─── */}
-        {viewMode === "wizard" && (
-          <FindMyBrokerWizard
-            onViewDetail={setDetailBroker}
-            onCompare={handleCompare}
-            compareIds={compareIds}
-            savedIds={savedIds}
-            onToggleSave={isSignedIn ? toggleSave : undefined}
-          />
-        )}
-
-        {/* ─── Section 4: Filter / Search / Sort (all & saved modes) ─── */}
-        {viewMode !== "wizard" && (
-          <>
-            <div className="space-y-3">
-              {/* Search */}
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search brokers..."
-                  className="w-full rounded-xl border border-border/50 bg-muted/20 pl-10 pr-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20"
-                />
-                {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery("")}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                )}
-              </div>
-
-              {/* Filter chips + sort */}
-              <div className="flex flex-wrap items-center gap-2">
-                {FILTER_CHIPS.map((chip) => (
-                  <button
-                    key={chip.key}
-                    onClick={() => toggleFilter(chip.key)}
-                    className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-all ${
-                      activeFilters.has(chip.key)
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted/30 text-muted-foreground border border-border/50 hover:bg-muted/50"
-                    }`}
-                  >
-                    {chip.label}
-                  </button>
-                ))}
-                <div className="ml-auto">
-                  <select
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value as SortOption)}
-                    className="rounded-lg border border-border/50 bg-muted/20 px-3 py-1.5 text-xs text-muted-foreground focus:outline-none focus:border-primary/50"
-                  >
-                    <option value="default">Sort: Default</option>
-                    <option value="name">Sort: Name</option>
-                    <option value="beginner">Sort: Beginner First</option>
-                  </select>
+          <section aria-labelledby="look-for">
+            <h2 id="look-for" className="text-2xl font-semibold text-foreground">What to look for</h2>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              {LOOK_FOR.map((item) => (
+                <div key={item.title} className="rounded-2xl border border-border bg-card p-4">
+                  <h3 className="text-lg font-semibold text-foreground">{item.title}</h3>
+                  <p className="mt-1 text-base text-muted-foreground">{item.body}</p>
                 </div>
-              </div>
+              ))}
             </div>
+          </section>
 
-            {/* ─── Section 5: Broker cards ─── */}
-            {viewMode === "saved" ? (
-              <div className="space-y-4">
-                <h2 className="font-serif text-2xl font-bold text-foreground">
-                  Saved Platforms
-                </h2>
-                {savedBrokers.length === 0 ? (
-                  <Card className="p-8 text-center bg-card/80 border-border/50 rounded-2xl">
-                    <Bookmark className="w-8 h-8 text-muted-foreground/30 mx-auto mb-3" />
-                    <p className="text-muted-foreground">
-                      No saved platforms yet. Tap the bookmark icon on any
-                      platform to save it here.
-                    </p>
-                  </Card>
-                ) : (
-                  <div className="grid gap-6 md:grid-cols-2">
-                    {sortBrokers(savedBrokers.filter(matchesFilters)).map(
-                      (broker) => (
-                        <BrokerCard
-                          key={broker.id}
-                          broker={broker}
-                          isSaved
-                          onToggleSave={toggleSave}
-                          onCompare={handleCompare}
-                          isInCompare={compareIds.has(broker.id)}
-                          onViewDetail={setDetailBroker}
-                        />
-                      )
-                    )}
-                  </div>
-                )}
+          <section aria-labelledby="gold-brokers">
+            <h2 id="gold-brokers" className="text-2xl font-semibold text-foreground">Brokers for gold and more</h2>
+            <div className="mt-3 space-y-3">
+              {[...featured, ...others].map((broker) => (
+                <BrokerEntry key={broker.id} broker={broker} notice={notice} />
+              ))}
+            </div>
+          </section>
+
+          {tradingView && (
+            <section aria-labelledby="learning-tools">
+              <h2 id="learning-tools" className="text-2xl font-semibold text-foreground">A learning tool</h2>
+              <p className="mt-1 text-base text-muted-foreground">Not a broker, but a popular place to look at charts.</p>
+              <div className="mt-3">
+                <BrokerEntry broker={{ ...tradingView, regions: ["US", "Global"] }} notice={notice} />
               </div>
-            ) : (
-              <div className="space-y-10">
-                {CATEGORIES.map((category) => {
-                  const items = sortBrokers(
-                    getBrokersByCategory(category).filter(matchesFilters)
-                  );
-                  if (items.length === 0) return null;
-                  return (
-                    <section key={category} className="space-y-4">
-                      <h2 className="font-serif text-2xl font-bold text-foreground">
-                        {category}
-                      </h2>
-                      <div className="grid gap-6 md:grid-cols-2">
-                        {items.map((broker) => (
-                          <BrokerCard
-                            key={broker.id}
-                            broker={broker}
-                            isSaved={savedIds.has(broker.id)}
-                            onToggleSave={
-                              isSignedIn ? toggleSave : undefined
-                            }
-                            onCompare={handleCompare}
-                            isInCompare={compareIds.has(broker.id)}
-                            onViewDetail={setDetailBroker}
-                          />
-                        ))}
-                      </div>
-                    </section>
-                  );
-                })}
-              </div>
-            )}
-          </>
-        )}
+            </section>
+          )}
 
-        {/* ─── Section 6: How to open a brokerage account ─── */}
-        <OpenBrokerageGuide />
-
-        {/* ─── Section 7: Education cards ─── */}
-        <BrokerEducationCards />
-
-        {/* ─── Section 7: Disclosures ─── */}
-        <BrokerHubDisclaimer />
-
-        {/* Bottom disclaimer */}
-        <Card className="p-4 bg-muted/50 border-border rounded-2xl">
-          <p className="text-xs text-center text-muted-foreground leading-relaxed">
-            Check availability and terms on each provider&apos;s website. Bloom
-            does not guarantee eligibility, rewards, or account approval. This
-            page is for informational purposes only and is not financial advice.
-          </p>
-        </Card>
-      </div>
-
-      {/* ─── Compare tray ─── */}
-      {compareList.length > 0 && (
-        <div className="fixed bottom-0 inset-x-0 z-50 bg-card border-t border-border shadow-2xl px-4 py-3 safe-area-pb">
-          <div className="max-w-3xl mx-auto flex items-center justify-between gap-4">
-            <div className="flex items-center gap-2 min-w-0">
-              <BarChart3 className="w-5 h-5 text-primary shrink-0" />
-              <span className="text-sm font-semibold text-foreground truncate">
-                {compareList.length} platform{compareList.length > 1 ? "s" : ""}{" "}
-                selected
-              </span>
-              <div className="flex gap-1.5 ml-2">
-                {compareList.map((b) => (
-                  <span
-                    key={b.id}
-                    className="rounded-full bg-muted/50 border border-border/50 px-2 py-0.5 text-[10px] text-muted-foreground"
-                  >
-                    {b.name}
-                  </span>
+          {stocksOnly.length > 0 && (
+            <section aria-labelledby="stocks-only">
+              <h2 id="stocks-only" className="text-2xl font-semibold text-foreground">For stocks only</h2>
+              <p className="mt-1 text-base text-muted-foreground">These don&apos;t offer gold CFDs, and aren&apos;t what our lessons cover.</p>
+              <div className="mt-3 space-y-3">
+                {stocksOnly.map((broker) => (
+                  <BrokerEntry key={broker.id} broker={broker} notice={notice} />
                 ))}
               </div>
-            </div>
-            <div className="flex items-center gap-2 shrink-0">
-              <button
-                onClick={() => setShowComparison(true)}
-                disabled={compareList.length < 2}
-                className="rounded-xl bg-primary hover:bg-primary/90 px-4 py-2 text-sm font-semibold text-primary-foreground transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                Compare
-              </button>
-              <button
-                onClick={() => setCompareList([])}
-                className="p-2 rounded-lg hover:bg-muted/50 transition-colors"
-                aria-label="Clear comparison"
-              >
-                <X className="w-4 h-4 text-muted-foreground" />
-              </button>
-            </div>
-          </div>
+            </section>
+          )}
+
+          <section className="rounded-3xl bg-secondary p-5 text-sm leading-relaxed text-muted-foreground">
+            <p>
+              <strong className="text-foreground">How Bloom earns money:</strong> Bloom is free because some of these links pay us a commission if you open an account. It doesn&apos;t cost you anything extra, and it doesn&apos;t change what we teach. Bloom isn&apos;t a broker and doesn&apos;t recommend any particular provider, so please do your own checks.
+            </p>
+          </section>
+
+          <RiskNote />
         </div>
-      )}
-
-      {/* ─── Comparison modal ─── */}
-      {showComparison && (
-        <BrokerComparisonTable
-          brokers={compareList}
-          onRemove={(id) =>
-            setCompareList((prev) => prev.filter((b) => b.id !== id))
-          }
-          onClose={() => setShowComparison(false)}
-        />
-      )}
-
-      {/* ─── Detail drawer ─── */}
-      {detailBroker && (
-        <BrokerDetailModal
-          broker={detailBroker}
-          onClose={() => setDetailBroker(null)}
-          onTrackClick={trackClick}
-        />
-      )}
-    </Layout>
+      </Layout>
+    </>
   );
 }

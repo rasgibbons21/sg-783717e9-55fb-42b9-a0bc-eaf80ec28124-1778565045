@@ -7,6 +7,7 @@ import type { Lesson } from "@/data/lessons-v2/types";
 import { lessonsInModule, nextLesson } from "@/data/lessons-v2";
 import { Botanical } from "@/components/brand/Botanical";
 import { RiskNote } from "@/components/RiskNote";
+import { useBrokerNotice } from "@/hooks/useBrokerNotice";
 
 export const BLOOMS_PER_LESSON = 5;
 
@@ -17,6 +18,7 @@ interface Props {
 }
 
 export function LessonComplete({ lesson, saveState, onRetrySave }: Props) {
+  const notice = useBrokerNotice();
   const next = nextLesson(lesson.slug);
   const moduleLessons = lessonsInModule(lesson.moduleId);
   const finishedModule = moduleLessons[moduleLessons.length - 1]?.slug === lesson.slug;
@@ -90,19 +92,21 @@ export function LessonComplete({ lesson, saveState, onRetrySave }: Props) {
           <span className="mt-1 block text-base text-muted-foreground">Every lesson moves you up the learning leaderboard.</span>
         </Link>
 
-        <Link
-          href="/brokers"
-          className={`block rounded-3xl p-5 transition-transform active:scale-[0.98] ${finishedModule ? "bg-accent/70" : "border border-border"}`}
-        >
-          <span className="block font-serif text-lg font-semibold text-foreground">
-            {finishedModule ? "You've finished this module. Curious about a demo?" : "When you feel ready, try a free demo"}
-          </span>
-          <span className="mt-1 block text-base text-muted-foreground">
-            {finishedModule
-              ? "A demo account lets you try a real broker's platform with pretend money. See what's available in your country, whenever you're ready."
-              : "There's no rush. See how a broker's practice account works."}
-          </span>
-        </Link>
+        {notice !== "us" && (
+          <Link
+            href="/brokers"
+            className={`block rounded-3xl p-5 transition-transform active:scale-[0.98] ${finishedModule ? "bg-accent/70" : "border border-border"}`}
+          >
+            <span className="block font-serif text-lg font-semibold text-foreground">
+              {finishedModule ? "You've finished this module. Curious about a demo?" : "When you feel ready, try a free demo"}
+            </span>
+            <span className="mt-1 block text-base text-muted-foreground">
+              {finishedModule
+                ? "A demo account lets you try a real broker's platform with pretend money. See what's available in your country, whenever you're ready."
+                : "There's no rush. See how a broker's practice account works."}
+            </span>
+          </Link>
+        )}
       </div>
 
       <div className="mt-6 text-left">
