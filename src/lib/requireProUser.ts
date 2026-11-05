@@ -21,31 +21,9 @@ function extractToken(req: NextApiRequest): string | null {
   return auth?.startsWith("Bearer ") ? auth.slice(7) : null;
 }
 
-/**
- * Verifies the Bearer token and confirms the user has an active Pro subscription.
- * Returns the verified user, or 401 (unauthenticated) / 403 (not Pro).
- */
+/** Bloom is free: any signed-in member passes. Kept until callers are renamed. */
 export async function requireProUser(req: NextApiRequest): Promise<AuthResult> {
-  const token = extractToken(req);
-  if (!token) return { error: 401, user: null };
-
-  const { data: { user }, error: userErr } = await supabaseAdmin.auth.getUser(token);
-  if (userErr || !user) return { error: 401, user: null };
-
-  const { data: profile } = await supabaseAdmin
-    .from("profiles")
-    .select("is_pro, subscription_status")
-    .eq("id", user.id)
-    .single();
-
-  if (!profile) return { error: 403, user: null };
-
-  const paidStatuses = new Set(["desk", "pro", "active", "lifetime"]);
-  const hasPaid = paidStatuses.has(profile.subscription_status ?? "") || profile.is_pro === true;
-
-  if (!hasPaid) return { error: 403, user: null };
-
-  return { user, error: null };
+  return requireLoggedInUser(req);
 }
 
 /**

@@ -4,7 +4,6 @@ import Link from "next/link";
 import { Layout } from "@/components/Layout";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { supabase } from "@/integrations/supabase/client";
-import { AdMobBanner } from "@/components/AdMobBanner";
 import { Trophy, Loader2, ArrowLeft, Share2 } from "lucide-react";
 import { useShareAchievement } from "@/components/ShareAchievement";
 
@@ -36,7 +35,7 @@ async function getToken(): Promise<string | null> {
 }
 
 export default function LeaderboardPage() {
-  const { isPaid, isLoggedIn, isLoading: authLoading, userId } = useSubscription();
+  const { isLoggedIn, isLoading: authLoading, userId } = useSubscription();
   const [top, setTop] = useState<LeaderboardRow[]>([]);
   const [me, setMe] = useState<LeaderboardRow | null>(null);
   const [loading, setLoading] = useState(true);
@@ -67,7 +66,6 @@ export default function LeaderboardPage() {
     else if (!authLoading) setLoading(false);
   }, [authLoading, isLoggedIn, fetchLeaderboard]);
 
-  const showAds = !isPaid;
 
   return (
     <>
@@ -102,12 +100,6 @@ export default function LeaderboardPage() {
                 </p>
               </div>
             </div>
-
-            {showAds && (
-              <div className="mb-4">
-                <AdMobBanner format="banner" />
-              </div>
-            )}
 
             {(authLoading || loading) && (
               <div className="flex justify-center py-16">
@@ -234,12 +226,6 @@ export default function LeaderboardPage() {
                     </div>
                   </>
                 )}
-              </div>
-            )}
-
-            {showAds && (
-              <div className="mt-6">
-                <AdMobBanner format="rectangle" />
               </div>
             )}
 

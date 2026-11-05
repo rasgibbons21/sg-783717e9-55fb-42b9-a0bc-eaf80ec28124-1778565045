@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
-import type { GetServerSideProps } from "next";
 import Head from "next/head";
 import Link from "next/link";
 import { Layout } from "@/components/Layout";
@@ -9,12 +8,9 @@ import { OrderTicket } from "@/components/OrderTicket";
 import { ActiveTradeCard } from "@/components/ActiveTradeCard";
 import { RiskRewardCalculator } from "@/components/RiskRewardCalculator";
 import { PositionSizeCalculator } from "@/components/PositionSizeCalculator";
-import { requireProUserSSR } from "@/lib/requireProUserSSR";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { supabase } from "@/integrations/supabase/client";
 import { marketService } from "@/services/marketService";
-import { canShowExternalPayment } from "@/lib/payments";
-import { AdMobBanner } from "@/components/AdMobBanner";
 import {
   TrendingUp, BookOpen, X, AlertTriangle, Plus, Lock, Search,
   Sparkles, NotebookPen, Loader2, Trophy, BarChart3, Globe,
@@ -790,34 +786,11 @@ function ClosedTradeRow({ trade }: { trade: Trade }) {
   );
 }
 
-// ── Pro Upsell Banner (replaces hard gate — free users can still trade) ──
-function ProUpsellBanner() {
-  return (
-    <div className="rounded-xl px-4 py-3 mb-4 flex items-center justify-between" style={{
-      background: "linear-gradient(135deg, rgba(39,183,200,0.15), rgba(73,176,110,0.1))",
-      border: "1px solid rgba(39,183,200,0.25)",
-    }}>
-      <div className="flex items-center gap-2">
-        <Lock className="w-4 h-4" style={{ color: C.accent }} />
-        <span className="text-sm" style={{ color: C.text }}>
-          <span className="font-semibold">Go Pro</span>
-          <span style={{ color: C.textDim }}> — remove ads, unlock advanced lessons</span>
-        </span>
-      </div>
-      <Link href="/subscription" className="text-xs font-semibold px-3 py-1.5 rounded-lg transition-all hover:brightness-110 flex-shrink-0"
-        style={{ background: C.accent, color: C.bg }}>
-        $7.99/mo
-      </Link>
-    </div>
-  );
-}
 
-// ══════════════════════════════════════════════════════════════════════════
 // ── MAIN PAGE ─────────────────────────────────────────────────────────────
 // ══════════════════════════════════════════════════════════════════════════
 export default function PracticePage(_props: PageProps) {
   const { isPaid, isLoading: authLoading, isLoggedIn } = useSubscription();
-  const showAds = !isPaid;
 
   // ── Data state ──────────────────────────────────────────────────────────
   const [account, setAccount] = useState<Account | null>(null);
@@ -983,7 +956,6 @@ export default function PracticePage(_props: PageProps) {
     setTrades(prev => prev.map(t => t.id === trade.id ? data.trade : t));
   };
 
-  const showProUpsell = !authLoading && !isPaid && isLoggedIn;
   const metrics = computeMetrics(account, trades);
 
   // ════════════════════════════════════════════════════════════════════════
@@ -1055,15 +1027,6 @@ export default function PracticePage(_props: PageProps) {
                 <div className="flex flex-col items-center justify-center py-20 gap-4">
                   <Loader2 className="w-8 h-8 animate-spin" style={{ color: C.accent }} />
                   <p className="text-sm" style={{ color: C.textDim }}>Loading your portfolio...</p>
-                </div>
-              )}
-
-              {/* Not Pro */}
-              {/* Pro Upsell + Ad for free users */}
-              {showProUpsell && <ProUpsellBanner />}
-              {showAds && (
-                <div className="mb-4">
-                  <AdMobBanner format="banner" />
                 </div>
               )}
 
@@ -1446,9 +1409,3 @@ export default function PracticePage(_props: PageProps) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-  const result = await requireProUserSSR(req as Parameters<typeof requireProUserSSR>[0]);
-  if (result.status === "not-pro") return { props: {} };
-  if (result.status === "unauthenticated") return { redirect: { destination: "/auth", permanent: false } };
-  return { props: { requiresClientAuth: result.status === "no-cookie" } };
-};

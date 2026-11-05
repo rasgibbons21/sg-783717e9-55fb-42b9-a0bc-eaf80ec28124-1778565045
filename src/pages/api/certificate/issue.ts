@@ -17,18 +17,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
   if (error || !user) return res.status(401).json({ error: "Unauthorized" });
 
-  const { data: profile } = await supabaseAdmin
-    .from("profiles")
-    .select("subscription_status, is_pro")
-    .eq("id", user.id)
-    .single();
-
-  const paidStatuses = new Set(["desk", "pro", "active", "lifetime"]);
-  const hasPaid = paidStatuses.has(profile?.subscription_status ?? "") || profile?.is_pro === true;
-  if (!hasPaid) {
-    return res.status(403).json({ error: "Certificates require an active paid subscription", requiresPaid: true });
-  }
-
   const { course_id, level } = req.body;
   if (!course_id || !level) return res.status(400).json({ error: "Missing course_id or level" });
 

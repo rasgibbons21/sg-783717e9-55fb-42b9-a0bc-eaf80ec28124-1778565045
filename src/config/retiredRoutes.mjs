@@ -32,7 +32,7 @@ const toLessons = [
 const toHome = ["/subscription/:path*", "/subscription-offer", "/ebook-premium", "/refer"];
 
 const toPractice = ["/paper-trader-v2"];
-const toProfile = ["/certificate"];
+const toProfile = ["/certificate", "/more"];
 
 export const RETIRED_ROUTES = [
   ...toLessons.map((source) => ({ source, destination: "/lessons", permanent: true })),

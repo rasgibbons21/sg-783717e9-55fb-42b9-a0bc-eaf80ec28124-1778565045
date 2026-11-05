@@ -30,44 +30,21 @@ export interface Entitlements {
   weeklyRecap: boolean;
 }
 
-const TIER_ENTITLEMENTS: Record<SubscriptionTier, Entitlements> = {
-  free: {
-    tier: "free",
-    maxAlerts: 3,
-    maxSavedScreens: 1,
-    maxJournalEntries: 10,
-    backtestTier: "none",
-    scannerFull: false,
-    paperFull: false,
-    journalAnalytics: false,
-    weeklyRecap: false,
-  },
-  desk: {
-    tier: "desk",
-    maxAlerts: 15,
-    maxSavedScreens: 5,
-    maxJournalEntries: Infinity,
-    backtestTier: "preset",
-    scannerFull: true,
-    paperFull: true,
-    journalAnalytics: false,
-    weeklyRecap: false,
-  },
-  pro: {
-    tier: "pro",
-    maxAlerts: 75,
-    maxSavedScreens: 25,
-    maxJournalEntries: Infinity,
-    backtestTier: "custom",
-    scannerFull: true,
-    paperFull: true,
-    journalAnalytics: true,
-    weeklyRecap: true,
-  },
+// Bloom is completely free, so every member has everything.
+const FULL_ACCESS: Entitlements = {
+  tier: "free",
+  maxAlerts: Infinity,
+  maxSavedScreens: Infinity,
+  maxJournalEntries: Infinity,
+  backtestTier: "none",
+  scannerFull: false,
+  paperFull: true,
+  journalAnalytics: true,
+  weeklyRecap: false,
 };
 
-export function getEntitlements(tier: SubscriptionTier): Entitlements {
-  return TIER_ENTITLEMENTS[tier];
+export function getEntitlements(_tier: SubscriptionTier): Entitlements {
+  return FULL_ACCESS;
 }
 
 export const FEATURE_MATRIX = [

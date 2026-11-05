@@ -1,8 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import type { GetServerSideProps } from "next";
 import Head from "next/head";
 import { Layout } from "@/components/Layout";
-import { requireProUserSSR } from "@/lib/requireProUserSSR";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -14,7 +12,6 @@ import {
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { TickerMark } from "@/components/TickerMark";
-import { canShowExternalPayment } from "@/lib/payments";
 import { ShareCardModal } from "@/components/ShareTradeCard";
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -450,30 +447,6 @@ function EntryCard({ entry, onUpdate, onShare }: { entry: JournalEntry; onUpdate
   );
 }
 
-// ── Pro gate ───────────────────────────────────────────────────────────────
-function ProGate() {
-  return (
-    <div className="flex flex-col items-center justify-center py-20 text-center">
-      <Lock className="w-10 h-10 text-[#27B7C8]/40 mb-4" />
-      <h2 className="font-serif text-xl font-bold text-[#F3EDE3] mb-2">Pro Feature</h2>
-      {canShowExternalPayment ? (
-        <>
-          <p className="text-sm text-[#F3EDE3]/50 mb-6 max-w-xs">
-            The Trade Journal is available to Pro subscribers. Upgrade to track your process and build better habits.
-          </p>
-          <Link href="/subscription-offer"
-            className="px-6 py-3 rounded-xl bg-[#27B7C8] text-[#07080C] font-semibold text-sm hover:bg-[#27B7C8]/90 transition-colors">
-            Upgrade to Pro
-          </Link>
-        </>
-      ) : (
-        <p className="text-sm text-[#F3EDE3]/50 max-w-xs">
-          This feature isn&apos;t available in this version.
-        </p>
-      )}
-    </div>
-  );
-}
 
 // ── Analytics ─────────────────────────────────────────────────────────────
 function JournalAnalytics({ entries }: { entries: JournalEntry[] }) {
@@ -1278,7 +1251,7 @@ function StatsView({ onShareStats }: { onShareStats?: (data: { winRate: number; 
 
 // ── Main Page ──────────────────────────────────────────────────────────────
 export default function JournalPage(_props: PageProps) {
-  const { isPaid, isLoading: authLoading } = useSubscription();
+  const { isLoggedIn: isPaid, isLoading: authLoading } = useSubscription();
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -1320,7 +1293,6 @@ export default function JournalPage(_props: PageProps) {
     setEntries(prev => prev.map(e => e.id === updated.id ? updated : e));
   };
 
-  const showProGate = !authLoading && !isPaid;
 
   // Stats
   const totalTrades = entries.length;
@@ -1388,8 +1360,6 @@ export default function JournalPage(_props: PageProps) {
               <span className="text-sm text-[#F3EDE3]/50">Loading journal…</span>
             </div>
           )}
-
-          {showProGate && <ProGate />}
 
           {!loading && !authLoading && isPaid && error && tab === "journal" && (
             <div className="rounded-xl bg-[#ef4444]/10 border border-[#ef4444]/20 px-4 py-3 text-sm text-[#ef4444] mb-4">
@@ -1526,9 +1496,3 @@ export default function JournalPage(_props: PageProps) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-  const result = await requireProUserSSR(req as Parameters<typeof requireProUserSSR>[0]);
-  if (result.status === "not-pro") return { props: {} };
-  if (result.status === "unauthenticated") return { redirect: { destination: "/auth", permanent: false } };
-  return { props: { requiresClientAuth: result.status === "no-cookie" } };
-};
