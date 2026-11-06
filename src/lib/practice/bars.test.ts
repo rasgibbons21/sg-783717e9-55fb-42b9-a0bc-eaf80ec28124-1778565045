@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseDailyBars } from "./bars";
+import { parseDailyBars, toCandles } from "./bars";
 
 const newer = { date: "2026-11-04", open: 2, high: 3, low: 1, close: 2, volume: 5 };
 const older = { date: "2026-11-03", open: 1, high: 2, low: 1, close: 2, volume: 4 };
@@ -20,5 +20,21 @@ describe("parseDailyBars", () => {
 
   it("treats missing volume as zero, since gold and forex may have none", () => {
     expect(parseDailyBars([{ date: "2026-11-03", open: 1, high: 2, low: 1, close: 2 }])[0].volume).toBe(0);
+  });
+});
+
+describe("toCandles", () => {
+  it("turns daily dates and intraday seconds into chart candles", () => {
+    const candles = toCandles([
+      { time: "2026-11-03", open: 1, high: 2, low: 0.5, close: 1.5, volume: 10 },
+      { time: 1793800000, open: 1.5, high: 2.5, low: 1, close: 2, volume: 12 },
+    ]);
+    expect(candles[0].time).toBe(Date.UTC(2026, 10, 3) / 1000);
+    expect(candles[1].time).toBe(1793800000);
+    expect(candles[1].volume).toBe(12);
+  });
+
+  it("drops bars with missing prices instead of drawing broken candles", () => {
+    expect(toCandles([{ time: 1, open: Number.NaN, high: 2, low: 1, close: 1.5, volume: 1 }])).toEqual([]);
   });
 });

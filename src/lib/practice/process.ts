@@ -4,8 +4,8 @@ export interface PlannedTrade {
   entry_price: number;
   stop_price: number | null;
   target_price: number | null;
-  risk_pct: number | null;
-  thesis: string | null;
+  risk_pct?: number | null;
+  thesis?: string | null;
   direction: "long" | "short";
 }
 

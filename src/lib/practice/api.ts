@@ -20,6 +20,10 @@ export interface PracticeTrade {
   status: "open" | "closed";
   entry_at: string;
   exit_at: string | null;
+  thesis?: string | null;
+  setup_type?: string | null;
+  timeframe?: string | null;
+  risk_pct?: number | null;
 }
 
 /** Calls a signed-in Bloom API, returning the parsed body and whether it succeeded. */
