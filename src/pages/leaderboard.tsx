@@ -65,7 +65,7 @@ function toBoard<T>(view: View<T>, convert: (row: T) => BoardRow): Board {
 const signedMoney = (value: number) => `${value >= 0 ? "+" : "-"}${money(Math.abs(value))}`;
 
 function BoardRows({ board, tab, userId }: { board: Board; tab: Tab; userId: string | null }) {
-  const format = (value: number) => (tab === "learning" ? `${value} blooms` : signedMoney(value));
+  const format = (value: number) => (tab === "learning" ? `${value} points` : signedMoney(value));
 
   if (board.rows.length === 0) {
     return (
@@ -147,7 +147,7 @@ export default function LeaderboardPage() {
       emoji: "🌸",
       stats: [
         { label: "Place", value: `${me.rank}` },
-        tab === "learning" ? { label: "Blooms", value: `${me.value}` } : { label: "Simulated gains", value: signedMoney(me.value) },
+        tab === "learning" ? { label: "Points", value: `${me.value}` } : { label: "Simulated gains", value: signedMoney(me.value) },
       ],
     });
   };
@@ -193,7 +193,7 @@ export default function LeaderboardPage() {
               </div>
 
               <p className="text-center text-sm text-muted-foreground">
-                {tab === "learning" ? "Earn blooms by finishing lessons." : "Simulated money, real practice. Ranked by results from closed practice trades."}
+                {tab === "learning" ? "Earn points by finishing lessons." : "Simulated money, real practice. Ranked by results from closed practice trades."}
               </p>
 
               {failed && (
@@ -221,10 +221,10 @@ export default function LeaderboardPage() {
                         ) : (
                           <p className="font-serif text-2xl font-semibold text-foreground">You&apos;re number {me.rank}</p>
                         )}
-                        <p className="text-base text-foreground">{tab === "learning" ? `${me.value} blooms` : `${signedMoney(me.value)} simulated`}</p>
+                        <p className="text-base text-foreground">{tab === "learning" ? `${me.value} points` : `${signedMoney(me.value)} simulated`}</p>
                         {board.gap != null && !board.hidden && (
                           <p className="mt-1 text-sm text-muted-foreground">
-                            {tab === "learning" ? `${board.gap} more blooms to reach the next place.` : `${money(board.gap)} of simulated gains to reach the next place.`}
+                            {tab === "learning" ? `${board.gap} more points to reach the next place.` : `${money(board.gap)} of simulated gains to reach the next place.`}
                           </p>
                         )}
                         {board.gap == null && !board.hidden && <p className="mt-1 text-sm text-muted-foreground">You&apos;re at the top. How lovely.</p>}

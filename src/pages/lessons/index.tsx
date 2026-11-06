@@ -77,10 +77,10 @@ export default function LessonsPage() {
           {finishedCount === ALL_LESSONS.length && (
             <div className="mt-8 rounded-3xl bg-accent/60 p-5">
               <h2 className="text-xl font-semibold text-foreground">You&apos;ve finished every lesson</h2>
-              <p className="mt-1 text-base text-muted-foreground">Keep practising, or look at a free demo account when you feel ready.</p>
+              <p className="mt-1 text-base text-muted-foreground">Keep sharpening your process in Practice, or see where to practise for real when you feel ready.</p>
               <div className="mt-3 flex flex-wrap gap-2">
                 <Link href="/practice" className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground">Go to Practice</Link>
-                <Link href="/brokers" className="rounded-full border border-primary px-4 py-2 text-sm font-semibold text-primary">See demo accounts</Link>
+                <Link href="/brokers" className="rounded-full border border-primary px-4 py-2 text-sm font-semibold text-primary">Where to practise for real</Link>
               </div>
             </div>
           )}

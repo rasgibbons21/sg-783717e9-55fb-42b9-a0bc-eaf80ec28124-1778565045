@@ -19,8 +19,8 @@ export default function LandingPage() {
   return (
     <>
       <SEO
-        title="Bloom - Learn gold & markets from zero. Free."
-        description="A warm, free place for women to learn gold trading and other markets, with interactive lessons, safe practice and Pansy beside you. No card, no upgrades."
+        title="Bloom - Learn to read stocks with skill. Free."
+        description="A free, premium place for women to learn stock analysis: fair value gaps, structure and liquidity, through interactive chart lessons and safe practice. No card, nothing to pay."
       />
       <Layout>
         {confirmationFailed && (

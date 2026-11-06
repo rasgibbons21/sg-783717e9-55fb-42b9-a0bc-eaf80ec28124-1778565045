@@ -43,6 +43,20 @@ describe("copy sweep", () => {
     expect(offenders).toEqual([]);
   });
 
+  it("talks about points, not blooms", () => {
+    const offenders = files.flatMap((file) =>
+      readableText(fs.readFileSync(file, "utf8"))
+        // "Bloom" the brand is fine; "blooms" as a points unit isn't.
+        .filter((text) => /\b[Bb]looms\b|\b(a|new|your) bloom\b/.test(text))
+        .map((text) => `${file}: ${text.slice(0, 80)}`),
+    );
+    expect(offenders).toEqual([]);
+  });
+
+  it("opens with the stock headline", () => {
+    expect(fs.readFileSync("src/components/home/SignedOutHero.tsx", "utf8")).toContain("Learn to read stocks with skill. Free.");
+  });
+
   it("has no garden visuals left", () => {
     const offenders = files.filter((file) => GARDEN_IMPORTS.test(fs.readFileSync(file, "utf8")));
     expect(offenders).toEqual([]);
