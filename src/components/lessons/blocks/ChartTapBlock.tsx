@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { LessonBlock } from "@/data/lessons-v2/types";
+import type { LessonBlock } from "@/data/lessons-stocks/types";
 import { Feedback } from "./Feedback";
 
 type ChartData = Extract<LessonBlock, { type: "chartTap" }>;

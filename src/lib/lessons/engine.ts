@@ -1,4 +1,4 @@
-import type { LessonBlock, SliderOutcomeKey } from "@/data/lessons-v2/types";
+import type { LessonBlock, SliderOutcomeKey } from "@/data/lessons-stocks/types";
 
 const READING_BLOCKS: LessonBlock["type"][] = ["text", "pansy"];
 const OUNCES_PER_LOT = 100;

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { LessonBlock } from "@/data/lessons-v2/types";
+import type { LessonBlock } from "@/data/lessons-stocks/types";
 import { sliderOutcome } from "@/lib/lessons/engine";
 
 type SliderData = Extract<LessonBlock, { type: "slider" }>;

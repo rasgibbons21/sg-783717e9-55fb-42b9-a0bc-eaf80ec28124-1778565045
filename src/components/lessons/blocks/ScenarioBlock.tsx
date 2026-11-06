@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import type { LessonBlock } from "@/data/lessons-v2/types";
+import type { LessonBlock } from "@/data/lessons-stocks/types";
 import { cn } from "@/lib/utils";
 import { Feedback } from "./Feedback";
 

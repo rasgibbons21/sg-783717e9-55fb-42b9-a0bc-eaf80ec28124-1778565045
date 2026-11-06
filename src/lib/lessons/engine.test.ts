@@ -32,6 +32,12 @@ describe("advancing", () => {
     expect(canAdvance({ type: "pansy", body: "x" }, false)).toBe(true);
   });
 
+  it("treats every chart exercise as interactive", () => {
+    const chart = { timeframes: [], initial: "5m" };
+    expect(isInteractive({ type: "chartFind", prompt: "", chart, answer: [], explanation: "" })).toBe(true);
+    expect(isInteractive({ type: "chartPlan", prompt: "", chart, direction: "long", entryZone: { top: 1, bottom: 0 }, invalidation: 0, minRR: 1.5, explanation: "" })).toBe(true);
+  });
+
   it("holds interactive blocks until answered", () => {
     const quiz = { type: "quiz" as const, q: "?", options: ["a", "b"], correct: 0, explanation: "x" };
     expect(isInteractive(quiz)).toBe(true);

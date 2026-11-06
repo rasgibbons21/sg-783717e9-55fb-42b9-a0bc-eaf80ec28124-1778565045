@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import type { Lesson, LessonBlock } from "@/data/lessons-v2/types";
+import type { Lesson, LessonBlock } from "@/data/lessons-stocks/types";
 import { canAdvance, isInteractive, loadResume, saveResume } from "@/lib/lessons/engine";
 import { clearCompletion, completeLesson, queueCompletion } from "@/lib/lessons/saveProgress";
 import { useSubscription } from "@/contexts/SubscriptionContext";
@@ -11,6 +11,11 @@ import { ScenarioBlock } from "./blocks/ScenarioBlock";
 import { SliderBlock } from "./blocks/SliderBlock";
 import { OrderBlock } from "./blocks/OrderBlock";
 import { ChartTapBlock } from "./blocks/ChartTapBlock";
+import { ChartFindBlock } from "./blocks/ChartFindBlock";
+import { ChartZoneBlock } from "./blocks/ChartZoneBlock";
+import { ChartVolumeBlock } from "./blocks/ChartVolumeBlock";
+import { ChartTimeframeBlock } from "./blocks/ChartTimeframeBlock";
+import { ChartPlanBlock } from "./blocks/ChartPlanBlock";
 import { LessonComplete } from "./LessonComplete";
 
 type SaveState = "saving" | "saved" | "failed";
@@ -31,6 +36,16 @@ function Block({ block, onAnswered }: { block: LessonBlock; onAnswered: (firstTr
       return <OrderBlock block={block} onAnswered={onAnswered} />;
     case "chartTap":
       return <ChartTapBlock block={block} onAnswered={onAnswered} />;
+    case "chartFind":
+      return <ChartFindBlock block={block} onAnswered={onAnswered} />;
+    case "chartZone":
+      return <ChartZoneBlock block={block} onAnswered={onAnswered} />;
+    case "chartVolume":
+      return <ChartVolumeBlock block={block} onAnswered={onAnswered} />;
+    case "chartTimeframe":
+      return <ChartTimeframeBlock block={block} onAnswered={onAnswered} />;
+    case "chartPlan":
+      return <ChartPlanBlock block={block} onAnswered={onAnswered} />;
   }
 }
 

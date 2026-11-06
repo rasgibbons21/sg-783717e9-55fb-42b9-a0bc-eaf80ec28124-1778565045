@@ -4,7 +4,7 @@ import Link from "next/link";
 import confetti from "canvas-confetti";
 import { motion } from "framer-motion";
 import { ArrowRight, Loader2 } from "lucide-react";
-import type { Lesson } from "@/data/lessons-v2/types";
+import type { Lesson } from "@/data/lessons-stocks/types";
 import { lessonsInModule, nextLesson } from "@/data/lessons-v2";
 import { RiskNote } from "@/components/RiskNote";
 import { useBrokerNotice } from "@/hooks/useBrokerNotice";
