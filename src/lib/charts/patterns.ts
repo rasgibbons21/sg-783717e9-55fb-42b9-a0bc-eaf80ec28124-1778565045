@@ -37,7 +37,8 @@ function random(seed: number): () => number {
 
 const round = (value: number) => Math.round(value * 100) / 100;
 
-const QUIET: Row[] = Array.from({ length: 10 }, () => [100, 100.2, 99.8, 100, 100]);
+// Small alternating bodies inside an identical high and low, so the lead-in has no swings or gaps.
+const QUIET: Row[] = Array.from({ length: 10 }, (_, i) => (i % 2 === 0 ? [99.92, 100.2, 99.8, 100.08, 100] : [100.08, 100.2, 99.8, 99.92, 100]));
 
 /** Flips a template upside down around 100, turning a bullish pattern into its bearish twin. */
 function mirror(rows: Row[]): Row[] {
