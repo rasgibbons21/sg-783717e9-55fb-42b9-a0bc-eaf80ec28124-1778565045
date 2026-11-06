@@ -5,8 +5,10 @@ import { describe, expect, it } from "vitest";
 const ROOTS = ["src/pages", "src/components"];
 const SKIP = [/[\\/]api[\\/]/, /[\\/]ui[\\/]/, /refund-policy\.tsx$/, /\.test\.tsx?$/, /[\\/]admin/, /PansyStory\.tsx$/];
 
-const BANNED_WORDS = /\b(signals?|scanners?|gap[- ]and[- ]go|screener|upgrade|free trial|go pro|pro plan|bloom pro|setups?|trading desk|watchlist)\b/i;
-const DARK_COLOURS = /#(07080C|0C1016|121821|171E28|0E1B30|06060a|F3EDE3|27B7C8)\b/i;
+// "Setup" is allowed now: the stock curriculum teaches named setups and Practice records which one was used.
+const BANNED_WORDS = /\b(signals?|scanners?|gap[- ]and[- ]go|screener|upgrade|free trial|go pro|pro plan|bloom pro|trading desk|watchlist)\b/i;
+const OLD_THEMES = /#(07080C|0C1016|121821|171E28|0E1B30|06060a|F3EDE3|27B7C8|3F4F3E|EFD9D3|B98A72|C2A15A|E6ECE3|8A5B44)\b/i;
+const GARDEN_IMPORTS = /from\s+["']@\/components\/(brand\/Botanical|BloomGarden)["']/;
 
 function sourceFiles(dir: string): string[] {
   return fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
@@ -36,8 +38,13 @@ describe("copy sweep", () => {
     expect(offenders).toEqual([]);
   });
 
-  it("has no leftover dark theme colours", () => {
-    const offenders = files.filter((file) => DARK_COLOURS.test(fs.readFileSync(file, "utf8")));
+  it("has no colours left from the old dark or soft-garden themes", () => {
+    const offenders = files.filter((file) => OLD_THEMES.test(fs.readFileSync(file, "utf8")));
+    expect(offenders).toEqual([]);
+  });
+
+  it("has no garden visuals left", () => {
+    const offenders = files.filter((file) => GARDEN_IMPORTS.test(fs.readFileSync(file, "utf8")));
     expect(offenders).toEqual([]);
   });
 });

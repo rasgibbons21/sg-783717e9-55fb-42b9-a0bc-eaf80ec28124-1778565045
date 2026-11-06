@@ -9,9 +9,9 @@ export default function Document() {
         
         {/* PWA Meta Tags */}
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#FBF8F2" />
+        <meta name="theme-color" content="#0C0D0B" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="Bloom" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         

@@ -1,6 +1,6 @@
 const PETALS = [0, 72, 144, 216, 288];
 
-/** Five soft petals around a gold centre, used wherever the Bloom name appears. */
+/** A fine-line geometric bloom in gold, used wherever the Bloom name appears. */
 export function BloomMark({ size = 32 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 40 40" role="img" aria-label="Bloom">
@@ -8,16 +8,16 @@ export function BloomMark({ size = 32 }: { size?: number }) {
         <ellipse
           key={angle}
           cx="20"
-          cy="10.5"
-          rx="6.5"
-          ry="9.5"
-          fill="var(--bloom-blush)"
-          stroke="var(--bloom-clay)"
-          strokeWidth="0.75"
+          cy="11.5"
+          rx="5.5"
+          ry="9"
+          fill="none"
+          stroke="var(--bloom-gold)"
+          strokeWidth="1.1"
           transform={`rotate(${angle} 20 20)`}
         />
       ))}
-      <circle cx="20" cy="20" r="4.5" fill="var(--bloom-gold)" />
+      <circle cx="20" cy="20" r="2.2" fill="var(--bloom-gold)" />
     </svg>
   );
 }
