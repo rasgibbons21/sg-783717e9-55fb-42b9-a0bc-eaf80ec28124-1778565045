@@ -18,6 +18,7 @@ interface BoardRow {
   name: string;
   rank: number;
   value: number;
+  process?: number;
 }
 
 interface Board {
@@ -41,6 +42,7 @@ interface PracticeRow {
   display_name: string;
   rank: number;
   total_pnl: number;
+  avg_process?: number;
 }
 
 interface View<T> {
@@ -51,7 +53,7 @@ interface View<T> {
 }
 
 const fromLearning = (row: LearningRow): BoardRow => ({ id: row.user_id, name: row.challenge_name, rank: row.rank, value: row.gems });
-const fromPractice = (row: PracticeRow): BoardRow => ({ id: row.user_id, name: row.display_name, rank: row.rank, value: row.total_pnl });
+const fromPractice = (row: PracticeRow): BoardRow => ({ id: row.user_id, name: row.display_name, rank: row.rank, value: row.total_pnl, process: row.avg_process });
 
 function toBoard<T>(view: View<T>, convert: (row: T) => BoardRow): Board {
   return {
@@ -101,7 +103,10 @@ function BoardRows({ board, tab, userId }: { board: Board; tab: Tab; userId: str
             {row.name}
             {row.id === userId && <span className="ml-1 text-sm font-normal text-muted-foreground">(you)</span>}
           </span>
-          <span className={cn("shrink-0 font-medium", tab === "practice" && row.value < 0 ? "text-[var(--bloom-blush)]" : "text-primary")}>{format(row.value)}</span>
+          <span className="shrink-0 text-right">
+            <span className={cn("block font-medium", tab === "practice" && row.value < 0 ? "text-[var(--bloom-blush)]" : "text-primary")}>{format(row.value)}</span>
+            {tab === "practice" && row.process !== undefined && <span className="block text-xs text-muted-foreground">Process {row.process}</span>}
+          </span>
         </li>
       ))}
     </ol>
@@ -176,7 +181,7 @@ export default function LeaderboardPage() {
                 {(
                   [
                     ["learning", "Learning"],
-                    ["practice", "Practice gains"],
+                    ["practice", "Practice gains (stocks)"],
                   ] as const
                 ).map(([value, label]) => (
                   <motion.button
@@ -193,7 +198,7 @@ export default function LeaderboardPage() {
               </div>
 
               <p className="text-center text-sm text-muted-foreground">
-                {tab === "learning" ? "Earn points by finishing lessons." : "Simulated money, real practice. Ranked by results from closed practice trades."}
+                {tab === "learning" ? "Earn points by finishing lessons." : "Simulated money, real practice. Ranked by results from closed stock trades, with each member's average process score."}
               </p>
 
               {failed && (
