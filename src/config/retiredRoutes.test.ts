@@ -27,6 +27,13 @@ describe("RETIRED_ROUTES", () => {
     }
   });
 
+  it("sends the old gold lessons to the lessons page, but keeps lessons that still exist", () => {
+    const gold = RETIRED_ROUTES.find((r) => r.source === "/lessons/what-is-gold-trading");
+    expect(gold?.destination).toBe("/lessons");
+    expect(sources).toContain("/lessons/silver-and-other-metals");
+    expect(sources).not.toContain("/lessons/support-and-resistance");
+  });
+
   it("no destination is itself retired", () => {
     for (const route of RETIRED_ROUTES) {
       expect(sources).not.toContain(route.destination);

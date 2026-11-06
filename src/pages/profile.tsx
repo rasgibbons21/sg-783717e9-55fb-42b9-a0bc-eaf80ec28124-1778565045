@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
+import { ProgressLine } from "@/components/ProgressLine";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { motion } from "framer-motion";
 import { Award, Loader2 } from "lucide-react";
 import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
-import { BloomGarden } from "@/components/BloomGarden";
 import { RiskNote } from "@/components/RiskNote";
 import { Switch } from "@/components/ui/switch";
 import { useSubscription } from "@/contexts/SubscriptionContext";
-import { ALL_LESSONS, hasFinishedCourse } from "@/data/lessons-v2";
+import { ALL_LESSONS, MODULES, hasFinishedCourse, lessonsInModule } from "@/data/lessons-stocks";
+import { processScore } from "@/lib/practice/process";
 import { useLearningProgress } from "@/hooks/useLearningProgress";
 import { supabase } from "@/integrations/supabase/client";
 import { money, practiceFetch, type PracticeAccount, type PracticeTrade } from "@/lib/practice/api";
@@ -27,6 +28,7 @@ interface PracticeSummary {
   balance: number;
   closedCount: number;
   result: number;
+  averageProcess: number | null;
 }
 
 export default function ProfilePage() {
@@ -72,6 +74,9 @@ export default function ProfilePage() {
           balance: Number(accountRes.data.account.cash_balance) + reserved,
           closedCount: closed.length,
           result: closed.reduce((sum, trade) => sum + Number(trade.pnl ?? 0), 0),
+          averageProcess: closed.some((t) => t.setup_type)
+            ? Math.round(closed.filter((t) => t.setup_type).reduce((sum, t) => sum + processScore(t), 0) / closed.filter((t) => t.setup_type).length)
+            : null,
         });
       }
     })();
@@ -125,18 +130,22 @@ export default function ProfilePage() {
             </header>
 
             <section className="rounded-3xl bg-secondary p-5" aria-labelledby="progress-heading">
-              <h2 id="progress-heading" className="text-xl font-semibold text-foreground">Your garden</h2>
+              <h2 id="progress-heading" className="text-xl font-semibold text-foreground">Your progress</h2>
               <p className="mt-1 text-base text-muted-foreground">
-                {finishedCount === 0 ? "Your first bloom is one lesson away." : `${finishedCount} of ${ALL_LESSONS.length} lessons finished.`}
+                {finishedCount === 0 ? "Your first lesson is waiting." : `${finishedCount} of ${ALL_LESSONS.length} lessons finished.`}
               </p>
-              <div className="mt-3">
-                <BloomGarden completedCount={finishedCount} total={ALL_LESSONS.length} />
+              <div className="mt-4 space-y-4">
+                {MODULES.map((mod) => {
+                  const inModule = lessonsInModule(mod.id);
+                  const done = inModule.filter((lesson) => completed.includes(lesson.slug)).length;
+                  return <ProgressLine key={mod.id} done={done} total={inModule.length} label={mod.title} />;
+                })}
               </div>
               <Link href="/lessons" className="mt-3 inline-block text-sm font-semibold text-primary underline underline-offset-2">
                 Go to lessons
               </Link>
               {hasFinishedCourse(completed) && (
-                <Link href="/app/certificate?course=gold-foundations&level=beginner" className="mt-4 flex items-center gap-2 rounded-2xl bg-card p-4 font-semibold text-foreground">
+                <Link href="/app/certificate?course=stock-analysis-foundations&level=beginner" className="mt-4 flex items-center gap-2 rounded-2xl bg-card p-4 font-semibold text-foreground">
                   <Award className="h-5 w-5 text-primary" /> See your certificate
                 </Link>
               )}
@@ -145,7 +154,7 @@ export default function ProfilePage() {
             <section className="rounded-3xl bg-card p-5 shadow-[var(--bloom-shadow)]" aria-labelledby="practice-heading">
               <h2 id="practice-heading" className="text-xl font-semibold text-foreground">Your practice</h2>
               {summary ? (
-                <dl className="mt-3 grid grid-cols-3 gap-2 text-center">
+                <dl className="mt-3 grid grid-cols-2 gap-3 text-center sm:grid-cols-4">
                   <div>
                     <dt className="text-xs text-muted-foreground">Simulated balance</dt>
                     <dd className="font-serif text-lg font-semibold text-foreground">{money(summary.balance)}</dd>
@@ -156,10 +165,14 @@ export default function ProfilePage() {
                   </div>
                   <div>
                     <dt className="text-xs text-muted-foreground">Results</dt>
-                    <dd className={`font-serif text-lg font-semibold ${summary.result >= 0 ? "text-primary" : "text-[#8A5B44]"}`}>
+                    <dd className={`font-serif text-lg font-semibold ${summary.result >= 0 ? "text-primary" : "text-[var(--bloom-blush)]"}`}>
                       {summary.result >= 0 ? "+" : "-"}
                       {money(Math.abs(summary.result))}
                     </dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs text-muted-foreground">Average process</dt>
+                    <dd className="font-serif text-lg font-semibold text-[var(--bloom-gold)]">{summary.averageProcess ?? "-"}</dd>
                   </div>
                 </dl>
               ) : (

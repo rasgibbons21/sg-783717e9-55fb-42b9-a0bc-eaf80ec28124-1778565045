@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getInstrument } from "@/config/instruments";
+import { FEED_TIMEFRAME } from "@/config/setups";
 import { parseDailyBars } from "@/lib/practice/bars";
 import { requireLoggedInUser, sendAuthError } from "@/lib/requireProUser";
 
@@ -21,7 +22,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });
 
-  const { ticker, timeframe = "daily" } = req.query as Record<string, string>;
+  const { ticker, timeframe: requested = "daily" } = req.query as Record<string, string>;
+  const timeframe = FEED_TIMEFRAME[requested as keyof typeof FEED_TIMEFRAME] ?? requested;
   if (!ticker) return res.status(400).json({ error: "ticker required" });
 
   const sym = encodeURIComponent(getInstrument(ticker)?.feedSymbol ?? ticker.toUpperCase().trim());

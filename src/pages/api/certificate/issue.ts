@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { hasFinishedCourse } from "@/data/lessons-v2";
+import { hasFinishedCourse } from "@/data/lessons-stocks";
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseAdmin = createClient(

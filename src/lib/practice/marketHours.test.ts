@@ -44,9 +44,26 @@ describe("index hours", () => {
   });
 });
 
+describe("US stock and ETF hours", () => {
+  it("is open during the US trading day", () => {
+    expect(isMarketOpen("AAPL", at("2026-11-04T15:00:00Z"))).toBe(true);
+    expect(isMarketOpen("SPY", at("2026-11-04T20:59:00Z"))).toBe(true);
+  });
+
+  it("rests before 9:30am, after 4pm and at the weekend", () => {
+    expect(isMarketOpen("AAPL", at("2026-11-04T14:00:00Z"))).toBe(false);
+    expect(isMarketOpen("AAPL", at("2026-11-04T21:30:00Z"))).toBe(false);
+    expect(isMarketOpen("AAPL", at("2026-11-07T15:00:00Z"))).toBe(false);
+  });
+
+  it("explains stock hours kindly", () => {
+    expect(marketRestingMessage("AAPL")).toContain("9:30am to 4pm New York time");
+  });
+});
+
 describe("older stock positions", () => {
   it("are never blocked from closing", () => {
-    expect(isMarketOpen("AAPL", at("2026-11-07T12:00:00Z"))).toBe(true);
+    expect(isMarketOpen("BRKB", at("2026-11-07T12:00:00Z"))).toBe(true);
   });
 });
 
@@ -55,6 +72,6 @@ describe("marketRestingMessage", () => {
     expect(marketRestingMessage("XAUUSD")).toContain("resting");
     expect(marketRestingMessage("XAUUSD")).toContain("Sunday");
     expect(marketRestingMessage("US500")).toContain("resting");
-    expect(marketRestingMessage("US500")).toContain("New York");
+    expect(marketRestingMessage("US500")).toContain("New York time");
   });
 });

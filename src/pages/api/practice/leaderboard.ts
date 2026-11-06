@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { createClient } from "@supabase/supabase-js";
 import { requireLoggedInUser, sendAuthError } from "@/lib/requireProUser";
 import { fetchAllRows } from "@/lib/fetchAllRows";
+import { countsForStockBoard, processScore, type PlannedTrade } from "@/lib/practice/process";
 import { displayName, gapToNext, rankRows } from "@/lib/leaderboard/rank";
 
 const supabaseAdmin = createClient(
@@ -16,6 +17,8 @@ export interface PracticeLeaderboardRow {
   total_pnl: number;
   total_trades: number;
   win_rate: number;
+  /** Average process score of the member's closed stock trades, out of 100. */
+  avg_process: number;
   rank: number;
 }
 
@@ -27,8 +30,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const [closedTrades, profiles] = await Promise.all([
-      fetchAllRows<{ user_id: string; pnl: number | null }>((from, to) =>
-        supabaseAdmin.from("practice_trades").select("user_id, pnl").eq("status", "closed").order("id").range(from, to),
+      fetchAllRows<PlannedTrade & { user_id: string; ticker: string; pnl: number | null }>((from, to) =>
+        supabaseAdmin
+          .from("practice_trades")
+          .select("user_id, ticker, pnl, entry_price, stop_price, target_price, risk_pct, thesis, direction")
+          .eq("status", "closed")
+          .order("id")
+          .range(from, to),
       ),
       fetchAllRows<{ id: string; challenge_name: string | null; full_name: string | null; is_review_account: boolean | null; show_on_leaderboard: boolean | null }>((from, to) =>
         supabaseAdmin.from("profiles").select("id, challenge_name, full_name, is_review_account, show_on_leaderboard").order("id").range(from, to),
@@ -44,10 +52,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       names.set(p.id, displayName(p));
     }
 
-    const stats = new Map<string, { pnl: number; total: number; wins: number }>();
+    const stats = new Map<string, { pnl: number; total: number; wins: number; process: number }>();
     for (const t of closedTrades) {
-      if (reviewIds.has(t.user_id)) continue;
-      const s = stats.get(t.user_id) ?? { pnl: 0, total: 0, wins: 0 };
+      if (reviewIds.has(t.user_id) || !countsForStockBoard(t.ticker)) continue;
+      const s = stats.get(t.user_id) ?? { pnl: 0, total: 0, wins: 0, process: 0 };
+      s.process += processScore(t);
       s.pnl += Number(t.pnl ?? 0);
       s.total += 1;
       if (Number(t.pnl ?? 0) > 0) s.wins += 1;
@@ -60,6 +69,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       total_pnl: Math.round(s.pnl * 100) / 100,
       total_trades: s.total,
       win_rate: s.total > 0 ? Math.round((s.wins / s.total) * 100) : 0,
+      avg_process: s.total > 0 ? Math.round(s.process / s.total) : 0,
       rank: 0,
     }));
 

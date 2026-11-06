@@ -31,6 +31,13 @@ describe("getServerQuote", () => {
     expect(fetchMock.mock.calls[0][0]).toContain("symbol=%5EGSPC");
   });
 
+  it("prices listed stocks from Finnhub", async () => {
+    respondWith({ c: 612.4 });
+    await expect(getServerQuote("SPY")).resolves.toMatchObject({ price: 612.4 });
+    expect(fetchMock.mock.calls[0][0]).toContain("finnhub.io");
+    expect(fetchMock.mock.calls[0][0]).toContain("symbol=SPY");
+  });
+
   it("still prices older stock positions from Finnhub", async () => {
     respondWith({ c: 210 });
     await expect(getServerQuote("AAPL")).resolves.toMatchObject({ price: 210 });

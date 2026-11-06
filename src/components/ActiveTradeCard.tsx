@@ -35,7 +35,7 @@ export function ActiveTradeCard({ trade, currentPrice, onClose }: Props) {
             {trade.stop_price != null && ` · Stop ${Number(trade.stop_price).toFixed(decimals)}`}
           </p>
         </div>
-        <p className={cn("text-right text-lg font-semibold", pnl == null ? "text-muted-foreground" : pnl >= 0 ? "text-primary" : "text-[#8A5B44]")}>
+        <p className={cn("text-right text-lg font-semibold", pnl == null ? "text-muted-foreground" : pnl >= 0 ? "text-primary" : "text-[var(--bloom-blush)]")}>
           {pnl == null ? "..." : `${pnl >= 0 ? "+" : "-"}${money(Math.abs(pnl))}`}
           <span className="block text-xs font-normal text-muted-foreground">simulated</span>
         </p>

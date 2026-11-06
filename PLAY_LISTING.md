@@ -1,34 +1,34 @@
 # Bloom: Google Play Listing
 
 ## Title
-Bloom: Learn Gold & Markets
+Bloom: Learn to Read Stocks
 
 ## Short Description
-Learn gold and markets from zero. Free lessons, safe practice and Pansy.
+Learn stock analysis with skill: fair value gaps, structure and safe practice. Free.
 
 ## Tagline
-Learn gold & markets from zero. Free.
+Learn to read stocks with skill. Free.
 
 ## Full Description
 
-Bloom is a warm, free place for women to learn gold trading and other markets from zero. There's no card, no paywall and nothing to upgrade.
+Bloom is a free, premium place for women to learn how to analyse US stocks. There's no card, no paywall and nothing to pay.
 
-**Interactive lessons**
-Short, friendly lessons that start with what gold trading even is. Tap a chart, put steps in order, try a slider and choose what you'd do. Then move on to forex pairs, indices and other metals.
+**Interactive chart lessons**
+26 lessons that take you from reading a candle to planning a full trade. Tap the three candles of a fair value gap, drag a zone over an order block, read the volume, switch between the daily, 1-hour and 5-minute charts, and drag your entry, stop and target into place.
 
-**Safe practice**
-Try what you've learned with simulated money, on gold and other instruments. A mistake here costs nothing.
+**What you'll learn**
+Market structure, breaks of structure and changes of character. Liquidity, sweeps, premium and discount. Fair value gaps, inverse gaps and displacement. Order blocks, breaker blocks and optimal trade entry. Power of 3, the Silver Bullet window, candle range theory, and breakouts and retests. Then the execution checklist, position sizing and journaling.
 
-**Friendly leaderboards**
-Grow your garden as you learn, and share your progress on our learning and practice leaderboards. You can hide yourself at any time.
+**Practice with structure**
+Plan trades on 15 well-known US stocks and ETFs with simulated money. Every trade records its setup and timeframe, and earns a process score for a sound plan.
+
+**Leaderboards**
+Learning and practice leaderboards that make progress visible. You can hide yourself at any time.
 
 **Pansy, your learning companion**
-Ask anything in your own words. Pansy explains things in plain language and helps you decide what to learn next.
-
-**Free demo accounts, when you're ready**
-Learn what a demo account is and what brokers such as XM and IC Markets offer. Availability depends on your country, and these brokers generally don't accept US residents. Bloom may earn a commission from some broker links.
+Ask about any concept, in your own words. Pansy explains precisely and suggests what to learn next.
 
 **Please note**
-Bloom is for education only and isn't financial advice. Bloom doesn't provide trade calls and isn't a broker. Trading gold, forex and other CFDs is high risk, and you can lose money quickly. Practice results use simulated money and don't predict real results.
+Bloom is for education only and isn't financial advice. Bloom doesn't give trade calls, tips or alerts, and isn't a broker. Trading stocks involves risk of loss. Practice results use simulated money and don't predict real results. Some brokers listed in the app offer CFDs, which are high risk. Bloom may earn a commission from some broker links.
 
 Pansy is an AI and can make mistakes.

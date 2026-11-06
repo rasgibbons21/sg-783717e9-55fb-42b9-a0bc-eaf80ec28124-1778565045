@@ -44,7 +44,7 @@ export default function Disclaimer() {
 
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">High Risk of Loss</h2>
             <p className="mb-6 text-foreground">
-              Trading gold, forex, indices and other CFDs is high risk. Leverage can magnify losses, and you can lose money quickly. Many beginners lose money. Only ever trade with money you can afford to lose, and consider seeking independent advice.
+              Trading stocks involves risk, and you can lose some or all of the money you invest. Some brokers listed on Bloom offer CFDs on shares, which use leverage and are high risk: you can lose money quickly, and many people do. Only ever trade with money you can afford to lose, and consider seeking independent advice.
             </p>
 
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Simulated Results</h2>

@@ -6,7 +6,7 @@ import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
 import { LessonPlayer } from "@/components/lessons/LessonPlayer";
 import { useSubscription } from "@/contexts/SubscriptionContext";
-import { ALL_LESSONS, getLesson } from "@/data/lessons-v2";
+import { ALL_LESSONS, getLesson } from "@/data/lessons-stocks";
 
 export default function LessonPage({ slug }: { slug: string }) {
   const router = useRouter();

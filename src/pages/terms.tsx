@@ -25,7 +25,7 @@ export default function Terms() {
 
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">The Service</h2>
             <p className="mb-6 text-foreground">
-              Bloom is a free education platform operated by Cinder Vault Enterprises LLC. Bloom provides lessons about gold, forex, indices and other markets, a practice area using simulated money, leaderboards, and Pansy, our AI learning companion. Bloom is NOT a registered investment advisor, broker-dealer, or financial institution, and it does not hold money or place real trades.
+              Bloom is a free education platform operated by Cinder Vault Enterprises LLC. Bloom provides lessons about analysing US stocks and ETFs, a practice area using simulated money, leaderboards, and Pansy, our AI learning companion. Bloom is NOT a registered investment advisor, broker-dealer, or financial institution, and it does not hold money or place real trades.
             </p>
 
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Educational Purpose Only</h2>

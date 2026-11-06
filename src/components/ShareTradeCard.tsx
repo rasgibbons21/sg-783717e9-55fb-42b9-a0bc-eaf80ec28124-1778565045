@@ -4,14 +4,14 @@ import { trackShareCard } from "@/lib/analytics";
 import { motion, AnimatePresence } from "framer-motion";
 
 const C = {
-  bg: "#FBF8F2",
-  card: "#FFFDF8",
-  teal: "#3F4F3E",
-  green: "#3F4F3E",
+  bg: "#0C0D0B",
+  card: "#1A1814",
+  teal: "#C4A574",
+  green: "#C4A574",
   red: "#EF4444",
   amber: "#F59E0B",
-  ivory: "#2A241C",
-  dim: "rgba(42,36,28,0.5)",
+  ivory: "#F3EEE4",
+  dim: "rgba(243,238,228,0.5)",
 };
 
 interface TradeData {
@@ -125,7 +125,7 @@ function TradeCardContent({ data }: { data: TradeData }) {
         {data.entryPrice != null && data.exitPrice != null && (
           <div
             className="grid grid-cols-2 gap-px rounded-xl overflow-hidden mb-4"
-            style={{ background: "rgba(42,36,28,0.04)" }}
+            style={{ background: "rgba(243,238,228,0.04)" }}
           >
             <div className="p-3 text-center" style={{ background: C.bg }}>
               <p className="text-[8px] font-bold uppercase tracking-wider mb-0.5" style={{ color: C.green }}>
@@ -149,7 +149,7 @@ function TradeCardContent({ data }: { data: TradeData }) {
         {/* Date + Branding */}
         <div
           className="flex items-center justify-between pt-3"
-          style={{ borderTop: "1px solid rgba(42,36,28,0.06)" }}
+          style={{ borderTop: "1px solid rgba(243,238,228,0.06)" }}
         >
           <span className="text-[10px]" style={{ color: C.dim }}>{data.date}</span>
           <div className="flex items-center gap-1.5">
@@ -199,7 +199,7 @@ function StatsCardContent({ data }: { data: StatsData }) {
         {/* Stats grid */}
         <div
           className="grid grid-cols-2 gap-px rounded-xl overflow-hidden mb-4"
-          style={{ background: "rgba(42,36,28,0.04)" }}
+          style={{ background: "rgba(243,238,228,0.04)" }}
         >
           {[
             { label: "Win Rate", value: `${data.winRate}%`, color: data.winRate >= 50 ? C.green : C.red },
@@ -231,7 +231,7 @@ function StatsCardContent({ data }: { data: StatsData }) {
         {/* Branding */}
         <div
           className="flex items-center justify-center gap-2 pt-3"
-          style={{ borderTop: "1px solid rgba(42,36,28,0.06)" }}
+          style={{ borderTop: "1px solid rgba(243,238,228,0.06)" }}
         >
           <span style={{ fontSize: 14 }}>&#127800;</span>
           <span className="text-xs font-semibold" style={{ color: C.dim }}>
@@ -333,7 +333,7 @@ export function ShareCardModal({ mode, onClose }: { mode: ShareMode; onClose: ()
             <button
               onClick={onClose}
               className="w-8 h-8 rounded-full flex items-center justify-center"
-              style={{ background: "rgba(42,36,28,0.1)" }}
+              style={{ background: "rgba(243,238,228,0.1)" }}
             >
               <X className="w-4 h-4" style={{ color: C.dim }} />
             </button>

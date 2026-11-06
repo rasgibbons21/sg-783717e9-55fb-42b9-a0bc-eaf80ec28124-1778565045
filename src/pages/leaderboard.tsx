@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { BloomMark } from "@/components/brand/BloomMark";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { EyeOff, Loader2, Share2 } from "lucide-react";
@@ -6,7 +7,6 @@ import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
 import { RiskNote } from "@/components/RiskNote";
 import { useShareAchievement } from "@/components/ShareAchievement";
-import { Botanical } from "@/components/brand/Botanical";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { money, practiceFetch } from "@/lib/practice/api";
 import { cn } from "@/lib/utils";
@@ -18,6 +18,7 @@ interface BoardRow {
   name: string;
   rank: number;
   value: number;
+  process?: number;
 }
 
 interface Board {
@@ -41,6 +42,7 @@ interface PracticeRow {
   display_name: string;
   rank: number;
   total_pnl: number;
+  avg_process?: number;
 }
 
 interface View<T> {
@@ -51,7 +53,7 @@ interface View<T> {
 }
 
 const fromLearning = (row: LearningRow): BoardRow => ({ id: row.user_id, name: row.challenge_name, rank: row.rank, value: row.gems });
-const fromPractice = (row: PracticeRow): BoardRow => ({ id: row.user_id, name: row.display_name, rank: row.rank, value: row.total_pnl });
+const fromPractice = (row: PracticeRow): BoardRow => ({ id: row.user_id, name: row.display_name, rank: row.rank, value: row.total_pnl, process: row.avg_process });
 
 function toBoard<T>(view: View<T>, convert: (row: T) => BoardRow): Board {
   return {
@@ -65,12 +67,12 @@ function toBoard<T>(view: View<T>, convert: (row: T) => BoardRow): Board {
 const signedMoney = (value: number) => `${value >= 0 ? "+" : "-"}${money(Math.abs(value))}`;
 
 function BoardRows({ board, tab, userId }: { board: Board; tab: Tab; userId: string | null }) {
-  const format = (value: number) => (tab === "learning" ? `${value} blooms` : signedMoney(value));
+  const format = (value: number) => (tab === "learning" ? `${value} points` : signedMoney(value));
 
   if (board.rows.length === 0) {
     return (
       <div className="rounded-3xl bg-card p-6 text-center shadow-[var(--bloom-shadow)]">
-        <Botanical variant="bloom" className="mx-auto h-20 w-20" />
+        <div className="mx-auto w-fit"><BloomMark size={56} /></div>
         <h2 className="mt-2 text-xl font-semibold text-foreground">Be the first to bloom here</h2>
         <p className="mt-1 text-base text-muted-foreground">
           {tab === "learning" ? "Finish a lesson and you'll appear on this board." : "Close a practice trade and you'll appear on this board."}
@@ -101,7 +103,10 @@ function BoardRows({ board, tab, userId }: { board: Board; tab: Tab; userId: str
             {row.name}
             {row.id === userId && <span className="ml-1 text-sm font-normal text-muted-foreground">(you)</span>}
           </span>
-          <span className={cn("shrink-0 font-medium", tab === "practice" && row.value < 0 ? "text-[#8A5B44]" : "text-primary")}>{format(row.value)}</span>
+          <span className="shrink-0 text-right">
+            <span className={cn("block font-medium", tab === "practice" && row.value < 0 ? "text-[var(--bloom-blush)]" : "text-primary")}>{format(row.value)}</span>
+            {tab === "practice" && row.process !== undefined && <span className="block text-xs text-muted-foreground">Process {row.process}</span>}
+          </span>
         </li>
       ))}
     </ol>
@@ -143,11 +148,11 @@ export default function LeaderboardPage() {
     share({
       type: "leaderboard",
       title: `Number ${me.rank} on Bloom`,
-      subtitle: tab === "learning" ? "Learning gold, one lesson at a time" : "Practising with simulated money",
+      subtitle: tab === "learning" ? "Learning stock analysis, one lesson at a time" : "Practising with simulated money",
       emoji: "🌸",
       stats: [
         { label: "Place", value: `${me.rank}` },
-        tab === "learning" ? { label: "Blooms", value: `${me.value}` } : { label: "Simulated gains", value: signedMoney(me.value) },
+        tab === "learning" ? { label: "Points", value: `${me.value}` } : { label: "Simulated gains", value: signedMoney(me.value) },
       ],
     });
   };
@@ -158,7 +163,6 @@ export default function LeaderboardPage() {
       <Layout>
         <div className="mx-auto max-w-2xl space-y-4 px-4 py-6">
           <header className="relative overflow-hidden rounded-3xl bg-secondary p-6">
-            <Botanical variant="corner" className="pointer-events-none absolute -right-6 -top-4 h-36 w-28" />
             <h1 className="max-w-[80%] text-3xl font-semibold leading-tight text-foreground">Growing together</h1>
             <p className="mt-2 max-w-[85%] text-base text-muted-foreground">Every lesson and every practice trade counts. Cheer each other on.</p>
           </header>
@@ -177,7 +181,7 @@ export default function LeaderboardPage() {
                 {(
                   [
                     ["learning", "Learning"],
-                    ["practice", "Practice gains"],
+                    ["practice", "Practice gains (stocks)"],
                   ] as const
                 ).map(([value, label]) => (
                   <motion.button
@@ -194,7 +198,7 @@ export default function LeaderboardPage() {
               </div>
 
               <p className="text-center text-sm text-muted-foreground">
-                {tab === "learning" ? "Earn blooms by finishing lessons." : "Simulated money, real practice. Ranked by results from closed practice trades."}
+                {tab === "learning" ? "Earn points by finishing lessons." : "Simulated money, real practice. Ranked by results from closed stock trades, with each member's average process score."}
               </p>
 
               {failed && (
@@ -222,10 +226,10 @@ export default function LeaderboardPage() {
                         ) : (
                           <p className="font-serif text-2xl font-semibold text-foreground">You&apos;re number {me.rank}</p>
                         )}
-                        <p className="text-base text-foreground">{tab === "learning" ? `${me.value} blooms` : `${signedMoney(me.value)} simulated`}</p>
+                        <p className="text-base text-foreground">{tab === "learning" ? `${me.value} points` : `${signedMoney(me.value)} simulated`}</p>
                         {board.gap != null && !board.hidden && (
                           <p className="mt-1 text-sm text-muted-foreground">
-                            {tab === "learning" ? `${board.gap} more blooms to reach the next place.` : `${money(board.gap)} of simulated gains to reach the next place.`}
+                            {tab === "learning" ? `${board.gap} more points to reach the next place.` : `${money(board.gap)} of simulated gains to reach the next place.`}
                           </p>
                         )}
                         {board.gap == null && !board.hidden && <p className="mt-1 text-sm text-muted-foreground">You&apos;re at the top. How lovely.</p>}

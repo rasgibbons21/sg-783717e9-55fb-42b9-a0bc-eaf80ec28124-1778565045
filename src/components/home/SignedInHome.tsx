@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
+import { ProgressLine } from "@/components/ProgressLine";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Flower2 } from "lucide-react";
-import { BloomGarden } from "@/components/BloomGarden";
-import { Botanical } from "@/components/brand/Botanical";
 import { useSubscription } from "@/contexts/SubscriptionContext";
-import { ALL_LESSONS, firstIncomplete } from "@/data/lessons-v2";
+import { ALL_LESSONS, firstIncomplete } from "@/data/lessons-stocks";
 import { useLearningProgress } from "@/hooks/useLearningProgress";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -56,17 +55,13 @@ export function SignedInHome() {
   return (
     <div className="mx-auto max-w-2xl space-y-4 px-4 py-6">
       <div className="relative overflow-hidden rounded-3xl bg-secondary p-6">
-        <Botanical variant="corner" className="pointer-events-none absolute -right-6 -top-4 h-36 w-28" />
         <p className="text-base text-muted-foreground">{greeting()}{userName ? `, ${userName}` : ""}</p>
         <h1 className="mt-1 max-w-[80%] text-3xl font-semibold leading-tight text-foreground">
-          {finishedCount === 0 ? "Let's begin with something small" : "Your garden is growing"}
+          {finishedCount === 0 ? "Let's start with how to read a chart" : "Your skills are building"}
         </h1>
         <div className="mt-4">
-          <BloomGarden completedCount={finishedCount} total={ALL_LESSONS.length} />
+          <ProgressLine done={finishedCount} total={ALL_LESSONS.length} label="Lessons finished" />
         </div>
-        <p className="mt-2 text-sm text-muted-foreground">
-          {finishedCount} of {ALL_LESSONS.length} lessons in bloom
-        </p>
       </div>
 
       {!loading &&
@@ -84,14 +79,14 @@ export function SignedInHome() {
         ) : (
           <div className="rounded-3xl bg-accent/60 p-5">
             <h2 className="text-xl font-semibold text-foreground">You&apos;ve finished every lesson</h2>
-            <p className="mt-1 text-base text-muted-foreground">What a wonderful thing. Keep practising, or try a free demo when you feel ready.</p>
+            <p className="mt-1 text-base text-muted-foreground">That&apos;s a real achievement. Keep sharpening your process in Practice.</p>
           </div>
         ))}
 
       <div className="grid gap-4 md:grid-cols-2">
         <Link href="/practice" className="block rounded-3xl bg-card p-5 shadow-[var(--bloom-shadow)] transition-transform active:scale-[0.98]">
-          <h2 className="text-xl font-semibold text-foreground">Practise safely</h2>
-          <p className="mt-1 text-base text-muted-foreground">Try what you&apos;ve learned with simulated money.</p>
+          <h2 className="text-xl font-semibold text-foreground">Practise with structure</h2>
+          <p className="mt-1 text-base text-muted-foreground">Plan trades on real stock charts with simulated money.</p>
         </Link>
 
         <Link href="/leaderboard" className="block rounded-3xl bg-card p-5 shadow-[var(--bloom-shadow)] transition-transform active:scale-[0.98]">
@@ -101,7 +96,7 @@ export function SignedInHome() {
           </h2>
           <p className="mt-1 text-base text-muted-foreground">
             {standing?.gap
-              ? `${standing.gap} more blooms to reach the next place.`
+              ? `${standing.gap} more points to reach the next place.`
               : standing
                 ? "See who's learning alongside you."
                 : "Finish a lesson to join the learning leaderboard."}
@@ -114,8 +109,8 @@ export function SignedInHome() {
         </Link>
 
         <Link href="/brokers" className="block rounded-3xl bg-card p-5 shadow-[var(--bloom-shadow)] transition-transform active:scale-[0.98]">
-          <h2 className="text-xl font-semibold text-foreground">Free demo accounts</h2>
-          <p className="mt-1 text-base text-muted-foreground">When you feel ready, see how a broker&apos;s practice account works.</p>
+          <h2 className="text-xl font-semibold text-foreground">Where to practise for real</h2>
+          <p className="mt-1 text-base text-muted-foreground">When you feel ready, see what brokers offer in your country.</p>
         </Link>
       </div>
     </div>

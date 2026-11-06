@@ -1,15 +1,26 @@
 import { describe, expect, it } from "vitest";
-import { getInstrument, INSTRUMENTS } from "@/config/instruments";
+import { getInstrument, INSTRUMENTS, LISTED_INSTRUMENTS } from "@/config/instruments";
 import { lotsToUnits, marginFor, pnlFor } from "./maths";
 
 describe("instruments", () => {
-  it("offers gold first, then the spec's other instruments", () => {
-    expect(INSTRUMENTS.map((i) => i.symbol)).toEqual(["XAUUSD", "XAGUSD", "EURUSD", "GBPUSD", "USDJPY", "US30", "US500"]);
+  it("offers exactly the spec's US stocks and ETFs in Practice", () => {
+    expect(LISTED_INSTRUMENTS.map((i) => i.symbol)).toEqual([
+      "SPY", "QQQ", "IWM", "DIA", "AAPL", "MSFT", "NVDA", "AMZN", "GOOGL", "META", "TSLA", "AMD", "JPM", "KO", "DIS",
+    ]);
+    for (const instrument of LISTED_INSTRUMENTS) {
+      expect(["stock", "etf"]).toContain(instrument.assetClass);
+      expect(instrument.leverage).toBe(1);
+      expect(instrument.feed).toBe("finnhub");
+    }
   });
 
-  it("does not recognise a stock ticker", () => {
-    expect(getInstrument("AAPL")).toBeUndefined();
-    expect(getInstrument("xauusd")?.symbol).toBe("XAUUSD");
+  it("keeps older instruments only so open positions can close", () => {
+    expect(getInstrument("xauusd")?.listed).toBe(false);
+    expect(INSTRUMENTS.filter((i) => !i.listed).map((i) => i.symbol)).toEqual(["XAUUSD", "XAGUSD", "EURUSD", "GBPUSD", "USDJPY", "US30", "US500"]);
+  });
+
+  it("does not recognise an unlisted ticker", () => {
+    expect(getInstrument("BRKB")).toBeUndefined();
   });
 });
 
@@ -39,8 +50,13 @@ describe("marginFor", () => {
     expect(marginFor("USDJPY", 150, 1000)).toBeCloseTo(33.33, 2);
   });
 
-  it("reserves full cost for older stock positions", () => {
+  it("reserves the full cost of shares, with no leverage", () => {
     expect(marginFor("AAPL", 200, 5)).toBe(1000);
+    expect(marginFor("SPY", 600, 2)).toBe(1200);
+  });
+
+  it("reserves full cost for older stock positions", () => {
+    expect(marginFor("BRKB", 200, 5)).toBe(1000);
   });
 });
 

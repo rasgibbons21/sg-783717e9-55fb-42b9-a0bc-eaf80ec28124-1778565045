@@ -45,5 +45,6 @@ async function finnhubQuote(sym: string): Promise<ServerQuote | null> {
 export async function getServerQuote(ticker: string): Promise<ServerQuote | null> {
   const sym = (ticker || "").toUpperCase().trim();
   const instrument = getInstrument(sym);
-  return instrument ? fmpQuote(instrument.feedSymbol) : finnhubQuote(sym);
+  if (instrument?.feed === "fmp") return fmpQuote(instrument.feedSymbol);
+  return finnhubQuote(instrument?.feedSymbol ?? sym);
 }

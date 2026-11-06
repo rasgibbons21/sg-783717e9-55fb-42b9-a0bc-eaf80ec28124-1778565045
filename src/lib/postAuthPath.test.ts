@@ -5,7 +5,7 @@ describe("postAuthPath", () => {
   it("sends a new member to the first lesson", () => {
     expect(postAuthPath(null)).toBe(FIRST_LESSON_PATH);
     expect(postAuthPath({ onboarding_complete: false })).toBe(FIRST_LESSON_PATH);
-    expect(FIRST_LESSON_PATH).toBe("/lessons/what-is-gold-trading");
+    expect(FIRST_LESSON_PATH).toBe("/lessons/reading-a-stock-chart");
   });
 
   it("sends a returning member home", () => {

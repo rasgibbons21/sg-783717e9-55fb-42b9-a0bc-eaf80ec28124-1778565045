@@ -43,6 +43,7 @@ vi.mock("@supabase/supabase-js", () => ({
 }));
 
 import handler from "@/pages/api/practice/trades";
+import { riskPct } from "@/lib/practice/maths";
 
 function call(body: Record<string, unknown>) {
   const res = {
@@ -60,75 +61,110 @@ function call(body: Record<string, unknown>) {
   return handler({ method: "POST", body } as unknown as NextApiRequest, res as unknown as NextApiResponse).then(() => res);
 }
 
-const goldOrder = { ticker: "XAUUSD", direction: "long", lots: 0.01, stop_price: 3950 };
+const stockOrder = { ticker: "AAPL", direction: "long", shares: 2, stop_price: 190, setup_type: "FVG", timeframe: "1H" };
 
 describe("opening a practice trade", () => {
   beforeEach(() => {
     inserted.length = 0;
     rpcCalls.length = 0;
-    reserveResult = 9800;
+    reserveResult = 9600;
     insertFails = false;
-    quote.mockReset().mockResolvedValue({ price: 4000, ts: 1 });
+    quote.mockReset().mockResolvedValue({ price: 200, ts: 1 });
     marketOpen.mockReset().mockReturnValue(true);
   });
 
-  it("opens gold from lots and reserves only the margin", async () => {
-    const res = await call(goldOrder);
+  it("opens whole shares, reserves the full cost and records the plan", async () => {
+    const res = await call(stockOrder);
     expect(res.statusCode).toBe(201);
-    expect(inserted[0]).toMatchObject({ ticker: "XAUUSD", shares: 1, entry_price: 4000, stop_price: 3950, risk_amount: 50 });
-    expect(rpcCalls[0]).toEqual({ name: "practice_reserve_cash", args: { p_account_id: "acct-1", p_amount: 200 } });
+    expect(inserted[0]).toMatchObject({
+      ticker: "AAPL",
+      shares: 2,
+      entry_price: 200,
+      stop_price: 190,
+      risk_amount: 20,
+      setup_type: "FVG",
+      timeframe: "1H",
+      risk_pct: 0.2,
+    });
+    expect(rpcCalls[0]).toEqual({ name: "practice_reserve_cash", args: { p_account_id: "acct-1", p_amount: 400 } });
   });
 
   it("opens nothing when another order has already used the money", async () => {
     reserveResult = null;
-    const res = await call(goldOrder);
+    const res = await call(stockOrder);
     expect(res.statusCode).toBe(400);
     expect(inserted).toHaveLength(0);
   });
 
   it("gives the money back if the trade can't be saved", async () => {
     insertFails = true;
-    const res = await call(goldOrder);
+    const res = await call(stockOrder);
     expect(res.statusCode).toBe(500);
     expect(rpcCalls.map((c) => c.name)).toEqual(["practice_reserve_cash", "practice_release_cash"]);
-    expect(rpcCalls[1].args).toEqual({ p_account_id: "acct-1", p_delta: 200 });
+    expect(rpcCalls[1].args).toEqual({ p_account_id: "acct-1", p_delta: 400 });
   });
 
-  it("rests kindly when the market is closed, and charges nothing", async () => {
+  it("rests kindly outside stock hours, and charges nothing", async () => {
     marketOpen.mockReturnValue(false);
-    const res = await call(goldOrder);
+    const res = await call(stockOrder);
     expect(res.statusCode).toBe(409);
-    expect((res.body as { error: string }).error).toContain("resting");
+    expect((res.body as { error: string }).error).toContain("9:30am to 4pm New York time");
     expect(inserted).toHaveLength(0);
     expect(rpcCalls).toHaveLength(0);
   });
 
   it("charges nothing when no price is available", async () => {
     quote.mockResolvedValue(null);
-    const res = await call(goldOrder);
+    const res = await call(stockOrder);
     expect(res.statusCode).toBe(502);
     expect(inserted).toHaveLength(0);
     expect(rpcCalls).toHaveLength(0);
   });
 
-  it("does not open new stock trades", async () => {
-    const res = await call({ ...goldOrder, ticker: "AAPL" });
+  it("no longer opens gold or other retired markets", async () => {
+    const res = await call({ ...stockOrder, ticker: "XAUUSD", stop_price: 3950 });
     expect(res.statusCode).toBe(400);
+    expect((res.body as { error: string }).error).toBe("That market isn't available in Practice anymore.");
     expect(inserted).toHaveLength(0);
   });
 
-  it("rejects lot sizes below the smallest size", async () => {
-    for (const lots of [0, -1, "many", 0.001]) {
-      const res = await call({ ...goldOrder, lots });
+  it("asks for whole shares", async () => {
+    for (const shares of [0, -1, 1.5, "many"]) {
+      const res = await call({ ...stockOrder, shares });
+      expect(res.statusCode).toBe(400);
+    }
+    expect(inserted).toHaveLength(0);
+  });
+
+  it("needs a setup and a timeframe from the lessons", async () => {
+    for (const plan of [{ setup_type: undefined }, { timeframe: undefined }, { setup_type: "A hunch" }, { timeframe: "2m" }]) {
+      const res = await call({ ...stockOrder, ...plan });
       expect(res.statusCode).toBe(400);
     }
     expect(inserted).toHaveLength(0);
   });
 
   it("stops one trade from risking too much of the balance", async () => {
-    const res = await call({ ...goldOrder, lots: 0.5, stop_price: 3900 });
+    const res = await call({ ...stockOrder, shares: 40, stop_price: 140 });
     expect(res.statusCode).toBe(400);
     expect((res.body as { error: string }).error).toContain("smaller");
     expect(rpcCalls).toHaveLength(0);
+  });
+
+  it("refuses a target on the wrong side of the price, which would close the trade at once", async () => {
+    for (const order of [
+      { ...stockOrder, target_price: 195 },
+      { ...stockOrder, direction: "short", stop_price: 210, target_price: 205 },
+    ]) {
+      const res = await call(order);
+      expect(res.statusCode).toBe(400);
+      expect((res.body as { error: string }).error).toContain("target");
+    }
+    expect(inserted).toHaveLength(0);
+  });
+
+  it("measures risk against the same balance the ticket shows", async () => {
+    await call(stockOrder);
+    expect(inserted[0]).toMatchObject({ risk_pct: riskPct(20, 10000) });
   });
 });

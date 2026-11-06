@@ -1,15 +1,15 @@
 import { useEffect } from "react";
+import { BloomMark } from "@/components/brand/BloomMark";
 import Link from "next/link";
 import confetti from "canvas-confetti";
 import { motion } from "framer-motion";
 import { ArrowRight, Loader2 } from "lucide-react";
-import type { Lesson } from "@/data/lessons-v2/types";
-import { lessonsInModule, nextLesson } from "@/data/lessons-v2";
-import { Botanical } from "@/components/brand/Botanical";
+import type { Lesson } from "@/data/lessons-stocks/types";
+import { lessonsInModule, nextLesson } from "@/data/lessons-stocks";
 import { RiskNote } from "@/components/RiskNote";
 import { useBrokerNotice } from "@/hooks/useBrokerNotice";
 
-export const BLOOMS_PER_LESSON = 5;
+export const POINTS_PER_LESSON = 5;
 
 interface Props {
   lesson: Lesson;
@@ -35,7 +35,7 @@ export function LessonComplete({ lesson, saveState, isNew, onRetrySave }: Props)
       particleCount: 60,
       spread: 70,
       origin: { y: 0.45 },
-      colors: ["#EFD9D3", "#C2A15A", "#3F4F3E", "#B98A72"],
+      colors: ["#C4A574", "#F3EEE4", "#8FA088", "#D9B8AE"],
       scalar: 0.85,
     });
   }, []);
@@ -43,16 +43,16 @@ export function LessonComplete({ lesson, saveState, isNew, onRetrySave }: Props)
   return (
     <div className="mx-auto max-w-xl px-4 py-8 text-center">
       <motion.div initial={{ scale: 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 160, damping: 14 }}>
-        <Botanical variant="bloom" className="mx-auto h-28 w-28" />
+        <div className="mx-auto w-fit"><BloomMark size={56} /></div>
       </motion.div>
-      <h1 className="mt-2 text-3xl font-semibold text-foreground">Lovely work</h1>
+      <h1 className="mt-2 text-3xl font-semibold text-foreground">Well done</h1>
       <p className="mt-2 text-base text-muted-foreground">
         You finished <strong className="text-foreground">{lesson.title}</strong>
       </p>
 
       {saveState === "saved" && isNew && (
         <p className="mt-3 inline-block rounded-full bg-accent px-4 py-1.5 text-sm font-semibold text-foreground">
-          A new bloom in your garden, worth {BLOOMS_PER_LESSON} points
+          +{POINTS_PER_LESSON} points
         </p>
       )}
       {saveState === "saving" && (
@@ -62,7 +62,7 @@ export function LessonComplete({ lesson, saveState, isNew, onRetrySave }: Props)
       )}
       {saveState === "failed" && (
         <div className="mt-3 rounded-2xl bg-accent/70 p-4 text-sm text-foreground" role="alert">
-          <p>We couldn&apos;t save your progress just now, so your bloom is waiting.</p>
+          <p>We couldn&apos;t save your progress just now, but it&apos;s kept on this device and we&apos;ll keep trying.</p>
           <button onClick={onRetrySave} className="mt-2 h-10 rounded-full bg-primary px-4 font-semibold text-primary-foreground">
             Try saving again
           </button>
@@ -93,18 +93,11 @@ export function LessonComplete({ lesson, saveState, isNew, onRetrySave }: Props)
           <span className="mt-1 block text-base text-muted-foreground">Every lesson moves you up the learning leaderboard.</span>
         </Link>
 
-        {notice === "general" && (
-          <Link
-            href="/brokers"
-            className={`block rounded-3xl p-5 transition-transform active:scale-[0.98] ${finishedModule ? "bg-accent/70" : "border border-border"}`}
-          >
-            <span className="block font-serif text-lg font-semibold text-foreground">
-              {finishedModule ? "You've finished this module. Curious about a demo?" : "When you feel ready, try a free demo"}
-            </span>
+        {finishedModule && notice === "general" && (
+          <Link href="/brokers" className="block rounded-3xl border border-[var(--bloom-rule)] p-5 transition-transform active:scale-[0.98]">
+            <span className="block font-serif text-lg font-semibold text-foreground">You&apos;ve finished this module</span>
             <span className="mt-1 block text-base text-muted-foreground">
-              {finishedModule
-                ? "A demo account lets you try a real broker's platform with pretend money. See what's available in your country, whenever you're ready."
-                : "There's no rush. See how a broker's practice account works."}
+              When you feel ready, see where you could practise for real in your country. There&apos;s no rush.
             </span>
           </Link>
         )}

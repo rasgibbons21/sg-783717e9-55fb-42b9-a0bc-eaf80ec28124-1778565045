@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import type { BrokerConfig } from "@/config/brokers";
-import { brokerNotice, canShowOpenButton } from "./region";
+import { brokers, type BrokerConfig } from "@/config/brokers";
+import { brokerNotice, brokersFor, canShowOpenButton } from "./region";
 
 const broker = (overrides: Partial<BrokerConfig>) =>
   ({ affiliateUrl: "https://example.com", category: "Forex & CFDs", active: true, ...overrides }) as BrokerConfig;
@@ -40,5 +40,28 @@ describe("canShowOpenButton", () => {
 
   it("shows no button until a broker has a link", () => {
     expect(canShowOpenButton(broker({ affiliateUrl: "" }), "general")).toBe(false);
+  });
+});
+
+describe("brokersFor", () => {
+  const ids = (notice: "us" | "general" | "unknown") => brokersFor(notice, brokers).map((b) => b.id);
+
+  it("shows US visitors real-share brokers and TradingView only", () => {
+    expect(ids("us")).toContain("webull");
+    expect(ids("us")).toContain("tradingview");
+    expect(ids("us")).not.toContain("xm");
+    expect(ids("us")).not.toContain("exness");
+  });
+
+  it("shows everyone else every current broker, with IC Markets for information", () => {
+    for (const id of ["xm", "icmarkets", "exness", "vantage", "avatrade", "deriv", "tradingview"]) {
+      expect(ids("general"), id).toContain(id);
+    }
+    expect(ids("general")).not.toContain("webull");
+    expect(ids("general").slice(0, 2)).toEqual(["xm", "icmarkets"]);
+  });
+
+  it("lists the same brokers while the country is still unknown", () => {
+    expect(ids("unknown")).toEqual(ids("general"));
   });
 });

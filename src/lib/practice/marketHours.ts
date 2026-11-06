@@ -31,7 +31,8 @@ export function isMarketOpen(symbol: string, now: Date): boolean {
   if (!instrument) return true;
   const { day, minutes } = newYorkClock(now);
 
-  if (instrument.assetClass === "index") {
+  // Stocks, ETFs and indices follow the US trading day.
+  if (instrument.assetClass === "index" || instrument.assetClass === "stock" || instrument.assetClass === "etf") {
     return day !== SATURDAY && day !== SUNDAY && minutes >= INDEX_OPEN && minutes < INDEX_CLOSE;
   }
   if (day === SATURDAY) return false;
@@ -41,7 +42,8 @@ export function isMarketOpen(symbol: string, now: Date): boolean {
 }
 
 export function marketRestingMessage(symbol: string): string {
-  return getInstrument(symbol)?.assetClass === "index"
-    ? "This market is resting right now. It's open on weekdays from 9:30am to 4pm New York time."
+  const assetClass = getInstrument(symbol)?.assetClass;
+  return assetClass === "index" || assetClass === "stock" || assetClass === "etf"
+    ? "The market is resting right now. US stocks trade on weekdays from 9:30am to 4pm New York time."
     : "The market is resting right now. It reopens on Sunday at 5pm New York time.";
 }

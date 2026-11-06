@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import { Loader2, MailCheck } from "lucide-react";
 import { SEO } from "@/components/SEO";
 import { BloomMark } from "@/components/brand/BloomMark";
-import { Botanical } from "@/components/brand/Botanical";
 import { RiskNote } from "@/components/RiskNote";
 import { supabase } from "@/integrations/supabase/client";
 import { authService } from "@/services/authService";
@@ -100,10 +99,8 @@ export default function SignUpPage() {
 
   return (
     <>
-      <SEO title="Start free - Bloom" description="Join Bloom free and start your first interactive gold lesson. No card, no upgrades." />
+      <SEO title="Start free - Bloom" description="Join Bloom free and start your first interactive stock lesson. No card, nothing to pay." />
       <div className="relative min-h-screen overflow-hidden bg-background px-4 py-8">
-        <Botanical variant="corner" className="pointer-events-none absolute -right-8 -top-6 h-52 w-44" />
-        <Botanical variant="corner" className="pointer-events-none absolute -bottom-10 -left-10 h-52 w-44 rotate-180" />
 
         <main className="relative mx-auto flex max-w-md flex-col">
           <Link href="/" className="mb-8 flex items-center gap-2 self-start">
@@ -120,13 +117,13 @@ export default function SignUpPage() {
               </p>
             </section>
           ) : (
-            <section className="rounded-3xl bg-card p-6 shadow-[var(--bloom-shadow)]">
+            <section className="surface-ivory rounded-3xl p-6 shadow-[var(--bloom-shadow)]">
               <h1 className="text-3xl font-semibold leading-tight text-foreground">
                 {mode === "signup" ? "Start learning, free" : "Welcome back"}
               </h1>
               <p className="mt-2 text-base text-muted-foreground">
                 {mode === "signup"
-                  ? "No card and nothing to pay. Your first gold lesson starts right after this."
+                  ? "No card and nothing to pay. Your first lesson starts right after this."
                   : "Sign in and pick up where you left off."}
               </p>
 

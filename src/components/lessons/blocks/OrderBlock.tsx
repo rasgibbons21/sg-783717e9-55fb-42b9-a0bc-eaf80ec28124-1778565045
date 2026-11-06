@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Reorder, motion } from "framer-motion";
 import { ChevronDown, ChevronUp, GripVertical } from "lucide-react";
-import type { LessonBlock } from "@/data/lessons-v2/types";
+import type { LessonBlock } from "@/data/lessons-stocks/types";
 import { isOrderCorrect, shuffleNotSolved } from "@/lib/lessons/engine";
 import { Feedback } from "./Feedback";
 

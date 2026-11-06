@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 const COPY =
-  "Bloom is for education only and isn't financial advice. Trading gold, forex and other CFDs is high risk, and you can lose money quickly. Practice trades use simulated money.";
+  "Bloom is for education only and isn't financial advice. Trading stocks involves risk, and you can lose money. Practice trades use simulated money, and practice results don't predict real results.";
 
 /** The standing risk reminder. `footer` closes a page, `inline` sits inside a card or lesson. */
 export function RiskNote({ variant = "inline" }: { variant?: "footer" | "inline" }) {

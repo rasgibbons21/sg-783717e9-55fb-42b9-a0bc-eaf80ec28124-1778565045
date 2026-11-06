@@ -1,9 +1,6 @@
-import type { LessonBlock, SliderOutcomeKey } from "@/data/lessons-v2/types";
+import type { LessonBlock } from "@/data/lessons-stocks/types";
 
 const READING_BLOCKS: LessonBlock["type"][] = ["text", "pansy"];
-const OUNCES_PER_LOT = 100;
-const EXAMPLE_MARGIN = 100;
-const EXAMPLE_BALANCE = 10_000;
 
 export function isInteractive(block: LessonBlock): boolean {
   return !READING_BLOCKS.includes(block.type);
@@ -28,40 +25,6 @@ export function shuffleNotSolved(steps: string[], seed: number): string[] {
   }
   if (dealt.length > 1 && isOrderCorrect(steps, dealt)) dealt.push(dealt.shift() as string);
   return dealt;
-}
-
-export interface SliderOutcome {
-  text: string;
-  controlled?: number;
-  adverseMoveCost?: number;
-  ounces?: number;
-  riskAmount?: number;
-}
-
-const money = (value: number) => `$${value.toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
-
-export function sliderOutcome(key: SliderOutcomeKey, value: number): SliderOutcome {
-  if (key === "leverage") {
-    const controlled = EXAMPLE_MARGIN * value;
-    const adverseMoveCost = controlled / 100;
-    return {
-      controlled,
-      adverseMoveCost,
-      text: `With ${money(EXAMPLE_MARGIN)} of your own money you control ${money(controlled)} of gold. If gold falls just 1%, you lose ${money(adverseMoveCost)}.`,
-    };
-  }
-  if (key === "lotSize") {
-    const ounces = Math.round(value * OUNCES_PER_LOT * 100) / 100;
-    return {
-      ounces,
-      text: `${value} lot is ${ounces} ${ounces === 1 ? "ounce" : "ounces"} of gold. Each $1 move in the gold price changes your result by ${money(ounces)}.`,
-    };
-  }
-  const riskAmount = (EXAMPLE_BALANCE * value) / 100;
-  return {
-    riskAmount,
-    text: `On a ${money(EXAMPLE_BALANCE)} practice account, a ${value}% risk means this trade can lose about ${money(riskAmount)} before your stop closes it.`,
-  };
 }
 
 const resumeKey = (slug: string) => `bloom-lesson-resume:${slug}`;
