@@ -47,6 +47,7 @@ function PracticeDesk() {
   const [marketOpen, setMarketOpen] = useState(true);
   const [priceProblem, setPriceProblem] = useState(false);
   const [charts, setCharts] = useState<Record<Timeframe, Candle[]>>({ Daily: [], "1H": [], "5m": [] });
+  const [chartsLoaded, setChartsLoaded] = useState<Record<Timeframe, boolean>>({ Daily: false, "1H": false, "5m": false });
   const [timeframe, setTimeframe] = useState<Timeframe>("1H");
   const [planning, setPlanning] = useState(false);
   const [levels, setLevels] = useState<Levels>({});
@@ -132,13 +133,16 @@ function PracticeDesk() {
   useEffect(() => {
     let active = true;
     setCharts({ Daily: [], "1H": [], "5m": [] });
+    setChartsLoaded({ Daily: false, "1H": false, "5m": false });
     setLevels({});
     setPlanning(false);
     for (const label of TIMEFRAMES) {
       practiceFetch<{ bars: { time: string | number; open: number; high: number; low: number; close: number; volume: number }[] }>(
         `/api/practice/ohlc?ticker=${instrument.symbol}&timeframe=${encodeURIComponent(label)}`,
       ).then(({ ok, data }) => {
-        if (active && ok) setCharts((current) => ({ ...current, [label]: toCandles(data.bars ?? []).slice(-BARS_SHOWN) }));
+        if (!active) return;
+        if (ok) setCharts((current) => ({ ...current, [label]: toCandles(data.bars ?? []).slice(-BARS_SHOWN) }));
+        setChartsLoaded((current) => ({ ...current, [label]: true }));
       });
     }
     return () => {
@@ -258,7 +262,11 @@ function PracticeDesk() {
               ))}
             </div>
             <p className="flex h-[200px] items-center justify-center px-6 text-center text-sm text-muted-foreground">
-              {timeframe === "Daily" ? "The chart will appear here when prices are available." : "This timeframe isn't available right now. Try Daily."}
+              {!chartsLoaded[timeframe]
+                ? "Loading the chart..."
+                : timeframe === "Daily"
+                  ? "The chart will appear here when prices are available."
+                  : "This timeframe isn't available right now. Try Daily."}
             </p>
           </div>
         )}

@@ -22,6 +22,11 @@ export function marginFor(ticker: string, price: number, units: number): number 
 }
 
 /** The result of a trade, in dollars and before rounding for storage. */
+/** Risk as a percentage of the simulated cash available, the same figure the ticket shows. */
+export function riskPct(risk: number, cash: number): number {
+  return cash > 0 ? Math.round((risk / cash) * 10000) / 100 : 0;
+}
+
 export function pnlFor(ticker: string, direction: Direction, entry: number, exit: number, units: number): number {
   const move = direction === "long" ? exit - entry : entry - exit;
   const result = move * units;

@@ -6,6 +6,8 @@ export type { ChartCandle as Candle };
 export interface ChartSpec {
   timeframes: { label: string; candles: ChartCandle[] }[];
   initial: string;
+  /** Shaded stretches of candles, such as a time window. Indexes refer to the initial timeframe. */
+  bands?: { fromIndex: number; toIndex: number; label: string }[];
 }
 
 export type LessonBlock =

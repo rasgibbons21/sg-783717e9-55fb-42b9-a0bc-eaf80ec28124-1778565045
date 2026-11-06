@@ -43,6 +43,7 @@ vi.mock("@supabase/supabase-js", () => ({
 }));
 
 import handler from "@/pages/api/practice/trades";
+import { riskPct } from "@/lib/practice/maths";
 
 function call(body: Record<string, unknown>) {
   const res = {
@@ -148,5 +149,22 @@ describe("opening a practice trade", () => {
     expect(res.statusCode).toBe(400);
     expect((res.body as { error: string }).error).toContain("smaller");
     expect(rpcCalls).toHaveLength(0);
+  });
+
+  it("refuses a target on the wrong side of the price, which would close the trade at once", async () => {
+    for (const order of [
+      { ...stockOrder, target_price: 195 },
+      { ...stockOrder, direction: "short", stop_price: 210, target_price: 205 },
+    ]) {
+      const res = await call(order);
+      expect(res.statusCode).toBe(400);
+      expect((res.body as { error: string }).error).toContain("target");
+    }
+    expect(inserted).toHaveLength(0);
+  });
+
+  it("measures risk against the same balance the ticket shows", async () => {
+    await call(stockOrder);
+    expect(inserted[0]).toMatchObject({ risk_pct: riskPct(20, 10000) });
   });
 });

@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { nudge, type NudgeKey } from "@/lib/charts/keyboard";
 import { riskReward } from "@/lib/charts/detectors";
 import { priceScale } from "@/lib/charts/scale";
+import { defaultLevels as spacedLevels, defaultZone, handleHitRects } from "@/lib/charts/levels";
 import type { Candle, Zone } from "@/lib/charts/types";
 import { useDrag } from "./useDrag";
 import { cn } from "@/lib/utils";
@@ -25,7 +26,11 @@ export interface ChartStageProps {
   onZoneChange?: (zone: Zone) => void;
   levels?: Levels;
   onLevelsChange?: (levels: Levels) => void;
-  overlays?: { zones?: (Zone & { label?: string })[]; lines?: { price: number; label: string }[] };
+  overlays?: {
+    zones?: (Zone & { label?: string })[];
+    lines?: { price: number; label: string }[];
+    bands?: { fromIndex: number; toIndex: number; label: string }[];
+  };
   height?: number;
   caption?: string;
 }
@@ -34,7 +39,7 @@ const HIT = 44;
 const PAD_X = 8;
 const PRICE_PAD = 14;
 const LEVEL_STYLE: Record<keyof Levels, { label: string; colour: string }> = {
-  entry: { label: "Entry", colour: "var(--bloom-text-light)" },
+  entry: { label: "Planned entry", colour: "var(--bloom-text-light)" },
   stop: { label: "Stop", colour: "var(--bloom-blush)" },
   target: { label: "Target", colour: "var(--bloom-sage)" },
 };
@@ -150,17 +155,11 @@ export function ChartStage({
   const topDrag = useDrag(svgRef, setZoneEdge("top"));
   const bottomDrag = useDrag(svgRef, setZoneEdge("bottom"));
 
-  const placeZoneAt = (y: number) => {
-    const centre = priceAt(y);
-    const half = (max - min) * 0.04;
-    onZoneChange?.({ top: clampPrice(centre + half), bottom: clampPrice(centre - half) });
-  };
+  const placeZoneAt = (y: number) => onZoneChange?.(defaultZone(priceAt(y), min, max, priceHeight, PRICE_PAD));
 
   const defaultLevels = (): Levels => {
     const last = candles[candles.length - 1]?.close ?? (min + max) / 2;
-    const span = max - min;
-    const stop = clampPrice(last - span * 0.08);
-    return { entry: clampPrice(last), stop, target: clampPrice(Math.min(last + (last - stop) * 2, max - span * 0.02)) };
+    return spacedLevels(last, min, max, priceHeight, PRICE_PAD);
   };
 
   useEffect(() => {
@@ -241,6 +240,20 @@ export function ChartStage({
               )}
             </g>
           ))}
+          {overlays?.bands?.map((band, i) => {
+            const x = PAD_X + slot * band.fromIndex;
+            const bandWidth = slot * (band.toIndex - band.fromIndex + 1);
+            return (
+              <g key={`band-${i}`}>
+                <rect x={x} y={0} width={bandWidth} height={priceHeight} fill="var(--bloom-gold)" fillOpacity={0.08} />
+                <line x1={x} x2={x} y1={0} y2={priceHeight} stroke="var(--bloom-gold)" strokeDasharray="3 3" strokeOpacity={0.6} />
+                <line x1={x + bandWidth} x2={x + bandWidth} y1={0} y2={priceHeight} stroke="var(--bloom-gold)" strokeDasharray="3 3" strokeOpacity={0.6} />
+                <text x={x + 4} y={12} fontSize={11} fill="var(--bloom-gold)">
+                  {band.label}
+                </text>
+              </g>
+            );
+          })}
           {overlays?.lines?.map((line, i) => (
             <g key={`line-${i}`}>
               <line x1={0} x2={width} y1={scale.toY(line.price)} y2={scale.toY(line.price)} stroke="var(--bloom-gold)" strokeDasharray="2 4" />
@@ -291,6 +304,7 @@ export function ChartStage({
                 const price = edge === "top" ? zone.top : zone.bottom;
                 const y = scale.toY(price);
                 const drag = edge === "top" ? topDrag : bottomDrag;
+                const hit = handleHitRects(scale.toY(zone.top), scale.toY(zone.bottom), HIT)[scale.toY(price) <= scale.toY(edge === "top" ? zone.bottom : zone.top) ? "top" : "bottom"];
                 return (
                   <g
                     key={edge}
@@ -306,7 +320,7 @@ export function ChartStage({
                     }}
                     {...drag}
                   >
-                    <rect x={0} y={y - HIT / 2} width={width} height={HIT} fill="transparent" />
+                    <rect x={0} y={hit.y} width={width} height={hit.height} fill="transparent" />
                     <circle cx={width / 2} cy={y} r={9} fill="var(--bloom-gold)" stroke="var(--bloom-ink)" strokeWidth={2} />
                   </g>
                 );
@@ -339,7 +353,15 @@ export function ChartStage({
             Reward to risk 1 : {rr.toFixed(1)}
           </span>
         )}
-        {mode === "markZone" && !zone && <span>Tap the chart to place a zone</span>}
+        {mode === "markZone" && !zone && (
+          <button
+            type="button"
+            onClick={() => placeZoneAt(priceHeight / 2)}
+            className="rounded-full border border-[var(--bloom-gold)] px-3 py-1.5 font-medium text-[var(--bloom-gold)]"
+          >
+            Tap the chart, or place a zone here
+          </button>
+        )}
       </div>
     </div>
   );

@@ -26,6 +26,7 @@ export function ChartFindBlock({ block, onAnswered }: { block: Data; onAnswered:
             setSelected(next);
             reset();
           }}
+          overlays={block.chart.bands ? { bands: block.chart.bands } : undefined}
         />
       </div>
       {!solved && <CheckButton onClick={() => check(gradeFind(selected, block.answer))} disabled={selected.length === 0} />}

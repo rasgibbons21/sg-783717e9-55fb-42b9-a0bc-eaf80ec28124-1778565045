@@ -89,6 +89,16 @@ describe("stock curriculum", () => {
     expect(gaps).toContain(block.answer.join(","));
   });
 
+  it("shades the Silver Bullet window on the chart, so the question can be answered", () => {
+    const block = getLesson("silver-bullet")!.blocks.find((b) => b.type === "chartFind") as Extract<LessonBlock, { type: "chartFind" }>;
+    const band = block.chart.bands?.[0];
+    expect(band?.label).toBe("10:00 to 11:00 New York");
+    for (const index of block.answer) {
+      expect(index).toBeGreaterThanOrEqual(band!.fromIndex);
+      expect(index).toBeLessThanOrEqual(band!.toIndex);
+    }
+  });
+
   it("asks zone questions inside the visible price range", () => {
     for (const { lesson, block } of blocksOf("chartZone")) {
       const candles = candlesFor(block.chart, block.chart.initial);

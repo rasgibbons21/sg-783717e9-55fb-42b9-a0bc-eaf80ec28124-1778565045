@@ -16,8 +16,8 @@ export const BIAS_OPTIONS = ["Rising: higher highs and higher lows", "Falling: l
 export const text = (body: string): Block<"text"> => ({ type: "text", body });
 export const pansy = (body: string): Block<"pansy"> => ({ type: "pansy", body });
 
-export function find(built: Built<unknown>, prompt: string, answer: number[], explanation: string): Block<"chartFind"> {
-  return { type: "chartFind", prompt, chart: chart5m(built), answer, explanation };
+export function find(built: Built<unknown>, prompt: string, answer: number[], explanation: string, bands?: ChartSpec["bands"]): Block<"chartFind"> {
+  return { type: "chartFind", prompt, chart: { ...chart5m(built), ...(bands ? { bands } : {}) }, answer, explanation };
 }
 
 export function zone(built: Built<unknown>, prompt: string, answer: Zone, explanation: string): Block<"chartZone"> {

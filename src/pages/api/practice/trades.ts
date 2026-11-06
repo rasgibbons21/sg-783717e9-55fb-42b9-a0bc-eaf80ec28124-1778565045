@@ -3,7 +3,7 @@ import { requireLoggedInUser, sendAuthError } from "@/lib/requireProUser";
 import { createClient } from "@supabase/supabase-js";
 import { getServerQuote } from "@/lib/serverQuote";
 import { getInstrument } from "@/config/instruments";
-import { marginFor, pnlFor } from "@/lib/practice/maths";
+import { marginFor, pnlFor, riskPct } from "@/lib/practice/maths";
 import { SETUP_TYPES, TIMEFRAMES } from "@/config/setups";
 import { isMarketOpen, marketRestingMessage } from "@/lib/practice/marketHours";
 import { releaseCash, reserveCash } from "@/lib/practice/cash";
@@ -69,6 +69,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: "When you buy, your stop needs to be below the current price.", fill_price: fill });
     if (direction === "short" && !(stop > fill))
       return res.status(400).json({ error: "When you sell, your stop needs to be above the current price.", fill_price: fill });
+    const target = target_price == null || target_price === "" ? null : Number(target_price);
+    if (target !== null && (direction === "long" ? !(target > fill) : !(target < fill)))
+      return res.status(400).json({
+        error: direction === "long" ? "When you buy, your target needs to be above the current price." : "When you sell, your target needs to be below the current price.",
+        fill_price: fill,
+      });
     if (Math.abs(fill - stop) / fill > 0.5)
       return res.status(400).json({ error: "That stop is very far from the price. Could there be a typo?", fill_price: fill });
 
@@ -108,9 +114,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         shares: sh,
         entry_price: fill,
         stop_price: stop,
-        target_price: target_price ? Number(target_price) : null,
+        target_price: target,
         risk_amount: riskAmount,
-        risk_pct: Math.round((riskAmount / Number(account.cash_balance)) * 10000) / 100,
+        risk_pct: riskPct(riskAmount, Number(account.cash_balance)),
         setup_type,
         timeframe,
         thesis: thesis || null,

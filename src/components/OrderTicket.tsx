@@ -5,7 +5,7 @@ import type { Levels } from "@/components/charts/ChartStage";
 import type { Instrument } from "@/config/instruments";
 import { SETUP_TYPES, TIMEFRAMES, type SetupType, type Timeframe } from "@/config/setups";
 import { riskReward } from "@/lib/charts/detectors";
-import { marginFor, pnlFor, type Direction } from "@/lib/practice/maths";
+import { marginFor, pnlFor, riskPct, type Direction } from "@/lib/practice/maths";
 import { money, practiceFetch } from "@/lib/practice/api";
 import { cn } from "@/lib/utils";
 
@@ -56,9 +56,11 @@ export function OrderTicket({ instrument, price, marketOpen, buyingPower, balanc
   const stopOnRightSide = price != null && stopValue > 0 && (direction === "long" ? stopValue < price : stopValue > price);
   const cost = price != null ? marginFor(instrument.symbol, price, shares) : null;
   const risk = stopOnRightSide && price != null ? Math.abs(pnlFor(instrument.symbol, direction, price, stopValue, shares)) : null;
-  const riskPercent = risk != null && balance > 0 ? (risk / balance) * 100 : null;
+  // Measured against available cash, exactly as the server records it for the process score.
+  const riskPercent = risk != null ? riskPct(risk, buyingPower) : null;
+  const targetOnRightSide = !targetValue || (price != null && (direction === "long" ? targetValue > price : targetValue < price));
   const rr = price != null && stopOnRightSide && targetValue ? riskReward(price, stopValue, targetValue) : null;
-  const canPlace = marketOpen && price != null && stopOnRightSide && !placing;
+  const canPlace = marketOpen && price != null && stopOnRightSide && targetOnRightSide && !placing;
 
   const place = async () => {
     setPlacing(true);
@@ -190,6 +192,9 @@ export function OrderTicket({ instrument, price, marketOpen, buyingPower, balanc
           <dd className={cn("font-medium", rr != null && rr >= 1.5 ? "text-[var(--bloom-gold)]" : "text-foreground")}>{rr != null ? `1 : ${rr.toFixed(1)}` : "-"}</dd>
         </div>
       </dl>
+      {!targetOnRightSide && (
+        <p className="mt-2 text-sm text-foreground">When you {direction === "long" ? "buy" : "sell"}, your target needs to be {direction === "long" ? "above" : "below"} the current price.</p>
+      )}
       {stop && !stopOnRightSide && price != null && (
         <p className="mt-2 text-sm text-foreground">When you {direction === "long" ? "buy" : "sell"}, your stop needs to be {direction === "long" ? "below" : "above"} the current price.</p>
       )}
@@ -204,7 +209,7 @@ export function OrderTicket({ instrument, price, marketOpen, buyingPower, balanc
           className="mt-1 w-full rounded-2xl border border-border bg-[var(--bloom-ink)] p-3 text-base text-foreground outline-none focus:border-primary"
         />
       </label>
-      <p className="mt-1 text-xs text-muted-foreground">A stop, a reward at least 1.5 times the risk, 1% risk or less and a note each add to your process score.</p>
+      <p className="mt-1 text-xs text-muted-foreground">Practice orders fill at the current price. A stop, a reward at least 1.5 times the risk, 1% risk or less and a note each add to your process score.</p>
 
       {message && (
         <p role="status" className={cn("mt-3 rounded-2xl p-3 text-sm text-foreground", message.good ? "bg-[rgba(143,160,136,0.18)]" : "bg-accent")}>

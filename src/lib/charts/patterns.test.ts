@@ -163,6 +163,14 @@ describe.each(SEEDS)("pattern builders with seed %i", (seed) => {
     expect(newYorkHour(answer.windowEnd)).toBe(11);
   });
 
+  it("leaves exactly one gap to find, so a correct-looking pick is never marked wrong", () => {
+    expect(findFVGs(bullishFVG(seed).candles)).toEqual([bullishFVG(seed).answer.fvg]);
+    expect(findFVGs(bearishFVG(seed).candles)).toEqual([bearishFVG(seed).answer.fvg]);
+    expect(findFVGs(silverBullet(seed).candles)).toEqual([silverBullet(seed).answer.fvg]);
+    const inverse = inverseFVG(seed);
+    expect(findFVGs(inverse.candles).filter((g) => g.direction === "bearish")).toEqual([inverse.answer.fvg]);
+  });
+
   it("gives every pattern higher timeframes built from the same prices", () => {
     const { candles, timeframes } = bullishFVG(seed);
     expect(timeframes.map((t) => t.label)).toEqual(["Daily", "1H", "5m"]);

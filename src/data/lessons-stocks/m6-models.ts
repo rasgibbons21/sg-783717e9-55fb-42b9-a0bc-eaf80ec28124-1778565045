@@ -61,7 +61,9 @@ export const M6_MODELS: Lesson[] = [
     intro: [
       "The Silver Bullet is a timing model. It looks for a fair value gap that forms between 10:00 and 11:00am New York time, after the opening rush has settled.\n\nThe idea is that this hour often brings a clean move towards nearby liquidity. You look for the gap inside the window, in the direction of the bias, then plan an entry back into it.",
     ],
-    spot: find(window, "Find the gap that forms inside the 10am to 11am window. Tap its three candles.", window.answer.fvg.indexes, "Yes. It forms just after 10:15am New York time, inside the Silver Bullet window."),
+    spot: find(window, "Find the gap that forms inside the 10am to 11am window. Tap its three candles.", window.answer.fvg.indexes, "Yes. It forms just after 10:15am New York time, inside the Silver Bullet window.", [
+      { fromIndex: window.candles.findIndex((c) => c.time === window.answer.windowStart), toIndex: window.candles.findIndex((c) => c.time === window.answer.windowEnd), label: "10:00 to 11:00 New York" },
+    ]),
     context: scenario(
       "A gap forms at 9:40am, before the window opens. Does it count as a Silver Bullet?",
       ["No. The model only uses gaps formed from 10am to 11am.", "Right. Timing is the whole point of this model, so a gap outside the window doesn't count."],
