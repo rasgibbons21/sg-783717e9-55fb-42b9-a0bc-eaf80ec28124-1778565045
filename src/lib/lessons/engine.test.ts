@@ -6,7 +6,6 @@ import {
   loadResume,
   saveResume,
   shuffleNotSolved,
-  sliderOutcome,
 } from "./engine";
 
 const steps = ["Choose an instrument", "Set a stop", "Choose a lot size", "Place the trade"];
@@ -43,22 +42,6 @@ describe("advancing", () => {
     expect(isInteractive(quiz)).toBe(true);
     expect(canAdvance(quiz, false)).toBe(false);
     expect(canAdvance(quiz, true)).toBe(true);
-  });
-});
-
-describe("sliderOutcome", () => {
-  it("shows what leverage controls and what a small move costs", () => {
-    const outcome = sliderOutcome("leverage", 20);
-    expect(outcome.controlled).toBe(2000);
-    expect(outcome.adverseMoveCost).toBe(20);
-  });
-
-  it("explains lot sizes in ounces of gold", () => {
-    expect(sliderOutcome("lotSize", 0.01).ounces).toBe(1);
-  });
-
-  it("works out the amount at risk from a percentage", () => {
-    expect(sliderOutcome("riskPercent", 1).riskAmount).toBe(100);
   });
 });
 

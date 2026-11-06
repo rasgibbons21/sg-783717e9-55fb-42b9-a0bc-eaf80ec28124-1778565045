@@ -1,14 +1,6 @@
 import type { Candle as ChartCandle, Zone } from "@/lib/charts/types";
 
-/** The simple candle shape used by the older chartTap block, which goes once the gold lessons are retired. */
-export interface Candle {
-  open: number;
-  high: number;
-  low: number;
-  close: number;
-}
-
-export type SliderOutcomeKey = "leverage" | "lotSize" | "riskPercent";
+export type { ChartCandle as Candle };
 
 /** The timeframes a lesson chart offers, and the one it opens on. */
 export interface ChartSpec {
@@ -46,19 +38,6 @@ export type LessonBlock =
       minRR: number;
       explanation: string;
     }
-  // Older blocks, kept only until the gold lessons are removed.
-  | { type: "chartTap"; prompt: string; candles: Candle[]; correctIndexes: number[]; explanation: string }
-  | {
-      type: "slider";
-      prompt: string;
-      min: number;
-      max: number;
-      step: number;
-      initial: number;
-      unit: string;
-      outcomeKey: SliderOutcomeKey;
-      note: string;
-    };
 
 export interface Lesson {
   slug: string;

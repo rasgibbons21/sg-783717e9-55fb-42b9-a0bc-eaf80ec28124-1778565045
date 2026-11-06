@@ -8,9 +8,7 @@ import { TextBlock } from "./blocks/TextBlock";
 import { PansyBlock } from "./blocks/PansyBlock";
 import { QuizBlock } from "./blocks/QuizBlock";
 import { ScenarioBlock } from "./blocks/ScenarioBlock";
-import { SliderBlock } from "./blocks/SliderBlock";
 import { OrderBlock } from "./blocks/OrderBlock";
-import { ChartTapBlock } from "./blocks/ChartTapBlock";
 import { ChartFindBlock } from "./blocks/ChartFindBlock";
 import { ChartZoneBlock } from "./blocks/ChartZoneBlock";
 import { ChartVolumeBlock } from "./blocks/ChartVolumeBlock";
@@ -30,12 +28,8 @@ function Block({ block, onAnswered }: { block: LessonBlock; onAnswered: (firstTr
       return <QuizBlock block={block} onAnswered={onAnswered} />;
     case "scenario":
       return <ScenarioBlock block={block} onAnswered={onAnswered} />;
-    case "slider":
-      return <SliderBlock block={block} onAnswered={onAnswered} />;
     case "order":
       return <OrderBlock block={block} onAnswered={onAnswered} />;
-    case "chartTap":
-      return <ChartTapBlock block={block} onAnswered={onAnswered} />;
     case "chartFind":
       return <ChartFindBlock block={block} onAnswered={onAnswered} />;
     case "chartZone":

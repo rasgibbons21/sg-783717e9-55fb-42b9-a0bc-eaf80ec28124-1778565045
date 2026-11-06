@@ -9,7 +9,7 @@ import { SEO } from "@/components/SEO";
 import { RiskNote } from "@/components/RiskNote";
 import { Switch } from "@/components/ui/switch";
 import { useSubscription } from "@/contexts/SubscriptionContext";
-import { ALL_LESSONS, hasFinishedCourse } from "@/data/lessons-v2";
+import { ALL_LESSONS, hasFinishedCourse } from "@/data/lessons-stocks";
 import { useLearningProgress } from "@/hooks/useLearningProgress";
 import { supabase } from "@/integrations/supabase/client";
 import { money, practiceFetch, type PracticeAccount, type PracticeTrade } from "@/lib/practice/api";

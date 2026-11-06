@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createClient } from "@supabase/supabase-js";
-import { getLesson } from "@/data/lessons-v2";
+import { getLesson } from "@/data/lessons-stocks";
 import { requireLoggedInUser, sendAuthError } from "@/lib/requireProUser";
 
 const supabaseAdmin = createClient(

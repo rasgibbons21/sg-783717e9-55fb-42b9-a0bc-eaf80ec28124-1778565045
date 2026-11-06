@@ -4,7 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Flower2 } from "lucide-react";
 import { useSubscription } from "@/contexts/SubscriptionContext";
-import { ALL_LESSONS, firstIncomplete } from "@/data/lessons-v2";
+import { ALL_LESSONS, firstIncomplete } from "@/data/lessons-stocks";
 import { useLearningProgress } from "@/hooks/useLearningProgress";
 import { supabase } from "@/integrations/supabase/client";
 

@@ -224,7 +224,7 @@ export function ChartStage({
           onPointerDown={(event) => {
             if (mode === "markZone" && !zone && svgRef.current) placeZoneAt(event.clientY - svgRef.current.getBoundingClientRect().top);
           }}
-          style={{ touchAction: mode === "markZone" || mode === "placeLevels" ? "none" : undefined }}
+          style={{ maxWidth: "100%", touchAction: mode === "markZone" || mode === "placeLevels" ? "none" : undefined }}
         >
           {[0.25, 0.5, 0.75].map((f) => (
             <line key={f} x1={0} x2={width} y1={priceHeight * f} y2={priceHeight * f} stroke="var(--bloom-rule)" strokeWidth={0.5} />

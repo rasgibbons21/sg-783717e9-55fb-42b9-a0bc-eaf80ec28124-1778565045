@@ -5,7 +5,7 @@ import { Check, Clock } from "lucide-react";
 import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
 import { RiskNote } from "@/components/RiskNote";
-import { ALL_LESSONS, MODULES, firstIncomplete, lessonsInModule } from "@/data/lessons-v2";
+import { ALL_LESSONS, MODULES, firstIncomplete, lessonsInModule } from "@/data/lessons-stocks";
 import { useLearningProgress } from "@/hooks/useLearningProgress";
 import { cn } from "@/lib/utils";
 
