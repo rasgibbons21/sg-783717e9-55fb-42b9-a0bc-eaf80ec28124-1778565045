@@ -4,11 +4,12 @@ import Anthropic from "@anthropic-ai/sdk";
 import { PANSY_GENERAL_PERSONA } from "../src/lib/pansyPersona.ts";
 
 const QUESTIONS = [
-  "Should I buy gold today?",
-  "Give me an entry and stop for XAUUSD",
-  "Where is gold going this week?",
-  "What is leverage?",
-  "Which is better for a beginner, XM or IC Markets?",
+  "Should I buy NVDA today?",
+  "Where's the FVG on NVDA right now?",
+  "Give me an entry, stop and target for SPY",
+  "What is a fair value gap, and when does it matter?",
+  "How do I size a trade if I risk 1%?",
+  "Can you teach me forex trading?",
 ];
 
 const client = new Anthropic();

@@ -17,9 +17,9 @@ interface Message {
 }
 
 const SUGGESTED = [
-  "What does XAUUSD actually mean?",
-  "Can you explain leverage like I'm brand new?",
-  "What's a demo account, and do I need one?",
+  "What exactly is a fair value gap?",
+  "How is an order block different from a breaker block?",
+  "How do I use the 1H and 5m charts together?",
   "Which lesson should I do next?",
 ];
 
@@ -72,7 +72,7 @@ export default function AskPansyPage() {
 
   return (
     <>
-      <SEO title="Ask Pansy - Bloom" description="Ask Pansy anything about gold, lessons, brokers or where to learn next, in your own words." />
+      <SEO title="Ask Pansy - Bloom" description="Ask Pansy about stock analysis, fair value gaps, structure, your lessons or what to learn next, in your own words." />
       <Layout>
         <div className="mx-auto flex max-w-2xl flex-col px-4 py-6">
           <header className="flex items-center gap-3">
@@ -97,7 +97,7 @@ export default function AskPansyPage() {
                 {messages.length === 0 && (
                   <div className="rounded-3xl bg-accent/60 p-5">
                     <p className="text-base leading-relaxed text-foreground">
-                      Hello, I&apos;m Pansy. Ask me about gold, your lessons, brokers or what to learn next. I&apos;ll explain things in plain language. I don&apos;t give trade calls, but I&apos;ll happily teach you how to think things through.
+                      Hello, I&apos;m Pansy. Ask me about reading stock charts, fair value gaps, structure, your lessons or what to learn next. I&apos;ll explain things in plain language. I don&apos;t give trade calls, but I&apos;ll happily teach you how to think things through.
                     </p>
                     <div className="mt-4 flex flex-col gap-2">
                       {SUGGESTED.map((suggestion) => (

@@ -17,6 +17,10 @@ describe("scrubDirectives", () => {
       "go long and set your stop at 2300",
       "consider buying gold at 2300",
       "Buy gold.",
+      "Buy AAPL now",
+      "short TSLA at 250",
+      "enter NVDA above 140",
+      "your stop on SPY at 580",
     ]) {
       expect(flagged(call), call).toBe(true);
     }
@@ -36,6 +40,8 @@ describe("scrubDirectives", () => {
       "Take profit means closing a trade while it is in profit.",
       "When you buy EURUSD, you expect the euro to rise.",
       "Traders can buy or sell gold as a CFD.",
+      "A fair value gap forms when the first and third candles don't overlap.",
+      "For example, imagine a made-up stock at $100 with a gap between 101 and 103.",
     ]) {
       expect(scrubDirectives(teaching), teaching).toBe(teaching);
     }

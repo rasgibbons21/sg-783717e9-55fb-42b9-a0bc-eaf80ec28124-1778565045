@@ -12,9 +12,9 @@ const DIRECTIVE_PATTERNS: { pattern: RegExp; label: string }[] = [
   { pattern: new RegExp(`^\\s*(?:buy|sell|short)\\s+${INSTRUMENT}\\s*[.!]?\\s*$`, "i"), label: "bare-directive" },
   { pattern: new RegExp(`\\b(?:consider|try|think about)\\s+(?:buying|selling|shorting)\\s+${INSTRUMENT}`, "i"), label: "soft-directive" },
   { pattern: /\bgo (?:long|short)\b/i, label: "go-long-short" },
-  { pattern: new RegExp(`\\b(?:buy|sell|enter|exit|get in)\\s+${LEVEL}`, "i"), label: "level-directive" },
+  { pattern: new RegExp(`\\b(?:buy|sell|enter|exit|get in)\\s+(?:[A-Z]{1,5}\\s+)?${LEVEL}`, "i"), label: "level-directive" },
   { pattern: /\bprice target\s*(of|is|at|:)?\s*\$?\d/i, label: "price-target" },
-  { pattern: /\bstop(?:[- ]?loss)?\s+(at|of|around|near)\s*\$?\d/i, label: "stop-directive" },
+  { pattern: /\bstop(?:[- ]?loss)?\s+(?:(?:on|for)\s+[A-Z]{1,5}\s+)?(at|of|around|near)\s*\$?\d/i, label: "stop-directive" },
   { pattern: /\btake[- ]?profit\s+(at|of|around|near)\s*\$?\d/i, label: "take-profit-directive" },
   { pattern: /\b(guaranteed|risk[- ]?free|can't lose|sure thing|free money)\b/i, label: "guarantee-language" },
 ];
