@@ -3,11 +3,11 @@ import { requireLoggedInUser, sendAuthError } from "@/lib/requireProUser";
 import { createClient } from "@supabase/supabase-js";
 import { getServerQuote } from "@/lib/serverQuote";
 import { getInstrument } from "@/config/instruments";
-import { lotsToUnits, marginFor, pnlFor } from "@/lib/practice/maths";
+import { marginFor, pnlFor } from "@/lib/practice/maths";
+import { SETUP_TYPES, TIMEFRAMES } from "@/config/setups";
 import { isMarketOpen, marketRestingMessage } from "@/lib/practice/marketHours";
 import { releaseCash, reserveCash } from "@/lib/practice/cash";
 
-const SMALLEST_LOT = 0.01;
 const MOST_RISK_PER_TRADE = 0.2;
 
 const supabaseAdmin = createClient(
@@ -35,25 +35,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   // ── POST: open a new trade (market order, mandatory stop) ──────────────────
   if (req.method === "POST") {
-    const { ticker, direction, lots, stop_price, target_price, thesis } = req.body;
+    const { ticker, direction, shares, stop_price, target_price, thesis, setup_type, timeframe } = req.body;
 
     // A stop is required on every trade, because it teaches the habit that matters most.
     if (!ticker || !direction || stop_price == null)
-      return res.status(400).json({ error: "Please choose an instrument, a direction and a stop." });
+      return res.status(400).json({ error: "Please choose a stock, a direction and a stop." });
     if (!["long", "short"].includes(direction))
       return res.status(400).json({ error: "Please choose buy or sell." });
 
     const instrument = getInstrument(ticker);
-    if (!instrument) return res.status(400).json({ error: "That instrument isn't available in Practice." });
+    if (!instrument) return res.status(400).json({ error: "That stock isn't available in Practice." });
+    if (!instrument.listed) return res.status(400).json({ error: "That market isn't available in Practice anymore." });
 
-    const lotSize = Number(lots);
+    // Every trade records the setup and timeframe from the lessons, so the process can be scored.
+    if (!SETUP_TYPES.includes(setup_type)) return res.status(400).json({ error: "Please choose the setup you're using." });
+    if (!TIMEFRAMES.includes(timeframe)) return res.status(400).json({ error: "Please choose the timeframe you planned on." });
+
+    const sh = Number(shares);
     const stop = Number(stop_price);
-    if (!(lotSize >= SMALLEST_LOT)) return res.status(400).json({ error: "The smallest size is 0.01 lot." });
+    if (!Number.isInteger(sh) || sh < 1) return res.status(400).json({ error: "Please choose a whole number of shares, at least 1." });
     if (!(stop > 0)) return res.status(400).json({ error: "Please choose a stop above zero." });
 
     if (!isMarketOpen(instrument.symbol, new Date())) return res.status(409).json({ error: marketRestingMessage(instrument.symbol) });
-
-    const sh = lotsToUnits(instrument.symbol, lotSize);
 
     // Fresh server-side market fill — never trust a client-supplied entry price.
     const quote = await getServerQuote(ticker);
@@ -107,6 +110,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         stop_price: stop,
         target_price: target_price ? Number(target_price) : null,
         risk_amount: riskAmount,
+        risk_pct: Math.round((riskAmount / Number(account.cash_balance)) * 10000) / 100,
+        setup_type,
+        timeframe,
         thesis: thesis || null,
         status: "open",
       })
