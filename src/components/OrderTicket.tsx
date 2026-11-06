@@ -137,7 +137,7 @@ export function OrderTicket({ instrument, price, marketOpen, buyingPower, balanc
       )}
 
       {message && (
-        <p role="status" className={cn("mt-3 rounded-2xl p-3 text-sm text-foreground", message.good ? "bg-[#E6ECE3]" : "bg-accent/70")}>
+        <p role="status" className={cn("mt-3 rounded-2xl p-3 text-sm text-foreground", message.good ? "bg-[rgba(143,160,136,0.18)]" : "bg-accent/70")}>
           {message.text}
         </p>
       )}

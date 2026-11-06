@@ -3,7 +3,6 @@ import Link from "next/link";
 import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
 import { RiskNote } from "@/components/RiskNote";
-import { Botanical } from "@/components/brand/Botanical";
 import { brokers, type BrokerConfig } from "@/config/brokers";
 import { useBrokerNotice } from "@/hooks/useBrokerNotice";
 import { supabase } from "@/integrations/supabase/client";
@@ -89,7 +88,6 @@ export default function BrokersPage() {
       <Layout>
         <div className="mx-auto max-w-2xl space-y-8 px-4 py-6">
           <header className="relative overflow-hidden rounded-3xl bg-secondary p-6">
-            <Botanical variant="corner" className="pointer-events-none absolute -right-6 -top-4 h-36 w-28" />
             <h1 className="max-w-[80%] text-3xl font-semibold leading-tight text-foreground">When you feel ready, try a free demo</h1>
             <p className="mt-2 max-w-[90%] text-base leading-relaxed text-muted-foreground">
               A demo account lets you practise on a real broker&apos;s platform with pretend money. There&apos;s no rush, and staying with Bloom&apos;s practice area is always fine.

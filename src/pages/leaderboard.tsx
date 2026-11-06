@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { BloomMark } from "@/components/brand/BloomMark";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { EyeOff, Loader2, Share2 } from "lucide-react";
@@ -6,7 +7,6 @@ import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
 import { RiskNote } from "@/components/RiskNote";
 import { useShareAchievement } from "@/components/ShareAchievement";
-import { Botanical } from "@/components/brand/Botanical";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { money, practiceFetch } from "@/lib/practice/api";
 import { cn } from "@/lib/utils";
@@ -70,7 +70,7 @@ function BoardRows({ board, tab, userId }: { board: Board; tab: Tab; userId: str
   if (board.rows.length === 0) {
     return (
       <div className="rounded-3xl bg-card p-6 text-center shadow-[var(--bloom-shadow)]">
-        <Botanical variant="bloom" className="mx-auto h-20 w-20" />
+        <div className="mx-auto w-fit"><BloomMark size={56} /></div>
         <h2 className="mt-2 text-xl font-semibold text-foreground">Be the first to bloom here</h2>
         <p className="mt-1 text-base text-muted-foreground">
           {tab === "learning" ? "Finish a lesson and you'll appear on this board." : "Close a practice trade and you'll appear on this board."}
@@ -101,7 +101,7 @@ function BoardRows({ board, tab, userId }: { board: Board; tab: Tab; userId: str
             {row.name}
             {row.id === userId && <span className="ml-1 text-sm font-normal text-muted-foreground">(you)</span>}
           </span>
-          <span className={cn("shrink-0 font-medium", tab === "practice" && row.value < 0 ? "text-[#8A5B44]" : "text-primary")}>{format(row.value)}</span>
+          <span className={cn("shrink-0 font-medium", tab === "practice" && row.value < 0 ? "text-[var(--bloom-blush)]" : "text-primary")}>{format(row.value)}</span>
         </li>
       ))}
     </ol>
@@ -158,7 +158,6 @@ export default function LeaderboardPage() {
       <Layout>
         <div className="mx-auto max-w-2xl space-y-4 px-4 py-6">
           <header className="relative overflow-hidden rounded-3xl bg-secondary p-6">
-            <Botanical variant="corner" className="pointer-events-none absolute -right-6 -top-4 h-36 w-28" />
             <h1 className="max-w-[80%] text-3xl font-semibold leading-tight text-foreground">Growing together</h1>
             <p className="mt-2 max-w-[85%] text-base text-muted-foreground">Every lesson and every practice trade counts. Cheer each other on.</p>
           </header>

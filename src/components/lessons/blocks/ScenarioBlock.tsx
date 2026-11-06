@@ -34,7 +34,7 @@ export function ScenarioBlock({ block, onAnswered }: { block: ScenarioData; onAn
             onClick={() => pick(index)}
             className={cn(
               "w-full rounded-2xl border border-border bg-card p-4 text-left text-base text-foreground",
-              picked === index && (option.good ? "border-primary bg-[#E6ECE3]" : "border-[var(--bloom-clay)] bg-accent/50"),
+              picked === index && (option.good ? "border-primary bg-[rgba(143,160,136,0.18)]" : "border-[var(--bloom-blush)] bg-accent/50"),
             )}
           >
             {option.label}

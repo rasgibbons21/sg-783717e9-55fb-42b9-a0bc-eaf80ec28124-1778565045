@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { BloomMark } from "@/components/brand/BloomMark";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
@@ -8,7 +9,6 @@ import { ActiveTradeCard } from "@/components/ActiveTradeCard";
 import DynamicChart, { type OHLCBar } from "@/components/DynamicChart";
 import { OrderTicket } from "@/components/OrderTicket";
 import { RiskNote } from "@/components/RiskNote";
-import { Botanical } from "@/components/brand/Botanical";
 import { INSTRUMENTS, getInstrument, type Instrument } from "@/config/instruments";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { marketRestingMessage } from "@/lib/practice/marketHours";
@@ -22,7 +22,7 @@ const PRICE_REFRESH_MS = 30_000;
 function SignedOutCard() {
   return (
     <div className="mx-auto max-w-xl px-4 py-10 text-center">
-      <Botanical variant="bloom" className="mx-auto h-24 w-24" />
+      <div className="mx-auto w-fit"><BloomMark size={56} /></div>
       <h1 className="mt-3 text-3xl font-semibold text-foreground">Practise what you just learned, safely</h1>
       <p className="mt-2 text-base text-muted-foreground">Join free and get a simulated account to try gold and other markets. No real money, ever.</p>
       <Link href="/onboarding" className="mt-5 inline-flex h-12 items-center rounded-full bg-primary px-7 font-semibold text-primary-foreground">
@@ -163,7 +163,7 @@ function PracticeDesk() {
         </div>
         <div>
           <p className="text-sm text-muted-foreground">Results so far</p>
-          <p className={cn("font-serif text-2xl font-semibold", totalResult >= 0 ? "text-primary" : "text-[#8A5B44]")}>
+          <p className={cn("font-serif text-2xl font-semibold", totalResult >= 0 ? "text-primary" : "text-[var(--bloom-blush)]")}>
             {totalResult >= 0 ? "+" : "-"}
             {money(Math.abs(totalResult))}
           </p>
@@ -252,7 +252,7 @@ function PracticeDesk() {
                     <span className="block font-medium text-foreground">{getInstrument(trade.ticker)?.name ?? trade.ticker}</span>
                     <span className="block text-sm text-muted-foreground">{trade.direction === "long" ? "Bought" : "Sold"}{trade.exit_reason ? ` · ${trade.exit_reason}` : ""}</span>
                   </span>
-                  <span className={cn("font-semibold", pnl >= 0 ? "text-primary" : "text-[#8A5B44]")}>
+                  <span className={cn("font-semibold", pnl >= 0 ? "text-primary" : "text-[var(--bloom-blush)]")}>
                     {pnl >= 0 ? "+" : "-"}
                     {money(Math.abs(pnl))}
                   </span>

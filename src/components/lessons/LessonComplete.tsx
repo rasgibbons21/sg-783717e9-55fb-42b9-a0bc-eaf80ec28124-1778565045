@@ -1,11 +1,11 @@
 import { useEffect } from "react";
+import { BloomMark } from "@/components/brand/BloomMark";
 import Link from "next/link";
 import confetti from "canvas-confetti";
 import { motion } from "framer-motion";
 import { ArrowRight, Loader2 } from "lucide-react";
 import type { Lesson } from "@/data/lessons-v2/types";
 import { lessonsInModule, nextLesson } from "@/data/lessons-v2";
-import { Botanical } from "@/components/brand/Botanical";
 import { RiskNote } from "@/components/RiskNote";
 import { useBrokerNotice } from "@/hooks/useBrokerNotice";
 
@@ -35,7 +35,7 @@ export function LessonComplete({ lesson, saveState, isNew, onRetrySave }: Props)
       particleCount: 60,
       spread: 70,
       origin: { y: 0.45 },
-      colors: ["#EFD9D3", "#C2A15A", "#3F4F3E", "#B98A72"],
+      colors: ["#C4A574", "#F3EEE4", "#8FA088", "#D9B8AE"],
       scalar: 0.85,
     });
   }, []);
@@ -43,7 +43,7 @@ export function LessonComplete({ lesson, saveState, isNew, onRetrySave }: Props)
   return (
     <div className="mx-auto max-w-xl px-4 py-8 text-center">
       <motion.div initial={{ scale: 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 160, damping: 14 }}>
-        <Botanical variant="bloom" className="mx-auto h-28 w-28" />
+        <div className="mx-auto w-fit"><BloomMark size={56} /></div>
       </motion.div>
       <h1 className="mt-2 text-3xl font-semibold text-foreground">Lovely work</h1>
       <p className="mt-2 text-base text-muted-foreground">

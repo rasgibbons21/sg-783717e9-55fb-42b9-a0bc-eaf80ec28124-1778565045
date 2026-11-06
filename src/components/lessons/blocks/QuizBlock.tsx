@@ -29,8 +29,8 @@ export function QuizBlock({ block, onAnswered }: { block: QuizData; onAnswered: 
             onClick={() => pick(index)}
             className={cn(
               "w-full rounded-2xl border border-border bg-card p-4 text-left text-base text-foreground transition-colors",
-              picked === index && index === block.correct && "border-primary bg-[#E6ECE3]",
-              picked === index && index !== block.correct && "border-[var(--bloom-clay)] bg-accent/50",
+              picked === index && index === block.correct && "border-primary bg-[rgba(143,160,136,0.18)]",
+              picked === index && index !== block.correct && "border-[var(--bloom-blush)] bg-accent/50",
             )}
           >
             {option}

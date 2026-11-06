@@ -2,7 +2,6 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowUpRight, BookOpen, Flower2, MessageCircleHeart, Sprout } from "lucide-react";
 import { BloomMark } from "@/components/brand/BloomMark";
-import { Botanical } from "@/components/brand/Botanical";
 import { RiskNote } from "@/components/RiskNote";
 import { HeroCards } from "./HeroCards";
 
@@ -30,8 +29,6 @@ export function SignedOutHero() {
             "radial-gradient(60% 45% at 12% 8%, rgba(194,161,90,0.20), transparent 70%), radial-gradient(55% 50% at 92% 20%, rgba(239,217,211,0.75), transparent 72%), radial-gradient(70% 55% at 50% 100%, rgba(63,79,62,0.12), transparent 75%), var(--bloom-paper-warm)",
         }}
       >
-        <Botanical variant="corner" className="pointer-events-none absolute -right-10 -top-6 h-64 w-52 opacity-50 blur-[1px]" />
-        <Botanical variant="corner" className="pointer-events-none absolute -left-16 top-40 h-64 w-52 rotate-180 opacity-30 blur-[1px]" />
 
         <div className="relative mx-auto max-w-2xl text-center">
           <div className="bloom-rise mx-auto w-fit">

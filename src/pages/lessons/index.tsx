@@ -1,10 +1,9 @@
 import Link from "next/link";
+import { ProgressLine } from "@/components/ProgressLine";
 import { motion } from "framer-motion";
 import { Check, Clock } from "lucide-react";
 import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
-import { BloomGarden } from "@/components/BloomGarden";
-import { Botanical } from "@/components/brand/Botanical";
 import { RiskNote } from "@/components/RiskNote";
 import { ALL_LESSONS, MODULES, firstIncomplete, lessonsInModule } from "@/data/lessons-v2";
 import { useLearningProgress } from "@/hooks/useLearningProgress";
@@ -22,14 +21,13 @@ export default function LessonsPage() {
       <Layout>
         <div className="mx-auto max-w-2xl px-4 py-6">
           <div className="relative overflow-hidden rounded-3xl bg-secondary p-6">
-            <Botanical variant="corner" className="pointer-events-none absolute -right-6 -top-4 h-36 w-28" />
             <p className="text-sm font-semibold text-muted-foreground">Your learning path</p>
             <h1 className="mt-1 max-w-[80%] text-3xl font-semibold leading-tight text-foreground">Gold first, then the wider markets</h1>
             <p className="mt-2 text-base text-muted-foreground">
               {finishedCount} of {ALL_LESSONS.length} lessons finished. Go at your own pace.
             </p>
             <div className="mt-4">
-              <BloomGarden completedCount={finishedCount} total={ALL_LESSONS.length} />
+              <ProgressLine done={finishedCount} total={ALL_LESSONS.length} label="Lessons finished" />
             </div>
           </div>
 

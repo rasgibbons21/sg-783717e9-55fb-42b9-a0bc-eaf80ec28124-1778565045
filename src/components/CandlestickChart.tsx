@@ -33,13 +33,13 @@ interface Props {
   height?: number;
 }
 
-const CHART_BG = "#FFFDF8";
-const SURFACE = "#3F4F3E";
-const GRID = "rgba(42,36,28,0.06)";
-const TEXT = "#6F6860";
-const UP = "#3F4F3E";
-const DOWN = "#B98A72";
-const TEAL = "#C2A15A";
+const CHART_BG = "#1A1814";
+const SURFACE = "#C4A574";
+const GRID = "rgba(243,238,228,0.06)";
+const TEXT = "#A79E91";
+const UP = "#C4A574";
+const DOWN = "#D9B8AE";
+const TEAL = "#C4A574";
 
 export function CandlestickChart({ data, priceLines, height = 280 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);

@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
+import { ProgressLine } from "@/components/ProgressLine";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { motion } from "framer-motion";
 import { Award, Loader2 } from "lucide-react";
 import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
-import { BloomGarden } from "@/components/BloomGarden";
 import { RiskNote } from "@/components/RiskNote";
 import { Switch } from "@/components/ui/switch";
 import { useSubscription } from "@/contexts/SubscriptionContext";
@@ -130,7 +130,7 @@ export default function ProfilePage() {
                 {finishedCount === 0 ? "Your first bloom is one lesson away." : `${finishedCount} of ${ALL_LESSONS.length} lessons finished.`}
               </p>
               <div className="mt-3">
-                <BloomGarden completedCount={finishedCount} total={ALL_LESSONS.length} />
+                <ProgressLine done={finishedCount} total={ALL_LESSONS.length} label="Lessons finished" />
               </div>
               <Link href="/lessons" className="mt-3 inline-block text-sm font-semibold text-primary underline underline-offset-2">
                 Go to lessons
@@ -156,7 +156,7 @@ export default function ProfilePage() {
                   </div>
                   <div>
                     <dt className="text-xs text-muted-foreground">Results</dt>
-                    <dd className={`font-serif text-lg font-semibold ${summary.result >= 0 ? "text-primary" : "text-[#8A5B44]"}`}>
+                    <dd className={`font-serif text-lg font-semibold ${summary.result >= 0 ? "text-primary" : "text-[var(--bloom-blush)]"}`}>
                       {summary.result >= 0 ? "+" : "-"}
                       {money(Math.abs(summary.result))}
                     </dd>

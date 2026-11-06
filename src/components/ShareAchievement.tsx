@@ -12,13 +12,13 @@ interface ShareAchievementProps {
 }
 
 const C = {
-  bg: '#FBF8F2',
-  card: '#FFFDF8',
-  accent: '#3F4F3E',
-  gold: '#C2A15A',
-  green: '#3F4F3E',
-  text: '#2A241C',
-  textDim: '#6F6860',
+  bg: '#0C0D0B',
+  card: '#1A1814',
+  accent: '#C4A574',
+  gold: '#C4A574',
+  green: '#C4A574',
+  text: '#F3EEE4',
+  textDim: '#A79E91',
 };
 
 export function ShareAchievement({
