@@ -16,7 +16,7 @@ export default function HomePage() {
 
   return (
     <>
-      <SEO title="Home - Bloom" description="Pick up your gold lessons where you left off." />
+      <SEO title="Home - Bloom" description="Pick up your stock lessons where you left off." />
       <Layout>
         {isLoggedIn ? (
           <SignedInHome />

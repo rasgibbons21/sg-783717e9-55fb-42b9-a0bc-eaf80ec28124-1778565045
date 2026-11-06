@@ -37,7 +37,7 @@ export default function AcademyCertificatePage() {
           Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
-          course_id: course || 'gold-foundations',
+          course_id: course || 'stock-analysis-foundations',
           level: level || 'beginner',
         }),
       });
@@ -52,7 +52,7 @@ export default function AcademyCertificatePage() {
   }, [router.isReady, course, level, router]);
 
   const courseTitle: Record<string, string> = {
-    'gold-foundations': 'Gold & Markets Foundations',
+    'stock-analysis-foundations': 'Stock Analysis Foundations',
     'investing-foundations': 'Investing Foundations',
     'advanced-trading': 'Advanced Trading Mastery',
     'options-strategies': 'Options Trading Strategies',
@@ -61,7 +61,7 @@ export default function AcademyCertificatePage() {
     'trade-fundamentals': 'Trade Fundamentals',
   };
 
-  const title = courseTitle[course as string] || 'Gold & Markets Foundations';
+  const title = courseTitle[course as string] || 'Stock Analysis Foundations';
   const certificateLevel = (level as 'beginner' | 'advanced') || 'beginner';
 
   if (loading) {

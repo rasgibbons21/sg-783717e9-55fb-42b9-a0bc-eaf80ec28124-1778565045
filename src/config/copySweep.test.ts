@@ -53,6 +53,18 @@ describe("copy sweep", () => {
     expect(offenders).toEqual([]);
   });
 
+  it("stays on stocks outside the broker and legal pages", () => {
+    const allowed = /(brokers|terms|disclaimer|privacy|refund-policy|delete-account)\.tsx$/;
+    const offenders = files
+      .filter((file) => !allowed.test(file))
+      .flatMap((file) =>
+        readableText(fs.readFileSync(file, "utf8"))
+          .filter((text) => /\b(gold|forex|xauusd|cfds?|ounces?)\b/i.test(text.replace(/bloom-gold/g, "")))
+          .map((text) => `${file}: ${text.slice(0, 80)}`),
+      );
+    expect(offenders).toEqual([]);
+  });
+
   it("opens with the stock headline", () => {
     expect(fs.readFileSync("src/components/home/SignedOutHero.tsx", "utf8")).toContain("Learn to read stocks with skill. Free.");
   });

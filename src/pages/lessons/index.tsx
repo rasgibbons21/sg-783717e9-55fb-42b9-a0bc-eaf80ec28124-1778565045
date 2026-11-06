@@ -17,12 +17,12 @@ export default function LessonsPage() {
 
   return (
     <>
-      <SEO title="Lessons - Bloom" description="Learn gold and other markets from zero with free, interactive lessons." />
+      <SEO title="Lessons - Bloom" description="Learn stock analysis with free, interactive chart lessons, from candles to fair value gaps." />
       <Layout>
         <div className="mx-auto max-w-2xl px-4 py-6">
           <div className="relative overflow-hidden rounded-3xl bg-secondary p-6">
             <p className="text-sm font-semibold text-muted-foreground">Your learning path</p>
-            <h1 className="mt-1 max-w-[80%] text-3xl font-semibold leading-tight text-foreground">Gold first, then the wider markets</h1>
+            <h1 className="mt-1 max-w-[80%] text-3xl font-semibold leading-tight text-foreground">From reading a chart to planning a trade</h1>
             <p className="mt-2 text-base text-muted-foreground">
               {finishedCount} of {ALL_LESSONS.length} lessons finished. Go at your own pace.
             </p>

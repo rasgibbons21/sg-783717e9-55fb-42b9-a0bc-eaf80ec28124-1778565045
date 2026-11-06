@@ -148,7 +148,7 @@ export default function LeaderboardPage() {
     share({
       type: "leaderboard",
       title: `Number ${me.rank} on Bloom`,
-      subtitle: tab === "learning" ? "Learning gold, one lesson at a time" : "Practising with simulated money",
+      subtitle: tab === "learning" ? "Learning stock analysis, one lesson at a time" : "Practising with simulated money",
       emoji: "🌸",
       stats: [
         { label: "Place", value: `${me.rank}` },

@@ -99,7 +99,7 @@ export default function SignUpPage() {
 
   return (
     <>
-      <SEO title="Start free - Bloom" description="Join Bloom free and start your first interactive gold lesson. No card, no upgrades." />
+      <SEO title="Start free - Bloom" description="Join Bloom free and start your first interactive stock lesson. No card, nothing to pay." />
       <div className="relative min-h-screen overflow-hidden bg-background px-4 py-8">
 
         <main className="relative mx-auto flex max-w-md flex-col">
@@ -123,7 +123,7 @@ export default function SignUpPage() {
               </h1>
               <p className="mt-2 text-base text-muted-foreground">
                 {mode === "signup"
-                  ? "No card and nothing to pay. Your first gold lesson starts right after this."
+                  ? "No card and nothing to pay. Your first lesson starts right after this."
                   : "Sign in and pick up where you left off."}
               </p>
 

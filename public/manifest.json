@@ -1,7 +1,7 @@
 {
-  "name": "Bloom: Learn Gold & Markets",
+  "name": "Bloom: Learn to Read Stocks",
   "short_name": "Bloom",
-  "description": "Learn gold and markets from zero. Free interactive lessons, safe paper practice and Pansy, your learning companion.",
+  "description": "Learn stock analysis with skill. Free interactive chart lessons on fair value gaps and structure, safe practice and Pansy, your learning companion.",
   "id": "/",
   "scope": "/",
   "start_url": "/home",
