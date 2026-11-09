@@ -88,7 +88,9 @@ describe("projections", () => {
   });
 
   it("grows faster when she steps her savings up each month", () => {
-    expect(projectStepUp(5000, "biweekly", 12, 500, 0)).toBe(201500);
+    // The spec example: $50 per payday every 2 weeks is $1,300 a year; adding $5 more each month makes it $1,630.
+    expect(projectStepUp(5000, "biweekly", 12, 500, 0)).toBe(163000);
+    expect(projectStepUp(5000, "weekly", 12, 500, 0) - project(5000, "weekly", 12, 0)).toBe(33000);
     expect(projectStepUp(5000, "biweekly", 12, 0, 0)).toBe(project(5000, "biweekly", 12, 0));
   });
 });
@@ -119,6 +121,14 @@ describe("periodBounds", () => {
   it("alternates the 1st and 16th for twice-monthly pay", () => {
     expect(periodBounds("2026-11-16", "semimonthly", "2026-11-20")).toEqual({ start: "2026-11-16", end: "2026-12-01" });
     expect(periodBounds("2026-11-16", "semimonthly", "2026-11-03")).toEqual({ start: "2026-11-01", end: "2026-11-16" });
+  });
+
+  it("uses her own twice-monthly paydays, such as the 15th and the last day", () => {
+    expect(periodBounds("2026-11-15", "semimonthly", "2026-11-15")).toEqual({ start: "2026-11-15", end: "2026-11-30" });
+    expect(periodBounds("2026-11-15", "semimonthly", "2026-11-16")).toEqual({ start: "2026-11-15", end: "2026-11-30" });
+    expect(periodBounds("2026-11-15", "semimonthly", "2026-12-03")).toEqual({ start: "2026-11-30", end: "2026-12-15" });
+    expect(periodBounds("2026-11-30", "semimonthly", "2026-12-31")).toEqual({ start: "2026-12-31", end: "2027-01-15" });
+    expect(periodBounds("2026-11-05", "semimonthly", "2026-11-25")).toEqual({ start: "2026-11-20", end: "2026-12-05" });
   });
 
   it("starts a new period on payday itself", () => {

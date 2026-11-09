@@ -37,14 +37,14 @@ export function allocate(plan: Plan): Allocation {
 
 /**
  * Savings after `months`, adding the monthly share of each payday's saving and compounding interest monthly.
- * `stepPerPayday` raises the saving per payday by that much after each month.
+ * `stepPerMonth` raises what she saves each month by that much after every month, matching "add $Z more each month".
  */
-export function projectStepUp(savePerPayday: number, pay: PayFrequency, months: number, stepPerPayday: number, annualRatePct: number): number {
+export function projectStepUp(savePerPayday: number, pay: PayFrequency, months: number, stepPerMonth: number, annualRatePct: number): number {
   const paydaysPerMonth = PAYDAYS_PER_YEAR[pay] / 12;
   const rate = annualRatePct / 1200;
   let total = 0;
   for (let month = 1; month <= months; month += 1) {
-    const contribution = (savePerPayday + stepPerPayday * (month - 1)) * paydaysPerMonth;
+    const contribution = savePerPayday * paydaysPerMonth + stepPerMonth * (month - 1);
     total = total * (1 + rate) + contribution;
   }
   return Math.round(total);
@@ -93,12 +93,21 @@ export function periodBounds(nextPayday: string, pay: PayFrequency, today: strin
   const now = toDate(today);
   const year = now.getUTCFullYear();
   const month = now.getUTCMonth();
-  if (pay === "semimonthly") {
-    return now.getUTCDate() >= 16
-      ? { start: monthDay(year, month, 16), end: monthDay(year, month + 1, 1) }
-      : { start: monthDay(year, month, 1), end: monthDay(year, month, 16) };
-  }
   const anchorDay = toDate(nextPayday).getUTCDate();
+  if (pay === "semimonthly") {
+    // Her two paydays, 15 days apart, taken from the payday she gave. The 15th (or a month-end payday) pairs with the last day.
+    const anchor = toDate(nextPayday);
+    const monthEnd = anchorDay === daysInMonth(anchor.getUTCFullYear(), anchor.getUTCMonth());
+    const first = monthEnd || anchorDay === 15 ? 15 : anchorDay > 15 ? anchorDay - 15 : anchorDay;
+    const secondIsEnd = monthEnd || first === 15;
+    const paydays = [-1, 0, 1].flatMap((offset) => [
+      monthDay(year, month + offset, first),
+      monthDay(year, month + offset, secondIsEnd ? 31 : first + 15),
+    ]);
+    const start = paydays.filter((day) => day <= today).pop() as string;
+    const end = paydays.find((day) => day > today) as string;
+    return { start, end };
+  }
   let offset = 0;
   if (monthDay(year, month, anchorDay) > today) offset = -1;
   return { start: monthDay(year, month + offset, anchorDay), end: monthDay(year, month + offset + 1, anchorDay) };
