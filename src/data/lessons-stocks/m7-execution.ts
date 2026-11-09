@@ -1,10 +1,10 @@
 import { bullishFVG } from "@/lib/charts/patterns";
 import { beyond, plan, scenario, text } from "./template";
-import type { Lesson } from "./types";
+import type { RawLesson } from "./types";
 
 const checklistChart = bullishFVG(21);
 
-export const M7_EXECUTION: Lesson[] = [
+export const M7_EXECUTION: RawLesson[] = [
   {
     slug: "the-execution-checklist",
     moduleId: "execution",

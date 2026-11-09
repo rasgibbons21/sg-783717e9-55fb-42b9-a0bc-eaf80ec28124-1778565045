@@ -1,6 +1,6 @@
 import { liquiditySweep, ote, supplyDemand } from "@/lib/charts/patterns";
-import { beyond, bias, find, plan, scenario, setupLesson, text, volume, zone } from "./template";
-import type { Lesson } from "./types";
+import { beyond, bias, find, plan, scenario, setupLesson, text, volume, zone, example } from "./template";
+import type { RawLesson } from "./types";
 
 const pools = liquiditySweep(2, "low");
 const sweep = liquiditySweep(4, "low");
@@ -9,7 +9,7 @@ const range = ote(3);
 const rangeMiddle = Math.round(((range.answer.swingLow + range.answer.swingHigh) / 2) * 100) / 100;
 const demand = supplyDemand(5, "demand");
 
-export const M3_LIQUIDITY: Lesson[] = [
+export const M3_LIQUIDITY: RawLesson[] = [
   {
     slug: "where-liquidity-rests",
     moduleId: "liquidity",
@@ -70,6 +70,8 @@ export const M3_LIQUIDITY: Lesson[] = [
     ),
     skip: "Skip a sweep that closes below the level instead of back above it, because that's a breakdown, not a sweep. Skip it too when volume is thin, or when the sweep goes against a strong higher-timeframe trend.",
     practiceHint: "In Practice, look for a sweep of equal lows on the QQQ 5m chart and plan the trade on the chart.",
+    example: example(liquiditySweep(6, "low"), { kind: "candles", indexes: [liquiditySweep(6, "low").answer.sweepIndex] }, "Here the sweep is marked: the wick dips under the equal lows, then the candle closes back above them."),
+    practice: { setup: "Liquidity sweep", timeframe: "5m" },
   }),
   {
     slug: "premium-and-discount",
@@ -131,5 +133,7 @@ export const M3_LIQUIDITY: Lesson[] = [
     ),
     skip: "Skip a zone that has already been tested several times, or one that price slices through with heavy volume. Skip it too if there's no room to a sensible target.",
     practiceHint: "In Practice, find a fresh demand zone on the JPM 1H chart and plan a buy on the 5m.",
+    example: example(supplyDemand(7, "demand"), { kind: "zone", zone: supplyDemand(7, "demand").answer.zone }, "Here the demand zone is shaded: the tight base just before price launched higher."),
+    practice: { setup: "Supply & demand", timeframe: "1H" },
   }),
 ];

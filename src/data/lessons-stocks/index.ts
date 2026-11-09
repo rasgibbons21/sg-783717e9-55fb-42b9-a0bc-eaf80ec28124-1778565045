@@ -5,7 +5,8 @@ import { M4_IMBALANCES } from "./m4-imbalances";
 import { M5_INSTITUTIONAL } from "./m5-institutional";
 import { M6_MODELS } from "./m6-models";
 import { M7_EXECUTION } from "./m7-execution";
-import type { Lesson, LessonModule } from "./types";
+import { stageConcept } from "./template";
+import type { Lesson, LessonModule, RawLesson } from "./types";
 
 export const MODULES: LessonModule[] = [
   { id: "foundations", number: 1, title: "Foundations", subtitle: "Candles, volume and timeframes." },
@@ -17,6 +18,9 @@ export const MODULES: LessonModule[] = [
   { id: "execution", number: 7, title: "Execution and risk", subtitle: "The full checklist, sizing and journaling." },
 ];
 
+/** Setup lessons arrive staged from their template. Concept lessons are staged here. */
+const staged = (lesson: RawLesson): Lesson => (lesson.kind === "setup" ? (lesson as Lesson) : stageConcept(lesson));
+
 export const ALL_LESSONS: Lesson[] = [
   ...M1_FOUNDATIONS,
   ...M2_STRUCTURE,
@@ -25,7 +29,7 @@ export const ALL_LESSONS: Lesson[] = [
   ...M5_INSTITUTIONAL,
   ...M6_MODELS,
   ...M7_EXECUTION,
-];
+].map(staged);
 
 export function getLesson(slug: string): Lesson | undefined {
   return ALL_LESSONS.find((lesson) => lesson.slug === slug);

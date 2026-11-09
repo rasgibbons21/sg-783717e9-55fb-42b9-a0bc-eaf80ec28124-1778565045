@@ -1,6 +1,6 @@
 import { bearishFVG, orderBlock, structureBreak, supportResistance } from "@/lib/charts/patterns";
-import { beyond, bias, find, plan, scenario, setupLesson, text, volume } from "./template";
-import type { Lesson } from "./types";
+import { beyond, bias, find, plan, scenario, setupLesson, text, volume, example } from "./template";
+import type { RawLesson } from "./types";
 
 const swings = structureBreak(2, "BOS");
 const bos = structureBreak(4, "BOS");
@@ -10,7 +10,7 @@ const chochPlan = bearishFVG(9);
 const support = supportResistance(6);
 const supportLevel = support.answer.level;
 
-export const M2_STRUCTURE: Lesson[] = [
+export const M2_STRUCTURE: RawLesson[] = [
   {
     slug: "trend-and-swings",
     moduleId: "structure",
@@ -71,6 +71,8 @@ export const M2_STRUCTURE: Lesson[] = [
     ),
     skip: "Skip a break that only pokes through with a wick, or happens on thin volume. Skip it too when the higher timeframe is clearly pointing the other way, or when price is already far from any zone to plan from.",
     practiceHint: "In Practice, find a recent break of structure on the MSFT 5m chart, then plan a pullback entry.",
+    example: example(structureBreak(7, "BOS"), { kind: "candles", indexes: [structureBreak(7, "BOS").answer.index] }, "Here the break of structure is marked: the candle whose body closes above the last swing high."),
+    practice: { setup: "BOS", timeframe: "1H" },
   }),
   setupLesson({
     slug: "change-of-character",
@@ -110,6 +112,8 @@ export const M2_STRUCTURE: Lesson[] = [
     ),
     skip: "Skip a CHoCH that forms in the middle of a choppy range, where swings don't mean much. Be very careful acting on one that fights a strong higher-timeframe trend.",
     practiceHint: "In Practice, look for a change of character on the NVDA 5m chart and note whether the 1H agrees.",
+    example: example(structureBreak(8, "CHoCH"), { kind: "candles", indexes: [structureBreak(8, "CHoCH").answer.index] }, "Here the change of character is marked: the first close below the last swing low after a rise."),
+    practice: { setup: "CHoCH", timeframe: "5m" },
   }),
   setupLesson({
     slug: "support-and-resistance",
@@ -149,6 +153,8 @@ export const M2_STRUCTURE: Lesson[] = [
     ),
     skip: "Skip a level that has been touched so often it looks worn, or one where price is grinding into it with heavy selling volume. Skip it too when the higher timeframe is falling hard.",
     practiceHint: "In Practice, mark a support level on the KO daily chart and see how price reacted the last three times.",
+    example: example(supportResistance(3), { kind: "candles", indexes: supportResistance(3).answer.touches }, "Here the three touches of support are marked, each one holding at the same price."),
+    practice: { setup: "Support & resistance", timeframe: "1H" },
   }),
 ];
 

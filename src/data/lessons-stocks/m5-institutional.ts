@@ -1,12 +1,12 @@
 import { breakerBlock, orderBlock, ote } from "@/lib/charts/patterns";
-import { beyond, bias, find, plan, scenario, setupLesson, volume, zone } from "./template";
-import type { Lesson } from "./types";
+import { beyond, bias, find, plan, scenario, setupLesson, volume, zone, example } from "./template";
+import type { RawLesson } from "./types";
 
 const block = orderBlock(8, "bullish");
 const breaker = breakerBlock(4);
 const retrace = ote(6);
 
-export const M5_INSTITUTIONAL: Lesson[] = [
+export const M5_INSTITUTIONAL: RawLesson[] = [
   setupLesson({
     slug: "order-blocks",
     moduleId: "institutional",
@@ -45,6 +45,8 @@ export const M5_INSTITUTIONAL: Lesson[] = [
     ),
     skip: "Skip an order block that didn't lead to a break of structure, or one in premium when you're looking to buy. Skip it too when price has already returned to it several times.",
     practiceHint: "In Practice, find a bullish order block on the GOOGL 5m chart and plan the retest.",
+    example: example(orderBlock(3, "bullish"), { kind: "candles", indexes: [orderBlock(3, "bullish").answer.obIndex] }, "Here the order block is marked: the last down candle before the strong move up."),
+    practice: { setup: "Order block", timeframe: "5m" },
   }),
   setupLesson({
     slug: "breaker-blocks",
@@ -84,6 +86,8 @@ export const M5_INSTITUTIONAL: Lesson[] = [
     ),
     skip: "Skip a breaker without a clear sweep first, or one where the break back through the zone was weak. Skip it too if the retest comes with heavy selling volume.",
     practiceHint: "In Practice, look for a sweep followed by a breaker on the META 5m chart.",
+    example: example(breakerBlock(2), { kind: "zone", zone: breakerBlock(2).answer.zone }, "Here the breaker block is shaded: the up candle that price later broke back above."),
+    practice: { setup: "Breaker block", timeframe: "5m" },
   }),
   setupLesson({
     slug: "optimal-trade-entry",
@@ -123,5 +127,7 @@ export const M5_INSTITUTIONAL: Lesson[] = [
     ),
     skip: "Skip an OTE on a weak or choppy swing, or one that goes against the higher timeframe. Skip it too if price slices through the zone without slowing.",
     practiceHint: "In Practice, measure the latest swing on the DIS 1H chart and mark its OTE zone.",
+    example: example(ote(9), { kind: "zone", zone: ote(9).answer.zone }, "Here the OTE zone is shaded, between 62% and 79% of the way back down the swing."),
+    practice: { setup: "OTE", timeframe: "5m" },
   }),
 ];

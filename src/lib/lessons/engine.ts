@@ -1,4 +1,4 @@
-import type { LessonBlock } from "@/data/lessons-stocks/types";
+import type { BaseBlock as LessonBlock } from "@/data/lessons-stocks/types";
 
 const READING_BLOCKS: LessonBlock["type"][] = ["text", "pansy"];
 

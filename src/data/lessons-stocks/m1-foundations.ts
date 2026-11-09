@@ -1,13 +1,13 @@
 import { bullishFVG, supportResistance } from "@/lib/charts/patterns";
 import { bias, find, pansy, scenario, text, volume } from "./template";
-import type { Lesson } from "./types";
+import type { RawLesson } from "./types";
 
 const firstChart = supportResistance(3);
 const highestClose = firstChart.candles.reduce((best, c, i, all) => (c.close > all[best].close ? i : best), 0);
 const volumeChart = bullishFVG(5);
 const timeframeChart = bullishFVG(8);
 
-export const M1_FOUNDATIONS: Lesson[] = [
+export const M1_FOUNDATIONS: RawLesson[] = [
   {
     slug: "reading-a-stock-chart",
     moduleId: "foundations",

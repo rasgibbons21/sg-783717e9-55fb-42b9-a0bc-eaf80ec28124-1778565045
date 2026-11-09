@@ -1,7 +1,7 @@
 import { consequentEncroachment } from "@/lib/charts/detectors";
 import { bullishFVG, inverseFVG } from "@/lib/charts/patterns";
-import { beyond, bias, find, plan, scenario, setupLesson, text, volume, zone } from "./template";
-import type { Lesson } from "./types";
+import { beyond, bias, find, plan, scenario, setupLesson, text, volume, zone, example } from "./template";
+import type { RawLesson } from "./types";
 
 const gap = bullishFVG(11);
 const gapZone = gap.answer.fvg.zone;
@@ -12,7 +12,7 @@ const money = (value: number) => `$${value.toFixed(2)}`;
 const inverse = inverseFVG(7);
 const displacementChart = bullishFVG(15);
 
-export const M4_IMBALANCES: Lesson[] = [
+export const M4_IMBALANCES: RawLesson[] = [
   setupLesson({
     slug: "fair-value-gaps",
     moduleId: "imbalances",
@@ -53,6 +53,8 @@ export const M4_IMBALANCES: Lesson[] = [
     ),
     skip: "Skip a gap that's tiny compared with the candles around it, one created on light volume, or one that goes against the higher timeframe. Skip it too if price has already traded back through the whole gap, because it has been filled.",
     practiceHint: "In Practice, find a bullish fair value gap on the NVDA 5m chart and plan a buy from inside it.",
+    example: example(bullishFVG(17), { kind: "zone", zone: bullishFVG(17).answer.fvg.zone }, "Here the fair value gap is shaded: the space between the first candle's high and the third candle's low."),
+    practice: { setup: "FVG", timeframe: "5m" },
   }),
   {
     slug: "consequent-encroachment",
@@ -114,6 +116,8 @@ export const M4_IMBALANCES: Lesson[] = [
     ),
     skip: "Skip an inversion where the close through the gap was weak or on light volume. Skip it too when price returns to the gap with heavy selling, which suggests it won't hold.",
     practiceHint: "In Practice, watch the SPY 5m chart for a gap that price closes through, then plan the retest.",
+    example: example(inverseFVG(9), { kind: "zone", zone: inverseFVG(9).answer.fvg.zone }, "Here the bearish gap that later fails is shaded. Price closes right through it."),
+    practice: { setup: "IFVG", timeframe: "5m" },
   }),
   {
     slug: "displacement",

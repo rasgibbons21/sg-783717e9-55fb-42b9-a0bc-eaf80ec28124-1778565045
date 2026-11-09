@@ -1,6 +1,6 @@
 import { breakoutRetest, candleRange, powerOf3, silverBullet } from "@/lib/charts/patterns";
-import { beyond, bias, find, plan, scenario, setupLesson, volume } from "./template";
-import type { Lesson } from "./types";
+import { beyond, bias, find, plan, scenario, setupLesson, volume, example } from "./template";
+import type { RawLesson } from "./types";
 
 const amd = powerOf3(3);
 const amdRangeLow = Math.min(...amd.candles.slice(0, 10).map((c) => c.low));
@@ -12,7 +12,7 @@ const crtSweep = crt.candles[crt.answer.sweepIndex];
 const breakout = breakoutRetest(6);
 const retest = breakout.candles[breakout.answer.retestIndex];
 
-export const M6_MODELS: Lesson[] = [
+export const M6_MODELS: RawLesson[] = [
   setupLesson({
     slug: "power-of-three",
     moduleId: "models",
@@ -51,6 +51,8 @@ export const M6_MODELS: Lesson[] = [
     ),
     skip: "Skip it when the range is wide and messy instead of quiet, or when the false move keeps going with heavy volume. Skip it too on days with major news, when the usual rhythm often breaks down.",
     practiceHint: "In Practice, watch the first hour of SPY on the 5m chart for a quiet range and a false move.",
+    example: example(powerOf3(7), { kind: "candles", indexes: [powerOf3(7).answer.manipulationIndex] }, "Here the manipulation candle is marked: the false move below the quiet range before the real move up."),
+    practice: { setup: "Power of 3", timeframe: "Daily" },
   }),
   setupLesson({
     slug: "silver-bullet",
@@ -92,6 +94,8 @@ export const M6_MODELS: Lesson[] = [
     ),
     skip: "Skip it on days with major news inside the window, or when the gap goes against the higher timeframe. Skip it too if the window passes without a clean gap. There's always another day.",
     practiceHint: "In Practice, open QQQ on the 5m chart between 10am and 11am New York time and look for a gap.",
+    example: example(silverBullet(4), { kind: "zone", zone: silverBullet(4).answer.fvg.zone }, "Here the gap that formed inside the 10am to 11am window is shaded."),
+    practice: { setup: "Silver Bullet", timeframe: "5m" },
   }),
   setupLesson({
     slug: "candle-range-theory",
@@ -131,6 +135,8 @@ export const M6_MODELS: Lesson[] = [
     ),
     skip: "Skip it when the sweep candle closes outside the range, because that's a breakout rather than a sweep. Skip it too if the range candle is tiny compared with recent candles.",
     practiceHint: "In Practice, pick a large 1H candle on AAPL and watch how the next candles treat its high and low.",
+    example: example(candleRange(8), { kind: "candles", indexes: [candleRange(8).answer.sweepIndex] }, "Here the sweep candle is marked: it takes out the range candle's low, then closes back inside."),
+    practice: { setup: "CRT", timeframe: "1H" },
   }),
   setupLesson({
     slug: "breakout-and-retest",
@@ -170,5 +176,7 @@ export const M6_MODELS: Lesson[] = [
     ),
     skip: "Skip breakouts on thin volume, or ones that come back and close well below the level. Skip it too if the breakout candle is so large that your stop would have to be very far away.",
     practiceHint: "In Practice, find a recent breakout on the IWM daily chart and plan the retest on the 5m.",
+    example: example(breakoutRetest(9), { kind: "candles", indexes: [breakoutRetest(9).answer.breakIndex] }, "Here the breakout candle is marked: the first close above resistance."),
+    practice: { setup: "Breakout", timeframe: "1H" },
   }),
 ];
