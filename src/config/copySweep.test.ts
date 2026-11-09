@@ -67,6 +67,7 @@ describe("copy sweep", () => {
 
   it("opens with the stock headline", () => {
     expect(fs.readFileSync("src/components/home/SignedOutHero.tsx", "utf8")).toContain("Learn to read stocks with skill. Free.");
+    expect(fs.readFileSync("src/components/home/SignedOutHero.tsx", "utf8")).toContain("grow your savings with Pansy");
   });
 
   it("has no garden visuals left", () => {

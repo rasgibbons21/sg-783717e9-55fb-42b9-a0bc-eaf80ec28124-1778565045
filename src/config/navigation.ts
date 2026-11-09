@@ -1,4 +1,4 @@
-import { BookOpen, Flower2, Home, MessageCircleHeart, Sprout, type LucideIcon } from "lucide-react";
+import { BookOpen, Home, MessageCircleHeart, Sprout, Wallet, type LucideIcon } from "lucide-react";
 
 export interface NavItem {
   href: string;
@@ -10,11 +10,12 @@ export const TAB_ITEMS: NavItem[] = [
   { href: "/home", label: "Home", icon: Home },
   { href: "/lessons", label: "Lessons", icon: BookOpen },
   { href: "/practice", label: "Practice", icon: Sprout },
-  { href: "/leaderboard", label: "Leaderboard", icon: Flower2 },
+  { href: "/budget", label: "Budget", icon: Wallet },
   { href: "/ask-pansy", label: "Pansy", icon: MessageCircleHeart },
 ];
 
 export const HEADER_ITEMS: NavItem[] = [
+  { href: "/leaderboard", label: "Leaderboard" },
   { href: "/brokers", label: "Brokers" },
   { href: "/profile", label: "Profile" },
 ];

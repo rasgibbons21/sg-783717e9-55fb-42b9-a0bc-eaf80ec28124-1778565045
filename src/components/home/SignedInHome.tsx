@@ -3,6 +3,7 @@ import { ProgressLine } from "@/components/ProgressLine";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Flower2 } from "lucide-react";
+import { HomeBudgetCard } from "@/components/budget/HomeBudgetCard";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { ALL_LESSONS, firstIncomplete } from "@/data/lessons-stocks";
 import { useLearningProgress } from "@/hooks/useLearningProgress";
@@ -82,6 +83,8 @@ export function SignedInHome() {
             <p className="mt-1 text-base text-muted-foreground">That&apos;s a real achievement. Keep sharpening your process in Practice.</p>
           </div>
         ))}
+
+      <HomeBudgetCard />
 
       <div className="grid gap-4 md:grid-cols-2">
         <Link href="/practice" className="block rounded-3xl bg-card p-5 shadow-[var(--bloom-shadow)] transition-transform active:scale-[0.98]">

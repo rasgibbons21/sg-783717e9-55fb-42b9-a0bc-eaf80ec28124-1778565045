@@ -9,13 +9,18 @@ import { SEO } from "@/components/SEO";
 import { RiskNote } from "@/components/RiskNote";
 import { Switch } from "@/components/ui/switch";
 import { useSubscription } from "@/contexts/SubscriptionContext";
-import { ALL_LESSONS, MODULES, hasFinishedCourse, lessonsInModule } from "@/data/lessons-stocks";
+import { ALL_LESSONS, MODULES, getLesson, hasFinishedCourse, lessonsInModule } from "@/data/lessons-stocks";
 import { processScore } from "@/lib/practice/process";
 import { useLearningProgress } from "@/hooks/useLearningProgress";
 import { supabase } from "@/integrations/supabase/client";
 import { money, practiceFetch, type PracticeAccount, type PracticeTrade } from "@/lib/practice/api";
 import { marginFor } from "@/lib/practice/maths";
 import { authService } from "@/services/authService";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { useBudget } from "@/components/budget/useBudget";
+import { nextMilestone, streak, todayIn } from "@/lib/budget/maths";
+import { formatMoney } from "@/lib/budget/money";
+import { testSummary, type ScoreRow } from "@/lib/lessons/scores";
 
 const sanitizeName = (raw: string) =>
   raw
@@ -44,6 +49,8 @@ export default function ProfilePage() {
   const [summary, setSummary] = useState<PracticeSummary | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [scores, setScores] = useState<ScoreRow[]>([]);
+  const budget = useBudget();
 
   useEffect(() => {
     if (!authLoading && !isLoggedIn) router.replace("/onboarding");
@@ -64,6 +71,12 @@ export default function ProfilePage() {
         setSavedBoardName(profile.challenge_name ?? "");
         setShowOnBoard((profile as { show_on_leaderboard?: boolean }).show_on_leaderboard !== false);
       }
+      // The test score columns are newer than the generated database types.
+      const { data: scoreRows } = await (supabase as unknown as SupabaseClient)
+        .from("lesson_progress")
+        .select("lesson_id, test_score, test_total")
+        .eq("user_id", userId);
+      setScores((scoreRows ?? []) as ScoreRow[]);
       if (accountRes.ok && tradesRes.ok) {
         const trades = tradesRes.data.trades ?? [];
         const closed = trades.filter((trade) => trade.status === "closed");
@@ -113,6 +126,8 @@ export default function ProfilePage() {
   };
 
   const finishedCount = ALL_LESSONS.filter((lesson) => completed.includes(lesson.slug)).length;
+  const tests = testSummary(scores);
+  const savingsNext = budget.plan ? nextMilestone(budget.balance, budget.milestones.map((m) => m.amountCents), budget.plan.goalCents) : null;
 
   return (
     <>
@@ -151,6 +166,56 @@ export default function ProfilePage() {
               )}
             </section>
 
+            <section className="rounded-3xl bg-card p-5 shadow-[var(--bloom-shadow)]" aria-labelledby="tests-heading">
+              <h2 id="tests-heading" className="text-xl font-semibold text-foreground">Your tests</h2>
+              {tests.averagePct === null ? (
+                <p className="mt-2 text-base text-muted-foreground">Finish a lesson test and your first-try scores will appear here.</p>
+              ) : (
+                <>
+                  <p className="mt-2 text-base text-foreground">
+                    Average first try: <span className="font-semibold">{tests.averagePct}%</span>
+                  </p>
+                  <ul className="mt-3 space-y-1 text-sm">
+                    {tests.best.map((row) => (
+                      <li key={row.slug} className="flex justify-between gap-3">
+                        <span className="text-muted-foreground">{getLesson(row.slug)?.title ?? row.slug}</span>
+                        <span className="font-medium text-foreground">
+                          {row.score}/{row.total}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+            </section>
+
+            <section className="rounded-3xl bg-card p-5 shadow-[var(--bloom-shadow)]" aria-labelledby="savings-heading">
+              <h2 id="savings-heading" className="text-xl font-semibold text-foreground">Your savings</h2>
+              {budget.plan ? (
+                <dl className="mt-3 grid grid-cols-3 gap-3 text-center">
+                  <div>
+                    <dt className="text-xs text-muted-foreground">Saved</dt>
+                    <dd className="font-serif text-lg font-semibold text-foreground">{formatMoney(budget.balance, budget.plan.currency)}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs text-muted-foreground">Next milestone</dt>
+                    <dd className="font-serif text-lg font-semibold text-foreground">
+                      {savingsNext !== null ? formatMoney(savingsNext, budget.plan.currency) : "-"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs text-muted-foreground">Days in a row</dt>
+                    <dd className="font-serif text-lg font-semibold text-foreground">{streak(budget.entries, todayIn(budget.plan.timeZone))}</dd>
+                  </div>
+                </dl>
+              ) : (
+                <p className="mt-2 text-base text-muted-foreground">Set up a save-first plan with Pansy to see your savings here.</p>
+              )}
+              <Link href={budget.plan ? "/budget" : "/budget/setup"} className="mt-3 inline-block text-sm font-semibold text-primary underline underline-offset-2">
+                {budget.plan ? "Go to Budget" : "Set up your savings plan"}
+              </Link>
+            </section>
+
             <section className="rounded-3xl bg-card p-5 shadow-[var(--bloom-shadow)]" aria-labelledby="practice-heading">
               <h2 id="practice-heading" className="text-xl font-semibold text-foreground">Your practice</h2>
               {summary ? (
@@ -165,14 +230,14 @@ export default function ProfilePage() {
                   </div>
                   <div>
                     <dt className="text-xs text-muted-foreground">Results</dt>
-                    <dd className={`font-serif text-lg font-semibold ${summary.result >= 0 ? "text-primary" : "text-[var(--bloom-blush)]"}`}>
+                    <dd className={`font-serif text-lg font-semibold ${summary.result >= 0 ? "text-[var(--bloom-sage-text)]" : "text-[var(--bloom-blush-text)]"}`}>
                       {summary.result >= 0 ? "+" : "-"}
                       {money(Math.abs(summary.result))}
                     </dd>
                   </div>
                   <div>
                     <dt className="text-xs text-muted-foreground">Average process</dt>
-                    <dd className="font-serif text-lg font-semibold text-[var(--bloom-gold)]">{summary.averageProcess ?? "-"}</dd>
+                    <dd className="font-serif text-lg font-semibold text-foreground">{summary.averageProcess ?? "-"}</dd>
                   </div>
                 </dl>
               ) : (
