@@ -4,9 +4,15 @@ import {
   isInteractive,
   isOrderCorrect,
   loadResume,
+  resumeAt,
   saveResume,
   shuffleNotSolved,
+  STAGE_INTRO,
+  STAGE_LABEL,
+  stagesOf,
+  testCount,
 } from "./engine";
+import { getLesson } from "@/data/lessons-stocks";
 
 const steps = ["Choose an instrument", "Set a stop", "Choose a lot size", "Place the trade"];
 
@@ -75,5 +81,38 @@ describe("resume", () => {
   it("ignores a corrupted saved value", () => {
     vi.stubGlobal("localStorage", { getItem: () => "not-a-number", setItem: () => undefined });
     expect(loadResume("what-is-gold-trading")).toBe(0);
+  });
+});
+
+describe("lesson stages in the player", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("lists a setup lesson's four stages in order", () => {
+    expect(stagesOf(getLesson("fair-value-gaps")!)).toEqual(["lesson", "strategy", "test", "practice"]);
+  });
+
+  it("lists a concept lesson's two stages", () => {
+    expect(stagesOf(getLesson("reading-a-stock-chart")!)).toEqual(["lesson", "test"]);
+  });
+
+  it("counts only the test blocks she answers", () => {
+    expect(testCount(getLesson("fair-value-gaps")!)).toBe(5);
+  });
+
+  it("treats the worked example, strategy and practice card as reading", () => {
+    const lesson = getLesson("fair-value-gaps")!;
+    for (const type of ["workedExample", "strategy", "practiceCta"]) {
+      expect(isInteractive(lesson.blocks.find((b) => b.type === type)!), type).toBe(false);
+    }
+  });
+
+  it("starts again when a saved place is past the end of the lesson", () => {
+    vi.stubGlobal("localStorage", { getItem: () => "99", setItem: () => undefined });
+    expect(resumeAt(getLesson("fair-value-gaps")!)).toBe(0);
+  });
+
+  it("names every stage", () => {
+    expect(STAGE_LABEL).toEqual({ lesson: "Lesson", strategy: "Strategy", test: "Test", practice: "Practice" });
+    expect(STAGE_INTRO.strategy).toBe("Strategy: how to trade it");
   });
 });

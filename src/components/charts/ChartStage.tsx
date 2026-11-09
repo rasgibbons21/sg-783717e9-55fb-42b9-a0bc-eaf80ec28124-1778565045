@@ -141,12 +141,14 @@ export function ChartStage({
   const { min, max } = useMemo(() => {
     const prices = candles.flatMap((c) => [c.high, c.low]);
     for (const z of overlays?.zones ?? []) prices.push(z.top, z.bottom);
+    // A drawn plan in view mode must stay on screen, even when its target sits past the last candle's range.
+    if (mode === "view" && prices.length > 0) for (const price of [levels.entry, levels.stop, levels.target]) if (price !== undefined) prices.push(price);
     if (prices.length === 0) return { min: 0, max: 1 };
     const low = Math.min(...prices);
     const high = Math.max(...prices);
     const margin = (high - low) * 0.06 || 1;
     return { min: low - margin, max: high + margin };
-  }, [candles, overlays]);
+  }, [candles, overlays, mode, levels.entry, levels.stop, levels.target]);
 
   const scale = priceScale(min, max, priceHeight, PRICE_PAD);
   const step = (max - min) * 0.005;

@@ -31,9 +31,7 @@ describe("lesson stages", () => {
 
   it("keeps concept lessons to lesson and test", () => {
     for (const lesson of ALL_LESSONS.filter((l) => l.kind !== "setup")) {
-      const stages = distinctStages(lesson.blocks);
-      expect(stages.every((s) => s === "lesson" || s === "test"), lesson.slug).toBe(true);
-      expect(lesson.blocks[0].stage, lesson.slug).toBe("lesson");
+      expect(distinctStages(lesson.blocks), lesson.slug).toEqual(["lesson", "test"]);
     }
   });
 

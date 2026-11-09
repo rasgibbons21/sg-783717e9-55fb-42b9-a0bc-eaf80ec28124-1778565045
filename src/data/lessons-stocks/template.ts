@@ -126,10 +126,17 @@ export function strategyFrom(parts: SetupParts): Block<"strategy"> {
   };
 }
 
-/** Concept lessons: reading blocks are the lesson, everything she answers is the test. */
+/**
+ * Concept lessons: the reading up to the first question is the lesson. From the first question on,
+ * everything is the test, including short explanations between questions, so the lesson reads Lesson then Test.
+ */
 export function stageConcept(lesson: RawLesson): Lesson {
   const reading = new Set<BaseBlock["type"]>(["text", "pansy", "workedExample"]);
-  return { ...lesson, blocks: lesson.blocks.map((block) => staged(reading.has(block.type) ? "lesson" : "test")(block)) };
+  const firstQuestion = lesson.blocks.findIndex((block) => !reading.has(block.type));
+  return {
+    ...lesson,
+    blocks: lesson.blocks.map((block, index) => staged(firstQuestion >= 0 && index >= firstQuestion ? "test" : "lesson")(block)),
+  };
 }
 
 /** Every setup runs Lesson (with a worked example), Strategy, Test (spot, context, volume, timeframe, plan) and Practice. */
