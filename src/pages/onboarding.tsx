@@ -117,7 +117,7 @@ export default function SignUpPage() {
               </p>
             </section>
           ) : (
-            <section className="surface-ivory rounded-3xl p-6 shadow-[var(--bloom-shadow)]">
+            <section className="rounded-3xl bg-card p-6 shadow-[var(--bloom-shadow)]">
               <h1 className="text-3xl font-semibold leading-tight text-foreground">
                 {mode === "signup" ? "Start learning, free" : "Welcome back"}
               </h1>

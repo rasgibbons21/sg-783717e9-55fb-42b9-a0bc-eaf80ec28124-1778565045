@@ -67,10 +67,50 @@ describe("copy sweep", () => {
 
   it("opens with the stock headline", () => {
     expect(fs.readFileSync("src/components/home/SignedOutHero.tsx", "utf8")).toContain("Learn to read stocks with skill. Free.");
+    expect(fs.readFileSync("src/components/home/SignedOutHero.tsx", "utf8")).toContain("grow your savings with Pansy");
   });
 
   it("has no garden visuals left", () => {
     const offenders = files.filter((file) => GARDEN_IMPORTS.test(fs.readFileSync(file, "utf8")));
     expect(offenders).toEqual([]);
+  });
+});
+
+describe("ivory theme", () => {
+  const DARK = /#0C0D0B|#24201A|surface-ivory|--bloom-panel|--bloom-text-light|--bloom-text-dark|--bloom-muted-ivory/i;
+  const everySource = (dir: string): string[] =>
+    fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) return everySource(full);
+      return /\.(tsx?|css)$/.test(entry.name) && !/\.test\.tsx?$/.test(entry.name) ? [full] : [];
+    });
+
+  it("keeps the old dark theme out", () => {
+    const offenders = everySource("src").filter((file) => DARK.test(fs.readFileSync(file, "utf8")));
+    expect(offenders).toEqual([]);
+  });
+
+  it("defines the ivory tokens", () => {
+    const css = fs.readFileSync("src/styles/globals.css", "utf8");
+    for (const token of [
+      "--bloom-ivory: #F6F1E8;",
+      "--bloom-paper: #FBF8F2;",
+      "--bloom-paper-raised: #FFFDF9;",
+      "--bloom-ink: #1A1814;",
+      "--bloom-muted: #6F6860;",
+      "--bloom-rule: rgba(26, 24, 20, 0.08);",
+      "--bloom-sage: #7F9277;",
+      "--bloom-blush: #D9B8AE;",
+      "--bloom-gold: #C4A574;",
+    ]) {
+      expect(css).toContain(token);
+    }
+  });
+
+  it("sets the ivory theme colour", () => {
+    const manifest = JSON.parse(fs.readFileSync("public/manifest.json", "utf8"));
+    expect(manifest.theme_color).toBe("#F6F1E8");
+    expect(manifest.background_color).toBe("#F6F1E8");
+    expect(fs.readFileSync("public/sw.js", "utf8")).toContain("bloom-v4");
   });
 });

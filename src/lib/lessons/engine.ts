@@ -1,6 +1,25 @@
-import type { LessonBlock } from "@/data/lessons-stocks/types";
+import type { BaseBlock as LessonBlock, Lesson, Stage } from "@/data/lessons-stocks/types";
 
-const READING_BLOCKS: LessonBlock["type"][] = ["text", "pansy"];
+const READING_BLOCKS: LessonBlock["type"][] = ["text", "pansy", "workedExample", "strategy", "practiceCta"];
+
+export const STAGE_LABEL: Record<Stage, string> = { lesson: "Lesson", strategy: "Strategy", test: "Test", practice: "Practice" };
+
+export const STAGE_INTRO: Record<Stage, string> = {
+  lesson: "Lesson: what it is",
+  strategy: "Strategy: how to trade it",
+  test: "Test: your turn",
+  practice: "Practice: try it for real, with pretend money",
+};
+
+/** The stages a lesson moves through, in order. */
+export function stagesOf(lesson: Lesson): Stage[] {
+  return lesson.blocks.map((block) => block.stage).filter((stage, index, all) => all.indexOf(stage) === index);
+}
+
+/** How many questions the test stage asks. */
+export function testCount(lesson: Lesson): number {
+  return lesson.blocks.filter((block) => block.stage === "test" && isInteractive(block)).length;
+}
 
 export function isInteractive(block: LessonBlock): boolean {
   return !READING_BLOCKS.includes(block.type);
@@ -44,4 +63,10 @@ export function loadResume(slug: string): number {
   } catch {
     return 0;
   }
+}
+
+/** Where to pick a lesson up, starting again if the saved place no longer exists. */
+export function resumeAt(lesson: Lesson): number {
+  const saved = loadResume(lesson.slug);
+  return saved >= 0 && saved < lesson.blocks.length ? saved : 0;
 }

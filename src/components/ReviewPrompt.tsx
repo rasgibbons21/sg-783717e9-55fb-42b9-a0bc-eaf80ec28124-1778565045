@@ -38,7 +38,7 @@ export function ReviewPrompt({ onClose, trigger }: ReviewPromptProps) {
       <div
         className="w-full max-w-sm rounded-2xl p-6 relative"
         style={{
-          background: 'linear-gradient(145deg, #0C0D0B, #1A1814)',
+          background: 'linear-gradient(145deg, #FBF8F2, #F6F1E8)',
           border: '1px solid rgba(196,165,116,0.2)',
           boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
         }}
@@ -46,9 +46,9 @@ export function ReviewPrompt({ onClose, trigger }: ReviewPromptProps) {
         <button
           onClick={onClose}
           className="absolute top-3 right-3 w-7 h-7 rounded-full flex items-center justify-center"
-          style={{ background: 'rgba(243,238,228,0.05)' }}
+          style={{ background: 'rgba(26,24,20,0.05)' }}
         >
-          <X className="w-4 h-4" style={{ color: 'rgba(243,238,228,0.4)' }} />
+          <X className="w-4 h-4" style={{ color: 'rgba(26,24,20,0.4)' }} />
         </button>
 
         {step === 'rate' && (
@@ -73,7 +73,7 @@ export function ReviewPrompt({ onClose, trigger }: ReviewPromptProps) {
                   <Star
                     className="w-10 h-10"
                     fill={s <= rating ? '#C4A574' : 'none'}
-                    stroke={s <= rating ? '#C4A574' : 'rgba(243,238,228,0.2)'}
+                    stroke={s <= rating ? '#C4A574' : 'rgba(26,24,20,0.2)'}
                     strokeWidth={1.5}
                   />
                 </button>
@@ -104,7 +104,7 @@ export function ReviewPrompt({ onClose, trigger }: ReviewPromptProps) {
               rel="noopener noreferrer"
               onClick={onClose}
               className="inline-block px-8 py-3 rounded-xl font-bold text-sm transition-all hover:scale-105"
-              style={{ background: 'linear-gradient(135deg, #C9A84C, #C4A574)', color: '#0C0D0B' }}
+              style={{ background: 'linear-gradient(135deg, #C9A84C, #C4A574)', color: '#1A1814' }}
             >
               Leave a Review
             </a>

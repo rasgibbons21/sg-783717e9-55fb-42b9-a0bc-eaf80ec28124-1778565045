@@ -12,7 +12,7 @@ export function HeroPreview() {
 
   return (
     <div className="mx-auto mt-12 max-w-xl text-left">
-      <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-[var(--bloom-gold)]">Try it now</p>
+      <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Try it now</p>
       <p className="mt-2 text-center font-serif text-2xl text-foreground">Tap the three candles that form the gap.</p>
       <div className="mt-4">
         <ChartStage
@@ -28,7 +28,7 @@ export function HeroPreview() {
         {found ? (
           <>
             That&apos;s a fair value gap.{" "}
-            <Link href="/onboarding" className="font-semibold text-[var(--bloom-gold)] underline underline-offset-4">
+            <Link href="/onboarding" className="font-semibold text-foreground underline underline-offset-4">
               Learn what to do with it
             </Link>
           </>

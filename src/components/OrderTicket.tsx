@@ -19,17 +19,23 @@ interface Props {
   levels: Levels;
   timeframe: Timeframe;
   onPlaced: () => void;
+  /** The setup a lesson asked Practice to open with. */
+  initialSetup?: SetupType;
 }
 
 const fieldClass =
-  "mt-1 h-12 w-full rounded-2xl border border-border bg-[var(--bloom-ink)] px-4 text-base font-normal text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20";
+  "mt-1 h-12 w-full rounded-2xl border border-border bg-secondary px-4 text-base font-normal text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20";
 
-export function OrderTicket({ instrument, price, marketOpen, buyingPower, balance, levels, timeframe: chartTimeframe, onPlaced }: Props) {
+export function OrderTicket({ instrument, price, marketOpen, buyingPower, balance, levels, timeframe: chartTimeframe, onPlaced, initialSetup }: Props) {
   const [direction, setDirection] = useState<Direction>("long");
   const [shares, setShares] = useState(1);
   const [stop, setStop] = useState("");
   const [target, setTarget] = useState("");
-  const [setup, setSetup] = useState<SetupType>("FVG");
+  const [setup, setSetup] = useState<SetupType>(initialSetup ?? "FVG");
+
+  useEffect(() => {
+    if (initialSetup) setSetup(initialSetup);
+  }, [initialSetup]);
   const [timeframe, setTimeframe] = useState<Timeframe>(chartTimeframe);
   const [note, setNote] = useState("");
   const [placing, setPlacing] = useState(false);
@@ -157,7 +163,7 @@ export function OrderTicket({ instrument, price, marketOpen, buyingPower, balanc
           value={shares}
           onChange={(e) => setShares(Math.max(1, Math.floor(Number(e.target.value) || 1)))}
           aria-label="Number of shares"
-          className="h-11 w-20 rounded-2xl border border-border bg-[var(--bloom-ink)] text-center text-base text-foreground"
+          className="h-11 w-20 rounded-2xl border border-border bg-secondary text-center text-base text-foreground"
         />
         <button type="button" aria-label="More shares" onClick={() => setShares((n) => n + 1)} className="flex h-11 w-11 items-center justify-center rounded-full border border-border active:scale-90">
           <Plus className="h-4 w-4" />
@@ -176,7 +182,7 @@ export function OrderTicket({ instrument, price, marketOpen, buyingPower, balanc
         </label>
       </div>
 
-      <dl className="mt-4 grid grid-cols-3 gap-2 rounded-2xl bg-[var(--bloom-ink)] p-3 text-center text-sm">
+      <dl className="mt-4 grid grid-cols-3 gap-2 rounded-2xl bg-secondary p-3 text-center text-sm">
         <div>
           <dt className="text-xs text-muted-foreground">Risk</dt>
           <dd className="font-medium text-foreground">{risk != null ? money(risk) : "-"}</dd>
@@ -189,7 +195,7 @@ export function OrderTicket({ instrument, price, marketOpen, buyingPower, balanc
         </div>
         <div>
           <dt className="text-xs text-muted-foreground">Reward to risk</dt>
-          <dd className={cn("font-medium", rr != null && rr >= 1.5 ? "text-[var(--bloom-gold)]" : "text-foreground")}>{rr != null ? `1 : ${rr.toFixed(1)}` : "-"}</dd>
+          <dd className={cn("font-medium", rr != null && rr >= 1.5 ? "text-[var(--bloom-sage-text)]" : "text-foreground")}>{rr != null ? `1 : ${rr.toFixed(1)}` : "-"}</dd>
         </div>
       </dl>
       {!targetOnRightSide && (
@@ -206,7 +212,7 @@ export function OrderTicket({ instrument, price, marketOpen, buyingPower, balanc
           onChange={(e) => setNote(e.target.value)}
           rows={2}
           placeholder="For example: 1H rising, sweep of the lows, bullish gap on the 5m."
-          className="mt-1 w-full rounded-2xl border border-border bg-[var(--bloom-ink)] p-3 text-base text-foreground outline-none focus:border-primary"
+          className="mt-1 w-full rounded-2xl border border-border bg-secondary p-3 text-base text-foreground outline-none focus:border-primary"
         />
       </label>
       <p className="mt-1 text-xs text-muted-foreground">Practice orders fill at the current price. A stop, a reward at least 1.5 times the risk, 1% risk or less and a note each add to your process score.</p>

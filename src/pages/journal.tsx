@@ -88,11 +88,11 @@ function fmtDuration(minutes: number | null) {
 
 function gradeColor(g: string | null) {
   if (!g) return { text: "text-muted-foreground", bg: "rgba(196,165,116,0.08)", border: "rgba(196,165,116,0.15)" };
-  if (g === "A") return { text: "text-[#C4A574]", bg: "rgba(73,176,110,0.1)", border: "rgba(73,176,110,0.3)" };
+  if (g === "A") return { text: "text-[var(--bloom-sage-text)]", bg: "rgba(73,176,110,0.1)", border: "rgba(73,176,110,0.3)" };
   if (g === "B") return { text: "text-primary", bg: "rgba(196,165,116,0.1)", border: "rgba(196,165,116,0.3)" };
   if (g === "C") return { text: "text-yellow-400", bg: "rgba(250,204,21,0.1)", border: "rgba(250,204,21,0.3)" };
   if (g === "D") return { text: "text-orange-400", bg: "rgba(251,146,60,0.1)", border: "rgba(251,146,60,0.3)" };
-  return { text: "text-[#ef4444]", bg: "rgba(239,68,68,0.1)", border: "rgba(239,68,68,0.3)" };
+  return { text: "text-[var(--bloom-blush-text)]", bg: "rgba(239,68,68,0.1)", border: "rgba(239,68,68,0.3)" };
 }
 
 const EMOTIONS = ["😤 Frustrated", "😰 Anxious", "😐 Neutral", "🧘 Calm", "🔥 Confident", "🤑 Greedy", "😱 Fearful"];
@@ -108,7 +108,7 @@ function ScoreRing({ label, score, icon: Icon }: { label: string; score: number 
     <div className="flex flex-col items-center gap-1">
       <div className="relative w-12 h-12">
         <svg className="w-12 h-12 -rotate-90" viewBox="0 0 40 40">
-          <circle cx="20" cy="20" r="18" fill="none" stroke="rgba(243,238,228,0.05)" strokeWidth="3" />
+          <circle cx="20" cy="20" r="18" fill="none" stroke="rgba(26,24,20,0.05)" strokeWidth="3" />
           <circle cx="20" cy="20" r="18" fill="none" stroke={color} strokeWidth="3" strokeDasharray={dash} strokeDashoffset={offset} strokeLinecap="round" />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
@@ -160,11 +160,11 @@ function EditableField({ label, value, placeholder, onSave, multiline }: {
           )}
           <div className="flex flex-col gap-1">
             <button onClick={save} disabled={saving}
-              className="p-1.5 rounded-lg bg-[#C4A574]/20 text-[#C4A574] hover:bg-[#C4A574]/30 disabled:opacity-40">
+              className="p-1.5 rounded-lg bg-[var(--bloom-sage-soft)] text-[var(--bloom-sage-text)] hover:bg-secondary disabled:opacity-40">
               <Check className="w-3.5 h-3.5" />
             </button>
             <button onClick={() => { setVal(value ?? ""); setEditing(false); }}
-              className="p-1.5 rounded-lg bg-[#ef4444]/10 text-[#ef4444]/70 hover:bg-[#ef4444]/20">
+              className="p-1.5 rounded-lg bg-[var(--bloom-blush-soft)] text-[var(--bloom-blush-text)]/70 hover:bg-secondary">
               <X className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -176,7 +176,7 @@ function EditableField({ label, value, placeholder, onSave, multiline }: {
   return (
     <button onClick={() => { haptic(); setEditing(true); }} className="text-left w-full group">
       <p className="text-[9px] text-muted-foreground uppercase tracking-wide mb-0.5">{label}</p>
-      <p className={`text-xs leading-relaxed rounded-lg px-2 py-1.5 transition-colors ${value ? "text-muted-foreground bg-transparent" : "text-muted-foreground italic bg-white/[0.02]"} group-hover:bg-accent`}>
+      <p className={`text-xs leading-relaxed rounded-lg px-2 py-1.5 transition-colors ${value ? "text-muted-foreground bg-transparent" : "text-muted-foreground italic bg-secondary/40"} group-hover:bg-accent`}>
         {value || placeholder || `Tap to add…`}
       </p>
     </button>
@@ -192,7 +192,7 @@ function EmotionField({ label, value, onSave }: { label: string; value: string |
       <button
         onClick={() => { haptic(); setOpen(o => !o); }}
         className="w-full text-left text-xs rounded-lg px-2.5 py-2 transition-colors"
-        style={{ background: value ? "rgba(196,165,116,0.06)" : "rgba(243,238,228,0.02)", border: "1px solid rgba(243,238,228,0.06)" }}
+        style={{ background: value ? "rgba(196,165,116,0.06)" : "rgba(26,24,20,0.02)", border: "1px solid rgba(26,24,20,0.06)" }}
       >
         {value || "Tap to pick…"}
       </button>
@@ -211,9 +211,9 @@ function EmotionField({ label, value, onSave }: { label: string; value: string |
                   onClick={async () => { haptic(); await onSave(em); setOpen(false); }}
                   className="text-[10px] px-2 py-1 rounded-full transition-all"
                   style={{
-                    background: value === em ? "rgba(196,165,116,0.2)" : "rgba(243,238,228,0.04)",
-                    color: value === em ? "#C4A574" : "rgba(243,238,228,0.5)",
-                    border: value === em ? "1px solid rgba(196,165,116,0.4)" : "1px solid rgba(243,238,228,0.06)",
+                    background: value === em ? "rgba(196,165,116,0.2)" : "rgba(26,24,20,0.04)",
+                    color: value === em ? "#56684F" : "#6F6860",
+                    border: value === em ? "1px solid rgba(196,165,116,0.4)" : "1px solid rgba(26,24,20,0.06)",
                   }}
                 >
                   {em}
@@ -249,7 +249,7 @@ function EntryCard({ entry, onUpdate, onShare }: { entry: JournalEntry; onUpdate
 
   const followedRules = entry.followed_plan;
   const rulesBadge = followedRules === "Yes" || followedRules?.toLowerCase().includes("yes")
-    ? { label: "Followed rules", color: "#C4A574", icon: "✓" }
+    ? { label: "Followed rules", color: "#56684F", icon: "✓" }
     : followedRules === "No" || followedRules?.toLowerCase().includes("no")
     ? { label: "Broke rules", color: "#EF4444", icon: "✗" }
     : null;
@@ -259,12 +259,12 @@ function EntryCard({ entry, onUpdate, onShare }: { entry: JournalEntry; onUpdate
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       className="rounded-2xl border overflow-hidden"
-      style={{ background: "#1A1814", borderColor: gc.border }}
+      style={{ background: "var(--bloom-paper)", borderColor: gc.border }}
     >
       {/* Collapsed header */}
       <button
         onClick={() => { haptic(); setExpanded(e => !e); }}
-        className="w-full flex items-center gap-3 p-4 text-left active:bg-white/[0.02] transition-colors"
+        className="w-full flex items-center gap-3 p-4 text-left active:bg-secondary/40 transition-colors"
       >
         {/* Grade circle */}
         <div
@@ -281,7 +281,7 @@ function EntryCard({ entry, onUpdate, onShare }: { entry: JournalEntry; onUpdate
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-mono font-bold text-foreground text-base">{entry.ticker}</span>
             {entry.direction && (
-              <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold flex items-center gap-0.5 ${entry.direction === "long" ? "bg-[#C4A574]/15 text-[#C4A574]" : "bg-[#ef4444]/15 text-[#ef4444]"}`}>
+              <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold flex items-center gap-0.5 ${entry.direction === "long" ? "bg-[var(--bloom-sage-soft)] text-[var(--bloom-sage-text)]" : "bg-[var(--bloom-blush-soft)] text-[var(--bloom-blush-text)]"}`}>
                 {entry.direction === "long" ? <TrendingUp className="w-2.5 h-2.5" /> : <TrendingDown className="w-2.5 h-2.5" />}
                 {entry.direction.toUpperCase()}
               </span>
@@ -301,7 +301,7 @@ function EntryCard({ entry, onUpdate, onShare }: { entry: JournalEntry; onUpdate
 
         {/* P/L */}
         <div className="text-right flex items-center gap-2">
-          <span className={`font-mono text-sm font-bold ${win ? "text-[#C4A574]" : "text-[#ef4444]"}`}>
+          <span className={`font-mono text-sm font-bold ${win ? "text-[var(--bloom-sage-text)]" : "text-[var(--bloom-blush-text)]"}`}>
             {win ? "+" : "-"}{fmt(entry.pnl)}
           </span>
           {expanded ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
@@ -318,13 +318,13 @@ function EntryCard({ entry, onUpdate, onShare }: { entry: JournalEntry; onUpdate
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <div className="border-t border-white/5 px-4 pb-4 pt-3 space-y-4">
+            <div className="border-t border-border px-4 pb-4 pt-3 space-y-4">
 
               {/* ── Trade Numbers ── */}
-              <div className="grid grid-cols-4 gap-px rounded-xl overflow-hidden" style={{ background: "rgba(243,238,228,0.04)" }}>
+              <div className="grid grid-cols-4 gap-px rounded-xl overflow-hidden" style={{ background: "rgba(26,24,20,0.04)" }}>
                 {[
-                  { label: "Entry", value: fmt(entry.entry_price), color: "#C4A574" },
-                  { label: "Exit", value: fmt(entry.exit_price), color: "#C4A574" },
+                  { label: "Entry", value: fmt(entry.entry_price), color: "#56684F" },
+                  { label: "Exit", value: fmt(entry.exit_price), color: "#56684F" },
                   { label: "Stop", value: fmt(entry.stop_price), color: "#EF4444" },
                   { label: "Target", value: fmt(entry.target_price), color: "#F59E0B" },
                 ].map(({ label, value, color }) => (
@@ -353,9 +353,9 @@ function EntryCard({ entry, onUpdate, onShare }: { entry: JournalEntry; onUpdate
                     <span>🌺</span> Pansy&apos;s assessment
                   </p>
                   {[
-                    { label: "What went well", text: entry.what_went_well, color: "#C4A574" },
+                    { label: "What went well", text: entry.what_went_well, color: "#56684F" },
                     { label: "What to improve", text: entry.what_to_improve, color: "#EF4444" },
-                    { label: "Did you follow your plan?", text: entry.followed_plan, color: "#C4A574" },
+                    { label: "Did you follow your plan?", text: entry.followed_plan, color: "#56684F" },
                     { label: "Remember next time", text: entry.remember_next, color: "#F59E0B" },
                   ].map(({ label, text, color }) => text && (
                     <div key={label} className="rounded-xl px-3 py-2.5" style={{ background: `${color}08`, border: `1px solid ${color}15` }}>
@@ -434,7 +434,7 @@ function EntryCard({ entry, onUpdate, onShare }: { entry: JournalEntry; onUpdate
               <button
                 onClick={() => { haptic(); onShare(entry); }}
                 className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-semibold transition-all active:scale-95"
-                style={{ background: "rgba(196,165,116,0.1)", color: "#C4A574", border: "1px solid rgba(196,165,116,0.2)" }}
+                style={{ background: "rgba(196,165,116,0.1)", color: "#56684F", border: "1px solid rgba(196,165,116,0.2)" }}
               >
                 <Share2 className="w-3.5 h-3.5" />
                 Share Trade Card
@@ -530,7 +530,7 @@ function JournalAnalytics({ entries }: { entries: JournalEntry[] }) {
     const color = lastVal >= 0 ? "#C4A574" : "#EF4444";
     return (
       <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-[50px]">
-        <line x1={pad} y1={zeroY} x2={w - pad} y2={zeroY} stroke="rgba(243,238,228,0.06)" strokeWidth="0.5" />
+        <line x1={pad} y1={zeroY} x2={w - pad} y2={zeroY} stroke="rgba(26,24,20,0.06)" strokeWidth="0.5" />
         <polyline points={points} fill="none" stroke={color} strokeWidth="1.5" strokeLinejoin="round" />
         <circle cx={Number(points.split(" ").pop()?.split(",")[0])} cy={Number(points.split(" ").pop()?.split(",")[1])} r="2.5" fill={color} />
       </svg>
@@ -538,7 +538,7 @@ function JournalAnalytics({ entries }: { entries: JournalEntry[] }) {
   })();
 
   return (
-    <div className="rounded-xl mb-4 overflow-hidden" style={{ background: "rgba(243,238,228,0.02)", border: "1px solid rgba(243,238,228,0.05)" }}>
+    <div className="rounded-xl mb-4 overflow-hidden" style={{ background: "rgba(26,24,20,0.02)", border: "1px solid rgba(26,24,20,0.05)" }}>
       <button
         onClick={() => { haptic(); setOpen(!open); }}
         className="w-full flex items-center justify-between px-3 py-2.5"
@@ -572,12 +572,12 @@ function JournalAnalytics({ entries }: { entries: JournalEntry[] }) {
               {/* Detailed metrics */}
               <div className="grid grid-cols-3 gap-2">
                 {[
-                  { label: "Avg Win", value: `+${fmt(avgWin)}`, color: "#C4A574" },
+                  { label: "Avg Win", value: `+${fmt(avgWin)}`, color: "#56684F" },
                   { label: "Avg Loss", value: `-${fmt(avgLoss)}`, color: "#EF4444" },
-                  { label: "Profit Factor", value: profitFactor === Infinity ? "∞" : profitFactor.toFixed(2), color: profitFactor >= 1.5 ? "#C4A574" : profitFactor >= 1 ? "#FACC15" : "#EF4444" },
-                  { label: "Largest Win", value: `+${fmt(largestWin)}`, color: "#C4A574" },
+                  { label: "Profit Factor", value: profitFactor === Infinity ? "∞" : profitFactor.toFixed(2), color: profitFactor >= 1.5 ? "#56684F" : profitFactor >= 1 ? "#FACC15" : "#EF4444" },
+                  { label: "Largest Win", value: `+${fmt(largestWin)}`, color: "#56684F" },
                   { label: "Largest Loss", value: fmt(largestLoss), color: "#EF4444" },
-                  { label: "R:R Score", value: avgRR != null ? `${avgRR}/100` : "—", color: avgRR && avgRR >= 60 ? "#C4A574" : "#FACC15" },
+                  { label: "R:R Score", value: avgRR != null ? `${avgRR}/100` : "—", color: avgRR && avgRR >= 60 ? "#56684F" : "#FACC15" },
                 ].map(({ label, value, color }) => (
                   <div key={label} className="rounded-lg px-2 py-1.5 text-center" style={{ background: `${color}06`, border: `1px solid ${color}10` }}>
                     <p className="text-[8px] text-muted-foreground uppercase tracking-wider">{label}</p>
@@ -590,13 +590,13 @@ function JournalAnalytics({ entries }: { entries: JournalEntry[] }) {
               <div className="flex gap-2">
                 <div className="flex-1 rounded-lg px-2 py-1.5" style={{ background: "rgba(73,176,110,0.06)", border: "1px solid rgba(73,176,110,0.10)" }}>
                   <p className="text-[8px] text-muted-foreground uppercase tracking-wider">Best Win Streak</p>
-                  <p className="text-xs font-bold text-[#C4A574]">{streaks.maxWin} trades</p>
-                  {streaks.currentWin > 1 && <p className="text-[8px] text-[#C4A574]/60 mt-0.5">Current: {streaks.currentWin}</p>}
+                  <p className="text-xs font-bold text-[var(--bloom-sage-text)]">{streaks.maxWin} trades</p>
+                  {streaks.currentWin > 1 && <p className="text-[8px] text-[var(--bloom-sage-text)]/60 mt-0.5">Current: {streaks.currentWin}</p>}
                 </div>
                 <div className="flex-1 rounded-lg px-2 py-1.5" style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.10)" }}>
                   <p className="text-[8px] text-muted-foreground uppercase tracking-wider">Worst Loss Streak</p>
-                  <p className="text-xs font-bold text-[#EF4444]">{streaks.maxLoss} trades</p>
-                  {streaks.currentLoss > 1 && <p className="text-[8px] text-[#EF4444]/60 mt-0.5">Current: {streaks.currentLoss}</p>}
+                  <p className="text-xs font-bold text-[var(--bloom-blush-text)]">{streaks.maxLoss} trades</p>
+                  {streaks.currentLoss > 1 && <p className="text-[8px] text-[var(--bloom-blush-text)]/60 mt-0.5">Current: {streaks.currentLoss}</p>}
                 </div>
               </div>
 
@@ -607,12 +607,12 @@ function JournalAnalytics({ entries }: { entries: JournalEntry[] }) {
                   <div className="space-y-1">
                     {emotionStats.topWin && (
                       <p className="text-[11px] text-muted-foreground">
-                        Winning mood: <span className="font-semibold text-[#C4A574]">{emotionStats.topWin}</span>
+                        Winning mood: <span className="font-semibold text-[var(--bloom-sage-text)]">{emotionStats.topWin}</span>
                       </p>
                     )}
                     {emotionStats.topLoss && (
                       <p className="text-[11px] text-muted-foreground">
-                        Losing mood: <span className="font-semibold text-[#EF4444]">{emotionStats.topLoss}</span>
+                        Losing mood: <span className="font-semibold text-[var(--bloom-blush-text)]">{emotionStats.topLoss}</span>
                       </p>
                     )}
                   </div>
@@ -628,8 +628,8 @@ function JournalAnalytics({ entries }: { entries: JournalEntry[] }) {
                       <div key={s.name} className="flex items-center gap-2 text-[11px]">
                         <span className="text-muted-foreground flex-1 truncate">{s.name}</span>
                         <span className="text-muted-foreground">{s.total}t</span>
-                        <span style={{ color: s.wr >= 50 ? "#C4A574" : "#EF4444" }}>{s.wr}%</span>
-                        <span className="w-16 text-right font-semibold" style={{ color: s.pnl >= 0 ? "#C4A574" : "#EF4444" }}>
+                        <span style={{ color: s.wr >= 50 ? "#56684F" : "#EF4444" }}>{s.wr}%</span>
+                        <span className="w-16 text-right font-semibold" style={{ color: s.pnl >= 0 ? "#56684F" : "#EF4444" }}>
                           {s.pnl >= 0 ? "+" : ""}{fmt(s.pnl)}
                         </span>
                       </div>
@@ -693,7 +693,7 @@ function WeeklyReview() {
   };
 
   return (
-    <div className="rounded-xl mb-4 overflow-hidden" style={{ background: "rgba(168,85,247,0.04)", border: "1px solid rgba(168,85,247,0.12)" }}>
+    <div className="rounded-xl mb-4 overflow-hidden" style={{ background: "rgba(26,24,20,0.04)", border: "1px solid rgba(26,24,20,0.12)" }}>
       <button
         onClick={() => { haptic(); if (review) setOpen(!open); else fetchReview(); }}
         className="w-full flex items-center justify-between px-3 py-2.5"
@@ -731,15 +731,15 @@ function WeeklyReview() {
                     analyze your emotional tendencies, and give you a game plan for next week.
                   </p>
                   <div className="flex items-center gap-2">
-                    <div className="flex rounded-lg overflow-hidden" style={{ border: "1px solid rgba(243,238,228,0.08)" }}>
+                    <div className="flex rounded-lg overflow-hidden" style={{ border: "1px solid rgba(26,24,20,0.08)" }}>
                       {(["week", "month"] as const).map(r => (
                         <button
                           key={r}
                           onClick={(e) => { e.stopPropagation(); haptic(); setReviewRange(r); }}
                           className="px-3 py-1.5 text-[10px] font-medium transition-colors"
                           style={{
-                            background: reviewRange === r ? "rgba(168,85,247,0.15)" : "transparent",
-                            color: reviewRange === r ? "#A855F7" : "rgba(243,238,228,0.35)",
+                            background: reviewRange === r ? "rgba(26,24,20,0.15)" : "transparent",
+                            color: reviewRange === r ? "#1A1814" : "#6F6860",
                           }}
                         >
                           {r === "week" ? "This Week" : "This Month"}
@@ -750,7 +750,7 @@ function WeeklyReview() {
                       whileTap={{ scale: 0.95 }}
                       onClick={(e) => { e.stopPropagation(); fetchReview(); }}
                       className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-semibold"
-                      style={{ background: "rgba(168,85,247,0.15)", color: "#A855F7", border: "1px solid rgba(168,85,247,0.25)" }}
+                      style={{ background: "rgba(26,24,20,0.15)", color: "#1A1814", border: "1px solid rgba(26,24,20,0.25)" }}
                     >
                       <Sparkles className="w-3.5 h-3.5" />
                       Get My Review
@@ -770,7 +770,7 @@ function WeeklyReview() {
 
               {error && !loading && (
                 <div className="rounded-lg px-3 py-2.5 mb-2" style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.15)" }}>
-                  <p className="text-xs text-[#EF4444]/80">{error}</p>
+                  <p className="text-xs text-[var(--bloom-blush-text)]/80">{error}</p>
                   <button
                     onClick={(e) => { e.stopPropagation(); fetchReview(); }}
                     className="text-xs text-primary mt-1 underline"
@@ -785,10 +785,10 @@ function WeeklyReview() {
                   {stats && (
                     <div className="grid grid-cols-4 gap-1.5 mb-3">
                       {[
-                        { label: "Trades", value: stats.totalTrades, color: "#A855F7" },
-                        { label: "Win Rate", value: `${stats.winRate}%`, color: stats.winRate >= 50 ? "#C4A574" : "#EF4444" },
-                        { label: "P/L", value: `${stats.totalPnl >= 0 ? "+" : ""}$${Math.abs(stats.totalPnl).toFixed(0)}`, color: stats.totalPnl >= 0 ? "#C4A574" : "#EF4444" },
-                        { label: "Discipline", value: `${stats.followedPlan}/${stats.totalTrades}`, color: stats.followedPlan >= stats.totalTrades * 0.7 ? "#C4A574" : "#F59E0B" },
+                        { label: "Trades", value: stats.totalTrades, color: "#1A1814" },
+                        { label: "Win Rate", value: `${stats.winRate}%`, color: stats.winRate >= 50 ? "#56684F" : "#EF4444" },
+                        { label: "P/L", value: `${stats.totalPnl >= 0 ? "+" : ""}$${Math.abs(stats.totalPnl).toFixed(0)}`, color: stats.totalPnl >= 0 ? "#56684F" : "#EF4444" },
+                        { label: "Discipline", value: `${stats.followedPlan}/${stats.totalTrades}`, color: stats.followedPlan >= stats.totalTrades * 0.7 ? "#56684F" : "#F59E0B" },
                       ].map(({ label, value, color }) => (
                         <div key={label} className="rounded-lg px-1.5 py-1 text-center" style={{ background: `${color}08`, border: `1px solid ${color}12` }}>
                           <p className="text-[7px] uppercase tracking-wider" style={{ color: `${color}99` }}>{label}</p>
@@ -891,7 +891,7 @@ function PnlChart({ data }: { data: { date: string; cumPnl: number }[] }) {
     ` L${points[points.length - 1].x},${zeroY} Z`;
 
   return (
-    <div className="rounded-xl p-3" style={{ background: "rgba(243,238,228,0.02)", border: "1px solid rgba(243,238,228,0.05)" }}>
+    <div className="rounded-xl p-3" style={{ background: "rgba(26,24,20,0.02)", border: "1px solid rgba(26,24,20,0.05)" }}>
       <div className="flex items-center justify-between mb-2">
         <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Equity Curve</p>
         <p className="text-xs font-mono font-bold" style={{ color: lineColor }}>
@@ -905,7 +905,7 @@ function PnlChart({ data }: { data: { date: string; cumPnl: number }[] }) {
             <stop offset="100%" stopColor={lineColor} stopOpacity="0" />
           </linearGradient>
         </defs>
-        <line x1={pad} y1={zeroY} x2={w - pad} y2={zeroY} stroke="rgba(243,238,228,0.06)" strokeWidth="0.5" strokeDasharray="4,4" />
+        <line x1={pad} y1={zeroY} x2={w - pad} y2={zeroY} stroke="rgba(26,24,20,0.06)" strokeWidth="0.5" strokeDasharray="4,4" />
         <path d={areaPath} fill={`url(#${gradientId})`} />
         <polyline points={polyline} fill="none" stroke={lineColor} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
         <circle cx={points[points.length - 1].x} cy={points[points.length - 1].y} r="3" fill={lineColor} />
@@ -924,7 +924,7 @@ function GradeBar({ grades }: { grades: Record<string, number> }) {
   const colors: Record<string, string> = { A: "#C4A574", B: "#C4A574", C: "#FACC15", D: "#F97316", F: "#EF4444" };
 
   return (
-    <div className="rounded-xl p-3" style={{ background: "rgba(243,238,228,0.02)", border: "1px solid rgba(243,238,228,0.05)" }}>
+    <div className="rounded-xl p-3" style={{ background: "rgba(26,24,20,0.02)", border: "1px solid rgba(26,24,20,0.05)" }}>
       <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold mb-2">Grade Distribution</p>
       <div className="flex gap-0.5 h-3 rounded-full overflow-hidden mb-2">
         {["A", "B", "C", "D", "F"].map(g => {
@@ -976,7 +976,7 @@ function StatsView({ onShareStats }: { onShareStats?: (data: { winRate: number; 
 
   if (error) {
     return (
-      <div className="rounded-xl bg-[#ef4444]/10 border border-[#ef4444]/20 px-4 py-3 text-sm text-[#ef4444]">
+      <div className="rounded-xl bg-[var(--bloom-blush-soft)] border border-[var(--bloom-blush)] px-4 py-3 text-sm text-[var(--bloom-blush-text)]">
         {error}
       </div>
     );
@@ -1055,7 +1055,7 @@ function StatsView({ onShareStats }: { onShareStats?: (data: { winRate: number; 
             });
           }}
           className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-semibold transition-all active:scale-95"
-          style={{ background: "rgba(196,165,116,0.1)", color: "#C4A574", border: "1px solid rgba(196,165,116,0.2)" }}
+          style={{ background: "rgba(196,165,116,0.1)", color: "#56684F", border: "1px solid rgba(196,165,116,0.2)" }}
         >
           <Share2 className="w-3.5 h-3.5" />
           Share Performance Card
@@ -1099,39 +1099,39 @@ function StatsView({ onShareStats }: { onShareStats?: (data: { winRate: number; 
           )}
         </div>
         <div className="rounded-xl p-2.5 text-center" style={{ background: "rgba(73,176,110,0.06)", border: "1px solid rgba(73,176,110,0.12)" }}>
-          <Flame className="w-3.5 h-3.5 text-[#C4A574] mx-auto mb-0.5 opacity-60" />
-          <p className="text-lg font-bold text-[#C4A574]">{s.bestWinStreak}</p>
-          <p className="text-[8px] uppercase tracking-wider text-[#C4A574]/60 font-bold">Best streak</p>
+          <Flame className="w-3.5 h-3.5 text-[var(--bloom-sage-text)] mx-auto mb-0.5 opacity-60" />
+          <p className="text-lg font-bold text-[var(--bloom-sage-text)]">{s.bestWinStreak}</p>
+          <p className="text-[8px] uppercase tracking-wider text-[var(--bloom-sage-text)]/60 font-bold">Best streak</p>
         </div>
         <div className="rounded-xl p-2.5 text-center" style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.12)" }}>
-          <ArrowDownRight className="w-3.5 h-3.5 text-[#EF4444] mx-auto mb-0.5 opacity-60" />
-          <p className="text-lg font-bold text-[#EF4444]">{s.worstLossStreak}</p>
-          <p className="text-[8px] uppercase tracking-wider text-[#EF4444]/60 font-bold">Worst streak</p>
+          <ArrowDownRight className="w-3.5 h-3.5 text-[var(--bloom-blush-text)] mx-auto mb-0.5 opacity-60" />
+          <p className="text-lg font-bold text-[var(--bloom-blush-text)]">{s.worstLossStreak}</p>
+          <p className="text-[8px] uppercase tracking-wider text-[var(--bloom-blush-text)]/60 font-bold">Worst streak</p>
         </div>
       </div>
 
       {/* Direction breakdown */}
       {(s.direction.longs > 0 || s.direction.shorts > 0) && (
-        <div className="rounded-xl p-3" style={{ background: "rgba(243,238,228,0.02)", border: "1px solid rgba(243,238,228,0.05)" }}>
+        <div className="rounded-xl p-3" style={{ background: "rgba(26,24,20,0.02)", border: "1px solid rgba(26,24,20,0.05)" }}>
           <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold mb-2">Long vs Short</p>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <div className="flex items-center gap-1.5 mb-1">
-                <TrendingUp className="w-3 h-3 text-[#C4A574]" />
-                <span className="text-xs font-bold text-[#C4A574]">Long</span>
+                <TrendingUp className="w-3 h-3 text-[var(--bloom-sage-text)]" />
+                <span className="text-xs font-bold text-[var(--bloom-sage-text)]">Long</span>
               </div>
               <p className="text-[11px] text-muted-foreground">{s.direction.longs} trades · {s.direction.longWinRate}% WR</p>
-              <p className="text-xs font-bold mt-0.5" style={{ color: s.direction.longPnl >= 0 ? "#C4A574" : "#EF4444" }}>
+              <p className="text-xs font-bold mt-0.5" style={{ color: s.direction.longPnl >= 0 ? "#56684F" : "#EF4444" }}>
                 {s.direction.longPnl >= 0 ? "+" : ""}${Math.abs(s.direction.longPnl).toFixed(2)}
               </p>
             </div>
             <div>
               <div className="flex items-center gap-1.5 mb-1">
-                <TrendingDown className="w-3 h-3 text-[#EF4444]" />
-                <span className="text-xs font-bold text-[#EF4444]">Short</span>
+                <TrendingDown className="w-3 h-3 text-[var(--bloom-blush-text)]" />
+                <span className="text-xs font-bold text-[var(--bloom-blush-text)]">Short</span>
               </div>
               <p className="text-[11px] text-muted-foreground">{s.direction.shorts} trades · {s.direction.shortWinRate}% WR</p>
-              <p className="text-xs font-bold mt-0.5" style={{ color: s.direction.shortPnl >= 0 ? "#C4A574" : "#EF4444" }}>
+              <p className="text-xs font-bold mt-0.5" style={{ color: s.direction.shortPnl >= 0 ? "#56684F" : "#EF4444" }}>
                 {s.direction.shortPnl >= 0 ? "+" : ""}${Math.abs(s.direction.shortPnl).toFixed(2)}
               </p>
             </div>
@@ -1148,8 +1148,8 @@ function StatsView({ onShareStats }: { onShareStats?: (data: { winRate: number; 
           {s.bestTrades.length > 0 && (
             <div className="rounded-xl p-3" style={{ background: "rgba(73,176,110,0.04)", border: "1px solid rgba(73,176,110,0.10)" }}>
               <div className="flex items-center gap-1.5 mb-2">
-                <Trophy className="w-3.5 h-3.5 text-[#C4A574]" />
-                <p className="text-[9px] text-[#C4A574]/80 uppercase tracking-wider font-bold">Best Trades</p>
+                <Trophy className="w-3.5 h-3.5 text-[var(--bloom-sage-text)]" />
+                <p className="text-[9px] text-[var(--bloom-sage-text)]/80 uppercase tracking-wider font-bold">Best Trades</p>
               </div>
               <div className="space-y-1.5">
                 {s.bestTrades.map((t, i) => (
@@ -1159,7 +1159,7 @@ function StatsView({ onShareStats }: { onShareStats?: (data: { winRate: number; 
                       <span className="text-xs font-mono font-bold text-foreground">{t.ticker}</span>
                       <span className="text-[9px] text-muted-foreground ml-1.5">{t.date.slice(5)}</span>
                     </div>
-                    <span className="text-xs font-bold text-[#C4A574]">+${t.pnl.toFixed(2)}</span>
+                    <span className="text-xs font-bold text-[var(--bloom-sage-text)]">+${t.pnl.toFixed(2)}</span>
                   </div>
                 ))}
               </div>
@@ -1168,8 +1168,8 @@ function StatsView({ onShareStats }: { onShareStats?: (data: { winRate: number; 
           {s.worstTrades.length > 0 && (
             <div className="rounded-xl p-3" style={{ background: "rgba(239,68,68,0.04)", border: "1px solid rgba(239,68,68,0.10)" }}>
               <div className="flex items-center gap-1.5 mb-2">
-                <AlertTriangle className="w-3.5 h-3.5 text-[#EF4444]" />
-                <p className="text-[9px] text-[#EF4444]/80 uppercase tracking-wider font-bold">Worst Trades</p>
+                <AlertTriangle className="w-3.5 h-3.5 text-[var(--bloom-blush-text)]" />
+                <p className="text-[9px] text-[var(--bloom-blush-text)]/80 uppercase tracking-wider font-bold">Worst Trades</p>
               </div>
               <div className="space-y-1.5">
                 {s.worstTrades.map((t, i) => (
@@ -1179,7 +1179,7 @@ function StatsView({ onShareStats }: { onShareStats?: (data: { winRate: number; 
                       <span className="text-xs font-mono font-bold text-foreground">{t.ticker}</span>
                       <span className="text-[9px] text-muted-foreground ml-1.5">{t.date.slice(5)}</span>
                     </div>
-                    <span className="text-xs font-bold text-[#EF4444]">-${Math.abs(t.pnl).toFixed(2)}</span>
+                    <span className="text-xs font-bold text-[var(--bloom-blush-text)]">-${Math.abs(t.pnl).toFixed(2)}</span>
                   </div>
                 ))}
               </div>
@@ -1190,14 +1190,14 @@ function StatsView({ onShareStats }: { onShareStats?: (data: { winRate: number; 
 
       {/* Top tickers */}
       {s.topTickers.length > 0 && (
-        <div className="rounded-xl p-3" style={{ background: "rgba(243,238,228,0.02)", border: "1px solid rgba(243,238,228,0.05)" }}>
+        <div className="rounded-xl p-3" style={{ background: "rgba(26,24,20,0.02)", border: "1px solid rgba(26,24,20,0.05)" }}>
           <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold mb-2">Most Traded</p>
           <div className="space-y-1.5">
             {s.topTickers.map(t => (
               <div key={t.ticker} className="flex items-center gap-3">
                 <TickerMark ticker={t.ticker} size="sm" />
                 <span className="text-xs font-mono font-bold text-foreground w-14">{t.ticker}</span>
-                <div className="flex-1 h-1.5 rounded-full bg-white/5 overflow-hidden">
+                <div className="flex-1 h-1.5 rounded-full bg-secondary overflow-hidden">
                   <div
                     className="h-full rounded-full"
                     style={{
@@ -1207,7 +1207,7 @@ function StatsView({ onShareStats }: { onShareStats?: (data: { winRate: number; 
                   />
                 </div>
                 <span className="text-[10px] text-muted-foreground w-6 text-right">{t.trades}</span>
-                <span className="text-[10px] font-bold w-16 text-right" style={{ color: t.pnl >= 0 ? "#C4A574" : "#EF4444" }}>
+                <span className="text-[10px] font-bold w-16 text-right" style={{ color: t.pnl >= 0 ? "#56684F" : "#EF4444" }}>
                   {t.pnl >= 0 ? "+" : ""}${Math.abs(t.pnl).toFixed(2)}
                 </span>
               </div>
@@ -1218,7 +1218,7 @@ function StatsView({ onShareStats }: { onShareStats?: (data: { winRate: number; 
 
       {/* Emotion insights */}
       {s.emotionStats.length > 0 && (
-        <div className="rounded-xl p-3" style={{ background: "rgba(168,85,247,0.04)", border: "1px solid rgba(168,85,247,0.10)" }}>
+        <div className="rounded-xl p-3" style={{ background: "rgba(26,24,20,0.04)", border: "1px solid rgba(26,24,20,0.10)" }}>
           <div className="flex items-center gap-1.5 mb-2">
             <Heart className="w-3.5 h-3.5 text-purple-400" />
             <p className="text-[10px] text-purple-400/80 uppercase tracking-wider font-bold">Emotion Patterns</p>
@@ -1228,10 +1228,10 @@ function StatsView({ onShareStats }: { onShareStats?: (data: { winRate: number; 
               <div key={e.emotion} className="flex items-center gap-2 text-[11px]">
                 <span className="text-muted-foreground flex-1 truncate">{e.emotion}</span>
                 <span className="text-muted-foreground">{e.trades}t</span>
-                <span className="w-10 text-right" style={{ color: e.winRate >= 50 ? "#C4A574" : "#EF4444" }}>
+                <span className="w-10 text-right" style={{ color: e.winRate >= 50 ? "#56684F" : "#EF4444" }}>
                   {e.winRate}%
                 </span>
-                <span className="w-14 text-right font-bold" style={{ color: e.pnl >= 0 ? "#C4A574" : "#EF4444" }}>
+                <span className="w-14 text-right font-bold" style={{ color: e.pnl >= 0 ? "#56684F" : "#EF4444" }}>
                   {e.pnl >= 0 ? "+" : ""}${Math.abs(e.pnl).toFixed(2)}
                 </span>
               </div>
@@ -1332,7 +1332,7 @@ export default function JournalPage(_props: PageProps) {
 
           {/* Tab bar */}
           {!authLoading && isPaid && (
-            <div className="flex gap-1 mb-4 p-1 rounded-xl" style={{ background: "rgba(243,238,228,0.03)", border: "1px solid rgba(243,238,228,0.05)" }}>
+            <div className="flex gap-1 mb-4 p-1 rounded-xl" style={{ background: "rgba(26,24,20,0.03)", border: "1px solid rgba(26,24,20,0.05)" }}>
               {([
                 { key: "journal" as const, label: "Journal", icon: NotebookPen },
                 { key: "stats" as const, label: "Stats", icon: BarChart3 },
@@ -1343,7 +1343,7 @@ export default function JournalPage(_props: PageProps) {
                   className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold transition-all"
                   style={{
                     background: tab === key ? "rgba(196,165,116,0.12)" : "transparent",
-                    color: tab === key ? "#C4A574" : "rgba(243,238,228,0.35)",
+                    color: tab === key ? "#56684F" : "#6F6860",
                     border: tab === key ? "1px solid rgba(196,165,116,0.25)" : "1px solid transparent",
                   }}
                 >
@@ -1362,7 +1362,7 @@ export default function JournalPage(_props: PageProps) {
           )}
 
           {!loading && !authLoading && isPaid && error && tab === "journal" && (
-            <div className="rounded-xl bg-[#ef4444]/10 border border-[#ef4444]/20 px-4 py-3 text-sm text-[#ef4444] mb-4">
+            <div className="rounded-xl bg-[var(--bloom-blush-soft)] border border-[var(--bloom-blush)] px-4 py-3 text-sm text-[var(--bloom-blush-text)] mb-4">
               {error} <button onClick={loadEntries} className="underline ml-2">Retry</button>
             </div>
           )}
@@ -1377,10 +1377,10 @@ export default function JournalPage(_props: PageProps) {
               {totalTrades > 0 && (
                 <div className="grid grid-cols-4 gap-2 mb-4">
                   {[
-                    { label: "Trades", value: totalTrades, color: "#C4A574" },
-                    { label: "Win rate", value: `${winRate}%`, color: winRate >= 50 ? "#C4A574" : "#EF4444" },
-                    { label: "P/L", value: `${totalPnl >= 0 ? "+" : ""}${fmt(totalPnl)}`, color: totalPnl >= 0 ? "#C4A574" : "#EF4444" },
-                    { label: "Followed", value: `${followedCount}/${totalTrades}`, color: followedCount >= totalTrades * 0.7 ? "#C4A574" : "#F59E0B" },
+                    { label: "Trades", value: totalTrades, color: "#56684F" },
+                    { label: "Win rate", value: `${winRate}%`, color: winRate >= 50 ? "#56684F" : "#EF4444" },
+                    { label: "P/L", value: `${totalPnl >= 0 ? "+" : ""}${fmt(totalPnl)}`, color: totalPnl >= 0 ? "#56684F" : "#EF4444" },
+                    { label: "Followed", value: `${followedCount}/${totalTrades}`, color: followedCount >= totalTrades * 0.7 ? "#56684F" : "#F59E0B" },
                   ].map(({ label, value, color }) => (
                     <div key={label} className="rounded-xl p-2.5 text-center" style={{ background: `${color}08`, border: `1px solid ${color}15` }}>
                       <p className="text-[9px] font-bold uppercase tracking-wider mb-0.5" style={{ color }}>{label}</p>
@@ -1397,7 +1397,7 @@ export default function JournalPage(_props: PageProps) {
               {totalTrades >= 3 && <WeeklyReview />}
 
               {/* Filters */}
-              <div className="rounded-xl p-3 mb-4 space-y-2" style={{ background: "rgba(243,238,228,0.02)", border: "1px solid rgba(243,238,228,0.05)" }}>
+              <div className="rounded-xl p-3 mb-4 space-y-2" style={{ background: "rgba(26,24,20,0.02)", border: "1px solid rgba(26,24,20,0.05)" }}>
                 <div className="flex items-center gap-2">
                   <Filter className="w-3 h-3 text-muted-foreground" />
                   <span className="text-[9px] text-muted-foreground uppercase tracking-wide">Filter</span>
@@ -1405,7 +1405,7 @@ export default function JournalPage(_props: PageProps) {
                 <div className="relative">
                   <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
                   <input
-                    className="w-full bg-background border border-white/8 rounded-lg pl-8 pr-3 py-2 text-xs text-foreground placeholder-[#F3EEE4]/20 focus:outline-none focus:border-primary"
+                    className="w-full bg-background border border-border rounded-lg pl-8 pr-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
                     placeholder="Search by ticker…"
                     value={ticker}
                     onChange={e => setTicker(e.target.value.toUpperCase())}
@@ -1420,7 +1420,7 @@ export default function JournalPage(_props: PageProps) {
                     <div key={label}>
                       <label className="text-[8px] text-muted-foreground uppercase tracking-wide block mb-0.5">{label}</label>
                       <select
-                        className="w-full bg-background border border-white/8 rounded-lg px-2 py-1.5 text-[10px] text-foreground focus:outline-none focus:border-primary"
+                        className="w-full bg-background border border-border rounded-lg px-2 py-1.5 text-[10px] text-foreground focus:outline-none focus:border-primary"
                         value={value} onChange={e => onChange(e.target.value)}
                       >
                         {opts.map(([v, l]) => <option key={v} value={v}>{l}</option>)}

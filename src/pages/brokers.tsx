@@ -56,7 +56,7 @@ function BrokerEntry({ broker, notice }: { broker: BrokerConfig; notice: BrokerN
             target="_blank"
             rel="sponsored noopener noreferrer"
             onClick={() => recordClick(broker)}
-            className="mt-4 inline-flex h-11 items-center gap-2 rounded-full border border-primary px-5 text-sm font-semibold text-[var(--bloom-gold)] transition-transform active:scale-95"
+            className="mt-4 inline-flex h-11 items-center gap-2 rounded-full border border-primary px-5 text-sm font-semibold text-foreground transition-transform active:scale-95"
           >
             Visit {broker.name} <ExternalLink className="h-4 w-4" aria-hidden="true" />
           </a>
@@ -79,7 +79,7 @@ export default function BrokersPage() {
       <Layout>
         <div className="mx-auto max-w-2xl space-y-8 px-4 py-6">
           <header className="rounded-3xl border border-[var(--bloom-rule)] bg-card p-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--bloom-gold)]">When you feel ready</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">When you feel ready</p>
             <h1 className="mt-2 text-4xl leading-tight text-foreground">Where to practise for real</h1>
             <p className="mt-3 text-base leading-relaxed text-muted-foreground">
               There&apos;s no rush. Many traders practise for months first, and staying in Bloom&apos;s Practice area is always fine.

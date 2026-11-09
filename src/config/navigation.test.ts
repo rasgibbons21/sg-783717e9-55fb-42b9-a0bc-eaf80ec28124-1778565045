@@ -5,12 +5,12 @@ import { RETIRED_ROUTES } from "./retiredRoutes.mjs";
 const retiredRoots = RETIRED_ROUTES.map((r) => r.source.replace("/:path*", ""));
 
 describe("navigation", () => {
-  it("has the five tabs from the spec", () => {
-    expect(TAB_ITEMS.map((t) => t.href)).toEqual(["/home", "/lessons", "/practice", "/leaderboard", "/ask-pansy"]);
+  it("has the five tabs from the spec, with Budget", () => {
+    expect(TAB_ITEMS.map((t) => t.href)).toEqual(["/home", "/lessons", "/practice", "/budget", "/ask-pansy"]);
   });
 
-  it("includes Brokers and Profile in the header", () => {
-    expect(HEADER_ITEMS.map((t) => t.href)).toEqual(["/brokers", "/profile"]);
+  it("includes Leaderboard, Brokers and Profile in the header", () => {
+    expect(HEADER_ITEMS.map((t) => t.href)).toEqual(["/leaderboard", "/brokers", "/profile"]);
   });
 
   it("never links to a retired route", () => {

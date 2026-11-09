@@ -64,8 +64,11 @@ export function AppShell({ children }: { children: ReactNode }) {
             ))}
           </nav>
 
-          <div className="ml-auto flex items-center gap-2">
-            <Link href="/brokers" className="rounded-full px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-secondary">
+          <div className="ml-auto flex items-center gap-1 sm:gap-2">
+            <Link href="/leaderboard" className="rounded-full px-2.5 py-2 text-sm font-medium text-muted-foreground hover:bg-secondary sm:px-3">
+              Leaderboard
+            </Link>
+            <Link href="/brokers" className="rounded-full px-2.5 py-2 text-sm font-medium text-muted-foreground hover:bg-secondary sm:px-3">
               Brokers
             </Link>
             <Link

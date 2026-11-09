@@ -33,13 +33,19 @@ export interface ChartStageProps {
   };
   height?: number;
   caption?: string;
+  /** View mode: the part of the chart a lesson is pointing at. */
+  highlight?: { kind: "zone"; zone: Zone } | { kind: "candles"; indexes: number[] };
+  /** View mode: which part of the chart to draw the eye to. */
+  emphasis?: ChartEmphasis | null;
 }
+
+export type ChartEmphasis = "pattern" | "volume" | "entry" | "stop" | "target" | "timeframe";
 
 const HIT = 44;
 const PAD_X = 8;
 const PRICE_PAD = 14;
 const LEVEL_STYLE: Record<keyof Levels, { label: string; colour: string }> = {
-  entry: { label: "Planned entry", colour: "var(--bloom-text-light)" },
+  entry: { label: "Planned entry", colour: "var(--bloom-gold)" },
   stop: { label: "Stop", colour: "var(--bloom-blush)" },
   target: { label: "Target", colour: "var(--bloom-sage)" },
 };
@@ -77,6 +83,7 @@ function DragLine({
   const drag = useDrag(svgRef, onMoveTo);
   return (
     <g
+      data-handle
       role="slider"
       aria-label={`${label} line. Use the up and down arrow keys to move it.`}
       aria-valuetext={label}
@@ -92,8 +99,8 @@ function DragLine({
     >
       <rect x={0} y={y - HIT / 2} width={width} height={HIT} fill="transparent" />
       <line x1={0} x2={width} y1={y} y2={y} stroke={colour} strokeWidth={1.5} strokeDasharray="5 4" />
-      <rect x={width - 66} y={y - 11} width={62} height={22} rx={11} fill="var(--bloom-panel)" stroke={colour} />
-      <text x={width - 35} y={y + 4} textAnchor="middle" fontSize={11} fill={colour}>
+      <rect x={width - 66} y={y - 11} width={62} height={22} rx={11} fill="var(--bloom-paper-raised)" stroke={colour} />
+      <text x={width - 35} y={y + 4} textAnchor="middle" fontSize={11} fill="var(--bloom-ink)">
         {label}
       </text>
     </g>
@@ -114,6 +121,8 @@ export function ChartStage({
   overlays,
   height = 300,
   caption = "Illustrative example",
+  highlight,
+  emphasis = null,
 }: ChartStageProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -132,12 +141,14 @@ export function ChartStage({
   const { min, max } = useMemo(() => {
     const prices = candles.flatMap((c) => [c.high, c.low]);
     for (const z of overlays?.zones ?? []) prices.push(z.top, z.bottom);
+    // A drawn plan in view mode must stay on screen, even when its target sits past the last candle's range.
+    if (mode === "view" && prices.length > 0) for (const price of [levels.entry, levels.stop, levels.target]) if (price !== undefined) prices.push(price);
     if (prices.length === 0) return { min: 0, max: 1 };
     const low = Math.min(...prices);
     const high = Math.max(...prices);
     const margin = (high - low) * 0.06 || 1;
     return { min: low - margin, max: high + margin };
-  }, [candles, overlays]);
+  }, [candles, overlays, mode, levels.entry, levels.stop, levels.target]);
 
   const scale = priceScale(min, max, priceHeight, PRICE_PAD);
   const step = (max - min) * 0.005;
@@ -188,9 +199,9 @@ export function ChartStage({
   const zoneBottom = zone ? Math.min(zone.top, zone.bottom) : 0;
 
   return (
-    <div className="rounded-3xl border border-[var(--bloom-rule)] bg-[var(--bloom-panel)] p-3 text-[var(--bloom-text-light)]">
+    <div className="rounded-3xl bg-[var(--bloom-paper)] p-3 text-[var(--bloom-ink)] shadow-[var(--bloom-shadow)]">
       {timeframes.length > 1 && (
-        <div className="mb-3 grid grid-flow-col gap-1 rounded-full bg-[var(--bloom-ink)] p-1" role="tablist" aria-label="Timeframe">
+        <div className="mb-3 grid grid-flow-col gap-1 rounded-full bg-secondary p-1" role="tablist" aria-label="Timeframe">
           {timeframes.map(({ label }) => (
             <button
               key={label}
@@ -204,6 +215,7 @@ export function ChartStage({
               className={cn(
                 "h-9 rounded-full text-sm font-medium transition-colors",
                 timeframe === label ? "bg-[var(--bloom-gold)] text-[var(--bloom-ink)]" : "text-[var(--bloom-muted)]",
+                timeframe === label && emphasis === "timeframe" && "bloom-pulse",
               )}
             >
               {label}
@@ -230,11 +242,24 @@ export function ChartStage({
           ))}
           <line x1={0} x2={width} y1={priceHeight + 4} y2={priceHeight + 4} stroke="var(--bloom-rule)" />
 
+          {highlight?.kind === "zone" && (
+            <rect
+              data-highlight
+              x={0}
+              width={width}
+              y={scale.toY(Math.max(highlight.zone.top, highlight.zone.bottom))}
+              height={Math.max(Math.abs(scale.toY(highlight.zone.bottom) - scale.toY(highlight.zone.top)), 1)}
+              fill="var(--bloom-gold)"
+              fillOpacity={emphasis === "pattern" ? 0.3 : 0.18}
+              stroke={emphasis === "pattern" ? "var(--bloom-gold)" : "none"}
+              strokeWidth={1.5}
+            />
+          )}
           {overlays?.zones?.map((z, i) => (
             <g key={`overlay-${i}`}>
               <rect x={0} width={width} y={scale.toY(Math.max(z.top, z.bottom))} height={Math.abs(scale.toY(z.bottom) - scale.toY(z.top))} fill="var(--bloom-gold)" fillOpacity={0.14} />
               {z.label && (
-                <text x={6} y={scale.toY(Math.max(z.top, z.bottom)) + 13} fontSize={11} fill="var(--bloom-gold)">
+                <text x={6} y={scale.toY(Math.max(z.top, z.bottom)) + 13} fontSize={11} fill="var(--bloom-muted)">
                   {z.label}
                 </text>
               )}
@@ -248,7 +273,7 @@ export function ChartStage({
                 <rect x={x} y={0} width={bandWidth} height={priceHeight} fill="var(--bloom-gold)" fillOpacity={0.08} />
                 <line x1={x} x2={x} y1={0} y2={priceHeight} stroke="var(--bloom-gold)" strokeDasharray="3 3" strokeOpacity={0.6} />
                 <line x1={x + bandWidth} x2={x + bandWidth} y1={0} y2={priceHeight} stroke="var(--bloom-gold)" strokeDasharray="3 3" strokeOpacity={0.6} />
-                <text x={x + 4} y={12} fontSize={11} fill="var(--bloom-gold)">
+                <text x={x + 4} y={12} fontSize={11} fill="var(--bloom-muted)">
                   {band.label}
                 </text>
               </g>
@@ -257,7 +282,7 @@ export function ChartStage({
           {overlays?.lines?.map((line, i) => (
             <g key={`line-${i}`}>
               <line x1={0} x2={width} y1={scale.toY(line.price)} y2={scale.toY(line.price)} stroke="var(--bloom-gold)" strokeDasharray="2 4" />
-              <text x={6} y={scale.toY(line.price) - 4} fontSize={11} fill="var(--bloom-gold)">
+              <text x={6} y={scale.toY(line.price) - 4} fontSize={11} fill="var(--bloom-muted)">
                 {line.label}
               </text>
             </g>
@@ -267,6 +292,8 @@ export function ChartStage({
             const x = PAD_X + slot * index + slot / 2;
             const rising = candle.close >= candle.open;
             const colour = rising ? "var(--bloom-sage)" : "var(--bloom-blush)";
+            const priceOpacity = emphasis === "volume" ? 0.5 : 1;
+            const highlighted = highlight?.kind === "candles" && highlight.indexes.includes(index);
             const top = scale.toY(Math.max(candle.open, candle.close));
             const bodyHeight = Math.max(1.5, Math.abs(scale.toY(candle.open) - scale.toY(candle.close)));
             const isSelected = selected.includes(index);
@@ -290,9 +317,22 @@ export function ChartStage({
               >
                 {interactive && <rect x={x - slot / 2} y={0} width={slot} height={height} fill="transparent" />}
                 {isSelected && <rect x={x - slot / 2 + 0.5} y={2} width={slot - 1} height={priceHeight - 4} rx={4} fill="none" stroke="var(--bloom-gold)" strokeWidth={1.5} />}
-                <line x1={x} x2={x} y1={scale.toY(candle.high)} y2={scale.toY(candle.low)} stroke={colour} strokeWidth={1} />
-                <rect x={x - slot * 0.3} y={top} width={Math.max(slot * 0.6, 1)} height={bodyHeight} fill={colour} />
-                <rect x={x - slot * 0.3} y={height - volumeBar} width={Math.max(slot * 0.6, 1)} height={volumeBar} fill={colour} fillOpacity={0.35} />
+                {highlighted && (
+                  <rect
+                    x={x - slot / 2 + 0.5}
+                    y={2}
+                    width={slot - 1}
+                    height={priceHeight - 4}
+                    rx={4}
+                    fill="var(--bloom-gold)"
+                    fillOpacity={emphasis === "pattern" ? 0.22 : 0.1}
+                    stroke="var(--bloom-gold)"
+                    strokeWidth={emphasis === "pattern" ? 1.5 : 1}
+                  />
+                )}
+                <line x1={x} x2={x} y1={scale.toY(candle.high)} y2={scale.toY(candle.low)} stroke="var(--bloom-ink)" strokeWidth={1} opacity={priceOpacity} />
+                <rect x={x - slot * 0.3} y={top} width={Math.max(slot * 0.6, 1)} height={bodyHeight} fill={colour} stroke="var(--bloom-ink)" strokeWidth={0.75} opacity={priceOpacity} />
+                <rect x={x - slot * 0.3} y={height - volumeBar} width={Math.max(slot * 0.6, 1)} height={volumeBar} fill={colour} fillOpacity={emphasis === "volume" ? 0.7 : 0.35} />
               </g>
             );
           })}
@@ -308,6 +348,7 @@ export function ChartStage({
                 return (
                   <g
                     key={edge}
+                    data-handle
                     role="slider"
                     tabIndex={0}
                     aria-label={`${edge === "top" ? "Top" : "Bottom"} of your zone. Use the up and down arrow keys to move it.`}
@@ -327,6 +368,24 @@ export function ChartStage({
               })}
             </g>
           )}
+
+          {mode === "view" &&
+            (Object.keys(LEVEL_STYLE) as (keyof Levels)[]).map((key) => {
+              const price = levels[key];
+              if (price === undefined) return null;
+              const y = scale.toY(price);
+              const focused = emphasis === key;
+              const dimmed = (emphasis === "entry" || emphasis === "stop" || emphasis === "target") && !focused;
+              return (
+                <g key={key} opacity={dimmed ? 0.4 : 1} aria-label={`${LEVEL_STYLE[key].label} ${price.toFixed(2)}`}>
+                  <line x1={0} x2={width} y1={y} y2={y} stroke={LEVEL_STYLE[key].colour} strokeWidth={focused ? 2.5 : 1.5} strokeDasharray="5 4" />
+                  <rect x={width - 92} y={y - 11} width={88} height={22} rx={11} fill="var(--bloom-paper-raised)" stroke={LEVEL_STYLE[key].colour} />
+                  <text x={width - 48} y={y + 4} textAnchor="middle" fontSize={11} fill="var(--bloom-ink)">
+                    {LEVEL_STYLE[key].label}
+                  </text>
+                </g>
+              );
+            })}
 
           {mode === "placeLevels" &&
             (Object.keys(LEVEL_STYLE) as (keyof Levels)[]).map((key) =>
@@ -349,7 +408,7 @@ export function ChartStage({
       <div className="mt-2 flex items-center justify-between gap-3 text-xs text-[var(--bloom-muted)]">
         <span>{caption}</span>
         {mode === "placeLevels" && rr !== null && (
-          <span className="font-medium text-[var(--bloom-gold)]" aria-live="polite">
+          <span className="font-medium text-[var(--bloom-ink)]" aria-live="polite">
             Reward to risk 1 : {rr.toFixed(1)}
           </span>
         )}
@@ -357,7 +416,7 @@ export function ChartStage({
           <button
             type="button"
             onClick={() => placeZoneAt(priceHeight / 2)}
-            className="rounded-full border border-[var(--bloom-gold)] px-3 py-1.5 font-medium text-[var(--bloom-gold)]"
+            className="min-h-[44px] rounded-full border border-[var(--bloom-gold)] px-3 py-1.5 font-medium text-[var(--bloom-ink)]"
           >
             Tap the chart, or place a zone here
           </button>

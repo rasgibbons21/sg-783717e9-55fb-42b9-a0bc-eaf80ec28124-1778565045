@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import { Layout } from "@/components/Layout";
@@ -10,7 +11,7 @@ import { OrderTicket } from "@/components/OrderTicket";
 import { RiskNote } from "@/components/RiskNote";
 import { BloomMark } from "@/components/brand/BloomMark";
 import { LISTED_INSTRUMENTS, getInstrument, type Instrument } from "@/config/instruments";
-import { TIMEFRAMES, type Timeframe } from "@/config/setups";
+import { TIMEFRAMES, type SetupType, type Timeframe } from "@/config/setups";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import type { Candle } from "@/lib/charts/types";
 import { toCandles } from "@/lib/practice/bars";
@@ -18,6 +19,7 @@ import { marketRestingMessage } from "@/lib/practice/marketHours";
 import { marginFor } from "@/lib/practice/maths";
 import { processScore } from "@/lib/practice/process";
 import { exitReasonAt } from "@/lib/practice/stops";
+import { parsePreselect } from "@/lib/practice/preselect";
 import { money, practiceFetch, type PracticeAccount, type PracticeTrade } from "@/lib/practice/api";
 import { cn } from "@/lib/utils";
 
@@ -55,6 +57,20 @@ function PracticeDesk() {
   const [notice, setNotice] = useState<string | null>(null);
   const [confirmingRestart, setConfirmingRestart] = useState(false);
   const closingIds = useRef(new Set<string>());
+  const router = useRouter();
+  const [initialSetup, setInitialSetup] = useState<SetupType | undefined>();
+
+  // A lesson or an idea can open Practice with a stock, timeframe and setup already picked.
+  useEffect(() => {
+    if (!router.isReady) return;
+    const picked = parsePreselect(router.query);
+    const stock = picked.symbol ? getInstrument(picked.symbol) : undefined;
+    if (stock) setInstrument(stock);
+    if (picked.timeframe) setTimeframe(picked.timeframe);
+    if (picked.setup) setInitialSetup(picked.setup);
+    // Applied once, when the address is ready.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router.isReady]);
 
   const open = trades.filter((trade) => trade.status === "open");
   const closed = trades.filter((trade) => trade.status === "closed");
@@ -195,7 +211,7 @@ function PracticeDesk() {
         </div>
         <div>
           <p className="text-xs text-muted-foreground">Average process</p>
-          <p className="font-serif text-2xl text-[var(--bloom-gold)]">{averageProcess ?? "-"}</p>
+          <p className="font-serif text-2xl text-foreground">{averageProcess ?? "-"}</p>
         </div>
       </section>
 
@@ -247,7 +263,7 @@ function PracticeDesk() {
           />
         ) : (
           <div className="rounded-3xl border border-[var(--bloom-rule)] bg-card p-4">
-            <div className="mb-3 grid grid-flow-col gap-1 rounded-full bg-[var(--bloom-ink)] p-1" role="tablist" aria-label="Timeframe">
+            <div className="mb-3 grid grid-flow-col gap-1 rounded-full bg-secondary p-1" role="tablist" aria-label="Timeframe">
               {TIMEFRAMES.map((label) => (
                 <button
                   key={label}
@@ -278,14 +294,14 @@ function PracticeDesk() {
             if (planning) setLevels({});
           }}
           disabled={visible.length === 0}
-          className="h-11 rounded-full border border-primary px-5 text-sm font-semibold text-[var(--bloom-gold)] transition-transform active:scale-95 disabled:opacity-40"
+          className="h-11 rounded-full border border-primary px-5 text-sm font-semibold text-foreground transition-transform active:scale-95 disabled:opacity-40"
         >
           {planning ? "Clear the plan from the chart" : "Plan on chart"}
         </button>
         {planning && <p className="text-sm text-muted-foreground">Drag the Entry, Stop and Target lines. The stop and target fill the plan below.</p>}
       </section>
 
-      <OrderTicket instrument={instrument} price={price} marketOpen={marketOpen} buyingPower={cash} balance={balance} levels={levels} timeframe={timeframe} onPlaced={loadAccount} />
+      <OrderTicket instrument={instrument} price={price} marketOpen={marketOpen} buyingPower={cash} balance={balance} levels={levels} timeframe={timeframe} onPlaced={loadAccount} initialSetup={initialSetup} />
 
       <section aria-label="Open trades">
         <h2 className="text-2xl text-foreground">Open trades</h2>
@@ -304,7 +320,7 @@ function PracticeDesk() {
       <section aria-label="Past trades">
         <div className="flex items-center justify-between">
           <h2 className="text-2xl text-foreground">Past trades</h2>
-          <Link href="/journal" className="text-sm font-semibold text-[var(--bloom-gold)] underline underline-offset-4">
+          <Link href="/journal" className="text-sm font-semibold text-foreground underline underline-offset-4">
             My journal
           </Link>
         </div>
@@ -357,7 +373,7 @@ function PracticeDesk() {
             </button>
           </div>
         ) : (
-          <button onClick={() => setConfirmingRestart(true)} className="mt-3 h-11 rounded-full border border-primary px-5 text-sm font-semibold text-[var(--bloom-gold)] transition-transform active:scale-95">
+          <button onClick={() => setConfirmingRestart(true)} className="mt-3 h-11 rounded-full border border-primary px-5 text-sm font-semibold text-foreground transition-transform active:scale-95">
             Start again
           </button>
         )}

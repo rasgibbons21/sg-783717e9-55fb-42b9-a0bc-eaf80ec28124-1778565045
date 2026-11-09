@@ -47,6 +47,11 @@ export default function Privacy() {
               Your data is stored securely using Supabase infrastructure with industry standard encryption. We retain your data for as long as your account is active or as required by law.
             </p>
 
+            <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Your Budget Information</h2>
+            <p className="mb-6 text-foreground">
+              If you use Budget &amp; Savings, we store the figures you enter in your budget, such as your pay, bills, savings and daily spending, so we can run your plan. Only you can see them. We never sell them or share them with brokers or advertisers, and they are deleted with your account.
+            </p>
+
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Broker Affiliate Disclosure</h2>
             <p className="mb-6 text-foreground">
               Some broker links on Bloom are affiliate partnerships. If you sign up with a recommended broker through our link, Bloom may earn a referral commission at no additional cost to you. We only recommend brokers we genuinely believe are good for our users.

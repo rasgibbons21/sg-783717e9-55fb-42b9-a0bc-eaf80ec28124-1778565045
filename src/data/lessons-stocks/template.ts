@@ -1,9 +1,10 @@
 import { volumeConfirms } from "@/lib/charts/detectors";
 import type { Built } from "@/lib/charts/patterns";
 import type { Zone } from "@/lib/charts/types";
-import type { ChartSpec, Lesson, LessonBlock } from "./types";
+import type { SetupType, Timeframe } from "@/config/setups";
+import type { BaseBlock, ChartSpec, Lesson, LessonBlock, RawLesson, Stage, StrategyStep } from "./types";
 
-type Block<T extends LessonBlock["type"]> = Extract<LessonBlock, { type: T }>;
+type Block<T extends BaseBlock["type"]> = Extract<BaseBlock, { type: T }>;
 
 /** All three timeframes, opening on the 5-minute chart where the pattern is. */
 export const chartOf = (built: Built<unknown>, initial = "5m"): ChartSpec => ({ timeframes: built.timeframes, initial });
@@ -57,6 +58,11 @@ export function plan(
   return { type: "chartPlan", prompt, chart: chart5m(built), direction, entryZone, invalidation, minRR: 1.5, explanation };
 }
 
+/** A chart with the answer already drawn, shown before she is asked to find one herself. */
+export function example(built: Built<unknown>, highlight: Block<"workedExample">["highlight"], caption: string): Block<"workedExample"> {
+  return { type: "workedExample", chart: chart5m(built), highlight, caption };
+}
+
 export function scenario(prompt: string, good: [string, string], bad: [string, string]): Block<"scenario"> {
   return {
     type: "scenario",
@@ -83,9 +89,57 @@ interface SetupParts {
   skip: string;
   practiceHint: string;
   pansyNote?: string;
+  /** The same setup on a fresh chart, already marked. */
+  example: Block<"workedExample">;
+  /** What Practice opens with after the lesson. */
+  practice: { setup: SetupType; timeframe: Timeframe };
 }
 
-/** Every setup follows the same six steps: spot it, context, volume, timeframes, plan, then practise. */
+const round2 = (value: number) => Math.round(value * 100) / 100;
+const staged = (stage: Stage) => (block: BaseBlock): LessonBlock => ({ ...block, stage });
+
+/** The setup playbook, built from the parts each lesson already has, so no step can disagree with its test. */
+export function strategyFrom(parts: SetupParts): Block<"strategy"> {
+  const { plan: rules } = parts;
+  const long = rules.direction === "long";
+  const entry = round2((rules.entryZone.top + rules.entryZone.bottom) / 2);
+  const stop = beyond(rules.invalidation, long ? "below" : "above", 0.001);
+  const risk = Math.abs(entry - stop);
+  const target = round2(long ? entry + 2 * risk : entry - 2 * risk);
+  const goodContext = parts.context.choices.find((choice) => choice.good)?.outcome ?? "";
+  const steps: StrategyStep[] = [
+    { label: "Spot it", body: parts.spot.explanation, focus: "pattern" },
+    { label: "Check the context", body: goodContext, focus: "context" },
+    { label: "Confirm with volume", body: parts.volume.explanation, focus: "volume" },
+    { label: "Check the higher timeframe", body: parts.timeframe.explanation, focus: "timeframe" },
+    { label: "Entry", body: "Enter inside the zone, not before price reaches it.", focus: "entry" },
+    { label: "Stop", body: "Place your stop just beyond the level that proves the idea wrong.", focus: "stop" },
+    { label: "Target", body: "Aim for at least 1.5 times your risk. This example uses 2 to 1.", focus: "target" },
+    { label: "When to skip it", body: parts.skip, focus: "skip" },
+  ];
+  return {
+    type: "strategy",
+    title: `How to trade ${parts.title}`,
+    chart: rules.chart,
+    plan: { direction: rules.direction, entry, stop, target },
+    steps,
+  };
+}
+
+/**
+ * Concept lessons: the reading up to the first question is the lesson. From the first question on,
+ * everything is the test, including short explanations between questions, so the lesson reads Lesson then Test.
+ */
+export function stageConcept(lesson: RawLesson): Lesson {
+  const reading = new Set<BaseBlock["type"]>(["text", "pansy", "workedExample"]);
+  const firstQuestion = lesson.blocks.findIndex((block) => !reading.has(block.type));
+  return {
+    ...lesson,
+    blocks: lesson.blocks.map((block, index) => staged(firstQuestion >= 0 && index >= firstQuestion ? "test" : "lesson")(block)),
+  };
+}
+
+/** Every setup runs Lesson (with a worked example), Strategy, Test (spot, context, volume, timeframe, plan) and Practice. */
 export function setupLesson(parts: SetupParts): Lesson {
   return {
     slug: parts.slug,
@@ -96,14 +150,15 @@ export function setupLesson(parts: SetupParts): Lesson {
     kind: "setup",
     practiceHint: parts.practiceHint,
     blocks: [
-      ...parts.intro.map(text),
-      ...(parts.pansyNote ? [pansy(parts.pansyNote)] : []),
-      parts.spot,
-      parts.context,
-      parts.volume,
-      parts.timeframe,
-      parts.plan,
-      text(`When to skip it\n\n${parts.skip}`),
+      ...[...parts.intro.map(text), ...(parts.pansyNote ? [pansy(parts.pansyNote)] : []), parts.example].map(staged("lesson")),
+      staged("strategy")(strategyFrom(parts)),
+      ...[parts.spot, parts.context, parts.volume, parts.timeframe, parts.plan].map(staged("test")),
+      staged("practice")({
+        type: "practiceCta",
+        setup: parts.practice.setup,
+        timeframe: parts.practice.timeframe,
+        body: `Practise ${parts.title} on a stock, on the ${parts.practice.timeframe} chart.`,
+      }),
     ],
   };
 }

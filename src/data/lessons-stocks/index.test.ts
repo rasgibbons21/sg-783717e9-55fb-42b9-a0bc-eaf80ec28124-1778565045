@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { findFVGs, volumeConfirms } from "@/lib/charts/detectors";
 import { isInteractive } from "@/lib/lessons/engine";
+import { gradePlan } from "@/lib/lessons/grading";
+import { SETUP_TYPES, TIMEFRAMES } from "@/config/setups";
 import type { LessonBlock } from "./types";
 import { ALL_LESSONS, MODULES, firstIncomplete, getLesson, hasFinishedCourse, nextLesson } from "./index";
 
@@ -9,6 +11,69 @@ const blocksOf = <T extends LessonBlock["type"]>(type: T) =>
 
 const candlesFor = (chart: { timeframes: { label: string; candles: { high: number; low: number; close: number; volume: number }[] }[] }, label: string) =>
   chart.timeframes.find((t) => t.label === label)!.candles;
+
+const STRATEGY_LABELS = ["Spot it", "Check the context", "Confirm with volume", "Check the higher timeframe", "Entry", "Stop", "Target", "When to skip it"];
+const distinctStages = (blocks: LessonBlock[]) => blocks.map((b) => b.stage).filter((stage, i, all) => i === 0 || all[i - 1] !== stage);
+
+describe("lesson stages", () => {
+  it("every block has a stage", () => {
+    for (const lesson of ALL_LESSONS) for (const block of lesson.blocks) expect(block.stage, lesson.slug).toMatch(/^(lesson|strategy|test|practice)$/);
+  });
+
+  it("orders setup lesson stages", () => {
+    for (const lesson of ALL_LESSONS.filter((l) => l.kind === "setup")) {
+      expect(distinctStages(lesson.blocks), lesson.slug).toEqual(["lesson", "strategy", "test", "practice"]);
+      for (const type of ["workedExample", "strategy", "practiceCta"]) {
+        expect(lesson.blocks.filter((b) => b.type === type), `${lesson.slug} ${type}`).toHaveLength(1);
+      }
+    }
+  });
+
+  it("keeps concept lessons to lesson and test", () => {
+    for (const lesson of ALL_LESSONS.filter((l) => l.kind !== "setup")) {
+      expect(distinctStages(lesson.blocks), lesson.slug).toEqual(["lesson", "test"]);
+    }
+  });
+
+  it("strategy has the eight steps in order", () => {
+    for (const { lesson, block } of blocksOf("strategy")) expect(block.steps.map((s) => s.label), lesson.slug).toEqual(STRATEGY_LABELS);
+  });
+
+  it("strategy plans are valid", () => {
+    for (const { lesson, block } of blocksOf("strategy")) {
+      const rules = lesson.blocks.find((b): b is Extract<LessonBlock, { type: "chartPlan" }> => b.type === "chartPlan")!;
+      const { entry, stop, target, direction } = block.plan;
+      expect(direction, lesson.slug).toBe(rules.direction);
+      const graded = gradePlan({ entry, stop, target }, rules);
+      expect(graded.ok, `${lesson.slug} ${graded.reasons.join(" ")}`).toBe(true);
+      expect(Math.abs(target - entry) / Math.abs(entry - stop), lesson.slug).toBeCloseTo(2, 1);
+    }
+  });
+
+  it("worked examples sit on their chart", () => {
+    for (const { lesson, block } of blocksOf("workedExample")) {
+      const candles = candlesFor(block.chart, block.chart.initial);
+      const low = Math.min(...candles.map((c) => c.low));
+      const high = Math.max(...candles.map((c) => c.high));
+      if (block.highlight.kind === "zone") {
+        const { top, bottom } = block.highlight.zone;
+        expect(Math.min(top, bottom) < Math.max(top, bottom), lesson.slug).toBe(true);
+        expect(Math.min(top, bottom) >= low && Math.max(top, bottom) <= high, lesson.slug).toBe(true);
+      } else {
+        expect(block.highlight.indexes.length, lesson.slug).toBeGreaterThan(0);
+        expect(block.highlight.indexes.every((i) => i >= 0 && i < candles.length), lesson.slug).toBe(true);
+      }
+      expect(block.caption.length, lesson.slug).toBeGreaterThan(10);
+    }
+  });
+
+  it("practice ids are valid", () => {
+    for (const { lesson, block } of blocksOf("practiceCta")) {
+      expect(SETUP_TYPES as readonly string[], lesson.slug).toContain(block.setup);
+      expect(TIMEFRAMES as readonly string[], lesson.slug).toContain(block.timeframe);
+    }
+  });
+});
 
 describe("stock curriculum", () => {
   it("has seven modules in the spec's order", () => {
@@ -31,7 +96,7 @@ describe("stock curriculum", () => {
     }
   });
 
-  it("teaches every setup with the six-step template", () => {
+  it("teaches every setup with the strategy, test and practice template", () => {
     const setups = ALL_LESSONS.filter((l) => l.kind === "setup");
     expect(setups.length).toBeGreaterThanOrEqual(14);
     for (const lesson of setups) {

@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import type { Lesson, LessonBlock } from "@/data/lessons-stocks/types";
-import { canAdvance, isInteractive, loadResume, saveResume } from "@/lib/lessons/engine";
+import { canAdvance, isInteractive, resumeAt, saveResume, stagesOf, testCount } from "@/lib/lessons/engine";
+import { screensFor } from "@/lib/lessons/screens";
 import { clearCompletion, completeLesson, queueCompletion } from "@/lib/lessons/saveProgress";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { TextBlock } from "./blocks/TextBlock";
@@ -14,7 +15,13 @@ import { ChartZoneBlock } from "./blocks/ChartZoneBlock";
 import { ChartVolumeBlock } from "./blocks/ChartVolumeBlock";
 import { ChartTimeframeBlock } from "./blocks/ChartTimeframeBlock";
 import { ChartPlanBlock } from "./blocks/ChartPlanBlock";
+import { WorkedExampleBlock } from "./blocks/WorkedExampleBlock";
+import { StrategyBlock } from "./blocks/StrategyBlock";
+import { PracticeCtaBlock } from "./blocks/PracticeCtaBlock";
 import { LessonComplete } from "./LessonComplete";
+import { StageBar } from "./StageBar";
+import { StageIntro } from "./StageIntro";
+import { TestSummary } from "./TestSummary";
 
 type SaveState = "saving" | "saved" | "failed";
 
@@ -40,26 +47,38 @@ function Block({ block, onAnswered }: { block: LessonBlock; onAnswered: (firstTr
       return <ChartTimeframeBlock block={block} onAnswered={onAnswered} />;
     case "chartPlan":
       return <ChartPlanBlock block={block} onAnswered={onAnswered} />;
+    case "workedExample":
+      return <WorkedExampleBlock block={block} />;
+    case "strategy":
+      return <StrategyBlock block={block} />;
+    case "practiceCta":
+      return <PracticeCtaBlock block={block} />;
   }
 }
 
 export function LessonPlayer({ lesson }: { lesson: Lesson }) {
   const { userId } = useSubscription();
-  const [index, setIndex] = useState(0);
+  const screens = useMemo(() => screensFor(lesson), [lesson]);
+  const stages = useMemo(() => stagesOf(lesson), [lesson]);
+  const total = useMemo(() => testCount(lesson), [lesson]);
+  const [position, setPosition] = useState(0);
   const [answered, setAnswered] = useState(false);
   const [finished, setFinished] = useState(false);
   const [saveState, setSaveState] = useState<SaveState>("saving");
   const [isNew, setIsNew] = useState(true);
+  const [score, setScore] = useState(0);
   const firstTryScore = useRef(0);
 
   useEffect(() => {
-    const resumed = loadResume(lesson.slug);
-    setIndex(resumed < lesson.blocks.length ? resumed : 0);
+    const resumedBlock = resumeAt(lesson);
+    const resumedScreen = screens.findIndex((screen) => screen.kind === "block" && screen.index === resumedBlock);
+    setPosition(resumedScreen >= 0 ? resumedScreen : 0);
     setAnswered(false);
     setFinished(false);
     setSaveState("saving");
     firstTryScore.current = 0;
-  }, [lesson]);
+    setScore(0);
+  }, [lesson, screens]);
 
   const save = useCallback(async () => {
     setSaveState("saving");
@@ -68,22 +87,29 @@ export function LessonPlayer({ lesson }: { lesson: Lesson }) {
       return;
     }
     // Kept on this device until the server confirms, so a lost connection can't lose the lesson.
-    queueCompletion(lesson.slug, firstTryScore.current);
-    const result = await completeLesson(lesson.slug, firstTryScore.current);
+    queueCompletion(lesson.slug, firstTryScore.current, total);
+    const result = await completeLesson(lesson.slug, firstTryScore.current, undefined, undefined, undefined, total);
     if (result.saved) {
       clearCompletion(lesson.slug);
       saveResume(lesson.slug, 0);
       setIsNew(result.isNew);
     }
     setSaveState(result.saved ? "saved" : "failed");
-  }, [lesson.slug, userId]);
+  }, [lesson.slug, userId, total]);
 
-  const block = lesson.blocks[index];
-  const total = lesson.blocks.length;
+  const screen = screens[position];
+  const block = screen?.kind === "block" ? lesson.blocks[screen.index] : null;
+  const stageOf = (s: (typeof screens)[number]) => (s.kind === "block" ? lesson.blocks[s.index].stage : s.kind === "intro" ? s.stage : "test");
+  const currentStage = screen ? stageOf(screen) : stages[0];
+  const stageScreens = screens.filter((s) => stageOf(s) === currentStage);
+  const progress = (stageScreens.indexOf(screen) + 1) / Math.max(stageScreens.length, 1);
 
   const onAnswered = (firstTry: boolean) => {
     setAnswered(true);
-    if (firstTry) firstTryScore.current += 1;
+    if (firstTry && block?.stage === "test") {
+      firstTryScore.current += 1;
+      setScore(firstTryScore.current);
+    }
     try {
       navigator?.vibrate?.(10);
     } catch {
@@ -92,37 +118,38 @@ export function LessonPlayer({ lesson }: { lesson: Lesson }) {
   };
 
   const advance = () => {
-    if (index + 1 >= total) {
+    if (position + 1 >= screens.length) {
       setFinished(true);
       save();
       window.scrollTo({ top: 0 });
       return;
     }
-    saveResume(lesson.slug, index + 1);
-    setIndex(index + 1);
+    const next = screens[position + 1];
+    if (next.kind === "block") saveResume(lesson.slug, next.index);
+    setPosition(position + 1);
     setAnswered(false);
     window.scrollTo({ top: 0 });
   };
 
   if (finished) return <LessonComplete lesson={lesson} saveState={saveState} isNew={isNew} onRetrySave={save} />;
-  if (!block) return null;
+  if (!screen) return null;
 
-  const ready = canAdvance(block, answered);
+  const ready = block ? canAdvance(block, answered) : true;
+  const label = !ready && block && isInteractive(block) ? "Choose an answer to continue" : position + 1 >= screens.length ? "Finish lesson" : "Continue";
 
   return (
     <div className="mx-auto max-w-xl px-4 pb-6 pt-5">
-      <div className="flex items-center gap-1" role="progressbar" aria-valuemin={0} aria-valuemax={total} aria-valuenow={index + 1} aria-label="Lesson progress">
-        {lesson.blocks.map((item, position) => (
-          <span
-            key={position}
-            className={`h-1.5 flex-1 rounded-full transition-colors ${position <= index ? "bg-[var(--bloom-gold)]" : "bg-secondary"}`}
-          />
-        ))}
-      </div>
+      <StageBar stages={stages} current={currentStage} progress={progress} />
       <p className="mt-4 text-sm font-medium text-muted-foreground">{lesson.title}</p>
 
-      <div key={index} className="bloom-rise surface-ivory mt-4 min-h-[320px] rounded-3xl p-5 shadow-[var(--bloom-shadow)]" style={{ animationDuration: "250ms" }}>
-        <Block block={block} onAnswered={onAnswered} />
+      <div
+        key={position}
+        className="bloom-rise mt-4 min-h-[320px] rounded-3xl bg-card p-5 shadow-[var(--bloom-shadow)]"
+        style={{ animationDuration: "250ms" }}
+      >
+        {screen.kind === "intro" && <StageIntro stage={screen.stage} />}
+        {screen.kind === "summary" && <TestSummary score={score} total={total} />}
+        {block && <Block block={block} onAnswered={onAnswered} />}
       </div>
 
       <motion.button
@@ -131,7 +158,7 @@ export function LessonPlayer({ lesson }: { lesson: Lesson }) {
         disabled={!ready}
         className="mt-6 h-12 w-full rounded-full bg-primary text-base font-semibold text-primary-foreground transition-opacity disabled:opacity-40"
       >
-        {!ready && isInteractive(block) ? "Choose an answer to continue" : index + 1 >= total ? "Finish lesson" : "Continue"}
+        {label}
       </motion.button>
     </div>
   );
