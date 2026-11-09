@@ -52,6 +52,11 @@ export default function Disclaimer() {
               Practice trades and the leaderboards use simulated money. Simulated results don't include all real-world costs and pressures, and they don't predict real results.
             </p>
 
+            <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Budget &amp; Savings</h2>
+            <p className="mb-6 text-foreground">
+              Budgeting tools are educational. Projections are estimates, not guarantees. Ideas to study are the same for every member, are never based on your savings, and are not recommendations to invest.
+            </p>
+
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">No Registered Status</h2>
             <p className="mb-2 text-foreground">Cinder Vault Enterprises LLC and Bloom are NOT:</p>
             <ul className="mb-6 space-y-2 text-foreground">

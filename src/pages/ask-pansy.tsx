@@ -21,6 +21,8 @@ const SUGGESTED = [
   "How is an order block different from a breaker block?",
   "How do I use the 1H and 5m charts together?",
   "Which lesson should I do next?",
+  "How does pay yourself first work?",
+  "How big should an emergency fund be?",
 ];
 
 const TROUBLE = "I'm having a little trouble answering just now. Please try again in a moment.";

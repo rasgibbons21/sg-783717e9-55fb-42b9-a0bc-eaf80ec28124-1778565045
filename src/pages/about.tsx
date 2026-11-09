@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BookOpen, LineChart, MessageCircleHeart, Trophy } from "lucide-react";
+import { BookOpen, LineChart, MessageCircleHeart, Trophy, Wallet } from "lucide-react";
 import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
 import { RiskNote } from "@/components/RiskNote";
@@ -9,6 +9,7 @@ const OFFERS = [
   { icon: BookOpen, title: "Interactive lessons", body: "26 lessons from reading a chart to fair value gaps, order blocks and the full execution checklist." },
   { icon: LineChart, title: "Practice with structure", body: "Plan trades on real US stocks with simulated money, and get a process score for every one." },
   { icon: Trophy, title: "Leaderboards", body: "One for learning and one for practice gains, so progress is visible and shared." },
+  { icon: Wallet, title: "Budget & savings with Pansy", body: "Pay yourself first, see the maths of your plan, log daily spending, and celebrate savings milestones." },
   { icon: MessageCircleHeart, title: "Pansy", body: "Your AI learning companion, who explains any concept precisely, whenever you ask." },
 ];
 

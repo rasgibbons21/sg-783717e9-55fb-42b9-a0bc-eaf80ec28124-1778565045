@@ -42,6 +42,9 @@ export default function Terms() {
             <p className="mb-6 text-foreground">
               You are solely responsible for all investment decisions you make.
             </p>
+            <p className="mb-6 text-foreground">
+              Budgeting tools are educational. Savings projections are estimates based on the figures you enter, not guarantees, and Ideas to study are general learning topics, not recommendations.
+            </p>
 
             <h2 className="mb-4 font-serif text-2xl font-semibold text-primary">Eligibility</h2>
             <p className="mb-6 text-foreground">

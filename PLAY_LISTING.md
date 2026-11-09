@@ -25,6 +25,9 @@ Plan trades on 15 well-known US stocks and ETFs with simulated money. Every trad
 **Leaderboards**
 Learning and practice leaderboards that make progress visible. You can hide yourself at any time.
 
+**Budget & savings with Pansy**
+Tell Pansy what you earn and she helps you pay yourself first: savings come out first, then bills, and you see exactly what is left to spend. Log daily spending in seconds, watch your savings grow, and celebrate milestones.
+
 **Pansy, your learning companion**
 Ask about any concept, in your own words. Pansy explains precisely and suggests what to learn next.
 
