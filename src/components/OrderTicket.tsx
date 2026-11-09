@@ -195,7 +195,7 @@ export function OrderTicket({ instrument, price, marketOpen, buyingPower, balanc
         </div>
         <div>
           <dt className="text-xs text-muted-foreground">Reward to risk</dt>
-          <dd className={cn("font-medium", rr != null && rr >= 1.5 ? "text-[var(--bloom-gold)]" : "text-foreground")}>{rr != null ? `1 : ${rr.toFixed(1)}` : "-"}</dd>
+          <dd className={cn("font-medium", rr != null && rr >= 1.5 ? "text-[var(--bloom-sage-text)]" : "text-foreground")}>{rr != null ? `1 : ${rr.toFixed(1)}` : "-"}</dd>
         </div>
       </dl>
       {!targetOnRightSide && (

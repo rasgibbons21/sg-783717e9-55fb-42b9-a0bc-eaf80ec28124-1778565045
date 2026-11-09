@@ -211,7 +211,7 @@ function PracticeDesk() {
         </div>
         <div>
           <p className="text-xs text-muted-foreground">Average process</p>
-          <p className="font-serif text-2xl text-[var(--bloom-gold)]">{averageProcess ?? "-"}</p>
+          <p className="font-serif text-2xl text-foreground">{averageProcess ?? "-"}</p>
         </div>
       </section>
 
@@ -294,7 +294,7 @@ function PracticeDesk() {
             if (planning) setLevels({});
           }}
           disabled={visible.length === 0}
-          className="h-11 rounded-full border border-primary px-5 text-sm font-semibold text-[var(--bloom-gold)] transition-transform active:scale-95 disabled:opacity-40"
+          className="h-11 rounded-full border border-primary px-5 text-sm font-semibold text-foreground transition-transform active:scale-95 disabled:opacity-40"
         >
           {planning ? "Clear the plan from the chart" : "Plan on chart"}
         </button>
@@ -320,7 +320,7 @@ function PracticeDesk() {
       <section aria-label="Past trades">
         <div className="flex items-center justify-between">
           <h2 className="text-2xl text-foreground">Past trades</h2>
-          <Link href="/journal" className="text-sm font-semibold text-[var(--bloom-gold)] underline underline-offset-4">
+          <Link href="/journal" className="text-sm font-semibold text-foreground underline underline-offset-4">
             My journal
           </Link>
         </div>
@@ -373,7 +373,7 @@ function PracticeDesk() {
             </button>
           </div>
         ) : (
-          <button onClick={() => setConfirmingRestart(true)} className="mt-3 h-11 rounded-full border border-primary px-5 text-sm font-semibold text-[var(--bloom-gold)] transition-transform active:scale-95">
+          <button onClick={() => setConfirmingRestart(true)} className="mt-3 h-11 rounded-full border border-primary px-5 text-sm font-semibold text-foreground transition-transform active:scale-95">
             Start again
           </button>
         )}

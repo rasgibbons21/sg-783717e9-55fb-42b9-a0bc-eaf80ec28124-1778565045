@@ -110,7 +110,7 @@ export function SignedOutHero() {
           <ol className="mt-8">
             {PATH.map((step, index) => (
               <li key={step} className="flex items-baseline gap-5 border-b border-[var(--bloom-rule)] py-4 last:border-b-0">
-                <span className="font-serif text-2xl text-[var(--bloom-gold)]">{String(index + 1).padStart(2, "0")}</span>
+                <span className="font-serif text-2xl text-muted-foreground">{String(index + 1).padStart(2, "0")}</span>
                 <span className="text-lg text-foreground">{step}</span>
               </li>
             ))}

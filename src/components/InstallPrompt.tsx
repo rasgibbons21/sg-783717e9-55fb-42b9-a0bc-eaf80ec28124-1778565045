@@ -142,7 +142,7 @@ export function InstallPrompt() {
                   Add Bloom to your home screen
                 </h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Quick access to your screener 🌸
+                  Quick access to your lessons, practice and budget
                 </p>
 
                 <div className="flex gap-2">
