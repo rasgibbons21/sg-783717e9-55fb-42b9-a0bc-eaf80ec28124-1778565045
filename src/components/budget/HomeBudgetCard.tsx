@@ -5,6 +5,7 @@ import { ArrowRight, Wallet } from "lucide-react";
 import { allocate, nextMilestone, periodBounds, todayIn } from "@/lib/budget/maths";
 import { formatMoney } from "@/lib/budget/money";
 import { pickNudge } from "@/lib/budget/nudges";
+import { budgetScreen } from "@/lib/budget/screens";
 import { NOTHING_TODAY } from "@/lib/budget/types";
 import { NudgeCard, dismissPayday, readPaydayDismissed } from "./NudgeCard";
 import { useBudget } from "./useBudget";
@@ -32,7 +33,9 @@ export function HomeBudgetCard() {
     };
   }, [plan, entries, balance, milestones, dismissedFor]);
 
-  if (budget.loading) return null;
+  const screen = budgetScreen(budget);
+  // While loading, or if her plan couldn't load, show nothing rather than wrongly inviting her to set one up.
+  if (screen === "loading" || screen === "error") return null;
 
   if (!plan || !view) {
     return (
@@ -53,6 +56,7 @@ export function HomeBudgetCard() {
   }
 
   const money = (cents: number) => formatMoney(cents, plan.currency);
+  const unseen = milestones.filter((m) => !m.seen).map((m) => m.amountCents);
 
   return (
     <div className="space-y-3">
@@ -60,7 +64,7 @@ export function HomeBudgetCard() {
         <NudgeCard
           nudge={view.nudge}
           currency={plan.currency}
-          onSavedPlanned={() => budget.add({ kind: "saving", amountCents: view.save, category: "saving", note: null, occurredOn: view.today }).catch(() => router.push(budgetHref))}
+          onSavedPlanned={() => budget.add({ kind: "saving", amountCents: view.save, category: "saving", note: null, occurredOn: view.today }).catch(() => { router.push(budgetHref); })}
           onSaveDifferent={() => router.push(budgetHref)}
           onNotThisTime={() => {
             dismissPayday(view.start);
@@ -68,7 +72,11 @@ export function HomeBudgetCard() {
           }}
           onAddSpending={() => router.push(budgetHref)}
           onNothingToday={() => budget.add({ kind: "expense", amountCents: 0, category: NOTHING_TODAY, note: null, occurredOn: view.today }).catch(() => undefined)}
-          onOpenIdeas={() => router.push(budgetHref)}
+          onOpenIdeas={() => {
+            budget.markSeen(unseen);
+            router.push(budgetHref);
+          }}
+          onDismissMilestone={() => budget.markSeen(unseen)}
         />
       )}
       <Link href={budgetHref} className="flex items-center justify-between gap-3 rounded-3xl bg-card p-5 shadow-[var(--bloom-shadow)] transition-transform active:scale-[0.98]">

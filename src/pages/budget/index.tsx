@@ -165,6 +165,7 @@ function BudgetHome() {
           onAddSpending={() => openSheet("expense")}
           onNothingToday={() => budget.add({ kind: "expense", amountCents: 0, category: NOTHING_TODAY, note: null, occurredOn: view.today }).catch(() => undefined)}
           onOpenIdeas={openIdeas}
+          onDismissMilestone={() => budget.markSeen(milestones.filter((m) => !m.seen).map((m) => m.amountCents))}
         />
       )}
 

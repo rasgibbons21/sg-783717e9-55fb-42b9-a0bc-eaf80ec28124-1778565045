@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { currencyForCountry, formatMoney, parseMoney } from "./money";
+import { currencyForCountry, customCurrency, formatMoney, parseMoney } from "./money";
 
 describe("parseMoney", () => {
   it("reads amounts the way people type them", () => {
@@ -43,5 +43,18 @@ describe("currencyForCountry", () => {
   it("falls back to US dollars", () => {
     expect(currencyForCountry("ZZ")).toBe("USD");
     expect(currencyForCountry(null)).toBe("USD");
+  });
+});
+
+describe("customCurrency", () => {
+  it("accepts any three-letter code, in any case", () => {
+    expect(customCurrency("php")).toBe("PHP");
+    expect(customCurrency(" mxn ")).toBe("MXN");
+  });
+
+  it("rejects anything else", () => {
+    expect(customCurrency("pesos")).toBeNull();
+    expect(customCurrency("P1P")).toBeNull();
+    expect(customCurrency("")).toBeNull();
   });
 });

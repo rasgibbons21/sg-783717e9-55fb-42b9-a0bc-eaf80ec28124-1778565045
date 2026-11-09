@@ -1,5 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { BloomMark } from "@/components/brand/BloomMark";
+import { singleFlight } from "@/lib/budget/actions";
 import { formatMoney } from "@/lib/budget/money";
 import type { Nudge } from "@/lib/budget/nudges";
 
@@ -31,16 +32,33 @@ export function NudgeCard({
   onAddSpending,
   onNothingToday,
   onOpenIdeas,
+  onDismissMilestone,
 }: {
   nudge: Exclude<Nudge, null>;
   currency: string;
-  onSavedPlanned: () => void;
+  onSavedPlanned: () => void | Promise<void>;
   onSaveDifferent: () => void;
   onNotThisTime: () => void;
   onAddSpending: () => void;
-  onNothingToday: () => void;
+  onNothingToday: () => void | Promise<void>;
   onOpenIdeas: () => void;
+  onDismissMilestone: () => void;
 }) {
+  const [busy, setBusy] = useState(false);
+  // One tap logs once, however quickly she taps again while it saves.
+  const guarded = useMemo(() => {
+    const wrap = (action: () => void | Promise<void>) =>
+      singleFlight(async () => {
+        setBusy(true);
+        try {
+          await action();
+        } finally {
+          setBusy(false);
+        }
+      });
+    return { savedPlanned: wrap(onSavedPlanned), nothingToday: wrap(onNothingToday) };
+  }, [onSavedPlanned, onNothingToday]);
+
   useEffect(() => {
     if (nudge.kind !== "milestone") return;
     try {
@@ -61,9 +79,14 @@ export function NudgeCard({
           </span>
           <h2 className="mt-4 text-3xl text-foreground">You reached {formatMoney(nudge.amountCents, currency)} in savings</h2>
           <p className="mt-2 text-base text-muted-foreground">That&apos;s discipline, and it shows. Pansy has some places to start studying.</p>
-          <button type="button" onClick={onOpenIdeas} className={`${button} mt-5 bg-primary text-primary-foreground`}>
-            Ideas to study
-          </button>
+          <div className="mt-5 flex flex-wrap justify-center gap-2">
+            <button type="button" onClick={onOpenIdeas} className={`${button} bg-primary text-primary-foreground`}>
+              Ideas to study
+            </button>
+            <button type="button" onClick={onDismissMilestone} className={`${button} border border-border text-foreground`}>
+              Thank you, Pansy
+            </button>
+          </div>
         </div>
       )}
 
@@ -72,8 +95,8 @@ export function NudgeCard({
           <p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">Payday check-in</p>
           <h2 className="mt-2 text-2xl text-foreground">Did you move {formatMoney(nudge.saveCents, currency)} into savings?</h2>
           <div className="mt-4 flex flex-wrap gap-2">
-            <button type="button" onClick={onSavedPlanned} className={`${button} bg-primary text-primary-foreground`}>
-              Yes, I did
+            <button type="button" onClick={() => guarded.savedPlanned()} disabled={busy} className={`${button} bg-primary text-primary-foreground disabled:opacity-50`}>
+              {busy ? "Saving..." : "Yes, I did"}
             </button>
             <button type="button" onClick={onSaveDifferent} className={`${button} border border-border text-foreground`}>
               A different amount
@@ -92,7 +115,7 @@ export function NudgeCard({
             <button type="button" onClick={onAddSpending} className={`${button} bg-primary text-primary-foreground`}>
               Add spending
             </button>
-            <button type="button" onClick={onNothingToday} className={`${button} border border-border text-foreground`}>
+            <button type="button" onClick={() => guarded.nothingToday()} disabled={busy} className={`${button} border border-border text-foreground disabled:opacity-50`}>
               Nothing today
             </button>
           </div>

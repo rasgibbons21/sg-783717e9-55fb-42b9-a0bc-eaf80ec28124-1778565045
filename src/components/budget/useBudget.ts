@@ -2,7 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { BudgetError } from "@/lib/budget/api";
 import { createMemoryStore, type BudgetStore } from "@/lib/budget/devStore";
-import { newlyReached, periodBounds, todayIn } from "@/lib/budget/maths";
+import { addEntryAndCheckMilestones, recordNewMilestones } from "@/lib/budget/actions";
+import { periodBounds, todayIn } from "@/lib/budget/maths";
 import { supabaseStore } from "@/lib/budget/store";
 import type { Entry, Plan } from "@/lib/budget/types";
 
@@ -75,30 +76,27 @@ export function useBudget(): BudgetState {
     reload();
   }, [reload]);
 
-  /** After money moves in or out of savings, record any milestone she has just reached. */
-  const afterSavingsChange = useCallback(async () => {
-    const [nextBalance, known] = await Promise.all([store.getBalance(), store.listMilestones()]);
-    const fresh = newlyReached(nextBalance, known.map((m) => m.amountCents), plan?.goalCents ?? null);
-    if (fresh.length > 0) await store.recordMilestones(fresh);
-  }, [store, plan]);
-
-  // Writes throw a BudgetError so a form can keep her values and show the message beside them.
+  // Writes throw a BudgetError only when the write itself failed, so a form keeps her values and shows the message.
+  // Once the write succeeds, the milestone check and the refresh can't turn it into a false "didn't save".
   const add = useCallback(
     async (entry: Omit<Entry, "id">) => {
-      await store.addEntry(entry);
-      if (entry.kind !== "expense") await afterSavingsChange();
+      await addEntryAndCheckMilestones(store, entry, plan?.goalCents ?? null);
       await reload();
     },
-    [store, afterSavingsChange, reload],
+    [store, plan, reload],
   );
 
   const update = useCallback(
     async (id: string, entry: Partial<Omit<Entry, "id">>) => {
       await store.updateEntry(id, entry);
-      await afterSavingsChange();
+      try {
+        await recordNewMilestones(store, plan?.goalCents ?? null);
+      } catch {
+        // The change is saved; milestones are checked again next time.
+      }
       await reload();
     },
-    [store, afterSavingsChange, reload],
+    [store, plan, reload],
   );
 
   const remove = useCallback(

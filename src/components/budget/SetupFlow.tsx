@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Plus, X } from "lucide-react";
 import { BloomMark } from "@/components/brand/BloomMark";
 import { allocate, project } from "@/lib/budget/maths";
-import { currencyForCountry, formatMoney, parseMoney } from "@/lib/budget/money";
+import { currencyForCountry, customCurrency, formatMoney, parseMoney } from "@/lib/budget/money";
 import { CURRENCIES, PAY_FREQUENCY_LABEL, type BillFrequency, type PayFrequency, type Plan } from "@/lib/budget/types";
 import { cn } from "@/lib/utils";
 
@@ -46,7 +46,11 @@ function Pansy({ children }: { children: React.ReactNode }) {
 /** Pansy's guided, save-first setup. Code does all the maths, so the numbers are always exact. */
 export function SetupFlow({ initial, country, onSave }: { initial: Plan | null; country: string | null; onSave: (plan: Plan) => Promise<void> }) {
   const [step, setStep] = useState(0);
-  const [currency, setCurrency] = useState(initial?.currency ?? currencyForCountry(country));
+  const [listedCurrency, setCurrency] = useState(initial?.currency ?? currencyForCountry(country));
+  const initialIsOther = Boolean(initial && !(CURRENCIES as readonly string[]).includes(initial.currency));
+  const [useOther, setUseOther] = useState(initialIsOther);
+  const [otherCode, setOtherCode] = useState(initialIsOther ? (initial?.currency ?? "") : "");
+  const currency = useOther ? (customCurrency(otherCode) ?? "USD") : listedCurrency;
   const [pay, setPay] = useState(initial ? (initial.payCents / 100).toFixed(2) : "");
   const [frequency, setFrequency] = useState<PayFrequency>(initial?.payFrequency ?? "monthly");
   const [nextPayday, setNextPayday] = useState(initial?.nextPayday ?? localToday());
@@ -88,7 +92,7 @@ export function SetupFlow({ initial, country, onSave }: { initial: Plan | null; 
   );
   const split = plan ? allocate(plan) : null;
 
-  const canContinue = [true, Boolean(payCents && payCents > 0 && nextPayday), billsValid, true, true][step];
+  const canContinue = [!useOther || customCurrency(otherCode) !== null, Boolean(payCents && payCents > 0 && nextPayday), billsValid, true, true][step];
 
   const finish = async () => {
     if (!plan) return;
@@ -117,13 +121,42 @@ export function SetupFlow({ initial, country, onSave }: { initial: Plan | null; 
             <label className="mt-6 block text-sm font-medium text-muted-foreground" htmlFor="currency">
               Currency
             </label>
-            <select id="currency" value={currency} onChange={(e) => setCurrency(e.target.value)} className={fieldClass}>
+            <select
+              id="currency"
+              value={useOther ? "OTHER" : listedCurrency}
+              onChange={(e) => {
+                if (e.target.value === "OTHER") return setUseOther(true);
+                setUseOther(false);
+                setCurrency(e.target.value);
+              }}
+              className={fieldClass}
+            >
               {CURRENCIES.map((code) => (
                 <option key={code} value={code}>
                   {code}
                 </option>
               ))}
+              <option value="OTHER">Other</option>
             </select>
+            {useOther && (
+              <>
+                <label className="mt-4 block text-sm font-medium text-muted-foreground" htmlFor="currency-code">
+                  Your currency&apos;s 3-letter code, such as PHP or MXN
+                </label>
+                <input
+                  id="currency-code"
+                  maxLength={3}
+                  autoCapitalize="characters"
+                  autoComplete="off"
+                  value={otherCode}
+                  onChange={(e) => setOtherCode(e.target.value.toUpperCase())}
+                  className={fieldClass}
+                />
+                {otherCode && customCurrency(otherCode) === null && (
+                  <p className="mt-2 text-sm text-[var(--bloom-blush-text)]">Please enter three letters, like PHP.</p>
+                )}
+              </>
+            )}
           </>
         )}
 

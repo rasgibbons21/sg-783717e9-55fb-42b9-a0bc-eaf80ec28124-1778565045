@@ -49,3 +49,9 @@ const COUNTRY_CURRENCY: Record<string, string> = {
 export function currencyForCountry(country: string | null | undefined): string {
   return (country && COUNTRY_CURRENCY[country.toUpperCase()]) || "USD";
 }
+
+/** A currency she typed herself under "Other": any three-letter code, such as PHP or MXN. */
+export function customCurrency(input: string): string | null {
+  const code = input.trim().toUpperCase();
+  return /^[A-Z]{3}$/.test(code) ? code : null;
+}

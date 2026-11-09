@@ -5,6 +5,7 @@ import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
 import { SetupFlow } from "@/components/budget/SetupFlow";
 import { useBudget } from "@/components/budget/useBudget";
+import { budgetScreen } from "@/lib/budget/screens";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 
 export default function BudgetSetupPage() {
@@ -24,11 +25,20 @@ export default function BudgetSetupPage() {
       .catch(() => undefined);
   }, []);
 
+  const screen = budgetScreen(budget);
+
   return (
     <>
       <SEO title="Your savings plan - Bloom" description="Build a calm, save-first plan with Pansy." />
       <Layout>
-        {isLoggedIn && !budget.loading ? (
+        {isLoggedIn && screen === "error" ? (
+          <div className="mx-auto max-w-xl px-4 pt-10 text-center" role="alert">
+            <p className="text-lg text-foreground">{budget.error}</p>
+            <button type="button" onClick={budget.reload} className="mt-4 h-12 rounded-full bg-primary px-6 text-base font-semibold text-primary-foreground">
+              Try again
+            </button>
+          </div>
+        ) : isLoggedIn && (screen === "setup" || screen === "plan") ? (
           <SetupFlow
             initial={budget.plan}
             country={country}
