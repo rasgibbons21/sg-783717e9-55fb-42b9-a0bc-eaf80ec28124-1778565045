@@ -19,17 +19,23 @@ interface Props {
   levels: Levels;
   timeframe: Timeframe;
   onPlaced: () => void;
+  /** The setup a lesson asked Practice to open with. */
+  initialSetup?: SetupType;
 }
 
 const fieldClass =
   "mt-1 h-12 w-full rounded-2xl border border-border bg-secondary px-4 text-base font-normal text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20";
 
-export function OrderTicket({ instrument, price, marketOpen, buyingPower, balance, levels, timeframe: chartTimeframe, onPlaced }: Props) {
+export function OrderTicket({ instrument, price, marketOpen, buyingPower, balance, levels, timeframe: chartTimeframe, onPlaced, initialSetup }: Props) {
   const [direction, setDirection] = useState<Direction>("long");
   const [shares, setShares] = useState(1);
   const [stop, setStop] = useState("");
   const [target, setTarget] = useState("");
-  const [setup, setSetup] = useState<SetupType>("FVG");
+  const [setup, setSetup] = useState<SetupType>(initialSetup ?? "FVG");
+
+  useEffect(() => {
+    if (initialSetup) setSetup(initialSetup);
+  }, [initialSetup]);
   const [timeframe, setTimeframe] = useState<Timeframe>(chartTimeframe);
   const [note, setNote] = useState("");
   const [placing, setPlacing] = useState(false);
