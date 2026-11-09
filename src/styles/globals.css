@@ -14,74 +14,75 @@
   :root {
     --radius: 0.75rem;
 
-    /* Bloom premium palette: ink and panel for chrome, ivory for reading surfaces, gold for accents. */
-    --bloom-ink: #0C0D0B;
-    --bloom-panel: #1A1814;
-    --bloom-panel-raised: #24201A;
+    /* Bloom ivory palette: light surfaces, ink text, sage and blush accents, gold kept rare. */
     --bloom-ivory: #F6F1E8;
     --bloom-paper: #FBF8F2;
-    --bloom-text-light: #F3EEE4;
-    --bloom-text-dark: #1A1814;
-    --bloom-muted: #A79E91;
-    --bloom-muted-ivory: #6F6860;
-    --bloom-gold: #C4A574;
-    --bloom-sage: #8FA088;
+    --bloom-paper-raised: #FFFDF9;
+    --bloom-ink: #1A1814;
+    --bloom-muted: #6F6860;
+    --bloom-rule: rgba(26, 24, 20, 0.08);
+    --bloom-sage: #7F9277;
+    --bloom-sage-text: #56684F;
+    --bloom-sage-soft: rgba(127, 146, 119, 0.14);
     --bloom-blush: #D9B8AE;
-    --bloom-rule: rgba(196, 165, 116, 0.25);
-    --bloom-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+    --bloom-blush-text: #9A5848;
+    --bloom-blush-soft: rgba(217, 184, 174, 0.22);
+    --bloom-gold: #C4A574;
+    --bloom-shadow: 0 1px 2px rgba(26, 24, 20, 0.04), 0 8px 24px -8px rgba(26, 24, 20, 0.10);
+    --bloom-shadow-lift: 0 2px 4px rgba(26, 24, 20, 0.05), 0 18px 40px -12px rgba(26, 24, 20, 0.16);
 
-    --background: 90 8% 5%;
-    --foreground: 40 45% 92%;
+    --background: 39 44% 94%;
+    --foreground: 40 13% 9%;
 
-    --card: 40 13% 9%;
-    --card-foreground: 40 45% 92%;
+    --card: 40 53% 97%;
+    --card-foreground: 40 13% 9%;
 
-    --popover: 40 13% 9%;
-    --popover-foreground: 40 45% 92%;
+    --popover: 40 100% 99%;
+    --popover-foreground: 40 13% 9%;
 
-    --primary: 37 42% 61%;
-    --primary-foreground: 90 8% 5%;
+    --primary: 40 13% 9%;
+    --primary-foreground: 40 53% 97%;
 
-    --secondary: 38 18% 12%;
-    --secondary-foreground: 40 45% 92%;
+    --secondary: 39 36% 90%;
+    --secondary-foreground: 40 13% 9%;
 
-    --muted: 38 18% 12%;
-    --muted-foreground: 35 10% 61%;
+    --muted: 39 36% 90%;
+    --muted-foreground: 32 7% 41%;
 
-    --accent: 14 38% 77% / 0.16;
-    --accent-foreground: 40 45% 92%;
+    --accent: 14 36% 77% / 0.22;
+    --accent-foreground: 40 13% 9%;
 
-    --rose: 14 38% 77%;
-    --rose-foreground: 90 8% 5%;
+    --rose: 14 36% 77%;
+    --rose-foreground: 40 13% 9%;
 
-    --destructive: 14 38% 66%;
-    --destructive-foreground: 90 8% 5%;
+    --destructive: 11 36% 44%;
+    --destructive-foreground: 40 53% 97%;
 
-    --border: 37 42% 61% / 0.22;
-    --input: 38 18% 12%;
+    --border: 40 13% 9% / 0.08;
+    --input: 39 36% 90%;
     --ring: 37 42% 61%;
 
-    --chart-1: 103 11% 58%;
+    --chart-1: 102 10% 52%;
     --chart-2: 37 42% 61%;
-    --chart-3: 14 38% 77%;
-    --chart-4: 35 10% 61%;
-    --chart-5: 38 18% 20%;
+    --chart-3: 14 36% 77%;
+    --chart-4: 32 7% 41%;
+    --chart-5: 39 36% 80%;
 
     /* Legacy tokens, remapped by role */
-    --r-bg: var(--bloom-ink);
-    --r-elevated: var(--bloom-panel);
-    --r-card: var(--bloom-panel);
-    --r-card2: var(--bloom-panel-raised);
+    --r-bg: var(--bloom-ivory);
+    --r-elevated: var(--bloom-paper);
+    --r-card: var(--bloom-paper);
+    --r-card2: var(--bloom-paper-raised);
     --r-hairline: var(--bloom-rule);
-    --r-ivory: var(--bloom-text-light);
-    --r-body: var(--bloom-text-light);
+    --r-ivory: var(--bloom-ink);
+    --r-body: var(--bloom-ink);
     --r-meta: var(--bloom-muted);
     --r-inactive: var(--bloom-muted);
     --r-teal: var(--bloom-gold);
-    --r-up-bg: rgba(143, 160, 136, 0.16);
-    --r-up-text: var(--bloom-sage);
-    --r-down-bg: rgba(217, 184, 174, 0.16);
-    --r-down-text: var(--bloom-blush);
+    --r-up-bg: var(--bloom-sage-soft);
+    --r-up-text: var(--bloom-sage-text);
+    --r-down-bg: var(--bloom-blush-soft);
+    --r-down-text: var(--bloom-blush-text);
   }
 }
 
@@ -96,6 +97,7 @@
   }
   body {
     @apply bg-background text-foreground;
+    background-color: var(--bloom-ivory);
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     font-size: 16px;
     -webkit-font-smoothing: antialiased;
@@ -104,25 +106,6 @@
 }
 
 @layer components {
-  /* Reading surfaces: ivory with dark text. Components inside keep using the usual tokens. */
-  .surface-ivory {
-    --foreground: 40 13% 9%;
-    --card: 40 60% 97%;
-    --card-foreground: 40 13% 9%;
-    --secondary: 39 47% 90%;
-    --secondary-foreground: 40 13% 9%;
-    --muted: 39 47% 90%;
-    --muted-foreground: 30 6% 41%;
-    --accent: 14 38% 77% / 0.35;
-    --accent-foreground: 40 13% 9%;
-    --primary: 40 13% 9%;
-    --primary-foreground: 40 45% 92%;
-    --border: 40 13% 9% / 0.1;
-    --input: 39 47% 90%;
-    --ring: 40 13% 9%;
-    background-color: var(--bloom-ivory);
-    color: var(--bloom-text-dark);
-  }
   .rule {
     border-color: var(--bloom-rule);
   }
@@ -152,6 +135,14 @@
 }
 
 /* The hero entrance is CSS-only, so the words appear even if JavaScript is slow or stalls. */
+@keyframes bloom-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+.bloom-pulse {
+  animation: bloom-pulse 1.4s ease-in-out infinite;
+}
+
 @keyframes bloom-rise {
   from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }

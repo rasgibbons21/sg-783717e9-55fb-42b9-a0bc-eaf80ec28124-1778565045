@@ -66,7 +66,7 @@ export default function AcademyCertificatePage() {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center" style={{ background: '#0C0D0B' }}>
+      <div className="fixed inset-0 flex items-center justify-center" style={{ background: '#F6F1E8' }}>
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
@@ -78,7 +78,7 @@ export default function AcademyCertificatePage() {
         <title>Your Certificate - Bloom</title>
       </Head>
 
-      <div className="min-h-screen p-4 sm:p-8" style={{ background: '#0C0D0B' }}>
+      <div className="min-h-screen p-4 sm:p-8" style={{ background: '#F6F1E8' }}>
         <div className="max-w-6xl mx-auto">
           {!nameConfirmed ? (
             /* ── Name input step ── */
@@ -86,11 +86,11 @@ export default function AcademyCertificatePage() {
               <div style={{ fontSize: 64 }} className="mb-4">&#127800;</div>
               <h1
                 className="text-3xl font-bold mb-2"
-                style={{ color: '#F3EEE4', fontFamily: 'Georgia, serif' }}
+                style={{ color: '#1A1814', fontFamily: 'Georgia, serif' }}
               >
                 Congratulations!
               </h1>
-              <p className="text-sm mb-8" style={{ color: 'rgba(243,238,228,0.6)' }}>
+              <p className="text-sm mb-8" style={{ color: 'rgba(26,24,20,0.6)' }}>
                 You&apos;ve completed <strong style={{ color: '#C4A574' }}>{title}</strong>.
                 Enter the name you&apos;d like on your certificate.
               </p>
@@ -103,9 +103,9 @@ export default function AcademyCertificatePage() {
                   placeholder="Your name for the certificate"
                   className="w-full px-4 py-3.5 rounded-xl text-center text-lg font-semibold outline-none transition-all focus:ring-2"
                   style={{
-                    background: 'rgba(243,238,228,0.05)',
+                    background: 'rgba(26,24,20,0.05)',
                     border: '1px solid rgba(201,168,76,0.3)',
-                    color: '#F3EEE4',
+                    color: '#1A1814',
                     fontFamily: 'Georgia, serif',
                     caretColor: '#C4A574',
                   }}
@@ -127,7 +127,7 @@ export default function AcademyCertificatePage() {
                   className="w-full py-3.5 rounded-xl font-bold text-sm transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-40"
                   style={{
                     background: 'linear-gradient(135deg, #C9A84C, #C4A574)',
-                    color: '#0C0D0B',
+                    color: '#1A1814',
                   }}
                 >
                   Generate My Certificate
@@ -137,7 +137,7 @@ export default function AcademyCertificatePage() {
                   <button
                     onClick={() => setCertName(defaultName)}
                     className="text-xs transition-colors hover:brightness-125"
-                    style={{ color: 'rgba(243,238,228,0.4)' }}
+                    style={{ color: 'rgba(26,24,20,0.4)' }}
                   >
                     Use my account name: {defaultName}
                   </button>
@@ -150,11 +150,11 @@ export default function AcademyCertificatePage() {
               <div className="text-center mb-8">
                 <h1
                   className="text-3xl font-bold mb-2"
-                  style={{ color: '#F3EEE4', fontFamily: 'Georgia, serif' }}
+                  style={{ color: '#1A1814', fontFamily: 'Georgia, serif' }}
                 >
                   Your Certificate
                 </h1>
-                <p style={{ color: 'rgba(243,238,228,0.5)' }} className="text-sm">
+                <p style={{ color: 'rgba(26,24,20,0.5)' }} className="text-sm">
                   Download or share your achievement
                 </p>
               </div>
@@ -175,7 +175,7 @@ export default function AcademyCertificatePage() {
                 <button
                   onClick={() => setNameConfirmed(false)}
                   className="text-xs transition-colors hover:brightness-125"
-                  style={{ color: 'rgba(243,238,228,0.4)' }}
+                  style={{ color: 'rgba(26,24,20,0.4)' }}
                 >
                   Change name on certificate
                 </button>

@@ -39,7 +39,7 @@ const HIT = 44;
 const PAD_X = 8;
 const PRICE_PAD = 14;
 const LEVEL_STYLE: Record<keyof Levels, { label: string; colour: string }> = {
-  entry: { label: "Planned entry", colour: "var(--bloom-text-light)" },
+  entry: { label: "Planned entry", colour: "var(--bloom-gold)" },
   stop: { label: "Stop", colour: "var(--bloom-blush)" },
   target: { label: "Target", colour: "var(--bloom-sage)" },
 };
@@ -92,7 +92,7 @@ function DragLine({
     >
       <rect x={0} y={y - HIT / 2} width={width} height={HIT} fill="transparent" />
       <line x1={0} x2={width} y1={y} y2={y} stroke={colour} strokeWidth={1.5} strokeDasharray="5 4" />
-      <rect x={width - 66} y={y - 11} width={62} height={22} rx={11} fill="var(--bloom-panel)" stroke={colour} />
+      <rect x={width - 66} y={y - 11} width={62} height={22} rx={11} fill="var(--bloom-paper-raised)" stroke={colour} />
       <text x={width - 35} y={y + 4} textAnchor="middle" fontSize={11} fill={colour}>
         {label}
       </text>
@@ -188,9 +188,9 @@ export function ChartStage({
   const zoneBottom = zone ? Math.min(zone.top, zone.bottom) : 0;
 
   return (
-    <div className="rounded-3xl border border-[var(--bloom-rule)] bg-[var(--bloom-panel)] p-3 text-[var(--bloom-text-light)]">
+    <div className="rounded-3xl bg-[var(--bloom-paper)] p-3 text-[var(--bloom-ink)] shadow-[var(--bloom-shadow)]">
       {timeframes.length > 1 && (
-        <div className="mb-3 grid grid-flow-col gap-1 rounded-full bg-[var(--bloom-ink)] p-1" role="tablist" aria-label="Timeframe">
+        <div className="mb-3 grid grid-flow-col gap-1 rounded-full bg-secondary p-1" role="tablist" aria-label="Timeframe">
           {timeframes.map(({ label }) => (
             <button
               key={label}

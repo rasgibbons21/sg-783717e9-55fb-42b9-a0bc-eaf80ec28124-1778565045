@@ -121,7 +121,7 @@ export function LessonPlayer({ lesson }: { lesson: Lesson }) {
       </div>
       <p className="mt-4 text-sm font-medium text-muted-foreground">{lesson.title}</p>
 
-      <div key={index} className="bloom-rise surface-ivory mt-4 min-h-[320px] rounded-3xl p-5 shadow-[var(--bloom-shadow)]" style={{ animationDuration: "250ms" }}>
+      <div key={index} className="bloom-rise mt-4 bg-card min-h-[320px] rounded-3xl p-5 shadow-[var(--bloom-shadow)]" style={{ animationDuration: "250ms" }}>
         <Block block={block} onAnswered={onAnswered} />
       </div>
 

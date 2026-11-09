@@ -247,7 +247,7 @@ function PracticeDesk() {
           />
         ) : (
           <div className="rounded-3xl border border-[var(--bloom-rule)] bg-card p-4">
-            <div className="mb-3 grid grid-flow-col gap-1 rounded-full bg-[var(--bloom-ink)] p-1" role="tablist" aria-label="Timeframe">
+            <div className="mb-3 grid grid-flow-col gap-1 rounded-full bg-secondary p-1" role="tablist" aria-label="Timeframe">
               {TIMEFRAMES.map((label) => (
                 <button
                   key={label}
