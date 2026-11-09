@@ -11,16 +11,27 @@ export interface SaveResult {
 }
 
 /** Records a finished lesson through the server. Repeating a lesson can never earn extra blooms. */
-export async function completeLesson(slug: string, score: number, post: Post = practiceFetch, retries = 2, retryDelayMs = 800): Promise<SaveResult> {
+export async function completeLesson(
+  slug: string,
+  score: number,
+  post: Post = practiceFetch,
+  retries = 2,
+  retryDelayMs = 800,
+  total?: number,
+): Promise<SaveResult> {
+  const body = total === undefined ? { slug, score } : { slug, score, total };
   for (let attempt = 0; attempt <= retries; attempt += 1) {
-    const { ok, data } = await post("/api/lessons/complete", { method: "POST", body: JSON.stringify({ slug, score }) });
+    const { ok, data } = await post("/api/lessons/complete", { method: "POST", body: JSON.stringify(body) });
     if (ok) return { saved: true, isNew: data.isNew === true };
     if (attempt < retries) await wait(retryDelayMs);
   }
   return { saved: false, isNew: false };
 }
 
-function readPending(): Record<string, number> {
+/** Older versions stored just the score; newer ones store the score with the test total. */
+type Pending = Record<string, number | { score: number; total: number }>;
+
+function readPending(): Pending {
   try {
     const parsed = JSON.parse(localStorage.getItem(PENDING_KEY) ?? "{}");
     return parsed && typeof parsed === "object" ? parsed : {};
@@ -29,7 +40,7 @@ function readPending(): Record<string, number> {
   }
 }
 
-function writePending(pending: Record<string, number>): void {
+function writePending(pending: Pending): void {
   try {
     if (Object.keys(pending).length === 0) localStorage.removeItem(PENDING_KEY);
     else localStorage.setItem(PENDING_KEY, JSON.stringify(pending));
@@ -39,8 +50,8 @@ function writePending(pending: Record<string, number>): void {
 }
 
 /** Remembers a finished lesson until the server confirms it, so a lost connection can't lose it. */
-export function queueCompletion(slug: string, score: number): void {
-  writePending({ ...readPending(), [slug]: score });
+export function queueCompletion(slug: string, score: number, total?: number): void {
+  writePending({ ...readPending(), [slug]: total === undefined ? score : { score, total } });
 }
 
 export function clearCompletion(slug: string): void {
@@ -52,8 +63,9 @@ export function clearCompletion(slug: string): void {
 /** Tries any lessons still waiting to be saved, and returns the ones that succeeded. */
 export async function flushPendingCompletions(post: Post = practiceFetch, retries = 0, retryDelayMs = 0): Promise<string[]> {
   const saved: string[] = [];
-  for (const [slug, score] of Object.entries(readPending())) {
-    const result = await completeLesson(slug, score, post, retries, retryDelayMs);
+  for (const [slug, entry] of Object.entries(readPending())) {
+    const { score, total } = typeof entry === "number" ? { score: entry, total: undefined } : entry;
+    const result = await completeLesson(slug, score, post, retries, retryDelayMs, total);
     if (result.saved) {
       clearCompletion(slug);
       saved.push(slug);

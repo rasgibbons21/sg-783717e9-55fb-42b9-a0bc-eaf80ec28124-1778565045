@@ -73,3 +73,28 @@ describe("pending completions", () => {
     await expect(flushPendingCompletions(ok(), 0, 0)).resolves.toEqual([]);
   });
 });
+
+describe("test scores", () => {
+  it("sends the test total with the score", async () => {
+    const post = ok();
+    await completeLesson("fair-value-gaps", 4, post, 0, 0, 5);
+    const [, options] = post.mock.calls[0] as unknown as [string, { body: string }];
+    expect(JSON.parse(options.body)).toEqual({ slug: "fair-value-gaps", score: 4, total: 5 });
+  });
+
+  it("keeps the total with a queued lesson", async () => {
+    queueCompletion("fair-value-gaps", 4, 5);
+    const post = ok();
+    await flushPendingCompletions(post, 0, 0);
+    const [, options] = post.mock.calls[0] as unknown as [string, { body: string }];
+    expect(JSON.parse(options.body)).toEqual({ slug: "fair-value-gaps", score: 4, total: 5 });
+  });
+
+  it("still sends lessons queued by an older version without a total", async () => {
+    store.set("bloom-pending-completions", JSON.stringify({ "why-gold-moves": 2 }));
+    const post = ok();
+    await flushPendingCompletions(post, 0, 0);
+    const [, options] = post.mock.calls[0] as unknown as [string, { body: string }];
+    expect(JSON.parse(options.body)).toEqual({ slug: "why-gold-moves", score: 2 });
+  });
+});

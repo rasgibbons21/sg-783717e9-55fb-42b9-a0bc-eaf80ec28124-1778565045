@@ -87,15 +87,15 @@ export function LessonPlayer({ lesson }: { lesson: Lesson }) {
       return;
     }
     // Kept on this device until the server confirms, so a lost connection can't lose the lesson.
-    queueCompletion(lesson.slug, firstTryScore.current);
-    const result = await completeLesson(lesson.slug, firstTryScore.current);
+    queueCompletion(lesson.slug, firstTryScore.current, total);
+    const result = await completeLesson(lesson.slug, firstTryScore.current, undefined, undefined, undefined, total);
     if (result.saved) {
       clearCompletion(lesson.slug);
       saveResume(lesson.slug, 0);
       setIsNew(result.isNew);
     }
     setSaveState(result.saved ? "saved" : "failed");
-  }, [lesson.slug, userId]);
+  }, [lesson.slug, userId, total]);
 
   const screen = screens[position];
   const block = screen?.kind === "block" ? lesson.blocks[screen.index] : null;
