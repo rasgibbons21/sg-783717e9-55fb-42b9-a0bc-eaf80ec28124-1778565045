@@ -23,8 +23,8 @@ const saving = (occurredOn: string): Entry => ({ id: "s", kind: "saving", amount
 const spent = (occurredOn: string): Entry => ({ id: "e", kind: "expense", amountCents: 500, category: "groceries", note: null, occurredOn });
 
 describe("pickNudge", () => {
-  it("celebrates a milestone before anything else", () => {
-    expect(pickNudge({ plan, entries: [], unseenMilestones: [50000, 25000], now: evening, paydayDismissedFor: null })).toEqual({ kind: "milestone", amountCents: 25000 });
+  it("celebrates the largest new milestone before anything else", () => {
+    expect(pickNudge({ plan, entries: [], unseenMilestones: [50000, 25000], now: evening, paydayDismissedFor: null })).toEqual({ kind: "milestone", amountCents: 50000 });
   });
 
   it("asks about payday savings before asking her to log", () => {

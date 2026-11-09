@@ -30,7 +30,16 @@ export function CountUp({ value, format, durationMs = 600 }: { value: number; fo
       else from.current = value;
     };
     frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
+    // Background or throttled tabs may never run animation frames; always land on the true value.
+    const settle = setTimeout(() => {
+      cancelAnimationFrame(frame);
+      setShown(value);
+      from.current = value;
+    }, durationMs + 150);
+    return () => {
+      cancelAnimationFrame(frame);
+      clearTimeout(settle);
+    };
   }, [value, durationMs]);
 
   return <span aria-label={format(value)}>{format(shown)}</span>;

@@ -11,10 +11,10 @@ function localHour(timeZone: string, now: Date): number {
   }
 }
 
-/** The one gentle card to show, if any: a milestone first, then the payday check-in, then logging today. */
+/** The one gentle card to show, if any: the largest new milestone first, then the payday check-in, then logging today. */
 export function pickNudge(input: { plan: Plan; entries: Entry[]; unseenMilestones: number[]; now: Date; paydayDismissedFor: string | null }): Nudge {
   const { plan, entries, unseenMilestones, now, paydayDismissedFor } = input;
-  if (unseenMilestones.length > 0) return { kind: "milestone", amountCents: Math.min(...unseenMilestones) };
+  if (unseenMilestones.length > 0) return { kind: "milestone", amountCents: Math.max(...unseenMilestones) };
 
   const today = todayIn(plan.timeZone, now);
   const { start } = periodBounds(plan.nextPayday, plan.payFrequency, today);
