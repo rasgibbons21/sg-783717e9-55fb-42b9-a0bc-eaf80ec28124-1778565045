@@ -18,9 +18,26 @@ export interface Plan {
   goalCents: number | null;
   interestPct: number;
   timeZone: string;
+  /** Her own spending categories, added to the built-in ones. */
+  categories?: string[];
+  savingsDays?: SavingsDays;
+  /** She asked for browser or phone notifications on savings days. */
+  notify?: boolean;
 }
 
-export type EntryKind = "expense" | "saving" | "withdrawal";
+/** income: money in beyond her usual pay. sweep: savings recorded as moved into her investing goal. */
+export type EntryKind = "expense" | "saving" | "withdrawal" | "income" | "sweep";
+
+/** When Pansy reminds her to save. */
+export type SavingsDays = "payday" | "fridays" | "sundays" | "daily" | "twice_monthly";
+
+export const SAVINGS_DAYS_LABEL: Record<SavingsDays, string> = {
+  payday: "On payday",
+  fridays: "Payday Fridays",
+  sundays: "Weekly Sundays",
+  daily: "Every day",
+  twice_monthly: "Twice a month (1st and 15th)",
+};
 
 export interface Entry {
   id: string;

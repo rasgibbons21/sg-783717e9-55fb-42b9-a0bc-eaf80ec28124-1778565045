@@ -54,8 +54,21 @@ export function project(savePerPayday: number, pay: PayFrequency, months: number
   return projectStepUp(savePerPayday, pay, months, 0, annualRatePct);
 }
 
+/** Savings: money saved, less withdrawals and sweeps to investing. */
 export function balance(entries: Entry[]): number {
-  return entries.reduce((sum, e) => sum + (e.kind === "saving" ? e.amountCents : e.kind === "withdrawal" ? -e.amountCents : 0), 0);
+  return entries.reduce((sum, e) => sum + (e.kind === "saving" ? e.amountCents : e.kind === "withdrawal" || e.kind === "sweep" ? -e.amountCents : 0), 0);
+}
+
+/** What she has swept from savings into her investing goal. */
+export function invested(entries: Entry[]): number {
+  return entries.filter((e) => e.kind === "sweep").reduce((sum, e) => sum + e.amountCents, 0);
+}
+
+/** Safe to spend this pay period: what her plan leaves after savings and bills, plus extra income, less spending. */
+export function safeToSpend(split: Allocation, entries: Entry[], bounds: { start: string; end: string }, today: string): number {
+  const inPeriod = (e: Entry) => e.occurredOn >= bounds.start && e.occurredOn <= today;
+  const extra = entries.filter((e) => e.kind === "income" && inPeriod(e)).reduce((sum, e) => sum + e.amountCents, 0);
+  return Math.max(0, split.spend + extra - periodSpending(entries, bounds, today));
 }
 
 /** Today's date where she lives, as YYYY-MM-DD. */

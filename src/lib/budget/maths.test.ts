@@ -12,6 +12,8 @@ import {
   projectStepUp,
   streak,
   todayIn,
+  invested,
+  safeToSpend,
 } from "./maths";
 import { NOTHING_TODAY, type Entry, type Plan } from "./types";
 
@@ -183,5 +185,24 @@ describe("milestones", () => {
   it("names the next milestone ahead", () => {
     expect(nextMilestone(60000, [10000, 25000, 50000], null)).toBe(100000);
     expect(nextMilestone(60000, [], 70000)).toBe(70000);
+  });
+});
+
+describe("income, sweeps and safe to spend", () => {
+  it("takes sweeps to investing out of savings", () => {
+    const entries = [entry("saving", 50000, "2026-11-01"), entry("sweep", 20000, "2026-11-02"), entry("income", 9999, "2026-11-02")];
+    expect(balance(entries)).toBe(30000);
+    expect(invested(entries)).toBe(20000);
+  });
+
+  it("adds extra income this period to what is safe to spend, less what she has spent", () => {
+    const bounds = { start: "2026-10-30", end: "2026-11-13" };
+    const entries = [entry("income", 15000, "2026-11-01"), entry("income", 5000, "2026-10-29"), entry("expense", 4000, "2026-11-08"), entry("saving", 1, "2026-11-08")];
+    expect(safeToSpend(allocate(plan()), entries, bounds, "2026-11-08")).toBe(90000 + 15000 - 4000);
+  });
+
+  it("never shows a negative safe to spend", () => {
+    const bounds = { start: "2026-10-30", end: "2026-11-13" };
+    expect(safeToSpend(allocate(plan()), [entry("expense", 999999, "2026-11-08")], bounds, "2026-11-08")).toBe(0);
   });
 });

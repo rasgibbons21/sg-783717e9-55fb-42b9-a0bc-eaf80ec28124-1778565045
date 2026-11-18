@@ -30,7 +30,7 @@ vi.mock("@/integrations/supabase/client", () => {
   };
 });
 
-import { BudgetError, addEntry, getBalance, getPlan, listMilestones, recordMilestones, savePlan } from "./api";
+import { BudgetError, addEntry, createChallenge, getBalance, getInvested, getPlan, listChallenges, listMilestones, recordMilestones, savePlan, updateChallenge } from "./api";
 import type { Plan } from "./types";
 
 const plan: Plan = {
@@ -43,6 +43,9 @@ const plan: Plan = {
   goalCents: null,
   interestPct: 0,
   timeZone: "America/Chicago",
+  categories: [],
+  savingsDays: "payday",
+  notify: false,
 };
 
 beforeEach(() => {
@@ -64,6 +67,9 @@ describe("budget data", () => {
         goal_cents: null,
         interest_pct: "0.00",
         time_zone: "America/Chicago",
+        categories: [],
+        savings_days: "payday",
+        notify: false,
       },
       error: null,
     };
@@ -120,5 +126,34 @@ describe("budget data", () => {
   it("does nothing when there are no new milestones", async () => {
     await recordMilestones([]);
     expect(calls).toEqual([]);
+  });
+});
+
+describe("savings plan sheets and investing", () => {
+  it("reads what she has swept to investing", async () => {
+    result = { data: 12000, error: null };
+    await expect(getInvested()).resolves.toBe(12000);
+    expect(calls.at(-1)).toMatchObject({ table: "budget_invested", op: "rpc" });
+  });
+
+  it("saves her own categories and savings days with the plan", async () => {
+    await savePlan({ ...plan, categories: ["Pets"], savingsDays: "fridays", notify: true });
+    const upsert = calls.find((c) => c.op === "upsert")!;
+    expect(upsert.args[0]).toMatchObject({ categories: ["Pets"], savings_days: "fridays", notify: true });
+  });
+
+  it("refuses too many or too long categories", async () => {
+    await expect(savePlan({ ...plan, categories: Array.from({ length: 21 }, (_, i) => `Cat ${i}`) })).rejects.toBeInstanceOf(BudgetError);
+    await expect(savePlan({ ...plan, categories: ["x".repeat(41)] })).rejects.toBeInstanceOf(BudgetError);
+  });
+
+  it("maps sheets both ways", async () => {
+    result = { data: [{ id: "c1", template: "week52", title: "52-Week Challenge", slots: [100, 200], completed: { "0": "e1" }, swept_cents: 100, active: true }], error: null };
+    await expect(listChallenges()).resolves.toEqual([{ id: "c1", template: "week52", title: "52-Week Challenge", slots: [100, 200], completed: { "0": "e1" }, sweptCents: 100, active: true }]);
+    result = { data: { id: "c2", template: "custom", title: "Holiday", slots: [500], completed: {}, swept_cents: 0, active: true }, error: null };
+    await createChallenge({ template: "custom", title: "Holiday", slots: [500] });
+    expect(calls.find((c) => c.op === "insert")!.args[0]).toEqual({ user_id: "user-1", template: "custom", title: "Holiday", slots: [500] });
+    await updateChallenge("c2", { sweptCents: 500, completed: { "0": "e9" } });
+    expect(calls.find((c) => c.op === "update")!.args[0]).toEqual({ swept_cents: 500, completed: { "0": "e9" } });
   });
 });

@@ -1,7 +1,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { supabase as typedClient } from "@/integrations/supabase/client";
-import type { Entry, Plan } from "./types";
+import type { Challenge } from "./challenges";
+import type { ChallengeChanges, NewChallenge } from "./devStore";
+import type { Entry, Plan, SavingsDays } from "./types";
 
 /** A kind, plain message for anything that goes wrong. Raw database errors never reach the screen. */
 export class BudgetError extends Error {}
@@ -23,6 +25,8 @@ export const BillsSchema = z
   )
   .max(15);
 
+export const CategoriesSchema = z.array(z.string().trim().min(1).max(40)).max(20);
+
 interface PlanRow {
   currency: string;
   pay_cents: number;
@@ -33,6 +37,19 @@ interface PlanRow {
   goal_cents: number | null;
   interest_pct: number | string;
   time_zone: string;
+  categories?: string[] | null;
+  savings_days?: SavingsDays | null;
+  notify?: boolean | null;
+}
+
+interface ChallengeRow {
+  id: string;
+  template: Challenge["template"];
+  title: string;
+  slots: number[];
+  completed: Record<string, string> | null;
+  swept_cents: number;
+  active: boolean;
 }
 
 interface EntryRow {
@@ -54,6 +71,19 @@ const toPlan = (row: PlanRow): Plan => ({
   goalCents: row.goal_cents === null ? null : Number(row.goal_cents),
   interestPct: Number(row.interest_pct),
   timeZone: row.time_zone,
+  categories: row.categories ?? [],
+  savingsDays: row.savings_days ?? "payday",
+  notify: row.notify ?? false,
+});
+
+const toChallenge = (row: ChallengeRow): Challenge => ({
+  id: row.id,
+  template: row.template,
+  title: row.title,
+  slots: (row.slots ?? []).map(Number),
+  completed: row.completed ?? {},
+  sweptCents: Number(row.swept_cents),
+  active: row.active,
 });
 
 const toEntry = (row: EntryRow): Entry => ({
@@ -84,6 +114,8 @@ export async function getPlan(): Promise<Plan | null> {
 export async function savePlan(plan: Plan): Promise<void> {
   const bills = BillsSchema.safeParse(plan.bills);
   if (!bills.success) throw new BudgetError("Please check your bills. You can add up to 15, each with a name and an amount.");
+  const categories = CategoriesSchema.safeParse(plan.categories ?? []);
+  if (!categories.success) throw new BudgetError("Please check your categories. You can add up to 20, each up to 40 characters.");
   const user_id = await userId();
   check(
     await db.from("budget_plans").upsert({
@@ -97,6 +129,9 @@ export async function savePlan(plan: Plan): Promise<void> {
       goal_cents: plan.goalCents,
       interest_pct: plan.interestPct,
       time_zone: plan.timeZone,
+      categories: categories.data,
+      savings_days: plan.savingsDays ?? "payday",
+      notify: plan.notify ?? false,
       updated_at: new Date().toISOString(),
     }),
     SAVE_FAILED,
@@ -105,6 +140,39 @@ export async function savePlan(plan: Plan): Promise<void> {
 
 export async function getBalance(): Promise<number> {
   return Number(check(await db.rpc("budget_balance"), LOAD_FAILED) ?? 0);
+}
+
+export async function getInvested(): Promise<number> {
+  return Number(check(await db.rpc("budget_invested"), LOAD_FAILED) ?? 0);
+}
+
+export async function listChallenges(): Promise<Challenge[]> {
+  const rows = check(await db.from("budget_challenges").select("id, template, title, slots, completed, swept_cents, active").order("created_at", { ascending: false }), LOAD_FAILED) as
+    | ChallengeRow[]
+    | null;
+  return (rows ?? []).map(toChallenge);
+}
+
+export async function createChallenge(challenge: NewChallenge): Promise<Challenge> {
+  const user_id = await userId();
+  const row = check(
+    await db.from("budget_challenges").insert({ user_id, template: challenge.template, title: challenge.title, slots: challenge.slots }).select("id, template, title, slots, completed, swept_cents, active").single(),
+    SAVE_FAILED,
+  ) as ChallengeRow;
+  return toChallenge(row);
+}
+
+export async function updateChallenge(id: string, changes: ChallengeChanges): Promise<void> {
+  const row: Record<string, unknown> = {};
+  if (changes.sweptCents !== undefined) row.swept_cents = changes.sweptCents;
+  if (changes.completed !== undefined) row.completed = changes.completed;
+  if (changes.active !== undefined) row.active = changes.active;
+  if (changes.title !== undefined) row.title = changes.title;
+  check(await db.from("budget_challenges").update(row).eq("id", id), SAVE_FAILED);
+}
+
+export async function deleteChallenge(id: string): Promise<void> {
+  check(await db.from("budget_challenges").delete().eq("id", id), SAVE_FAILED);
 }
 
 export async function listEntries(since: string): Promise<Entry[]> {
