@@ -2,6 +2,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowUpRight, BookOpen, LineChart, MessageCircleHeart, Trophy, Wallet } from "lucide-react";
 import { BloomMark } from "@/components/brand/BloomMark";
+import { Botanical } from "@/components/brand/Botanical";
 import { RiskNote } from "@/components/RiskNote";
 import { sampleAllocation, SAMPLE_PLAN } from "@/data/budget/sample";
 import { formatMoney } from "@/lib/budget/money";
@@ -49,18 +50,21 @@ function SavingsPreview() {
 export function SignedOutHero() {
   return (
     <>
-      <section className="relative overflow-hidden px-4 pb-16 pt-14 md:pt-20">
+      <section className="relative overflow-hidden px-4 pb-16 pt-12 md:pt-20">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0"
-          style={{ background: "radial-gradient(55% 40% at 50% 0%, rgba(196,165,116,0.16), transparent 70%)" }}
+          style={{ background: "radial-gradient(60% 45% at 50% 8%, rgba(217,184,174,0.32), transparent 72%)" }}
         />
+        <Botanical variant="corner" className="pointer-events-none absolute -right-10 -top-4 h-64 w-52 opacity-60" />
+        <Botanical variant="corner" className="pointer-events-none absolute -left-14 top-48 h-64 w-52 rotate-180 opacity-40" />
+        <Botanical variant="bloom" className="pointer-events-none absolute right-6 top-60 hidden h-24 w-20 opacity-50 md:block" />
         <div className="relative mx-auto max-w-2xl text-center">
-          <div className="bloom-rise mx-auto w-fit">
-            <BloomMark size={52} />
+          <div className="bloom-grow mx-auto w-fit rounded-full bg-[var(--bloom-paper)] p-4 shadow-[var(--bloom-shadow)]">
+            <BloomMark size={84} />
           </div>
-          <p className="bloom-rise mt-6 text-xs font-semibold uppercase tracking-[0.25em] text-muted-foreground" style={{ animationDelay: "80ms" }}>
-            Stock analysis for women
+          <p className="bloom-rise mt-6 text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground" style={{ animationDelay: "80ms" }}>
+            She Blooms Wealth
           </p>
           <h1 className="bloom-rise-soft mt-4 text-5xl leading-[1.05] text-foreground md:text-7xl" style={{ animationDelay: "140ms" }}>
             Learn to read stocks with skill. Free.
@@ -71,7 +75,7 @@ export function SignedOutHero() {
           <div className="bloom-rise mt-8" style={{ animationDelay: "450ms" }}>
             <motion.span whileTap={{ scale: 0.97 }} whileHover={{ y: -1 }} className="inline-block">
               <Link href="/onboarding" className="group inline-flex h-14 items-center gap-2 rounded-full bg-primary px-9 text-lg font-semibold text-primary-foreground">
-                Start free
+                Start Blooming
                 <ArrowUpRight className="h-5 w-5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" />
               </Link>
             </motion.span>

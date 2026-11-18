@@ -8,7 +8,6 @@ const SKIP = [/[\\/]api[\\/]/, /[\\/]ui[\\/]/, /refund-policy\.tsx$/, /\.test\.t
 // "Setup" is allowed now: the stock curriculum teaches named setups and Practice records which one was used.
 const BANNED_WORDS = /\b(signals?|scanners?|gap[- ]and[- ]go|screener|upgrade|free trial|go pro|pro plan|bloom pro|trading desk|watchlist)\b/i;
 const OLD_THEMES = /#(07080C|0C1016|121821|171E28|0E1B30|06060a|F3EDE3|27B7C8|3F4F3E|EFD9D3|B98A72|C2A15A|E6ECE3|8A5B44)\b/i;
-const GARDEN_IMPORTS = /from\s+["']@\/components\/(brand\/Botanical|BloomGarden)["']/;
 
 function sourceFiles(dir: string): string[] {
   return fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
@@ -47,6 +46,7 @@ describe("copy sweep", () => {
     const offenders = files.flatMap((file) =>
       readableText(fs.readFileSync(file, "utf8"))
         // "Bloom" the brand is fine; "blooms" as a points unit isn't.
+        .map((text) => text.replace(/She Blooms Wealth/gi, ""))
         .filter((text) => /\b[Bb]looms\b|\b(a|new|your) bloom\b/.test(text))
         .map((text) => `${file}: ${text.slice(0, 80)}`),
     );
@@ -65,14 +65,19 @@ describe("copy sweep", () => {
     expect(offenders).toEqual([]);
   });
 
-  it("opens with the stock headline", () => {
-    expect(fs.readFileSync("src/components/home/SignedOutHero.tsx", "utf8")).toContain("Learn to read stocks with skill. Free.");
-    expect(fs.readFileSync("src/components/home/SignedOutHero.tsx", "utf8")).toContain("grow your savings with Pansy");
+  it("opens with the blossom welcome", () => {
+    const hero = fs.readFileSync("src/components/home/SignedOutHero.tsx", "utf8");
+    expect(hero).toContain("Start Blooming");
+    expect(hero).toContain("grow your savings with Pansy");
+    expect(hero).toContain('from "@/components/brand/Botanical"');
   });
 
-  it("has no garden visuals left", () => {
-    const offenders = files.filter((file) => GARDEN_IMPORTS.test(fs.readFileSync(file, "utf8")));
-    expect(offenders).toEqual([]);
+  it("uses the cream blossom icon, not the old navy bull", async () => {
+    const sharp = (await import("sharp")).default;
+    for (const file of ["public/icon-192.png", "public/icon-512.png", "public/apple-touch-icon.png"]) {
+      const { data } = await sharp(file).extract({ left: 2, top: 2, width: 1, height: 1 }).raw().toBuffer({ resolveWithObject: true });
+      expect([data[0], data[1], data[2]], file).toEqual([246, 241, 232]);
+    }
   });
 });
 
