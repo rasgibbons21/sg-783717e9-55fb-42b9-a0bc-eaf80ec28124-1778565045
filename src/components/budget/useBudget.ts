@@ -2,7 +2,9 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { BudgetError } from "@/lib/budget/api";
 import { createMemoryStore, type BudgetStore } from "@/lib/budget/devStore";
-import { addEntryAndCheckMilestones, recordNewMilestones } from "@/lib/budget/actions";
+import { addEntryAndCheckMilestones, completeSlot, recordNewMilestones, sweepChallenge, uncompleteSlot } from "@/lib/budget/actions";
+import type { Challenge } from "@/lib/budget/challenges";
+import type { NewChallenge } from "@/lib/budget/devStore";
 import { periodBounds, todayIn } from "@/lib/budget/maths";
 import { supabaseStore } from "@/lib/budget/store";
 import type { Entry, Plan } from "@/lib/budget/types";
@@ -25,6 +27,9 @@ export interface BudgetState {
   plan: Plan | null;
   entries: Entry[];
   balance: number;
+  /** What she has swept from savings into her investing goal. */
+  invested: number;
+  challenges: Challenge[];
   milestones: { amountCents: number; seen: boolean }[];
   loading: boolean;
   error: string | null;
@@ -34,6 +39,11 @@ export interface BudgetState {
   remove: (id: string) => Promise<void>;
   savePlan: (plan: Plan) => Promise<void>;
   markSeen: (amounts: number[]) => Promise<void>;
+  createSheet: (sheet: NewChallenge) => Promise<void>;
+  fillSlot: (sheet: Challenge, index: number) => Promise<void>;
+  unfillSlot: (sheet: Challenge, index: number) => Promise<void>;
+  sweep: (sheet: Challenge) => Promise<void>;
+  archiveSheet: (sheet: Challenge) => Promise<void>;
 }
 
 const message = (error: unknown) => (error instanceof BudgetError ? error.message : "Something went wrong. Please try again.");
@@ -48,6 +58,8 @@ export function useBudget(): BudgetState {
   const [plan, setPlan] = useState<Plan | null>(null);
   const [entries, setEntries] = useState<Entry[]>([]);
   const [balance, setBalance] = useState(0);
+  const [invested, setInvested] = useState(0);
+  const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [milestones, setMilestones] = useState<{ amountCents: number; seen: boolean }[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -59,10 +71,18 @@ export function useBudget(): BudgetState {
       const nextPlan = await store.getPlan();
       setPlan(nextPlan);
       if (nextPlan) {
-        const [nextEntries, nextBalance, nextMilestones] = await Promise.all([store.listEntries(loadSince(nextPlan)), store.getBalance(), store.listMilestones()]);
+        const [nextEntries, nextBalance, nextMilestones, nextInvested, nextChallenges] = await Promise.all([
+          store.listEntries(loadSince(nextPlan)),
+          store.getBalance(),
+          store.listMilestones(),
+          store.getInvested(),
+          store.listChallenges(),
+        ]);
         setEntries(nextEntries);
         setBalance(nextBalance);
         setMilestones(nextMilestones);
+        setInvested(nextInvested);
+        setChallenges(nextChallenges);
       }
       setError(null);
     } catch (problem) {
@@ -127,5 +147,80 @@ export function useBudget(): BudgetState {
     [store],
   );
 
-  return { plan, entries, balance, milestones, loading, error, reload, add, update, remove, savePlan, markSeen };
+  const today = () => todayIn(plan?.timeZone ?? "UTC");
+
+  // Sheet actions throw only when nothing was saved, and the screen always refreshes afterwards.
+  const createSheet = useCallback(
+    async (sheet: NewChallenge) => {
+      await store.createChallenge(sheet);
+      await reload();
+    },
+    [store, reload],
+  );
+
+  const fillSlot = useCallback(
+    async (sheet: Challenge, index: number) => {
+      try {
+        await completeSlot(store, sheet, index, today(), plan?.goalCents ?? null);
+      } finally {
+        await reload();
+      }
+    },
+    // today() reads plan, which is listed.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [store, plan, reload],
+  );
+
+  const unfillSlot = useCallback(
+    async (sheet: Challenge, index: number) => {
+      try {
+        await uncompleteSlot(store, sheet, index);
+      } finally {
+        await reload();
+      }
+    },
+    [store, reload],
+  );
+
+  const sweep = useCallback(
+    async (sheet: Challenge) => {
+      try {
+        await sweepChallenge(store, sheet, today());
+      } finally {
+        await reload();
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [store, plan, reload],
+  );
+
+  const archiveSheet = useCallback(
+    async (sheet: Challenge) => {
+      await store.updateChallenge(sheet.id, { active: false });
+      await reload();
+    },
+    [store, reload],
+  );
+
+  return {
+    plan,
+    entries,
+    balance,
+    invested,
+    challenges,
+    milestones,
+    loading,
+    error,
+    reload,
+    add,
+    update,
+    remove,
+    savePlan,
+    markSeen,
+    createSheet,
+    fillSlot,
+    unfillSlot,
+    sweep,
+    archiveSheet,
+  };
 }

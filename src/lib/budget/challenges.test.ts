@@ -3,6 +3,7 @@ import {
   TEMPLATES,
   customSlots,
   isSavingsDay,
+  savingsDayPrompt,
   nextSlotIndex,
   progress,
   savedCents,
@@ -110,5 +111,30 @@ describe("savings days", () => {
     expect(isSavingsDay("payday", "2026-11-13", "2026-11-13", "biweekly")).toBe(true);
     expect(isSavingsDay("payday", "2026-11-27", "2026-11-13", "biweekly")).toBe(true);
     expect(isSavingsDay("payday", "2026-11-20", "2026-11-13", "biweekly")).toBe(false);
+  });
+});
+
+describe("savingsDayPrompt", () => {
+  const plan = { nextPayday: "2026-11-30", payFrequency: "monthly" as const, savingsDays: "fridays" as const };
+  const sheet = challenge({ slots: [100, 200, 300], completed: { "0": "e1" } });
+
+  it("offers her next slot on a savings day", () => {
+    expect(savingsDayPrompt({ plan, sheet, entries: [], today: "2026-11-20", dismissedFor: null })).toEqual({ index: 1, amountCents: 200 });
+  });
+
+  it("stays quiet on other days", () => {
+    expect(savingsDayPrompt({ plan, sheet, entries: [], today: "2026-11-21", dismissedFor: null })).toBeNull();
+  });
+
+  it("stays quiet once she filled a slot today or said not today", () => {
+    const filledToday = [{ id: "e9", kind: "saving" as const, amountCents: 200, category: "challenge", note: null, occurredOn: "2026-11-20" }];
+    expect(savingsDayPrompt({ plan, sheet, entries: filledToday, today: "2026-11-20", dismissedFor: null })).toBeNull();
+    expect(savingsDayPrompt({ plan, sheet, entries: [], today: "2026-11-20", dismissedFor: "2026-11-20" })).toBeNull();
+  });
+
+  it("stays quiet without a sheet or when the sheet is full", () => {
+    expect(savingsDayPrompt({ plan, sheet: null, entries: [], today: "2026-11-20", dismissedFor: null })).toBeNull();
+    const full = challenge({ slots: [100], completed: { "0": "e1" } });
+    expect(savingsDayPrompt({ plan, sheet: full, entries: [], today: "2026-11-20", dismissedFor: null })).toBeNull();
   });
 });

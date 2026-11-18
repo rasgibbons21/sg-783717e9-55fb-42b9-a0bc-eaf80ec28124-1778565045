@@ -20,6 +20,8 @@ const TITLES: Record<EntryKind, string> = {
   expense: "Add spending",
   saving: "Add to savings",
   withdrawal: "Move money out of savings",
+  income: "Add income",
+  sweep: "Sweep to investments",
 };
 
 const fieldClass =
@@ -35,6 +37,7 @@ export function AddSpendingSheet({
   defaultAmount,
   onSubmit,
   onDelete,
+  customCategories = [],
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -44,7 +47,13 @@ export function AddSpendingSheet({
   defaultAmount?: number;
   onSubmit: (entry: Omit<Entry, "id">) => Promise<void>;
   onDelete?: (id: string) => Promise<void>;
+  /** Her own categories, shown after the built-in ones. */
+  customCategories?: string[];
 }) {
+  const categoryOptions: { value: string; label: string }[] = [
+    ...CATEGORIES.map((value) => ({ value, label: CATEGORY_LABEL[value] })),
+    ...customCategories.map((name) => ({ value: name, label: name })),
+  ];
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState<string>("groceries");
   const [note, setNote] = useState("");
@@ -108,7 +117,9 @@ export function AddSpendingSheet({
           <SheetDescription>
             {entryKind === "expense"
               ? "Small amounts count too."
-              : "Every amount you set aside adds up."}
+              : entryKind === "income"
+                ? "Money in beyond your usual pay, like a side job or a gift."
+                : "Every amount you set aside adds up."}
           </SheetDescription>
         </SheetHeader>
 
@@ -150,7 +161,7 @@ export function AddSpendingSheet({
                 role="radiogroup"
                 aria-label="Category"
               >
-                {CATEGORIES.map((value) => (
+                {categoryOptions.map(({ value, label }) => (
                   <button
                     key={value}
                     type="button"
@@ -164,7 +175,7 @@ export function AddSpendingSheet({
                         : "border-border text-foreground",
                     )}
                   >
-                    {CATEGORY_LABEL[value]}
+                    {label}
                   </button>
                 ))}
               </div>

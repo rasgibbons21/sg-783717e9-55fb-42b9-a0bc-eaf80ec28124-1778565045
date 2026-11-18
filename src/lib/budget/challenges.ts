@@ -1,5 +1,5 @@
 import { periodBounds } from "./maths";
-import type { PayFrequency, SavingsDays } from "./types";
+import type { Entry, PayFrequency, SavingsDays } from "./types";
 
 export type TemplateId = "week52" | "sprint30" | "envelope100" | "custom";
 
@@ -86,4 +86,23 @@ export function isSavingsDay(days: SavingsDays, today: string, nextPayday: strin
   if (days === "sundays") return date.getUTCDay() === 0;
   if (days === "twice_monthly") return date.getUTCDate() === 1 || date.getUTCDate() === 15;
   return periodBounds(nextPayday, payFrequency, today).start === today;
+}
+
+/**
+ * Pansy's savings-day card: on one of her savings days, offer the next empty slot of her sheet,
+ * unless she already filled a slot today or said "not today".
+ */
+export function savingsDayPrompt(input: {
+  plan: { nextPayday: string; payFrequency: PayFrequency; savingsDays?: SavingsDays };
+  sheet: Challenge | null;
+  entries: Entry[];
+  today: string;
+  dismissedFor: string | null;
+}): { index: number; amountCents: number } | null {
+  const { plan, sheet, entries, today, dismissedFor } = input;
+  if (!sheet || dismissedFor === today) return null;
+  if (!isSavingsDay(plan.savingsDays ?? "payday", today, plan.nextPayday, plan.payFrequency)) return null;
+  if (entries.some((e) => e.category === "challenge" && e.occurredOn === today)) return null;
+  const index = nextSlotIndex(sheet);
+  return index === null ? null : { index, amountCents: sheet.slots[index] };
 }
