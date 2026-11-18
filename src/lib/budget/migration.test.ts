@@ -9,8 +9,9 @@ describe("budget migration", () => {
     const text = sql();
     // The 2026-08 tracker created budget_entries with amount/date columns. Keeping it would make every save fail.
     expect(text).toMatch(/column_name = 'kind'/);
-    expect(text).toContain("ALTER TABLE public.budget_entries RENAME TO budget_entries_legacy");
-    expect(text.indexOf("RENAME TO budget_entries_legacy")).toBeLessThan(text.indexOf("CREATE TABLE IF NOT EXISTS budget_entries"));
+    expect(text).toContain("legacy_name TEXT := 'budget_entries_legacy'");
+    expect(text).toContain("EXECUTE format('ALTER TABLE public.budget_entries RENAME TO %I', legacy_name)");
+    expect(text.indexOf("RENAME TO %I")).toBeLessThan(text.indexOf("CREATE TABLE IF NOT EXISTS budget_entries"));
   });
 
   it("deletes budget data with her account", () => {
@@ -59,5 +60,38 @@ describe("budget migration", () => {
     const text = sql();
     expect(count(text, /CREATE TABLE IF NOT EXISTS/g)).toBe(4);
     expect(count(text, /DROP POLICY IF EXISTS/g)).toBe(16);
+  });
+});
+
+describe("savings sheet database steps", () => {
+  it("fills, un-fills and sweeps in one transaction each, as her", () => {
+    const text = sql();
+    for (const fn of ["budget_fill_slot", "budget_unfill_slot", "budget_sweep"]) {
+      expect(text, fn).toContain(`CREATE OR REPLACE FUNCTION ${fn}(`);
+      expect(text, fn).toContain(`GRANT EXECUTE ON FUNCTION ${fn}`);
+    }
+    expect(count(text, /LANGUAGE plpgsql SECURITY INVOKER/g)).toBe(3);
+  });
+
+  it("adds to the sheet without overwriting slots filled elsewhere", () => {
+    const text = sql();
+    expect(text).toContain("completed = completed || jsonb_build_object(");
+    expect(text).toContain("completed ? slot_key");
+  });
+
+  it("never sweeps more than her savings", () => {
+    expect(sql()).toMatch(/LEAST\(\s*sheet_saved - sheet\.swept_cents,\s*budget_balance\(\)\s*\)/);
+  });
+
+  it("upgrades a database that ran the earlier version of this file", () => {
+    const text = sql();
+    expect(text).toContain("ALTER TABLE budget_plans ADD COLUMN IF NOT EXISTS categories");
+    expect(text).toContain("ALTER TABLE budget_plans ADD COLUMN IF NOT EXISTS savings_days");
+    expect(text).toContain("ALTER TABLE budget_plans ADD COLUMN IF NOT EXISTS notify");
+    expect(text).toContain("DROP CONSTRAINT IF EXISTS budget_entries_kind_check");
+  });
+
+  it("doesn't fail if the legacy table name is already taken", () => {
+    expect(sql()).toMatch(/table_name = 'budget_entries_legacy'/);
   });
 });

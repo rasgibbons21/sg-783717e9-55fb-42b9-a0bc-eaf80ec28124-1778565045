@@ -1,3 +1,4 @@
+import { formatMoney } from "./money";
 import type { Bill, BillFrequency, Entry, PayFrequency, Plan } from "./types";
 
 export const PAYDAYS_PER_YEAR: Record<PayFrequency, number> = { weekly: 52, biweekly: 26, semimonthly: 24, monthly: 12 };
@@ -159,4 +160,11 @@ export function nextMilestone(balanceCents: number, reached: number[], goalCents
 export function newlyReached(balanceCents: number, reached: number[], goalCents: number | null): number[] {
   const done = new Set(reached);
   return ladderCents(goalCents).filter((amount) => amount <= balanceCents && !done.has(amount));
+}
+
+/** Why a withdrawal can't go ahead, or null if it can: she can't move out more than she has saved. */
+export function withdrawalProblem(amountCents: number, balanceCents: number, currency: string): string | null {
+  if (amountCents <= balanceCents) return null;
+  if (balanceCents <= 0) return "There's nothing in savings to move out yet.";
+  return `You have ${formatMoney(balanceCents, currency, "en-US")} in savings, so you can move out up to that.`;
 }

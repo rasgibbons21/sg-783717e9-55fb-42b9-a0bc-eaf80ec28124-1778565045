@@ -274,6 +274,8 @@ function BudgetHome() {
         onSubmit={(entry) => (sheet.editing ? budget.update(sheet.editing.id, entry) : budget.add(entry))}
         onDelete={budget.remove}
         customCategories={plan.categories ?? []}
+        savingsCents={balance}
+        currency={plan.currency}
       />
       <IdeasPanel open={ideasOpen} onOpenChange={setIdeasOpen} />
 

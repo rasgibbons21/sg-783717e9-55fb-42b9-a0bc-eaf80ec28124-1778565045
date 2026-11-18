@@ -38,61 +38,41 @@ export function singleFlight<T>(work: () => Promise<T>): () => Promise<T | undef
   };
 }
 
-/**
- * Fills one slot of a savings plan sheet: records it as a saving, then marks the slot.
- * If the sheet can't be updated, the saving is removed again so nothing is counted twice.
- */
+const ALREADY_SWEPT = "That slot's money was already swept to investing, so it stays filled.";
+
+/** The sheet as stored now, rather than the copy that was on screen. */
+async function stored(store: BudgetStore, sheet: Challenge): Promise<Challenge> {
+  return (await store.listChallenges()).find((c) => c.id === sheet.id) ?? sheet;
+}
+
+/** Fills one slot. The store records the saving and marks the slot in one step, so quick taps can't overwrite each other. */
 export async function completeSlot(store: BudgetStore, challenge: Challenge, index: number, today: string, goalCents: number | null): Promise<Challenge> {
-  const key = String(index);
-  if (key in challenge.completed || index < 0 || index >= challenge.slots.length) return challenge;
-  const entry = await store.addEntry({
-    kind: "saving",
-    amountCents: challenge.slots[index],
-    category: "challenge",
-    note: `${challenge.title}: slot ${index + 1}`.slice(0, 140),
-    occurredOn: today,
-  });
-  const completed = { ...challenge.completed, [key]: entry.id };
-  try {
-    await store.updateChallenge(challenge.id, { completed });
-  } catch (error) {
-    await store.deleteEntry(entry.id).catch(() => undefined);
-    throw error;
-  }
+  if (String(index) in challenge.completed || index < 0 || index >= challenge.slots.length) return challenge;
+  await store.fillSlot(challenge.id, index, today);
   try {
     await recordNewMilestones(store, goalCents);
   } catch {
     // The slot is saved; milestones are checked again next time.
   }
-  return { ...challenge, completed };
+  return stored(store, challenge);
 }
 
-/** Un-ticks a slot tapped by mistake, removing the saving it recorded. Swept money stays swept. */
+/** Un-ticks a slot tapped by mistake, removing its saving in the same step. Swept money stays swept. */
 export async function uncompleteSlot(store: BudgetStore, challenge: Challenge, index: number): Promise<Challenge> {
-  const key = String(index);
-  const entryId = challenge.completed[key];
-  if (!entryId) return challenge;
-  if (savedCents(challenge) - challenge.slots[index] < challenge.sweptCents) {
-    throw new Error("That slot's money was already swept to investing, so it stays filled.");
-  }
-  const completed = { ...challenge.completed };
-  delete completed[key];
-  await store.updateChallenge(challenge.id, { completed });
-  await store.deleteEntry(entryId).catch(() => undefined);
-  return { ...challenge, completed };
-}
-
-/** Records the sheet's saved, not-yet-swept money as moved into her investing goal. */
-export async function sweepChallenge(store: BudgetStore, challenge: Challenge, today: string): Promise<Challenge> {
-  const amount = sweepableCents(challenge);
-  if (amount <= 0) return challenge;
-  const entry = await store.addEntry({ kind: "sweep", amountCents: amount, category: "investing", note: `Swept from ${challenge.title}`.slice(0, 140), occurredOn: today });
-  const sweptCents = challenge.sweptCents + amount;
+  if (!challenge.completed[String(index)]) return challenge;
+  if (savedCents(challenge) - challenge.slots[index] < challenge.sweptCents) throw new Error(ALREADY_SWEPT);
   try {
-    await store.updateChallenge(challenge.id, { sweptCents });
+    await store.unfillSlot(challenge.id, index);
   } catch (error) {
-    await store.deleteEntry(entry.id).catch(() => undefined);
+    if (error instanceof Error && /already swept/i.test(error.message)) throw new Error(ALREADY_SWEPT);
     throw error;
   }
-  return { ...challenge, sweptCents };
+  return stored(store, challenge);
+}
+
+/** Records the sheet's saved, not-yet-swept money as moved into her investing goal, never more than her savings. */
+export async function sweepChallenge(store: BudgetStore, challenge: Challenge, today: string): Promise<Challenge> {
+  if (sweepableCents(challenge) <= 0) return challenge;
+  await store.sweepSheet(challenge.id, today);
+  return stored(store, challenge);
 }

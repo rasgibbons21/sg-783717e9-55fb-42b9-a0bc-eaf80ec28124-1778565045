@@ -19,12 +19,26 @@ interface PlanRow {
   time_zone: string;
 }
 
-/** The members whose chosen savings day is today, each in her own time zone. */
+/** Notifications only go out between 8am and 9pm her time; otherwise Pansy reminds her in the app. */
+export const QUIET_BEFORE = 8;
+export const QUIET_FROM = 21;
+
+function localHour(timeZone: string, now: Date): number {
+  try {
+    return Number(new Intl.DateTimeFormat("en-GB", { timeZone, hour: "2-digit", hourCycle: "h23" }).format(now));
+  } catch {
+    return now.getUTCHours();
+  }
+}
+
+/** The members whose chosen savings day is today, each in her own time zone, and only in her daytime. */
 export function dueForSavingsReminder(rows: PlanRow[], now: Date): string[] {
   return rows
     .filter((row) => {
       if (!SAVINGS_DAYS.includes(row.savings_days as SavingsDays)) return false;
       if (!PAY_FREQUENCIES.includes(row.pay_frequency as PayFrequency)) return false;
+      const hour = localHour(row.time_zone || "UTC", now);
+      if (hour < QUIET_BEFORE || hour >= QUIET_FROM) return false;
       const today = todayIn(row.time_zone || "UTC", now);
       return isSavingsDay(row.savings_days as SavingsDays, today, row.next_payday, row.pay_frequency as PayFrequency);
     })

@@ -19,9 +19,16 @@ describe("dueForSavingsReminder", () => {
   });
 
   it("uses each member's local date", () => {
-    // 2026-11-21 03:00 UTC is still Friday evening in Chicago, but Saturday in Lagos.
-    const late = new Date("2026-11-21T03:00:00Z");
+    // 2026-11-21 02:00 UTC is still Friday evening (8pm) in Chicago, but Saturday in Lagos.
+    const late = new Date("2026-11-21T02:00:00Z");
     expect(dueForSavingsReminder([row("chicago", "fridays"), row("lagos", "fridays", "Africa/Lagos")], late)).toEqual(["chicago"]);
+  });
+
+  it("never sends a notification at night in her time zone", () => {
+    // 15:00 UTC is 2am Saturday in Sydney: she gets Pansy in the app instead.
+    expect(dueForSavingsReminder([row("sydney", "daily", "Australia/Sydney"), row("chicago", "daily")], fridayMorning)).toEqual(["chicago"]);
+    // 03:00 UTC is 9pm in Chicago, after the evening cut-off.
+    expect(dueForSavingsReminder([row("chicago", "daily")], new Date("2026-11-21T03:00:00Z"))).toEqual([]);
   });
 
   it("skips rows with settings it doesn't recognise", () => {

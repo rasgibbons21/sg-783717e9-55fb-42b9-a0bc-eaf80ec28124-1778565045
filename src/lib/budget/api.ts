@@ -3,7 +3,7 @@ import { z } from "zod";
 import { supabase as typedClient } from "@/integrations/supabase/client";
 import type { Challenge } from "./challenges";
 import type { ChallengeChanges, NewChallenge } from "./devStore";
-import type { Entry, Plan, SavingsDays } from "./types";
+import { isReservedCategory, type Entry, type Plan, type SavingsDays } from "./types";
 
 /** A kind, plain message for anything that goes wrong. Raw database errors never reach the screen. */
 export class BudgetError extends Error {}
@@ -25,7 +25,9 @@ export const BillsSchema = z
   )
   .max(15);
 
-export const CategoriesSchema = z.array(z.string().trim().min(1).max(40)).max(20);
+export const CategoriesSchema = z
+  .array(z.string().trim().min(1).max(40).refine((name) => !isReservedCategory(name)))
+  .max(20);
 
 interface PlanRow {
   currency: string;
@@ -233,4 +235,23 @@ export async function recordMilestones(amounts: number[]): Promise<void> {
 export async function markMilestonesSeen(amounts: number[]): Promise<void> {
   if (amounts.length === 0) return;
   check(await db.from("budget_milestones").update({ seen_at: new Date().toISOString() }).in("amount_cents", amounts).is("seen_at", null), SAVE_FAILED);
+}
+
+/** Fills a slot and records its saving in one database step (budget_fill_slot). */
+export async function fillSlot(sheetId: string, index: number, day: string): Promise<void> {
+  check(await db.rpc("budget_fill_slot", { sheet_id: sheetId, slot_index: index, day }), SAVE_FAILED);
+}
+
+/** Un-fills a slot and removes its saving in one database step. "already swept" is passed through for the sheet to explain. */
+export async function unfillSlot(sheetId: string, index: number): Promise<void> {
+  const { error } = await db.rpc("budget_unfill_slot", { sheet_id: sheetId, slot_index: index });
+  if (error) {
+    const message = (error as { message?: string }).message ?? "";
+    throw new BudgetError(/already swept/i.test(message) ? "already swept" : SAVE_FAILED);
+  }
+}
+
+/** Sweeps the sheet's unswept savings to investing, capped at her savings, in one database step. */
+export async function sweepSheet(sheetId: string, day: string): Promise<number> {
+  return Number(check(await db.rpc("budget_sweep", { sheet_id: sheetId, day }), SAVE_FAILED) ?? 0);
 }

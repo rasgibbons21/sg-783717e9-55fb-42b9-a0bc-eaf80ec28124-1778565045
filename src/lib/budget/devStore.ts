@@ -1,4 +1,4 @@
-import type { Challenge } from "./challenges";
+import { savedCents, type Challenge } from "./challenges";
 import { balance, invested } from "./maths";
 import type { Entry, Plan } from "./types";
 
@@ -22,6 +22,12 @@ export interface BudgetStore {
   createChallenge(challenge: NewChallenge): Promise<Challenge>;
   updateChallenge(id: string, changes: ChallengeChanges): Promise<void>;
   deleteChallenge(id: string): Promise<void>;
+  /** Fills a slot and records its saving in one step. Filling a filled slot changes nothing. */
+  fillSlot(sheetId: string, index: number, day: string): Promise<void>;
+  /** Un-fills a slot and removes its saving in one step. Throws "already swept" if that money was swept. */
+  unfillSlot(sheetId: string, index: number): Promise<void>;
+  /** Sweeps the sheet's unswept savings to investing, capped at her savings. Returns the amount. */
+  sweepSheet(sheetId: string, day: string): Promise<number>;
 }
 
 /** A store kept in memory, for trying the budget in the development preview without a real account. */
@@ -70,6 +76,46 @@ export function createMemoryStore(): BudgetStore {
     },
     deleteChallenge: async (id) => {
       challenges = challenges.filter((c) => c.id !== id);
+    },
+    // These mirror the database functions: each reads the stored sheet, never a copy from the screen.
+    fillSlot: async (sheetId, index, day) => {
+      const sheet = challenges.find((c) => c.id === sheetId);
+      if (!sheet) throw new Error("sheet not found");
+      const key = String(index);
+      if (key in sheet.completed) return;
+      if (index < 0 || index >= sheet.slots.length) throw new Error("no such slot");
+      const entry: Entry = {
+        id: String(nextId++),
+        kind: "saving",
+        amountCents: sheet.slots[index],
+        category: "challenge",
+        note: `${sheet.title}: slot ${index + 1}`.slice(0, 140),
+        occurredOn: day,
+      };
+      entries = [...entries, entry];
+      sheet.completed = { ...sheet.completed, [key]: entry.id };
+    },
+    unfillSlot: async (sheetId, index) => {
+      const sheet = challenges.find((c) => c.id === sheetId);
+      if (!sheet) throw new Error("sheet not found");
+      const key = String(index);
+      const entryId = sheet.completed[key];
+      if (!entryId) return;
+      if (savedCents(sheet) - sheet.slots[index] < sheet.sweptCents) throw new Error("already swept");
+      entries = entries.filter((e) => e.id !== entryId);
+      sheet.completed = Object.fromEntries(Object.entries(sheet.completed).filter(([k]) => k !== key));
+    },
+    sweepSheet: async (sheetId, day) => {
+      const sheet = challenges.find((c) => c.id === sheetId);
+      if (!sheet) throw new Error("sheet not found");
+      const amount = Math.min(savedCents(sheet) - sheet.sweptCents, balance(entries));
+      if (amount <= 0) return 0;
+      entries = [
+        ...entries,
+        { id: String(nextId++), kind: "sweep", amountCents: amount, category: "investing", note: `Swept from ${sheet.title}`.slice(0, 140), occurredOn: day },
+      ];
+      sheet.sweptCents += amount;
+      return amount;
     },
   };
 }

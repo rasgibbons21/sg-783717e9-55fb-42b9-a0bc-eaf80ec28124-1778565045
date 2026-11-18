@@ -65,6 +65,21 @@ export const CATEGORY_LABEL: Record<Category, string> = {
 /** A zero-amount marker for a day she chose to log as "nothing today", so her streak still counts. */
 export const NOTHING_TODAY = "none";
 
+/** Names Bloom uses itself, which her own categories can never take. */
+export const RESERVED_CATEGORIES = new Set<string>([
+  ...CATEGORIES,
+  ...Object.values(CATEGORY_LABEL).map((label) => label.toLowerCase()),
+  NOTHING_TODAY,
+  "challenge",
+  "investing",
+  "saving",
+  "withdrawal",
+  "income",
+  "sweep",
+]);
+
+export const isReservedCategory = (name: string) => RESERVED_CATEGORIES.has(name.trim().toLowerCase());
+
 export const CURRENCIES = ["USD", "GBP", "EUR", "CAD", "AUD", "NZD", "ZAR", "NGN", "KES", "GHS", "INR", "JMD", "TTD"] as const;
 
 export const PAY_FREQUENCY_LABEL: Record<PayFrequency, string> = {

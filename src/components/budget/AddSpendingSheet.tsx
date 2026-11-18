@@ -6,7 +6,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { todayIn } from "@/lib/budget/maths";
+import { todayIn, withdrawalProblem } from "@/lib/budget/maths";
 import { parseMoney } from "@/lib/budget/money";
 import {
   CATEGORIES,
@@ -38,6 +38,8 @@ export function AddSpendingSheet({
   onSubmit,
   onDelete,
   customCategories = [],
+  savingsCents,
+  currency = "USD",
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -49,6 +51,9 @@ export function AddSpendingSheet({
   onDelete?: (id: string) => Promise<void>;
   /** Her own categories, shown after the built-in ones. */
   customCategories?: string[];
+  /** Her savings now, so a withdrawal can never take more than she has. */
+  savingsCents?: number;
+  currency?: string;
 }) {
   const categoryOptions: { value: string; label: string }[] = [
     ...CATEGORIES.map((value) => ({ value, label: CATEGORY_LABEL[value] })),
@@ -79,9 +84,12 @@ export function AddSpendingSheet({
   const cents = parseMoney(amount);
   const valid = cents !== null && cents > 0 && /^\d{4}-\d{2}-\d{2}$/.test(day);
   const entryKind = editing?.kind ?? kind;
+  // When editing a withdrawal, its own amount is already out of savings, so it counts as available again.
+  const available = (savingsCents ?? Number.MAX_SAFE_INTEGER) + (editing?.kind === "withdrawal" ? editing.amountCents : 0);
+  const overdraw = entryKind === "withdrawal" && cents !== null ? withdrawalProblem(cents, available, currency) : null;
 
   const submit = async () => {
-    if (!valid || cents === null) return;
+    if (!valid || cents === null || overdraw) return;
     setBusy(true);
     setProblem(null);
     try {
@@ -145,6 +153,11 @@ export function AddSpendingSheet({
             onChange={(e) => setAmount(e.target.value)}
             className={cn(fieldClass, "text-2xl")}
           />
+          {overdraw && (
+            <p className="mt-2 text-sm text-[var(--bloom-alert)]" role="alert">
+              {overdraw}
+            </p>
+          )}
           {amount && !valid && (
             <p className="mt-2 text-sm text-[var(--bloom-blush-text)]">
               Please enter an amount like 12.50.
@@ -221,7 +234,7 @@ export function AddSpendingSheet({
 
           <button
             type="submit"
-            disabled={!valid || busy}
+            disabled={!valid || busy || Boolean(overdraw)}
             className="mt-6 h-12 w-full rounded-full bg-primary text-base font-semibold text-primary-foreground disabled:opacity-40"
           >
             {busy ? "Saving..." : problem ? "Try again" : "Save"}

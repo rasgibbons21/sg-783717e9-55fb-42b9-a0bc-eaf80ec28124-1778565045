@@ -19,7 +19,12 @@ export async function enableSavingsNotifications(): Promise<PushResult> {
     if (permission !== "granted") return "denied";
     const { publicKey } = await fetch("/api/push/key").then((res) => res.json());
     if (!publicKey) return "not-configured";
-    const registration = await navigator.serviceWorker.ready;
+    // The service worker only registers in production; never wait forever for it.
+    const registration = await Promise.race([
+      navigator.serviceWorker.ready,
+      new Promise<null>((resolve) => setTimeout(() => resolve(null), 8000)),
+    ]);
+    if (!registration) return "unsupported";
     const subscription =
       (await registration.pushManager.getSubscription()) ??
       (await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(publicKey) }));

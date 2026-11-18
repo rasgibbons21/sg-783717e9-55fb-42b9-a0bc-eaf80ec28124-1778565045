@@ -80,11 +80,23 @@ describe("savings plan sheet actions", () => {
     expect(await store.getBalance()).toBe(0);
   });
 
-  it("removes the saving again if the sheet can't be updated, so nothing is counted twice", async () => {
+  it("keeps both slots when two fills start from the same sheet on screen", async () => {
     const { store, sheet } = await setup();
-    store.updateChallenge = vi.fn().mockRejectedValue(new Error("offline"));
-    await expect(completeSlot(store, sheet, 0, "2026-11-20", null)).rejects.toThrow();
+    await Promise.all([completeSlot(store, sheet, 0, "2026-11-20", null), completeSlot(store, sheet, 1, "2026-11-20", null)]);
+    const [saved] = await store.listChallenges();
+    expect(Object.keys(saved.completed).sort()).toEqual(["0", "1"]);
+    expect(await store.getBalance()).toBe(2000);
+  });
+
+  it("never sweeps more than her savings, even after a withdrawal", async () => {
+    const { store, sheet } = await setup();
+    let current = await completeSlot(store, sheet, 0, "2026-11-20", null);
+    current = await completeSlot(store, current, 1, "2026-11-20", null);
+    await store.addEntry({ kind: "withdrawal", amountCents: 1500, category: "withdrawal", note: null, occurredOn: "2026-11-20" });
+    current = await sweepChallenge(store, current, "2026-11-21");
+    expect(await store.getInvested()).toBe(500);
     expect(await store.getBalance()).toBe(0);
+    expect(current.sweptCents).toBe(500);
   });
 
   it("won't un-tick a slot whose money was already swept to investing", async () => {

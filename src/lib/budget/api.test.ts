@@ -21,8 +21,8 @@ vi.mock("@/integrations/supabase/client", () => {
   return {
     supabase: {
       from: (table: string) => builder(table),
-      rpc: async (name: string) => {
-        calls.push({ table: name, op: "rpc", args: [] });
+      rpc: async (name: string, params?: unknown) => {
+        calls.push({ table: name, op: "rpc", args: params === undefined ? [] : [params] });
         return result;
       },
       auth: { getUser: async () => ({ data: { user }, error: null }) },
@@ -30,7 +30,7 @@ vi.mock("@/integrations/supabase/client", () => {
   };
 });
 
-import { BudgetError, addEntry, createChallenge, getBalance, getInvested, getPlan, listChallenges, listMilestones, recordMilestones, savePlan, updateChallenge } from "./api";
+import { BudgetError, addEntry, createChallenge, fillSlot, sweepSheet, unfillSlot, getBalance, getInvested, getPlan, listChallenges, listMilestones, recordMilestones, savePlan, updateChallenge } from "./api";
 import type { Plan } from "./types";
 
 const plan: Plan = {
@@ -155,5 +155,31 @@ describe("savings plan sheets and investing", () => {
     expect(calls.find((c) => c.op === "insert")!.args[0]).toEqual({ user_id: "user-1", template: "custom", title: "Holiday", slots: [500] });
     await updateChallenge("c2", { sweptCents: 500, completed: { "0": "e9" } });
     expect(calls.find((c) => c.op === "update")!.args[0]).toEqual({ swept_cents: 500, completed: { "0": "e9" } });
+  });
+});
+
+describe("sheet steps run in the database", () => {
+  it("fills, un-fills and sweeps through one database call each", async () => {
+    await fillSlot("c1", 4, "2026-11-20");
+    expect(calls.at(-1)).toMatchObject({ table: "budget_fill_slot", op: "rpc", args: [{ sheet_id: "c1", slot_index: 4, day: "2026-11-20" }] });
+    await unfillSlot("c1", 4);
+    expect(calls.at(-1)).toMatchObject({ table: "budget_unfill_slot", op: "rpc", args: [{ sheet_id: "c1", slot_index: 4 }] });
+    result = { data: 700, error: null };
+    await expect(sweepSheet("c1", "2026-11-21")).resolves.toBe(700);
+    expect(calls.at(-1)).toMatchObject({ table: "budget_sweep", op: "rpc", args: [{ sheet_id: "c1", day: "2026-11-21" }] });
+  });
+
+  it("passes 'already swept' through so the sheet can explain it", async () => {
+    result = { data: null, error: { message: "already swept" } };
+    await expect(unfillSlot("c1", 0)).rejects.toThrow("already swept");
+  });
+});
+
+describe("reserved category names", () => {
+  it("refuses names Bloom uses itself", async () => {
+    for (const name of ["challenge", "None", "investing", "groceries", "Kids & family"]) {
+      await expect(savePlan({ ...plan, categories: [name] }), name).rejects.toBeInstanceOf(BudgetError);
+    }
+    await expect(savePlan({ ...plan, categories: ["Pets"] })).resolves.toBeUndefined();
   });
 });

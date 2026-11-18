@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { X } from "lucide-react";
-import { CATEGORIES, CATEGORY_LABEL, type Plan } from "@/lib/budget/types";
+import { CATEGORIES, CATEGORY_LABEL, isReservedCategory, type Plan } from "@/lib/budget/types";
 
 /** Her spending categories: the built-in ones, plus up to 20 of her own. */
 export function CategoriesCard({ plan, onSave }: { plan: Plan; onSave: (plan: Plan) => Promise<void> }) {
@@ -10,7 +10,8 @@ export function CategoriesCard({ plan, onSave }: { plan: Plan; onSave: (plan: Pl
   const [problem, setProblem] = useState<string | null>(null);
   const taken = new Set([...CATEGORIES.map((c) => CATEGORY_LABEL[c].toLowerCase()), ...own.map((c) => c.toLowerCase())]);
   const name = draft.trim();
-  const canAdd = name.length > 0 && name.length <= 40 && !taken.has(name.toLowerCase()) && own.length < 20;
+  const clash = name.length > 0 && (taken.has(name.toLowerCase()) || isReservedCategory(name));
+  const canAdd = name.length > 0 && name.length <= 40 && !clash && own.length < 20;
 
   const save = async (categories: string[]) => {
     setBusy(true);
@@ -71,7 +72,7 @@ export function CategoriesCard({ plan, onSave }: { plan: Plan; onSave: (plan: Pl
           Add
         </button>
       </form>
-      {name && taken.has(name.toLowerCase()) && <p className="mt-2 text-sm text-muted-foreground">You already have that category.</p>}
+      {clash && <p className="mt-2 text-sm text-muted-foreground">That name is already used. Please choose another.</p>}
       {problem && (
         <p className="mt-2 text-sm text-[var(--bloom-alert)]" role="alert">
           {problem}

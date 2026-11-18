@@ -14,6 +14,7 @@ import {
   todayIn,
   invested,
   safeToSpend,
+  withdrawalProblem,
 } from "./maths";
 import { NOTHING_TODAY, type Entry, type Plan } from "./types";
 
@@ -204,5 +205,16 @@ describe("income, sweeps and safe to spend", () => {
   it("never shows a negative safe to spend", () => {
     const bounds = { start: "2026-10-30", end: "2026-11-13" };
     expect(safeToSpend(allocate(plan()), [entry("expense", 999999, "2026-11-08")], bounds, "2026-11-08")).toBe(0);
+  });
+});
+
+describe("withdrawalProblem", () => {
+  it("allows moving out up to what she has saved", () => {
+    expect(withdrawalProblem(5000, 5000, "USD")).toBeNull();
+  });
+
+  it("explains kindly when she tries to move out more than she has", () => {
+    expect(withdrawalProblem(5001, 5000, "USD")).toBe("You have $50.00 in savings, so you can move out up to that.");
+    expect(withdrawalProblem(100, 0, "USD")).toBe("There's nothing in savings to move out yet.");
   });
 });
