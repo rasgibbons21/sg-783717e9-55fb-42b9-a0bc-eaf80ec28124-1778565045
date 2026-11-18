@@ -108,3 +108,11 @@ export function savingsDayPrompt(input: {
   const index = nextSlotIndex(sheet);
   return index === null ? null : { index, amountCents: sheet.slots[index] };
 }
+
+/** A friendly percentage: never "0%" once something is saved, and never "100%" until the sheet is full. */
+export function progressLabel(saved: number, total: number): string {
+  if (total <= 0 || saved <= 0) return "0%";
+  if (saved >= total) return "100%";
+  const pct = Math.floor((saved / total) * 100);
+  return pct < 1 ? "<1%" : `${pct}%`;
+}

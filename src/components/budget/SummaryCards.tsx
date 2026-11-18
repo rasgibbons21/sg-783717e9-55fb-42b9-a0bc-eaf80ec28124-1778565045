@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CountUp } from "@/components/ui/CountUp";
+import { progressLabel } from "@/lib/budget/challenges";
 import { formatMoney } from "@/lib/budget/money";
 
 const card = "bloom-rise block rounded-3xl bg-card p-5 shadow-[var(--bloom-shadow)]";
@@ -61,7 +62,7 @@ export function SummaryCards({
         <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Savings Challenge</p>
         {challenge ? (
           <>
-            <p className="mt-2 font-serif text-3xl leading-none text-foreground">{pct}%</p>
+            <p className="mt-2 font-serif text-3xl leading-none text-foreground">{progressLabel(challenge.saved, challenge.total)}</p>
             <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-secondary" aria-hidden="true">
               <div className="h-full rounded-full bg-[var(--bloom-sage)]" style={{ width: `${pct}%` }} />
             </div>

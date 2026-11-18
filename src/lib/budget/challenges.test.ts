@@ -4,6 +4,7 @@ import {
   customSlots,
   isSavingsDay,
   savingsDayPrompt,
+  progressLabel,
   nextSlotIndex,
   progress,
   savedCents,
@@ -136,5 +137,15 @@ describe("savingsDayPrompt", () => {
     expect(savingsDayPrompt({ plan, sheet: null, entries: [], today: "2026-11-20", dismissedFor: null })).toBeNull();
     const full = challenge({ slots: [100], completed: { "0": "e1" } });
     expect(savingsDayPrompt({ plan, sheet: full, entries: [], today: "2026-11-20", dismissedFor: null })).toBeNull();
+  });
+});
+
+describe("progressLabel", () => {
+  it("never shows 0% once she has saved something", () => {
+    expect(progressLabel(300, 137800)).toBe("<1%");
+    expect(progressLabel(0, 137800)).toBe("0%");
+    expect(progressLabel(68900, 137800)).toBe("50%");
+    expect(progressLabel(137700, 137800)).toBe("99%");
+    expect(progressLabel(137800, 137800)).toBe("100%");
   });
 });
