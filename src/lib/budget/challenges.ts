@@ -17,11 +17,13 @@ export interface Challenge {
   active: boolean;
 }
 
-export const TEMPLATES: { id: TemplateId; title: string; blurb: string }[] = [
-  { id: "week52", title: "52-Week Challenge", blurb: "Save $1 more each week, $1 to $52, for $1,378 in a year." },
-  { id: "sprint30", title: "30-Day Sprint", blurb: "Thirty daily blossoms of $10, for $300 of quick momentum." },
-  { id: "envelope100", title: "100-Envelope Grid", blurb: "One hundred numbered envelopes, $1 to $100, totalling $5,050." },
-  { id: "custom", title: "Custom Sheet", blurb: "Your own target, number of slots and amounts." },
+type Money = (cents: number) => string;
+
+export const TEMPLATES: { id: TemplateId; title: string; blurb: (money: Money) => string }[] = [
+  { id: "week52", title: "52-Week Challenge", blurb: (m) => `Save a little more each week, ${m(100)} to ${m(5200)}, for ${m(137800)} in a year.` },
+  { id: "sprint30", title: "30-Day Sprint", blurb: (m) => `Thirty daily blossoms of ${m(1000)}, for ${m(30000)} of quick momentum.` },
+  { id: "envelope100", title: "100-Envelope Grid", blurb: (m) => `One hundred numbered envelopes, ${m(100)} to ${m(10000)}, totalling ${m(505000)}.` },
+  { id: "custom", title: "Custom Sheet", blurb: () => "Your own target, number of slots and amounts." },
 ];
 
 const range = (count: number) => Array.from({ length: count }, (_, i) => i + 1);

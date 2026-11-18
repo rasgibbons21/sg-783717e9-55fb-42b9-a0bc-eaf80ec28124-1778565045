@@ -14,48 +14,51 @@
   :root {
     --radius: 0.75rem;
 
-    /* Bloom ivory palette: light surfaces, ink text, sage and blush accents, gold kept rare. */
+    /* She Blooms Wealth palette: cream and ivory surfaces, deep charcoal text, blush accents,
+       sage for savings and gains, muted terracotta for alerts, gold kept rare. */
     --bloom-ivory: #F6F1E8;
     --bloom-paper: #FBF8F2;
     --bloom-paper-raised: #FFFDF9;
-    --bloom-ink: #1A1814;
+    --bloom-ink: #2E2B28;
     --bloom-muted: #6F6860;
     --bloom-rule: rgba(26, 24, 20, 0.08);
     --bloom-sage: #7F9277;
     --bloom-sage-text: #56684F;
     --bloom-sage-soft: rgba(127, 146, 119, 0.14);
     --bloom-blush: #D9B8AE;
-    --bloom-blush-text: #9A5848;
+    --bloom-alert: #A0522D;
+    --bloom-alert-soft: rgba(160, 82, 45, 0.10);
+    --bloom-blush-text: var(--bloom-alert);
     --bloom-blush-soft: rgba(217, 184, 174, 0.22);
     --bloom-gold: #C4A574;
     --bloom-shadow: 0 1px 2px rgba(26, 24, 20, 0.04), 0 8px 24px -8px rgba(26, 24, 20, 0.10);
     --bloom-shadow-lift: 0 2px 4px rgba(26, 24, 20, 0.05), 0 18px 40px -12px rgba(26, 24, 20, 0.16);
 
     --background: 39 44% 94%;
-    --foreground: 40 13% 9%;
+    --foreground: 30 7% 17%;
 
     --card: 40 53% 97%;
-    --card-foreground: 40 13% 9%;
+    --card-foreground: 30 7% 17%;
 
     --popover: 40 100% 99%;
-    --popover-foreground: 40 13% 9%;
+    --popover-foreground: 30 7% 17%;
 
-    --primary: 40 13% 9%;
+    --primary: 30 7% 17%;
     --primary-foreground: 40 53% 97%;
 
     --secondary: 39 36% 90%;
-    --secondary-foreground: 40 13% 9%;
+    --secondary-foreground: 30 7% 17%;
 
     --muted: 39 36% 90%;
     --muted-foreground: 32 7% 41%;
 
     --accent: 14 36% 77% / 0.22;
-    --accent-foreground: 40 13% 9%;
+    --accent-foreground: 30 7% 17%;
 
     --rose: 14 36% 77%;
-    --rose-foreground: 40 13% 9%;
+    --rose-foreground: 30 7% 17%;
 
-    --destructive: 11 36% 44%;
+    --destructive: 19 56% 40%;
     --destructive-foreground: 40 53% 97%;
 
     --border: 40 13% 9% / 0.08;

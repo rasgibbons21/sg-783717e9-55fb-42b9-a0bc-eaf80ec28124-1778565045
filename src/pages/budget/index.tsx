@@ -14,10 +14,16 @@ import { NudgeCard, dismissPayday, readPaydayDismissed } from "@/components/budg
 import { PeriodCard } from "@/components/budget/PeriodCard";
 import { Projections } from "@/components/budget/Projections";
 import { SavingsCard } from "@/components/budget/SavingsCard";
+import { CategoriesCard } from "@/components/budget/CategoriesCard";
+import { RemindersCard } from "@/components/budget/RemindersCard";
+import { SavingsDayCard, dismissSavingsDay, readSavingsDayDismissed } from "@/components/budget/SavingsDayCard";
+import { SavingsPlanSheet } from "@/components/budget/SavingsPlanSheet";
+import { SummaryCards } from "@/components/budget/SummaryCards";
+import { savedCents, savingsDayPrompt, totalCents } from "@/lib/budget/challenges";
 import { useBudget } from "@/components/budget/useBudget";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { sampleAllocation, SAMPLE_PLAN } from "@/data/budget/sample";
-import { allocate, ladderCents, nextMilestone, periodBounds, periodSpending, streak, todayIn } from "@/lib/budget/maths";
+import { allocate, ladderCents, nextMilestone, periodBounds, periodSpending, safeToSpend, streak, todayIn } from "@/lib/budget/maths";
 import { formatMoney } from "@/lib/budget/money";
 import { pickNudge } from "@/lib/budget/nudges";
 import { NOTHING_TODAY, type Entry, type EntryKind } from "@/lib/budget/types";
@@ -72,10 +78,14 @@ function BudgetHome() {
   const [sheet, setSheet] = useState<{ open: boolean; kind: EntryKind; editing: Entry | null; defaultAmount?: number }>({ open: false, kind: "expense", editing: null });
   const [ideasOpen, setIdeasOpen] = useState(false);
   const [dismissedFor, setDismissedFor] = useState<string | null>(null);
+  const [savingsDayDismissed, setSavingsDayDismissed] = useState<string | null>(null);
   const [now, setNow] = useState(() => new Date());
   const preview = process.env.NODE_ENV === "development" && router.query.pro === "1" ? "?pro=1" : "";
 
-  useEffect(() => setDismissedFor(readPaydayDismissed()), []);
+  useEffect(() => {
+    setDismissedFor(readPaydayDismissed());
+    setSavingsDayDismissed(readSavingsDayDismissed());
+  }, []);
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 60_000);
     return () => clearInterval(timer);
@@ -93,10 +103,19 @@ function BudgetHome() {
     const next = nextMilestone(balance, reached, plan.goalCents);
     const ladder = ladderCents(plan.goalCents);
     const previous = next ? [...ladder].reverse().find((amount) => amount < next) ?? 0 : 0;
+    const split = allocate(plan);
+    const safe = safeToSpend(split, entries, bounds, today);
+    const daysLeft = Math.max(1, daysBetween(today, bounds.end));
+    const activeSheet = budget.challenges.find((c) => c.active) ?? null;
     return {
+      safe,
+      perDay: Math.floor(safe / daysLeft),
+      daysLeft,
+      activeSheet,
+      savingsPrompt: savingsDayPrompt({ plan, sheet: activeSheet, entries, today, dismissedFor: savingsDayDismissed }),
       today,
       bounds,
-      split: allocate(plan),
+      split,
       spent: periodSpending(entries, bounds, today),
       todayTotal: entries.filter((e) => e.kind === "expense" && e.occurredOn === today).reduce((sum, e) => sum + e.amountCents, 0),
       streakDays: streak(entries, today),
@@ -105,7 +124,7 @@ function BudgetHome() {
       previous,
       nudge: pickNudge({ plan, entries, unseenMilestones: milestones.filter((m) => !m.seen).map((m) => m.amountCents), now, paydayDismissedFor: dismissedFor }),
     };
-  }, [plan, entries, balance, milestones, now, dismissedFor]);
+  }, [plan, entries, balance, milestones, now, dismissedFor, savingsDayDismissed, budget.challenges]);
 
   if (budget.error && !plan) {
     return (
@@ -140,7 +159,29 @@ function BudgetHome() {
         <h1 className="text-4xl leading-tight text-foreground">Pay yourself first</h1>
       </header>
 
-      {budget.error && <p className="text-sm text-[var(--bloom-blush-text)]" role="alert">{budget.error}</p>}
+      {budget.error && <p className="text-sm text-[var(--bloom-alert)]" role="alert">{budget.error}</p>}
+
+      <SummaryCards
+        currency={plan.currency}
+        savings={balance}
+        invested={budget.invested}
+        safe={view.safe}
+        perDay={view.perDay}
+        challenge={view.activeSheet ? { title: view.activeSheet.title, saved: savedCents(view.activeSheet), total: totalCents(view.activeSheet) } : null}
+      />
+
+      {view.savingsPrompt && view.activeSheet && (
+        <SavingsDayCard
+          slotNumber={view.savingsPrompt.index + 1}
+          amountCents={view.savingsPrompt.amountCents}
+          currency={plan.currency}
+          onFill={() => budget.fillSlot(view.activeSheet!, view.savingsPrompt!.index).catch(() => undefined)}
+          onNotToday={() => {
+            dismissSavingsDay(view.today);
+            setSavingsDayDismissed(view.today);
+          }}
+        />
+      )}
 
       <SavingsCard
         balance={balance}
@@ -169,10 +210,20 @@ function BudgetHome() {
         />
       )}
 
+      <SavingsPlanSheet
+        sheets={budget.challenges}
+        currency={plan.currency}
+        onCreate={budget.createSheet}
+        onFill={budget.fillSlot}
+        onUnfill={budget.unfillSlot}
+        onSweep={budget.sweep}
+        onArchive={budget.archiveSheet}
+      />
+
       <PeriodCard
         split={view.split}
-        spent={view.spent}
-        daysLeft={daysBetween(view.today, view.bounds.end)}
+        safe={view.safe}
+        perDay={view.perDay}
         currency={plan.currency}
         onEdit={() => router.push(`/budget/setup${preview}`)}
       />
@@ -188,6 +239,13 @@ function BudgetHome() {
         >
           <Plus className="h-5 w-5" /> Add spending
         </motion.button>
+        <button
+          type="button"
+          onClick={() => openSheet("income")}
+          className="mt-2 flex min-h-[44px] w-full items-center justify-center rounded-full border border-border text-sm font-medium text-foreground"
+        >
+          Add income
+        </button>
       </section>
 
       <EntryList entries={entries} currency={plan.currency} onEdit={(entry) => openSheet(entry.kind, entry)} onDelete={(entry) => budget.remove(entry.id).catch(() => undefined)} />
@@ -202,6 +260,10 @@ function BudgetHome() {
 
       <Milestones reached={view.reached} balance={balance} goalCents={plan.goalCents} currency={plan.currency} onOpenIdeas={openIdeas} />
 
+      <RemindersCard plan={plan} onSave={budget.savePlan} />
+
+      <CategoriesCard plan={plan} onSave={budget.savePlan} />
+
       <AddSpendingSheet
         open={sheet.open}
         onOpenChange={(open) => setSheet((s) => ({ ...s, open }))}
@@ -211,6 +273,7 @@ function BudgetHome() {
         defaultAmount={sheet.defaultAmount}
         onSubmit={(entry) => (sheet.editing ? budget.update(sheet.editing.id, entry) : budget.add(entry))}
         onDelete={budget.remove}
+        customCategories={plan.categories ?? []}
       />
       <IdeasPanel open={ideasOpen} onOpenChange={setIdeasOpen} />
 

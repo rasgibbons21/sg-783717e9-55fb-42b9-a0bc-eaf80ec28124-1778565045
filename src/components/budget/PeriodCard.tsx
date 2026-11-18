@@ -4,20 +4,20 @@ import { formatMoney } from "@/lib/budget/money";
 /** This pay period at a glance: savings first, then bills, then what's left to spend and per day. */
 export function PeriodCard({
   split,
-  spent,
-  daysLeft,
+  safe,
+  perDay,
   currency,
   onEdit,
 }: {
   split: Allocation;
-  spent: number;
-  daysLeft: number;
+  /** Safe to spend this period, including extra income and less spending so far. */
+  safe: number;
+  perDay: number;
   currency: string;
   onEdit: () => void;
 }) {
   const money = (cents: number) => formatMoney(cents, currency);
-  const left = Math.max(0, split.spend - spent);
-  const perDay = Math.floor(left / Math.max(daysLeft, 1));
+  const left = safe;
   const total = Math.max(split.pay, 1);
   const parts = [
     { label: "Savings", value: split.save, colour: "var(--bloom-sage)" },
@@ -50,7 +50,7 @@ export function PeriodCard({
         ))}
       </dl>
       <p className="mt-5 text-base text-foreground">
-        Left to spend: <span className="font-semibold">{money(left)}</span>
+        Safe to spend: <span className="font-semibold">{money(left)}</span>
         {left > 0 && <span className="text-muted-foreground">, about {money(perDay)} a day until payday</span>}
       </p>
       {split.overspent && <p className="mt-2 text-sm text-muted-foreground">Your plan asks for more than your pay. Edit your plan and Pansy will help you rebalance.</p>}

@@ -65,6 +65,8 @@ export function SignedInHome() {
         </div>
       </div>
 
+      <HomeBudgetCard />
+
       {!loading &&
         (nextUp ? (
           <motion.div whileTap={{ scale: 0.98 }}>
@@ -83,8 +85,6 @@ export function SignedInHome() {
             <p className="mt-1 text-base text-muted-foreground">That&apos;s a real achievement. Keep sharpening your process in Practice.</p>
           </div>
         ))}
-
-      <HomeBudgetCard />
 
       <div className="grid gap-4 md:grid-cols-2">
         <Link href="/practice" className="block rounded-3xl bg-card p-5 shadow-[var(--bloom-shadow)] transition-transform active:scale-[0.98]">
